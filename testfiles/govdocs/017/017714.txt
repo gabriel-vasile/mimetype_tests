@@ -1,0 +1,42 @@
+-- updated 040423 DDH
+
+-- Affected_by: trait->geneclasstraitaffected->geneclass
+-- QTL: trait->qtl
+-- Evaluation: trait->traitstudy
+-- Pathology: trait->pathology
+
+create table trait (
+	id integer auto_increment primary key,
+	name varchar(255)
+) ENGINE=InnoDB;
+create index name_index on trait (name);
+
+create table traitseealso (
+	id integer auto_increment primary key,
+	traitid integer,
+	-- See_also
+	seealso_traitid integer
+) ENGINE=InnoDB;
+create index traitid_index on traitseealso (traitid);
+create index seealso_traitid_index on traitseealso (seealso_traitid);
+
+create table traitremark (
+	id integer auto_increment primary key,
+	traitid integer,
+	-- Description
+	type varchar(50),
+	remark text
+) ENGINE=InnoDB;
+create index traitid_index on traitremark (traitid);
+
+create table traitontology (
+        id integer auto_increment primary key,
+	traitid integer,
+	dbname varchar(100),
+	-- Ontology[0]
+	accession varchar(100),
+	url varchar(100),
+	-- Ontology[1]
+	remark varchar(255)
+) ENGINE=InnoDB;
+create index traitid_index on traitontology (traitid);

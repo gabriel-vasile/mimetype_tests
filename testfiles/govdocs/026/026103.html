@@ -1,0 +1,659 @@
+<html>
+
+<head>
+<title>Disciplinary Actions</title>
+<style TYPE="text/css">
+<!--
+.menu { position:absolute; 
+		visibility:hidden; 
+		background-color: white; 
+		color: black;
+		width: 100px;
+		height: auto;
+		border-style: solid; 
+		border-color: blue; 
+		border-width: 2px; 
+		padding: 2px;
+		font-size : 11px;
+		font-family: "arial", "helvetica";
+		font-weight: bold;
+		line-height: 12px;}
+
+.menu A:hover {color: red;}
+.menu A {text-decoration: none; color: blue;}
+-->		 
+</style>
+
+<script language="javascript">
+
+//do browser detect stuff
+var isNS = (navigator.appName == "Netscape");
+var isMacIE = ( (navigator.userAgent.indexOf("IE 4")  > -1) && (navigator.userAgent.indexOf("Mac")  > -1) );
+var layerRef = (isNS) ? "document" : "document.all";
+var styleRef = (isNS) ? "" : ".style";
+var isDynamic = ( (document.layers || document.all) && !isMacIE );
+
+var activeMenu = 0;
+
+function activateMenu(menuLayerRef, offset) {
+	
+	if (isDynamic && activeMenu != menuLayerRef) {
+
+		if (activeMenu) hideMenu("menu" + activeMenu);
+			
+		menuID = "menu" + menuLayerRef;
+		activeMenu = menuLayerRef;
+	
+		if (isNS) {
+			document[menuID].top = 105;
+			document[menuID].left = offset;
+		} else {
+			document.all[menuID].style.pixelTop = 110;
+			document.all[menuID].style.pixelLeft = offset;
+		}
+
+		showMenu(menuID)
+	}
+}
+
+function showMenu(layerID) {
+	eval(layerRef + '["' + layerID + '"]' + styleRef + '.visibility = "visible"');
+}
+
+function hideMenu(layerID) {
+	eval(layerRef + '["' + layerID + '"]' + styleRef + '.visibility = "hidden"');
+}
+
+function killMenu(e) {
+	//check if theres a menu active
+	if (activeMenu) {
+		menuID = "menu" + activeMenu;
+		hideMenu(menuID);
+		activeMenu = 0;
+	}  
+
+}
+
+function init() {
+	if (isDynamic) {
+		if (isNS) {document.captureEvents(Event.MOUSEUP);} 
+		document.onmouseup = killMenu;
+	}
+}
+
+function MonthArray( ) {
+       var args = MonthArray.arguments;
+       for (var i = 0; i < args.length; i++) {
+            this[i] = args[i];
+       }
+       this.length = args.length
+       }
+
+function DispDate() {
+       var CurDate = new Date();  
+       var month_names = new MonthArray("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") ;
+       ls =CurDate.getDate()+"/" + month_names[CurDate.getMonth()+1]  +"/"+CurDate.getFullYear();
+       ls = "<FONT face='arial' color=white SIZE='1' ALIGN='top' ><B> "+  month_names[CurDate.getMonth()] + " " +  CurDate.getDate() + ", " +CurDate.getFullYear() + "</FONT></B>";
+       document.write(ls);
+}
+
+</script>
+
+
+</head>
+
+<body bgColor="#ffffff" leftMargin="0" text="#000080" topMargin="0" marginheight="0" marginwidth="0" onload="init();">
+
+<script language="javascript1.2" src="clickscript.asp"></script>
+
+<TABLE cellSpacing=0 cellPadding=0 width="110%" background=images/spacer.gif 
+border=0 color="white">
+  
+  <TR>
+    <TD noWrap align=left><IMG height=85 alt="dcpbanner.gif (6423 bytes)" 
+      src="images/MIS-Logo1.gif" 
+      width=480><strong><script>DispDate();</script></strong>&nbsp;&nbsp;&nbsp;<A 
+      href="http://www.hhs.gov"><IMG height=73 
+      alt="Go to Department of Health and Human Services Site" 
+      src="images/hhs.jpg" width=83 border=0></A>
+      
+       </TD>
+  </TR>
+        <TR>
+			<td>
+				<table background="images/spacer1.gif" border="0" height="21" cellPadding="0" cellSpacing="0" width="110%">
+					<tr>
+						<td align="bottom"><A href="default.asp"><IMG height=21 alt="Return to Home Page" src="images/home1.gif" width=54 border=0></a> </td>
+						<td ><A onmouseover=activateMenu(1,38) href="AboutUs.asp"><IMG height=21 alt="About Us" src="images/aboutus.gif" width=60 border=0></a> </td>
+						<td ><A onmouseover=activateMenu(3,95) href="faqs.asp"><IMG height=21 alt="Frequently Asked Questions" src="images/faqs.gif" width=39 border=0></a> </td>
+						<td ><A onmouseover=activateMenu(4,141) href="SecureArea.asp"><IMG height=21 alt="Secure Area" src="images/SecureArea.gif" width=75 border=0></a> </td>
+						<td ><A onmouseover=activateMenu(5,196) href="Jobs.asp"><IMG height=21 alt=Jobs src="images/jobs.gif" width=38 border=0></a> </td>
+						<td ><A onmouseover=activateMenu(6,244) href="Services.asp"><IMG height=21 alt=Services src="images/services.gif" width=58 border=0></a> </td>
+						<td ><A onmouseover=activateMenu(7,296) href="Policies.asp"><IMG height=21 alt=Policies src="images/policies.gif" width=51 border=0></a> </td>
+						<td ><A onmouseover=activateMenu(8,371) href="Payroll.asp"><IMG height=21 alt=Payroll Issues src="images/payroll.gif" width=86 border=0></a> </td>
+						<td ><A onmouseover=activateMenu(9,441) href="Publications.asp"><IMG height=21 alt=Publications src="images/publications.gif" width=75 border=0></a> </td>
+						<td ><A onmouseover=activateMenu(10,516) href="Training.asp"><IMG height=21 alt=Training src="images/training.gif" width=52 border=0></a> </td>
+						<td ><A onmouseover=activateMenu(11,556) href="Links.asp"><IMG height=21 alt=Links src="images/links.gif" width=42 border=0> </a> </td>
+
+						<td WIDTH="110%" HEIGHT="21"></td>
+					</TR>
+				</TABLE>	
+			</TD>
+		</TR>
+	</TABLE>
+
+
+
+  <br>
+
+<h2 align="center"><a name="top">DISCIPLINARY ACTIONS</a></h2>
+
+<ul>
+<li><font size="4"><A href="disciplinaryactions.asp#intro">Introduction</a></font>
+<li><font size="4"><A href="disciplinaryactions.asp#policy">Policy</a></font>
+<li><font size="4"><A href="disciplinaryactions.asp#prob">Probation</a></font>
+<li><font size="4"><A href="disciplinaryactions.asp#summ">Summary Actions</a></font>
+<li><font size="4"><A href="disciplinaryactions.asp#board">Board Review of the Records</a></font>
+<li><font size="4"><A href="disciplinaryactions.asp#hear">Hearings</a></font>
+<li><font size="4"><A href="disciplinaryactions.asp#ques">Questions</a></font>
+<li><font size="4"><A href="disciplinaryactions.asp#liais">Agency Liaisons</a></font>
+<li><font size="4"><A href="disciplinaryactions.asp#sgpac">Surgeon General Policy Advisory Committee</a></font></li></ul>
+
+<h3 align="center">&nbsp;</h3>
+
+<h3 align="center"><a name="intro">INTRODUCTION</a></h3>
+
+<div><font size="3"><p>The following is an overview of the causes for and types of disciplinary action. It is
+a synopsis of several Regulations and INSTRUCTIONS. It is not intended to reproduce the
+Commissioned Corps Personnel Manual (CCPM). The official policy/regulation is in the
+CCPM.&nbsp; (Please note: INSTRUCTIONS and Regulations are in a&nbsp;PDF file
+format, which requires Acrobat Reader.&nbsp; If you do not have a copy of Adobe
+Acrobat Reader, you may <a href="http://www.adobe.com/products/acrobat/readstep.html">download</a>
+a free copy from the Adobe web site.)</p>
+
+
+<i><A href="disciplinaryactions.asp#top"><br>
+<b>
+Return to top</b></a></i></font></div>
+
+<h3 align="center"><a name="policy">POLICY</a> </h3>
+
+<div><font size="3"><p>The Public Health Service (PHS) Commissioned Corps is a career Uniformed Service for
+health professionals. Officers are expected to be familiar with and to adhere to the
+strict rules, policies, and procedures that promote the order and discipline required of a
+uniformed service. (See<strong>  <a href="http://dcp.psc.gov/PDF_docs/CCPM_P62.pdf"> Commissioned Officers' Handbook
+1998, CCPM Pamphlet 62</a></strong>) Important
+responsibilities of commissioned corps officers include the following: 
+
+<ul>
+  <li>An officer must exhibit professional and personal 
+  integrity and behavior which reflects credit upon the officer and the Corps, 
+  both on and off the job. 
+  <li>An officer must adhere to official orders and, in 
+  some cases, must not act without official orders. 
+  <li>An officer is subject to report to duty 24 hours a day, 7 days a week, and must be in an
+    official duty status at all times.</li>
+</ul>
+
+<p>
+Each year, the Director, Division of Commissioned Personnel, sends a memorandum to every
+active-duty commissioned officer with a summary of important issues addressed in the <u>Standards
+of Conduct</u>, <a href="PDF_docs\Standards_May2004.pdf"><b>INSTRUCTION 1, Subchapter CC26.1,
+"Standards of Conduct," of the CCPM</b></a>. The memorandum also contains the names
+and telephone numbers of the ethics officers in each of the Operating Divisions and
+programs to which Commissioned Officers are assigned. The purpose of the memorandum is to
+assure that officers fully understand their ethical responsibilities. It is the individual
+officer's responsibility to know and abide by these standards. <br>
+<br>
+An active-duty PHS officer who engages in misconduct or whose performance is marginal or
+substandard may be disciplined by his/her Operating Division (OpDiv) Head or designee; the
+Director, DCP; or the Surgeon General. Conduct that may be criminal in nature will be
+referred to the Office of the Inspector General for review and possible referral to the
+Department of Justice for prosecution.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;<br>
+Misconduct that may warrant disciplinary action is described in Section D,<b>  <a href="http://dcp.psc.gov/PDF_docs/4641.pdf">INSTRUCTION 1, Subchapter CC46.4, "Disciplinary Action,"
+of the CCPM</a></b>.
+Misconduct also includes violations of the standards of conduct. Because officers are
+subject to report to duty 24 hours a day, 7 days a week, conduct that occurs outside
+scheduled duty hours or outside the work station may be the cause for discipline.<br>
+<br>
+Marginal or substandard performance includes:
+</p>
+
+<ul>
+  <li>Commissioned Officer's Effectiveness Reports (COER) 
+  with ratings usually at or below a "B," 
+  <li>a single incident reflecting negligence in 
+  performance of duties or professional acts that are inconsistent with accepted 
+  practice, 
+  <li>Series of incidents or a pattern of performance below that expected of an officer of the
+    same rank and position.</li>
+</ul>
+<b><i><A href="disciplinaryactions.asp#top"><br>
+Return to top</a></i></b></font></div>
+
+<h3 align="center"><a name="prob">PROBATION</a></h3>
+
+<div><font size="3"><p>All officers serve a 3-year probationary period upon <u>each</u> call to active duty.
+Additionally, Regular Corps officers serve a 3-year probationary period following
+appointment in the Regular Corps. During this period, supervisors carefully monitor
+officers' performance, conduct, dedication to duty, professionalism, flexibility, and
+willingness to accept new assignments.</p>
+
+<p>To assure an understanding of what is expected of them, all officers should take the
+time necessary to familiarize themselves with the contents of the Commissioned Officers'
+Handbook and related publications. Officers should also attend the Basic Officers Training
+Course and any other training that will enhance their transition to active duty PHS life
+and their career progression. Officers should also review their billet descriptions to be
+sure they understand the scope of their duties., </p>
+
+<p>Managers, administrators and fellow officers have a vested interest in seeing a newly
+appointed officer succeed. (See<a href="http://dcp.psc.gov/PDF_docs/pamphlet58.pdf"> <b>A Supervisor's Guide to the Commissioned
+Corps Personnel System 1999, CCPM Pamphlet 58</b>.</a>) To that end managers should make expectations clear to
+the officer. When it becomes evident that an officer is not performing as expected,
+managers should take the necessary remedial steps necessary to correct deficiencies in
+conduct or performance. Remedial steps may include informal or formal counseling,
+placement on a performance evaluation plan or temporary placement in an evaluative
+assignment. However, a manager may determine that disciplinary action is required due to
+the nature and/or severity of the misconduct or performance problem. A manager may issue a
+Letter of Reproval, Letter of Reprimand or may recommend termination under probation.<br>
+<br>
+A Reserve officer who fails to maintain the standard of performance or conduct expected
+of an officer of that grade and category, may be separated from active duty at any time
+during the probationary period.&nbsp;&nbsp; <a href="http://dcp.psc.gov/PDF_docs/2371B.pdf"><strong>INSTRUCTION
+1, Subchapter CC23.7, "Involuntary Separation During the Probationary Period Served
+by Officers on Active Duty in the Reserve Corps," of the CCPM</strong></a>. A
+Regular Corps officer who fails to maintain the standard of performance or conduct of an
+officer of that grade and category may be separated with six months severance pay
+following a 3-year file review board.&nbsp; <strong><a href="http://dcp.psc.gov/PDF_docs/4371.pdf">INSTRUCTION
+1, Subchapter CC43.7,&nbsp; "Separation of Officers in the Regular and
+Reserve Corps Without Consent of the Officers Involved", of the CCPM.</a></strong>
+</p>
+
+<p>Officers who successfully complete a probationary period are expected to continue to
+perform their duties in an exemplary manner. Further, officers are expected to grow
+professionally by seeking and accepting assignments of increasing responsibility. To that
+end, officers should seek guidance and counseling from their liaison, Professional
+Advisory Committee Representative, Chief Professional Officer, or Surgeon General Policy
+Coordination Committee Representative.</p>
+
+<p>Officers who, subsequent to completion of the probationary period, perform their duties
+at a level less than that expected of an officer of that rank and category, risk
+disciplinary action, including separation. Management assesses multiple variables in
+determining which disciplinary actions to recommend or implement. Variables include, but
+are not limited to: 
+
+<ul>
+  <li>Status of officer: Regular Corps or Reserve 
+  <li>Length of Service 
+  <li>Prior disciplinary actions 
+  <li>Severity of the offense/performance deficit 
+  <li>Alternatives to discipline such as performance improvement plans and/or reassignment</li>
+</ul>
+
+<p>Further, management may place an officer in a nonduty with pay status (NDWP) pending
+the outcome of an investigation or determination of a course of action. Placement in an
+NDWP status is not in itself considered a disciplinary action. Disciplinary actions range
+from a letter of reproval to a discharge under less than honorable conditions.</p>
+
+<p><strong><a href="http://dcp.psc.gov/PDF_docs/2374.pdf">INSTRUCTION 4, Subchapter CC23.7,
+"Involuntary Separation of Regular Corps Officers for Marginal and Substandard
+Performance," of the CCPM.</a></strong></p>
+
+<p><strong><a href="http://dcp.psc.gov/PDF_docs/2376.pdf">INSTRUCTION 6, Subchapter CC23.7,
+"Involuntary Termination of Reserve Corps Officers' Commissions for Marginal or
+Sub-Standard Performance," of the CCPM.</a></strong></p>
+
+<p><strong><a href="http://dcp.psc.gov/PDF_docs/4371.pdf">INSTRUCTION 1, Subchapter CC43.7,
+"Separation of Officers in the Regular and Reserve Corps Without Consent of the
+Officers Involved," of the CCPM.</a></strong></p>
+
+<b><i><A href="disciplinaryactions.asp#top"><br>
+Return to top</a></i></b></font></div>
+
+<div><font size="3"><p><br>
+There are three basic types of disciplinary actions: <strong><u>summary actions</u></strong>,
+<strong><u>board reviews of the record</u></strong> and <strong><u>hearings</u></strong>.</p>
+
+<p><u><strong><a name="summ">SUMMARY ACTIONS</a></strong></u> require no Board review of the record nor
+hearing. These include letters of reproval, letters of reprimand and summary dismissals.<br>
+
+<ol>
+  <li><u><strong>Letter of Reproval/Letter of Reprimand</strong></u><br>
+    Both of these actions are issued in writing to the 
+  officer. They can be issued by the OPDIV Head and those management officials 
+  designated by the OPDIV Head, the Director DCP, the Surgeon General, or the 
+  Assistant Secretary for Health. The primary difference between the two is that 
+  the letter of reprimand is placed in the officer's Official Personnel Folder 
+  (OPF) for a period not to exceed two years, while the letter of reproval is 
+  placed in an official file maintained at the officer's duty station. 
+  <p>As most personnel actions in the commissioned corps involve a board review, having a
+    letter of reprimand in the OPF can adversely affect an officer's career. An officer may
+    file a rebuttal which is placed in the OPF with the Letter of Reprimand. Management is not
+    required to respond to a rebuttal. The officer may also grieve the Letter of Reprimand.
+    Grievances and responses to grievances are not incorporated in the OPF.&nbsp;&nbsp;<a href="http://dcp.psc.gov/PDF_docs/2811.pdf">
+  <b>INSTRUCTION 1 ,
+    Subchapter CC28.1, "Official Personnel Folder" of the CCPM</b></a><b>,
+  and the December 11, 1998, Federal Register, Part III, Department of
+    Health and Human Services, Privacy Act of 1974.</b></p>
+  <li><u><strong>Summary Dismissal</strong></u><br>
+    An officer's commission may be terminated without a Board review or a hearing if he or
+    she: <br>
+    <ul>
+      <li>Has been AWOL for 30 or more consecutive days; 
+      <li>Has been convicted of a criminal offense and 
+    sentenced to more than 30 days in a State, Federal, or other correctional 
+    facility with or without suspension; or, 
+      <li>Is being separated during the probationary period.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>
+<strong><font color="#ff0000"><a href="http://dcp.psc.gov/PDF_docs/2915.pdf">INSTRUCTION 5, Subchapter CC29.1</a></font><a href="http://dcp.psc.gov/PDF_docs/2915.pdf">,
+"Absence Without Leave," of the CCPM</a></strong><a href="http://dcp.psc.gov/PDF_docs/2915.pdf">.</a><br>
+<strong>
+<font color="#ff0000"><a href="http://dcp.psc.gov/PDF_docs/2371B.pdf">INSTRUCTION 1, Subchapter CC23.7</a></font><a href="http://dcp.psc.gov/PDF_docs/2371B.pdf">,
+"Involuntary Separation During Probationary Period," of the CCPM</a></strong>.<br>
+</p>
+
+<b><i><A href="disciplinaryactions.asp#top"><br>
+Return to top</a></i></b></font></div>
+
+
+
+<div><font size="3"><p><br><u><strong><a name="board">BOARD REVIEW OF THE RECORDS</a></strong></u> occurs when disciplinary actions
+require the review of an officer's service record by a special board appointed by the
+Director, DCP, or the Surgeon General. Such boards include the Temporary Promotion Review
+Board, Involuntary Separation Board, and Involuntary Retirement Board. Officers are
+notified when they will be the subject of such boards and provided opportunity to submit
+documentation to their records for review by the Board.
+</p>
+
+<p><strong><a href="PDF_docs\TL666.PDF">INSTRUCTION 2, Subchapter CC23.4,
+"Temporary Grade Promotions," of the CCPM.</a><br>
+<a href="http://dcp.psc.gov/PDF_docs/2345.pdf">INSTRUCTION 5, Subchapter CC23.4,
+"Failure of Permanent Promotion," of the CCPM.</a><br>
+<a href="http://dcp.psc.gov/PDF_docs/2383.pdf">INSTRUCTION 3, Subchapter CC23.8,
+"Retirement of an Officer with 30 Years of Active Service," of the
+CCPM.</a><br>
+<a href="http://dcp.psc.gov/PDF_docs/2384.pdf">INSTRUCTION 4, Subchapter CC23.8,
+"Involuntary Retirement After 20 Years of Service," of the CCPM.</a><br>
+<a href="http://dcp.psc.gov/PDF_docs/4371.pdf">INSTRUCTION 1, Subchapter CC43.7,
+"Separation of Officers in the Regular and Reserve Corps Without Consent of the
+Officers Involved," of the CCPM.</a></p>
+
+<b><i><A href="disciplinaryactions.asp#top"><br>
+Return to top</a></i></b></font></div>
+<div><font size="3"><p><br>
+<a name="hear">HEARINGS</a>: </STRONG> The Surgeon General may order an officer
+to appear before a Board of Inquiry if the officer is charged with misconduct. The officer
+has a right to appear before the Board of Inquiry with or without legal representation.
+The officer may also call witnesses and cross examine the Agency's witnesses. The board,
+after considering all the evidence, may recommend actions including but not limited to:
+exoneration, reassignment, termination of the officer's commission, or reduction in
+temporary and/or permanent grades. If the officer's commission is terminated, his or her
+service may be characterized as "honorable," "under honorable
+conditions," or "under other than honorable conditions."</p>
+
+<p>A regular-corps officer whose performance deteriorates subsequent
+to satisfactory completion of a 3-year file review, may be referred to an Involuntary
+Separation Board. The regular-corps officer has a right to a hearing, which includes the
+right to appear before the Board, call witnesses and cross examine the Governments
+witnesses.</p>
+
+<strong>
+
+<p><strong><a href="http://dcp.psc.gov/PDF_docs/2374.pdf">INSTRUCTION 4, Subchapter CC23.7,
+"Involuntary Termination of Regular Corps for Marginal or Substandard
+Performance," of the CCPM.</a><br>
+<a href="http://dcp.psc.gov/PDF_docs/4641.pdf">INSTRUCTION 1, Subchapter CC46.4,
+"Disciplinary Action," of the CCPM.</a></strong>
+</p>
+
+<p><br>
+
+<b><i><A href="disciplinaryactions.asp#top">Return to top<br>
+</a></i></b>
+
+</p></font></div>
+
+<h3 align="center"><b><u><a name="ques">QUESTIONS</a></u></b></h3>
+
+<div><font size="3"><p>
+<strong><em>What is the difference between a letter of reproval and a letter of reprimand?
+</em></strong><br>
+<br></STRONG>
+The difference between the two is that the letter of reprimand is placed in the officer's
+OPF for a period not to exceed two (2) years, while the letter of reproval is placed in
+the station file. The real difference is in the effect. A Letter of Reproval is used
+primarily to document counseling. A Letter of Reprimand may have far reaching effects if
+the OPF is reviewed by a selecting official for reassignment, Boards including promotion,
+etc.<br>
+<strong>
+<br>
+<em><strong>What can I do if I receive a letter of reproval or letter of reprimand?</strong></em>
+<br>
+<br>
+</strong>
+You may prepare a rebuttal which states your point of view and request that it be attached
+to the letter of reprimand. Management is not required to respond to a rebuttal. The
+rebuttal is attached to the letter of reprimand so that those reviewing the record will
+see your response.
+
+<p>
+<strong>
+<br>
+</strong>
+You may also grieve the action in addition to the rebuttal. The procedure to file a
+grievance is found in<strong> <strong><a href="http://dcp.psc.gov/PDF_docs/2615.pdf">INSTRUCTION
+5, Subchapter CC26.1, "Grievances," of the CCPM</a></strong><a href="http://dcp.psc.gov/PDF_docs/2615.pdf">.</a> 
+</strong> The grievance is not filed in the OPF. The purpose of the grievance is
+to allow management an opportunity to respond to your request for remedial action.<strong><br>
+<br>
+<em><strong>Will DCP provide an attorney for me if I have to go to a Disciplinary Board? </strong></em><br>
+<br>
+</strong>
+No. Although you have the right to legal representation in preparing your submission to
+the Record in the case of a record review board and in appearing before the board in the
+case of a hearing, DCP lacks the statutory authority to provide legal counsel. You may
+obtain legal counsel, if you desire, at your own expense. Also, you may seek guidance from
+your Commissioned Corps Liaison, Chief Professional Officer, and/or the DCP Adverse Action
+Officer.<strong><br>
+<br>
+<em><strong>How do I know I am receiving due process? </strong></em><br>
+<br>
+</strong>
+Due process requires notice and the opportunity to be heard. In general, there is no prior
+notice of a Letter of Reproval/Reprimand. In summary actions you are given a 30-day notice
+of a disciplinary board or termination, except in the cases of Absent Without Leave. The
+officer will be given a copy of all documentation that will be submitted to the Board,
+which is not otherwise readily available on the DCP web site. The officer is provided the
+opportunity to respond to that documentation by a specific date, thus having had the
+opportunity to be heard. The officer's response will be reviewed by the Board.<strong><br>
+<br>
+<em><strong>What exactly are the different types of Boards?</strong></em><br>
+<br>
+</strong>
+There are several types of Boards. These include a Temporary Promotion Review Board, an
+Involuntary Termination Board, an Involuntary Retirement Board and a Board of Inquiry. The
+Board to which the officer will be sent, depends on the issues leading to the request and
+how long the officer has been in the service. Detailed descriptions of the various Boards
+can be found in the INSTRUCTIONS listed at this web site or at the DCP web site for the
+CCPM.<strong><br>
+<br>
+<em><strong>I'm being sent to an Involuntary Retirement Board. I want to be present at the
+Board to state my case. Is that possible? <br>
+<br>
+</strong></em></strong>No. This Board is a review of the records. As such, officers are not present
+for the Board's deliberations. However, you should be available by phone during the time
+the Board is deliberating, in the event the board members seek the clarification of your
+statement.<br>
+<strong>
+<br>
+<em><strong>Can I grieve a Board action?</strong></em> <br>
+<br>
+</strong>
+A Board action cannot be grieved. You may request reconsideration by the Surgeon General
+if you have newly discovered relevant material, information, or evidence, which was not
+available or discoverable prior to the Board which may have resulted in a different
+outcome. If you feel an error or injustice exists in your record, you may make application
+to the Board for Correction of the PHS Commissioned Corps Records.<strong><br>
+<br>
+<em><strong>What is Non-Duty With Pay? </strong></em><br>
+<br>
+</strong>
+Non-Duty With Pay is a status in which an officer is placed when allegations of misconduct
+or unsatisfactory performance are of such severity that the officer is relieved of duty as
+a precautionary measure pending full investigation of the allegations, or because of a
+pending involuntary separation, board of inquiry, or fitness for duty evaluation.<br>
+<strong>
+<br>
+<em><strong>What is the probationary period? </strong></em><br>
+<br>
+</strong>
+Newly commissioned officers enter on active duty in the reserve corps. During the first 3
+years of<strong> <b> each</b>  </strong> reserve corps appointment, all officers serve a probationary period. During
+this period, their performance, conduct, dedication to duty, professionalism, flexibility,
+and willingness to accept new assignments are monitored closely. In certain categories and
+grade levels there are diminishing needs for career officers and only a portion can be
+retained beyond the 3-year commitment.<strong><br>
+<br>
+</strong>
+Officers can be involuntarily separated from active duty at any time during the
+probationary period for reasons including, but not limited to:
+
+<ul>
+  <li>Abolishment of an officer's position due to budgetary 
+  restrictions, or unavailability of appropriate assignment; 
+  <li>Unsuitability, i.e., the officer demonstrates general 
+  character traits that make him or her unsuitable for continued service; 
+  <li>Failure to demonstrate the level of performance, 
+  conduct, dedication to duty or professional attitude and attributes expected 
+  of an officer in the uniformed services; 
+  <li>Refusal to accept reassignment; 
+  <li>Unsatisfactory conduct before call to active duty based on factual information obtained
+    subsequent to entry on duty, i.e., information that would have disqualified the officer
+    for appointment if it had been known in advance. Included here is failure to provide
+    complete and truthful information on any of the materials associated with an application
+    for appointment.</li>
+</ul>
+
+<p>Prior to the end of the probationary period, DCP, in conjunction with the officer's
+OPDIV, conducts a review of the officer's performance and conduct during the probationary
+period to determine whether an officer on probation should be retained. If DCP and the
+OPDIV determine that an officer on probation will be terminated, the officer will be
+provided with at least 30 days prior notice of the effective date of such action.</p>
+
+<strong>
+
+<p><em><strong>I have been assimilated into the Regular Corps. What is the 3-Year File
+Review? </strong></em><br>
+<br>
+</strong>
+At the end of an officer's first 3 years of service in the regular corps, the record of
+each officer originally appointed to the regular corps in the Senior Assistant grade or
+above will be reviewed by a board convened for that purpose. Based on a review of the
+officer's record, the board will recommend either that the commission of the officer be
+terminated or that the officer be retained.<strong><br>
+<br>
+<em><strong>What can I do if the relief I sought through the rebuttal and grievance
+procedures is not granted?</strong></em> <br>
+<br>
+</strong>
+You may file an application with the Board for Correction. However, you must have
+exhausted the grievance process. That is, you have received a final decision from the
+highest level of review. Administrative remedies include, but are not limited to
+grievances, EEO complaint procedures, and appeals to the Comptroller General. Guidance may
+be found in<strong> <a href="http://dcp.psc.gov/PDF_docs/4991.pdf"><b>INSTRUCTION 1, Subchapter CC49.9, "Board for
+Correction of PHS Commissioned Corps Records," of the CCPM.</b></a></p>
+
+<p><br><b><i><A href="disciplinaryactions.asp#top">Return to top</a></i></b>
+</p></font></div>
+
+<h3 align="center"><br>
+<a name="liais">AGENCY LIAISONS&nbsp;</a></h3>
+<div align="center"><center>
+<p>Click <A href="contacts.asp">here</a> for a current listing of Commissioned Corps Agency Liaisons.</p>
+</center></div>
+
+<p><br>
+<b><i><A href="disciplinaryactions.asp#top">Return to top</a></i></b>
+<br>
+</p>
+
+<h3 align="center"><a name="sgpac"><br>SURGEON GENERAL POLICY ADVISORY COMMITTEE</a></h3>
+<div align="center"><center>
+<p>Click <A href="contacts.asp">here</a> for a current listing of SG Policy Advisory Committee members.</p>
+</center></div>
+
+<p><br><font size="3"><i><A href="disciplinaryactions.asp#top">Return to top</a></i></font>
+</p>
+
+<p>&nbsp;</p></STRONG><span class="Hypertext" style="FONT-SIZE: 12pt; FONT-FAMILY: Times New Roman; mso-fareast-font-family: Times New Roman; mso-ansi-language: EN-US; mso-fareast-language: EN-US; mso-bidi-language: AR-SA; mso-spacerun: yes">
+<p>For Questions or Comments, please send e-mail to: <A href="mailto:cchapman@psc.gov">Adverse
+Action Officer</a>, DCP&nbsp;<br>
+ or Call: 301-594-0669</span> <TABLE align="center"  cellSpacing=0 cellPadding=0 width="640px" bgColor=#ffffff border=0 
+color="#000080">
+  
+  <TR>
+    <TD align=center style="font-size: 8pt; font-family: Arial; line-height:14px">
+      
+      <HR style="height:1px; color=black; clear:center">
+
+     <EM>
+       <strong>Commissioned Corps Management Information System </strong>| 5600 
+      Fishers Lane | Rockville, MD 20857</EM><br><BR style="line-height:8px">
+      Please send questions and comments about our Web site 
+      to:&nbsp; <A 
+      href="mailto:cchelpdesk@psc.gov">helpdesk</A><BR><BR style="line-height=8px"></TD></TR>
+  <TR>
+	<TD align=center style="font-size: 8pt; font-family: Arial; line-height:14px">
+         <a href="http://www.hhs.gov">HHS Home</A> | 
+      <A 
+      href="http://www.hhs.gov/Accessibility.html">Accessibility</A> 
+      | <A href="http://www.hhs.gov/Privacy.html">Privacy 
+      Notice</A> | <A 
+      href="http://www.hhs.gov/foia">Freedom of Information 
+      Act</A> | <A 
+      href="http://www.hhs.gov/Disclaimer.html">Disclaimers</A> 
+      | <A 
+      href="http://www.usa.gov/">USA.gov</A> | 
+      <A href="http://www.whitehouse.gov">The White 
+      House</A></TD></TR>
+  <TR>
+<!--	<TD align=center style="font-size: 8pt; font-family: Arial; line-height:14px">
+          |&nbsp;<A 
+      href="default.asp">Home</A>&nbsp;|  <A 
+      href="AboutUs.asp">About Us  </A>&nbsp;|  
+      <A href="WhatsNew.asp">What's New  
+      </A>&nbsp;|  <A 
+      href="faqs.asp">FAQs</A>&nbsp;| &nbsp; <A 
+      href="securearea.asp">Secure Area </A> 
+      |&nbsp;<A 
+      href="Jobs.asp">Jobs</A> 
+      &nbsp;|&nbsp; <A 
+      href="Services.asp">Services</A>&nbsp;| 
+      <A 
+      href="Policies.asp">Policies</A>&nbsp;|  
+      <BR> <A 
+      href="Publications.asp">Publications</A>&nbsp;| 
+      <A 
+      href="Training.asp">Training</A>&nbsp;|<BR>|  
+      <A href="Links.asp">Links</A>&nbsp;| 
+  
+      </TD>  -->
+      </TR>
+      <TR>
+		<TD align=center style="font-size: 8pt; font-family: Arial; line-height:14px">
+			<BR><P><A href="ESSGeneralRulesofBehavior-FNAL06.htm">Rules 
+					of Behavior for Use of PSC ESS Systems</TD></TR></TABLE>
+
+    <p>Last updated: September 
+13, 
+2001</p>
+
+
+</body>
+</html>

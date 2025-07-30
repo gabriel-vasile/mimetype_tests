@@ -1,0 +1,1304 @@
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+      INTEGER FUNCTION KB2INIgms                                                
+     +(CIN,COUT,IOPT)                                                           
+                                                                                
+                                                                                
+      IMPLICIT NONE          !  All variables must be declared                  
+                                                                                
+      CHARACTER*4 CIN        !  Input pixel type (RAW, BRIT)                    
+      CHARACTER*4 COUT       !  Output pixel type (TEMP, ALB, RAD, RAW, BRIT)   
+      INTEGER IOPT(*)        !  Input calibration parameters                    
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+      INCLUDE 'areaparm.inc'         !  Global declarations for McIDAS areas    
+                                     !     (defines NUMAREAOPTIONS)             
+                                                                                
+      COMMON/GMSXXgmskb2/                                                       
+     +JTYPE,ISOU,IDES,KOPT,JOPT                                                 
+      INTEGER JTYPE                  !  Flag identifying conversion code        
+      INTEGER ISOU                   !  Source pixel size in bytes              
+      INTEGER IDES                   !  Destination pixel size in bytes         
+      INTEGER KOPT                   !  Flag specifying how to construct ITAB   
+      INTEGER JOPT(NUMAREAOPTIONS)   !  Calibration parameters for conversion   
+                                                                                
+      COMMON/DEBUGgmskb2/                                                       
+     +IVAL,XTAB,ITAB,JTAB                                                       
+      INTEGER ITAB(1024)                                                        
+      INTEGER JTAB(1024)                                                        
+      INTEGER IVAL                                                              
+      REAL XTAB(1024)                                                           
+                                                                                
+                                                                                
+                                                                                
+      INTEGER LWFILE                 !  Tests for LW file presence              
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+      INTEGER IERROR                 !  Error flag for byte size, conversion    
+                                     !  type, and calibration file test         
+                                                                                
+                                                                                
+      CALL MOVW(NUMAREAOPTIONS,IOPT,JOPT)                                       
+      IERROR = 0                                                                
+      JTYPE = 0                                                                 
+      ISOU = IOPT(1)                                                            
+      IDES = IOPT(2)                                                            
+      IF(ISOU.NE.1.OR.(IDES.NE.1.AND.IDES.NE.2.AND.IDES.NE.4)) THEN             
+         IERROR = 1                                                             
+         CALL EDEST('KBX_INI: Invalid byte sizes specified.',0)                 
+         CALL EDEST('Source (must be 1)=',ISOU)                                 
+         CALL EDEST('Destination (must be 1,2, or 4)=',IDES)                    
+      END IF                                                                    
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+      IF((CIN.EQ.'BRIT'.OR.CIN.EQ.'RAW').AND.COUT.EQ.'TEMP') JTYPE=1            
+      IF((CIN.EQ.'BRIT'.OR.CIN.EQ.'RAW').AND.COUT.EQ.'ALB' ) JTYPE=2            
+      IF((CIN.EQ.'BRIT'.OR.CIN.EQ.'RAW').AND.COUT.EQ.'RAD' ) JTYPE=3            
+      IF((CIN.EQ.'BRIT'                ).AND.COUT.EQ.'MODB') JTYPE=4            
+      IF((CIN.EQ.'BRIT'.OR.CIN.EQ.'RAW').AND.COUT.EQ.'RAW' ) JTYPE=5            
+      IF((CIN.EQ.'BRIT'.OR.CIN.EQ.'RAW').AND.COUT.EQ.'BRIT') JTYPE=6            
+      IF((CIN.EQ.'RAW'                 ).AND.COUT.EQ.'MODB') JTYPE=7            
+      IF(JTYPE.EQ.0) THEN                                                       
+         CALL EDEST('KBX_CAL data conversion unrecognized:',0)                  
+         CALL EDEST('          Input  type-->'//CIN//'<--',0)                   
+         CALL EDEST('          Output type-->'//COUT//'<--',0)                  
+         IERROR =1                                                              
+      END IF                                                                    
+                                                                                
+      IF( LWFILE('GMSCAL') .EQ. 0) THEN                                         
+         CALL EDEST('KBX_INI error, LW file GMSCAL not found',0)                
+         IERROR = 1                                                             
+      ENDIF                                                                     
+      IF( LWFILE('GMSCALU') .EQ. 0) THEN                                        
+      ENDIF                                                                     
+      IF(IERROR.NE.0) GO TO 900                                                 
+                                                                                
+                                                                                
+                                                                                
+      KOPT=0     !  Initialize calibration table generation to try all methods  
+                                                                                
+      KB2INIgms                                                                 
+     +=0                                                                        
+      GO TO 999                                                                 
+                                                                                
+                                                                                
+  900 CONTINUE                                                                  
+      KB2INIgms                                                                 
+     +=-1                                                                       
+                                                                                
+                                                                                
+  999 CONTINUE                                                                  
+      RETURN                                                                    
+                                                                                
+      END                                                                       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+      INTEGER FUNCTION KB2CALgms                                                
+     +(CALB,IDIR,NVAL,IBAND,IBUF)                                               
+                                                                                
+                                                                                
+                                                                                
+      IMPLICIT NONE             !  All variables must be declared               
+                                                                                
+      INTEGER CALB(*)           !  Input array of calibration constants         
+                                !     from each line header for IBUF data       
+      INTEGER IDIR(*)           !  Area directory buffer (this is mandatory     
+                                !     for GMS, since the area calibration       
+                                !     block must be accessed locally)           
+      INTEGER NVAL              !  Number of pixels to process from input       
+      INTEGER IBAND             !  Band number (not needed for GMS-4)           
+                                                                                
+      INTEGER IBUF(*)           !  I/O array containing pixels to be modified   
+                                !     (will contain converted values at end)    
+                                                                                
+                                                                                
+                                                                                
+      INCLUDE 'areaparm.inc'         !  Global declarations for McIDAS areas    
+                                     !     (defines NUMAREAOPTIONS)             
+                                                                                
+      COMMON/GMSXXgmskb2/                                                       
+     +JTYPE,ISOU,IDES,KOPT,JOPT                                                 
+      INTEGER JTYPE                  !  Flag identifying conversion code        
+      INTEGER ISOU                   !  Source pixel size in bytes              
+      INTEGER IDES                   !  Destination pixel size in bytes         
+      INTEGER KOPT                   !  Flag specifying how to construct ITAB   
+      INTEGER JOPT(NUMAREAOPTIONS)   !  Calibration parameters for conversion   
+                                                                                
+      COMMON/BRKPNTgmskb2/                                                      
+     +CALTYP           !  Common block for BRKSET table type                    
+      CHARACTER*4 CALTYP             !  Calibration type for breakpoint table   
+                                                                                
+      COMMON/DEBUGgmskb2/                                                       
+     +IVAL,XTAB,ITABR,JTAB                                                      
+      INTEGER IVAL                   !  Identifies method used by RD_CAL        
+                                     !    to generate the ITAB/ITABR array      
+      INTEGER ITABR(1024)            !  stage 1 conversion table                
+                                     !    produced by RD_CAL function           
+                                     !    and returned as ITAB.  It is          
+                                     !    renamed ITABR here to avoid doubly    
+                                     !    defining the array.                   
+      REAL XTAB(1024)                !  Real physical quantity corresponding    
+                                     !    to the input DN value: either         
+                                     !    albedo, temperature, or radiance      
+                                     !    (this quantity is converted to a      
+                                     !    scaled integer appearing in JTAB)     
+      INTEGER JTAB(1024)             !  stage 2 conversion table                
+                                     !    produced by KBX_CAL here              
+                                     !    (generates conversion transfer        
+                                     !     function table from albedo or        
+                                     !     temperature to scaled integer        
+                                     !     output, using BRKVAL and MPIXTB)     
+      INTEGER JTABV(256,4)           !  JTAB array for visible channel where    
+                                     !     visible sensors are identified       
+                                     !     by IVISN=1,2,3,4.  For IR bands,     
+                                     !     the value of IVISN=1 always, since   
+                                     !     only 1/4 of the table is used        
+      EQUIVALENCE (JTAB,JTABV)                                                  
+                                                                                
+                                                                                
+                                                                                
+      INTEGER BRKVAL                 !  Provides values from breakpoint table   
+      REAL VPLANCgmskb2                                                         
+     +                    !  Planck function                                    
+      INTEGER RDCALgmskb2                                                       
+     +                  !  Sets up the ITAB lookup table                        
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+      INTEGER I                      !  index variable                          
+      INTEGER K                      !  index variable                          
+      INTEGER IBRIT                  !  Output of GRYSCAL TEMP-->BRIT conversion
+                                     !    (high BRIT on screen means low TEMP)  
+      INTEGER ICHAN                  !  visible or IR channel designator        
+                                     !     *** may have to increase to  0-3     
+                                     !         for GMS-5 ***                    
+      INTEGER IVISN                  !  Visible sensor designator 0-4           
+                                     !     (0 means unknown or undefined)       
+      REAL XALB                      !  true albedo 0.000-1.000                 
+                                     !    (returned ALB output is               
+                                     !     in %, i.e. albedo*100.)              
+      REAL XTEMP                     !  true absolute temperature (Kelvins)     
+      REAL XRAD                      !  Radiance (mW/m**2/ster/cm**-1)          
+      INTEGER IRTAB                  !  Identifies current channel as IR        
+      INTEGER ITAB(1024)             !  stage 1 conversion table                
+                                     !    produced by RD_CAL function           
+                                     !    (generates a calibrated transfer      
+                                     !     function table from the physical     
+                                     !     conversion formulas -- input         
+                                     !     index is a function of DN value      
+                                     !     and IVISN, output is either an       
+                                     !     albedo or is in degrees Kelvin)      
+      INTEGER ITABV(256,4)           !  ITAB array for visible channel where    
+                                     !     visible sensors are identified       
+                                     !     by IVISN=1,2,3,4                     
+      EQUIVALENCE (ITAB,ITABV)                                                  
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+      INTEGER IVFLG                  !  if set to 1 means visible data          
+      INTEGER LASTYP                 !  JTYPE for which tables are current      
+      INTEGER LASCHAN                !  ICHAN for which tables are current      
+      INTEGER LASBAND                !  IBAND for which tables are current      
+                                                                                
+      DATA IVFLG    /  0 /                                                      
+      DATA LASTYP   / -1 /                                                      
+      DATA LASCHAN  / -1 /                                                      
+      DATA LASBAND  / -1 /                                                      
+                                                                                
+                                                                                
+                                                                                
+      IF(IDIR(3).EQ.12) THEN                                                    
+         ICHAN=0                                                                
+         IRTAB=0                                                                
+      ELSE IF(IDIR(3).EQ.13) THEN                                               
+         ICHAN=1                                                                
+         IRTAB=1                                                                
+      ELSE IF(IDIR(3).EQ.82.AND.IBAND.EQ.1) THEN                                
+         ICHAN=0                                                                
+         IRTAB=0                                                                
+      ELSE IF(IDIR(3).EQ.82.AND.IBAND.EQ.2) THEN                                
+         ICHAN=1                                                                
+         IRTAB=1                                                                
+      ELSE IF(IDIR(3).EQ.82.AND.IBAND.EQ.8) THEN                                
+         ICHAN=1                                                                
+         IRTAB=1                                                                
+      ELSE IF(IDIR(3).EQ.83.AND.IBAND.EQ.1) THEN                                
+         ICHAN=0                                                                
+         IRTAB=0                                                                
+      ELSE IF(IDIR(3).EQ.83.AND.IBAND.EQ.2) THEN                                
+         ICHAN=1                                                                
+         IRTAB=1                                                                
+      ELSE IF(IDIR(3).EQ.83.AND.IBAND.EQ.3) THEN                                
+         ICHAN=1                                                                
+         IRTAB=1                                                                
+      ELSE IF(IDIR(3).EQ.83.AND.IBAND.EQ.4) THEN                                
+         ICHAN=1                                                                
+         IRTAB=1                                                                
+      ELSE IF(IDIR(3).EQ.83.AND.IBAND.EQ.8) THEN                                
+         ICHAN=1                                                                
+         IRTAB=1                                                                
+      ELSE                                                                      
+         CALL EDEST('KBX_CAL: Unrecognized data band or SS',0)                  
+         KB2CALgms                                                              
+     + = -1                                                                     
+      END IF                                                                    
+      IF(IBAND.EQ.1) THEN                                                       
+         IF(CALB(2).EQ.Z'6C6C0000') THEN                                        
+            IVISN=1                                                             
+         ELSE IF(CALB(2).EQ.Z'B4B40000') THEN                                   
+            IVISN=2                                                             
+         ELSE IF(CALB(2).EQ.Z'D8D80000') THEN                                   
+            IVISN=3                                                             
+         ELSE IF(CALB(2).EQ.Z'FCFC0000') THEN                                   
+            IVISN=4                                                             
+         ELSE                                                                   
+            IVISN=1                                                             
+         END IF                                                                 
+      ELSE                                                                      
+         IVISN=1                                                                
+      END IF                                                                    
+                                                                                
+                                                                                
+                                                                                
+      IF ( (CALTYP.EQ.'BRIT' .AND. JTYPE.EQ.4 .AND. LASTYP.NE.JTYPE)            
+     &.OR. (CALTYP.EQ.'RAW'  .AND. JTYPE.EQ.7 .AND. LASTYP.NE.JTYPE) )          
+     &THEN                                                                      
+         DO I=1,256                                                             
+            JTAB(I) = BRKVAL(REAL(I-1))                                         
+         END DO                                                                 
+         LASTYP = JTYPE                                                         
+         KB2CALgms                                                              
+     + = 0                                                                      
+                                                                                
+                                                                                
+      ELSE IF (JTYPE.EQ.5 .AND. LASTYP.NE.JTYPE) THEN                           
+         DO I=1,256                                                             
+            JTAB(I) = I-1                                                       
+         END DO                                                                 
+         LASTYP = JTYPE                                                         
+         KB2CALgms                                                              
+     + = 0                                                                      
+                                                                                
+                                                                                
+                                                                                
+      ELSE IF (LASTYP.NE.JTYPE .OR. LASCHAN.NE.ICHAN .OR.                       
+     &         LASBAND .NE. IBAND) THEN                                         
+                                                                                
+                                                                                
+         IF(ICHAN.EQ.0 .AND. (IVFLG.EQ.0 .OR. LASTYP.NE.JTYPE .OR.              
+     &      LASBAND .NE. IBAND) ) THEN                                          
+                                                                                
+                                                                                
+            LASCHAN = ICHAN                                                     
+            LASBAND = IBAND                                                     
+            IF(RDCALgmskb2                                                      
+     +(CALB,IDIR,IBAND,ITAB).NE.0) THEN                                         
+               CALL EDEST('KBX_CAL: RD_CAL call failed.',0)                     
+               KB2CALgms                                                        
+     + = -1                                                                     
+            END IF                                                              
+            IVFLG=1                                                             
+                                                                                
+            IF(JTYPE.EQ.2 .OR. JTYPE.EQ.4 .OR. JTYPE.EQ.7) THEN                 
+               DO I=1,1024                                                      
+                  XALB = REAL(ITAB(I)/1000.)                                    
+                  XTAB(I) = XALB                                                
+                  IF (CALTYP.EQ.'ALB'.AND.JTYPE.NE.2) THEN       ! MODB         
+                     JTAB(I) = BRKVAL((XALB+0.5)/10.)                           
+                  ELSE IF(JTYPE .EQ. 2) THEN                     ! ALB          
+                     JTAB(I) = INT(XALB+0.5)                                    
+                  END IF                                                        
+               END DO                                                           
+               LASTYP = JTYPE                                                   
+            ENDIF                                                               
+                                                                                
+            IF(JTYPE.EQ.6 .OR. JTYPE.EQ.7) THEN                                 
+               IF(CALTYP.EQ.'BRIT' .AND. JTYPE.NE.6) THEN     ! MODB            
+                  DO I=1,256                                                    
+                     K = BRKVAL(REAL(ITAB(I))/4000.)                            
+                     JTAB(I) = K                                                
+                     JTAB(I+256) = K                                            
+                     JTAB(I+512) = K                                            
+                     JTAB(I+768) = K                                            
+                  END DO                                                        
+               ELSE IF(JTYPE.EQ.6) THEN                       ! BRIT            
+                  DO I=1,1024                                                   
+                     JTAB(I) = ITAB(I)/4000.                                    
+                     JTAB(I) = 35. + (200./250.)*JTAB(I)                        
+                  END DO                                                        
+               END IF                                                           
+               IVISN=1                                                          
+               LASTYP = JTYPE                                                   
+            ENDIF                                                               
+                                                                                
+                                                                                
+         ELSE IF(ICHAN.EQ.1 .AND. LASTYP.NE.JTYPE .OR.                          
+     &           LASBAND .NE. IBAND) THEN                                       
+                                                                                
+                                                                                
+            LASCHAN = ICHAN                                                     
+            LASBAND = IBAND                                                     
+            IF(RDCALgmskb2                                                      
+     +(CALB,IDIR,IBAND,ITAB).NE.0) THEN                                         
+               CALL EDEST('KBX_CAL: RD_CAL call failed.',0)                     
+               KB2CALgms                                                        
+     + = -1                                                                     
+            END IF                                                              
+            IVFLG=1                                                             
+                                                                                
+            IF(JTYPE.EQ.1 .OR. JTYPE.EQ.4 .OR. JTYPE.EQ.7) THEN                 
+               DO I=1,256                                                       
+                  IF (CALTYP.EQ.'TEMP' .AND. JTYPE.NE.1) THEN    ! MODB         
+                     JTAB(I) = BRKVAL(ITAB(I)/1000.)                            
+                  ELSE IF (JTYPE.EQ.1) THEN                      ! TEMP         
+                     JTAB(I) = INT(ITAB(I)/100.+0.5)                            
+                  END IF                                                        
+                  XTEMP = FLOAT(ITAB(I))/1000.                                  
+                  XTAB(I) = XTEMP                                               
+               END DO                                                           
+               IVISN=1                                                          
+            END IF                                                              
+                                                                                
+            IF(JTYPE.EQ.3 .OR. JTYPE.EQ.4 .OR. JTYPE.EQ.7) THEN                 
+               DO I=1,256                                                       
+                  IF (CALTYP.EQ.'RAD ' .AND. JTYPE.NE.3) THEN    ! MODB         
+                     JTAB(I) = BRKVAL(VPLANCgmskb2                              
+     +(ITAB(I)/1000.,I,IDIR(3),                                                 
+     &                  IBAND)*10)                                              
+                  ELSE IF (JTYPE.EQ.3) THEN                      ! RAD          
+                     JTAB(I) = NINT(VPLANCgmskb2                                
+     +(ITAB(I)/1000.,I,IDIR(3),                                                 
+     &                  IBAND)*100.)                                            
+                  ENDIF                                                         
+                  XTEMP = FLOAT(ITAB(I))/1000.                                  
+                  XRAD = VPLANCgmskb2                                           
+     +(XTEMP,I,IDIR(3),IBAND)                                                   
+                  XTAB(I) = XRAD                                                
+               END DO                                                           
+               IVISN=1                                                          
+            ENDIF                                                               
+                                                                                
+                                                                                
+            IF(JTYPE .EQ. 6 .OR. JTYPE .EQ. 7) THEN                             
+               LASTYP = JTYPE                                                   
+               DO I=1,256                                                       
+                  XTEMP = FLOAT(ITAB(I))/1000.                                  
+                  CALL GRYSCL(XTEMP,IBRIT)                                      
+                  XTAB(I)=REAL(IBRIT)                                           
+                  IF(CALTYP.EQ.'BRIT' .AND. JTYPE.NE.6) THEN     ! MODB         
+                     JTAB(I) = BRKVAL(REAL(IBRIT))                              
+                  ELSE IF(JTYPE .EQ. 6) THEN                     ! BRIT         
+                     JTAB(I) = IBRIT                                            
+                  ENDIF                                                         
+               END DO                                                           
+               IVISN=1                                                          
+            END IF                                                              
+            LASTYP=JTYPE                                                        
+                                                                                
+         ENDIF                                                                  
+         KB2CALgms                                                              
+     + = 0                                                                      
+                                                                                
+                                                                                
+                                                                                
+      ELSE                                                                      
+         KB2CALgms                                                              
+     + =  0                                                                     
+      ENDIF                                                                     
+                                                                                
+                                                                                
+      CALL MPIXTB(NVAL,ISOU,IDES,IBUF,JTABV(1,IVISN))                           
+                                                                                
+                                                                                
+      RETURN                                                                    
+                                                                                
+      END                                                                       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+      INTEGER FUNCTION KB2OPTgms                                                
+     +(CFUNC,IIN,IOUT)                                                          
+                                                                                
+      IMPLICIT NONE             !  All variables must be declared               
+                                                                                
+      CHARACTER*4 CFUNC         !  Option or function descriptor                
+      INTEGER IIN(*)            !  Input parameters                             
+                                                                                
+      INTEGER IOUT(*)           !  Output parameters                            
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+      INCLUDE 'areaparm.inc'         !  Global declarations for McIDAS areas    
+                                     !     (defines NUMAREAOPTIONS)             
+                                                                                
+      COMMON/GMSXXgmskb2/                                                       
+     +JTYPE,ISOU,IDES,KOPT,JOPT                                                 
+      INTEGER JTYPE                  !  Flag identifying conversion code        
+      INTEGER ISOU                   !  Source pixel size in bytes              
+      INTEGER IDES                   !  Destination pixel size in bytes         
+      INTEGER KOPT                   !  Flag specifying how to construct ITAB   
+      INTEGER JOPT(NUMAREAOPTIONS)   !  Calibration parameters for conversion   
+                                                                                
+      COMMON/BRKPNTgmskb2/                                                      
+     +CALTYP           !  Common block for BRKSET table type                    
+      CHARACTER*4 CALTYP             !  Calibration type for breakpoint table   
+                                                                                
+      COMMON/DEBUGgmskb2/                                                       
+     +IVAL,XTAB,ITAB,JTAB                                                       
+      INTEGER ITAB(1024)                                                        
+      INTEGER JTAB(1024)                                                        
+      INTEGER IVAL                                                              
+      REAL XTAB(1024)                                                           
+                                                                                
+                                                                                
+                                                                                
+      INTEGER BRKSET                 !  Sets breakpoint table values            
+      INTEGER ISCHAR                 !  Numeric ASCII value of character byte   
+      INTEGER LIT                    !  Four byte integer representing CHAR*4   
+      INTEGER IAND                   !  Logical AND function                    
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+      CHARACTER*8 CFILE              !  Breakpoint table name for SU            
+                                     !    (stored in frame dir words 38-39)     
+      INTEGER ITEST                  !  Validity test variable                  
+                                                                                
+                                                                                
+                                                                                
+      IF(CFUNC.EQ.'KEYS') THEN                                                  
+         IF(IIN(1).EQ.12.OR.(IIN(1).GE.82.AND.IIN(4).EQ.1) ) THEN               
+            IOUT(1)=3                                                           
+            IOUT(2)=LIT('RAW ')                                                 
+            IOUT(3)=LIT('ALB ')                                                 
+            IOUT(4)=LIT('BRIT')                                                 
+         ELSE IF(IIN(1).EQ.13.OR.(IIN(1).GE.82.AND.IIN(4).GT.1) ) THEN          
+            IOUT(1)=4                                                           
+            IOUT(2)=LIT('RAW ')                                                 
+            IOUT(3)=LIT('RAD ')                                                 
+            IOUT(4)=LIT('TEMP')                                                 
+            IOUT(5)=LIT('BRIT')                                                 
+         ELSE                                                                   
+            CALL EDEST('KBX_OPT: Cannot identify vis or IR for KEYS opti        
+     &on.',0)                                                                   
+         ENDIF                                                                  
+                                                                                
+         KB2OPTgms                                                              
+     + = 0                                                                      
+         IF (ISCHAR(IIN(38)).EQ. 1) THEN                                        
+            CALL MOVWC(IIN(38),CFILE)                                           
+            IF (BRKSET(CFILE,CALTYP).NE.0) THEN                                 
+               KB2OPTgms                                                        
+     + = -3                                                                     
+            ENDIF                                                               
+         ENDIF                                                                  
+                                                                                
+                                                                                
+      ELSE IF (CFUNC.EQ.'BRKP') THEN                                            
+         CALL MOVWC(IIN(1), CFILE)                                              
+         KB2OPTgms                                                              
+     + = 0                                                                      
+         IF (BRKSET(CFILE,CALTYP).NE.0) THEN                                    
+            KB2OPTgms                                                           
+     + = -3                                                                     
+         ENDIF                                                                  
+                                                                                
+                                                                                
+      ELSE  IF (CFUNC .EQ. 'INFO') THEN                                         
+                                                                                
+         IF(IIN(2).EQ.12.OR.(IIN(2).GE.82.AND.IIN(1).EQ.1) ) THEN               
+            IOUT(1) = 3                                                         
+            IOUT(2) = LIT('RAW ')                                               
+            IOUT(3) = LIT('ALB ')                                               
+            IOUT(4) = LIT('BRIT')                                               
+            IOUT(5) = LIT('    ')                                               
+            IOUT(6) = LIT('  % ')                                               
+            IOUT(7) = LIT('    ')                                               
+            IOUT(8) = 1                                                         
+            IOUT(9) = 10                                                        
+            IOUT(10) = 1                                                        
+         ELSE IF(IIN(2).EQ.13.OR.(IIN(2).GE.82.AND.IIN(1).GT.1) ) THEN          
+            IOUT(1) = 4                                                         
+            IOUT(2) = LIT('RAW ')                                               
+            IOUT(3) = LIT('RAD ')                                               
+            IOUT(4) = LIT('TEMP')                                               
+            IOUT(5) = LIT('BRIT')                                               
+            IOUT(6) = LIT('    ')                                               
+            IOUT(7) = LIT('MW**')                                               
+            IOUT(8) = LIT('  K ')                                               
+            IOUT(9) = LIT('    ')                                               
+            IOUT(10)= 1                                                         
+            IOUT(11)= 100                                                       
+            IOUT(12)= 10                                                        
+            IOUT(13)= 1                                                         
+         ELSE                                                                   
+            CALL EDEST('KBX_OPT: Cannot identify vis or IR for INFO opti        
+     &on.',0)                                                                   
+         ENDIF                                                                  
+         KB2OPTgms                                                              
+     + = 0                                                                      
+                                                                                
+                                                                                
+      ELSE  IF (CFUNC .EQ. 'METH') THEN                                         
+                                                                                
+                                                                                
+         ITEST=IAND(IIN(1),Z'FFFFFFF0')                                         
+         IF(ITEST.NE.0) THEN                                                    
+            KB2OPTgms                                                           
+     + = -4                                                                     
+            KOPT = 0                                                            
+            CALL EDEST('KB2OPTgms                                               
+     +: Invalid calibration table method!  ',                                   
+     &         IIN(1))                                                          
+            CALL EDEST('        Must be 1-15',0)                                
+         ELSE                                                                   
+            KB2OPTgms                                                           
+     + = 0                                                                      
+            KOPT=IIN(1)                                                         
+         END IF                                                                 
+                                                                                
+      ELSE                                                                      
+         CALL EDEST('Unknown KBX_OPT function-->'//CFUNC//'<--',0)              
+         KB2OPTgms                                                              
+     + = -1                                                                     
+      END IF                                                                    
+                                                                                
+      RETURN                                                                    
+                                                                                
+      END                                                                       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+      REAL FUNCTION VPLANCgmskb2                                                
+     +(T,INDEX,ISS,IBAND)                                                       
+                                                                                
+      IMPLICIT NONE                                                             
+      REAL T                    ! Absolute temperature                          
+      INTEGER INDEX             ! Table index (DN value)                        
+      INTEGER ISS               ! Spacecraft or instrument ID                   
+      INTEGER IBAND             ! Spectral Band for instrument                  
+                                                                                
+      COMMON/RADgmskb2/                                                         
+     +KTAB                                                                      
+      INTEGER KTAB(256)         ! Radiance table for GMS-5 from RD_CAL          
+                                !  (and GMP_FCO/GMT_RAD if not a power series)  
+                                                                                
+                                                                                
+      REAL EXPN                                                                 
+      REAL TT                                                                   
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+      REAL FK1                                                                  
+      REAL FK2                                                                  
+      REAL TC1                                                                  
+      REAL TC2                                                                  
+                                                                                
+      DATA FK1 / .81021E+04 /                                                   
+      DATA FK2 / .12654E+04 /                                                   
+      DATA TC1 / .62070     /                                                   
+      DATA TC2 / .99528     /                                                   
+                                                                                
+                                                                                
+                                                                                
+      IF(     ISS.EQ.13                                                         
+     &   .OR.(ISS.EQ.82.AND.IBAND.EQ.2)                                         
+     &   .OR.(ISS.EQ.82.AND.IBAND.EQ.8)) THEN                                   
+         TT=TC1+TC2*T                                                           
+         EXPN=EXP(FK2/TT) - 1.                                                  
+         VPLANCgmskb2                                                           
+     +=FK1/EXPN                                                                 
+      ELSE IF(ISS.GE.83.AND.ISS.LE.86) THEN                                     
+         VPLANCgmskb2                                                           
+     +=KTAB(INDEX)/1000.                                                        
+      ELSE                                                                      
+         CALL EDEST('V_PLANC:  Unrecognized SS or BAND',0)                      
+         CALL EDEST('              ISS=',ISS)                                   
+         CALL EDEST('            IBAND=',IBAND)                                 
+         VPLANCgmskb2                                                           
+     +=0.0                                                                      
+      END IF                                                                    
+                                                                                
+      RETURN                                                                    
+                                                                                
+      END                                                                       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+      REAL FUNCTION GMTRADgmskb2                                                
+     +(T,IBAND)                                                                 
+                                                                                
+      IMPLICIT NONE                                                             
+      REAL T                   !  Temperature in degrees Kelvin                 
+      INTEGER IBAND            !  IR band number                                
+                                                                                
+      INTEGER NK               !  Number of bands                               
+      INTEGER NT               !  Number of TC constants                        
+      PARAMETER (NK=3,NT=2)                                                     
+                                                                                
+      INTEGER K                !  IR channel array index                        
+      REAL EXPN                                                                 
+      REAL TT                                                                   
+                                                                                
+      COMMON/GMSPFCgmskb2/                                                      
+     +CWN(NK),FK1(NK),FK2(NK),TC(NT,NK)                                         
+      REAL CWN                                                                  
+      REAL FK1                                                                  
+      REAL FK2                                                                  
+      REAL TC                                                                   
+                                                                                
+      K=IBAND-1                                                                 
+      TT=TC(1,K)+TC(2,K)*T                                                      
+      EXPN=EXP(FK2(K)/TT) - 1.                                                  
+      GMTRADgmskb2                                                              
+     +=FK1(K)/EXPN                                                              
+                                                                                
+      RETURN                                                                    
+                                                                                
+      END                                                                       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+      SUBROUTINE GMPFCOgmskb2                                                   
+     +(CDET,IOK)                                                                
+                                                                                
+      IMPLICIT NONE                                                             
+                                                                                
+      CHARACTER*1 CDET                                                          
+      CHARACTER*1 CA                                                            
+      CHARACTER*1 CB                                                            
+      INTEGER IOK                                                               
+                                                                                
+      INTEGER NK               !  Number of bands                               
+      INTEGER NT               !  Number of TC constants                        
+      PARAMETER (NK=3,NT=2)                                                     
+      INTEGER J                !  Index                                         
+      INTEGER K                !  Index                                         
+                                                                                
+      COMMON/GMSPFCgmskb2/                                                      
+     +CWN(NK),FK1(NK),FK2(NK),TCC(NT,NK)                                        
+      REAL CWN                                                                  
+      REAL FK1                                                                  
+      REAL FK2                                                                  
+      REAL TCC                                                                  
+                                                                                
+      REAL AWN(NK)                                                              
+      REAL AK1(NK)                                                              
+      REAL AK2(NK)                                                              
+      REAL ACC(NT,NK)                                                           
+      REAL BWN(NK)                                                              
+      REAL BK1(NK)                                                              
+      REAL BK2(NK)                                                              
+      REAL BCC(NT,NK)                                                           
+                                                                                
+      DATA CA/'A'/,CB/'B'/                                                      
+                                                                                
+      DATA AWN/925.374,869.613,1443.508/                                        
+      DATA AK1/.94381E+04,.78327E+04,.35825E+05/                                
+      DATA AK2/.13314E+04,.12512E+04,.20769E+04/                                
+      DATA ACC/.52162,.99819, .45456,.99833, .45842,.99893/                     
+                                                                                
+      DATA BWN/929.438,869.225,1444.768/                                        
+      DATA BK1/.95630E+04,.78222E+04,.35919E+05/                                
+      DATA BK2/.13373E+04,.12506E+04,.20787E+04/                                
+      DATA BCC/.53652,.99815, .51422,.99811, .48990,.99886/                     
+                                                                                
+                                                                                
+      IOK=1                                                                     
+      IF(CDET.EQ.CA) THEN                                                       
+         DO K=1,NK                                                              
+            CWN(K)=AWN(K)                                                       
+            FK1(K)=AK1(K)                                                       
+            FK2(K)=AK2(K)                                                       
+            DO J=1,NT                                                           
+               TCC(J,K)=ACC(J,K)                                                
+            ENDDO                                                               
+         ENDDO                                                                  
+      ELSE IF(CDET.EQ.CB) THEN                                                  
+         DO K=1,NK                                                              
+            CWN(K)=BWN(K)                                                       
+            FK1(K)=BK1(K)                                                       
+            FK2(K)=BK2(K)                                                       
+            DO J=1,NT                                                           
+               TCC(J,K)=BCC(J,K)                                                
+            ENDDO                                                               
+         ENDDO                                                                  
+      ELSE                                                                      
+         IOK=0                                                                  
+      ENDIF                                                                     
+                                                                                
+      RETURN                                                                    
+                                                                                
+      END                                                                       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+      INTEGER FUNCTION RDCALgmskb2                                              
+     +(CALB,IDIR,IBAND,ITAB)                                                    
+                                                                                
+      IMPLICIT NONE             !  All variables must be declared               
+                                                                                
+      INTEGER CALB(*)           !  Input array of calibration constants         
+                                !     from each line header for IBUF data       
+      INTEGER IDIR(*)           !  Area directory buffer (this is mandatory     
+                                !     for GMS, since the area calibration       
+                                !     block must be accessed locally)           
+      INTEGER IBAND             !  Band number of data in area                  
+                                                                                
+      INTEGER ITAB(*)           !  Lookup table containing albedo or            
+                                !     absolute radiation temperature            
+                                                                                
+      INCLUDE 'areaparm.inc'    !  Global declarations for McIDAS areas         
+                                !     (defines NUMAREAOPTIONS)                  
+                                                                                
+      COMMON/GMSXXgmskb2/                                                       
+     +JTYPE,ISOU,IDES,KOPT,JOPT                                                 
+      INTEGER JTYPE             !  Flag identifying conversion code             
+      INTEGER ISOU              !  Source pixel size in bytes                   
+      INTEGER IDES              !  Destination pixel size in bytes              
+      INTEGER KOPT              !  Flag specifying how to construct ITAB        
+      INTEGER JOPT(NUMAREAOPTIONS)   !  Calibration parameters for conversion   
+                                                                                
+      COMMON/RADgmskb2/                                                         
+     +KTAB                                                                      
+      INTEGER KTAB(256)         !  Radiance table for GMS-5                     
+                                                                                
+      COMMON/DEBUGgmskb2/                                                       
+     +IVAL,XTAB,ITABR,JTAB  !  We use only IVAL to pass back                    
+      INTEGER ITABR(1024)                !   the calibration option used        
+      INTEGER JTAB(1024)                 !   and rename ITAB because its        
+      INTEGER IVAL                       !   address is passed as an argument   
+      REAL XTAB(1024)                    !   too, and might be susceptable to   
+                                         !   platform or compiler dependencies  
+                                                                                
+      INTEGER LTAB              !  ID number of calibration table               
+      INTEGER IOFF              !  byte offset into GMSCAL file(s)              
+                                                                                
+                                                                                
+                                                                                
+      INTEGER IAND                   !  Logical .AND. function                  
+      INTEGER KSYS                   !  Acquire SYSVAL value                    
+      INTEGER LWI                    !  LW file read                            
+      INTEGER LIT                    !  Converts CHAR*4 to INTEGER              
+      REAL AMOD                      !  Real MOD function                       
+      REAL GMTRADgmskb2                                                         
+     +                    !  Converts GMS-5 TEMP to RAD                         
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+      INTEGER I                      !  index variable                          
+      INTEGER J                      !  index variable                          
+      INTEGER K                      !  index variable                          
+      INTEGER NLEN                   !  Length of arbitrary block in bytes      
+      INTEGER KEND                   !  End word count of a block               
+      INTEGER LBSTART                !  Input block starting byte count         
+      INTEGER NBSTART                !  Output block starting byte count        
+      INTEGER IV                     !  Input index value                       
+      INTEGER IXV                    !  Interpolated data output index value    
+      INTEGER V1                     !  First table value                       
+      INTEGER V2                     !  Second table value                      
+      INTEGER IAREA                  !  area number from IDIR array             
+      INTEGER ISS                    !  spacecraft/sensor ID from IDIR array    
+      INTEGER ISTAT                  !  LWI status returned                     
+      INTEGER IYR                    !  Year                                    
+      INTEGER IMO                    !  Month                                   
+      INTEGER IDA                    !  Day of month                            
+      INTEGER IHR                    !  Hour of day (GMT)                       
+      INTEGER IMN                    !  Minute of hour                          
+      INTEGER NTABS                  !  number of tables in the GMSCAL file     
+                                     !    (from first word in file)             
+      INTEGER DIR(512)               !  Default GMSCAL table directory          
+      INTEGER ICALBL(1792)           !  GMS-5 McIDAS Calibration block          
+      INTEGER IDCAL                  !  Calibration ID from data block          
+      INTEGER IDATE(2)               !  Six-byte date data block was generated  
+                                     !    (YY,YY,MM,DD,HH,mm)                   
+      INTEGER IDSEN                  !  Sensor selector byte                    
+                                     !    (1=primary,   2=redundant)            
+      INTEGER IOK                    !  bad radiance value counter              
+                                     !    (significant if non-zero)             
+      INTEGER JOK                    !  error flag for GMP_FCO function         
+                                     !    (significant if non-zero)             
+      INTEGER KBYT                   !  Byte address of CNAME block             
+      INTEGER IBETA(7,3)             !  Calibration constants for the three     
+                                     !    IR bands for converting DN to         
+                                     !    sensor output voltage (scaled ints)   
+      INTEGER IFACT(3)               !  Number of calibration constants in      
+                                     !    the series expansion for each band    
+      INTEGER IG(3)                  !  G constant for each IR band             
+      INTEGER IV0(3)                 !  V0 constant for each IR band            
+      INTEGER IC0(3)                 !  C0 constant for each IR band            
+      INTEGER ISPARE(3)              !  Unused spare location in table          
+      INTEGER IFAC                   !  Number of calibration constants in      
+                                     !    the series expansion to be used       
+                                                                                
+      REAL RIV                       !  Real input index value IV               
+      REAL RREM                      !  Remainder mod 1.0                       
+      REAL BETA(7,3)                 !  Calibration constants for the three     
+                                     !    IR bands for converting DN to         
+                                     !    sensor output voltage                 
+      REAL G                         !  G constant to be used                   
+                                     !     (volts/watt/cm**2/sr)                
+      REAL V0                        !  V0 constant to be used                  
+                                     !     (zero level voltage)                 
+      REAL C0                        !  C0 constant to be used                  
+      REAL C                         !  Intermediate "DN" value used in the     
+                                     !    series expansion                      
+      REAL V                         !  Output voltage from series expansion    
+      REAL R                         !  Radiance from voltage and G constant    
+                                     !     (watts/cm**2/sr)                     
+      REAL WNFCTR(3)                 !  Wave number factor to convert from      
+                                     !     W/cm**2/sr to W/etc/cm**-1           
+                                     !     for the GMS-5 IR bands               
+      CHARACTER*12 CFILE             !  Input file containing default           
+                                     !     calibration tables                   
+      CHARACTER*1 CALBL(7168)        !  GMS-5 McIDAS Calibration block          
+      CHARACTER*4 CNAME              !  Table Name in calibration data block    
+                                                                                
+      DATA WNFCTR /.7903, .7874, .8676/                                         
+                                                                                
+                                                                                
+      ISS=IDIR(3)                                                               
+      IAREA=IDIR(33)                                                            
+                                                                                
+                                                                                
+                                                                                
+      LTAB=0                                                                    
+      IF(IDIR(3).EQ.12) THEN                                                    
+         LTAB=1                                                                 
+      ELSE IF(IDIR(3).EQ.13) THEN                                               
+         LTAB=3                                                                 
+      ELSE IF(IDIR(3).EQ.82.AND.IBAND.EQ.1) THEN                                
+         LTAB=1                                                                 
+      ELSE IF(IDIR(3).EQ.82.AND.IBAND.EQ.2) THEN                                
+         LTAB=3                                                                 
+      ELSE IF(IDIR(3).EQ.82.AND.IBAND.EQ.8) THEN                                
+         LTAB=3                                                                 
+      ELSE IF(IDIR(3).EQ.83.AND.IBAND.EQ.1) THEN                                
+         LTAB=4                                                                 
+      ELSE IF(IDIR(3).EQ.83.AND.IBAND.EQ.2) THEN                                
+         LTAB=5                                                                 
+      ELSE IF(IDIR(3).EQ.83.AND.IBAND.EQ.3) THEN                                
+         LTAB=6                                                                 
+      ELSE IF(IDIR(3).EQ.83.AND.IBAND.EQ.4) THEN                                
+         LTAB=7                                                                 
+      ELSE IF(IDIR(3).EQ.83.AND.IBAND.EQ.8) THEN                                
+         LTAB=5                                                                 
+      ELSE                                                                      
+         CALL EDEST('RD_CAL: Unrecognized data band or SS',0)                   
+         RDCALgmskb2                                                            
+     +=-1                                                                       
+         GO TO 500                                                              
+      END IF                                                                    
+                                                                                
+      IF(KOPT.LE.0.OR.KOPT.GT.15) THEN                                          
+         KOPT=KSYS(151)                                                         
+      END IF                                                                    
+      IF(KOPT.LE.0.OR.KOPT.GT.15) THEN                                          
+         KOPT=7                                                                 
+         IF(IDIR(3).LE.82) KOPT=3                                               
+      END IF                                                                    
+      IF(IDIR(3).LE.82.AND.KOPT.GT.3) THEN                                      
+         CALL EDEST('Invalid calibration option for SS=',IDIR(3))               
+         CALL EDEST('     ...was ',KOPT)                                        
+         KOPT=3                                                                 
+         CALL EDEST('     ...reset to ',KOPT)                                   
+         CALL EDEST('Options > 3 valid for GMS-5 and later only!',0)            
+      END IF                                                                    
+                                                                                
+      IVAL=0                                                                    
+                                                                                
+      IDSEN=0                                                                   
+                                                                                
+                                                                                
+      IF(IAND(KOPT,12).NE.0) THEN                                               
+                                                                                
+         CALL ARAGET(IAREA,IDIR(63),7168,ICALBL)                                
+                                                                                
+         IF(ICALBL(1).NE.LIT('GMS5') .OR. ICALBL(2).GT.90) THEN                 
+            CALL EDEST('Calibration block is not GMS-5 format.',0)              
+            CALL EDEST('It cannot be used by the GMS calibration module.        
+     &',0)                                                                      
+            CALL EDEST('Will attempt to use GMSCAL file tables instead.'        
+     &,0)                                                                       
+            GO TO 200                                                           
+         END IF                                                                 
+                                                                                
+         NLEN=ICALBL(2)                                                         
+                                                                                
+                                                                                
+         IF(ICALBL(3).EQ.LIT('COEF')) THEN                                      
+            CALL MOVB(256,ICALBL(1),CALBL,0)                                    
+            DO I=1,60,3                                                         
+               DO J=I,I+2                                                       
+                  DO K=-3,0                                                     
+                     IF(ICHAR(CALBL(J*4+K)).LT.32.OR.                           
+     &                  ICHAR(CALBL(J*4+K)).GT.126)                             
+     &                        CALBL(J*4+K)='*'                                  
+                  END DO                                                        
+               END DO                                                           
+            END DO                                                              
+                                                                                
+            CALL MOVB(256,ICALBL(ICALBL(4)/4+1),CALBL,0)                        
+            CALL MOVB(4,CALBL(1),IDCAL,0)                                       
+            CALL MOVB(6,CALBL(5),IDATE,0)                                       
+            IYR=IDATE(1)/65536                                                  
+            IMO=(IDATE(1)-IYR*65536)/256                                        
+            IDA=IDATE(1)-IYR*65536-IMO*256                                      
+            IHR=(IDATE(2)/65536)/256                                            
+            IMN=IDATE(2)/65536-IHR*256                                          
+            CALL MOVB(1,CALBL(11),IDSEN,0)                                      
+            IDSEN=IDSEN/16777216              ! shift right 3 bytes             
+            IFACT(1)=ICHAR(CALBL(12))                                           
+            CALL MOVB(4,CALBL(13),IBETA(1,1),0)                                 
+            CALL MOVB(4,CALBL(17),IBETA(2,1),0)                                 
+            CALL MOVB(4,CALBL(21),IBETA(3,1),0)                                 
+            CALL MOVB(4,CALBL(25),IBETA(4,1),0)                                 
+            CALL MOVB(4,CALBL(29),IBETA(5,1),0)                                 
+            CALL MOVB(4,CALBL(33),IBETA(6,1),0)                                 
+            CALL MOVB(4,CALBL(37),IBETA(7,1),0)                                 
+            CALL MOVB(4,CALBL(41),IG(1),0)                                      
+            CALL MOVB(4,CALBL(45),IV0(1),0)                                     
+            CALL MOVB(4,CALBL(49),IC0(1),0)                                     
+            CALL MOVB(4,CALBL(53),ISPARE(1),0)                                  
+            IFACT(2)=ICHAR(CALBL(57))                                           
+            CALL MOVB(4,CALBL(58),IBETA(1,2),0)                                 
+            CALL MOVB(4,CALBL(62),IBETA(2,2),0)                                 
+            CALL MOVB(4,CALBL(66),IBETA(3,2),0)                                 
+            CALL MOVB(4,CALBL(70),IBETA(4,2),0)                                 
+            CALL MOVB(4,CALBL(74),IBETA(5,2),0)                                 
+            CALL MOVB(4,CALBL(78),IBETA(6,2),0)                                 
+            CALL MOVB(4,CALBL(82),IBETA(7,2),0)                                 
+            CALL MOVB(4,CALBL(86),IG(2),0)                                      
+            CALL MOVB(4,CALBL(90),IV0(2),0)                                     
+            CALL MOVB(4,CALBL(94),IC0(2),0)                                     
+            CALL MOVB(4,CALBL(98),ISPARE(2),0)                                  
+            IFACT(3)=ICHAR(CALBL(102))                                          
+            CALL MOVB(4,CALBL(103),IBETA(1,3),0)                                
+            CALL MOVB(4,CALBL(107),IBETA(2,3),0)                                
+            CALL MOVB(4,CALBL(111),IBETA(3,3),0)                                
+            CALL MOVB(4,CALBL(115),IBETA(4,3),0)                                
+            CALL MOVB(4,CALBL(119),IBETA(5,3),0)                                
+            CALL MOVB(4,CALBL(123),IBETA(6,3),0)                                
+            CALL MOVB(4,CALBL(127),IBETA(7,3),0)                                
+            CALL MOVB(4,CALBL(131),IG(3),0)                                     
+            CALL MOVB(4,CALBL(135),IV0(3),0)                                    
+            CALL MOVB(4,CALBL(139),IC0(3),0)                                    
+            CALL MOVB(4,CALBL(143),ISPARE(3),0)                                 
+                                                                                
+                                                                                
+            IF(IBAND.GT.1.AND.IBAND.LE.4) THEN                                  
+                                                                                
+               G= IAND( IG(IBAND-1),Z'7FFFFFFF')*1.0E-6                         
+               V0=IAND(IV0(IBAND-1),Z'7FFFFFFF')*1.0E-6                         
+               C0=IAND(IC0(IBAND-1),Z'7FFFFFFF')*1.0E-6                         
+                                                                                
+               G=SIGN(G,REAL(IG(IBAND-1)))                                      
+               V0=SIGN(V0,REAL(IV0(IBAND-1)))                                   
+               C0=SIGN(C0,REAL(IC0(IBAND-1)))                                   
+                                                                                
+               IFAC=IFACT(IBAND-1)+1                                            
+                                                                                
+               IF(IFAC.LT.1.OR.IFAC.GT.7) THEN                                  
+                  IFAC=7                                                        
+               END IF                                                           
+                                                                                
+               DO I=1,3                                                         
+                  DO J=1,IFAC                                                   
+                     BETA(J,I)=IAND(IBETA(J,I),Z'7FFFFFFF')*1.0E-6              
+                     BETA(J,I)=SIGN(BETA(J,I),REAL(IBETA(J,I)))                 
+                  END DO                                                        
+               END DO                                                           
+                                                                                
+               DO J=1,255                       !  index on S-VISSR DN level    
+                  C=255.-J+C0                   !  convert to instrument DN     
+                  V=0.0                                                         
+                  DO K=1,IFAC                   !  do the series expansion      
+                     V=V+BETA(K,IBAND-1)*C**(K-1)                               
+                  END DO                                                        
+                  R=(V-V0)/G                    !  convert to radiance W/etc.   
+                  R=0.5*R/WNFCTR(IBAND-1)       !  convert to mW/etc./cm**-1    
+                  KTAB(J)=INT(R*1000.0)         !  scale by 1000 and put into   
+                                                !     the KTAB table as mW/etc. 
+               END DO                                                           
+                                                                                
+               IOK=0                                                            
+               DO J=2,255                                                       
+                  IF(KTAB(J).LT.0.OR.KTAB(J).GT.190000) IOK=IOK+1               
+               END DO                                                           
+                                                                                
+            END IF                                                              
+                                                                                
+         ELSE                                                                   
+                                                                                
+            GO TO 100                                                           
+                                                                                
+         END IF                                                                 
+                                                                                
+                                                                                
+         IF(LTAB.LE.3) THEN                                                     
+            GO TO 100                                                           
+         END IF                                                                 
+         IF(LTAB.EQ.4) CNAME='5VIS'                                             
+         IF(LTAB.EQ.5) CNAME='5IR1'                                             
+         IF(LTAB.EQ.6) CNAME='5IR2'                                             
+         IF(LTAB.EQ.7) CNAME='5IR3'                                             
+         IF(LTAB.GE.8) THEN                                                     
+            GO TO 100                                                           
+         END IF                                                                 
+                                                                                
+         KBYT=0                                                                 
+         KEND=NLEN/4                                                            
+                                                                                
+         IF(KEND.GT.22) THEN                                                    
+            CALL EDEST('RD_CAL:  Bad directory structure. KEND=',KEND)          
+            KEND=22                                                             
+         END IF                                                                 
+         DO J=5,KEND                                                            
+            IF(ICALBL(J).EQ.LIT(CNAME)) THEN                                    
+               KBYT=ICALBL(J+1)                                                 
+            END IF                                                              
+         END DO                                                                 
+         IF(KBYT.NE.0) THEN                                                     
+            CALL MOVB(1024,ICALBL(KBYT/4+1),ITAB,0)                             
+                                                                                
+            ITAB(1)=ITAB(2)                                                     
+            ITAB(256)=ITAB(255)                                                 
+                                                                                
+         ELSE                                                                   
+                                                                                
+            CALL EDEST('KBYT cannot be set -- no table exists',0)               
+            GO TO 100                                                           
+                                                                                
+         END IF                                                                 
+                                                                                
+                                                                                
+         IF(IBAND.NE.1) GO TO 80                                                
+                                                                                
+                                                                                
+         DO I=4,1,-1                                                            
+            LBSTART = 1 + (I-1)*64                                              
+            NBSTART = (I-1)*256                                                 
+            DO IXV=256,1,-1                                                     
+               RIV=(FLOAT(IXV-1)/252.)*63.                                      
+               IV=RIV                                                           
+               V1=ITAB(LBSTART+IV)                                              
+               V2=ITAB(LBSTART+IV+1)                                            
+               IF(IV.EQ.63) V2=1000000                                          
+               RREM=AMOD(RIV,1.)                                                
+               ITAB(NBSTART+IXV)=(V1+(V2-V1)*RREM+0.5)                          
+            END DO                                                              
+         END DO                                                                 
+                                                                                
+   80    CONTINUE                                                               
+         IVAL=8                                                                 
+         IF(IOK.GT.5.AND.IAND(KOPT,15).EQ.8) THEN                               
+            CALL EDEST('Too many of the real-time power series radiances        
+     & are',0)                                                                  
+            CALL EDEST('outside expected limits and are likely to be in         
+     &error.',0)                                                                
+            GO TO 100                                                           
+         END IF                                                                 
+                                                                                
+         IF(IAND(KOPT,4).EQ.0) GO TO 400                                        
+      END IF                                                                    
+                                                                                
+                                                                                
+  100 CONTINUE                                                                  
+                                                                                
+      IF(IAND(KOPT,4).NE.0) THEN                                                
+                                                                                
+                                                                                
+         IF(ISS.EQ.83) THEN                                                     
+            IF(IDSEN.NE.2) CALL GMPFCOgmskb2                                    
+     +('A',JOK)                                                                 
+            IF(IDSEN.EQ.2) CALL GMPFCOgmskb2                                    
+     +('B',JOK)                                                                 
+            IF(JOK.EQ.0) THEN                                                   
+               GO TO 300                                                        
+            END IF                                                              
+            DO J=1,256                                                          
+               KTAB(J)=GMTRADgmskb2                                             
+     +(ITAB(J)*0.001,IBAND)*1000.                                               
+            END DO                                                              
+         ELSE                                                                   
+            GO TO 200                                                           
+         END IF                                                                 
+                                                                                
+         IVAL=4                                                                 
+         GO TO 400                                                              
+                                                                                
+      END IF                                                                    
+                                                                                
+                                                                                
+  200 CONTINUE                                                                  
+                                                                                
+      IF(IAND(KOPT,2).NE.0) THEN                                                
+                                                                                
+         CFILE='GMSCALU'                                                        
+                                                                                
+                                                                                
+         ISTAT=LWI(CFILE,0,512,DIR)                                             
+         CALL SWBYT4 (DIR, 512)                                                 
+         IF(ISTAT.NE.0.AND.IAND(KOPT,1).EQ.0) THEN                              
+            CALL EDEST('ERROR reading calibration tables from file '//          
+     &         CFILE,0)                                                         
+            GO TO 300                                                           
+         END IF                                                                 
+         NTABS=DIR(1)                                                           
+                                                                                
+         IOFF = 512+(LTAB-1)*256                                                
+         IF(LTAB.GT.NTABS) THEN                                                 
+            GO TO 300                                                           
+         END IF                                                                 
+         ISTAT = LWI(CFILE,IOFF,256,ITAB)                                       
+         CALL SWBYT4 (ITAB, 256)                                                
+                                                                                
+         DO J=1,256                                                             
+            ITAB(J+256)=ITAB(J)                                                 
+            ITAB(J+512)=ITAB(J)                                                 
+            ITAB(J+768)=ITAB(J)                                                 
+         END DO                                                                 
+                                                                                
+         IF(ISTAT.NE.0) THEN                                                    
+            GO TO 300                                                           
+         END IF                                                                 
+                                                                                
+         IF(ISS.EQ.83) THEN                                                     
+            IF(IDSEN.NE.2) CALL GMPFCOgmskb2                                    
+     +('A',JOK)                                                                 
+            IF(IDSEN.EQ.2) CALL GMPFCOgmskb2                                    
+     +('B',JOK)                                                                 
+            IF(JOK.EQ.0) THEN                                                   
+               GO TO 300                                                        
+            END IF                                                              
+            DO J=1,256                                                          
+               KTAB(J)=GMTRADgmskb2                                             
+     +(ITAB(J)*0.001,IBAND)*1000.                                               
+            END DO                                                              
+         END IF                                                                 
+                                                                                
+         IVAL=2                                                                 
+         GO TO 400                                                              
+                                                                                
+      END IF                                                                    
+                                                                                
+  300 CONTINUE                                                                  
+                                                                                
+                                                                                
+      IF(IAND(KOPT,1).NE.0) THEN                                                
+                                                                                
+         CFILE='GMSCAL'                                                         
+                                                                                
+                                                                                
+         ISTAT=LWI(CFILE,0,512,DIR)                                             
+         CALL SWBYT4 (DIR, 512)                                                 
+         IF(ISTAT.NE.0) THEN                                                    
+            CALL EDEST('ERROR reading calibration tables from file '//          
+     &         CFILE,0)                                                         
+            RDCALgmskb2                                                         
+     +=-1                                                                       
+            GO TO 500                                                           
+         END IF                                                                 
+         NTABS=DIR(1)                                                           
+                                                                                
+         IOFF = 512+(LTAB-1)*256                                                
+         IF(LTAB.GT.NTABS) THEN                                                 
+            CALL EDEST('RD_CAL ERROR -- Unrecognized Table ID=',LTAB)           
+            CALL EDEST('The table index is greater than number of tables in     
+     & in the file '//CFILE,0)                                                  
+            CALL EDEST('Check SS and band number for consistency with the t     
+     &e table ID',0)                                                            
+            CALL EDEST('                                   SS=',IDIR(3))        
+            CALL EDEST('                                 Band=',IBAND)          
+            RDCALgmskb2                                                         
+     +=-1                                                                       
+            GO TO 500                                                           
+         END IF                                                                 
+         ISTAT = LWI(CFILE,IOFF,256,ITAB)                                       
+         CALL SWBYT4 (ITAB, 256)                                                
+                                                                                
+         DO J=1,256                                                             
+            ITAB(J+256)=ITAB(J)                                                 
+            ITAB(J+512)=ITAB(J)                                                 
+            ITAB(J+768)=ITAB(J)                                                 
+         END DO                                                                 
+                                                                                
+         IF(ISTAT.NE.0) THEN                                                    
+            CALL EDEST('File status error reading file'//CFILE,ISTAT)           
+            RDCALgmskb2                                                         
+     +=-1                                                                       
+            GO TO 500                                                           
+         END IF                                                                 
+                                                                                
+         IF(ISS.EQ.83) THEN                                                     
+            IF(IDSEN.NE.2) CALL GMPFCOgmskb2                                    
+     +('A',JOK)                                                                 
+            IF(IDSEN.EQ.2) CALL GMPFCOgmskb2                                    
+     +('B',JOK)                                                                 
+            IF(JOK.EQ.0) THEN                                                   
+               RDCALgmskb2                                                      
+     +=-1                                                                       
+               GO TO 500                                                        
+            END IF                                                              
+            DO J=1,256                                                          
+               KTAB(J)=GMTRADgmskb2                                             
+     +(ITAB(J)*0.001,IBAND)*1000.0                                              
+            END DO                                                              
+         END IF                                                                 
+                                                                                
+         IVAL=1                                                                 
+         GO TO 400                                                              
+                                                                                
+      END IF                                                                    
+                                                                                
+                                                                                
+      RDCALgmskb2                                                               
+     +=-1                                                                       
+      GO TO 500                                                                 
+                                                                                
+  400 CONTINUE                                                                  
+      IF(IVAL.EQ.0) THEN                                                        
+         RDCALgmskb2                                                            
+     +=-1                                                                       
+      ELSE                                                                      
+         RDCALgmskb2                                                            
+     +=0                                                                        
+      END IF                                                                    
+                                                                                
+                                                                                
+  500 CONTINUE                                                                  
+      CALL SYSIN(152,IVAL)                                                      
+                                                                                
+      DO I=1,1024                                                               
+         ITABR(I)=ITAB(I)                                                       
+      END DO                                                                    
+      RETURN                                                                    
+                                                                                
+      END                                                                       
+                                                                                

@@ -1,0 +1,216 @@
+Readme.1st
+
+Table of Contents:
+
+INTRODUCTION
+REQUIREMENTS BEFORE YOU START
+CONTENTS OF DISTRIBUTION
+INSTALLATION 
+RUNNING THE PROGRAM
+
+
+INTRODUCTION
+
+Mrc2xml.pl is a perl program that converts a file of MARC records 
+to XML. The resulting XML markup will reflect the MARC tags and 
+subfields that occur in the input file of MARC records. The output 
+file will be well-formed XML but not necessarily valid XML (i.e valid 
+when parsed against the DTD mrcbfile.dtd). The DTD reflects only the 
+tags present in MARC 21 (including obsolete tags). So, for instance, 
+any 9XX local fields will cause validation to fail. This means that, 
+in order to produce valid XML data, the user will need to either, 
+
+1) delete the local fields (before or after conversion), or, 
+2) edit the DTD to allow the presence of the local fields.
+
+The program optionally provides for conversion of special characters 
+and diacritics to Unicode character entities (see RUNNING THE 
+PROGRAM below).
+
+
+REQUIREMENTS BEFORE YOU START
+
+The conversion software requires Perl v5.003 or later and 
+version 1.2 or later of the free nsgmls parsers.  Ports of Perl are 
+available from http://www.perl.com, and nsgmls is available from
+http://www.jclark.com/sp.  NOTE: Both perl and nsgmls need to be 
+installed on your path.
+
+You need to know three things before you install the software:
+
+1. The location of your Perl executable, which will be "perl.exe" on
+DOS and Windows systems and "perl" on Unix systems;
+
+2. The location of Perl's "lib" directory; and
+
+3. The directory in which you want the mrc2xml.pl file installed. 
+This should be in a directory on your path.
+
+
+CONTENTS OF DISTRIBUTION:
+
+INSTALL.ME   Perl script to install mrc2xml.pl
+
+MANIFEST     File listing used by install.me
+
+README.1ST   The file you are reading.
+
+bin/         Directory containing program files
+
+lib/         Directory containing Perl libraries and modules
+
+
+INSTALLATION
+
+To install the conversion software, go to the directory where you
+unpacked the distribution, then type the following at your shell 
+prompt and follow the instructions:  perl install.me
+
+
+SAMPLE INSTALLATION
+
+C:> perl 
+install.me
+Pathname of perl executable: \perl\bin\perl.exe
+Directory to install executables: ("") \local\bin
+Directory to install library files: ("") \perl\lib
+You have specified the following: Perl path: \local\bin
+Bin directory: \local\bin
+Lib directory: \perl\lib
+Is this correct? ['y'] y
+(\perl\bin\perl.exe)
+Installing programs to "\local\bin":
+bin/mrc2xml.pl => \local\bin\mrc2xml.pl
+Installing lib files to "\perl\lib":
+lib/SGMLS => \perl\lib\SGMLS
+lib/SGMLS.pm => \perl\lib\SGMLS.pm
+lib/sgmlspl.pl => \perl\lib\sgmlspl.pl
+lib/sgmlspl.pm => \perl\lib\sgmlspl.pm
+lib/Marcconv => \perl\lib\Marcconv
+
+
+NOTES ON INSTALLATION PROGRAM
+
+o   You must be in the same directory as the install.me program.
+o   The programs require Perl 5.003 and nsgml 1.2 or later to 
+    be installed.
+o   The '#!' line in the installed programs is set to point to
+    the Perl executable specified in the installation process.
+o   Programs are updated to include the path location of the
+    installed library files.  Hence, you can install the library files
+    in any location, and the program will still work.
+
+Manual Installation
+o   Copy library (*.pl) files in the "lib" directory to the library location 
+    you desire.
+o   Copy the program files to the location you want them installed.
+    After copying, you must edit each file as follows:
+    -    Edit the "#!/..." line (the first line of each file) to be 
+         the complete pathname of your perl interpreter.  Note, this 
+         step is unnecessary for Windows/MSDOS users.
+    -    Add a new line right after the "#!/..." line to contain the 
+         following: unshift(@INC, "/path/to/lib/files");
+         where "/path/to/lib/files/" is the path to where you
+         copied the library files.  
+         Note, for Windows/MSDOS user, you will have to use "\\" 
+         (w/o the quotes) as the directory separator if using double 
+         quotes to delimit the path.  For example:
+         unshift(@INC, "C:\\path\\to\\lib\\files");
+         Note, if the location you copied the libraries are
+         already part of Perl's standard library search path, 
+         you do not need to add the unshift () statement.
+
+
+RUNNING THE PROGRAM
+
+To run the program on DOS and Windows systems, the program 
+is run from the DOS prompt.  The program command line must 
+be preceded by "perl -S", as in the following examples, so that 
+the program is run by the PERL interpreter.
+
+On Unix systems, the "perl -S" is not necessary since Unix systems 
+are able to automatically start the PERL interpreter to execute the program.
+
+
+Examples
+
+The following examples illustrate the use of the mrc2xml.pl program 
+in the DOS and Windows command format.  The complete program 
+options are listed below  (see Complete Command Options below).
+
+The user will type (or place in a batch file) the following commands 
+and parameter settings:
+
+C:\perl -S mrc2xml.pl file.mrc
+
+The file of MARC records, "file.mrc", will be converted to XML. 
+Since no options were given, the default minimal conversion of 
+significant XML characters will be performed, the output will be 
+written to "stdout.xml", and the log file written to "mrc2xml.log"
+
+C:\perl -S mrc2xml.pl -charconv file.mrc
+
+This is the same as the previous example except that " -charconv" 
+specifies that that non-ASCII characters will be converted to Unicode 
+entities using the character conversion table referenced by the program.
+
+perl -S mrc2xml.pl -command mycmd.cmd file.mrc 
+
+The program is executed using the options contained in the command 
+file "mycmd.cmd".
+
+C:\perl -S mrc2xml.pl -command mycmd.cmd -log mylog.log file.mrc 
+
+The program is executed using the options contained in the command 
+file "mycmd.cmd", except that the command line option" -log mylog.log" 
+overrides both the default log file name and any " -log" log file name 
+assignment in the command file.
+
+Complete Command Options
+
+Following is the complete list of command options used to invoke 
+the MARC-to-XML conversion utility. The command can be followed by a 
+variety of parameter settings, each of which follows the command, 
+separated by a space, as follows.
+
+mrc2xml.pl [ -command file] [ -charconv | -userconv file] [-log file] 
+[-o file] [-marcdesc file] [-help] input-file 
+
+Remember, parts of these parameter settings highlighted above are 
+determined by the user. Not all parameter setting must be used. When a 
+parameter setting is not provided by the user, system defaults are 
+applied by the conversion utility. Descriptions of each parameter 
+setting are as follows: 
+
+-command file     Read program command options from "file" 
+
+-xmlconv          Perform minimal, "XML sanity" character conversion 
+                  using the built-in conversion table.   This is 
+                  the default character conversion.
+
+-charconv         Convert characters to entities using the built-in 
+                  conversion table.  The minimal XML conversion will 
+                  also be performed. 
+
+-userconv file    Perform character conversion using the user
+
+-supplied         Conversion specification in "file".  An error will 
+                  be signaled if "file" is not specified or if "file" 
+                  cannot be opened, or if "file" is not a file of the 
+                  correct format. The minimal XML conversion will also
+                  be performed.
+
+-log file         Write the output log to "file". If this option is 
+                  not specified, the log will be written to 
+                  " mrc2xml.log" in the current directory. 
+
+-o file           Write the unvalidated XML output to "file" instead 
+                  of to the default file "stdout.xml". 
+
+-marcdesc file    Read the MARC Description File named "file" instead 
+                  of the default MARC Description File that the program
+                  automatically reads on initialization. 
+
+-help             Print help information then quit. 
+
+input -file       The name of the input MARC record file

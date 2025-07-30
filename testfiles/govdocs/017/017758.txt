@@ -1,0 +1,187 @@
+From owner-nwchem-users@emsl.pnl.gov Tue Mar 20 11:02:42 2007
+Received: from odyssey.emsl.pnl.gov (localhost [127.0.0.1])
+	by odyssey.emsl.pnl.gov (8.13.8/8.13.8) with ESMTP id l2KI2fXh014262
+	for <nwchem-users-outgoing-0915@odyssey.emsl.pnl.gov>; Tue, 20 Mar 2007 11:02:42 -0700 (PDT)
+Received: (from majordom@localhost)
+	by odyssey.emsl.pnl.gov (8.13.8/8.13.8/Submit) id l2KI2fXq014261
+	for nwchem-users-outgoing-0915; Tue, 20 Mar 2007 11:02:41 -0700 (PDT)
+X-Authentication-Warning: odyssey.emsl.pnl.gov: majordom set sender to owner-nwchem-users@emsl.pnl.gov using -f
+X-Ironport-SG: Throttle
+X-Ironport-SBRS: 1.3
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-Anti-Spam-Result: Ao8CALO+/0VCxGT3cWdsb2JhbACPMQ4HIw
+X-IronPort-AV: i="4.14,305,1170662400"; 
+   d="scan'208"; a="24160245:sNHT32873568"
+DomainKey-Signature: a=rsa-sha1; q=dns; c=nofws;
+  s=s1024; d=yahoo.com;
+  h=X-YMail-OSG:Received:Date:From:Subject:To:In-Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-ID;
+  b=GIjrYs2sUpaPD1SWxA1RWFGupy7n4H3V/XsELS/8tORV7p9fuJQpSL5k1bJuDV0s8Trt8kOAIDjdhPd2YgP4jK57txmit4QEKmKj2W7WDQDdMw3lQIh/SNmfJdnsWG4HtzitiYozeivp04jBaQ1xL+k9ZQ7ObJwQZjTVW7Rqzr4=;
+X-YMail-OSG: F_c_AB8VM1kTTd7jis6ef74NB6axxip9cDVi_gOX8x.e9J9WGYFHEuPlXXVfv6Qj1VL8ICJ16C3L.KVsNwjs.WSFCPgqZplJTQJX5tnPdyvKX0LAvfhCfoZKp5TLiRnq
+Date: Tue, 20 Mar 2007 11:02:35 -0700 (PDT)
+From: Francesco Pietra <chiendarret@yahoo.com>
+Subject: Re: [NWCHEM] Partial atomic charges
+To: "Lins, Roberto D" <roberto.lins@pnl.gov>,
+        users nwchem <nwchem-users@emsl.pnl.gov>
+In-Reply-To: <C225690F.2A22%roberto.lins@pnl.gov>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Message-ID: <687759.85415.qm@web58912.mail.re1.yahoo.com>
+Sender: owner-nwchem-users@emsl.pnl.gov
+Precedence: bulk
+
+Hi Roberto:
+Thanks. Do you have at hand a reference to breaking
+into fragments for MD purposes a molecule that has no
+repeating units? I am always brought to biopolymers or
+at most modified proteins.
+
+The molecules I want to study display properties that
+depend from the whole, with subtle chirality axes. It
+may well be that I did not grasp the substance of MD,
+though I find difficult where to break the molecule.
+Unless it is a formal breaking in some way, while
+there is behind a trait-de-union as if the molecule
+were intact.
+
+Apologize for such naive expressions.
+Thanks
+francesco
+
+
+--- "Lins, Roberto D" <roberto.lins@pnl.gov> wrote:
+
+> Hi Francesco,
+> 
+> Yes, you can use NWChem directly to compute the RESP
+> charges.
+> In the ESP module you can break up your large
+> molecule into
+> several fragments (I won't discuss the benefits of
+> having
+> smaller charge groups). For example if you'd like to
+> set
+> that atoms 1 to 15 of your molecule to have a net
+> charge of
+> 0.0 and 16 to 25 of -1.0 you could type in these
+> couple of
+> lines within the ESP deck:
+> 
+> constrain  0.0  1 through 15
+> constrain -1.0 16 through 25
+> 
+> From my experience, you should have at least 5-6
+> atoms per
+> charge group when doing the RESP-fitting. Too small
+> charge
+> groups will lead to charges that will render your
+> molecule
+> with unacceptably large deviations from the
+> QM-calculated
+> dipole moment.
+> 
+> Hope it helps,
+> 
+> Roberto
+> 
+> P.S.: The newer AMBER force fields (96 and newer)
+> uses
+> RESP-based charges instead of CHELPG.
+> 
+> ----------------------------------------
+> Roberto Lins, Research Scientist
+> Computational Biology and Bioinformatics
+> Pacific Northwest National Laboratory
+> P.O. Box 999, M/S:K7-90, ISB2/507
+> Richland, WA 99352 USA
+> Phone: +1 (509) 375-2755
+> Fax: +1 (509) 372-4720
+> E-mail: roberto.lins@pnl.gov
+> ----------------------------------------
+> 
+> 
+> On 3/20/07 10:00 AM, "Francesco Pietra"
+> <chiendarret@yahoo.com> wrote:
+> 
+> > I am setting up classical (Amber FF) simulations
+> on
+> > natural products, where the "fragment" is the
+> final
+> > "sequence" approaching the limit of 99 atoms.
+> > Difficult, if possible at all, to cut the molecule
+> > into fragments.
+> > 
+> > In learning about the method used to define the
+> > partial charges, I came across a discouraging (for
+> my
+> > type of job) description:
+> > 
+> > "One of the weak points of CHELPG (and other
+> > approaches based on fitting the MEP) is the
+> treatment
+> > of larger systems, in which some of the innermost
+> > atoms are located far away from the points at
+> which
+> > the MEP is evaluated. In such a situation,
+> variations
+> > of the innermost atomic charges will not lead to
+> > significant changes of the MEP potential outside
+> of
+> > the molecule and fitting of these atomic charges
+> will
+> > therefore not result in meaningful results. It
+> should
+> > also be remembered that atomic charges can depend
+> > strongly on the conformation of the molecule.
+> > Representative atomic charges for flexible
+> molecules
+> > should therefore be derived as average values over
+> > several conformers. Using ethanol as an example,
+> the
+> > charge parameters derived for the Cs symmetric
+> > conformer A and the C1 symmetric conformer B vary,
+> in
+> > part, by almost 30%. The variation is, however,
+> rather
+> > different for different parts of the
+> >
+>
+system(http://www.cup.uni-muenchen.de/oc/zipse/compchem/pop/chelpg.html)"
+> > 
+> > At any event, for a given novel fragment (geometry
+> > optimized with MM global space search), should the
+> > RHF-ESP calculation be preceded by a RHF-Geometry
+> > calculation?
+> > 
+> > I rely on Ecce for the ESP calculation, though it
+> > seems to me that the question I posed is valid
+> also
+> > for using NWChem directly.
+> > 
+> > Thanks
+> > francesco pietra
+> > 
+> > 
+> > 
+> > 
+> > 
+> > 
+> >  
+> >
+>
+______________________________________________________________________________
+> > ______
+> > Now that's room service!  Choose from over 150,000
+> hotels
+> > in 45,000 destinations on Yahoo! Travel to find
+> your fit.
+> > http://farechase.yahoo.com/promo-generic-14795097
+> 
+
+
+
+ 
+____________________________________________________________________________________
+Don't pick lemons.
+See all the new 2007 cars at Yahoo! Autos.
+http://autos.yahoo.com/new_cars.html 

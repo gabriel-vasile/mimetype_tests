@@ -1,0 +1,64 @@
+<!doctype html public "-//W30//DTD WWW HTML 2.0//EN">
+<html>
+<head>
+<title>    GeneralString vs. VisibleString in GRS </title>
+<script type='text/javascript' src='/global/triggerParams.js'></script><script type='text/javascript' src='/global/stdLauncher.js'></script><script type='text/javascript'>Poll();</script></head>
+<body>
+<hr>
+<p>
+<h2>    GeneralString vs VisibleString in GRS </h2>
+<p>
+<hr>
+<p>
+<em>Issue raised by:</em>    Mike Douglass <douglm@rpi.edu> Fri, 18 Jul 1997
+                             12:34:25 -0400
+<hr>
+<em>Synopsis:</em>
+<blockquote>
+      InternationalString is defined as one of the possible ElementData types
+      in GRS.  This is defined as GeneralString with tag 27. There is some
+      prose (in the body of the standard) referring to this collapsing to
+      VisibleString when V2 is in force.
+<p>
+      VisibleString (tag 26) is what some servers send me. Is this legal? If
+      so, should the asn-1 for GRS-1 supply a tag value for this data type?
+
+
+                  
+</blockquote>
+<hr>
+<em>Response:</em>
+<blockquote>
+      VisibleString (tag 26) is not supported by GRS and it is therefore not
+      legal. Those servers sending tag 26 are in error. 
+<p>
+      The "collapsing" refers only to the character repertoire, not the asn.1
+      tag.  It applies only to asn.1 identifiers from the 1992 version. 
+<p>
+      The intent of Z39.50-1995 is to depricate VisibleString. There are asn.1
+      identifiers from the 1992 version of type visibleString, so the 1995
+      version stipulates that when v2 is in effect (because if v2 is in effect
+      one of the two systems may be based on the 1992 version), those
+      parameters are restricted to the visibleString repertiore. Choice of tag
+      -- 26 or 27 -- fortunately is not an issue, in all but one or two cases,
+      because these are defined as IMPLICIT, and in the cases where they are
+      not, the 95 version makes an explicit CHOICE depending on version. 
+<p>
+      True, GRS-1 is intended to operate when v2 is in effect. But GRS
+      encounters data elements (not asn.1 identifiers from the 1992 version)
+      defined by tagsets and schemas based on the retrieval architecture
+      developed for the 95 version.  No server has built support for GRS based
+      on the 1992 version, because there was no GRS in the 1992 version. 
+
+
+</blockquote>
+<hr>
+<em>Status:</em>  Approved (8/97)
+
+<hr>
+<img src="http://www.loc.gov/homepage/lc2.gif" ALT=""> <strong>Library 
+of Congress</strong><br>
+(10/22/97)
+
+<script type='text/javascript' src='/global/s_code.js'></script></body>
+</html>

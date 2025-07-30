@@ -1,0 +1,71 @@
+The following is a file prepared partly by Richa Agarwala describing a
+simple use of SimIBD on a real data set. I have removed references
+to the data set to avoid revealing any research information.
+This describes a cookbook usage. 
+
+
+The reference for SimIBD is:
+
+Davis S, Schroeder M, Goldin LR, Weeks DE (1996) Nonparametric simulation-based
+statistics for detecting linkage in general pedigrees. 
+Am J Hum Genet 58:867-880.
+
+
+
+Running SimIBD
+--------------------------------------------------
+Summary
+------------------------------
+Do not use SimIBD version 1.x.y as it has been superseded by version 2.1
+(and possibly later versions).
+Required input files:
+             locusXYZ:LINKAGE/FASTLINK format locus file
+             pedigree file: LINKAGE/FASTLINK format pedigree file
+One output file is produced.
+SimIBD currenlty does only 2-point analysis.
+--------------------------------------------------------------------------------
+
+Simplest usage: simibd  <pedigree file> <locus file>
+
+
+SimIBD produces two output files:
+  simibd.out
+  simibd.aff.out
+
+Steps:
+0. simibd <pedigree file> <locus file>. 
+   We are only doing SimIBD computation and not SimAPM or SimKIN.
+1. Choose weighting function from
+     A : f(p) = 1
+     B : f(p) = 1/sqrt(p)
+     C : f(p) = 1/p
+  Choose option B; this is strongly recommended in the documentation.
+2. Specify number of replicates; a recommended value is in brackets,
+   but you must specify some number
+3. Specify number of BOOTSTRAPS per SIMULATED NULL replicate.
+   Again, a number is recommended in brackets.
+4. Specify number of SIMULATED NULL DISTRIBUTION replicates total.
+   Again a number is recommended in brackets.
+5. Trait locus number: 1
+   This is the LINKAGE convention.
+6. Enter the marker locus number:
+
+
+This creates simibd.out which summarizes the results of the runs and 
+simibd.aff.out which is the full output from affected comparisons.
+
+The important table is simibd.out with headings:
+
+  Family   ZObs    # Aff.  Weight  Weighted ZObs  PValue   Range
+
+This will be followed by 1 row of results for each pedigree in your
+data set.
+
+The Weight column here has to do with the number of affected people
+in the family, and is unrelated to the allele frequency weight
+that you were asked to select.
+For this program you should literally look at the "bottom line" and
+see if the p-value is small. p-values < 0.05 are considered significant.
+
+SimIBD can be run in parallel. Contact tran@helix.nih.gov for
+more information.

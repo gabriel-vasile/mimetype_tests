@@ -1,0 +1,2017 @@
+// wheat:/mRNA/home/genbank/ggtest/wspec/models.xgraingenes, dem 18dec01,
+// standard GG models with changes in ?Sequence to fit GenBankGG data:
+//                  Cultivar ?Germplasm // 18dec01
+//                  Chromosome Text // GRL
+//                  Clone_lib Text // 18dec01
+//                  Tissue Text // 18dec01
+//                  Dev_stage Text // GRL
+//			DB_xref ?Sequence // GRL
+//			Codon_start Int // GRL
+//		Properties
+//			pseudo // GRL
+//			virion // GRL
+//			chloroplast // GRL
+//			mitochondrion // GRL
+//			germline // GRL
+//			macronuclear // GRL
+//		EMBL_feature
+//                      feature_gene	Int Int Text #EMBL_info // GRL
+//			misc_RNA	Int Int Text #EMBL_info // GRL
+//			tRNA		Int Int Text #EMBL_info // GRL
+//			STS		Int Int Text #EMBL_info // GRL
+//                      5'UTR           Int Int Text #EMBL_info // TPD
+//		DB_info
+//	        	Database ?Database Text Text // ID  Accession_number //Score// GRL
+//			EC_number ?Enzyme // GRL
+// (24dec01, second try)
+//			Keyword Text	// instead of ?Keyword
+//			EC_number Text  // oops, no ?Enzyme class installed yet
+// (25dec01, third try) 
+//			  DB_remark ?Text -> Text
+//			  Strain ?Text -> Text
+//			  Clone ?Text -> Text
+//			  Remark ?Text -> Text  ("Feature: source:"?  a bug?)
+// 	Added Tags: 3'UTR, -35_signal, Sex, unsure
+// 	Added/fixed Tags: uRNA, snRNA, scRNA, -10_signal
+// 4jul02:
+//	Tags containing "'" and "-", e.g. 3'UTR, -35_signal, were illegal.
+// 24jul02:  Reordered some tags.
+//	Linkage_Data Map to top.  (as in Map_Data)
+//	Gene Mapping_information to top.  (Is this a bad idea?)
+
+
+// master GrainGenes models.wrm, from: 
+// ~sbeer/AllWheat/Roeder/models.wrm 3feb99 SCB, ex:
+// models.wrm 2.7, for GrainGenes 1.8, from GRL 18mar98, ex:
+// models.wrm 2.2, enhanced 28 Aug 95 for ace4_1, ex:
+// models.wrm v. 1.9, 28 Oct 1994, for GrainGenes 1.4.  ex:...
+// models.wrm for Soybase, from Lisa Lorenzen, 10 Sep 1992, based on:
+// models.wrm - for AATDB, database release 1-6
+
+// DEM 4/94 Removed some fossil tags and classes that weren't in use.
+//	    Added ?Help
+// DEM 10/94 Changed Comment Text to Comment ?Text in ?Gene, ?Gene_Class and
+//	and ?Gene_Set, thus squashing a big bad bug of long standing.
+//           Also changed ?Colleague Mail Text to ?Text, so Text Search's by 
+//	city name etc. will work.
+// v2.1, DEM 6/95: Patched errors reported by xace4_0b4 (mainly dangling XREFs)
+// DEM 7/95 Added Orthologous_gene_set, Current_name, Alien_species to ?Gene
+//	and ?Allele
+// JMW, 6-15-95:  Added Candidate_orthology_group and Possible_orthologues
+// tags from mapdb models.wrm to ?Locus
+//
+// JMW, 6-15-95:  Added anchoring to ?MultiMap copying from mapdb models.wrm. 
+// 
+// JMW 6-15-95: Added tags to Trait_study and Trait_scores classes and an XREF
+// to the Environment class (for R.Line stripe rust data). 
+//
+// JMW 7/31/95: Added Gale_orthology_group and Gale_orthologues tags to ?Locus.
+// JMW 8/01/95: Adding Translocation_break_point as a possible type to Type tag
+// of Class ?Locus.
+// JMW 8/04/95: Added Type STS to Locus data object model.
+// DEM 3 Apr 95, version 2.4: Added Tom De Stein's ?Sequence modifications for
+//	Genbank data
+// DEM 23feb01, changed ?Method as per Gerry Lazo's wEST database.
+// DEM 5dec01, Revised invalid tags: C-bands, 5'UTR, 3'UTR, Temp_optimum(C)
+// DEM 16dec01, Removed ?Sequence XREFs for Species and Germplasm.
+
+
+// models.wrm - main file defining tree class structures
+// This file is read only when starting a new database or when you select
+// "Read Models" or "Add Update File"
+// from the main menu.
+//
+// all tags must appear in tags.wrm or systags.wrm
+//
+
+//?Allele:  DEM 5/93 Modified to load Cat. Gene Symb. for Wheat
+//lines deleted or changed:
+//?Allele Name	Correct_name ?Allele XREF Other_name
+//		Other_name ?Allele XREF Other_name
+//  	Reference_Germplasm ?Germplasm XREF Allele
+//	Origin ?Text
+//10/93 Added link to ?Gene_Product
+// Gary Hart, email of 11/16/93: v, tv, dv, al, and i stocks should be
+//	?Germplasm; ad, s, su and tr should be ?Text
+// Gary Hart, email of 1/5/94: For stocks OTHER than the reference stocks that
+//  are also known to bear a particular allele, use label "Other_stock".
+?Allele Reference ?Reference XREF Allele
+	Correct_name UNIQUE ?Allele XREF Other_name
+	Other_name ?Allele XREF Correct_name ?Reference XREF Allele
+        Previous_name ?Allele ?Reference //DON'T XREF.  For the case of two
+                //old names whose meanings are now swapped. XREF -> confusion!
+        Current_name ?Allele ?Reference //DON'T XREF.
+	Synonym ?Allele XREF Synonym ?Reference //For two valid names for same
+		//allele, e.g. wheat "Aco-H1a (Hordeum)" vs. barley "Aco-1a"
+	Compound_allele ?Allele XREF Component_allele ?Reference
+	Component_allele ?Allele XREF Compound_allele ?Reference
+	Gene UNIQUE ?Gene XREF Allele //Put the Reference in the ?Gene record
+	Gene_product ?Gene_Product XREF Allele ?Reference
+	Locus ?Locus XREF Allele // for molecular alleles, i.e. genotyping
+	Hexaploid_stock ?Germplasm XREF Allele ?Reference
+	Tetraploid_stock ?Germplasm XREF Allele ?Reference
+	Diploid_stock ?Germplasm XREF Allele ?Reference
+	Alien_species ?Germplasm XREF Allele ?Reference
+	Near_isogenic_stock ?Germplasm XREF Allele ?Reference
+	Unnamed_synthetic_stock ?Germplasm XREF Allele ?Reference
+	Homologous_chromosome_substitution_line ?Germplasm XREF Allele ?Reference
+	Alien_chromosome_addition_line ?Germplasm XREF Allele ?Reference
+	Alien_chromosome_substitution_line ?Germplasm XREF Allele ?Reference
+	Translocation_line ?Germplasm XREF Allele ?Reference
+	Origin ?Text ?Reference	//for non-germplasms like "Ace*4/CS"
+	Germplasm ?Germplasm XREF Allele ?Reference //for germplasms in which
+		// the allele is present but which aren't the Stock for it
+	Comment	?Text
+        Mutagen UNIQUE ?Reagent Text	//Text is dose, other conditions.
+	Pathology ?Pathology XREF Resistant_allele
+        Phenotype ?Text
+	//Some of these properties should be dropped or done another way.
+	Properties	Recessive
+			Intragenic_revertant_of_dominant
+                        Dominant
+			Semi_dominant
+			Codominant 
+			Weak
+		        Temperature_Sensitive	Thermo_sensitive
+						Cryo_sensitive
+			Amber
+                        Maternal	Strictly_Maternal
+					Maternal_and_Zygotic
+					With_Maternal_effect
+                        Paternal
+	Image ?Image XREF Allele
+	Interactions ?Text 	//Text says what kind of interaction.
+        Probe ?Probe XREF Source_allele
+	Sequence ?Sequence XREF Allele
+	Mapping_data  3Point ?3_point_data
+               	      Df_Dup ?Df_Dup_data
+	Numbered_reference Int ?Reference XREF Allele //Int is a numbered reference
+						  //citation used in a Comment.
+	Data_source ?Colleague ?Text 	//Text is date, eg 94.04.28
+	Information_source ?Reference // If source is a reference
+	Data_curated ?Colleague ?Text   //Who validated and converted to .ace
+	Last_update ?Text		//PGD wants this for all our data.
+//To add:
+//Clone_of_allele ?Clone  		//clones derived from this allele
+//Molecular_phenotype ?Gel_pattern  	//MWs of bands for this allele
+//External_DB_keys ?Text ?Text  	//links to external databases
+//Dropped:
+//        Sequence ?Sequence		//Use only for ?Probe or ?Clone
+
+
+//?Gene_Class:  DEM extended, 5/93
+//see abbreviation list in Catalogue of Gene Symbols for Wheat, 1988, p.1295
+//DEM 9/93 Added Trait_affected
+//DEM 11/93 removed (should link to Allele instead, maybe Gene):
+//		Gene_product ?Gene_Product
+//  Should change Abbreviation from ?Text to Text.  It's picking up values from
+//  the Germplasm Abbreviation ?Text, which are ALL CAPs.  Or, change the 
+//  name to 'Symbol'?
+//DEM 2/94 Abbreviation ?Text -> Text (collided with Germplasm Abbreviation)
+//	   Changed Character_affected from ?Text to ?Trait
+//DEM 3/94 Appending "XREF Affected_by" to Character_affected caused ACEDB 
+//           death, until database reinitialized.
+//DEM 6/94 Gene <-> Gene_Class links are now routinely causing database death.
+//	     There's some nonuniformity in Space vs. Tab alignment of tags
+//	     in the model here; expanded to all Space's.
+?Gene_Class Reference ?Reference XREF Gene_class
+            URL Text Text // First is URL, second is optional description.
+            Abbreviation Text //eg "Adh". 
+            See_also ?Gene_Class XREF See_also
+            Character_affected ?Trait XREF Affected_by
+	    Pathology ?Pathology XREF Gene_class
+            Orthologous_gene_set ?Gene_Set XREF Gene_class	//e.g. Adh-1
+            Gene ?Gene XREF Gene_class				//e.g. Adh-A1, Adh-B1...
+            QTL ?QTL XREF Gene_class
+            Gene_product ?Gene_Product XREF Gene_class		// GRL
+	    Locus ?Locus XREF Gene_class
+            Clone ?Probe XREF Source_gene_class			//DEM 3/94
+            Sequence ?Sequence XREF Gene_Class			// GRL
+            Comment ?Text
+            Numbered_reference Int ?Reference XREF Gene_class //Int is a  
+                        //numbered reference citation used in a Comment.
+
+//DEM 11/93 created.  E.g. Aadh-1 is a homologous gene set in the Gene_Class
+//Aadh.  The set includes the individuals on homoeologous chromosomes of wheat
+//or other species: Aadh-A1 (Triticum), Aadh-B1 (Triticum), Adh-R1 (Secale), 
+//etc.
+?Gene_Set 	Reference ?Reference XREF Gene_Set
+		Abbreviation ?Text		//eg "Adh-1"
+		Gene_class ?Gene_Class XREF Orthologous_gene_set
+		Character_affected ?Text
+                Gene ?Gene XREF Orthologous_gene_set
+		Comment ?Text
+		Numbered_reference Int ?Reference XREF Gene_Set //Int is a  
+			//numbered reference citation used in a Comment.
+
+//?Gene:  DEM May 93 Modified to load the Catalogue of Gene Symbols for Wheat
+//lines removed or changed:
+//?Gene Name	Gene_class UNIQUE ?Gene_Class XREF Gene
+//		Correct_name ?Gene XREF Other_name
+//              Other_name ?Gene XREF Other_name
+//      Reference_Allele ?Allele XREF Gene Text
+//      Allele  ?Allele XREF Gene
+//	Origin ?Text
+//    New:
+//	Hexaploid_stock ?Germplasm XREF Gene ?Reference, etc.
+//10/93 Added link to ?Gene_Product.  Moved Reference to top of model.
+// Gary Hart, email of 11/16/93: v, tv, dv, al, and i stocks should be
+//  ?Germplasm; ad, s, su and tr should be ?Text.
+// Gary Hart, email of 1/14/94: Add Previous_name and Synonym for the special
+//  usages indicated below.
+// 6/94: Expanded Tab's to Space's in this model.
+// aug00, added for Barley Genetic Stocks: Inheritance, Description, 
+//	First_mutation, Reference_allele_and_background 
+?Gene   Mapping_information Locus ?Locus XREF Associated_gene
+			    Candidate_locus ?Locus XREF Candidate_gene
+        Full_name ?Text //Barley uses full names a lot.
+        Reference ?Reference XREF Gene //The standard reference for this gene
+        URL Text Text // First is URL, second is optional description.
+        Gene_class ?Gene_Class XREF Gene
+	Orthologous_gene_set ?Gene_Set XREF Gene
+        Other_name ?Gene XREF Correct_name ?Reference  
+        Correct_name ?Gene XREF Other_name ?Reference
+        Previous_name ?Gene ?Reference //DON'T XREF.  For the case of two
+                //old names whose meanings are now swapped. XREF -> confusion!
+        Current_name ?Gene ?Reference //DON'T XREF.
+        Synonym ?Gene XREF Synonym ?Reference //For two valid names for same
+                //gene, e.g. wheat and barley names Aco-H1(Hordeum) vs. Aco-1
+		//Use instead of Other_name<->Correct_name for ALL barley genes
+        Compound_gene ?Gene XREF Component_gene ?Reference
+        Component_gene ?Gene XREF Compound_gene ?Reference
+	QTL ?QTL XREF Associated_gene
+        Gene_product ?Gene_Product XREF Gene ?Reference
+        Chromosome ?Text ?Reference
+        Chromosome_arm ?Text ?Reference
+        Hexaploid_stock ?Germplasm XREF Gene ?Reference
+        Tetraploid_stock ?Germplasm XREF Gene ?Reference
+        Diploid_stock ?Germplasm XREF Gene ?Reference
+	Alien_species ?Germplasm XREF Gene ?Reference
+        Near_isogenic_stock ?Germplasm XREF Gene ?Reference
+	Unnamed_synthetic_stock ?Germplasm XREF Gene ?Reference
+        Homologous_chromosome_substitution_line ?Germplasm XREF Gene ?Reference
+        Alien_chromosome_addition_line ?Germplasm XREF Gene ?Reference
+        Alien_chromosome_substitution_line ?Germplasm XREF Gene ?Reference
+        Translocation_line ?Germplasm XREF Gene ?Reference
+        Origin ?Text ?Reference //for non-germplasms like "Ace*4/CS"
+        Reference_allele UNIQUE ?Allele XREF Gene ?Reference
+        Reference_allele_and_background ?Allele XREF Gene ?Germplasm
+        Allele ?Allele XREF Gene ?Reference
+        Inheritance ?Text
+        Description ?Text
+        First_mutation ?Text
+        Comment ?Text
+        Molecular_information   Clone ?Probe XREF Source_gene //3/94
+                                Sequence ?Sequence XREF Gene
+        Pathology ?Pathology XREF Resistance_gene //DEM
+        Image ?Image XREF Gene
+	BGS_photo Text		// for links to Barley Genetic Stocks DB
+        Mapping_data    2_point_data ?2_Point_Data XREF Gene
+                        3Point ?3_point_data
+                        Df_Dup ?Df_Dup_data
+        Related_genes   ?Gene XREF Related_genes ?Text //4/94: Text describes
+                                //kind of relationship.
+        Numbered_reference Int ?Reference XREF Gene //Int is a numbered 
+                                //reference citation used in a Comment.
+	Data_source ?Colleague ?Text 	 //Text is date, eg 94.04.28
+	Information_source ?Reference // If source is a reference.
+	Data_curated ?Colleague ?Text   //Who validated and converted to .ace
+
+?Rearrangement  Name    Correct_name ?Rearrangement XREF Other_name
+                	Other_name ?Rearrangement XREF Other_name
+	        Reference_germplasm ?Germplasm XREF Rearrangement Text
+		Remark ?Text
+		Variant Text
+	        Molecular_Information  Polymorphism Found  ?Probe
+					            Absent ?Probe
+		Mutagen ?Reagent Text	// Text is dose
+		Phenotype	?Text
+	        Dosage_effects  Haplo_insufficiency
+		Qualifier Text
+		Location ?Colleague
+		Author Text
+		Date Text
+		Type    Deletion Uncovers Text
+        	        Duplication Covers Text
+			Translocation
+			Compound	// More types needed?
+		Map ?Map XREF Rearrangement #map_position
+		Proximal_breakpoint ?Breakpoint XREF Distal_rearrangement // 3feb99
+		Distal_breakpoint ?Breakpoint XREF Proximal_rearrangement // 3feb99
+		Positive Proximal_marker ?Locus
+                         Contains ?Locus XREF In_segment
+                Negative Distal_marker ?Locus
+                         Does_not_contain ?Locus XREF Not_in_segment
+		Mapping_data	2Point ?2_Point_Data
+				3Point ?3_point_data
+				Df_Dup ?Df_Dup_data
+	        In_situ  UNIQUE ?Map Float Float
+	        Germplasm	?Germplasm XREF Rearrangement //approx=line 122
+        	Reference ?Reference XREF Rearrangement
+
+
+//?Locus
+//DEM 5 Oct 92:
+//	New "Type" values: RAPD, Gene
+//	Removed:
+//	Mapped_bands	Map ?Map_Data //Lisa
+//			Enzyme ?Restriction //Lisa
+//			A81-356022 float  //Lisa
+//			PI468.916 float  //Lisa
+//v1.5, Feb 93:
+//	"Mapping_information" -> "Map"
+//	Data ?F2_data -> Data ?Map_Data
+// S.Tanksley 3/93 says Locus_type's should include: RFLP RAPD PCR VNTR
+//      Microsatellite Isozyme Gene (Gene includes Morph, Resistance, etc.)
+//v1.6: Added: QTL, Linked_QTL, Image
+//	Removed:
+//	Not_used ?Restriction REPEAT
+//      Polymorphic_for ?Restriction REPEAT //Lisa
+//	Not_polymorphic_for ?Restriction REPEAT
+//4/94: Drop the Wheat_name, Published_name, GrainGenes_name business,
+//	and switch to listing only under published name and Homoeology_
+//	name?
+//	Wheat_name ?Locus XREF GrainGenes_name//Name that follows Wheat rules
+//	Published_name ?Locus XREF GrainGenes_name //Name published as
+//	GrainGenes_name ?Locus  //Put gMap values only in this object
+//Feb 95: Added Candidate_gene, for Gary Hart	
+//JMW, 6-15-95:  Added Candidate_orthology_group and Possible_orthologues
+//	tags from mapdb models.wrm
+//JMW, 7-31-95:  Added Gale_orthology_group, Gale_orthologues.
+//JMW, 8-04-95:  Added Type STS.
+//DEM, 6 Dec 95: Removed: (old version of Candidate_orthology_group)
+//       Homoeology_name ?Locus	//Common name for homoeologs on all maps.
+//dem 24sep04 Made Candidate_orthology_group ?Text instead of ?Locus
+//dem 28sep04 Added Type IFLP (Intron Fragment Length Polymorphism) 
+//	      for Pat Hayes.
+?Locus	Type	RFLP
+		CAPS		//DEM added apr03
+		RAPD
+		APPCR		//DEM added 10/95
+		Microsatellite
+		SNP
+		Indel
+		STS
+		AFLP
+		SSAP
+		IFLP
+		TRAP
+		DArT
+		Gene
+		QTL
+		Trait
+		BAC
+		BAC_contig
+                Translocation_break_point
+		Centromere
+		Telomere
+		C_band
+		Insertion	// For transposon mutagenesis
+	//7/95: Add Other_name, Previous_name, for Wheat Gene Catalog
+        Other_name ?Locus XREF Correct_name ?Reference
+        Correct_name ?Locus XREF Other_name ?Reference 
+        Previous_name ?Locus ?Reference //DON'T XREF.  For the case of two
+                //old names whose meanings are now swapped. XREF -> confusion!
+        Current_name ?Locus ?Reference //DON'T XREF.
+	Synonym ?Locus XREF Synonym    //When neither name is preferred.
+        Location Chromosome Text ?Species     //E.g. 3D
+                 Chromosome_arm Text ?Species //E.g. 3DS, short arm of 3D
+		 Map ?Map XREF Locus #map_position
+                 Main_Marker ?Map XREF Main_Marker
+                 Inside Chrom_Band ?Chrom_Band XREF Inside
+		 	Interval ?Interval XREF Inside
+	Sequence UNIQUE ?Sequence XREF Locus // Only when the Sequence is 
+		// _identical_ to the Locus, e.g. BAC loci on a physical map.
+	Bin ?Bin XREF Locus	// for Kleinhofs' bins. See ?Bin for usage.
+	Bin_locus_in ?Bin XREF Bin_locus             // See ?Bin for usage.
+	Bin_marker_for ?Bin XREF Bin_marker	     // See ?Bin for usage.
+	Positive In_QTL ?QTL XREF Significant_marker // to draw GMAP colors
+                 In_segment ?Rearrangement XREF Contains
+		 In_interval ?Breakpoint_interval XREF Contains // 3fe99
+        Negative Not_in_QTL ?QTL XREF Nonsignificant_marker
+                 Not_in_segment ?Rearrangement XREF Does_not_contain
+		 Not_in_interval ?Breakpoint_interval XREF Does_not_contain // 3feb99
+	Data	?Map_Data XREF Locus #How_mapped
+	Background_marker ?Map_Data //If used specially in Composite Interval
+					// Mapping
+        Linkage_data ?Linkage_Data XREF Locus #How_mapped
+	Mapping_data Well_ordered // DEM 6/95 for ace4
+               	     2_point ?2_Point_Data
+        Species ?Species ?Reference // Species in which location was determined
+	Probe ?Probe XREF Locus ?Reference
+	Allele ?Allele XREF Locus // for molecular alleles, i.e. genotyping
+	//Float is size(s) of restriction bands that were mapped at this locus:
+	TABLE ?Text REPEAT //Column headings for Mapped_bands table, e.g.
+		// Enzyme "Size (kb)" Germplasm Chromosome
+	Mapped_bands ?Restriction ?Text ?Germplasm ?Text 
+		//First ?Text is size in kb. Second is chromosome name, e.g. 6D
+	Linked_QTL UNIQUE ?QTL // dem aug04: This is here to support existing
+		// legacy data that uses it, but probably should switch to
+		// In_QTL. It used to be XREF'd to Nearest_marker.
+	Associated_gene ?Gene XREF Locus //If locus mapped by gene function.
+	Candidate_gene ?Gene XREF Candidate_locus //If mapped by probe.
+	Homology ?Protein Text Text // dem mar02: Data from Probe -> Sequence
+				    // -> Best_pep.  Texts are E-value, Title.
+	Gene_class ?Gene_Class XREF Locus
+        Image ?Image XREF Locus
+	BGS_photo Text		// for links to Barley Genetic Stocks DB
+	Reference ?Reference XREF Locus
+	Data_source ?Colleague Text // Text is date, eg 95.11.10
+	Remarks Text
+        Candidate_orthology_group ?Text
+        Gale_orthology_group ?Text
+//Dropped: 
+//        Candidate_orthology_group ?Locus XREF Possible_orthologues
+//        Possible_orthologues ?Locus XREF Candidate_orthology_group
+//        Gale_orthology_group ?Locus XREF Gale_orthologues
+//        Gale_orthologues ?Locus XREF Gale_orthology_group
+
+//10/97, for Kleinhofs' bins
+?Bin Locus ?Locus XREF Bin   // When the locus was mapped directly in the
+			     // base population for the binmap, e.g. S x M.
+     Bin_locus ?Locus XREF Bin_locus_in    // Locus mapped indirectly.
+     Bin_marker ?Locus XREF Bin_marker_for // Locus defines one of the 
+			                   // endpoints of the bin.
+     Map ?Map XREF Bin #map_position
+     Data_source ?Colleague Text	   // Text is date, eg 2006.01
+
+//4/94 Proposed:
+//List of all loci that are homoeologous, i.e. homologous in function and/or
+//DNA sequence, and not-non-syntenic in location.  Includes loci that are
+//variant names for the same probe used by different authors.
+//?Homoeology_group
+//	Homoeologues ?Locus XREF Homoeology_name
+
+// Constructed type used in ?Locus Data ?Map_Data #How_mapped
+?How_mapped Mapped_with_probe ?Probe
+            Mapped_by_function ?Gene
+
+//?Germplasm
+//DEM 25 Feb 93 Removed the dumb "Pedigree" indentation pseudotag, but no
+//  effect on data display even after "Read models",quit,restart; must 
+//  rebuild database.
+//  Added tags for describing genetic stocks.
+//  Removed the XREF from Collection_and_ID ?Collection
+//  Added XREF for Other_name
+//  Changed Summary_pedigree to Pedigree, and made UNIQUE
+//  Made Species ?Species instead of ?Text
+//v1.6: Added Image, Trait, Trait_scores
+//DEM 13 Aug 94 Removed UNIQUE from Species, Pedigree, etc.  Data should be
+//  loaded and then tested for COUNT > 1 to test for inconsistencies.
+?Germplasm 	Other_name ?Germplasm XREF Other_name // Put data in only one.
+		Species ?Species //Required.  Even if Subspecies also given.
+		Subspecies ?Species //e.g. "Triticum turgidum ssp. durum"
+		Donor_species ?Species 	//For addition chromosomes
+		Type #Germplasm_type
+		Collection_and_ID ?Collection ?Germplasm XREF Other_name
+		Cross_number ?Text	//Identifier used by CIMMYT
+		Chromosome_configuration ?Text
+		Deletion_distal_to ?Breakpoint XREF Distal_deletion_in // 3feb99
+		Contains_breakpoint ?Breakpoint XREF Germplasm // 3feb99
+		Abbreviation ?Germplasm XREF Full_name //DEM 3/94
+		Full_name ?Germplasm XREF Abbreviation // "   "
+		Pairing_configuration ?Text
+		Chromosome_number ?Text //Not Int. "42tt" = ditelosomic substn.
+		Female_Parent ?Germplasm
+		Male_Parent ?Germplasm
+		Pedigree ?Text
+		Selection_history ?Germplasm XREF Other_name
+		Market_Class ?Text
+		Characteristic ?Text 	//e.g. "Awn-color: blue-black"
+		Pathology ?Pathology XREF Resistant_line
+		QTL ?QTL XREF Parent
+		Allele ?Allele XREF Germplasm ?Trait_Study  //dem 24jun04,
+					//to document genotyping studies.
+		Gene ?Gene 	//No XREF, load only from Gene side.
+		Gene_product ?Gene_Product XREF Germplasm //To add Reference,
+							//load from other side.
+		Rearrangement	 ?Rearrangement XREF Germplasm
+		Sequence ?Sequence XREF Germplasm
+		Derived_from ?Germplasm  //DEM: should XREF?
+		Chromosome_donor ?Text //for additions, substitutions.  May be
+			// a Germplasm or Species (or any text)
+		Cytoplasm ?Text
+		Developed_by ?Text //changed from ?Colleague for KDK, 2/94
+		Development_site ?Text //e.g. Alabama-USA
+		Collection_site ?Text  //e.g. "By the road, near Tel Aviv"
+		Date_collected ?Text   //e.g. 72.08.09
+		Primary_collection ?Collection
+		Date_of_release ?Text
+		Registration_No ?Text     //lisa
+		Remark ?Text
+		Polymorphism ?Polymorphism #Presence //list of band sizes
+		Trait_description ?Trait_Study XREF Germplasm_description ?Text ?Text 
+			// First Text is coded score, second is rough 
+			// translation.
+		Trait_score ?Trait_Study Float ?Text 
+			// Float is score, Text is units.  NOTE:  No XREF.
+			// Must manually add data to
+			///?Trait_Study Germplasm_score ?Germplasm Float ?Text
+		Reference ?Reference XREF Germplasm
+		Data_source ?Colleague ?Text //Text is date, e.g. 93.08.27
+		Data_curated ?Colleague ?Text // Who converted source to .ace
+		Mapping_data ?Map_Data
+                Linkage_data ?Linkage_Data
+		2_point_data ?2_Point_Data
+                DNA_library ?Library XREF Germplasm
+		Trait_study ?Trait_Study
+        	Image ?Image XREF Germplasm
+		Trait_scores ?Trait_scores //Should be near end of model, 
+			//could be a long list.
+		Coefficient_of_parentage ?Germplasm Float //Must be at end of
+			//model; this could be a Long list.  Should XREF, or
+			//let folks query for the other matrix direction?
+//DEM 5/93: Old tags expunged:
+//		Traits ?Trait #Trait_Information 
+//    9/93: Changed 'Remark General_remark' to 'Remark'
+//DEM 4/94: Old tags expunged:
+//		Generation_derived UNIQUE Text
+//		Selection_method ?Text
+//		Maturity_group ?Text
+//		Phenotype UNIQUE ?Text  //DEM: Delete?
+//		Genotype Text	//3/94: not used yet
+//		Growth_Req UNIQUE Text
+//		Mutagen UNIQUE ?Reagent
+//		Location ?Colleague #Lab_Location
+//		Source ?Text
+
+//?Germplasm_type, DEM 2/93  
+// Controlled vocabulary for ?Germplasm Type tag.
+?Germplasm_type	Cultivar
+		Elite_germplasm
+		Germplasm
+		Substitution
+		Translocation
+		Amphiploid
+		Aneuploid
+		Deletion
+		Duplication
+		Alien_addition
+		Synthetic
+		Recombinant_translocation_line
+		Mutation
+	        Isogenic
+		Marker
+		Alloplasmic_line
+
+// ?Presence, DEM 1/95
+// List of band sizes present or absent for a polymorphism in a ?Germplasm.
+// Used in 
+// ?Germplasm
+//            Polymorphism ?Polymorphism #Presence
+?Presence Present ?Text REPEAT // e.g. 14.5 6.6 4.4
+          Absent ?Text REPEAT
+
+// 5/94 DEM updated for acedb 3.0
+// 8/95 DEM partly updated for ace4_1
+?Map	Type UNIQUE Genetic  // this flag can be used to define subclasses
+                    Cytogenetic //Chromosome could be Map, filtered Cytogenetic
+                    Physical
+        Species ?Species	// GRL to assist queries
+        Mapping_data ?Map_Data XREF Map
+        Linkage_data ?Linkage_Data XREF Map
+        Display Non_graphic  // Prevents a graphic display 
+                Title UNIQUE ?Text
+                Remark Text // Will appear in top right corner  
+		Flipped // Then coordinates go upwards
+                Unit UNIQUE Text // i.e. kb, centiMorgan, MegaParsec
+		Centre UNIQUE Float UNIQUE Float  // centre, width - else 0, 10
+	    	Extent UNIQUE Float UNIQUE Float  // min, max
+		Default_view UNIQUE ?View
+		Minimal_view UNIQUE ?View // use this when >1 map displayed
+		View ?View	// Columns to display
+        Inherits  From_map UNIQUE ?Map 	  // To locally edit
+		  Author Text             // login name of who edited it
+		  Date Text
+ 	Main_Marker Main_Locus ?Locus // Items shown left of locator
+		    Band ?Chrom_Band
+        Contains Locus ?Locus XREF Map
+                 Chrom_Band ?Chrom_Band XREF Map
+		 Rearrangement ?Rearrangement XREF Map
+		 Interval ?Interval XREF Map
+		 Breakpoint ?Breakpoint XREF Map // 3feb99
+		 Breakpoint_interval ?Breakpoint_interval XREF Map // 3feb99
+                 QTL ?QTL XREF Map
+		 Contig ?Contig
+		 Bin ?Bin XREF Map
+
+?map_position UNIQUE Position UNIQUE Float #map_error
+                     Ends Left UNIQUE Float #map_error
+                          Right UNIQUE Float #map_error
+                     Multi_Position  Float #map_error //2 places on same Map
+       		     Multi_Ends Float UNIQUE Float
+		     With UNIQUE With_locus UNIQUE ?Locus #Map_offset
+			// see probe.nalusda.gov:/acedocs/magic/map.html
+
+// used for ?map_position With
+?map_offset Offset UNIQUE Float
+
+?map_error Error UNIQUE Float
+
+?View 	Type 	UNIQUE	Pepmap 	
+			Fmap
+		  	Gmap
+			Grid  Grid_map Int #View_tags // Int is priority
+			      Grid_edit_default UNIQUE Text UNIQUE Text 
+			      Grid_edit_menu Text UNIQUE Text 
+			Pmap  Pmap_probes Pmap_probe_query Text
+					  Pmap_probe_height Int
+			      Pmap_YAC  Pmap_YAC_query Text
+					Pmap_YAC_bold_query Text
+					Pmap_YAC_height Int
+			      Pmap_cmid Pmap_cmid_query Text
+					Pmap_cmid_bold_query Text
+					Pmap_cmid_height Int
+			      Pmap_locus Pmap_locus_query Text
+					 Pmap_locus_height Int
+			      Pmap_remark Pmap_remark_query Text
+					  Pmap_remark_height Int
+				// 1st text tag name, 2nd text optional "Negative"
+	Display Submenus	// BOOL for submenus on item boxes
+		Cambridge	// Cambridge v. Montpellier behaviour
+		No_buttons      // suppress header buttons for WWW 
+		Hide_header     // No headers and footers 
+	Name 	UNIQUE 	Text
+	Columns	Text UNIQUE Int #Column	// Int is BOOL for Hidden/Visible
+
+?Column	UNIQUE	Scale Scale_unit UNIQUE Float	// minimum increment
+		      Cursor Cursor_on
+			     Cursor_unit UNIQUE Float
+		Locator Magnification UNIQUE Float
+			Projection_lines_on
+		Marker_points
+		Marker_intervals
+		Contigs
+		Reversed_physical
+		Physical_genes
+		Two_point
+		Multi_point
+		Likelihood
+		Points	Point_query UNIQUE Text
+			Point_yellow UNIQUE Text
+                        Point_colour Text #Colour // to replace above
+			Point_width UNIQUE Int	// max width if not at RHS
+                        Point_error_scale UNIQUE Float
+			Point_segregate_ordered
+                        Point_show_marginal
+			Point_pne #Colour // positive, no error
+			Point_pe  #Colour // positive, error
+			Point_nne #Colour // negative, no error
+                	Point_ne  #Colour // negative, error
+			Point_symbol UNIQUE Text // can now have more than one of these
+		Interval_JTM	#Interval_col_conf
+		Interval_RD	#Interval_col_conf
+               	Interval_SRK 	#Interval_col_conf
+		Derived_tags	DT_query UNIQUE Text
+				DT_width UNIQUE Int
+				DT_no_duplicates
+                                DT_neighbours
+                                DT_parents
+				DT_follow_parent
+                                DT_symbol_query
+                                DT_tag Text
+                                DT_hide
+ 		Spacer          Spacer_colour #Colour
+                                Spacer_width Float
+		RH_data		RH_query UNIQUE Text
+				RH_spacing UNIQUE Float
+				RH_show_all
+				RH_positive #Colour
+				RH_negative #Colour
+				RH_contradictory #Colour
+		pepSequence	PS_Highlight_residue   // il all needed for colomn display of peptides
+				PS_Residues_per_wrap Int
+				PS_Colours Text #Colour
+		Hydrophobicity	HP_Show_Zero_bar
+				HP_Fixed_Scaling
+				HP_Calculation_window Int
+				HP_Display_width Int
+                Homol           HOM_bump
+                pepFeature      FEA_bump
+                                FEA_Query Text
+                Homol_Name      HOM_NAME_bump
+				HOM_NAME_width Int
+                pepActiveZone
+	
+?View_tags	Colour #Colour
+		Surround_colour #Colour	// colour when surround
+		Tag Text		// could be many tags
+
+?Interval_col_conf 	Query UNIQUE Text // Query
+			Names_on
+			No_neighbours
+			Show_multiple
+			Width UNIQUE Int
+			Symbol UNIQUE Text
+			Colours Text #Colour // Only for chrom_bands.
+			Pne #Colour // positive, no error
+			Pe  #Colour // positive, error
+			Nne #Colour // negative, no error
+                	Ne  #Colour // negative, error
+
+//JMW 6-15-95:  Added everything below ?MultiMap Map ?Map from mapdb
+//	models.wrm to allow anchoring.
+?MultiMap Map ?Map
+          Min Int // keep loci appearing on at least min maps. Default = 2 
+          Anchor UNIQUE Text UNIQUE Text UNIQUE Text  // Class tag1 tag2
+                            // i.e Locus Homeology_group Homelogs
+                            // class members on different maps with the
+                            // same Anchor tag will be chained
+
+
+?Reagent        Other_name ?Reagent XREF Other_name
+		Description Text
+		Remark Text
+		Reference ?Reference
+		Source ?Source
+		Contact ?Colleague
+
+//?Library
+//Created DEM 15mar01
+//For DNA clone libraries, especially ones for EST sequencing and RFLP probes
+?Library Type cDNA
+              Genomic
+	      BAC
+	      YAC
+	 Source ?Colleague
+         Species ?Species XREF DNA_library
+         Germplasm ?Germplasm XREF DNA_library
+	 Chromosome Text
+	 Developmental_stage ?Text
+	 Tissue ?Text
+	 Treatment ?Text
+	 Date ?Text
+	 Vector ?Text
+	 Cloning_site ?Text
+	 Number_of_clones Text
+	 Clone_size Text
+	 Coverage Text
+	 Sequencing_primers ?Text
+	 Reference ?Reference
+	 WWW_page Text
+	 Remark Text
+	 Data_source ?Colleague Text  // Text is date.
+	 Probe ?Probe XREF DNA_library
+	 Sequence ?Sequence XREF DNA_library
+
+//?Probe
+//DEM 8/27/93: Added Data_source, changed Derived_from to Source_germplasm
+//DEM 12/16/93: Removed the following unused and undesired tags:
+//	Type	#Probe_Type	//Replaced with local booleans under Origin
+//		Y_Remark Text
+//		PCR_Remark ?Text
+//		  Hybridizes_to_YAC ?Probe XREF Positive_probe REPEAT//obselete
+//		  Vaxmap UNIQUE Float
+//		Insert_sequence ?Sequence //Lisa
+//	Length		Seq_length UNIQUE Int
+//			Gel_length Float Float	// Kb
+//			HindIII_sites UNIQUE Int
+//       Map ?Map_Data 
+//        FingerPrint     Gel_number UNIQUE Int
+//                        Approximate_match_to UNIQUE ?Probe XREF Canonical_for
+//                        Exact_match_to UNIQUE ?Probe XREF Canonical_for
+//                        Funny_match_to UNIQUE ?Probe XREF Canonical_for
+//                        Canonical_for ?Probe
+//                        Bands   UNIQUE Int Int
+//		        Flag    UNIQUE Int
+//	Calcul	Session Int
+//		Neighbours ?Probe UNIQUE Float
+//		Cor   Int
+//		Common_bands  FREE
+//DEM 10/94: Added the Other_name <-> Please_see aliasing.
+?Probe  Locus   ?Locus XREF Probe
+	Other_name ?Probe XREF Please_see ?Reference //Please_see is the 
+					  // accepted name, 
+	Please_see ?Probe XREF Other_name // Other_name is for alternates.
+	Synonym ?Probe XREF Synonym	  // Nov97, added for Katrien.
+	Related_probe ?Help ?Probe	  // ?Help is a word for the
+				// relationship, explained in the ?Help object.
+	Similar_probes ?Probe XREF Similar_probes // Probe _clusters_, based
+						  // on sequence homology.
+	External_DB ?Text ?Text	//e.g. "Sequence L43928", for GenBank link
+	Reference ?Reference XREF Probe  //DEM Added
+        General_remark ?Text
+	Type cDNA	//booleans
+	     Genomic
+	     PCR
+             SSR
+             STS
+	     EST
+	     Isozyme
+	PCR_primers ?Text  // mar00, currently being used for STSs, RAPDs,
+			   //   SSRs.  Need to separate these out.
+	AFLP_primers ?Text // E.g. "E37 5' GACTGCGTACCAATTCACG"
+        STS_primers ?Text  // Both primers in one text field.
+	STS_size ?Text
+	SSR_size ?Text
+	Amplification_conditions ?Text
+	Specificity ?Text // What genes or alleles are known to be recognized
+			  // or distinguished, or not.
+	Sequence	?Sequence XREF Probe
+	Barley_rating Excellent
+		      Good
+		      Fair
+		      Poor
+	Copy_number Text
+	Background ?Text      //Lowest is clearest. Show scale, e.g. "3/5".
+	//Chromosome, Enzyme, Score.  E.g. '7A EcorI "33 (3/13)"'
+	Wheat_polymorphism ?Text ?Restriction ?Text
+        //Chromosome, Enzyme, Score.  E.g. '2D EcoRI "15 (2/15)"'
+	Barley_polymorphism ?Restriction ?Text
+	// Band sizes for this probe, a different ?Polymorphism for each
+	//  restriction enzyme.  Each one contains data for all germplasms.
+	// ?Text is "Polymorphic", "Not", "Maybe", "Mapped"
+	Cross_hybridizes_to ?Species Text
+	Polymorphism ?Polymorphism XREF Probe ?Text
+	Gel ?Gel XREF Probe  //Electrophoretogram, autoradiogram...
+	Linkage_Group ?Text
+	//DEM: Insert_enzyme is the enzyme used to cut the insert DNA before
+	//  inserting into the vector.  Is there a better name?  "Cloning_
+	//  enzyme"?  "DNA_enzyme"?
+	Origin	DNA_library ?Library XREF Probe
+                Insert_enzyme ?Restriction ?Restriction
+		Source_gene_class ?Gene_Class XREF Clone //if Gene not known
+		Source_gene ?Gene XREF Clone 		 //3/94
+        	Source_allele ?Allele XREF Probe
+		Source_species ?Species
+		Source_germplasm ?Germplasm
+		Source_tissue ?Text 
+		DNA_Origin ?Text //eg Hydroxylapatite-PERT-genomic (Bad label)
+	Insert	Size Float ?Text // Text: additional bands, notes
+		PCR_size Float   //size using Vector_PCR_primers
+				 //Change to Insert_PCR_size?
+	Clone   Vector   ?Text
+		Vector_enzyme ?Restriction //enzyme used to open the vector
+		Excision_enzyme ?Restriction ?Restriction // enzyme(s) used
+			              // to remove insert from the vector
+		Vector_PCR_primers ?Text
+		Vector_amplification ?Text
+		Bacterial_strain ?Text
+		Antibiotic ?Text
+		Subcloned_in ?Probe XREF Subclone_of
+		Subclone_of ?Probe XREF Subcloned_in
+		Location ?Colleague
+		Authority ?Colleague
+		In_pool ?Pool XREF Probe
+        	Gridded ?Probe_Grid
+	Position  Hybridizes_to ?Probe_Grid ?Probe XREF Positive_probe ?Text
+		  Positive_probe ?Probe
+		  Positive_pool_probe ?Pool
+	Image ?Image XREF Probe //Lisa
+	Data_source ?Colleague ?Text //Text is date, e.g. 93.08.27
+        Information_source ?Reference   //If source is a Reference, other than
+					// the primary reference.
+	Note ?LongText
+//4/94 Old tags expunged:
+//      Position  In_situ  UNIQUE Int Int
+//		  Chrom_Band ?Chrom_Band XREF Probe
+//                pMap UNIQUE ?Contig XREF Probe Int Int // bands pMap units
+//		  bMap UNIQUE Int Int	// base units
+//		  Autopos
+
+//DEM 8/93 Restructured
+//Information describing an electophoretic polymorphism: RFLP, PCR, isozyme,
+//seed proteins, etc.
+//DEM 11/93 removed old version of table:
+//	      TABLE ?Text //Column headings for the Size table, e.g.
+//			  //"    Germplasm    Gel Number   Size (kb) Intensity"
+//	      // Float is in Kb, ?Text is "Faint", "Medium", "Dark":
+//	      Size ?Germplasm XREF Polymorphism ?Gel XREF Polymorphism Float ?Text 
+//DEM 1/95 Added Band_sizes, Pattern (based on RiceGenes)
+//DEM 10/95 Removed:
+//	      Locus_mapped ?Locus	  // no XREF; load ?Locus Mapped_bands
+?Polymorphism Probe UNIQUE ?Probe XREF Polymorphism
+	      Enzyme UNIQUE ?Restriction  // For RFLPs; omit for PCR probes.
+              //
+	      TABLE ?Text REPEAT //Column headings for the Size table, e.g.
+		  //     "    Gel Number   Size (kb) Intensity    Germplasm"
+	          // or the Value table, e.g.
+		  //     "Species   " "Allele" "Germplasm"
+	      // Float is in Kb, ?Text is "Faint", "Medium", "Dark":
+	      Size ?Gel XREF Polymorphism Float ?Text ?Germplasm XREF Polymorphism 
+	      // Gale-style table.  Text is Allele letter.:
+	      Value ?Species Text ?Germplasm  
+	      //
+	      Band_size ?Text //Column headings for the Pattern table, e.g.
+                              //"14.5 12.3  4.4"
+              Pattern Text ?Germplasm // Don't just XREF, say Present/Absent
+	      //
+	      Germplasm ?Germplasm XREF Polymorphism //Use when there are no
+			  //size measurements, just an image.
+	      Image ?Image XREF Polymorphism	    // Autoradiogram, gel photo
+              Remarks Text
+	      Reference ?Reference
+	      Data_source ?Colleague Text // Text is date, eg 95.11.10
+
+//DEM 8/93 New
+//Information about a gel electrophoretogram or autoradiogram (DNA, protein...)
+//A blot or film is also a ?Gel.
+//Better name for this class?  "Phoretogram"?
+?Gel	Probe ?Probe XREF Gel	
+	Date ?Text  // Date of gel or blot or autorad, then what procedure
+		    // E.g. "93.08.05 DNA extraction"
+		    // Standard date format: "93.08.05" (5 Aug 93)
+	Run_by ?Colleague	// Who did the lab work
+	Conditions ?Text	// Stringency, exposure time,...
+	Polymorphism ?Polymorphism  //LOAD AS ?POLYMORPHISM XREF, NOT DIRECTLY
+	Germplasm ?Germplasm	// Source of sample.
+	Image ?Image		
+	TABLE Text REPEAT 	// Column headings for Band table.
+        Band ?Restriction Float UNIQUE Int UNIQUE Text // Kb, Intensity, Chrom
+	Data_source ?Colleague Text  // Text is date, e.g. 97.11
+
+?Probe_Grid	Title	?Text
+		Layout	Columns	Int
+			Lines_at	Int Int	// x, y spacing
+			Space_at	Int Int	// x, y spacing
+			No_stagger	// default is with alternate lines staggered
+			A1_labelling	// label spaced blocks a-h down LHS, 1-12 across top
+		Row Int ?Probe XREF Gridded REPEAT
+
+//4/94: Unused, possibly unusable in acedb3.0
+?Contig bMap	Length UNIQUE Int	// in base units
+		Position UNIQUE Int	// left extremity in bases
+		b2g	UNIQUE	Float Float // gMap = ax + b
+	gMap	UNIQUE ?Map XREF Contig Float Float	// extremities on gMap
+        pMap    UNIQUE Int Int         // extremities in pMap units
+//	Probe	?Probe XREF Contig
+//      Locus	?Locus XREF bMap
+
+//DEM 11/94 First use.  Based on current SolGenes + old Soybase
+//    11/95 'Results' -> 'Simple_distance', to allow 'Gmap data' display
+//	    Removed 'Standard_error'.
+?2_Point_Data  Point_1 UNIQUE Locus_1 UNIQUE ?Locus XREF 2_point
+                                            //? Edie appends "UNIQUE Int".
+	       Point_2 UNIQUE Locus_2 UNIQUE ?Locus XREF 2_point
+	       Gene ?Gene XREF 2_point_data // A convenience link for querying
+		     // from the Gene side.  ?Locus values are still required.
+	       Simple_distance Min      Float
+			       Distance Float
+			       Max      Float
+			       Error    Float
+                               Distance_units Text
+			       Linkage  Text
+	       Trait_marker	//== Locus_1 is a gene or qtl and Locus_2 is 
+				// a molecular marker for it.
+	       QTL
+               Location Chromosome Text     //E.g. 3D
+                        Chromosome_arm Text //E.g. 3DS
+               Species ?Species // Give this even if parents also given.
+	       Female_Parent ?Germplasm	XREF 2_point_data
+	       Male_Parent ?Germplasm XREF 2_point_data
+               Parent ?Germplasm XREF 2_point_data // If cross was reciprocal,
+						   //  or unknown
+	       Population ?Text // If parents not known
+               Generation ?Text // e.g. "BC1F2"
+	       Number_of_individuals Int
+	       Method ?Text
+               // for raw segregation data:
+               Map_data ?Map_Data XREF 2_point
+               Linkage_data ?Linkage_data XREF 2_point
+               //Mapped_by ?Colleague // DEFUNCT, EXPUNGED 2/96
+	       Contact ?Colleague // Replaces Mapped_by, for Penner & Sorrells
+	       Reference ?Reference XREF 2_point_data 
+               URL Text Text // First is URL, second is optional description.
+	       Remark ?Text
+	       Data_source ?Colleague ?Text // Text is date, 94.11.30 e.g.     
+
+?Df_Dup_data 	       Rearrangement ?Rearrangement XREF Df_Dup
+		       Allele1 Text  // when the def is also known as allele
+		       Gene UNIQUE ?Gene XREF Df_Dup
+                       Allele UNIQUE  ?Allele XREF Df_Dup
+                       Linkage_Group ?Map
+                       Temperature UNIQUE Text
+                       Date  UNIQUE Text
+                       Mapper ?Author
+                       Genotype UNIQUE Text
+                       Results UNIQUE Text
+                       CGC   Flag Text
+                             Laboratory UNIQUE ?Colleague
+			     Linkage Text
+                       AATDB   Note UNIQUE Text
+         		       Total UNIQUE  Int
+		               A_deletes_B  UNIQUE Text Text
+         		       A_does_not_delete_B UNIQUE  Text Text
+		               A_includes_B UNIQUE  Text Text
+         		       A_does_not_include_B UNIQUE   Text Text
+
+?3_point_data          Gene1 UNIQUE ?Gene XREF 3Point ?Allele XREF 3Point
+                       Allele1 UNIQUE  ?Allele XREF 3point
+                       Gene2 UNIQUE ?Gene XREF 3Point ?Allele XREF 3Point
+                       Allele2 UNIQUE  ?Allele XREF 3point
+                       Gene3 UNIQUE ?Gene XREF 3Point ?Allele XREF 3Point
+                       Allele3 UNIQUE  ?Allele XREF 3point
+		       Linker ?3_point_data XREF Linker
+                       Linkage_group ?Map
+                       Temperature UNIQUE Text
+                       Date  UNIQUE Text
+                       Mapper ?Author
+                       Genotype  Text
+                       Results Text
+                       Result_type ABC
+                                   AB_C
+                                   A_BC
+                       Recombinant_1 Text
+                       Recombinant_2 Text
+                       Recombinant_3 Text
+                       Counts UNIQUE Int Text Int Text Int Text Int Text
+                       CGC   Laboratory UNIQUE ?Colleague
+
+//?Colleague
+// New version from Edie Paul, 3/93
+// DEM 10/93 Added Image
+?Colleague      Position Text
+                Profession Text
+                Institution // Boolean, = "not_person"
+                Address Mail ?Text 
+                        Country ?Text 
+                        Phone Text
+                        Fax Text
+                        E_mail Text
+                        Telex Text
+		WWW_page Text
+		Background Text	// Training, experience, degrees
+                Research_interest ?Text
+		Image ?Image XREF Colleague
+                Publishes_as ?Author XREF Full_name
+		Remark Text   // Note uncertainties, possible other_names etc.
+                Obtained_from ?Source Text // Text is date, e.g. 95.10.27
+                Last_update UNIQUE ?Text // For info direct from source, yy.mm 
+
+//?Author
+//DEM: On R.Durbin's advice, 11 Mar 93 (~/Mail/acedb), removed the 
+//    "XREF Author" after "Paper ?Reference".  To avoid scrambled Author orders
+//    in papers loaded from dump files.
+?Author Full_name ?Colleague XREF Publishes_as
+        Paper ?Reference
+	Image ?Image
+
+?Journal Other_name ?Journal XREF Other_name
+	 Source_code ?Text
+	 ISSN_number Text
+	 URL Text
+	 Remark Text
+         Paper ?Reference XREF Journal
+
+//?Reference
+//DEM Jan 94 Added Agricola_code, Gene_Catalogue_number, Cited_in.
+//    Feb 94 Added Series
+?Reference  Reference   Title UNIQUE ?Text
+                        Original_title Text
+			Journal UNIQUE ?Journal XREF Paper
+			Publisher UNIQUE Text
+			Series ?Text  // for named series of named volumes
+			Contained_in ?Reference XREF Contains
+                        Year Int      // Pers.Comm.s might have more than one. 
+                        Volume UNIQUE Int Text  //Text when Int isn't complete
+                        Page  UNIQUE Int Int
+			Remark Text   //e.g. when page numbers aren't Int's
+			URL Text         //for WWW hrefs
+			Online Text Text //e.g. "PubMed" "10417723", Text1 is
+					 //database, Text2 is accession.
+	    Institution Text
+	    Author ?Author XREF Paper
+	    Editor ?Author XREF Paper
+	    Type UNIQUE Text 	     //Article, Book, Proceedings, Abstract,
+			     	     //Dissertation, Bulletin, or Report
+	    Language Text	     //English, Spanish, ...
+	    Image ?Image XREF Reference
+	    Abstract Text
+	    Contains ?Reference XREF Contained_in
+	    Refers_to	Gene_class ?Gene_Class XREF Reference	
+			Gene_set ?Gene_Set XREF Reference
+			Gene ?Gene XREF Reference
+			Allele ?Allele XREF Reference
+			Locus ?Locus XREF Reference
+			Rearrangement ?Rearrangement XREF Reference
+			Breakpoint ?Breakpoint XREF Reference // 3fe99
+			Probe ?Probe XREF Reference
+			Sequence ?Sequence XREF Reference
+			Germplasm ?Germplasm XREF Reference
+			Mapping_data ?Map_Data XREF Reference
+                        Linkage_data ?Linkage_Data XREF Reference
+			2_point_data ?2_Point_Data //Lisa
+			Trait_study ?Trait_Study XREF Reference
+			Isolate ?Isolate XREF Reference
+			QTL ?QTL XREF Reference
+	    Keyword ?Keyword
+	    Agricola_code ?Text
+	    Gene_Catalogue_number Int	//Ref number in 1993 Wheat Gene Catalog
+	    Cited_in ?Reference		//4/94 DEM changed from ?Text
+	    Summary_of ?Reference XREF Summarized_in	//e.g. Plant Breeding 
+							//Abstracts
+	    Summarized_in ?Reference XREF Summary_of	
+
+?Restriction	Site UNIQUE Text
+		Offset Text
+		Cleavage Text
+		Overhang Text
+		Isoschizomers ?Restriction REPEAT
+		Company ?Source
+		Reference ?Reference
+		Remark Text
+
+// DEM 4/95 Added External_DB_key, like RiceGenes's
+// 4/96: This version replaced by the TPD (Tom De Stein) revision below.
+// ?Sequence Title UNIQUE ?Text
+// 	  Other_name ?Text	// for repeats
+// 	  External_DB ?Text ?Text //e.g. "Sequence" "X63202". "Sequence" makes					 // link to EMBL, Genobase etc. via WWW
+// 	  Sequence Text // To show sequence in this Tree window instead of fMap
+// 	  Type UNIQUE DNA UNIQUE ?DNA UNIQUE Int	// Int is the length
+// 		      Peptide UNIQUE ?AA
+//           RNA			// if this tag is set display AUGC
+// 	  Length UNIQUE Int
+// 	  Library	?Source Text Text // ID  Accession_number
+// 	  Subsequence_of	Source UNIQUE ?Sequence
+// 				Source_Exons Int Int // sequence of positions in genomic
+// 	  General	cDNA
+// 		  	Probe ?Probe XREF Sequence 
+// 			Gene ?Gene XREF Sequence
+// 			Gene_product ?Gene_Product XREF Sequence
+// 		        Related_Sequence ?Sequence XREF Related_Sequence
+// 			Keyword ?Keyword
+// 	  		Remark ?Text
+// 			DB_remark ?Text
+// 	  		Reference ?Reference XREF Sequence
+// 			DB_searched ?Source Int // number of homologues found
+// 	  		Data_source ?Colleague ?Text // ?Text is date.
+// 	  Properties    Pseudogene Text
+// 			Transposon
+// 			Coding	CDS UNIQUE Int Int
+// 				Precursor
+// 			Transcript	End_not_found
+// 				 	Start_not_found Int // Int is frame of base 1
+// 					mRNA	Processed_mRNA
+// 						Unprocessed_mRNA
+// 					tRNA Text
+// 					rRNA Text
+// 					snRNA Text
+// 	  Contains	Has_CDS ?Sequence XREF Source Int Int
+// 			Has_Transcript ?Sequence XREF Source Int Int
+// 			Has_Pseudogene ?Sequence XREF Source Int Int
+// 			Has_Structural_RNA ?Sequence XREF Source Int Int
+// 			Has_Transposon ?Sequence XREF Source Int Int
+// 			Has_Subsequence ?Sequence XREF Source Int Int
+// 			Has_Other_Subsequence ?Sequence XREF Source Int Int
+// 	  Features	polyA_signal Int Int // putative
+// 			promoter Int Int ?Text
+// 			polyA_site Int Int Text
+// 			misc_signal Int Int ?Text
+// 			misc_feature Int Int ?Text
+// 			repeat_region Int Int Text
+// 			repeat_unit Int Int Text
+// 			mutation Int Int ?Text
+// 			sig_peptide Int Int Text
+// 			mat_peptide Int Int Text
+// 			old_sequence Int Int Text
+// 			protein_bind Int Int Text
+// 			modified_base Int Int Text
+
+// Start copy from SAMPLEDB
+?Sequence DNA UNIQUE ?DNA UNIQUE Int		// Int is the length
+	  Length Int Text // Text is units, e.g. KB, Bands
+          Peptide UNIQUE ?Peptide UNIQUE Int    // GRL
+          Contigset ?Contigset	     // dem 1mar02, for EST contig sets
+	  Contig_members ?Sequence XREF Contig
+	  Contig ?Sequence XREF Contig_members
+	  Singleton_in ?Contigset
+	  Tracefile Text
+	  Structure  From	Source UNIQUE ?Sequence
+				Source_Exons Int UNIQUE Int // start at 1
+		     Subsequence ?Sequence XREF Source UNIQUE Int UNIQUE Int
+                     Sequence Text // TPD
+		     Overlap_right UNIQUE ?Sequence XREF Overlap_left UNIQUE Int
+			// potentially use Overlap_right integer for auto-linking
+		     Overlap_left UNIQUE ?Sequence XREF Overlap_right
+		//     Clone_left_end ?Clone XREF Clone_left_end UNIQUE Int // TPD
+		//     Clone_right_end ?Clone XREF Clone_right_end UNIQUE Int // TPD
+	//  DB_info	Database ?Database Text Text // ID  Accession_number // TPD
+	  DB_info	External_DB Text Text Text ?Reference // Texts: Database,Accession,Evidence-code
+	        	Database ?Database Text Text // ID  Accession_number //Score// GRL
+			DB_xref ?Sequence // GRL
+			Blast_hits ?Database Text Text	// GRL database-geneid-accession
+		  	DB_remark Text		// EMBL/Genbank
+//			EC_number ?Enzyme // GRL
+			EC_number Text // dem 24dec01 temporary
+			Keyword Text	// EMBL/Genbank
+	  Origin  Germplasm ?Germplasm
+		  Species ?Species
+                  Cultivar Text // 25dec01
+                  Chromosome Text // 18dec01
+                  Clone_lib Text // 18dec01
+                  Tissue Text // 18dec01
+                  Dev_stage Text // 18dec01
+                  Sex Text // GRL
+		  Date Text  // TPD
+	// TPD	  Date DateType Text			// Text for comments on operation
+                  Data_source ?Colleague Text // TPD  Text is date from Genbank
+	  Map ?Map // TPD XREF Sequence #Map_position	// use in particular for Genomic_canonical
+	  Visible	Title UNIQUE Text
+	  		Other_name ?Text	// for repeats
+			Matching_Genomic ?Sequence XREF Matching_cDNA
+		 	Matching_cDNA ?Sequence XREF Matching_Genomic
+			Corresponding_protein UNIQUE ?Protein XREF Corresponding_DNA  // GRL
+			Strain Text // GRL
+                 	DNA_library ?Library XREF Sequence  // DEM
+			Clone Text // GRL
+		  	Probe ?Probe XREF Sequence // TPD
+          	        Locus UNIQUE ?Locus XREF Sequence //  Only when Sequence is
+ 		          // _identical_ to the Locus, e.g. BAC loci on a physical map.
+			Enzyme ?Enzyme // TPD XREF DNA
+			Allele ?Allele XREF Sequence
+                        Gene ?Gene XREF Sequence
+		        Related_DNA ?Sequence XREF Related_DNA Text // Text gives relationship.
+		// TPD  Related_protein ?Protein XREF Related_DNA
+			Gene_class ?Gene_Class XREF Sequence
+			Gene_product ?Gene_Product XREF Sequence
+			Remark Text
+			Confidential_remark ?Text
+			Brief_identification UNIQUE ?Text
+	  		Reference ?Reference XREF Sequence
+		// tag2 system: names of all objects following next tag are shown in the 
+		//   general annotation display column as "tag:objname"
+	  Contains	Has_CDS ?Sequence XREF Source Int Int // TPD
+			Has_Transcript ?Sequence XREF Source Int Int // TPD
+			Has_Pseudogene ?Sequence XREF Source Int Int // TPD
+			Has_Structural_RNA ?Sequence XREF Source Int Int // TPD
+			Has_Transposon ?Sequence XREF Source Int Int // TPD
+			Has_Subsequence ?Sequence XREF Source Int Int // TPD
+			Has_Other_Subsequence ?Sequence XREF Source Int Int // TPD
+	  Properties    5prime_EST  // DEM
+			3prime_EST
+			BAC
+			BAC_contig
+			Pseudogene Text		// explanation
+			pseudo // GRL
+			virion // GRL
+			chloroplast // GRL
+			mitochondrion // GRL
+			germline // GRL
+			macronuclear // GRL
+			Transposon Text		// transposon type
+			Genomic_canonical
+			cDNA 	cDNA_EST 
+				Contig_Phrap
+			RNA	// if set then use U in place of T
+			Coding	CDS UNIQUE Int UNIQUE Int
+		// TPD		CDS_predicted_by ?Method Float // score of method
+				Precursor
+			End_not_found
+			Start_not_found
+			Codon_start Int // GRL
+			Transcript	UNIQUE	mRNA	UNIQUE  Processed_mRNA
+								Unprocessed_mRNA
+//						tRNA UNIQUE Text
+//						rRNA UNIQUE Text // GRL commented out
+//						snRNA UNIQUE Text
+//						scRNA UNIQUE Text
+						uRNA UNIQUE Text // GRL
+//						misc_RNA UNIQUE Text  // GRL commented out
+			Status	Received UNIQUE DateType
+				Library_construction UNIQUE DateType
+				Shotgun	UNIQUE DateType
+				Shotgun_complete UNIQUE DateType
+				Contiguous UNIQUE DateType
+				Finished UNIQUE DateType
+				Submitted UNIQUE DateType
+				Archived UNIQUE DateType UNIQUE Text // Date Disk
+			Match_type  UNIQUE Match_with_function
+					   Match_without_function
+				// These are designed specifically for measuring 
+				// statistics.  What you match should be listed in 
+				// Brief_id, Remark etc.  The aim now is to use Brief_id
+				// exactly for what you would like a half-line summary to
+				// contain, for making tables etc.
+// TPD          ABI Clipping UNIQUE Int UNIQUE Int
+// TPD              SCF_File UNIQUE Text
+	  Assembly  Total_contig_length Int
+		    Nbr_gel_readings Int
+		    Nbr_contigs Int			// total number
+		    Nbr_large_contigs Int		// number > 750bp
+		    Large_contig_length Int		// lengths > 750bp
+		    Pads_in_large_contigs Int
+		    Ns_in_large_contigs Int
+		    Double_strand Int	// amount of sequence left to double strand
+		// Should most of these be UNIQUE, giving the current status, or is
+		// the idea that they will show the time progression?
+// TPD	  Splices	Confirmed_intron  Int Int #Splice_confirmation
+// TPD			Predicted_5 ?Method Float Int Int // (x, x+1) or (x, x-1)
+// TPD			Predicted_3 ?Method Float Int Int // (x, x+1) or (x, x-1)
+// TPD	  Oligo ?Oligo XREF In_sequence Int UNIQUE Int	// for human mapping mostly
+	  Assembly_tags	Text Int Int Text // type, start, stop, comment
+	  // Allele ?Allele // TPD XREF Sequence UNIQUE Int UNIQUE Int UNIQUE Text
+		// start, stop, replacement sequence
+		// if an insertion point Text is transposon name (distinguished
+		// by containing non ACTG letters), and (n, n+1) = T A, so indicates 
+		// direction (if known).
+		// if a deletion, put '-' as the replacement sequence
+	  EMBL_feature  CAAT_signal	Int Int Text #EMBL_info
+			GC_signal	Int Int Text #EMBL_info
+			TATA_signal	Int Int Text #EMBL_info
+			allele_seq	Int Int Text #EMBL_info
+			conflict	Int Int Text #EMBL_info
+			mat_peptide	Int Int Text #EMBL_info
+			misc_binding	Int Int Text #EMBL_info
+			misc_feature	Int Int Text #EMBL_info
+			misc_signal	Int Int Text #EMBL_info
+			misc_recomb	Int Int Text #EMBL_info
+			modified_base	Int Int Text #EMBL_info
+			mutation	Int Int Text #EMBL_info
+			old_sequence	Int Int Text #EMBL_info
+			polyA_signal	Int Int Text #EMBL_info
+			polyA_site	Int Int Text #EMBL_info
+			prim_binding	Int Int Text #EMBL_info
+			prim_transcript Int Int Text #EMBL_info
+			promoter	Int Int Text #EMBL_info
+			repeat_region	Int Int Text #EMBL_info
+			repeat_unit	Int Int Text #EMBL_info
+			satellite	Int Int Text #EMBL_info
+			sig_peptide	Int Int Text #EMBL_info
+			variation	Int Int Text #EMBL_info
+			enhancer	Int Int Text #EMBL_info
+			protein_bind	Int Int Text #EMBL_info
+			stem_loop	Int Int Text #EMBL_info
+			primer_bind	Int Int Text #EMBL_info
+			transit_peptide Int Int Text #EMBL_info
+			misc_structure  Int Int Text #EMBL_info
+			precursor_RNA   Int Int Text #EMBL_info
+                        feature_source  Int Int Text #EMBL_info // TPD
+                        feature_gene	Int Int Text #EMBL_info // GRL
+                        exon            Int Int Text #EMBL_info // TPD
+                        intron          Int Int Text #EMBL_info // TPD
+//illegal               5'UTR           Int Int Text #EMBL_info // TPD
+//illegal               3'UTR           Int Int Text #EMBL_info // TPD
+                        5_UTR           Int Int Text #EMBL_info // TPD
+                        3_UTR           Int Int Text #EMBL_info // TPD
+                        RBS             Int Int Text #EMBL_info // TPD
+                        LTR             Int Int Text #EMBL_info // TPD
+			terminator      Int Int Text #EMBL_info // GRL
+                        misc_difference Int Int Text #EMBL_info // TPD
+			misc_RNA	Int Int Text #EMBL_info // GRL
+			rRNA		Int Int Text #EMBL_info // GRL
+			tRNA		Int Int Text #EMBL_info // GRL
+			snRNA		Int Int Text #EMBL_info // GRL
+			scRNA		Int Int Text #EMBL_info // GRL
+			STS		Int Int Text #EMBL_info // GRL
+//illegal		-35_signal	Int Int Text #EMBL_info // GRL
+//illegal		-10_signal	Int Int Text #EMBL_info // GRL
+			m35_signal	Int Int Text #EMBL_info // dem
+			m10_signal	Int Int Text #EMBL_info // dem
+			unsure		Int Int Text #EMBL_info // GRL
+		// EMBL_features are for legitimate EMBL feature table entries only
+	  Homol Best_DNA ?Sequence XREF DNA_homol Float Text
+		Best_Pep ?Protein XREF DNA_homol Float Text
+		DNA_homol ?Sequence XREF DNA_homol ?Method Float Int UNIQUE Int Int UNIQUE Int Text  // Text is e-value.
+		Pep_homol ?Protein XREF DNA_homol ?Method Float Int UNIQUE Int Int UNIQUE Int
+// TPD		Motif_homol ?Motif XREF DNA_homol ?Method Float Int UNIQUE Int Int UNIQUE Int
+// TPD	  Feature ?Method Int Int UNIQUE Float UNIQUE Text
+		// Float is score
+		// Text is shown on select, and same Text are neighbours
+		// again, each method has a column
+		// double-click shows the method
+		// absorb TSL_site, TSL, Inverted, Tandem as features
+		// and probably Assembly_tags (not yet)
+	  Method UNIQUE ?Method		// DEM
+			// We will generate a column for each distinct ?Method.  So for
+			// distinct Worm_EST and Worm_genomic columns, use ?Method objects
+			// Worm_EST_Blastn and Worm_genomic_Blastn.
+	  Pick_me_to_call Text Text	// GRL to call Genbank annotations
+	  Alignment ?LongText  // dem mar01, for CAP3 output
+
+// Future model for URL calling feature:
+// ?Url	Url UNIQUE Text 	// Simple, text of URL
+// 	Template UNIQUE ?Url 	// use this object as a generic template
+// 	Reference_tag UNIQUE Text 	// look for this tag in the reffing object for url
+// 	Remove_prefix UNIQUE Text 	// prefix to remove to make url
+// 	Remove_postfix UNIQUE Text 	// postfix to remove to make url
+// 	Prepend UNIQUE Text 	// then add this to the beginning
+// 	Append UNIQUE Text 	// then add this to the end
+
+?EMBL_info	Location UNIQUE Text	// full location if non-trivial
+		Qualifier Note Text	// all qualifiers correctly
+			  Product Text
+	// We could have in #EMBL_info a more complete representation of
+	// feature table qualifiers/syntax.  I doubt this is worth it.
+
+?Splice_confirmation UNIQUE cDNA
+			    Homology
+
+// TPD?Repeat_info	Percent_Identity UNIQUE Int
+// TPD		Score ?Method UNIQUE Float
+// TPD		N_gaps UNIQUE Int
+// TPD		Loop UNIQUE Int UNIQUE Int	// rel start, stop
+// TPD		Unit_Length UNIQUE Int
+
+?Protein  Title UNIQUE ?Text  // GRL
+// TPD	  Other_name ?Text	// for repeats
+          Peptide UNIQUE ?Peptide UNIQUE Int // Length, GRL ?Peptide replaced
+          DB_info	Database ?Database Text Text // ID  Accession_number
+// TPD		  	DB_remark ?Text		// Swissprot CC entries
+// TPD			Keyword ?Keyword	// Swissprot
+// TPD	  		DB_searched ?Database Int // Int = version - should this be here?
+          Origin  From_Database ?Database UNIQUE Int	// release number
+// TPD		  Date DateType Text			// Text for comments on operation
+// TPD		  Species ?Species
+// TPD		  Wormpep Replaces ?Protein XREF Replaced_by
+// TPD			  Inactive Replaced_by ?Protein XREF Replaces
+// TPD		// inactive wormpep entries won't be output in standard wormpep dumps
+	  Visible	Corresponding_DNA ?Sequence XREF Corresponding_protein  // GRL
+// TPD		        Related_DNA ?Sequence XREF Related_protein
+// TPD		        Related_protein ?Protein XREF Related_protein
+// TPD			Enzyme ?Enzyme // TPD XREF Protein
+// TPD			Reference ?Reference // TPD XREF Protein
+// TPD		// tag2 system.  For now I have not populated this column.  For C. elegans
+// TPD		// wormpep we want to get the information from the ?Corresponding_DNA 
+// TPD		// object.  Because those objects have long term continuity, while wormpep
+// TPD		// objects are one per protein sequence.  At least that is the current 
+// TPD		// plan.
+// TPD	  Swiss_feature	Text Int Int Text // feature name, start, stop, note
+	  Homol	DNA_homol ?Sequence XREF Pep_homol ?Method Float Int UNIQUE Int Int UNIQUE Int
+		Pep_homol ?Protein XREF Pep_homol ?Method Float Int UNIQUE Int Int UNIQUE Int
+// TPD		Motif_homol ?Motif XREF Pep_homol ?Method Float Int UNIQUE Int Int UNIQUE Int
+// TPD	  Feature ?Method Int Int UNIQUE Float	// display according to method
+					// double-click shows the method
+
+// TPD?Motif	Match_sequence  UNIQUE Text	// Text is the DNA or protein sequence
+// TPD	Num_mismatch UNIQUE Int		// Allowed number of mismatches when matching
+// TPD					// (default 0)
+// TPD	Restriction     Isoschizomer ?Motif XREF Isoschizomer
+// TPD		        Offset UNIQUE Int   
+// TPD			Cleavage UNIQUE Text  // will show the cleavage points ex: G_ACGT'C
+// TPD		        Overhang UNIQUE Int
+// TPD		        Company UNIQUE Text
+// TPD        Remark ?Text
+// TPD	Title ?Text
+// TPD	DB_info	Database ?Database Text Text // ID  Accession_number
+// TPD	  	DB_remark ?Text
+// TPD		DB_text ?LongText
+// TPD	Substrate UNIQUE DNA
+// TPD			 Peptide
+// TPD	Homol	DNA_homol ?Sequence XREF Motif_homol ?Method Float Int UNIQUE Int Int UNIQUE Int
+// TPD		Pep_homol ?Protein XREF Motif_homol ?Method Float Int UNIQUE Int Int UNIQUE Int
+// TPDD		Motif_homol ?Motif XREF Motif_homol ?Method Float Int UNIQUE Int Int UNIQUE Int
+
+// dem 1mar02, created
+?Contigset Author ?Author
+	   Date Text
+	   Description Text
+	   Species ?Species
+	   Software Text
+	   Parameters Text
+	   Procedure Text
+	   Contigs Int
+	   Singletons Int
+	   Clones Int    // Number of clones in assembly (for BAC assemblies).
+	   Markers Int   // Number of anchor markers in assembly (for BACs).
+	   Remarks Text
+	   WWW_page UNIQUE Text  // UNIQUE: One is enough. Easier for mysql.
+
+// DEM 8may00 Found this was commented out, though it's actually being used.
+?Database	Name Text // Full name
+		Contents ?Text // Description of material included
+		WWW	Arg1_URL_prefix UNIQUE Text
+			Arg1_URL_suffix UNIQUE Text
+			Arg2_URL_prefix UNIQUE Text
+			Arg2_URL_suffix UNIQUE Text
+
+?Method	Remark ?Text
+	  // the Display information controls how the column looks.
+	Display Colour #Colour
+		Frame_sensitive
+		Strand_sensitive Show_up_strand #Colour
+		Score	Score_by_offset	// has priority over width, for Jean
+			Score_by_width
+			Score_by_histogram UNIQUE Float	// baseline value
+			Score_bounds UNIQUE Float UNIQUE Float 
+				// limits for squashing
+			Percent // '%' in text, + default bounds 25, 100
+		Overlap_mode UNIQUE	Overlap		  // draw on top - default
+					Bumpable	  // bump to avoid overlap
+			     		Cluster		  // one column per homol target
+		Width UNIQUE Float
+		Symbol UNIQUE Text	// first char only is used
+		Right_priority UNIQUE Float // the greater the more right
+		Max_mag UNIQUE Float	// don't show if more bases per line
+		Min_mag UNIQUE Float	// don't show if fewer bases per line
+		Show_text      // only put text in right-hand column if set
+	Blastn		// can calculate percent from score if blastn
+	Blixem  Blixem_X
+		Blixem_N
+		Blixem_P
+	Belvu
+
+// ?Oligo	Sequence UNIQUE ?Sequence // verbatim sequence - useful
+//	In_sequence ?Sequence XREF Oligo
+//	STS STS1 UNIQUE ?STS XREF Oligo1
+//	    STS2 UNIQUE ?STS XREF Oligo2
+
+//?STS	Oligo1 UNIQUE ?Oligo
+//	Oligo2 UNIQUE ?Oligo
+//	Map ?Map #Map_position
+
+
+// End copy from SAMPLEDB
+
+
+?Gene_Product	Other_name ?Text
+		Type ?Text ?Reference Text //Enzyme, Protein, etc
+		Function ?Text
+		RNA_type
+		IUB_number UNIQUE ?Text ?Reference
+		EC_number UNIQUE ?Text
+		Gene ?Gene XREF Gene_product
+		Gene_class ?Gene_Class XREF Gene_product  // GRL
+		Allele ?Allele XREF Gene_product
+		Source	Species ?Species ?Reference
+			Germplasm ?Germplasm XREF Gene_product ?Reference ?Text
+			Tissue ?Text ?Reference ?Text
+			Organelle ?Text ?Reference ?Text
+			Membrane_Associated ?Reference //boolian +ref.
+		Pathway ?Pathway #Components
+		Substrate_specificity ?Text ?Reference ?Text
+		pH_optimum Float ?Reference ?Text
+		Temp_optimum Text ?Reference ?Text
+		Regulation #Regulators	
+		Ancillary_enzyme ?Gene_Product
+		Catalytic_mechanism #Mechanism
+		Prosthetic_group ?Text
+		Isozymes ?Gene_Product
+		Structure	Native_Mr Float
+				3D_structure Text //boolian with comment
+				Purification Text 
+				Isoelectric_point Float
+		Biochemistry Text //
+		Remarks Text //
+		Reference ?Reference //
+		Contact ?Colleague //
+		Sequence ?Sequence //
+
+?Regulators	Activator ?Text
+		Vmax Text
+		Cooperativity //boolian
+		Inhibitor ?Text
+		Ki Text
+		Developmental ?Reference Text
+		Hormonal Text
+		Environmental ?Reference Text
+		Genetic ?Reference Text
+		Inducer ?Text
+		Repressor ?Text
+
+?Mechanism	Ping_Pong
+
+?Components	Reaction ?Reaction
+		Reactant ?Text
+		Km Text
+		Product ?Text
+
+//4/94 Proposal:  Change to a #ConstructedType for situations where multiple
+//	 types of sources are
+//      valid, e.g.:
+//?Source Colleague ?Colleague
+//        Reference ?Reference
+//        Collection ?Collection
+//        General ?Text
+?Source		Other_name ?Text // Full name
+		Contents Text // Description of collection
+		Remarks Text // other descriptions
+		Contact ?Colleague
+		Reference ?Reference
+		Journal ?Journal
+		Address Mail Text
+                        Phone Text
+                        E_mail Text
+			Fax Text
+
+// DEM v1.5: Added Pathology, Probe, Caption
+//     v1.6: Added Germplasm, Species, Map, Trait; changed Paper to Reference
+//   	     Added Locus, QTL
+?Image  Continued_from ?Image XREF Continued_in
+	Continued_in ?Image XREF Continued_from
+	Gene ?Gene XREF Image
+	Locus ?Locus XREF Image 
+	Allele ?Allele XREF Image
+	Pathology ?Pathology XREF Image 
+	Probe ?Probe XREF Image 
+	Polymorphism ?Polymorphism XREF Image
+	//A QTL link is for an image of a particular QTL, e.g. an autorad of 
+	//bulked segregant analysis of the linked marker.  See also Trait.
+	QTL ?QTL XREF Image
+	Germplasm ?Germplasm XREF Image
+	Species ?Species XREF Image
+	Map ?Map_Data XREF Image
+        Linkage_data ?Linkage_Data XREF Image
+	Colleague ?Colleague XREF Image	//For pix of people.  cf Author, below.
+	Trait_study ?Trait_Study XREF Image
+	Caption ?Text //DEM
+	Author ?Author XREF Image
+	Reference ?Reference XREF Image
+	Pick_me_to_call  UNIQUE Text Text  //Program name followed by file name
+//	Secret  Text  // If set prevents display except by owner (uid == Text).                         DEM deactivated.
+
+?Pool	Contains	Probe ?Probe XREF In_pool
+			Subpool ?Pool XREF In_pool
+	In_pool ?Pool
+	Map	Hybridizes_to ?Probe_Grid ?Probe XREF Positive_pool_probe ?Text
+		Chrom_Band ?Chrom_Band XREF Positive_pool_probe
+	Location ?Colleague
+	Reference ?Reference
+
+// 5/94, modified for acedb 3.0
+?Chrom_Band   	Type    Centromere
+	              	p_Telomere	// Left end of chromosome
+                      	q_Telomere	// Right end of chromosome
+                Drawing Dark
+                      	NOR
+                      	Colour #Colour
+		Position  UNIQUE Map ?Map XREF Chrom_Band #map_position
+		Contains ?Chrom_Band XREF Contained_in
+		Contained_in UNIQUE ?Chrom_Band XREF Contains
+		Positive Contains_breakpoint ?Breakpoint XREF In_chrom_band // 3feb99
+		Negative Does_not_contain_breakpoint ?Breakpoint XREF Not_in_chrom_band // 3feb99
+		Locus Inside ?Locus XREF Chrom_Band
+		Positive_pool_probe ?Pool XREF Chrom_Band
+		Reference ?Reference
+
+// DEM 98apr.  For miscellaneous map intervals.
+?Interval   	Position  UNIQUE Map ?Map XREF Interval #map_position
+		Contains ?Interval XREF Contained_in
+		Contained_in UNIQUE ?Interval XREF Contains
+		Locus Inside ?Locus XREF Interval
+		Remark Text
+
+//?Collection     lisa added the Collection class
+// DEM removed the  "Collection_and_ID ?Collection XREF Entries" from 
+//     ?Germplasm, so ?Collection no longer contains an automatic list of
+//     all its entries.
+// DEM 1/96 added new fields for IPGRI database of collections.  Previous
+//	records should have their addresses moved from Description to Mail
+?Collection Curator ?Colleague
+	    Address Mail Text
+		    Country Text
+		    Phone Text
+		    Fax Text
+		    E_mail Text
+		    Cable Text
+		    Telex Text
+	    Description ?Text
+	    Please_see ?Collection // For the GrainGenes name_of_record.
+	    Contained_in ?Collection XREF Contains
+	    Contains ?Collection XREF Contained_in
+	    IPGRI_code Text
+	    WWW_page Text
+	    Species ?Species Int   // Int is number of entries.
+	    Entries ?Germplasm XREF Collection_and_ID
+	    Update ?Source Text // When our source was last updated, e.g. 
+				// IPGRI 94.11.07
+	    Data_source ?Source Text   // Text is date.
+		
+//?Pathology   Lisa added the pathology class
+// 2/93 Dave extended
+// 11/93 Added fields for Ken Kephart
+?Pathology	Other_name ?Pathology XREF Other_name //Choose one, 
+						      //put the data in that.
+		Type	Fungus
+			Bacterium
+			Virus
+			Nematode
+			Insect
+			Abiotic
+			Mycoplasma
+			Parasitic_plant
+			Mollusk
+		Host_species ?Species XREF Disease
+		Causal_organism ?Species XREF Causes
+		Vector ?Species XREF Vector_of
+		Trait ?Trait XREF Pathology
+		Evaluation ?Trait_Study XREF Pathology
+		Gene_class ?Gene_Class XREF Pathology
+		Resistance_gene ?Gene XREF Pathology
+		Resistant_allele ?Allele XREF Pathology
+		Resistant_line ?Germplasm XREF Pathology
+		Symptoms Text
+		Image ?Image XREF Pathology
+		Reference ?Reference
+
+//?Isolate 5/97 DEM, based on PathoGenes
+//  For all kinds of pathogen and pest "germplasm"s.
+?Isolate Synonym ?Isolate XREF Synonym
+	 Type Pathotype
+	      Strain
+	 Species ?Species
+         Origin Collector ?Colleague ?Text
+                Latitude ?Text
+                Longitude ?Text
+                Country ?Text
+         Characteristic ?Text //eg "Mating type: +" "1 mM Ethirimol: Resistant"
+	 Avirulence ?Text     //for formulae
+         Note ?Text
+         Reference ?Reference XREF Isolate
+         Data_source ?Colleague ?Text // Text is date, eg. 95.03.07
+         Reaction_to_host_genes ?Text ?Allele  //e.g. "2-3", "A", "V"
+         Reaction_to_host_germplasm ?Text ?Germplasm
+
+//?Species 2/93 DEM, based on the PGD schema
+//         3/6/93 KDK,DEM refined
+// Object's id is full name, "Triticum turgidum L. group turgidum Bowden"
+// Correct_name is not XREF'd as Synonym.  This allows two classes of wrong
+// names: dumb ones like "A. squarrosa" that aren't even listed as Synonyms,
+// and valid (common or historical) ones like "Ae. squarrosa L.".
+//v1.6:
+//  Added Image
+//  Feb 94: Haploid_chromosome_number not UNIQUE
+//	    Synonym XREF from Correct_name to Synonym
+//	    Species to Species_epithet
+?Species   Correct_name UNIQUE ?Species //If object is a Synonym, say only this
+           Full_name UNIQUE ?Text //Genus not abbreviated, with Authority
+           Genus UNIQUE ?Text
+           Species_epithet ?Text
+	   Variety ?Text
+           Authority ?Text
+           Synonym ?Species XREF Synonym
+           Common_name ?Text
+           Sequence ?Sequence // TPD 
+           Genome UNIQUE ?Text //E.g. "D", "ABD"
+           Haploid_chromosome_number Int
+	   Mapping_data ?Map_Data
+           Linkage_data ?Linkage_Data
+	   Disease ?Pathology XREF Host_species // diseases of this species
+	   Causes ?Pathology XREF Causal_organism // diseases caused by it
+	   Vector_of ?Pathology XREF Vector // diseases vectored by it
+	   Reference ?Reference
+	   Image ?Image XREF Species
+           DNA_library ?Library XREF Species
+
+//?Map_Data:  A result of a particular mapping study, or perhaps a summary map.
+// Added by Lisa, extended by Dave Matthews
+// v1.5: Now contains what used to be ?F2_data
+// v1.6: Added Image, Trait, QTL
+?Map_Data Map ?Map XREF Mapping_data
+	  External_DB Text Text    // for Gramene, NCBI
+	  Species ?Species XREF Mapping_data //If interspecies cross, give both
+	  Female_parent UNIQUE ?Germplasm XREF Mapping_data
+	  Male_parent UNIQUE ?Germplasm XREF Mapping_data 
+	  Parent ?Germplasm XREF Mapping_data //for reciprocal, multiparental
+	  Type 	Genetic
+		Cytogenetic
+		Chromosome_arm
+		Physical
+	  Map_units Text // e.g. cM, microns, KB
+	  Reference ?Reference XREF Mapping_data
+	  URL Text Text // First is URL, second is optional description.
+	  Contact ?Colleague
+	  Remarks ?Text //Number of progeny, markers; kind of mapping populat'n
+          Data_curated ?Colleague Text // Text is date, e.g. 99.11
+	  Image ?Image XREF Map
+	  Trait_study ?Trait_Study XREF Mapping_data  //Trait analyzed for QTLs
+						      //with this map
+	  QTL ?QTL XREF Mapping_data      //Each QTL found
+          2_point ?2_Point_Data XREF Map_data
+	  Locus ?Locus XREF Data Text  	//Text is raw Mapmaker data
+	  Breakpoint ?Breakpoint XREF Map_data // 3feb99
+	  Breakpoint_interval ?Breakpoint_interval XREF Map_data // 3feb99
+
+//?Linkage_Data:  A subchromosomal region resulting from a particular mapping
+// study (population).  Bigger than 2 or 3 markers (see ?2_Point_Data), and/or
+// with the raw population segregation data given.
+// Added by Dave Matthews, 3/96, based on ?Map_Data.
+// Removed Type Chromosome_arm
+?Linkage_Data Map ?Map XREF Linkage_data
+              Species ?Species XREF Linkage_data //If interspecies cross,
+                                                 // give both parental species.
+              Female_parent UNIQUE ?Germplasm XREF Linkage_data
+              Male_parent UNIQUE ?Germplasm XREF Linkage_data
+              Parent ?Germplasm XREF Linkage_data //for reciprocal etc.
+              Type      Genetic
+                        Cytogenetic
+                        Physical
+              Map_units Text // e.g. centiMorgans, microns, KB
+              Location Chromosome Text     //E.g. 3D
+                       Chromosome_arm Text //E.g. 3DS
+              Reference ?Reference XREF Linkage_data
+              Contact ?Colleague
+              Remarks ?Text //Number of progeny, kind of mapping populat'n
+              Image ?Image XREF Linkage_data
+              Trait_study ?Trait_Study XREF Linkage_data  //Trait analyzed for
+                                                          // QTLs with this map
+              QTL ?QTL XREF Linkage_data      //Each QTL found
+              2_point ?2_Point_Data XREF Linkage_data
+              Locus ?Locus XREF Linkage_data Text //Text is raw Mapmaker data
+	      Data_curated ?Colleague Text // Text is date, e.g. 99.11
+  	      Breakpoint ?Breakpoint XREF Linkage_data // 11mar03
+	      Breakpoint_interval ?Breakpoint_interval XREF Linkage_data 
+
+//?Trait:  A property of ?Germplasms, affected by ?Gene_Classes and ?QTLs, 
+//    evaluated in ?Trait_Studies.
+// DEM 9/93 Created
+//	    ?Germplasms are not directly linked, only via ?Trait_Studies
+// DEM 3/94 Affected_by caused ACEDB death, until database reinitialized.
+?Trait  Description ?Text		//Brief explanation of the trait name
+	See_also ?Trait XREF See_also
+	Ontology ?Text Text // First Text is T.O. ID#, second is its name
+	Pathology ?Pathology XREF Trait //If trait is related to a disease
+	Affected_by ?Gene_Class XREF Character_affected 
+	QTL ?QTL XREF Trait_affected
+	Evaluation ?Trait_Study XREF Trait //HUH?  For some reason, this isn't
+		//creating the backreference.
+	Remark ?Text
+
+//?Trait_Study:  Evaluation of a particular set of germplasms in a particular
+//   experiment.  Other experiments measuring the "same" trait should have
+//   different trait_study identifiers, e.g. "Yield, Smith93b"
+//   Omit Species, Parents.  They're in Mapping_data if this is an evaluation
+//   of a QTL mapping population, and not germane here if it's just a bunch of
+//   random germplasms being compared.
+//   For uniformity through database, always give R-squared as proportion 
+//   (fraction of 1.00), rather than as percentage.
+//   DEM 5/93
+//   5/20: Added Type_I_error_rate_per_locus, Number_of_markers
+//   6/8 : Changed Number_of_markers to Number_of_markers_tested
+//   9/14: Changed name from ?Trait to ?Trait_Study
+?Trait_Study Trait ?Trait XREF Evaluation
+	     Pathology ?Pathology XREF Evaluation //If trait is disease-related
+             Reference ?Reference XREF Trait_study
+             Description Text       // JMW, 6-15-95; DEM is dubious.
+             Protocol Text	//Description of the trait and how measured
+  	     Ontology ?Text Text // First Text is T.O. ID#, second is its name
+	     Values ?Text // Description of possible scores, e.g. "1=Resistant"
+	     Environment ?Environment XREF Trait_study
+       	     Parental_description ?Germplasm XREF Trait_study ?Text
+				        //Qualitative description
+             Parental_Mean_SD ?Germplasm XREF Trait_study Float Float 
+			//Value of mean and standard deviation for each parent
+             Mapping_data ?Map_Data XREF Trait_study //Info about parents, loci
+             Linkage_data ?Linkage_Data XREF Trait_study
+             Population_size UNIQUE Int //Number of individuals in population
+             Population_type Text	//Kind of mapping population, eg F5 RIs
+             QTL_analysis_method ?Text  //Methods used, eg Single-factor ANOVA
+             Statistics Text		//ANOVA table, etc. for this trait
+             Heritability Float Text    //Value and basis, 
+					// e.g. 0.84 "line mean basis"
+             Type_I_error_rate_per_locus Float 	//Alpha, 
+			// probability of calling locus significant by chance
+             Number_of_markers_tested Int  //Number of loci in the Mapping_data
+             QTLs_found UNIQUE Int	//How many QTLs were detected?
+             Phenotypic_R2 Float Text   //Phenotypic variance explained by 
+		// all QTLs.  Text is qualifier, for different values in 
+		// different Environments or other conditions.
+             Genetic_R2 Float Text
+             R2_definition Text	   //Exact definition of "R-squared" used above
+             Comment Text
+             Image ?Image XREF Trait_study  //Photos of the rating scale, eg
+             QTL ?QTL XREF Trait_study	//Location, significance, for each QTL
+	     Germplasm_description ?Germplasm XREF Trait_description ?Text Text
+	     Germplasm_score ?Germplasm Float ?Text  //NOTE:  No XREF.  Must
+		//manually enter data for 
+		//?Germplasm Trait_score ?Trait_Study Float ?Text
+             Trait_scores ?Trait_scores XREF Trait_study 
+					//For either a mapping population 
+                                        //or individual named germplasms
+	     Data_source ?Colleague ?Text // Text is date, yy.mm.dd
+             Data_curated ?Colleague ?Text // Who converted source to .ace
+
+//?QTL:  An individual Quantitative Trait Locus for a particular trait.  
+//  DEM 5/93
+//  5/20: Changed Type_I_error_per_locus to Significance_level
+//		  Effect_on_score to Size_of_allelic_effect
+//		  Positive_allele_from to Higher_scoring_allele_from
+//		  Type_I_error_x_Environment to Significance_x_Environment
+//  6/8:  Changed Size_of_allelic_effect to Effect_of_allele_substitution
+//  6/24: Added Image
+?QTL Trait_affected UNIQUE ?Trait XREF QTL	
+     Gene_class ?Gene_Class XREF QTL
+     Synonym ?QTL XREF Synonym
+     Species ?Species                // Is sometimes multi-valued.
+     Parent ?Germplasm XREF QTL
+     Trait_study ?Trait_Study XREF QTL
+     Environment ?Environment XREF QTL
+     Mapping_data ?Map_Data XREF QTL //Molecular markers used to map it
+     Linkage_data ?Linkage_Data XREF QTL
+     Chromosome_arm ?Text		    //eg 3BL, long arm of chromosome 3B
+     Associated_gene ?Gene XREF QTL
+     Nearest_marker UNIQUE ?Locus
+     Significance_level UNIQUE Float    //Significance of marker. P < 0.what?
+     Positive Significant_marker ?Locus XREF In_QTL Text   // Text is 
+                                 // significance level, e.g. "alpha < .01"
+     Negative Nonsignificant_marker ?Locus XREF Not_in_QTL
+     Position UNIQUE Map ?Map XREF QTL #map_position // to draw a bar on Map
+     Map_label ?Text                                 // label for the bar
+     LOD_peak_location UNIQUE ?Locus XREF QTL // ? Or just use Position?
+     LOD_peak_height Float ?Environment       // LOD value at this position
+     LOD_threshold Float ?Environment // Threshold value for LOD significance
+     Phenotypic_R2 Float ?Environment 
+        // Phenotypic variance explained by this QTL
+     Genetic_R2 Float ?Environment 
+        // Genetic variance explained by this QTL
+     Effect_of_allele_substitution Float Text ?Environment 
+        // Magnitude of allelic effect.  Text is units.
+     Additivity_Dominance_ratio UNIQUE Float
+     Higher_scoring_allele_from ?Germplasm ?Environment 
+        // Which parent's allele gives higher scores
+     Interactions Text		     // Epistasis, interaction with environment
+     Significance_x_Environment Float ?Environment // QTL x Env.  P < 0.what?
+     Comment Text		     // Eg R-squared of nearby markers
+     Image ?Image XREF QTL	     // Eg for blot of bulk segregant analysis.
+     Reference ?Reference XREF QTL
+     Data_source ?Colleague ?Text  // Text is date, yy.mm.dd
+     Data_curated ?Colleague ?Text // Text is date, yy.mm.dd
+
+//?Trait_scores:  Values measured for a particular trait in a particular
+//    environment
+// Scores = Value of trait for each member of mapping population, in the 
+//   same order as listed for the molecular markers in ?Trait Mapping_data
+// Germplasm_Mean_SD = Mean and SD for each germplasm (for a comparison
+//   that is not a mapping study)
+// Environment is not UNIQUE, to allow an averaged-over-evironments record.
+// DEM 5/93
+?Trait_scores Trait_study UNIQUE ?Trait_Study XREF Trait_scores
+	      Environment ?Environment XREF Trait_scores
+	      Comment Text
+	//For QTLs:
+	      Scores Text          //If only have means, list all on one line.
+	      Score_Mean_SD Float Float	 //If (mean, SD) pairs, separate lines.
+	//For trials of named germplasms:
+	      Germplasm_Mean_SD ?Germplasm XREF Trait_scores Float Float
+	      Germplasm_score Float ?Germplasm XREF Trait_scores 
+			//If only have means, give number first for better
+			//visual alignment.
+	//For one-record-per-datum, e.g. ISWYN24:
+	      Germplasm ?Germplasm XREF Trait_scores
+	      Unit Text         // Unit of measurement, e.g. Days, cm, kg.
+	      Sample_size Text  // E.g. "10 spikes"
+	      Score Float
+	      Standard_deviation Float
+	      Replications Int
+              Percent_of_local_check Float
+	      Difference_from_local_check Float //When many values are Zero.
+              Pathogen_race ?Isolate
+
+//?Environment:  Location and experimental conditions for a (field) test of
+//    a trait.
+// DEM 5/93, built on Lisa's version
+?Environment Year UNIQUE Text    	//eg 1993-4
+	     Location UNIQUE ?Text	//eg "Ketola Farm, Ithaca, NY, USA"
+	     Latitude UNIQUE Text
+	     Longitude UNIQUE Text
+	     Elevation UNIQUE Text
+	     Experimental_design ?Text	//eg "Randomized Complete Block"
+	     Replications UNIQUE Int	//How many replications here?
+	     Evaluator ?Colleague	
+	     Institute ?Text
+	     Topography UNIQUE Text
+	     Drainage UNIQUE Text
+	     Soil_texture UNIQUE Text
+	     Irrigation Text		//Type, number of days, total amount
+	     Moisture Text		//Amount, units; eg 455 mm
+	     Planting_date UNIQUE Text  //Format: 88.04.16
+	     Harvest_date UNIQUE Text
+	     Testing_date Text
+	     N_applied Text		//Nitrogen fertilizer used, units
+	     P2O5_applied Text		//Phosphorus, in units of P2O5
+	     K2O_applied Text		//Potassium, in units of K2O
+	     Remarks Text		//Special conditions or events here
+	     Trait_study ?Trait_Study XREF Environment //What study(ies) were
+	         //performed at this Environment.  (Usually only one.)
+	     Trait_scores ?Trait_scores XREF Environment //Scores obtained here
+	     QTL ?QTL XREF Environment
+
+//?Help.  Added by DEM 4/94
+?Help Intro ?Text
+      Overview ?Text
+      Note ?Text
+      Tip ?Text
+      More ?LongText
+
+// ?Breakpoint_interval added 3feb99 
+?Breakpoint_interval	Correct_name ?Breakpoint_interval XREF Other_name
+                 	Other_name ?Breakpoint_interval XREF Other_name
+			Map_data ?Map_Data XREF Breakpoint_interval
+			Linkage_data ?Linkage_Data XREF Breakpoint_interval
+ 			Map ?Map XREF Breakpoint_interval #map_position
+			Proximal_breakpoint ?Breakpoint XREF Distal_interval
+			Distal_breakpoint ?Breakpoint XREF Proximal_interval
+			Positive Contains ?Locus XREF In_interval
+			Negative Does_not_contain ?Locus XREF Not_in_interval
+ 	        	Reference_stocks ?Germplasm  //15feb99
+ 			Phenotype	?Text
+         		Reference ?Reference
+ 			Location ?Colleague
+ 			Remark ?Text
+
+// ?Breakpoint added 3feb99 
+?Breakpoint  	Correct_name ?Breakpoint XREF Other_name
+                Other_name ?Breakpoint XREF Other_name
+		Map_data ?Map_Data XREF Breakpoint
+		Linkage_data ?Linkage_Data XREF Breakpoint
+ 		Map ?Map XREF Breakpoint #map_position
+		Positive In_chrom_band ?Chrom_Band XREF Contains_breakpoint
+		Negative Not_in_chrom_band ?Chrom_Band XREF Does_not_contain_breakpoint
+		Fraction_length	UNIQUE Float UNIQUE ?Reference
+		Germplasm ?Germplasm XREF Contains_breakpoint
+		Distal_deletion_in ?Germplasm XREF Deletion_distal_to
+		Distal_interval ?Breakpoint_interval XREF Proximal_breakpoint
+		Proximal_interval ?Breakpoint_interval XREF Distal_breakpoint
+		Distal_rearrangement ?Rearrangement XREF Proximal_breakpoint
+		Proximal_rearrangement ?Rearrangement XREF Distal_breakpoint
+		Reference ?Reference XREF Breakpoint
+		Remark ?Text

@@ -1,0 +1,647 @@
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+
+<!-- -->
+	
+<html>
+<head>
+	<title>DLS: Digital Library System</title>
+
+	<script language="JavaScript" type="text/javascript" src="app_jscsslib/defaultlib.js"></script>
+	
+	<link rel="stylesheet" href="default.cfm?fuseaction=styles&amp;library_id=none" type="text/css" />
+	
+
+<script language="JavaScript" type="text/javascript">
+<!--
+// Peform a broad test for Internet Explorer 5.5;
+var ie55 = /MSIE ((5\.[56789])|([6789]))/.test( navigator.userAgent ) &&
+			navigator.platform == "Win32";
+
+
+// This process can be replaced with Server Side functions in CF 5
+var viewPg = "filemanager/download.cfm?id=";
+var imgPg = "/default.cfm?fuseaction=records.imagedisplay&CFID=10310336&CFTOKEN=42352627&url=";
+
+function writeRelFld(str) {
+	if(isURL(str)) {
+		document.write("<a href='"+str+"' target='_top'>"+str+"</a>")
+	} else if (isUUID(str)) {
+		document.write("<a href='"+viewPg+str+"'>View Record</a>")
+	}
+}
+function isURL(s) {
+	var reg = new RegExp("/(\w+)://([^/:]+)(:\d+)?/(.*)|/");
+	return reg.test(s);
+}
+function isUUID(s) {
+	var str = decodeURIComponent(str); //Decode it as a URL string
+	var reg = new RegExp("\.{8}\x2D\.{4}\x2D\.{4}\x2D\.{16}");
+	return reg.test(s);
+}
+function displayImage(url) {
+	window.open(imgPg+url,'imgViewer','resizable=yes,scrollbars=yes');
+}
+
+
+
+
+
+function downloadItem(url,tt) {
+	
+	if(ie55) {
+		var SP1_VER_CONST = "5.50.4522.1800";
+		var SP2_VER_CONST = "5.51.4807.2300";
+		var fullVersion = blankSpace.getComponentVersion("{89820200-ECBD-11CF-8B85-00AA005B4383}","componentid");
+		
+
+		if(fullVersion.indexOf(SP1_VER_CONST)!=-1) {
+			var canNotDownload = true;
+			
+		} else {
+			var canNotDownload = false;
+		}
+		
+	} else {
+		var canNotDownload = false;
+	}
+	
+	if(canNotDownload) {
+		var msg = "Internet Explorer 5.5 Service Pack 1 User: \n" +
+				"-----------------------------------------\n\n" +
+				"To download this file, please click View this File \n" +
+				"and then right-click in your browser, click Save As..";
+		alert(msg);
+	} else {
+		window.location = "filemanager/download.cfm?id="+url+"&as="+tt;
+	}
+
+	
+}
+
+
+
+//-->
+</script>
+</head>
+<body bgcolor="#ffffff"
+		text="#000000"
+		leftmargin="0" topmargin="0"
+		marginwidth="0" marginheight="0">
+
+
+<noscript>
+<h1>The Digital Library System software Requires JavaScript</h1>
+<p>Please upgrade your browser or enable JavaScript before proceeding.</p>
+<hr />
+</noscript>
+		
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+<tr>
+	<td rowspan="2" width="150"><img src="lib_assets/_dls/headerbanner_logos.jpg" width="150" height="130" border="0" alt="Logos of the Department of the Interior and U.S. Fish and Wildlife Service" /></td>
+	<td width="470"><img src="lib_assets/_dls/headerbanner_title.gif" width="470" height="85" border="0" alt="U.S. Fish and Wildlife Service Digital Library System" /></td>
+	<td rowspan="2" width="100%" style="background-image: url(lib_assets/_dls/headerbanner_bkgrnd.gif);"></td>
+</tr>
+<tr>
+	<td><img src="lib_assets/_dls/headerbanner_subtitle.gif" width="470" height="45" border="0" alt="Gateway to Digital Media" /></td>
+</tr>
+</table> 
+<table width="100%" border="0" cellpadding="2" cellspacing="0">
+	<tr valign="top">
+		<td class="tabs"><img src="app_images/spacer.gif" width="150" height="1" alt="" /></td>
+		<td class="tabs" nowrap="nowrap"><a href="/default.cfm?CFID=10310336&amp;CFTOKEN=42352627"
+			title="Start Page and Quick Keyword Search"
+			onmouseover="displayStatusMsg('Home: Start Page and Quick Keyword Search');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue">home</a></td>
+		<td class="tabs"><img src="app_images/spacer.gif" width="10" height="1" alt="" /></td>
+		<td class="tabs" nowrap="nowrap"><a href="/default.cfm?fuseaction=records.search&amp;CFID=10310336&amp;CFTOKEN=42352627"
+			title="Perform Field-specific Full Searches"
+			onmouseover="displayStatusMsg('Advanced Search: Perform Field-specific Full Searches');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue">advanced search</a></td>
+		<td class="tabs" width="100%">&nbsp;</td>
+		<td class="tabs" nowrap="nowrap"><a href="/default.cfm?fuseaction=help&amp;CFID=10310336&amp;CFTOKEN=42352627"
+			title="Information on Using the System and Contact Details"
+			onmouseover="displayStatusMsg('Help: Information on Using the System and Contact Details');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue">help</a></td>
+		<td class="tabs"><img src="app_images/spacer.gif" width="10" height="1" alt="" /></td>
+	</tr>
+</table>
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+<tr valign="top">
+<td width="5" bgcolor="#eeeeee"><img src="app_images/spacer.gif" width="5" height="1" border="0" alt=""></td>
+<td width="140" bgcolor="#eeeeee"><img src="app_images/spacer.gif" width="140" height="1" border="0" alt=""><br /><br />
+
+
+<div class="laSideBar">
+
+</div>
+
+<br /> 	<table width="140" border="1" cellspacing="0" cellpadding="0"		bordercolor="#003399"		bgcolor="#003399"		style="border-width:1px;border-color:#003399;border-style:solid;">	<tr><td class="leftHead">Record Options</td></tr>	<tr><td bgcolor="#ffffff" class="leftContent">	
+<table>
+<tr>
+<td><img src="app_images/bullet.gif" width="3" height="3" hspace="2" vspace="6" alt="*" /></td>
+<td class="leftContent"><a href="default.cfm?fuseaction=records.getmoreinfo&amp;id=BD5A9581-0F6B-1CDD-7331BDCC96E82FDB&amp;CFID=10310336&amp;CFTOKEN=42352627">Contact us about this resource</a></td></tr>
+</table>
+	</td></tr>	</table>	<br /> 
+
+
+<form action="default.cfm?CFID=10310336&amp;CFTOKEN=42352627"
+	method="post"
+	onsubmit="return checkQuickSearch(this)" autocomplete="Off">
+<input type="hidden" name="fuseaction" value="records.searchresults" />
+<input type="hidden" name="searchType" value="quick" />
+<input type="hidden" name="library_Id" value="none" /> 
+
+	<table width="140" border="1" cellspacing="0" cellpadding="0"		bordercolor="#003399"		bgcolor="#003399"		style="border-width:1px;border-color:#003399;border-style:solid;">	<tr><td class="leftHead">Quick Search</td></tr>	<tr><td bgcolor="#ffffff" class="leftContent">	
+
+<table>
+<tr><td colspan="2" class="leftContent">Enter Your Keywords: </td></tr>
+<tr><td colspan="2"><input type="text" name="kw" size="10" title="Enter your search criteria. The search engine will search record text fields for the keywords you enter" class="leftInput" /></td></tr>
+
+<tr><td colspan="2" class="leftContent"><a href="/default.cfm?fuseaction=records.browseKeywords">Or Browse The Library</a></td></tr>
+<tr><td colspan="2" class="leftContent">&nbsp;</td></tr>
+
+<tr><td colspan="2">
+	<select name="lb" size="1" class="leftDrop">
+		<option value="" selected="selected">All Libraries</option>
+	
+		<option value="r7">Alaska Image Library</option>
+		<option value="ao">California Nevada Image Library</option>
+		<option value="ad">Historic Image Library</option>
+		<option value="af">Midwest Image Library</option>
+		<option value="ai">NCTC Image Library</option>
+		<option value="ak">Northeast Image Library</option>
+		<option value="ah">Pacific Image Library</option>
+		<option value="ag">Southeast Image Library</option>
+		<option value="r4">Southwest Image</option>
+		<option value="ae">Washington DC Library</option>
+	</select></td></tr>
+
+<tr><td colspan="2"><input type="submit" value="Search" title="Search with the Keywords and search options selected above" class="leftSubmit" /></td></tr>
+<tr><td colspan="2">
+<a href="/default.cfm?fuseaction=records.search&amp;CFID=10310336&amp;CFTOKEN=42352627"
+			title="Perform Field-specific Full Searches"
+			onmouseover="displayStatusMsg('Advanced Search: Perform Field-specific Full Searches');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue">Advanced Search</a></td></tr>
+</table>
+	</td></tr>	</table>	
+
+<input type=hidden name="s8fid" value="24012339075101" />
+</form>
+
+
+<br /> 	<table width="140" border="1" cellspacing="0" cellpadding="0"		bordercolor="#003399"		bgcolor="#003399"		style="border-width:1px;border-color:#003399;border-style:solid;">	<tr><td class="leftHead">Links of Interest</td></tr>	<tr><td bgcolor="#ffffff" class="leftContent">	
+<table>
+
+<tr>
+<td><img src="app_images/bullet.gif" width="3" height="3" hspace="2" vspace="6" alt="*" /></td>
+<td class="leftContent"><a href="http://www.fws.gov/"
+			title="External Link of Interest"
+			onmouseover="displayStatusMsg('Link: USFWS Homepage');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue">USFWS Homepage</a></td></tr>
+
+<tr>
+<td><img src="app_images/bullet.gif" width="3" height="3" hspace="2" vspace="6" alt="*" /></td>
+<td class="leftContent"><a href="http://www.fws.gov/help/policies.html"
+			title="External Link of Interest"
+			onmouseover="displayStatusMsg('Link: Privacy Policy');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue">Privacy Policy</a></td></tr>
+
+</table>
+	</td></tr>	</table>	<br /> 	<table width="140" border="1" cellspacing="0" cellpadding="0"		bordercolor="#003399"		bgcolor="#003399"		style="border-width:1px;border-color:#003399;border-style:solid;">	<tr><td class="leftHead">Libraries</td></tr>	<tr><td bgcolor="#ffffff" class="leftContent">	
+<table>
+<tr><td class="leftContent">
+
+<strong><a href="/default.cfm?library_id=none&amp;CFID=10310336&amp;CFTOKEN=42352627">Digital Library System</strong></a>
+
+</td></tr>
+</table>
+
+<table>
+<tr><td class="leftContent">
+<a href="javascript:dspCntToggle('libNavPortals')"
+	title="Display Portal List"
+	onmouseover="displayStatusMsg('Library: Portals');return document.returnValue"
+	onmouseout="displayStatusMsg('');return document.returnValue">Portals</a>
+</td></tr>
+</table>
+<div id="libNavPortals" style="display:none">
+<table>
+
+</table>
+</div>
+<table>
+<tr><td class="leftContent">
+<a href="javascript:dspCntToggle('libNavCollections')"
+	title="Display Collection List"
+	onmouseover="displayStatusMsg('Library: Collections');return document.returnValue"
+	onmouseout="displayStatusMsg('');return document.returnValue">Collections</a>
+</td></tr>
+</table>
+<div id="libNavCollections" style="display:none">
+<table>
+
+<tr>
+<td><img src="app_images/bullet.gif" width="3" height="3" hspace="2" vspace="6" alt="*" /></td>
+<td class="leftContent"><a href="/default.cfm?library_id=r7&amp;CFID=10310336&amp;CFTOKEN=42352627"
+			title="Alaska Image Library"
+			onmouseover="displayStatusMsg('Library: Alaska Image Library');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue">Alaska Image Library</a></td></tr>
+
+<tr>
+<td><img src="app_images/bullet.gif" width="3" height="3" hspace="2" vspace="6" alt="*" /></td>
+<td class="leftContent"><a href="/default.cfm?library_id=ao&amp;CFID=10310336&amp;CFTOKEN=42352627"
+			title="California Nevada Image Library"
+			onmouseover="displayStatusMsg('Library: California Nevada Image Library');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue">California Nevada Image Library</a></td></tr>
+
+<tr>
+<td><img src="app_images/bullet.gif" width="3" height="3" hspace="2" vspace="6" alt="*" /></td>
+<td class="leftContent"><a href="/default.cfm?library_id=ad&amp;CFID=10310336&amp;CFTOKEN=42352627"
+			title="Historic Image Library"
+			onmouseover="displayStatusMsg('Library: Historic Image Library');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue">Historic Image Library</a></td></tr>
+
+<tr>
+<td><img src="app_images/bullet.gif" width="3" height="3" hspace="2" vspace="6" alt="*" /></td>
+<td class="leftContent"><a href="/default.cfm?library_id=af&amp;CFID=10310336&amp;CFTOKEN=42352627"
+			title="Midwest Image Library"
+			onmouseover="displayStatusMsg('Library: Midwest Image Library');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue">Midwest Image Library</a></td></tr>
+
+<tr>
+<td><img src="app_images/bullet.gif" width="3" height="3" hspace="2" vspace="6" alt="*" /></td>
+<td class="leftContent"><a href="/default.cfm?library_id=ai&amp;CFID=10310336&amp;CFTOKEN=42352627"
+			title="NCTC Image Library"
+			onmouseover="displayStatusMsg('Library: NCTC Image Library');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue">NCTC Image Library</a></td></tr>
+
+<tr>
+<td><img src="app_images/bullet.gif" width="3" height="3" hspace="2" vspace="6" alt="*" /></td>
+<td class="leftContent"><a href="/default.cfm?library_id=ak&amp;CFID=10310336&amp;CFTOKEN=42352627"
+			title="Northeast Image Library"
+			onmouseover="displayStatusMsg('Library: Northeast Image Library');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue">Northeast Image Library</a></td></tr>
+
+<tr>
+<td><img src="app_images/bullet.gif" width="3" height="3" hspace="2" vspace="6" alt="*" /></td>
+<td class="leftContent"><a href="/default.cfm?library_id=ah&amp;CFID=10310336&amp;CFTOKEN=42352627"
+			title="Pacific Image Library"
+			onmouseover="displayStatusMsg('Library: Pacific Image Library');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue">Pacific Image Library</a></td></tr>
+
+<tr>
+<td><img src="app_images/bullet.gif" width="3" height="3" hspace="2" vspace="6" alt="*" /></td>
+<td class="leftContent"><a href="/default.cfm?library_id=ag&amp;CFID=10310336&amp;CFTOKEN=42352627"
+			title="Southeast Image Library"
+			onmouseover="displayStatusMsg('Library: Southeast Image Library');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue">Southeast Image Library</a></td></tr>
+
+<tr>
+<td><img src="app_images/bullet.gif" width="3" height="3" hspace="2" vspace="6" alt="*" /></td>
+<td class="leftContent"><a href="/default.cfm?library_id=r4&amp;CFID=10310336&amp;CFTOKEN=42352627"
+			title="Southwest Image"
+			onmouseover="displayStatusMsg('Library: Southwest Image');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue">Southwest Image</a></td></tr>
+
+<tr>
+<td><img src="app_images/bullet.gif" width="3" height="3" hspace="2" vspace="6" alt="*" /></td>
+<td class="leftContent"><a href="/default.cfm?library_id=ae&amp;CFID=10310336&amp;CFTOKEN=42352627"
+			title="Washington DC Library"
+			onmouseover="displayStatusMsg('Library: Washington DC Library');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue">Washington DC Library</a></td></tr>
+
+</table>
+</div>
+	</td></tr>	</table>	
+
+<br />
+
+<table>
+
+<tr valign="top">
+	<td><img src="app_images/functions_addfavorite.gif"
+	width="14" height="14" border="0"
+	alt="Favorites Icon" /></td>
+	<td class="leftFunctions"><a id="addAsFavorite" title=""
+		href="javascript:addAsFavorite('Digital Library System','http://dls.fws.gov//default.cfm?library_id=none')"
+		onmouseover="displayStatusMsg('Function: Add to My Favorites');return document.returnValue"
+		onmouseout="displayStatusMsg('');return document.returnValue">Add Digital Library System to my favorites</a></td></tr>
+<tr valign="top">
+	<td><img src="app_images/functions_makehomepage.gif"
+	width="14" height="14" border="0"
+	alt="Homepage Icon" /></td>
+	<td class="leftFunctions"><a id="makeMyHomepage" title=""
+		href="javascript:makeMyHomepage('Digital Library System','http://dls.fws.gov//default.cfm?library_id=none','makeMyHomepage')"
+		onmouseover="displayStatusMsg('Function: Make My Homepage');return document.returnValue"
+		onmouseout="displayStatusMsg('');return document.returnValue">Make Digital Library System my homepage</a></td></tr>
+
+</table>
+
+<br /> 
+</td>
+<td width="5" bgcolor="#eeeeee"><img src="app_images/spacer.gif" width="5" height="1" border="0" alt=""></td>
+<td width="1" bgcolor="#333333"><img src="app_images/spacer.gif" width="1" height="1" border="0" alt=""></td>
+<td width="9" bgcolor="#ffffff"><img src="app_images/spacer.gif" width="9" height="1" border="0" alt=""></td>
+<td bgcolor="#ffffff">
+  
+
+<div id="blankSpace" style="behavior:url(#default#clientCaps)"></div>
+
+<table width="100%" cellpadding="4" cellspacing="0" border="0">
+	<tr height="20">
+		<td bgcolor="#33cc33"
+			class="displayOptions">&nbsp;<a href="javascript:history.back()"><img src="system/icons/navthrurecords_left.gif" width="15" height="13" border="0" alt="left"> Back</a></td>
+	</tr>
+</table>
+
+
+<h1>Great Egrets</h1>
+
+
+
+
+<table>
+<tr valign="top">
+	<td rowspan="2"><img src="app_images/record_fileicon.gif"
+		width="40" height="40" alt="Files Icon" /></td>
+	<td class="recordDataGroup">Files</td></tr>
+<tr>
+	<td>
+
+<table>
+<tr>
+
+	
+<td>
+
+<table>
+<tr>
+	<td colspan="2" align="center"><a href="javascript:displayImage('http://dls.fws.gov/DATA/files/BC7A9BE1-AF2A-976B-323CA3C024D3019A.JPG')"><img src="DATA/thumbs/BC7A9BE1-AF2A-976B-323CA3C024D3019A.jpg" alt="BC7A9BE1-AF2A-976B-323CA3C024D3019A.JPG" /></a></td></tr>
+<tr>
+	<td align="right" class="recordDataField">File size:</td>
+	<td class="recordData">1.10 MB</td></tr>
+<tr>
+	<td align="right" class="recordDataField"><span title="The physical or digital manifestation of the resource.">Format:</span></td>
+	<td class="recordData">JPEG image (image/jpeg)</td></tr>
+
+<tr>
+	<td align="right" class="recordDataField">Dimensions:</td>
+	<td class="recordData">Screen: 1600px x 1200px</td></tr>
+<tr>
+	<td align="right" class="recordDataField">&nbsp;</td>
+	<td class="recordData">Print:
+	
+		unavailable
+	
+	</td></tr>
+<tr>
+	<td align="right" class="recordDataField">Resolution:</td>
+	<td class="recordData">-1 dpi
+	
+	
+	</td></tr>
+
+<tr>
+	<td align="right" class="recordDataField">Depth:</td>
+	<td class="recordData">24 color(s)</td></tr>
+
+<tr>
+	<td colspan="2" align="center" class="recordData">
+
+	
+	
+	
+
+	<script>
+	if(document.all) {
+		// Internet Explorer Download
+		if(document.getElementById&&(navigator.platform=="Win32")) {
+			// IE 5 or better for Windows
+			document.write("<strong><a href=\"javascript:downloadItem('BC7A9BE1-AF2A-976B-323CA3C024D3019A','Great%20Egrets')\">Download to My Computer</a></strong>");
+		} else {
+			// Not IE 5.5 SP2 or better for Windows
+			document.write("<strong>Download to My Computer:</strong><br>");
+			document.write("1. <a href=\"javascript:displayImage('http://dls.fws.gov/DATA/files/BC7A9BE1-AF2A-976B-323CA3C024D3019A.JPG')\">Click here</a><br>");
+			document.write("2. Right click \(or hold-click on the Mac\) on the image<br>");
+			document.write("3. Select \'Save Picture As..\' from the drop down menu");
+		}
+	} else {
+		// Netscape, Opera or Mozilla Download
+		document.write("<strong>Download to My Computer:</strong><br>");
+		document.write("1. <a href=\"javascript:displayImage('http://dls.fws.gov/DATA/files/BC7A9BE1-AF2A-976B-323CA3C024D3019A.JPG')\">Click here</a><br>");
+		document.write("2. Right click \(or hold-click on the Mac\) on the image<br>");
+		document.write("3. Select \'Save Image As..\' from the drop down menu");
+	}
+	</script>
+		
+	
+	
+
+	
+	
+	
+	</td></tr>
+</table>
+
+</td>
+
+</tr>
+</table>
+	
+</td></tr>
+</table>
+
+
+
+
+
+
+
+
+
+<table>
+<tr valign="top">
+	<td rowspan="2"><img src="app_images/record_dataicon.gif"
+		width="40" height="40" alt="Data Icon" /></td>
+	<td class="recordDataGroup">Primary Metadata</td></tr>
+<tr>
+	<td>
+
+<table>
+<tr>
+	<td align="right" class="recordDataField"><span title="A name given to the resource.">Title:</span></td>
+	<td class="recordData">Great Egrets</td>
+	<td class="recordData"></td></tr>
+<tr>
+	<td align="right" class="recordDataField"><span title="Any form of the title used as a substitute or alternative to the formal title of the resource.">Alternative Title:</span></td>
+	<td class="recordDataItal">Ardea alba</td>
+	<td class="recordData"></td></tr>
+<tr>
+	<td align="right" class="recordDataField"><span title="An entity primarily responsible for making the content of the resource.">Creator:</span></td>
+	<td class="recordData">Corbin, Ginger L.</td>
+	<td class="recordData"></td></tr>
+
+<tr>
+	<td align="right" class="recordDataField"><span title="An entity responsible for making the resource available.">Publisher:</span></td>
+	<td class="recordData"><span class="na">(none)</span></td></tr>
+<tr>
+	<td align="right" class="recordDataField"><span title="An entity responsible for making contributions to the content of the resource.">Contributor:</span></td>
+	<td class="recordData"><a href="http://offices.fws.gov/directory/OfficeDetail.cfm?OrgCode=42570">SANTEE NATIONAL WILDLIFE REFUGE</a></td></tr>
+<tr>
+	<td align="right" class="recordDataField"><span title="A language of the intellectual content of the resource.">Language:</span></td>
+	<td class="recordData">EN - ENGLISH</td></tr>
+<tr>
+	<td align="right" class="recordDataField"><span title="Information about rights held in and over the resource.">Rights:</span></td>
+	<td class="recordData"><span class="na">(public domain)</span></td></tr>
+<tr>
+	<td align="right" class="recordDataField"><span title="A category of user for whom the resource is intended.">Audience:</span></td>
+	<td class="recordData"><span class="na">(general)</span></td></tr>
+<tr valign="top">
+	<td align="right" class="recordDataField"><span title="The topic of the content of the resource.">Subject:</span></td>
+	<td class="recordData"> Santee National Wildlife Refuge<br />
+	 South Carolina<br />
+	 Aquatic Environments<br />
+	 Refuges<br />
+	 Flowering Plants<br />
+	 Shorebirds<br />
+	 Ardea alba<br />
+	Birds<br />
+	  Great Egrets<br />
+	</td></tr>
+</table>
+
+</td></tr>
+</table>
+
+
+
+
+<table>
+<tr valign="top">
+	<td rowspan="2"><img src="app_images/record_descicon.gif"
+		width="40" height="40" alt="Description Icon" /></td>
+	<td class="recordDataGroup">Description</td></tr>
+<tr>
+	<td>
+
+<table>
+
+
+<tr>
+	<td align="right" class="recordDataField">Abstract:</td>
+	<td class="recordData">
+	Great Egrets (Ardea alba) in pond with wildflowers in fore ground at Santee NWR.
+	
+	
+	
+	</td></tr>
+	
+</table>
+
+</td></tr>
+</table>
+
+
+
+
+<table>
+<tr valign="top">
+	<td rowspan="2"><img src="app_images/record_dateicon.gif"
+		width="40" height="40" alt="Date Icon" /></td>
+	<td class="recordDataGroup">Date</td></tr>
+<tr>
+	<td>
+	
+<table cellspacing="1" cellpadding="2" border="0">
+
+<tr>
+	<td align="right" class="recordDataField">Created:</td>
+	<td class="recordData">April 28 2003</td></tr>
+
+<tr>
+	<td align="right" class="recordDataField">Available:</td>
+	<td class="recordData">April 25 2006</td></tr>
+<tr>
+	<td align="right" class="recordDataField">Issued:</td>
+	<td class="recordData">April 21 2006</td></tr>
+<tr>
+	<td align="right" class="recordDataField">Modified:</td>
+	<td class="recordData">April 25 2006</td></tr>
+</table>
+	
+	</td></tr>
+</table>
+
+
+
+<table>
+<tr valign="top">
+	<td rowspan="2"><img src="app_images/record_relationicon.gif"
+		width="40" height="40" alt="Relation Icon" /></td>
+	<td class="recordDataGroup">Relation</td></tr>
+<tr>
+	<td>
+
+<table>
+
+<tr><td class="recordData">No relation information exists for this record</td></tr>
+
+
+</table>
+
+	</td></tr>
+</table>
+
+
+   
+
+<table>
+<tr valign="top">
+	<td rowspan="2"><img src="app_images/record_covicon.gif"
+		width="40" height="40" alt="Coverage Icon" /></td>
+	<td class="recordDataGroup">Coverage</td></tr>
+<tr>
+	<td>
+
+
+<table>
+<tr><td class="recordData">No coverage information exists for this record</td></tr>
+</table>
+
+
+	</td></tr>
+</table>
+
+
+</td>
+<td width="10" bgcolor="#ffffff"><img src="app_images/spacer.gif" width="10" height="1" border="0" alt=""></td>
+</tr>
+</table>
+ 
+
+<table width="100%" cellspacing="0" cellpadding="3"><tr><td width="100%" align="center" class="copyright">
+<br />
+A <acronym title="U.S. Fish &amp; Wildlife Service">USFWS</acronym>
+External Affairs (Alaska/Washington D.C. Regions) /
+<acronym title="National Conservation Training Center">NCTC</acronym>
+Project.<br />
+
+DLS Software developed by
+<acronym title="U.S. Fish &amp; Wildlife Service">USFWS</acronym>
+<acronym title="Information Resource Management">IRM</acronym> Alaska Region /
+<acronym title="National Communications Center (Denver)">NCC</acronym>.
+
+</td><td width="75" align="right"><a href="default.cfm?library_id=none&amp;CFID=10310336&amp;CFTOKEN=42352627"
+			title="Powered By DLS"
+			onmouseover="displayStatusMsg('Powered By DLS (Digital Library System)');return document.returnValue"
+			onmouseout="displayStatusMsg('');return document.returnValue"><img src="app_images/dlsicon_smallpowerby.gif" width="75" height="45" border="0" alt="Powered By DLS" /></a></td></tr>
+</table>
+
+
+
+</body>
+</html> 

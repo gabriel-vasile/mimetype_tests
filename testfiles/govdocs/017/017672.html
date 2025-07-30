@@ -1,0 +1,373 @@
+<html>
+<head>
+<LINK rel="stylesheet" type="text/css" href="/ARSWeb/look/sas.css" /> 
+<LINK rel="stylesheet" type="text/css" href="/ARSWeb/look/AIPL.css" /> 
+<LINK rel="stylesheet" type="text/css" href="/ARSWeb/look/Left_Menu/Left_Nav.css" />
+<script language='JavaScript' type='text/javascript' src='/AIPL.js'></script>
+<script language='JavaScript' type='text/javascript' src='/ARSWeb/look/SortTable/common.js'></script>
+<script language='JavaScript' type='text/javascript' src='/ARSWeb/look/SortTable/css.js'></script>
+<script language='JavaScript' type='text/javascript' src='/ARSWeb/look/SortTable/standardista-table-sorting.js'></script>
+<LINK rel="stylesheet" media="screen" type="text/css" href="/ARSWeb/look/ScrollTable/TableScrollScreen.css" />
+<LINK rel="stylesheet" media="print" type="text/css" href="/ARSWeb/look/ScrollTable/TableScrollPrint.css" />
+
+<cfinclude template="/CF-templates/get_env.cfc">
+ 
+<!DOCTYPE HTML PUBLIC "-//SoftQuad Software//DTD HoTMetaL PRO 6.0::19990601::extensions to HTML 4.0//EN" "hmpro6.dtd">
+<HTML> 
+  <HEAD> 
+	 <TITLE>AIPL documentation of calculations</TITLE>
+	 <META NAME="keywords" CONTENT="genetic, evaluation, dairy, cow, bull"> 
+
+</head>
+<body class="ARS_BODY">
+<A id="PageTop" name="PageTop"></A>
+<table id="ARS_LAYOUT_TABLE" summary="Page Layout CONTROLL" width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+	<td colspan="2" align="left">
+		<a href="http://www.usda.gov/"><img alt="USDA Logo" src="/ARSWeb/look/img/USDA.gif" align="baseline" class="leftlogo" /></a>
+		<a href="http://www.ars.usda.gov/"><img alt="ARS Logo" src="/ARSWeb/look/img/ARS.gif" align="baseline" class="leftlogo" /></a>
+		<a href="/"><img alt="AIPL Logo" src="/ARSWeb/look/img/sitelogo.jpg" id="Lab_logo" /></a>
+	</td>
+</tr>
+<tr>
+	<td colspan="2" class="TabNav_Cell"><!-- Cell for Org. Tabs -->
+		<span><A href="http://www.ars.usda.gov/main/site_main.htm?modecode=12-00-00-00">Beltsville  \ BARC</A></span>
+		<span><A href="http://www.ars.usda.gov/main/site_main.htm?modecode=12-65-00-00">Animal &amp; Natural Resources</A></span>
+		<span id="current"><A href="/">Animal Improvement Programs</A></span>
+	</td>
+</tr>
+<tr class="GREEN_Nav_Cell"><!-- Row for Green Bar -->
+	<td colspan="2" align="left" valign="top">
+		<div class="Float_Left">
+			<a id="AIPL_Left_Nav_Controll" href="#"></a>
+		</div>
+<cfinclude template="/AIPL-Login.cfm">
+		<div class="Float_Right">
+			&#166;<a href="/">&#160;Home&#160;</a>&#166;<a href="/AboutUs/AboutUs.htm">&#160;About&#160;</a>&#166;<a href="/Help/Help.htm">&#160;Help&#160;</a>&#166;<a href="mailto:inquiry@aipl.arsusda.gov?subject=inquiry%20from%20AIPL%20website&body=%0D%0APlease Include the address of the page you refer to.%0D%0A" id="AIPL_inquiry_Contact">&#160;Contact Us&#160;</a>&#166;<a href="http://translate.google.com/translate?u=http%3A%2F%2Faipl.arsusda.gov%2F&langpair=en%7Ces&hl=en&ie=UTF-8&oe=UTF-8&prev=%2Flanguage_tools" id="AIPL_InSpanish">&#160;En Espanol&#160;</a>&#166;&#160;
+		</div>
+	</td>
+</tr>
+<tr>
+	<td valign="top" align="left" width="1%">
+	<div ID="Left_Nav_Div" border="0" cellpadding="0" cellspacing="0">
+<br>
+<table ID="LeftNav_Table" border="0" cellpadding="0" cellspacing="0">
+<tr><td>
+	<div ID="Left_Nav_TL"><div ID="Left_Nav_TR">
+	&nbsp;&nbsp;&nbsp;&nbsp;SEARCH AIPL
+	</div>
+	</div>
+</td></tr><tr><td>
+<table ID="AIPL_Lnav_content" summary="Left Navigation Layout" border="0" cellpadding="0" cellspacing="0">
+	<tr><td>
+		<form method="POST" action="/cgi-bin/search/htsearch" id="AIPL_Search_Form">
+			<input type="text" name="words" value="" alt="search term entry box" size="10">
+			<INPUT name="" TYPE="image" SRC="/ARSWeb/look/Left_Menu/button-go.gif" ALT="Go" BORDER="0" align="absmiddle">
+			<input type="hidden" name="Submit" value="Go">
+		</form>
+	</td></tr>
+<!--
+	<tr><td ID="AIPL_By_Subject">
+			Threat Level
+	</td></tr>
+	<tr align="center"><td valign="center" style="padding:5px; ">
+		<a href="http://www.usda.gov/homelandsecurity"><img border="0" align="middle" src="http://www.usda.gov/img/nav/bars/section_heads_home.gif"></a>
+	</td></tr>
+-->
+	<tr><td ID="AIPL_By_Subject">
+			Browse&nbsp;By&nbsp;Subject
+	</td></tr>
+	<tr><td>
+		<UL id="FirstLeftNavUL">
+		<cfif cgi.script_name contains "/Main/site_main.htm" or cgi.script_name contains "index.htm">
+		
+			<LI><div ID="Main"><img class="NoBorder" src="/ARSWeb/look/Left_Menu/Title_LI_off.gif" alt=""><a href="/Main/site_main.htm" class="leftNav">&nbsp;Home</a></div></LI>
+		</cfif>
+		
+		
+		<cfif cgi.script_name contains "/AboutUs/" or cgi.script_name contains "/aipl/history/" or cgi.script_name contains "/aipl/directions.htm">
+		
+			<LI><div ID="AboutUs"><img class="NoBorder" src="/ARSWeb/look/Left_Menu/Title_LI_off.gif" alt=""><a href="/AboutUs/AboutUs.htm" class="leftNav">&nbsp;About Us</a></div></LI>
+		</cfif>
+		
+
+	
+	<cfelse>
+		<LI><div ID="Research"><img class="NoBorder" src="/ARSWeb/look/Left_Menu/Title_LI_off.gif" alt=""><a href="/Research/Research.htm" class="leftNav">&nbsp;Research</a></div></LI>
+	
+	</cfif>
+
+	
+		<LI><div ID="Services"><img class="NoBorder" src="/ARSWeb/look/Left_Menu/Title_LI_off.gif" alt=""><a href="/Services/Services.htm" class="leftNav">&nbsp;Products&nbsp;&amp;&nbsp;Services</a></div></LI>
+	</cfif>
+	
+
+
+	
+		<LI><div ID="PandP"><img class="NoBorder" src="/ARSWeb/look/Left_Menu/Title_LI_off.gif" alt=""><a href="http://www.ars.usda.gov/PandP/locations/people.htm?modecode=12-65-05-00" class="leftNav">&nbsp;People &amp; Places</a></div></LI>
+	</cfif>
+	
+
+	
+		<LI><div ID="News"><img class="NoBorder" src="/ARSWeb/look/Left_Menu/Title_LI_off.gif" alt=""><a href="/News/News.htm" class="leftNav">&nbsp;News &amp; Events</a></div></LI>
+	</cfif>
+	
+
+	
+		<LI><div ID="Business"><img class="NoBorder" src="/ARSWeb/look/Left_Menu/Title_LI_off.gif" alt=""><a href="/Business/Business.htm" class="leftNav">&nbsp;Partnering</a></div></LI>
+	</cfif>
+	
+
+
+	
+		<LI><div ID="Careers"><img class="NoBorder" src="/ARSWeb/look/Left_Menu/Title_LI_off.gif" alt=""><a href="/Careers/Careers.htm" class="leftNav">&nbsp;Careers</a></div></LI>
+	</cfif>
+	
+
+	</UL>
+	</td></tr>
+</table>
+</td></tr><tr><td>
+	<div ID="Left_Nav_BL"><div ID="Left_Nav_BR">&nbsp;
+	</div></div><br>
+</td></tr>
+</table>
+
+
+<!-- ======start OLD AIPL_SidBar bottom links =================================== -->
+
+      <P id="more_Left_NAV"><br>
+      <span style="white-space:nowrap; background-color:#FFFFFF; "><font color="green">AIPL CENTENNIAL<br>CELEBRATION<br>
+      <i>October 28, 2008</i></font></span><br>
+		 &raquo;&nbsp;<A href="http://aipl.arsusda.gov/Centennial/AIPL Centennial agenda.pdf" style="text-decoration:none; color:green;">Agenda with links to <br>presentations and notes </A><br>
+ 		 &raquo;&nbsp;<A href="http://aipl.arsusda.gov/Centennial/AIPL history_ARR HIST1.pdf" style="text-decoration:none; color:green;">AIPL history</A><br>
+ 		 &raquo;&nbsp;<A href="http://aipl.arsusda.gov/Centennial/AIPL puzzles.pdf" style="text-decoration:none; color:green;">AIPL puzzles</A><br>
+		 &raquo;&nbsp;<A href="http://aipl.arsusda.gov/Centennial/presentations/labpics_compressed.pps" style="text-decoration:none; color:green;">AIPL slide show</A><br>
+		 &raquo;&nbsp;<A href="http://aipl.arsusda.gov/Centennial/AIPL Centennial participants.pdf" style="text-decoration:none; color:green;">Participants</A><br>
+		 &raquo;&nbsp;<A href="http://aipl.arsusda.gov/Centennial/AIPL Centennial Sponsors.pdf" style="text-decoration:none; color:green;">Sponsors</A><br><br>
+         &raquo;&nbsp;<A href="http://aipl.arsusda.gov/CF-queries/" style="text-decoration: none">New&nbsp;Query&nbsp;(Preview)</A><br>
+	     &raquo;&nbsp;<A href="http://aipl.arsusda.gov/cgi-bin/general/Qpublic/query-selection.cgi" style="text-decoration: none">General Queries</A><br>
+         &raquo;&nbsp;<A href="http://aipl.arsusda.gov/cgi-bin/general/protected/query-selection.cgi" style="text-decoration: none">Industry Queries</A><br>
+         &raquo;&nbsp;<A href="/eval/summary/activeai_menu.cfm" style="text-decoration: none">Active AI Lists</A><br>
+         &raquo;&nbsp;<A href="/dynamic/sortnew/current/index.shtml" style="text-decoration: none">Top Bull Lists</A><br>
+         &raquo;&nbsp;<A href="/eval/summary/elite_menu.cfm" style="text-decoration: none">Elite Cow List</A><br>
+         &raquo;&nbsp;<A href="ftp://aipl.arsusda.gov/pub/password" style="text-decoration: none">Password</A><br>
+         &raquo;&nbsp;<A href="/formats/formats.html" style="text-decoration: none">Data Exchange</A><br>
+         &raquo;&nbsp;<A href="/email.htm" style="text-decoration: none">E-mailing Lists</A><br>
+         &raquo;&nbsp;<A href="mailto:inquiry@aipl.arsusda.gov" style="text-decoration: none">Contact AIPL</A>
+      </P>
+
+<!-- ======end OLD AIPL_SidBar bottom links =================================== -->
+
+<script language="javascript" type="text/javascript">
+if ( LnavSelected == undefined ){
+  var LnavSelected = location.href;
+  var LnavSelected = LnavSelected.replace(/http\:\/\/[A-Za-z0-9\.]*/g,"");
+  var LnavSelected = LnavSelected.replace(/[^a-z,A-Z,0-9]/g,"X");
+}
+if ( AIPL_LNav_controll = document.getElementById('AIPL_Left_Nav_Controll')){
+  AIPL_LNav_controll.innerHTML = '&nbsp;Show\\Hide Left Navigation&nbsp;';
+  AIPL_LNav_controll.href = "#";
+  AIPL_LNav_controll.onclick = new Function('AIPL_ToggleDisplayById("Left_Nav_Div")');
+}
+if (submnuitm = document.getElementById(LnavSelected + 'Zsub')){
+  submnuitm.getElementsByTagName("img")[0].src="/ARSWeb/look/Left_Menu/leftnav_on_bullet.gif";
+}
+
+function AIPL_ToggleDisplayById(ID2Toggle){
+	ToggleMe = document.getElementById(ID2Toggle)
+	if (ToggleMe.style.display == 'none') {
+		ToggleMe.style.display = 'block'
+	} else {
+		ToggleMe.style.display = 'none'
+	}
+}
+
+</script>
+<br><br></div>
+
+	<cfinclude template="/ARSWeb/look/Left_Menu/LeftMenu.htm">
+<SCRIPT LANGUAGE="JavaScript" type="text/javascript">
+<!--//hide from old browsers
+if (document.getElementById('AIPL_inquiry_Contact')){
+  document.getElementById('AIPL_inquiry_Contact').href = 'mailto:inquiry@aipl.arsusda.gov?subject=inquiry%20from%20AIPL%20website&body=%0D%0APosted from page URL:%0D%0A' + escape(location.href) + '%0D%0A%0D%0A';
+}
+if (document.getElementById('AIPL_InSpanish')){
+  document.getElementById('AIPL_InSpanish').href = 'http://translate.google.com/translate?u=' + escape(location.href) + '&langpair=en%7Ces&hl=en&ie=UTF-8&oe=UTF-8&prev=%2Flanguage_tools';
+}
+function ShowRef (fmt)
+   {
+   msgWindow = window.open("/formats/ref." + fmt + ".html",
+                           "refwin",
+                           "toolbar=1,scrollbars=1,resizable=1,width=650,height=300")
+   msgWindow.focus()
+   }
+//end hiding of stuff-->
+</SCRIPT>
+</td><td id="Page_Content" valign="top" align="left">
+	<A id="StartBody" name="StartBody"></A>
+
+<!-- NOT ! Crumbs here -->
+  </HEAD> 
+  <BODY><BR> 
+	 <TABLE CELLPADDING="3" SUMMARY="Formatting"> 
+		<TR> 
+		  <TD COLSPAN="2" VALIGN="TOP"> 
+			 <H2 STYLE="margin-bottom: 3pt; color:#01541C;"> Documentation of
+				calculations</H2> 
+			 <P>For evaluation results, please refer to "<A
+				HREF="eval.htm">Evaluations</A>" page.</P> 
+			 <P><A HREF="#changes">Changes</A> | <A HREF="#traits">Traits</A> |
+				<A HREF="#details">Trait details</A> | <A
+				HREF="#schedule">Schedule/distribution</A> | <A
+				HREF="#formats">Formats/edits</A> | <A HREF="#genomics">Genomics</A> |
+				<A HREF="#interbull">Interbull</A></P> <HR></TD> 
+		</TR> 
+		<TR> 
+		  <TD VALIGN="TOP" WIDTH="55%"> 
+			 <H3 STYLE="margin-top: 6pt; color:#01541C;"><A
+				NAME="changes"></A>Changes in calculations</H3> 
+			 <UL STYLE="margin-top: 3pt; margin-bottom: 6pt;"> 
+				<LI><A HREF="reference/changes/summary_chrono.html">Changes across
+				  time</A> </LI> 
+				<LI><A HREF="reference/changes/summary_topic.html">Changes by
+				  topic</A> </LI> 
+			 </UL> 
+			 <H3 STYLE="color:#01541C; "><A NAME="traits"></A>Trait
+				evaluations</H3> 
+			 <UL STYLE="margin-top: 3pt; margin-bottom: 6pt;"> 
+				<LI><A HREF="reference/xm-yield.htm">Yield</A> (protein, fat,
+				  milk)</LI> 
+				<LI><A HREF="reference/scspl/xm-pl.htm">Productive life</A>
+				  (longevity)</LI> 
+				<LI><A HREF="reference/scspl/xm-scs.htm">Somatic cell score</A>
+				  (udder health)</LI> 
+				<LI><A HREF="reference/fertility/Form_GE_FFertility_0809.pdf">Daughter pregnancy
+				  rate</A> (female fertility)</LI> 
+				  <li><a href="reference/fertility/Form_GE_FFertility_0809.pdf">Cow conception rate</a> (female fertility)</li>
+				  <li><a href="reference/fertility/Form_GE_FFertility_0809.pdf">Heifer conception rate</a> (female fertility)</li>
+				  <li><a href="reference/fertility/SCR.pdf">Sire conception rate</a> (male fertility)</li>
+				<LI><A HREF="reference/fertility/ercr.htm">Estimated relative
+				  conception rate</A> (male fertility)</LI> 
+				<LI><A HREF="reference/type/type.htm">Type</A> (conformation)</LI> 
+				<LI><A HREF="reference/fertility/ce.htm">Calving ease and
+				  stillbirth</A></LI> 
+				  <LI><A HREF="reference/type/mspeed.pdf">Milking speed</A></LI>
+			 </UL> 
+			 <H3 STYLE="color:#01541C; "><A NAME="details"></A>Trait calculation
+				details</H3> 
+			 <UL STYLE="margin-top: 3pt; margin-bottom: 6pt;"> 
+				<LI><A HREF="/reference/arr-scr1.htm">Sire conception rate</A>
+				  (SCR)</LI> 
+				<LI><A HREF="/reference/nmcalc.htm">Lifetime net merit</A>
+				  (NM$)</LI> 
+				<LI><A HREF="reference/bestpred.htm">Best prediction of lactation
+				  yield</A></LI> 
+				<LI><A HREF="reference/edy.htm">Estimating daily milk
+				  yield</A></LI> 
+				<LI><A HREF="reference/ageseason.htm">Age-season standardization
+				  for yield</A></LI> 
+				<LI><A HREF="reference/datarating.htm">Data-collection rating</A>
+				  (DCR)</LI> 
+				<LI><A HREF="reference/useos.htm">Use of owner-sampler
+				  data</A></LI> 
+				<LI><A HREF="reference/trueprot.htm">True protein</A></LI> 
+				<LI><A HREF="reference/multi-pl.htm">Multitrait productive life</A>
+				  (PL)</LI> 
+				<LI><A HREF="reference/fertility/DPR_rpt.htm">Daughter pregnancy
+				  rate</A> (DPR)</LI> 
+				<LI><A HREF="/reference/fertility/ce2005.htm">Calving ease</A>
+				  (CE)</LI> 
+				<LI><A HREF="/reference/fertility/sb2006.html">Stillbirth</A>
+				  (SB)</LI> 
+				<LI><A HREF="reference/type/typedef.htm">Type for non-Holstein
+				  breeds</A></LI> 
+				<LI><A HREF="reference/goat/goatdoc.html">Goat information</A>
+				  </LI> 
+			 </UL> <BR> </TD> 
+		  <TD VALIGN="TOP" WIDTH="45%"> 
+			 <H3 STYLE="margin-top: 6pt; color:#01541C; "><A
+				NAME="schedule"></A>Schedule and distribution</H3> 
+			 <UL STYLE="margin-top: 3pt; margin-bottom: 6pt;"> 
+				<LI><A HREF="reference/sched.htm">File receipt and release
+				  dates</A> </LI> 
+				<LI> <A HREF="reference/distrib.htm">Distribution of
+				  evaluations</A></LI> 
+				<LI><A HREF="reference/access.html">Access to cooperator
+				  data</A></LI> 
+			 </UL> 
+			 <H3 STYLE="color:#01541C; "><A NAME="formats"></A>Formats and
+				edits</H3> 
+			 <UL STYLE="margin-top: 3pt; margin-bottom: 6pt;"> 
+				<LI><A HREF="formats/formats.html">Data-exchange formats</A></LI> 
+				<LI><A HREF="formats/formats.html">Record-coding
+				  assistance</A></LI> 
+				<LI><A HREF="/formats/geterr.cfm">Error-code explanation </A></LI> 
+<!--						<LI><A href="formats/errors/errors.shtml">Error-code explanation </A></LI> -->
+				<LI><A HREF="reference/misseval.html">Missing-evaluation
+				  explanation</A></LI> 
+				<LI><A HREF="reference/AmerID.pdf">The American ID number</A></LI> 
+				<LI><A HREF="reference/ib/idinfo.html">International ID
+				  formats</A></LI> 
+				<LI><A HREF="reference/goat/goatid.html">Goat ID systems</A></LI> 
+			 </UL> 
+			 <H3 STYLE="color:#01541C; "><A NAME="genomic">Genomic
+				calculations</A></H3> 
+			 <UL STYLE="margin-top: 3pt; margin-bottom: 6pt;"> 
+				<LI><A HREF="reference/genomic%20prediction.html">Genomic
+				  prediction</A></LI> 
+			 </UL> 
+			 <H3 STYLE="color:#01541C; "><A NAME="interbull"></A>Interbull
+				calculations</H3> 
+			 <UL STYLE="margin-top: 3pt; margin-bottom: 6pt;"> 
+				<LI><A HREF="http://www-interbull.slu.se">Interbull
+				  homepage</A></LI> 
+				<LI><A HREF="reference/ib/itbrules.htm">Evaluations used by
+				  Interbull</A></LI> 
+				<LI><A HREF="reference/ib/cvt.html">Conversion equations</A></LI> 
+				<LI><A
+				  HREF="http://www-interbull.slu.se/generalinfo/Advertising.pdf">Advertising
+				  guidelines</A></LI> 
+				<LI><A HREF="reference/ib/intlcowlist.html">International cow
+				  list</A></LI> 
+			 </UL> </TD> 
+		</TR> 
+	 </TABLE> 
+	 <DIV ALIGN="right" STYLE="padding-right:190px; clear:both;">
+	
+		Last Modified: 11/17/2008
+	 </DIV>
+
+
+</td></tr>
+<tr><td colspan="2">
+	<div class="footer_Cell"><!-- Cell for ARS footer -->
+		<a href="http://www.ars.usda.gov/main/main.htm" class="footerNav">ARS Home</a>&nbsp;<span class="footerSepartorLine">|</span>
+		<a href="http://www.usda.gov/" class="footerNav">USDA.gov</a>&nbsp;<span class="footerSepartorLine">|</span>
+		<a href="http://www.ars.usda.gov/ars_sitemap.htm?modecode=12-65-05-00" class="footerNav">Site Map</a>&nbsp;<span class="footerSepartorLine">|</span>
+		<a href="http://www.ars.usda.gov/disclaim.html" class="footerNav">Policies and Links</a>&nbsp;<span class="footerSepartorLine"></span>
+		<br>
+		<a href="http://www.ars.usda.gov/Services/docs.htm?docid=1398" class="footerNav">FOIA</a>&nbsp;<span class="footerSepartorLine">|</span>
+		<a href="http://www.ars.usda.gov/disclaim.html#access" class="footerNav">Accessibility Statement</a>&nbsp;<span class="footerSepartorLine">|</span>
+		<a href="http://www.ars.usda.gov/disclaim.html#privacy" class="footerNav">Privacy Policy</a>&nbsp;<span class="footerSepartorLine">|</span>
+		<a href="http://www.ars.usda.gov/disclaim.html#nondiscrim" class="footerNav">Nondiscrimination Statement</a>&nbsp;<span class="footerSepartorLine">|</span>
+		<a href="http://www.ars.usda.gov/Main/docs.htm?docid=8040" class="footerNav">Information Quality</a>&nbsp;<span class="footerSepartorLine">|</span>
+		<a href="http://www.usa.gov" class="footerNav" target="_blank">USA.gov</a>&nbsp;<span class="footerSepartorLine">|</span>
+		<a href="http://www.whitehouse.gov" class="footerNav" target="_blank">White House</a>
+	</div>
+</td></tr>
+</table>
+<script language="javascript" type="text/javascript">
+  if(location.href.indexOf('webdvlp.aipltr.arsusda.gov') !=-1){
+    AIPL_hrefs = document.getElementsByTagName('a');
+    for(var i = 0;i < AIPL_hrefs.length;i++){
+      AIPL_hrefs[i].href = AIPL_hrefs[i].href.replace(/http\:\/\/aipl\.arsusda\.gov/g,'');
+    }
+  }
+
+</script>
+</body>
+</html>
+
+  </BODY>
+</HTML>

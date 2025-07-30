@@ -1,0 +1,869 @@
+/*
+ *	Xy542 Analog input / Analog output driver.
+ *	Updated from Xy540 driver. Oleg A. Makarov 06/10/99
+ *
+ *	Xy540 Analog input / Analog output driver.
+ *
+ *	Author:		Matthew Needes
+ *	Updated:	4-18-95
+ *
+ *	Written for the William Keck Observatory
+ *
+ *
+ *	The A/D conversions are setup for random channel mode. The 
+ *	routine xy540_change_conv_mode is not implemented (ie. one
+ *	cannot change the A/D conversion mode). Ahoney 04/16/96
+ *
+ */
+
+#include <vxWorks.h>
+#include <vme.h>
+#include <rebootLib.h>
+#include <vxLib.h>
+#include <stdio.h>
+#include <taskLib.h>
+#include <stdlib.h>
+#include <sysLib.h>
+#include <logLib.h>
+#include <intLib.h>
+#include <iv.h>
+
+#include <drvSup.h>
+#include <devLib.h>
+#include "koDevLib.h"
+#include "drvXy542Ko.h"
+
+/* Indicates that no channel is pending */
+#define NONE_PENDING    -1
+ 
+/* ISR queue length */
+#define Q_SIZE          64
+
+#define IO_AI 0
+#define IO_AO 1
+ 
+/*
+ *  Set random channel mode
+ *      ENABLE interrupts.
+ */
+#define RAND_CH		0x200
+#define INT_EN		0x8
+ 
+/*
+ *  Zero reset, turn on green, turn off red
+ */
+#define XY_ALL_OK       0x3
+ 
+/*
+ *  Disable interrupts, reset board, turn on red, turn off green
+ */
+#define XY_RESET        0x10
+ 
+/*
+ *  Mask for programming gain for gain register
+ */
+#define XY_PROGRAM_GAIN 0x500
+ 
+#define XY542_VME_SIZE 0x400
+ 
+typedef volatile uint8_t REG8BIT;
+typedef volatile uint16_t REG16BIT;
+ 
+/* Xycom 542 structure */
+struct io_xy542_reg {
+    REG8BIT id[22];                 /* board ID, compare with id_expected */
+    REG8BIT pad1[107];              /* next byte offset is 22+107 = 0x81 */
+    REG8BIT csr;                    /* control status register (rw)
+                                       0x20 1-simultaneous D/A update mode requires write to d_a_upd,
+                                            0-transparent mode
+                                       0x10 combination 0-1-0 performs a software reset to D/A section
+                                            this resets all DAC outputs and clears d_a_upd register
+                                       0x03 LED control: 0-GRS=011, 1-GRS=000, 2-GRS=110, 3-GRS=100    */  
+    REG8BIT pad2[6];                /* next byte offset is 0x81+1+6 = 0x88 */
+    REG16BIT dac[8];                /* DAC data (w) */
+    REG8BIT pad3[81];               /* next byte offset is 0x88 + 16 + 81 = 0xE9 */
+    REG8BIT d_a_upd;                /* D/A update register (w) */
+    REG8BIT pad4[23];               /* next byte offset is 0xE9 + 1 + 23 = 0x101*/
+    REG8BIT itr;                    /* interrupt timer register (rw)
+                                       0x80 enables periodic interrupts
+                                       0x47 interrupt timeout periods:
+                                       0x00 -    8.192 msec
+                                       0x01 -   16.384 msec
+                                       0x02 -   24.576 msec
+                                       0x03 -   32.768 msec
+                                       0x04 -   40.960 msec
+                                       0x05 -   49.152 msec
+                                       0x06 -   57.344 msec
+                                       0x07 -   65.536 msec 
+                                       0x40 -  131.072 msec
+                                       0x41 -  262.144 msec
+                                       0x42 -  393.216 msec
+                                       0x43 -  524.288 msec
+                                       0x44 -  655.360 msec
+                                       0x45 -  786.432 msec
+                                       0x46 -  917.504 msec
+                                       0x47 - 1048.576 msec  */
+    REG8BIT pad5;                   /* next byte offset is 0x101 + 1 + 1= 0x103 */
+    REG8BIT ivr;                    /* interrupt vector register (w) */
+    REG8BIT pad6[13];               /* next byte offset is 0x103 + 1 + 13 = 0x111*/
+    REG8BIT autoscan_ctrl;          /* autoscasn control register (rw)
+				       used for autoscanning mode ie 0x4 is written to adm:
+                                       0x80 enable autoscan control register. It is cleared on power up, 
+                                            sysreset or A/D software reset
+                                       0x3  used to select channels scanned:     
+                                            0x0  0-7 channels
+                                            0x1  0-15 channels
+                                            0x2  0-31 channels
+                                            0x3  0-64 channels  */
+    REG8BIT pad7[110];               /* next byte offset is 0x111 + 1 +110 = 0x180 */
+    REG16BIT admsc;                  /* A/D mode/status/control (rw)
+                                        0x0700 operating mode for analog inputs:
+                                                 0x0000 single channel
+                                                 0x0100 sequential channel
+                                                 0x0200 random channel
+                                                 0x0300 external trigger
+                                                 0x0400 autoscanning
+                                                 0x0500 programming gain
+    
+                                        0x0080 A/D conversion in process
+                                        0x0040 initiates conversion
+                                        0x0010 software reset for analog input section
+                                        0x0008 enables interrupt at the end of A/D conversion
+                                        0x0004 flag bit: end of conversion has occured
+                                                 cleared by: starting new A/D conversion
+                                                             backplane or software reset
+                                                             read the converted input data from the low order byte of data
+                                                             select autoscanning mode */
+    REG8BIT pad8;                   /* next byte offset is 0x180 + 2 + 1 = 0x183 */
+    REG8BIT ivc;                    /* End-of-Conversion vector register (w) */
+    REG16BIT gain_ch_trig;          /* gain / channel trig register (rw)
+                                       0x0300 select the gain:
+                                              0x0000 - 1/4/10
+                                              0x0100 - 2/8/20
+                                              0x0200 - 5/20/50
+                                              0x0300 - 10/50/100
+                                       0x003f channel number to program gain       */ 
+    REG16BIT adc;                   /* ADC data (r) */
+    REG8BIT pad9[120];              /* next byte offset is 0x183 + 1 + 2 + 2 + 120 = 0x200 */
+    REG16BIT adcs[64];              /* ADC scan data (r) */
+    REG8BIT padX[384];              /* pad until next card, offset is 0x200 + 64*2 + 384 = 0x400 */
+};
+
+struct io_xy542 {
+    struct io_xy542_reg *reg;       /* Registers */
+    XY542_CBACK *rd_cback[NUM_I_CHAN];/* Callbacks, one per channel */
+    uint16_t gain_setting[NUM_I_CHAN]; /* Channel gain */
+    uint16_t last_read[NUM_I_CHAN]; /* Last read values from board */
+    uint16_t last_write[NUM_O_CHAN];/* Last written values to board */
+    int fresh_read[NUM_I_CHAN];     /* 1 if last_read[x] has valid data */
+    int fresh_write[NUM_O_CHAN];    /* 1 if last_write[x] has valid data */
+    enum input_mode inp_mode;       /* Diff. or single ended input mode */
+    int ch_pending;                 /* Channel # undergoing conversion */
+    unsigned int Q[Q_SIZE];         /* Channel conversion queue */
+    unsigned int startQ, endQ;      /* Queue pointers */
+    int inQ[NUM_I_CHAN];            /* Whether a channel is already Q'ed */
+    int configured;
+    int enableItrOnInit;
+};
+
+
+
+STATIC void xy542_isr(int card);
+STATIC void xy542_reboot_hook();
+STATIC long xy542_driver_init();
+long xy542_io_report();
+
+/*
+ *  Run-time operation:
+ *	This driver employs a simple
+ *	queueing-scheme, where any user task
+ *	can add a request for a conversion.
+ *
+ *	Any task can call "xy542_req_conversion()" to
+ *	request a conversion.  If there aren't any
+ *	reads currently pending, this function will
+ *	queue a request directly to the 542 board.
+ *	If, on the other hand, there are reads
+ *	currently pending it will add the request to a
+ *	queue (a fixed length array of channels), and
+ *	then increment the queue tail pointer.
+ *
+ *	When a conversion completes, an ISR will
+ *	be invoked.  This ISR will queue the next
+ *	request if there is one available on top
+ *	of the queue, and will then call a user-defined
+ *	callback to inform device-support or some other
+ *	higher level software that the original conversion
+ *	has completed.
+ *
+ *	The higher-level software, can then invoke
+ *	xy542_read() to obtain the channel's value.
+ *
+ *  Initialization:
+ *	On initialization the higher-level software
+ *	will call xy542_conf_channel() to associate callbacks
+ *	with particular channels and tell driver support
+ *	whether the board is running in single-ended or
+ *	differential mode.
+ */
+
+#define DEBUG
+
+#define DEVICE_NOT_VALID(LIST,NODE,CARD) \
+(NODE = koDevPrivate(koDevNodeByCardNum(LIST,CARD))) == NULL ? 1 \
+: (NODE->configured == FALSE) ? 1 : 0
+
+#define PARAMS_NOT_VALID(LIST,NODE,CARD,SIGNAL,TYPE) \
+(NODE = koDevPrivate(koDevNodeByCardNum(LIST,CARD))) == NULL ? 1 \
+: xy542_signal_check( NODE,(long)SIGNAL,TYPE) == ERR ? 1 \
+: (NODE->configured == FALSE) ? 1 : 0
+
+/*
+ *	Driver entry table
+ */
+struct {
+    long number;
+    long (*report)();
+    long (*init)();
+} drvXy542 = {
+    2,
+    xy542_io_report,
+    xy542_driver_init
+};
+
+/* 
+ *	pointers to the binary output cards 
+ */
+STATIC struct devInfo *pXy542List = NULL;
+
+STATIC char *id_expected = "VMEIDXYC542";
+
+
+/*
+ *  Lists the board configuration info
+ */
+void xy542List()
+{
+    koDevList( id_expected, pXy542List );
+}
+
+/*
+ *  XY542CONFIGURE
+ *      caches board info for use during driver init
+ */
+long xy542Configure(
+    int         cardNum,        /* card number as used in INP fields */
+    void        *base,          /* base address of the board */
+    int         vectorNum,      /* interrupt vector number. If 0 then one */
+				/* will be found */
+    int         itrLevel,       /* board's interrupt level */
+    int         itrState,       /* whether or not interrupts should be */
+				/* enabled at init time */
+    int		aiType		/* analog input signal type (differential=0 */
+				/* or single-ended=1 */
+)
+{
+    struct io_xy542	*pPrivate;
+
+    if ( koDevInUse( base, cardNum, &pXy542List ) ) {
+	logMsg("%s: card %2d or address %x already used!\n",
+		(int)id_expected,(int)cardNum, (int)base, 0,0,0);
+	return -1;
+    }
+
+/*
+ *  Allocate space for the device descriptors
+ */
+    pPrivate = calloc (1, sizeof(struct io_xy542) );
+
+    if ( pPrivate == NULL ) {
+	logMsg ("%s: Memory allocation error\n", (int)id_expected,0,0,0,0,0 );
+	return -1;
+    }
+
+    pPrivate->configured = FALSE; 
+    pPrivate->enableItrOnInit = itrState;
+    pPrivate->inp_mode = aiType+1;
+
+    return koDevConfigure( id_expected, cardNum, (void *)base, vectorNum, itrLevel, 
+		    pPrivate, &pXy542List );
+
+}
+
+STATIC void xy542_reboot_hook()
+{
+    struct devInfo	*pCard;
+    struct io_xy542	*pPrivate;
+
+    pCard = koDevFirst(pXy542List);
+
+    while (pCard != NULL) {
+
+	pPrivate = koDevPrivate( pCard );
+
+	if (pPrivate->configured)
+	    pPrivate->reg->admsc = pPrivate->reg->admsc & !INT_EN;
+
+	pCard = koDevNext( pCard );
+    }
+}
+
+/*
+ *	Driver init entry point follows. This routine confirms that the cards
+ *	exist and
+ */
+STATIC long xy542_driver_init()
+{
+    struct devInfo	*pCard;
+    struct io_xy542	*pPrivate;
+    int 			rprobe, vecNum, numChans, chan, status, index=0;
+
+    pCard = koDevFirst(pXy542List);
+
+    while (pCard != NULL) {
+
+	pPrivate = koDevPrivate( pCard );
+
+	/* register the card in the A24 address space */
+	if ( (status = devRegisterAddress( id_expected, atVMEA24,
+			    (void *) koDevAddrs(pCard),
+			    XY542_VME_SIZE,
+			    (void **) &pPrivate->reg)
+	     != OK )) {
+	    logMsg( "%s: Cannot register device at %x. Error is %x\n",
+		    (int)id_expected, (int)koDevAddrs(pCard), status, 0,0,0 );
+	 /*
+	 * Verify that something exists at the specified address
+	 */
+	} else if ( (vxMemProbe ( (char *) pPrivate->reg,
+				  READ,
+				  sizeof (short),
+				  (char *) &rprobe )) != OK ) {
+	    logMsg("%s: NO DEVICE at VME A24 address 0x%x, IOC address: 0x%x, error is: 0x%x\n",
+	           (int)id_expected, (int)koDevAddrs(pCard),(int)pPrivate->reg, status,0,0);
+	} else {
+/*
+ * verify that the device is an XVME-542 board by examining the id ROM
+ */
+	  for (index = 0; id_expected[index] != EOS; index++) {
+	    if (id_expected[index] != ((char*) pPrivate->reg->id)[2*index + 1]) break;
+	  }
+	  if ( id_expected[index] != EOS ) {
+	    logMsg("%s: card does not exist at the VME A24 address 0x%x\n",
+		    (int)id_expected,(int)koDevAddrs(pCard), 0,0,0,0);
+
+	    (void) devUnregisterAddress( atVMEA24,
+			    (void *)koDevAddrs(pCard), id_expected);
+
+	    pPrivate->configured = FALSE;
+	  } else {
+	    logMsg("%s: 0x%x VME A24 address -> 0x%x IOC address\n",
+	           (int)id_expected,(int)koDevAddrs(pCard),(int)pPrivate->reg, 0,0,0);
+	    pPrivate->configured = TRUE;
+	    pPrivate->reg->csr = XY_ALL_OK;
+	    numChans = pPrivate->inp_mode ==  XY542_DI ? 31 : 63;
+	    pPrivate->reg->admsc = XY_PROGRAM_GAIN;
+	    for ( chan = 0; chan <= numChans; chan++ ) {
+		pPrivate->reg->gain_ch_trig = pPrivate->gain_setting[chan] | chan; 
+	    }
+
+	    pPrivate->ch_pending = NONE_PENDING;
+	    if ( (vecNum = koDevVectorNum( pCard )) > 0 ) {
+		/*
+		 *    Connect the ISR to the interrupt vector
+		 */
+		if ( (status = devConnectInterrupt( intVME, vecNum, xy542_isr,
+						  (void *)koDevCardNum(pCard) ))
+		     != OK) vecNum = -1;
+	    } else {
+		for ( vecNum =  FIRST_USER_VECTOR; vecNum <= LAST_USER_VECTOR; vecNum++ ) {
+		    if ((status = devConnectInterrupt( intVME, vecNum, xy542_isr,
+				    (void *)koDevCardNum( pCard ))) == OK) break;
+		}
+	    }
+	    if (vecNum > LAST_USER_VECTOR) vecNum = -1;
+	    koDevSetVectorNum(pCard, vecNum);
+
+	    if (vecNum > 0) {
+	        pPrivate->reg->csr = XY_ALL_OK;
+		pPrivate->reg->ivc = vecNum;
+		logMsg ("%s: card #%d, 0x%x VME A24 address, 0x%x interrupt vector\n",
+		        (int)id_expected,(int)koDevCardNum(pCard),(int)koDevAddrs(pCard),pPrivate->reg->ivc,0,0);
+		/*
+		 *  Read the ADC to prevent spurious interrupt
+		 *     conditions on initialization.
+		 */
+		chan = pPrivate->reg->adc;
+		/*
+		 *  If appropriate, enable the interrupts
+		 */
+		if (pPrivate->enableItrOnInit == TRUE)
+		    if ( devEnableInterruptLevel( 
+			     intVME, koDevItrLevel( pCard ) ) == OK ) 
+			pPrivate->reg->admsc = RAND_CH | INT_EN; 
+		    else
+	                pPrivate->enableItrOnInit = FALSE;
+	    } else {
+		logMsg("%s: Interrupt vector not allocated for card %d at address %x\n",
+		    (int)id_expected,(int)koDevCardNum(pCard),
+		    (int)koDevAddrs(pCard), 0,0,0);
+		pPrivate->enableItrOnInit = FALSE;
+		pPrivate->configured = FALSE;
+		return status;
+	    }
+	  }
+	}
+	pCard = koDevNext(pCard);
+    }
+
+    if ( rebootHookAdd( (FUNCPTR) xy542_reboot_hook) != OK )
+	logMsg("%s: xy542_reboot_hook could not be added!\n", 
+		(int)id_expected, 0,0,0,0,0);
+    return Ok;
+}
+
+long xy542_last_card()
+{
+    struct devInfo	*descrp;
+    long		cardNum = 0,
+			highCard = 0;
+
+    descrp = koDevFirst( pXy542List );
+
+    while (descrp != NULL) {
+	cardNum = koDevCardNum( descrp );
+
+	if (cardNum > highCard) highCard = cardNum;
+
+	descrp = koDevNext( descrp );
+    }
+    
+    return highCard;
+}
+
+STATIC int xy542_signal_check(
+	struct io_xy542	*descrp,
+	long		signal,
+	int		io_type)
+{
+    int status = S_drvXy542_OK;
+    switch (io_type){ case IO_AO:
+		if ( signal < 0 || signal > NUM_O_CHAN )
+			status = S_drvXy542_badParam;
+	break; case IO_AI:
+		if (   (signal < 0)
+		    || (signal > (descrp->inp_mode ==  XY542_DI ? 31 : 63)) )
+			status = S_drvXy542_badParam;
+	break; default:
+		status = S_drvXy542_badParam;
+    }
+    return (status);
+}
+
+/*
+ *  Register a callback for a particular channel
+ *	Informs the driver of the board's mode,
+ *	differential or single-ended.
+ */
+int xy542_conf_channel(
+    unsigned short card,
+    unsigned short channel,
+    XY542_CBACK *callback,
+    enum input_mode inp_mode)
+{
+    struct io_xy542	*descrp;
+    XY542_CBACK 		*orig_callback;
+    int 			status = S_drvXy542_OK;
+    /*
+     *  verify that the card and signal are valid
+     */
+    if ( DEVICE_NOT_VALID(pXy542List,descrp,card) ) return S_drvXy542_noDevice;
+    if (descrp->inp_mode != XY542_UNSET &&
+	descrp->inp_mode != inp_mode ) status = S_drvXy542_invSigMode;
+    orig_callback = descrp->rd_cback[channel];
+    /*
+     *  If a previous callback does not match the new callback,
+     *	something is wrong.  Change the callback anyway.
+     */
+    if (orig_callback != NULL && orig_callback != callback) 
+	status = S_drvXy542_cbackChg;
+    descrp->rd_cback[channel] = callback;
+    return status;
+}
+
+/*
+ *  Queue a conversion request with
+ *	the driver.
+ */
+int xy542_req_conversion(
+    unsigned short card,
+    unsigned short channel)
+{
+    struct io_xy542	*pio;
+    int 		status = S_drvXy542_OK;
+    int                 level;
+    /*
+     *  verify that the card and signal are valid
+     */
+    if ( PARAMS_NOT_VALID(pXy542List,pio,card,channel,IO_AI) ) {
+	if (pio == NULL) return S_drvXy542_noDevice; 
+	if (!pio->configured) return S_drvXy542_noDevice; 
+	return S_drvXy542_badParam;
+    }
+    taskLock();    /* Disable context switching and interrupts */
+    level = intLevelSet( koDevItrLevel(koDevNodeByCardNum(pXy542List,card)) );
+    if (pio->ch_pending == NONE_PENDING) {
+	/*
+	 *  1. Store the channel # that will be undergoing conversion
+	 *  2. Start a conversion
+	 *  3. Indicate that the channel is in queue
+	 */
+	pio->ch_pending = channel;
+	pio->reg->gain_ch_trig = pio->gain_setting[channel];
+	pio->inQ[channel] = TRUE;
+    } else {
+      if ( pio->inQ[channel]) {
+	    /*
+	     *  Already queued a request, multiple requests
+	     *	are disallowed.
+	     */
+	    status = S_drvXy542_alreadyQd;
+      } else {
+	    /*
+	     *  1. Add channel to queue
+	     *  2. Indicate that channel is currently Q'ed
+	     *  3. Advance queue pointer
+	     */
+	    pio->Q[pio->endQ] = channel;
+	    pio->inQ[channel] = TRUE;
+	    (pio->endQ == (pio->inp_mode == XY542_SE ? 63 : 31)) 
+			  ? pio->endQ = 0 : pio->endQ++;
+      }
+    }
+    /* Reenable interrupts and context switching */
+    intLevelSet( level ); taskUnlock();
+    return status;
+}
+
+#ifdef DEBUG
+int xy542_int_count = 0;
+#endif
+
+/*
+ *  XY542 Interrupt Service Routine
+ */
+STATIC void xy542_isr(int card)
+{
+    struct io_xy542	*pio = NULL;
+    int 		last_ch_pending;	
+    int			level;
+
+#ifdef DEBUG
+    xy542_int_count++;
+#endif
+
+    pio = koDevPrivate( koDevNodeByCardNum( pXy542List,card ));
+    /*
+     * if the device list or descriptor is corrupted then the interrupt will
+     * never be cleared
+     */
+    if (pio == NULL){
+	    logMsg("xy542_isr: descriptor corrupted!\n",0,0,0,0,0,0);
+	    return;
+    }
+    level = intLevelSet( koDevItrLevel(koDevNodeByCardNum(pXy542List,card)) );
+    last_ch_pending = pio->ch_pending;
+    /*
+     *  1. Read the card and acknowledge the interrupt
+     *  2. Indicate that this channel is no longer undergoing a conversion
+     *  3. Indicate that this channel is no longer queued
+     */
+    pio->last_read[last_ch_pending] = pio->reg->adc;
+    pio->fresh_read[last_ch_pending] = TRUE;
+    pio->inQ[last_ch_pending] = FALSE;
+    /*
+     *  See if anything else is on the queue
+     */
+    if (pio->startQ == pio->endQ) {
+	pio->ch_pending = NONE_PENDING;	/* No further requests */
+    } else {
+	/*  1. Store the channel # that will be undergoing conversion
+	 *  2. Start a conversion
+	 *  3. Advance queue pointer */
+	pio->ch_pending = pio->Q[pio->startQ];
+	pio->reg->gain_ch_trig = pio->gain_setting[pio->ch_pending];
+	(pio->startQ == (pio->inp_mode == XY542_SE ? 63 : 31)) 
+			? pio->startQ = 0 : pio->startQ++;
+    }
+
+    /*  Invoke the user callback */
+    if (pio->rd_cback[last_ch_pending] != NULL)
+	(*(pio->rd_cback[last_ch_pending]))(card, last_ch_pending);
+    intLevelSet( level );
+}
+
+int xy542_change_conv_mode(
+    unsigned short card,
+    enum conv_mode conv_mode
+)
+{
+    struct io_xy542	*descrp;
+    /*  verify that the card and signal are valid */
+    if ( DEVICE_NOT_VALID(pXy542List,descrp,card) ) return S_drvXy542_noDevice;
+    if (conv_mode == XY542_SINGLE) {
+    } else {
+    }
+    return S_drvXy542_OK;
+}
+
+int xy542_change_gain(
+    unsigned short card,
+    unsigned short signal,
+    unsigned int gain)
+{
+    struct io_xy542	*descrp;
+    /*  verify that the card and signal are valid */
+    if ( PARAMS_NOT_VALID(pXy542List,descrp,card,signal,IO_AI) ) {
+	if (descrp == NULL) return S_drvXy542_noDevice;
+	if (!descrp->configured) return S_drvXy542_noDevice;
+	return S_drvXy542_badParam;
+    }
+    /*  Shift the two gain bits to the 0x300
+     *	positions, then OR with the program gain mask
+     *	and channel number. */
+    descrp->reg->admsc = XY_PROGRAM_GAIN; /* set program gain mode */
+    descrp->gain_setting[signal] = ((gain << 8) | signal) & 0x33f;
+    descrp->reg->gain_ch_trig = descrp->gain_setting[signal];
+    descrp->reg->admsc = RAND_CH | INT_EN;
+    return S_drvXy542_OK;
+}
+
+int xy542_read_gain(
+    unsigned short card,
+    unsigned short signal,
+    unsigned int *gain)
+{
+    struct io_xy542	*descrp;
+    /*  verify that the card and signal are valid */
+    if ( PARAMS_NOT_VALID(pXy542List,descrp,card,signal,IO_AI) ) {
+	if (descrp == NULL) return S_drvXy542_noDevice;
+	if (!descrp->configured) return S_drvXy542_noDevice;
+	return S_drvXy542_badParam;
+    }
+    /* Shift the two gain bits to the least significant	positions. */
+    *gain = descrp->gain_setting[signal] >> 8;
+    return S_drvXy542_OK;
+}
+
+/*
+ *  XY542 READ
+ *	read an analog input.
+ */
+int xy542_read(
+    unsigned short card,
+    unsigned short channel,
+    unsigned long *val)
+{
+    struct io_xy542	*descrp;
+    /*  verify that the card and signal are valid */
+    if ( PARAMS_NOT_VALID(pXy542List,descrp,card,channel,IO_AI) ) {
+	if (descrp == NULL) return S_drvXy542_noDevice;
+	if (!descrp->configured) return S_drvXy542_noDevice;
+	return S_drvXy542_badParam;
+    }
+    *val = descrp->last_read[channel];
+    return S_drvXy542_OK;
+}
+
+/*
+ *  XY542 WRITE
+ *	write an analog output
+ */
+int xy542_write(
+    unsigned short card,
+    unsigned short signal,
+    unsigned int val)
+{
+    struct io_xy542	*descrp;
+    /*  verify that the card and signal are valid */
+    if ( PARAMS_NOT_VALID(pXy542List,descrp,card,signal,IO_AO) ) {
+	if (descrp == NULL) return S_drvXy542_noDevice;
+	if (!descrp->configured) return S_drvXy542_noDevice;
+	return S_drvXy542_badParam;
+    }
+    descrp->reg->dac[signal] = val;
+    descrp->last_write[signal] = val;
+    descrp->fresh_write[signal] = TRUE;
+    return S_drvXy542_OK;
+}
+
+/*  Names for XY542 input modes  */
+STATIC char *mode_name[XY542_NUM_INP_MODES] = {
+    "TYPE NOT SET",
+    "Differential",
+    "Single-Ended"
+};
+
+/*   XY542 IO report   */
+long xy542_io_report()
+{
+    struct devInfo      *pDevBlock;
+    struct io_xy542	*pPrivate;
+    int 		signal, num_signals, noCard;
+    pDevBlock = koDevFirst( pXy542List );
+    while ( pDevBlock != NULL ) {
+	noCard = FALSE;
+	pPrivate = koDevPrivate( pDevBlock );
+	if (pPrivate == NULL) noCard = TRUE;
+	if (pPrivate->configured == FALSE) noCard = TRUE;
+	if (noCard) {
+	    logMsg("%s: card %ld NOT CONFIGURED!\n",
+	    	(long)id_expected,koDevCardNum(pDevBlock),0,0,0,0);
+	} else {
+	    logMsg( "%s: card %2ld (0x%lx) IVEC:0x%2lx IRQ:%2ld %s\n",
+		(long)id_expected,
+		koDevCardNum(pDevBlock),
+		(long)pPrivate->reg,
+		(long)(pPrivate->reg->ivc),
+		(long)koDevItrLevel(pDevBlock),
+		(long)mode_name[pPrivate->inp_mode]  );
+ 
+	    for (signal=0; signal < NUM_O_CHAN; signal++) {
+		if (pPrivate->fresh_write[signal]) {
+		    logMsg("OUT %2d = 0x%04x  ", signal,
+				    pPrivate->last_write[signal],0,0,0,0);
+		} else {
+		    logMsg("OUT %2d = UNKNWN  ", signal,0,0,0,0,0);
+		}
+
+		if (signal % 4 == 3) logMsg("\n",0,0,0,0,0,0);
+	    }
+	    num_signals = pPrivate->inp_mode == XY542_DI ? 32 : 64;
+	    for (signal=0; signal < num_signals; signal++) {
+		if (pPrivate->fresh_read[signal]) {
+			logMsg("INP %2d = 0x%04x  ",
+				signal, (unsigned int)
+				pPrivate->last_read[signal],0,0,0,0);
+		} else {
+			logMsg("INP %2d = UNKNWN  ", signal,0,0,0,0,0);
+		}
+		if (signal % 4 == 3) logMsg("\n",0,0,0,0,0,0);
+	    }
+	}
+	pDevBlock = koDevNext( pDevBlock );
+    }
+    return Ok;
+}
+
+/*   XY542 SOFT RESET CARD   */
+void xy542_reset(unsigned short card)
+{
+    struct io_xy542	*descrp;
+    /*  verify that the card and signal are valid  */
+    if ( DEVICE_NOT_VALID(pXy542List,descrp,card) ) return;
+    /*  Toggle reset bit, reset occurs on "falling-edge".  */
+    descrp->reg->csr = XY_RESET;
+    /* enable interrupts and enable random channel mode for AI  */
+    descrp->reg->csr = XY_ALL_OK;
+    descrp->reg->admsc = RAND_CH | INT_EN;
+}
+
+#ifdef DEBUG
+
+int xy542_test_callback(
+    unsigned short card,
+    unsigned short signal)
+{
+    logMsg("XY542 TEST: CALLBACK CARD %d SIGNAL %d\n", card, signal, 0,0,0,0);
+    return S_drvXy542_OK;
+}
+
+int xy542_read_test(unsigned short card)
+{
+    int status, channel;
+    /* initialize callback on all cards and channels. */
+    for (channel=0; channel < NUM_I_CHAN; channel++) {
+	status = xy542_conf_channel(card, channel, xy542_test_callback,
+						XY542_DI);
+	if (status != S_drvXy542_OK && status != S_drvXy542_cbackChg) {
+		logMsg("XY542: REGISTER CALLBACK FAILED\n",0,0,0,0,0,0);
+		return status;
+	}
+    }
+    /* queue reads for every channel */
+    for (channel=0; channel < NUM_I_CHAN; channel++) {
+	status = xy542_req_conversion(card, channel);
+	if (status != S_drvXy542_OK) {
+		logMsg("XY542: QUEUE READ FAILED\n",0,0,0,0,0,0);
+		return status;
+	}
+    }
+    return Ok;
+}
+
+int xy542_test()
+{
+    xy542_read_test(0);
+    xy542_read_test(1);
+    xy542_read_test(0);
+    xy542_read_test(1);
+    return Ok;
+}
+
+int xy542_write_test(
+    unsigned short card,
+    unsigned short channel,
+    unsigned long value)
+{
+    unsigned int val = value;
+    int status;
+    status = xy542_write(card, channel, val);
+    if (status == S_drvXy542_OK) return Ok;
+    logMsg("XY542: WRITE FAILED\n",0,0,0,0,0,0);
+    return ERR;
+}
+
+#endif
+
+/*+*********************************************************************
+$Log: drvXy540Ko.c,v $
+Revision 1.8  1998/02/13 02:47:48  ahoney
+Corrected gain_setting init.
+
+Revision 1.7  1998/02/05 19:07:12  ahoney
+Removed intLock() and intUnlock().
+
+ * Revision 1.5  1996/12/18  23:13:52  ahoney
+ * Mods to xy540_read_test so that the routine does not abort on a
+ * changed callback.
+ *
+ * Revision 1.4  1996/05/04  02:08:53  ahoney
+ * Replaced all ERR and OK return codes with the appropriate device specific
+ * code.
+ *
+* Revision 1.3  1996/02/23  01:28:36  ahoney
+* Modified the reboot routine so that it functions correctly for a
+* non-existent board.
+*
+* Revision 1.2  1996/02/15  19:16:46  ahoney
+ * Mods relevant to eliminating module_types.
+ * Added all defines and structures, which were in drvXy540ko.h, that are
+ * relevant only to this module - they are private to the driver so should
+ * be herein.
+ * Added xy540Configure for startup script card configurations.
+ * Major changes to xy540_driver_init.
+ * Changes to all other routines so as to use the list structure which
+ * was added for the config routine and devLib usage.
+ *
+ * Revision 1.1  1995/10/27  20:51:14  ahoney
+ * Moved from dev/src/drv to dev/xy540
+ *
+ * Revision 1.1.1.2  1995/06/28  19:44:56  ahoney
+ * Initial insert of the Force SIO2 Vxworks driver.
+ *
+ * Revision 1.1.1.1  1995/05/11  21:30:18  rwright
+ * initial insertion of kss/dcs2/dev
+ *
+ *
+***********************************************************************/
+ 

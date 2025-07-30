@@ -1,0 +1,51 @@
+06/09/05: Patrice Verdier
+---------
+
+This directory /rooms/in2p3B/pverdier/2EMhighpt contains p20.04.01 TMB
+for RunIIb data passing the "2EMhighpt" event flag. 
+
+* Data sample:
+--------------
+
+All run2b data recorded after the 4th of August 2006, and which were 
+reconstructed when submitting the jobs (2006/09/04).
+=> run range : [223953-224749]
+~700,000 events in total
+SAM dataset definitions per run for the unskimmed files: pv-tmbp200401-<RunNumber>
+
+The skimming was done using the event flag computed in d0reco.
+Definition of the SKIM_2EMhighpt event flag:
+(np_tmb_stream/rcp/2EMhighpt_stream.rcp)
+==================================================================
+string Tag = "SKIM_2EMhighpt"
+ 
+string Trigger = ( )
+ 
+string Cuts = ( "Cut1" "Cut2")
+ 
+string Cut1 = ( "EM" "(absID==10 || absID==11) && Pt > 12.0" )
+string Cut2 = ( "EM" "(absID==10 || absID==11) && Pt > 12.0" )
+ 
+RCP    EMid_Algo = < emreco EMReco-scone-id >
+string EMid_SearchRCPs = ("clusterer","HMReco",)
+========================================================================
+
+* TMB files for this 2EMhighpt skim :
+/rooms/in2p3B/pverdier/2EMhighpt/TMBStream_x-p20.04.01-maxopt-Linux-pv-tmbp200401-22*/CSskim-2EMhighpt
+
+jobs were ran per run, but there might be few parallel jobs per run. 
+The name of the output directories means:  
+TMBStream_x-p20.04.01-maxopt-Linux-pv-tmbp200401-<Run-Number>-<jobID>
+
+becareful, there might be few directories with runnumber < 223953
+
+* np_tmb_stream code is on :
+/work/shaul-clued0/pverdier/calgo/p20.04.01_np_tmb_stream
+
+* Known problems :
+
+run 224680 crashed
+I have not check that all jobs processed all the files they had to.
+Few unskimmed files were not delivered, but I will not try to process them.
+The goal is only to have enough Z->ee statistic until the official CSskim
+are produced.

@@ -1,0 +1,589 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>SNP3D</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body bgcolor="#FFFFFF">
+<html><!-- #BeginTemplate "/Templates/dbSNP_new.dwt" --><!-- DW6 -->
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>SNPto3D</title>
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+	<META name="keywords" content="single nucleotide polymorphism, SNP,
+sequence variation, genome, gene mapping, population structure, dbSNP,
+evolution, microsatellite repeat, phenotype, national center for
+biotechnology information, ncbi, national library of medicine, nlm, database, 
+archive, bioinformatics, national institute of health, ncbi">
+	<META name="description" content="The Single Nucleotide Polymorphism
+database (dbSNP) is a public-domain archive for a broad collection of simple
+genetic polymorphisms.">
+	<META name="author" content="snpdev">
+	<META name="robots" content="index,nofollow,noarchive">
+	<meta http-equiv="Expires" content="Wed, 28 Jan 2006 01:01:01 GMT">
+
+<!-- #BeginEditable "MetaRegion" -->
+<META name="robots" content="index,nofollow,NOARCHIVE">
+<META NAME="keywords" CONTENT="SNP, Polymorphism, deletion, insertion, microsatellite, Indel, Haplotype, genotype, population, frequency">
+<META NAME="description" CONTENT="Database of Single Nucleotide Polymorphism">
+<!-- #EndEditable -->
+
+<script language="JavaScript" src="http://www.ncbi.nlm.nih.gov/corehtml/query/query.js"></script>
+<script language="JavaScript" src="Javascripts/snputils.js"></script>
+<script src="Javascripts/prototype.js" type="text/javascript"></script>	
+<script language="JavaScript" src="Javascripts/cookies.js"></script>
+<script language="JavaScript" src="Javascripts/sidebar.js"></script>
+  
+<link rel="stylesheet" href="http://www.ncbi.nlm.nih.gov/corehtml/ncbi.css">
+<link rel="stylesheet" href="snp.css" type="text/css">
+<link type="text/css" rel="stylesheet" href="http://www.ncbi.nlm.nih.gov/corehtml/ncbi_test.css">
+
+<!-- #BeginEditable "JAVASCRIPT" --> 
+<SCRIPT language=JAVASCRIPT>
+//JAVASCRIPTS start here
+function checkAll(check, myform) {
+	alert(myform);
+	var f = document.forms[myform];
+	var a = f.pageparam.value; 
+	alert(f);
+	var s = a.split("_");
+	var varcolor = s[2].split("%");
+    for (i=0;i<s[1];i++) {
+      if (check) { 
+		 if (varcolor[i] == check){
+		 	if ( f.box[i].checked)
+				{f.box[i].checked=false;}
+			else { f.box[i].checked=true;}
+		 }
+      }
+    }
+}
+
+</SCRIPT>
+<NOSCRIPT> </NOSCRIPT> <!-- #EndEditable -->
+ 
+
+<script type="text/javascript" language="JavaScript">
+<!--
+	if (document.layers) { origWidth = window.innerWidth; origHeight = window.innerHeight; window.onresize = resizeFix; }
+	function resizeFix() {
+		if (document.layers && (window.innerWidth != origWidth || window.innerHeight != origHeight)) { window.history.go(0); }
+	}
+// -->
+</script>  
+
+
+    		<script type="text/javascript">
+    		<!--
+    		var PopUpMenu2_GlobalConfig = [
+    		  ["UseThisGlobalConfig","yes"]
+    		]
+    		//-->
+    		</script>
+    		<script type="text/javascript" src="/coreweb/javascript/popupmenu2/popupmenu2_7loader.js"></script>
+<!--
+<script language="JavaScript" src="Javascripts/cookies.js"></script>
+<script language="JavaScript" src="Javascripts/OrganismSelect.js"></script>
+-->
+
+<style type="text/css">
+<!--
+.style1 {
+	color: #FF0000;
+	font-family: Arial, Helvetica, sans-serif;
+}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" background="bkgd.gif" text="#000000" link="#CC6600" vlink="#CC6600" onLoad="">
+<!-- #BeginEditable "DHTML Items" --><!-- #EndEditable -->
+<!--  the header   --><!-- #BeginLibraryItem "/Library/dbSNP_topbar.lbi" -->
+<table width="615" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <!-- logo -->
+    <td><table width="100%" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+          <td width="135" align="left" bgcolor="#336699"><a href="http://www.ncbi.nlm.nih.gov"><img src="corehtml/left.GIF" width="130" height="45" border="0" alt="NCBI"></a><br>
+          </td>
+          <td align="left"><p>
+              <map name="mapMap">
+                <area shape="rect" alt="NLM" coords="321,7,447,52"
+href="http://www.nlm.nih.gov">
+              </map>
+              <!-- #BeginLibraryItem "/Library/SNPlogo.lbi" --><img name="SNPlogo" src="SNPlogo2.jpg" width="440" height="70" border="0" alt=""><!-- #EndLibraryItem --><!-- #BeginLibraryItem "/Library/Alert.lbi" --><!-- #EndLibraryItem --></p></td>
+        </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <!--site map-->
+    <td><table class="TEXT" border="0" cellspacing="0" cellpadding="2" bgcolor="#000000" width="100%">
+        <tr class="TEXT" align="CENTER">
+          <td><a href="/entrez/query.fcgi?db=PubMed" class="topbarHeading"><font color="#FFFFFF">PubMed</font></a></td>
+          <td><a href="/entrez/query.fcgi?db=Nucleotide" class="topbarHeading"><font color="#FFFFFF">Nucleotide</font></a></td>
+          <td><a href="/entrez/query.fcgi?db=Protein" class="topbarHeading"><font color="#FFFFFF">Protein</font></a></td>
+          <td><a href="/entrez/query.fcgi?db=Genome" class="topbarHeading"><font color="#FFFFFF">Genome</font></a></td>
+          <td><a href="/entrez/query.fcgi?db=Structure" class="topbarHeading"><font color="#FFFFFF">Structure</font></a></td>
+          <td><a href="/entrez/query.fcgi?db=Popset" class="topbarHeading"><font color="#FFFFFF">PopSet</font></a></td>
+          <td><a href="/entrez/query.fcgi?db=Taxonomy" class="topbarHeading"><font color="#FFFFFF">Taxonomy</font></a></td>
+          <td><a href="/entrez/query.fcgi?db=OMIM" class="topbarHeading"><font color="#FFFFFF">OMIM</font></a></td>
+          <td><a href="/entrez/query.fcgi?db=Books" class="topbarHeading"><font color="#FFFFFF">Books</font></a></td>
+          <td><a href="/entrez/query.fcgi?db=Snp" class="topbarHeading"><font color="#FFFFFF">SNP</font></a></td>
+        </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <!--query box-->
+    <td><table border="0" width="100%" cellspacing="0" cellpadding="2" bgcolor="#ccccff">
+        <form action="http://www.ncbi.nlm.nih.gov/coreutils/dispatch.cgi" method="post" name="Search" id="Search">
+          <tbody>
+            <tr>
+              <td class="SMALL1"><div id="HintEntrezSnp" class="hintBox">Search for SNP on NCBI Reference Assembly</div><label for="Search">&nbsp;&nbsp;Search Entrez</label>
+                  <small>
+ <select name="db">
+   		    <option value="500">All Databases</option>
+			<option value="17">NCBI Web Site</option>
+			<option value="00">-------------</option>
+            <option value="0">PubMed</option>
+			<option value="1">Protein</option>
+            <option value="2">Nucleotide</option>
+			<option value="37">EST</option>
+			<option value="38">GSS</option>
+			<option value="3">Structure</option>
+
+			<option value="4">Genome</option>
+			<option value="8">Books</option>
+			<option value="23">CancerChromosomes</option>
+			<option value="14">Conserved Domains</option>
+			<option value="10">3D Domains</option>
+			<option value="21">Gene</option>
+
+			<option value="30">Genome Project</option>
+			<option value="34">dbGaP</option>
+			<option value="28">GENSAT</option>
+			<option value="19">GEO Profiles</option>
+			<option value="20">GEO Datasets</option>
+			<option value="22">HomoloGene</option>
+
+			<option value="15">Journals</option>
+			<option value="18">MeSH</option>
+		    <option value="24">NLM Catalog</option>
+			<option value="33">OMIA</option>
+			<option value="6">OMIM</option>
+			<option value="16">PMC</option>
+
+			<option value="5">PopSet</option>
+			<option value="29">Probe</option>
+            <option value="35">Protein Clusters</option>
+			<option value="25">PubChem BioAssay</option>
+			<option value="26">PubChem Compound</option>
+			<option value="27">PubChem Substance</option>
+
+			<option value="13" selected>SNP</option>
+            <option value="7">Taxonomy</option>
+			<option value="11">UniGene</option> 
+            <option value="12">UniSTS</option>  
+			 </select>
+                  </small>
+                  <label for="for">for</label>
+                  <input type="text" name="term" id="term" size="24">
+                  <input type="submit" name="submit" value="Go">
+                  <input type="hidden" name="SITE" value="NcbiHome">
+                  
+</td>
+            </tr>
+          </tbody>
+        </form>
+    </table></td>
+  </tr>
+  <tr>
+    <td><table width="615" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+          <td width="153" bgcolor="#CCCCCC"><img src="corehtml/transparent.gif" width="130" height="1"></td>
+          <td width="462" bgcolor="#CCCCCC"><!-- toolbar -->
+          </td>
+        </tr>
+    </table></td>
+  </tr>
+</table>
+<!-- #EndLibraryItem --><!--start of first table -->
+<!--end of first table -->
+<!--  the contents   -->
+<table summary=""  border="0" width="615" cellspacing="0" cellpadding="0">
+  <tr valign="TOP">
+    <!--  left column   -->
+    <td
+width="135" valign="top" bgcolor="#336699"> <span class="GUTTER1"></span> <img src="http://www.ncbi.nlm.nih.gov/corehtml/spacer10.GIF"
+width="135" height="1" border="0" alt="Spacer gif"><!-- #BeginLibraryItem "/Library/dbSNP_sidebar.lbi" -->
+<link href="CSS/snp.css" rel="stylesheet" type="text/css">
+
+<style type="text/css">
+<!--
+.roundcont {
+	background-color: #f90;
+	color: #fff;
+	width: 120px;
+}
+
+.roundcont p {
+	margin: 0 10px;
+}
+
+.roundtop { 
+	background: url(./css_images/tr.gif) no-repeat right top; 
+}
+
+.roundbottom {
+	background: url(./css_images/br.gif) no-repeat top right; 
+}
+img.corner {
+   width: 15px;
+   height: 15px;
+   border: none;
+   display: block;
+}
+-->
+</style>
+
+<table width="135">
+  <tr> 
+    <td bgcolor="#336699"> 
+	<div align="center"><span class=""><strong><font COLOR="#ffcc66">BUILD 129</font></strong></span><!-- #BeginLibraryItem "/Library/FAQ search box.lbi" -->
+<div class="roundcont">
+   <div class="faqtitle">Have a question about dbSNP? Try searching the SNP FAQ Archive!</div>
+<form name="frmGo" method="get" action="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi" onSubmit="searchFAQ(this);">
+ <input name="db" value="Books" type="hidden">
+ <input name="cmd" value="Search" type="hidden">
+ <input name="term" value="" size="12">
+ <input type="submit" name="Submit" value="Go">
+ <input name="doptcmdl" value="TOCView" type="hidden">
+</form>
+<script language="JavaScript" type="text/JavaScript">
+<!--
+function searchFAQ (frm) {
+	frm.term.value += ' AND helpsnpfaq[book]';
+}
+-->
+</script>
+</div>	<!-- #EndLibraryItem --></div>
+
+<div class="sidebarDiv" id="sideBar">
+	<p>
+		<div class="sidebarHeading" id="divGeneral" onClick="toggleSideBar(this);">GENERAL</div>
+		<div class="sidebarSubHeadingDiv" id="divGeneralContent">
+			<a href="javascript:Help();" >Contact Us</a><br>
+			<a href="sitemap.html" >Site Map</a><br>
+			<a href="index.html" accesskey="A" >dbSNP Homepage</a><br>
+			<a accesskey="B" href="http://www.ncbi.nlm.nih.gov/mailman/listinfo/dbsnp-announce">Announcements</a><BR>
+			<a accesskey="C" href="snp_summary.cgi">dbSNP Summary</a><BR>
+			<a accesskey="D" href="ftp://ftp.ncbi.nih.gov/snp/">FTP Download</a>
+	    </div>
+        <div class="sidebarHeading" id="divHumanVariations" onClick="toggleSideBar(this);">HUMAN VARIATION</div>
+	  <div class="sidebarSubHeadingDiv" id="divHumanVariationsContent">
+		  <a  href="tranSNP/tranSNP.cgi" title="Search for variation in the human genome using HGVS nomenclature with an opportunity to submit new or annotate existing information ">Search, Annotate, Submit</a><span class="sidebarHeading"></span><img src="new.gif" alt="NEW"><br>
+			<a  href="tranSNP/VarBatchSub.cgi" title="Submit multiple variants using HGVS nomenclature with an opportunity to identify their clinical relevance">Annotate and Submit Batch Data with Clinical Impact</a><span class="sidebarHeading"></span><img src="new.gif" alt="NEW"><br>
+        </div> 
+		<div class="sidebarHeading" id="divSubmission" onClick="toggleSideBar(this);">SNP SUBMISSION</div>
+		<div class="sidebarSubHeadingDiv" id="divSubmissionContent">
+       	  <a accesskey="H" href="http://www.ncbi.nlm.nih.gov/books/bv.fcgi?rid=helpsnpfaq.chapter.QuickStart">Quick Start</a><br>
+			<a accesskey="H" href="how_to_submit.html">How to Submit</a><br>
+			<a accesskey="F" href="handle.html">Handle Request</a><br>
+		</div>
+		<div class="sidebarHeading" id="divDocumentation" onClick="toggleSideBar(this);">DOCUMENTATION</div>
+		<div class="sidebarSubHeadingDiv" id="divDocumentationContent">
+			<a accesskey="R" href="http://www.ncbi.nlm.nih.gov/mailman/mmsearch/dbsnp-announce?restrict=;exclude=;config=dbsnp-announce;method=or;format=short;sort=time;words=build;page=1">Build Release Note</a><br>
+			<a accesskey="E" href="buildhistory.cgi">Build History</a><br>
+			<a accesskey="F" href="http://www.ncbi.nlm.nih.gov/books/bv.fcgi?rid=helpsnpfaq.TOC" title="Search SNP archived FAQ updated to 2006">Search FAQ Archive</a><br>
+			<a accesskey="G" href="http://www.ncbi.nlm.nih.gov/books/bv.fcgi?rid=handbook.chapter.ch5">dbSNP Handbook</a><br>
+			<a accesskey="G" href="get_html.cgi?whichHtml=overview">Overview</a><br>
+			<a accesskey="A" href="http://www.ncbi.nlm.nih.gov/About/primer/snps.html">SNP Science Primer</a><br>
+			<a accesskey="I" href="get_html.cgi?whichHtml=verbose">RefSNP Summary Info</a><br>
+			<a accesskey="J" href="ftp://ftp.ncbi.nih.gov/snp/database/b124/mssql/schema/erd_dbSNP.pdf">Database Schema</a><br>
+			<a accesskey="J" href="snp_db_list_table.cgi">Database Dictionary</a><br>
+			<a href="snp_schemaChange.htm">Database Changes</a><br>
+			<a href="http://ncbi.nlm.nih.gov/SNP/geno/genoex_doc.html">Genotype Schema</a><br>
+			<a href="ftp://ftp.ncbi.nih.gov/snp/00readme.txt">Data Formats</a><BR>
+			<a href="docsum/docsum_doc.html">Docsum Schema</a><img src="new.gif" width="25" height="12" alt="NEW gif"><BR>
+			<a href="Hetfreq.html">Heterozygosity Computation</a>
+		</div>
+		<div class="sidebarHeading" id="divSearch" onClick="toggleSideBar(this);">SEARCH</div>
+		<div class="sidebarSubHeadingDiv" id="divSearchContent">
+			<a href="http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?db=Snp">Entrez SNP</a><br>
+			<a href="SNPeutils.htm">EUtils API</a><br>
+			<a accesskey="K" href="snp_blastByOrg.cgi">Blast SNP</a><br>
+			<a accesskey="M" href="batchquery.html">Batch Query</a><BR>
+          <a accesskey="K" href="snp_blastByOrg.cgi">Blast SNP</a><br>
+			<a accesskey="G" href="snp_gf.cgi">Genotype Query</a><BR>
+			<a accesskey="N" href="snp_tableList.cgi?type=submitter">By Submitter</a><BR>
+			<a accesskey="O" href="snp_batchSearch.cgi?init=y">New Batches</a><BR>
+			<a accesskey="P" href="snp_tableList.cgi?type=method">Method</a><br>
+			<a accesskey="Q" href="snp_tableList.cgi?type=pop">Population Detail</a><br>
+			<!-- <a accesskey="Q" href="../popclass.cgi">Population Class</a><br> -->
+			<a accesskey="R" href="snp_tableList.cgi?type=pub">Publication</a><BR>
+			<a accesskey="T" href="index.html#Locus">Locus Information</a><BR>
+			<a accesskey="U" href="index.html#Markers">STS Markers</a><br>
+			<a accesskey="M" href="MouseSNP.cgi">Mouse Strains</a>
+        </div>
+        <!--
+		<div class="sidebarHeading" id="divHaplotype" onClick="toggleSideBar(this);">HAPLOTYPE</div>
+		<div class="sidebarSubHeadingDiv" id="divHaplotypeContent">
+			 <a  href="../hap/dbSNP_haplotype_intro.html">Submission</a>
+		</div>
+        -->
+		<div class="sidebarHeading" id="divRelatedSites" onClick="toggleSideBar(this);">RELATED SITES</div>
+		<div class="sidebarSubHeadingDiv" id="divRelatedSitesContent">
+			<a  href="http://www.ncbi.nlm.nih.gov/IEB/Research/GVWG/">Genome Variation<br>&nbsp;&nbsp;&nbsp;&nbsp;Working Group</a><br>
+			<a  href="http://www.ncbi.nlm.nih.gov/WGA/">Whole Genome Association</a><br>
+		<a  href="http://www.ncbi.nlm.nih.gov/mhc/MHC.fcgi?cmd=init">dbMHC</a></div>
+		
+		
+        </div>  
+</td>
+  </tr>
+</table>
+<script language="JavaScript" type="text/JavaScript">
+	//toggleSideBar($('divGeneral'));
+	toggleSideBar($('divHumanVariations'));
+</script> <!-- #EndLibraryItem --><SPAN class="GUTTER1"><BR>
+    </SPAN> </td>
+    <!-- extra column to force things over the gif border -->
+    <td width="5"> <img src="http://www.ncbi.nlm.nih.gov/corehtml/spacer10.GIF"
+width="3" height="1" border="0" alt="Spacer gif"> </td>
+    <!-- right content column  -->
+    <!-- #BeginEditable "SNP_right column" --> 
+    <td width="460"> 
+      
+                    <div align="center"><font size="4"><b><font color="#FF0000" size="3">To display
+                            3D structure, download <a href="http://www.ncbi.nlm.nih.gov:80/Structure/CN3D/cn3d.shtml"><strong>Cn3D
+                            v4.0</strong></a></font></b></font></div>
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr> 
+            <td> 
+              <div align="left"> 
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td align="right" valign="top"><table summary="" 
+border="0" width="460" cellspacing="2" cellpadding="0" bgcolor="#FFFFFF">
+          <tr> 
+            <td width="100%" bgcolor="#CCCCFF" class="H3" height="19"> 
+              <div align="center"><b><font size="4"><a name="NP_003784"></a>1 variation mapped to protein 
+                <a HREF="http://www.ncbi.nlm.nih.gov/entrez/viewer.cgi?list_uids=6042196">NP_003784</A></font></b></div>
+            </td>
+          </tr>
+        </table></td>
+                  </tr>
+                  <tr> 
+                    <td align="right" valign="top" width="18%"> 
+                      <div align="left"><b>PDB Blast Result:</b> <a HREF="http://www.ncbi.nlm.nih.gov/blast/bl2seq/wblast2.cgi?program=blastp&one=6042196&two=34811401">View Alignment</A></div>
+                    </td>
+                  </tr>
+                  <tr> 
+                    <td align="right" valign="top" width="18%"> 
+                      <div align="left"><b>Protein:</b></div>
+                    </td>
+                  </tr>
+                  <tr> 
+                    <td align="right" valign="top" width="18%"> 
+                      <div align="left">gi|<a href="http://www.ncbi.nlm.nih.gov/entrez/viewer.cgi?list_uids=6042196">6042196</a>|1-1 cathepsin F [Homo sapiens]|<a href=""></a></div>
+                    </td>
+                  </tr>
+                  <tr> 
+                    <td align="right" valign="top" width="18%"> 
+                      <div align="left"><b>Structure Neighbor:</b></div>
+                    </td>
+                  </tr>
+                  <tr> 
+                    <td align="right" valign="top" width="18%"> 
+                      <div align="left">gi|<a href="http://www.ncbi.nlm.nih.gov/entrez/viewer.cgi?list_uids=34811401">34811401</a>|1-1 Chain A, Crystal Structure Of Human Cathepsin F|<a href=""></a> </div>
+                    </td>
+                  </tr>
+                </table>
+                <br>
+<!--3DTABLE_START-->
+            </div>
+            <form name="NP_003784" method="put" action="snp3D.cgi">
+              <font face="Arial, Helvetica, sans-serif"> 
+              <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tbody> 
+                <tr valign="Top"> 
+                  <td valign="Top"><br>
+                  </td>
+                  <td valign="Top" colspan="2" bgcolor="#999999"> 
+                    <div align="Center"><small><font face="Helvetica, Arial, sans-serif"><b> 
+                      <a href="#help">Protein Context</a></b></font></small></div>
+                  </td>
+                  <td valign="Top"> 
+                    <div align="Center"><small><font face="Helvetica, Arial, sans-serif"><b> 
+                      dbSNP</b></font></small><br>
+                    </div>
+                  </td>
+                  <td valign="Top" colspan="2" bgcolor="#999999"> 
+                    <div align="Center"><b><small><font face="Helvetica, Arial, sans-serif"> 
+                      <a href="#help">Structure Neighbor</a></font></small><br>
+                      </b></div>
+                  </td>
+                  <td valign="Top"> 
+                    <div align="Center"><br>
+                    </div>
+                  </td>
+                </tr>
+                <tr bgcolor="#cccccc"> 
+                  <th bgcolor="#FFFFFF"><small><font face="Helvetica, Arial, sans-serif"> 
+                    SnpID</font></small></th>
+                  <th><small><font face="Helvetica, Arial, sans-serif"> Position</font></small><br>
+                    <small><font face="Helvetica, Arial, sans-serif">protein</font></small><br>
+                  </th>
+                  <th><small><font face="Helvetica, Arial, sans-serif"> Amino<br>
+                    Acid<br>
+                    </font></small></th>
+                  <th bgcolor="#FFFFFF"><small><font face="Helvetica, Arial, sans-serif"> 
+                    Amino<br>
+                    Acid<br>
+                    </font></small></th>
+                  <th><small><font face="Helvetica, Arial, sans-serif"> Amino<br>
+                    Acid</font></small><br>
+                  </th>
+                  <th><small><font face="Helvetica, Arial, sans-serif"> Position<br>
+                    neighbor<br>
+                    </font></small></th>
+                  <th bgcolor="#FFFFFF"><small><font face="Helvetica, Arial, sans-serif"> 
+                    Cn3D</font></small></th>
+                </tr>
+<TR><TH bgcolor="#FF9999"><a HREF="snp_ref.cgi?type=rs&rs=572846">rs572846</A></TH><TH>467</TH><TH bgcolor="#FF9900">ARG</TH><TH bgcolor="#FF9900">ARG</TH><TH bgcolor="#FF9900">ARG</TH><TH>197</TH><TH><input type="checkbox" name="box" value="572846"></TH></TR>
+
+              </table>
+              </font><br>
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" height="24">
+                <tr> 
+                  <td width="75%" align="left" height="27" valign="top"> 
+                    <div ><font size="4"><b>Cn3D</b></font><b>:</b> 
+                      <input type="submit" name="Submit" value="All">
+                      <input type="submit" name="Submit" value="Selected">
+                      <font size="2" color="#FF9900">Synonymous</font><font size="2"> 
+                      <input type="checkbox" name="Syn" value="checkbox" onClick="checkAll(1,'NP_003784')">
+                      </font> <font size="2" color="#00FF00">Nonsynonymous</font><font size="2"> 
+                      <input type="checkbox" name="Syn2" value="checkbox" onClick="checkAll(2,'NP_003784')">
+                      </font> 
+                      <input type="hidden" name="pageparam" value="572846_1_1%">
+                    </div>
+                  </td>
+                </tr>
+              </table>
+     </form>
+              <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr> 
+                  <td height="3"> 
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                      <tr> 
+                      <td><font size="4"><b> </b></font>
+                        <form name="Download_NP_003784" method="put" action="snp3D.cgi">
+                         <input type="submit" name="Submit" value="Download RS#">
+                          <input type="hidden" name="snplist" value=" 572846">
+						</form></td>
+                        <td> <form name="Batch_NP_003784" method="put" action="dbSNP.cgi">
+							<input type="submit" name="Submit" value="Batch Query RS#">
+							<input type="hidden" name="list" value="rslist 572846">
+							</form>
+						</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr> 
+                  <td width="100%" bgcolor="#CCCCFF" class="H3" height="19"> 
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                      <tr> 
+                        <td bgcolor="#CCCCCC"><b><font size="4">Additional Links:&nbsp;&nbsp;<a href="http://www.ncbi.nlm.nih.gov/Structure/mmdb/mmdbsrv.cgi?uid="><img src="maplists/mmdb.gif" width="45" height="15" border="0" alt="MMDB Database"></a>
+<a href="http://www.ncbi.nlm.nih.gov/Structure/cdd/wrpsb.cgi?DATALIB=oasis_sap&INPUT_TYPE=access&EXPECT=0.001&SEQUENCE=6042196"><img src="maplists/cdd.gif" width="45" height="15" border="0" alt="CDD Database"></a>
+<a href="http://www.ncbi.nlm.nih.gov/Structure/lexington/lexington.cgi?cmd=seq&EXPECT=0.0001&fasta=6042196"><img src="maplists/dart.gif" width="45" height="15" border="0" alt="DART Database"></a></font></b></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+      </table>
+ <hr>
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr> <font face="Helvetica, Arial, sans-serif"> </font> <font face="Helvetica, Arial, sans-serif"> 
+          </font> 
+          <td width="89%" valign="Top"><font face="Helvetica, Arial, sans-serif" size="2"> 
+            <b><a name="help"></a>Position protein</b><br>
+            Contig reference residue from the translated XP_ protein. Position 
+            is given on the protein sequence.</font></td>
+        </tr>
+        <tr> <font face="Helvetica, Arial, sans-serif"> </font> <font face="Helvetica, Arial, sans-serif"> 
+          </font> <font face="Helvetica, Arial, sans-serif"> </font> 
+          <td width="89%" valign="Top"><font face="Helvetica, Arial, sans-serif" size="2"> 
+            <b>Amino Acid</b><br>
+            Residue on the contig reference, variant residue specified by one 
+            or more alleles for a variation record in dbSNP (synonymous or nonsynonymous), 
+            or the corresponding residue on the neighbored protein with structure 
+            information, respectively.</font></td>
+        </tr>
+        <tr> <font face="Helvetica, Arial, sans-serif"> </font> <b><font face="Helvetica, Arial, sans-serif"> 
+          </font></b> <font face="Helvetica, Arial, sans-serif"> </font> 
+          <td width="89%" valign="Top"><font face="Helvetica, Arial, sans-serif" size="2"> 
+            <b>Position neighbor</b><br>
+            Position of the variant amino acid on the protein sequence with structure 
+            information. The alignment between the contig protein and its neighbor 
+            structure can be viewed in Cn3D or by selecting the 'view alignment' 
+            button above. </font></td>
+        </tr>
+        <tr> <font face="Helvetica, Arial, sans-serif"> </font> <font face="Helvetica, Arial, sans-serif"> 
+          </font> <font face="Helvetica, Arial, sans-serif"> </font> 
+          <td width="89%" valign="Top"><font size="2" face="Helvetica, Arial, sans-serif"> 
+            <b>Cn3D</b><br>
+            Check box to include the selected variation in the set of highlighted 
+            positions in the Cn3D export file.</font></td>
+        </tr>
+      </table>
+      <P class="SMALL1"> 
+<!--3DTABLE_END-->
+      </P>
+      <!-- #BeginLibraryItem "/Library/dbSNPTextLinks.lbi" --> 
+<!--Bottom Link Start -->
+<p><font size="2"> <b>GENERAL</b>: <a href="javascript:Help();">Contact Us</a> | <a href="index.html">Homepage</a> | <a href="http://www.ncbi.nlm.nih.gov/mailman/listinfo/dbsnp-announce" >Announcements</a> 
+  |<a href="snp_summary.cgi">dbSNP Summary</a> | <a href="http://www.nhgri.nih.gov/Grant_info/Funding/discover_polymorphisms.html">Genome</a> 
+  | <a href="ftp://ftp.ncbi.nih.gov/snp/">FTP SERVER</a> | <a href="buildhistory.cgi">Build 
+  History</a> | <a href="handle.html">Handle Request</a> <br>
+  <b>DOCUMENTATION</b>:</font> <font size="2"><a href="get_html.cgi?whichHtml=faq">FAQ</a> 
+  | <a href="http://www.ncbi.nlm.nih.gov/books/bv.fcgi?rid=helpsnpfaq.TOC">Searchable FAQ Archive</a> | <a accesskey="G" href="get_html.cgi?whichHtml=overview" >Overview</a> | 
+  <a href="Library/how_to_submit.html">How to Submit</a> | <a accesskey="I" href="get_html.cgi?whichHtml=verbose" >RefSNP 
+  Summary Info</a> | <a accesskey="J" href="ftp://ftp.ncbi.nih.gov/snp/mssql/schema/erd_dbSNP.pdf" >Database 
+  Schema</a><br>
+  <b>SEARCH</b>:  <a href="http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?db=Snp">Entrez SNP</a> | <a href="snp_blastByOrg.cgi">Blast SNP</a> | <a accesskey="M" href="batchquery.html" >Batch Query</a> | 
+  <a href="snp_tableList.cgi?type=submitter" > By Submitter</a> |<a accesskey="O" href="snp_batchSearch.cgi?in
+it=y" >New 
+  Batches</a> | <a href="snp_tableList.cgi?type=method" >Method</a> | <a href="snp_tableList.cgi?type=pop" >Population</a> 
+  | <a href="snp_tableList.cgi?type=pub" >Publication</a>
+  <!--  | <a href="../maplists/maplist-newmap.html" >Chromosome Report</a> -->| <a href="index.html#Batch">Batch</a> 
+  | <a href="index.html#Locus">Locus Info</a> | <a href="index.html#Markers">Between 
+  Marker <br>
+  </a></font> <font size="2"> <!-- <b>HAPLOTYPE</b>:<a  href="../hap/dbSNP_haplotype_intro.html">Submission</a> | <a href="../HapMap/index.html">Specifications</a> | <a href="../hapset.cgi?hapset_id=1">Sample HapSet</a> | 
+  <a href="../hap_ind.cgi?ind_id=3">Sample Individual</a><br> -->
+  <b>NCBI</b>: <a href="/PubMed/">PubMed</a> | <a href="/Entrez/">Entrez</a> | 
+  <a href="/BLAST/">BLAST</a> | <a href="/omim/">OMIM</a> | <a href="/Taxonomy/taxonomyhome.html">Taxonomy</a> 
+  | <a href="/Structure/">Structure</a> </font></p>
+<p><a href="http://www.ncbi.nlm.nih.gov/About/disclaimer.html"
+class="SMALL1">Disclaimer</a> &nbsp;&nbsp;&nbsp;&nbsp;<a
+href="http://www.ncbi.nlm.nih.gov/About/privacy.html"
+class="SMALL1">Privacy statement</a></p> 
+<p>Revised: 
+  <!-- #BeginDate format:Am1a -->December 30, 2008 3:12 PM<!-- #EndDate -->
+  .</p>
+<!-- #EndLibraryItem --><P class="SMALL1">&nbsp; </P>
+    <!-- #EndEditable --> <br>
+  </tr>
+</table>
+<!--  end of content  -->
+</body>
+<!--  the header   -->
+<!-- #EndTemplate --></html>
+
+</body>
+</html>

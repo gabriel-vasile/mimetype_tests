@@ -1,0 +1,166 @@
+<HTML>
+<HEAD>
+  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+  <META NAME="Author" CONTENT="Roland Draxler">
+  <META NAME="keywords" CONTENT="Generic Reaction Set,GRS,ozone,hysplit">
+  <META NAME="description" CONTENT="Example of surface ozone prediction using the GRS Method incorporated into HYSPLIT">
+  <TITLE>HYSPLIT Ozone GRS Method</TITLE>
+  <style type="text/css">
+  <!--
+  -->
+</style>
+
+<link rel="stylesheet" href="/ready/Rdy.css">
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+  function jumpAlert() {
+  window.alert('You are now leaving the Air Resources Laboratory Web site.\n\nARL provides a link to this external web page because it may contain related information of interest to you. This link does not constitute an endorsement by ARL of any information, products or services on this external web site.')
+  }
+//   -->
+</SCRIPT>
+
+<script language="JavaScript1.2" src="/ready/ajlib.js"></script>
+<script language="JavaScript1.2" src="/ready/ajmenu.js"></script>
+</head>
+
+<!--<BODY BACKGROUND="/images/rdybkgd.jpg" bgproperties="fixed" topmargin="0" leftmargin="0" onload="loadMenu()" onresize="loadMenu()">-->
+<body onload="loadMenu()" onresize="loadMenu()"-->
+<center>
+   <!--<a href="/:NOSSL"><img src="/images/bar4.gif" width="618" height="47" border="0" ALT="NOAA Air Resources Laboratory"></a>-->
+   <a href="http://www.arl.noaa.gov/"><img src="/images/ARL_banner2.gif" border="0" ALT="NOAA Air Resources Laboratory"></a>
+   <script language="JavaScript1.2" src="/ready/READY.js"></script>
+   <script language="JavaScript1.2">displayMenu();</script>
+
+<NOSCRIPT>
+   <a href="/ready.html:NOSSL">READY Home</a> | 
+   <a href="/ready/hysplit4.html:NOSSL">HYSPLIT</a> | 
+   <a href="/ready/dispersion.html:NOSSL"> Dispersion Modeling</a> | 
+   <a href="/ready/aq.html:NOSSL">Air Quality</a> | 
+   <a href="/ready/er.html:NOSSL">Emergency Assistance</a> | 
+   <a href="/ready/cmet.html:NOSSL">Current Meteorology</a> | 
+   <a href="/ready/amet.html:NOSSL">Archived Meteorology</a>
+</NOSCRIPT>
+
+<TABLE width="700" bgcolor="#FFFFFF">
+<TR>
+  <TD>
+  <br>
+  <center>
+
+
+<h2>HYSPLIT and the Generic Reaction Set (GRS) for Ozone Formation</h2>
+</center>
+<strong>&lt;</strong><a href="/ready/hyspchem/">Back to HYSPLIT Chemistry</a><br>
+<hr>
+<P>
+The Generic Reaction Set (GRS) model by Azzi (1993,1994) is 
+a semi-empirical approach, but it is written in terms of a non-steady
+state chemical mechanism using the reaction rate equations for the 
+seven species. The GRS is not limited by the photo-stationary 
+steady-state assumption of the 
+<a href="/ready/hyspchem/ier.html">IER model</a>. Unlike the IER model, the 
+implementation of the GRS model within the framework of a 
+meteorological transport and dispersion model is non-linear and 
+requires adding the precursor contributions from all sources before 
+integration. The GRS model has been evaluated by Venkatram (1994) and 
+Tonnesen and Jeffries (1994). The core subroutines used in HYSPLIT to
+compute ozone formation using the GRS were developed by Martin Cope, 
+Victoria EPA, and later modified by G.D. Hess, BMRC, BoM, Melbourne, 
+Australia.  The key to properly linking a Lagrangian model with 
+Eulerian chemistry is the conversion of particle mass to concentration
+and then back to particle mass after the chemistry has been applied.
+The method of Stein (2000) is used in the HYSPLIT-GRS module.
+</P>
+
+<P>
+Azzi, M.; Johnson, G.M. Airtrak: new developments,
+Clean Air 1993, 27, 191-193.
+</P>
+
+<P>
+Azzi, M.; Johnson, G.M.; Cope, M. An introduction to the generic 
+reaction set photochemical smog mechanism, In Proceedings of the 
+International Conference of Clean Air Soc. of Aust. and N.Z. 
+1992, 2, 451-462.
+</P>
+
+<P>
+Stein, A. <a href="mailto:roland.draxler@noaa.gov?subject=ozone_cb4.pdf"> 
+Incorporation of detailed chemistry into a three-dimensional
+Lagrangian-Eulerian hybrid model</A>, Atm. Environ. 34: 4361-4372.
+</P>
+
+<P>
+Tonnesen, S.; Jeffries, H.E. Inhibition of odd oxygen production 
+in the carbon bond four and generic reaction set mechanisms,
+Atmos. Environ. 1994, 28, 1339-1349.
+</P>
+
+<P>
+Venkatram, A.; Karamchandani, P.; Pai, P.; Goldstein, R.
+The development and application of a simplified ozone modeling 
+system (SOMS), Atmos. Environ. 1994, 28, 3665-3678.
+</P>
+
+<P><HR ALIGN=LEFT></P>
+
+<P><B>Equation Overview</B></P>
+
+<P><U>1) Radical production from photo-oxidation of ROC </U></P>
+
+<P><CENTER><BR>
+ROC + hv -&gt; RP + ROC <BR>
+k<sub>1</sub> = 0.0067 k<sub>3</sub> f(T)</CENTER></P>
+
+<P><U>2) Oxidation of nitric oxide by radicals </U></P>
+
+<P><CENTER><BR>
+RP + NO -&gt; NO<sub>2</sub> <BR>
+k<sub>2</sub> = 3.58 x 10<sup>6</sup> T<sup>-1</sup></CENTER></P>
+
+<P><U>3)&nbsp; Photolysis of nitrogen dioxide to nitric oxide
+</U></P>
+
+<P><CENTER><BR>
+NO<sub>2</sub> + hv -&gt; NO + O<sub>3</sub> <BR>
+k<sub>3 </sub>= f(a,R)</CENTER></P>
+
+<P><U>4) Nitric oxide-ozone titration reaction</U> </P>
+
+<P><CENTER><BR>
+NO + O<sub>3</sub> -&gt; NO<sub>2</sub> <BR>
+&nbsp;k<sub>4</sub> = 9.24 x 10<sup>5</sup> T<sup>-1</sup> e<sup>-1450/T</sup></CENTER></P>
+
+<P><U>5) Radical pool sink through recombination to stable products
+</U></P>
+
+<P><CENTER><BR>
+RP + RP -&gt; RP <BR>
+k<sub>5</sub> = 10200</CENTER></P>
+
+<P><U>6) Sink for nitrogen dioxide to stable gaseous nitrates
+</U></P>
+
+<P><CENTER><BR>
+RP + NO<sub>2 </sub>-&gt; SGN <BR>
+k<sub>6</sub> = 120</CENTER></P>
+
+<P><U>7) Sink for nitrogen dioxide to stable non-gaseous nitrates
+</U></P>
+
+<P><CENTER><BR>
+RP + NO<sub>2</sub> -&gt; SNGN <BR>
+k<sub>7</sub> = 120</center></CENTER>
+<br>
+<hr>
+</TD>
+</TR>
+</TABLE>
+</center>
+<script language="JavaScript1.2">createMenu()</script>
+</BODY>
+</HTML>
+
+
+

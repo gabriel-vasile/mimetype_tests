@@ -1,0 +1,292 @@
+<HTML>
+<head>
+<title>Blast Result</title>
+
+<META NAME="keywords" CONTENT="NCBI, BLAST, ORF, Bioinformatics">
+<link rel="stylesheet" href="http://www.ncbi.nlm.nih.gov/ncbi.css">
+<SCRIPT LANGUAGE="Javascript">
+<!-- HIDE
+function chan(a)
+{
+	if (a.value == 'off') {
+		document.bl2.gopen.value=11;
+		document.bl2.gext.value=1;
+		document.bl2.match.value="";
+		document.bl2.msmatch.value="";
+		a.value = 'on';
+	} else {
+		document.bl2.gopen.value=5;
+		document.bl2.gext.value=2;
+		document.bl2.match.value="1";
+		document.bl2.msmatch.value="-2";
+		a.value = 'off';
+	}
+}
+function chan_prog(a)
+{
+	if (a.selectedIndex == 0) {
+		document.bl2.gopen.value = 5;
+		document.bl2.gext.value = 2;
+		document.bl2.match.value=1;
+		document.bl2.msmatch.value="-2";
+		document.bl2.word.value="11";
+             document.bl2.matrix.options.length = 1;
+             document.bl2.matrix.options[0] = null;
+             document.bl2.matrix.options[0] = new Option('Not Applicable');
+             document.bl2.matrix.options[0].text='Not Applicable';
+             document.bl2.matrix.options[0].value=-1;
+             document.bl2.strand.options.length = 4;
+             document.bl2.strand.options[0] = null;
+             document.bl2.strand.options[0] = new Option('Both strands');
+             document.bl2.strand.options[0].text='Both strands';
+             document.bl2.strand.options[0].value=3;
+             document.bl2.strand.options[0].selected=true;
+             document.bl2.strand.options[1].text='Top strand';
+             document.bl2.strand.options[1].value=1;
+             document.bl2.strand.options[2].text='Reverse strand';
+             document.bl2.strand.options[2].value=2;
+	} else if (a.selectedIndex >= 1) {
+             document.bl2.matrix.options.length = 6;
+             document.bl2.matrix.options[0] = null;
+             document.bl2.matrix.options[0] = new Option('BLOSUM62');
+             document.bl2.matrix.options[0].selected = true;
+             document.bl2.matrix.options[0].text='BLOSUM62';
+             document.bl2.matrix.options[0].value=0;
+             document.bl2.matrix.options[1].text='PAM30';
+             document.bl2.matrix.options[1].value=1;
+             document.bl2.matrix.options[2].text='PAM70';
+             document.bl2.matrix.options[2].value=2;
+             document.bl2.matrix.options[3].text='BLOSUM45';
+             document.bl2.matrix.options[3].value=3;
+             document.bl2.matrix.options[4].text='BLOSUM80';
+             document.bl2.matrix.options[4].value=4;
+		document.bl2.word.value="3";
+		if (document.bl2.matrix.selectedIndex == 1) {
+			document.bl2.gopen.value = 9;
+			document.bl2.gext.value = 1;
+		} else if (document.bl2.matrix.selectedIndex == 2) {
+			document.bl2.gopen.value = 10;
+			document.bl2.gext.value = 1;
+		} else if (document.bl2.matrix.selectedIndex == 3) {
+			document.bl2.gopen.value = 15;
+			document.bl2.gext.value = 2;
+		} else if (document.bl2.matrix.selectedIndex == 4) {
+			document.bl2.gopen.value =10;
+			document.bl2.gext.value = 1;
+		} else {
+			document.bl2.gopen.value = 11;
+			document.bl2.gext.value = 1;
+		}
+		document.bl2.match.value="";
+		document.bl2.msmatch.value="";
+		document.bl2.megablast.checked = 0;
+             document.bl2.strand.options.length = 1;
+             document.bl2.strand.options[0] = null;
+             document.bl2.strand.options[0] = new Option('Not Applicable');
+             document.bl2.strand.options[0].selected = true;
+             document.bl2.strand.options[0].text='Not Applicable';
+             document.bl2.strand.options[0].value=0;
+	}
+}
+function update_mtrx(a)
+{
+	if (document.bl2.program.selectedIndex == 0) {
+		return;
+	}
+     document.bl2.word.value = 3;
+	if (a.selectedIndex == 0) {
+		document.bl2.gopen.value = 11;
+		document.bl2.gext.value = 1;
+	} else if (a.selectedIndex == 1) {
+		document.bl2.gopen.value = 9;
+		document.bl2.gext.value = 1;
+	} else if (a.selectedIndex == 2) {
+		document.bl2.gopen.value = 10;
+		document.bl2.gext.value = 1;
+	} else if (a.selectedIndex == 3) {
+		document.bl2.gopen.value = 14;
+		document.bl2.gext.value = 2;
+	} else if (a.selectedIndex == 4) {
+		document.bl2.gopen.value = 10;
+		document.bl2.gext.value = 1;
+	} else if (a.selectedIndex == 5) {
+		document.bl2.gopen.value = 13;
+		document.bl2.gext.value = 2;
+	}
+}
+function clear_sequence() {
+    document.bl2.seqfile1.value=''
+    document.bl2.seqfile2.value=''
+    document.bl2.sseq.value=''
+    document.bl2.seq.value=''
+    document.bl2.to.value=''
+    document.bl2.tto.value=''
+    document.bl2.from.value=''
+    document.bl2.ffrom.value=''
+    document.bl2.seq.focus()
+}
+function megablast_update(a)
+{
+	if (a.checked == 0) {
+         document.bl2.word.value = 11;
+         document.bl2.gopen.value = 5;
+         document.bl2.gext.value = 2;
+	} else {
+         if (document.bl2.program.selectedIndex != 0) {
+            document.bl2.program.selectedIndex = 0;
+            chan_prog(document.bl2.program);
+         }
+         document.bl2.word.value = 28;
+         document.bl2.gopen.value = "";
+         document.bl2.gext.value = "";
+     }
+}
+// -->
+</SCRIPT>
+</head>
+<BODY bgcolor="#f0f0fe">
+<table border=0 width=600 cellspacing=0 cellpadding=0>
+<tr valign=center> 
+<td width=140><A HREF="http://www.ncbi.nlm.nih.gov"><img src="http://www.ncbi.nlm.nih.gov/corehtml/left.GIF" width=130 height=45 border=0 ALT="NCBI logo"></A></td>
+<td width=460 ><h1>Blast 2 Sequences results</h1></td>
+</tr>
+</table>
+<!--  the quicklinks bar--> 
+<table border=0 width=600 cellspacing=0 cellpadding=1 bgcolor=#003366>
+<tr align="center">
+<td width=100><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed" class="BAR"><FONT COLOR=#FFFFFF>PubMed</FONT></a></td>
+<td width=100><a href="http://www.ncbi.nlm.nih.gov/Entrez/" class="BAR"><FONT COLOR=#FFFFFF>Entrez</FONT></a></td>
+<td width=100><a href="http://www.ncbi.nlm.nih.gov/blast/" class="BAR"><FONT COLOR=#FFFFFF>BLAST</FONT></a></td>
+<td width=100><a href="http://www.ncbi.nlm.nih.gov/omim/" class="BAR"><FONT COLOR=#FFFFFF>OMIM</FONT></a></td>
+<td width=100><a href="http://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html" class="BAR"><FONT COLOR=#FFFFFF>Taxonomy</FONT></a></td>
+<td width=100><a href="http://www.ncbi.nlm.nih.gov/Structure/" class="BAR"><FONT COLOR=#FFFFFF>Structure</FONT></a></td>
+</tr></TABLE><p>
+<b>BLAST 2 SEQUENCES RESULTS VERSION BLASTP 2.2.18 [Mar-02-2008]</b>
+<FORM NAME= bl2 method="post" action="wblast2.cgi?0" enctype="multipart/form-data">
+
+<INPUT TYPE=hidden name="page" value="1">
+<A HREF=http://www.ncbi.nlm.nih.gov/BLAST/options.html#matrix TARGET=one>Matrix</A>
+<select name="matrix" onChange="update_mtrx(this)">
+<option value=0>BLOSUM62
+<option value=1>PAM30
+<option value=2>PAM70
+<option value=3>BLOSUM45
+<option value=4>BLOSUM80
+</select>
+gap open:<INPUT TYPE=text name=gopen size=2 value=11>
+gap extension: <INPUT TYPE=text size=2 name="gext" value=1> <BR>
+x_dropoff: <INPUT TYPE=text size=2 name="dropoff" value="0">
+expect:<INPUT TYPE=text size=4 name="expect" value="10.000000">
+wordsize: <INPUT type=text size=2 name="word" value=3>
+
+<a href=http://www.ncbi.nlm.nih.gov/blast/newoptions.html#filter>Filter</a> <INPUT TYPE=checkbox NAME=Filter VALUE=1>
+View option <select name="view">
+<option value=1 SELECTED> Standard
+<option value=2 > Mismatch-highlighting
+</select>&nbsp;&nbsp;&nbsp;
+<BR>Masking character option <select name="mask_char">
+<option value=0 SELECTED> X for protein, n for nucleotide
+<option value=2 > Lower case
+</select>&nbsp;&nbsp;&nbsp;
+Masking color option <select name="mask_color">
+<option value=1 SELECTED> Black
+<option value=2 > Grey
+<option value=3 > Red
+</select>&nbsp;&nbsp;&nbsp;
+<BR><INPUT type=checkbox NAME=cds_translation>Show CDS translation
+<INPUT TYPE=hidden name="program" value="blastp">
+<INPUT TYPE=hidden name="matrix" value="0">
+<INPUT TYPE=submit VALUE=Align><HR>
+<INPUT TYPE=hidden name="seq" value="9910412">
+<INPUT TYPE=hidden name="sseq" value="15218209">
+<INPUT TYPE=hidden name="from" value="1">
+<INPUT TYPE=hidden name="to" value="229">
+<INPUT TYPE=hidden name="ffrom" value="1">
+<INPUT TYPE=hidden name="tto" value="552">
+<BR><strong> Sequence 1</strong>: <A HREF=http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?val=9910412>gi|9910412|C-type lectin domain family 1, member b [Mus musculus] >gi|81906770|sp|Q9JL99.1|CLC1B_MOUSE RecName: Full=C-type lectin domain family 1 member B; AltName: Full=C-type lectin-like receptor 2; Short=CLEC-2 >gi|7110218|gb|AAF36831.1|AF201457_1 C-type lectin-like receptor 2 [Mus musculus] >gi|39795684|gb|AAH64054.1| C-type lectin domain family 1, member b [Mus musculus] >gi|148667505|gb|EDK99921.1| C-type lectin domain family 1, member b [Mus musculus]</A><BR>Length = 229
+(1 .. 229)
+<BR><BR>
+<strong> Sequence 2</strong>: <A HREF=http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?val=15218209>gi|15218209|protein kinase family protein / C-type lectin domain-containing protein [Arabidopsis thaliana] >gi|12323127|gb|AAG51547.1|AC037424_12 protein kinase, putative; 54672-52611 [Arabidopsis thaliana] >gi|17065350|gb|AAL32829.1| protein kinase, putative [Arabidopsis thaliana] >gi|31711972|gb|AAP68342.1| At1g52310 [Arabidopsis thaliana]</A><BR>
+Length = 552
+(1 .. 552)
+<BR><BR><BR>
+<table>
+<tr><td>
+<img
+ height=2 src='images/00.gif' width=29><img
+ height=9 width=1 src='images/00.gif'><A HREF=#0><img height=9 src='images/1.gif' BORDER=0 width=10></a><img
+ height=9 width=1 src='images/00.gif'><img
+ height=5 src='images/3.gif' width=1><img
+ height=9 width=1 src='images/00.gif'><A HREF=#0><img height=9 src='images/1.gif' BORDER=0 width=3></a><img
+ height=9 width=1 src='images/00.gif'><img
+ height=5 src='images/3.gif' width=1><img
+ height=9 width=1 src='images/00.gif'><A HREF=#0><img height=9 src='images/1.gif' BORDER=0 width=1></a><img
+ height=9 width=1 src='images/00.gif'><img
+ height=5 src='images/3.gif' width=2><img
+ height=9 width=1 src='images/00.gif'><A HREF=#0><img height=9 src='images/1.gif' BORDER=0 width=4></a><img
+ height=9 width=1 src='images/00.gif'><A HREF=#0><img height=9 src='images/1.gif' BORDER=0 width=1></a><img
+ height=9 width=1 src='images/00.gif'><img
+ height=5 src='images/3.gif' width=1><img
+ height=9 width=1 src='images/00.gif'><A HREF=#0><img height=9 src='images/1.gif' BORDER=0 width=3></a><img
+ height=9 width=1 src='images/00.gif'><img
+ height=2 src='images/00.gif' width=4><BR>
+<img
+ height=2 src='images/0.gif' width=14><img
+ height=2 src='images/00.gif' width=16><img
+ height=9 width=1 src='images/00.gif'><A HREF=#0><img height=9 src='images/1.gif' BORDER=0 width=11></a><A HREF=#0><img height=9 src='images/1.gif' BORDER=0 width=2></a><A HREF=#0><img height=9 src='images/1.gif' BORDER=0 width=4></a><A HREF=#0><img height=9 src='images/1.gif' BORDER=0 width=2></a><A HREF=#0><img height=9 src='images/1.gif' BORDER=0 width=2></a><A HREF=#0><img height=9 src='images/1.gif' BORDER=0 width=3></a><A HREF=#0><img height=9 src='images/1.gif' BORDER=0 width=5></a><A HREF=#0><img height=9 src='images/1.gif' BORDER=0 width=2></a><A HREF=#0><img height=9 src='images/1.gif' BORDER=0 width=2></a><A HREF=#0><img height=9 src='images/1.gif' BORDER=0 width=3></a><img
+ height=9 width=1 src='images/00.gif'><img
+ height=2 src='images/00.gif' width=99><BR><BR>
+</td><td width=75></td><td valign=top><b>2</b></td><td>
+<IMG border=0 SRC="bl2bag.cgi?2Q2QCCCCCC-rD9D9D9()3399CC3(1A291b1y1b1x1m1t1m1s1r1q1r1m221i221h271g271f2G1b)">
+</td><td valign=bottom><b>1</b></td></tr></table>
+<BR><font color=#FF0000>NOTE:</font>Bitscore and expect value are calculated based on the size of the nr database.<BR><BR>
+<a name=0>
+<img
+ height=2 src='images/00.gif' width=90><img
+ height=11 width=1 src='images/00.gif'><img height=11 src='images/1.gif' width=32><img
+ height=11 width=1 src='images/00.gif'><img
+ height=5 src='images/3.gif' width=1><img
+ height=11 width=1 src='images/00.gif'><img height=11 src='images/1.gif' width=12><img
+ height=11 width=1 src='images/00.gif'><img
+ height=5 src='images/3.gif' width=1><img
+ height=11 width=1 src='images/00.gif'><img height=11 src='images/1.gif' width=6><img
+ height=11 width=1 src='images/00.gif'><img
+ height=5 src='images/3.gif' width=9><img
+ height=11 width=1 src='images/00.gif'><img height=11 src='images/1.gif' width=13><img
+ height=11 width=1 src='images/00.gif'><img
+ height=5 src='images/3.gif' width=1><img
+ height=11 width=1 src='images/00.gif'><img height=11 src='images/1.gif' width=5><img
+ height=11 width=1 src='images/00.gif'><img
+ height=5 src='images/3.gif' width=1><img
+ height=11 width=1 src='images/00.gif'><img height=11 src='images/1.gif' width=11><img
+ height=11 width=1 src='images/00.gif'><img
+ height=2 src='images/00.gif' width=11><BR>
+<img
+ height=2 src='images/0.gif' width=41><img
+ height=2 src='images/00.gif' width=50><img
+ height=11 width=1 src='images/00.gif'><img height=11 src='images/1.gif' width=33><img height=11 src='images/1.gif' width=2><img height=11 src='images/1.gif' width=13><img height=11 src='images/1.gif' width=2><img height=11 src='images/1.gif' width=7><img height=11 src='images/1.gif' width=10><img height=11 src='images/1.gif' width=14><img height=11 src='images/1.gif' width=2><img height=11 src='images/1.gif' width=6><img height=11 src='images/1.gif' width=2><img height=11 src='images/1.gif' width=11><img
+ height=11 width=1 src='images/00.gif'><img
+ height=2 src='images/00.gif' width=298><BR><BR>
+<pre><script src="blastResult.js"></script>
+ Score = 42.7 bits (99),  Expect = 0.035
+ Identities = 31/125 (24%), Positives = 47/125 (37%), Gaps = 21/125 (16%)
+
+Query  113  CYGFFRRNLTWEESKQYCTEQNATLVKTASQSTLDYIAERI---TSVRWIGLSRQNSKKD  169
+            CY +F+ + +WE+S+ +C      L   AS   L ++ +      S  WIG    NS   
+Sbjct  63   CYAYFKNSTSWEKSEMFCRTYGGHLASLASSKELSFVQKLCNGNVSSCWIGGRSMNSSTS  122
+
+Query  170  ---WMWEDSSV------------LRKNGINLSGNTEENMN-CAYLHNG--KIHPASCKER  211
+               W W D               +R    N +G++    N C  + NG   I    C   
+Sbjct  123  GFRWSWSDPKTPQWNQSMFPKVPIRTRCGNGNGSSSCRANICIAVTNGSSSIFGERCNAS  182
+
+Query  212  HYLIC  216
+            H  +C
+Sbjct  183  HAFVC  187
+
+
+</pre><pre>
+CPU time:     0.06 user secs.	    0.05 sys. secs	    0.11 total secs.
+
+<br>
+</BODY>
+</HTML>

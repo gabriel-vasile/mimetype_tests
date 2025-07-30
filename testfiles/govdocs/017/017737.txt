@@ -1,0 +1,657 @@
+
+
+/* READ COMMENTS:
+This is the missing data ADDITIVE logistic approach for missing fathers or mothers.  
+
+Should be used with SAS Version 8 or higher. Runs in batch.  
+
+This code works for the following SAS data.
+Each record must consist of M,F,C, and X variables, where 
+M= # of copies of the variant allele that the mother carries,
+F= # of copies of the variant allele that the father carries,
+C= # of copies of the variant allele that the child carries, and
+X= the quantitative trait.
+FLAG_F= flag that equals 0 if father's genotype is available and 1 if father's genotype is missing.
+FLAG_M= flag that equals 0 if mother's genotype is available and 1 if mother's genotype is missing.  
+ID= identifier of trio.
+
+YOU MUST ENTER THE NAME OF YOUR DATA SET IN THE FIRST %LET STATEMENT BELOW!
+
+If you want to increase the number of iterations, increase the variable K in the macro calls 
+%emalg(MTYPE01 MTYPE11 MTYPE12,X,k=9).  There are two calls to the macro in the body of the program.  
+Search on the number 9 and replace all with the new number of iterations.  
+
+It is advisable to confirm convergence by trying a higher number of iterations and checking that the results do not change.
+
+
+Beware: There is no warranty with this code. 
+
+*/
+
+TITLE1 "ADDITIVE logistic approach for missing fathers or mothers";
+
+
+%LET YOUR_DATA=ENTERHERE;
+
+ODS LISTING CLOSE;
+
+/* THE EM approach (a macro) for missing data.  */
+
+%MACRO emalg(vars1,vars2,k=);
+
+%DO i=0 %TO &k;
+
+/* Creating changing conditions depending on whether it's just starting or whether it's iterating. */
+
+%IF &i=0 %THEN %DO;
+    %LET COND=((flag_f=0) and (flag_m=0));
+    %LET D1=;
+    %LET D2=;
+    %END;
+%ELSE %DO;
+    %LET D1=B C01 C11 C12;
+    %LET D2=A00 A01 A11 A12 A02 A22 U00 U01 U11 U12 U02 U22;
+    %LET COND=((flag_f=0) OR (flag_m=0));
+       PROC SORT DATA=WEIGHTS&j OUT=PLOGDATA&i;
+       BY ID;
+    %END;
+
+*M-STEP;
+
+/* Complete data QPL */
+
+ODS TRACE OFF;
+ODS OUTPUT FitStatistics=lldata&i ParameterEstimates=Parm1Ests&i;
+
+PROC LOGISTIC DATA=PLOGDATA&i(where=(&COND and ((MTYPE01=1) or (MTYPE11=1) or (MTYPE12=1))));
+MODEL COUNT/POSSIBLE = &vars1 / NOINT LINK=LOGIT;
+WEIGHT W;
+RUN;
+
+
+/* Transforming estimates into equation friendly variables. */
+
+DATA PARMS&i;
+  SET Parm1Ests&i END=EOF;
+  RETAIN B 0 C01 C11 C12;
+  IF VARIABLE="X" THEN B=ESTIMATE;
+  IF VARIABLE="MTYPE01" THEN C01=ESTIMATE;
+  IF VARIABLE="MTYPE11" THEN C11=ESTIMATE;
+  IF VARIABLE="MTYPE12" THEN C12=ESTIMATE;
+
+  IF EOF THEN OUTPUT;
+  DROP ESTIMATE VARIABLE DF STDERR WALDCHISQ PROBCHISQ;
+RUN;
+
+/* Computing conditional probabilities for each family using above estimates. */
+
+DATA CONDPROB&i;
+  IF _N_=1 THEN SET PARMS&i;
+  ELSE SET PLOGDATA&i(DROP=&D1) END=EOF;
+  IF _N_^=1 THEN DO;
+     P0_00=1;
+     P0_01=1/(EXP(B*X+C01)+1);
+     P1_01=EXP(B*X+C01)/(1+EXP(B*X+C01));
+     P0_11=1/((1+EXP(B*X+C11))**2);
+     P1_11=2*EXP(B*X+C11)/((1+EXP(B*X+C11))**2);
+     P2_11=(EXP(B*X+C11)**2)/((1+EXP(B*X+C11))**2);
+     P1_02=1;
+     P1_12=1/(EXP(B*X+C12)+1);
+     P2_12=EXP(B*X+C12)/(EXP(B*X+C12)+1);
+     P2_22=1;
+
+  OUTPUT;
+  END;
+RUN;
+
+/* Sorting data for second polytomous model. (Model in Equation #2) */
+
+PROC SORT DATA=CONDPROB&i OUT=ONLYX&i;
+BY MTYPE;
+
+/* Model from equation #2. */
+
+ODS TRACE OFF;
+ODS OUTPUT FitStatistics=F2stats&i ParameterEstimates=Parm2Ests&i;
+
+PROC LOGISTIC DATA=ONLYX&i(where=&COND) ORDER=DATA;
+MODEL MTYPE = &vars2 / LINK=GLOGIT;
+WEIGHT W;
+RUN;
+
+/* Transforming parameters from second model. */
+
+DATA CONDPARM&i;
+  SET Parm2Ests&i END=EOF;
+  RETAIN A00 0 A01 0 A11 0 A12 0 A02 0 A22 0 U00 0 U01 0 U11 0 U12 0 U02 0 U22 0;
+  IF VARIABLE="X" AND RESPONSE="0" THEN A00=ESTIMATE;
+  IF VARIABLE="X" AND RESPONSE="10" THEN A01=ESTIMATE;
+  IF VARIABLE="X" AND RESPONSE="11" THEN A11=ESTIMATE;
+  IF VARIABLE="X" AND RESPONSE="12" THEN A12=ESTIMATE;
+  IF VARIABLE="X" AND RESPONSE="20" THEN A02=ESTIMATE;
+
+  IF VARIABLE="Intercept" AND RESPONSE="0" THEN U00=ESTIMATE;
+  IF VARIABLE="Intercept" AND RESPONSE="10" THEN U01=ESTIMATE;
+  IF VARIABLE="Intercept" AND RESPONSE="11" THEN U11=ESTIMATE;
+  IF VARIABLE="Intercept" AND RESPONSE="12" THEN U12=ESTIMATE;
+  IF VARIABLE="Intercept" AND RESPONSE="20" THEN U02=ESTIMATE;
+  A22=0;
+  U22=0; 
+   
+  IF EOF THEN OUTPUT;
+  DROP ESTIMATE VARIABLE RESPONSE DF STDERR WALDCHISQ PROBCHISQ;
+RUN;
+
+/* Computing conditional probabilities for each family using above estimates. */
+
+DATA UPROBS&i;
+  IF _N_=1 THEN SET CONDPARM&i;
+  ELSE SET CONDPROB&i(DROP=&D2) END=EOF;
+  IF _N_^=1 THEN DO;
+     TOTAL=EXP(A00*X+U00)+EXP(A01*X+U01)+EXP(A11*X+U11)+EXP(A12*X+U12)+EXP(A02*X+U02)+EXP(A22*X+U22);
+
+     P00=EXP(A00*X+U00)/TOTAL;
+     P01=EXP(A01*X+U01)/TOTAL;
+     P11=EXP(A11*X+U11)/TOTAL;
+     P12=EXP(A12*X+U12)/TOTAL;
+     P02=EXP(A02*X+U02)/TOTAL;
+     P22=EXP(A22*X+U22)/TOTAL;
+
+     SUM=P00+P01+P11+P12+P02+P22;
+
+     P000=P00;
+     P021=P02;
+     P222=P22;
+     P010=P01*P0_01;
+     P011=P01*P1_01;
+     P110=P11*P0_11;
+     P111=P11*P1_11;
+     P112=P11*P2_11;
+     P121=P12*P1_12;
+     P122=P12*P2_12;
+     SUM10=P000+P021+P222+P010+P011+P110+P111+P112+P121+P122;
+
+     OUTPUT;
+  END;
+RUN;
+
+*E-STEP; /* Computing fractional data to add to complete data. */
+
+PROC SORT DATA=UPROBS&i;
+BY ID F;
+
+
+DATA WEIGHTS&i;
+  SET UPROBS&i;
+  IF ((FLAG_F=0) AND (FLAG_M=0)) THEN OUTPUT;
+  IF ((FLAG_F=1) AND (FLAG_M=0)) THEN DO;
+     IF ((M=0) AND (C=0) AND (F=0)) THEN DO;
+         W=P0_00*P00/(P0_00*P00+.5*P0_01*P01);
+         OUTPUT;
+         END;
+     IF ((M=0) AND (C=0) AND (F=1)) THEN DO;
+         W=.5*P0_01*P01/(P0_00*P00+.5*P0_01*P01);
+         OUTPUT;
+         END;
+     IF ((M=0) AND (C=1) AND (F=1)) THEN DO;
+         W=.5*P1_01*P01/(.5*P1_01*P01+.5*P1_02*P02);
+         OUTPUT;
+         END;
+     IF ((M=0) AND (C=1) AND (F=2)) THEN DO;
+         W=.5*P1_02*P02/(.5*P1_01*P01+.5*P1_02*P02);
+         OUTPUT;
+         END;
+     IF ((M=1) AND (C=0) AND (F=0)) THEN DO;
+         W=.5*P0_01*P01/(.5*P0_01*P01+P0_11*P11);
+         OUTPUT;
+         END;
+      IF ((M=1) AND (C=0) AND (F=1)) THEN DO;
+         W=P0_11*P11/(.5*P0_01*P01+P0_11*P11);
+         OUTPUT;
+         END;
+     IF ((M=1) AND (C=1) AND (F=0)) THEN DO;
+         W=.5*P1_01*P01/(.5*P1_01*P01+P1_11*P11+.5*P1_12*P12);
+         OUTPUT;
+         END;
+     IF ((M=1) AND (C=1) AND (F=1)) THEN DO;
+         W=P1_11*P11/(.5*P1_01*P01+P1_11*P11+.5*P1_12*P12);
+         OUTPUT;
+         END;
+     IF ((M=1) AND (C=1) AND (F=2)) THEN DO;
+         W=.5*P1_12*P12/(.5*P1_01*P01+P1_11*P11+.5*P1_12*P12);
+         OUTPUT;
+         END;
+     IF ((M=1) AND (C=2) AND (F=1)) THEN DO;
+         W=P2_11*P11/(P2_11*P11+.5*P2_12*P12);
+         OUTPUT;
+         END;
+     IF ((M=1) AND (C=2) AND (F=2)) THEN DO;
+         W=.5*P2_12*P12/(P2_11*P11+.5*P2_12*P12);
+         OUTPUT;
+         END;
+     IF ((M=2) AND (C=1) AND (F=0)) THEN DO;
+         W=.5*P1_02*P02/(.5*P1_02*P02+.5*P1_12*P12);
+         OUTPUT;
+         END;
+     IF ((M=2) AND (C=1) AND (F=1)) THEN DO;
+         W=.5*P1_12*P12/(.5*P1_02*P02+.5*P1_12*P12);
+         OUTPUT;
+         END;
+     IF ((M=2) AND (C=2) AND (F=1)) THEN DO;
+         W=.5*P2_12*P12/(.5*P2_12*P12+P2_22*P22);
+
+         OUTPUT;
+         END;
+     IF ((M=2) AND (C=2) AND (F=2)) THEN DO;
+         W=P2_22*P22/(.5*P2_12*P12+P2_22*P22);
+         OUTPUT;
+         END;
+  END;
+  IF ((FLAG_F=0) AND (FLAG_M=1)) THEN DO;
+     IF ((M=0) AND (C=0) AND (F=0)) THEN DO;
+         W=P0_00*P00/(P0_00*P00+.5*P0_01*P01);
+         OUTPUT;
+         END;
+     IF ((M=1) AND (C=0) AND (F=0)) THEN DO;
+         W=.5*P0_01*P01/(P0_00*P00+.5*P0_01*P01);
+         OUTPUT;
+         END;
+     IF ((M=1) AND (C=1) AND (F=0)) THEN DO;
+         W=.5*P1_01*P01/(.5*P1_01*P01+.5*P1_02*P02);
+         OUTPUT;
+         END;
+     IF ((M=2) AND (C=1) AND (F=0)) THEN DO;
+         W=.5*P1_02*P02/(.5*P1_01*P01+.5*P1_02*P02);
+         OUTPUT;
+         END;
+     IF ((M=0) AND (C=0) AND (F=1)) THEN DO;
+         W=.5*P0_01*P01/(.5*P0_01*P01+P0_11*P11);
+         OUTPUT;
+         END;
+      IF ((M=1) AND (C=0) AND (F=1)) THEN DO;
+         W=P0_11*P11/(.5*P0_01*P01+P0_11*P11);
+         OUTPUT;
+         END;
+     IF ((M=0) AND (C=1) AND (F=1)) THEN DO;
+         W=.5*P1_01*P01/(.5*P1_01*P01+P1_11*P11+.5*P1_12*P12);
+         OUTPUT;
+         END;
+     IF ((M=1) AND (C=1) AND (F=1)) THEN DO;
+         W=P1_11*P11/(.5*P1_01*P01+P1_11*P11+.5*P1_12*P12);
+         OUTPUT;
+         END;
+     IF ((M=2) AND (C=1) AND (F=1)) THEN DO;
+         W=.5*P1_12*P12/(.5*P1_01*P01+P1_11*P11+.5*P1_12*P12);
+         OUTPUT;
+         END;
+     IF ((M=1) AND (C=2) AND (F=1)) THEN DO;
+         W=P2_11*P11/(P2_11*P11+.5*P2_12*P12);
+         OUTPUT;
+         END;
+     IF ((M=2) AND (C=2) AND (F=1)) THEN DO;
+         W=.5*P2_12*P12/(P2_11*P11+.5*P2_12*P12);
+         OUTPUT;
+         END;
+     IF ((M=0) AND (C=1) AND (F=2)) THEN DO;
+         W=.5*P1_02*P02/(.5*P1_02*P02+.5*P1_12*P12);
+         OUTPUT;
+         END;
+     IF ((M=1) AND (C=1) AND (F=2)) THEN DO;
+         W=.5*P1_12*P12/(.5*P1_02*P02+.5*P1_12*P12);
+         OUTPUT;
+         END;
+     IF ((M=1) AND (C=2) AND (F=2)) THEN DO;
+         W=.5*P2_12*P12/(.5*P2_12*P12+P2_22*P22);
+         OUTPUT;
+         END;
+     IF ((M=2) AND (C=2) AND (F=2)) THEN DO;
+         W=P2_22*P22/(.5*P2_12*P12+P2_22*P22);
+         OUTPUT;
+         END;
+
+  END;
+
+%LET j=&i;
+
+%END;
+
+%MEND;
+
+/* Below is program that calls the above macro. */
+
+/* Creating all the possible records for the missing genotype families. The assigned weights are overwritten later.  They are just representing the expected weights under the null.  Which isn't important at all.  Could also be assigned weights of 0.  */
+
+DATA MISSING;
+  SET &YOUR_DATA;
+  W=1;
+  IF ((FLAG_F=0) AND (FLAG_M=0)) THEN OUTPUT;
+  IF FLAG_F=1 THEN DO;
+       IF ((M=0) AND (C=0)) THEN DO;
+         W=.33333333;
+         F=0;
+         OUTPUT;
+         W=1-.33333333;
+         F=1;
+         OUTPUT;
+         END;
+     IF ((M=0) AND (C=1)) THEN DO;
+         W=.5;
+         F=1;
+         OUTPUT;
+         W=.5;
+         F=2;
+         OUTPUT;
+         END;
+     IF ((M=1) AND (C=0)) THEN DO;
+         W=1-.33333333;
+         F=0;
+         OUTPUT;
+         W=.33333333;
+         F=1;
+         OUTPUT;
+         END;
+     IF ((M=1) AND (C=1)) THEN DO;
+         W=.333333333;
+         F=0;
+         OUTPUT;
+         W=.333333333;
+         F=1;
+         OUTPUT;
+         W=.333333333;
+         F=2;
+         OUTPUT;
+         END;
+     IF ((M=1) AND (C=2)) THEN DO;
+         W=.333333333;
+         F=1;
+         OUTPUT;
+         W=1-.333333333;
+         F=2;
+         OUTPUT;
+         END;
+     IF ((M=2) AND (C=1)) THEN DO;
+         W=.5;
+         F=0;
+         OUTPUT;
+         W=.5;
+         F=1;
+         OUTPUT;
+         END;
+     IF ((M=2) AND (C=2)) THEN DO;
+         W=.333333333;
+         F=1;
+         OUTPUT;
+         W=1-.333333333;
+         F=2;
+         OUTPUT;
+         END;
+  END;
+  IF FLAG_M=1 THEN DO;
+       IF ((F=0) AND (C=0)) THEN DO;
+         W=.33333333;
+         M=0;
+         OUTPUT;
+         W=1-.33333333;
+         M=1;
+         OUTPUT;
+         END;
+     IF ((F=0) AND (C=1)) THEN DO;
+         W=.5;
+         M=1;
+         OUTPUT;
+         W=.5;
+         M=2;
+         OUTPUT;
+         END;
+     IF ((F=1) AND (C=0)) THEN DO;
+         W=1-.33333333;
+         M=0;
+         OUTPUT;
+         W=.33333333;
+         M=1;
+         OUTPUT;
+         END;
+     IF ((F=1) AND (C=1)) THEN DO;
+         W=.333333333;
+         M=0;
+         OUTPUT;
+         W=.333333333;
+         M=1;
+         OUTPUT;
+         W=.333333333;
+         M=2;
+         OUTPUT;
+         END;
+     IF ((F=1) AND (C=2)) THEN DO;
+         W=.333333333;
+         M=1;
+         OUTPUT;
+         W=1-.333333333;
+         M=2;
+         OUTPUT;
+         END;
+     IF ((F=2) AND (C=1)) THEN DO;
+         W=.5;
+         M=0;
+         OUTPUT;
+         W=.5;
+         M=1;
+         OUTPUT;
+         END;
+     IF ((F=2) AND (C=2)) THEN DO;
+         W=.333333333;
+         M=1;
+         OUTPUT;
+         W=1-.333333333;
+         M=2;
+         OUTPUT;
+         END;
+  END;
+
+
+/* Creating neccessary indicator variables MTYPE00, MTYPE01, MTYPE11, MTYPE12, MTYPE22, MTYPE02 and variable MTYPE for second polytomous logistic model in equation #2. */
+
+DATA PLOGDATA0;
+SET MISSING;
+  MTYPE01=0;
+  MTYPE11=0;
+  MTYPE12=0;
+  MTYPE00=0;
+  MTYPE02=0;
+  MTYPE22=0;
+  ORDER=0;
+  COUNT=C;
+  POSSIBLE=1;
+  IF (((M=0) AND (F=1)) OR ((M=1) AND (F=0))) THEN DO;
+    MTYPE01=1;
+    MTYPE=10;
+    END;
+  IF ((M=1) AND (F=1)) THEN DO;
+    MTYPE11=1;
+    MTYPE=11;
+    POSSIBLE=2;
+    END;
+  IF (((M=1) AND (F=2)) OR ((M=2) AND (F=1))) THEN DO;
+    MTYPE12=1;
+    MTYPE=12;
+    COUNT=C-1;
+    END;
+  IF ((M=0) AND (F=0)) THEN DO;
+    MTYPE00=1;
+    MTYPE=00;
+    END;
+  IF (((M=0) AND (F=2)) OR ((M=2) AND (F=0))) THEN DO;
+    MTYPE02=1;
+    MTYPE=20;
+    COUNT=C-1;
+    END;
+  IF ((M=2) AND (F=2)) THEN DO;
+    MTYPE22=1;
+    MTYPE=22;
+    COUNT=C-2;
+    END;
+
+
+RUN;
+
+
+/* Calling the EM algorithm macro, with x as a predictor. */
+ 
+%emalg(X MTYPE01 MTYPE11 MTYPE12,X,k=9);
+
+/* Ordering by ID variable so that each family only contributes to the likelihood once. */
+
+ods listing;
+
+proc print data=parm1ests9;
+run;
+
+ods listing close;
+
+proc sort data=uprobs9 out=condpr;
+by id;
+run;
+
+/* Computing likelihood based on observed data-likelihood from equation #4 in paper. */
+
+DATA LLWX;
+  merge condpr END=EOF;
+  BY ID;
+  RETAIN LL 0;
+  IF ((FLAG_F=0) AND (FLAG_M=0)) THEN DO;
+     IF (MTYPE00=1) THEN LL=LL+LOG(P000);
+     IF (MTYPE02=1) THEN LL=LL+LOG(P021);
+     IF (MTYPE22=1) THEN LL=LL+LOG(P222);
+     IF ((MTYPE01=1) AND (C=0)) THEN LL=LL+LOG(P010);
+     IF ((MTYPE01=1) AND (C=1)) THEN LL=LL+LOG(P011);
+     IF ((MTYPE11=1) AND (C=0)) THEN LL=LL+LOG(P110);
+     IF ((MTYPE11=1) AND (C=1)) THEN LL=LL+LOG(P111);
+     IF ((MTYPE11=1) AND (C=2)) THEN LL=LL+LOG(P112);
+     IF ((MTYPE12=1) AND (C=1)) THEN LL=LL+LOG(P121);
+     IF ((MTYPE12=1) AND (C=2)) THEN LL=LL+LOG(P122);
+  END;
+  IF ((FLAG_F=1) AND (FLAG_M=0) AND LAST.ID) THEN DO;
+    IF ((M=0) AND (C=0)) THEN 
+         LL=LL+LOG(P00+.5*P010);
+     IF ((M=0) AND (C=1)) THEN
+         LL=LL+LOG(.5*P011+.5*P021);
+     IF ((M=1) AND (C=0)) THEN 
+         LL=LL+LOG(.5*P010+P110);
+     IF ((M=1) AND (C=1)) THEN 
+         LL=LL+LOG(.5*P011+P111+.5*P121);         
+     IF ((M=1) AND (C=2)) THEN 
+         LL=LL+LOG(P112+.5*P122);
+     IF ((M=2) AND (C=1)) THEN 
+         LL=LL+LOG(.5*P121+.5*P021);
+     IF ((M=2) AND (C=2)) THEN 
+         LL=LL+LOG(.5*P122+P222);
+  END;
+  IF ((FLAG_F=0) AND (FLAG_M=1) AND LAST.ID) THEN DO;
+    IF ((F=0) AND (C=0)) THEN 
+         LL=LL+LOG(P00+.5*P010);
+     IF ((F=0) AND (C=1)) THEN
+         LL=LL+LOG(.5*P011+.5*P021);
+     IF ((F=1) AND (C=0)) THEN 
+         LL=LL+LOG(.5*P010+P110);
+     IF ((F=1) AND (C=1)) THEN 
+         LL=LL+LOG(.5*P011+P111+.5*P121);         
+     IF ((F=1) AND (C=2)) THEN 
+         LL=LL+LOG(P112+.5*P122);
+     IF ((F=2) AND (C=1)) THEN 
+         LL=LL+LOG(.5*P121+.5*P021);
+     IF ((F=2) AND (C=2)) THEN 
+         LL=LL+LOG(.5*P122+P222);
+  END;
+  IF EOF THEN 
+    OUTPUT;
+  KEEP LL;
+
+RUN;
+
+/* Repeat the same steps without x as a predictor. */
+
+%emalg(MTYPE01 MTYPE11 MTYPE12,X,k=9);
+
+
+proc sort data=uprobs9 out=condprwox;
+by id;
+run;
+
+
+DATA LLWOX;
+  merge condprwox END=EOF;
+  BY ID;
+  RETAIN LL 0;
+  IF ((FLAG_F=0) AND (FLAG_M=0)) THEN DO;
+     IF (MTYPE00=1) THEN LL=LL+LOG(P000);
+     IF (MTYPE02=1) THEN LL=LL+LOG(P021);
+     IF (MTYPE22=1) THEN LL=LL+LOG(P222);
+     IF ((MTYPE01=1) AND (C=0)) THEN LL=LL+LOG(P010);
+     IF ((MTYPE01=1) AND (C=1)) THEN LL=LL+LOG(P011);
+     IF ((MTYPE11=1) AND (C=0)) THEN LL=LL+LOG(P110);
+     IF ((MTYPE11=1) AND (C=1)) THEN LL=LL+LOG(P111);
+     IF ((MTYPE11=1) AND (C=2)) THEN LL=LL+LOG(P112);
+     IF ((MTYPE12=1) AND (C=1)) THEN LL=LL+LOG(P121);
+     IF ((MTYPE12=1) AND (C=2)) THEN LL=LL+LOG(P122);
+  END;
+  IF ((FLAG_F=1) AND (FLAG_M=0) AND LAST.ID) THEN DO;
+    IF ((M=0) AND (C=0)) THEN 
+         LL=LL+LOG(P00+.5*P010);
+     IF ((M=0) AND (C=1)) THEN
+         LL=LL+LOG(.5*P011+.5*P021);
+     IF ((M=1) AND (C=0)) THEN 
+         LL=LL+LOG(.5*P010+P110);
+     IF ((M=1) AND (C=1)) THEN 
+         LL=LL+LOG(.5*P011+P111+.5*P121);         
+     IF ((M=1) AND (C=2)) THEN 
+         LL=LL+LOG(P112+.5*P122);
+     IF ((M=2) AND (C=1)) THEN 
+         LL=LL+LOG(.5*P121+.5*P021);
+     IF ((M=2) AND (C=2)) THEN 
+         LL=LL+LOG(.5*P122+P222);
+  END;
+  IF ((FLAG_F=0) AND (FLAG_M=1) AND LAST.ID) THEN DO;
+    IF ((F=0) AND (C=0)) THEN 
+         LL=LL+LOG(P00+.5*P010);
+     IF ((F=0) AND (C=1)) THEN
+         LL=LL+LOG(.5*P011+.5*P021);
+     IF ((F=1) AND (C=0)) THEN 
+         LL=LL+LOG(.5*P010+P110);
+     IF ((F=1) AND (C=1)) THEN 
+         LL=LL+LOG(.5*P011+P111+.5*P121);         
+     IF ((F=1) AND (C=2)) THEN 
+         LL=LL+LOG(P112+.5*P122);
+     IF ((F=2) AND (C=1)) THEN 
+         LL=LL+LOG(.5*P121+.5*P021);
+     IF ((F=2) AND (C=2)) THEN 
+         LL=LL+LOG(.5*P122+P222);
+  END;
+IF EOF THEN  OUTPUT;
+  KEEP LL;
+RUN;
+
+/* Computing the test statistic. */
+
+DATA EMMISSLR;
+  MERGE llwx(RENAME=(LL=WX)) 
+        llwox(RENAME=(LL=WOX));
+  LRT=-2*(WOX-WX);
+  ProbChiSq=1-PROBCHI(LRT,1);
+RUN;
+
+
+ODS LISTING;
+OPTIONS NOTES;
+
+
+
+PROC PRINT DATA=EMMISSLR;
+RUN;
+
+
+
+
+
+
+
+

@@ -1,0 +1,2856 @@
+                              ISAJET 7.00
+
+      A MONTE CARLO EVENT GENERATOR FOR P-P AND PBAR-P REACTIONS
+
+                            Frank E. Paige
+               Superconducting Super Collider Laboratory
+                        2550 Beckleymeade Ave.
+                           Dallas, TX 75237
+
+                        Serban D. Protopopescu
+                    Brookhaven National Laboratory
+                         Upton, NY 11973, USA
+
+
+
+[1] INTRODUCTION
+
+      ISAJET is a Monte Carlo program which simulates p-p and pbar-p
+interactions at high energies. It is based on perturbative QCD plus
+phenomenological models for parton and beam jet fragmentation. Events
+are generated in four distinct steps:
+      (1) A primary hard scattering is generated according to the
+appropriate QCD cross section.
+      (2) QCD radiative corrections are added for both the initial and
+the final state.
+      (3) Partons are fragmented into hadrons independently, and
+hadrons with lifetimes less than about 10**-12 seconds are decayed.
+      (4) Beam jets are added assuming that these are identical to a
+minimum bias event at the remaining energy.
+
+      This document is divided into the following sections:
+[2] PHYSICS        Available reactions, QCD corrections, hadronization.
+[3] SAMPLE JOB     For CDC, IBM, and VAX versions.
+[4] PATCHY         Usage; organization of the PAM.
+[5] MAIN PROGRAM   Supplied by the user.
+[6] INPUT          Input commands and default values.
+[7] OUTPUT TAPE    Format and common blocks.
+[8] TAPE READING   Restores information to common blocks.
+[9] DECAY TABLE    Format for the table of particle decays.
+[10] IDENT CODES   Particle codes and masses.
+[11] HIGHER ORDER  Generating higher order QCD or electroweak processes.
+
+      ISAJET incorporates ISASUSY, which evaluates branching ratios for
+the minimal supersymmetric extension of the standard model. H. Baer and
+X. Tata are coauthors of this package, and they have done the original
+calculations with various collaborators. See the documentation in the
+patch ISASSDOC.
+
+      ISAJET is supported for CRAY, DEC Ultrix, DEC VAX, HP/9000 7xx,
+IBM 370 and 30xx, IBM RS/6000, Silicon Graphics 4D, and SUN computers.
+The CDC 7600 and ETA 10 versions are obsolete and are no longer
+supported. It is written mainly in ANSI standard FORTRAN 77, but it does
+contain some extensions, especially for the CDC version. It is
+maintained with the Patchy code management system, which is part of the
+CERN Library. ISAJET is supplied to BNL, CERN, FERMILAB, and SLAC; it is
+also available by request from the authors. The original sources are
+kept on the BNL VAX Cluster in BNLCL6::$2$DUA14:[ISAJET.ISALIBRARY] and
+subdirectories therein. The files ISAJET.OLB and DEB_ISAJET.OLB are VAX
+object libraries and the file ISAJET.CAR is the Patchy CAR file. The
+directory [ISAJET.Vnnn] contains all the changes required to go from
+version nnn-1 to nnn.
+
+      Patch ISAPLT contains the skeleton of an HBOOK histogramming
+job, a trivial calorimeter simulation, and a jet-finding algorithm.
+(The default is HBOOK4; HBOOK3 can be selected with a Patchy switch.)
+These are provided for convenience only and are not supported.
+
+
+
+[2] PHYSICS
+
+      ISAJET is a Monte Carlo program which simulates p-p and pbar-p
+interactions at high energy. (It also contains an electron-positron
+event generator, but this is much less developed.) The program
+incorporates perturbative QCD cross sections, initial state and final
+state QCD radiative corrections in the leading log approximation,
+independent fragmentation of quarks and gluons into hadrons, and a
+phenomenological model tuned to minimum bias and hard scattering data
+for the beam jets.
+
+      (1) Hard Scattering:
+      The first step in simulating an event is to generate a primary
+hard scattering according to some QCD cross section. This has the
+general form
+      sigma = sigma0 * F(x1,Q**2) * F(x2,Q**2)
+where sigma0 is a cross section calculated in QCD perturbation theory,
+F(x,Q**2) is a structure function incorporating QCD scaling
+violations, x1 and x2 are the usual parton model momentum fractions,
+and Q**2 is an appropriate momentum transfer scale.
+
+      For each of the processes included in ISAJET, the basic cross
+section sigma0 is a two-body one, and the user can set limits on the
+kinematic variables and type for each of the two primary jets. For
+DRELLYAN and WPAIR events the full matrix element for the decay of the
+W's into leptons or quarks is also included.
+
+      The following processes are available:
+
+      MINBIAS: No hard scattering at all, so that the event consists
+only of beam jets. Note that at high energy the jet cross sections
+become large. To represent the total cross section it is better to use a
+sample of TWOJET events with the lower limit on pt chosen to give a
+cross section equal to the inelastic cross section or to use a mixture
+of MINBIAS and TWOJET events.
+
+      TWOJET: All order alphas**2 QCD processes, which give rise in
+lowest order to two high-pt jets. Included are, e.g.
+      gluon + gluon --> gluon + gluon,
+      gluon + quark --> gluon + quark,
+      gluon + gluon --> quark + antiquark, ....
+Masses are neglected for c and lighter quarks but are taken into
+account for b and t quarks. The Q**2 scale is taken to be
+      Q**2 = 2*s*t*u/(s**2+t**2+u**2).
+The default structure functions are those of Eichten, Hinchliffe, Lane
+and Quigg, Solution I. Note that structure functions for heavy quarks
+are included, so that processes like
+      gluon + top --> gluon + top
+can be generated. The Duke-Owens structure functions are also available;
+these do not contain b or t quarks.
+
+      Hadrons containing t quarks are decayed into lighter quarks and
+leptons with a V-A matrix element, e.g.
+      UT. --> UB + DN + BB,  ANUE + E- + BB,  ...
+The matrix element incorporates the W propagator with a nonzero width,
+so the same decays should be used for m_t < m_W and m_t > m_W; the W
+should NOT be listed as part of the decay mode. The partons are then
+evolved and fragmented as usual; see below. The spectator is ignored
+because ISAJET uses independent fragmentation. The real or virtual W and
+the final partons from the decay, including any radiated gluons, are
+listed in the particle table, followed by their fragmentation products.
+Note that for semileptonic decays the leptons appear twice: the lepton
+parton decays into a single particle of the same type but in general
+somewhat different momentum. In all cases only particles with IDCAY = 0
+should be included in the final state.
+
+      A fourth generation (x,y) is also allowed. Fourth generation
+quarks are produced only by gluon fusion. Decay modes are not included
+in the decay table; for a sequential fourth generation they would be
+very similar to the t decays. In decays involving quarks, it is
+essential that the quarks appear last.
+
+      DRELLYAN: Production of a W in the standard model, including a
+virtual photon, a W+, a W-, or a Z0, and its decay into quarks or
+leptons. If the transverse momentum qt of the W is fixed equal to zero
+then the process simulated is
+      quark + antiquark --> W --> quark + antiquark,
+                              --> lepton + antilepton.
+Thus the W has zero transverse momentum until initial state QCD
+corrections are taken into account. If non-zero limits on the
+transverse momentum qt for the W are set, then instead the processes
+      quark + antiquark --> W + gluon,
+      gluon + quark     --> W + quark
+are simulated, including the full matrix element for the W decay.
+These are the dominant processes at high qt, but they are of course
+singular at qt=0. A cutoff of the 1/qt**2 singularity is made by the
+replacement
+      1/qt**2 --> 1/sqrt(qt**4+qt0**4)
+      qt0**2   =  (.2 GeV) * M
+This cutoff is chosen to reproduce approximately the qt dependence
+calculated by the summation of soft gluons and to give about the right
+integrated cross section. Thus this option can be used for low as well
+as high transverse momenta.
+
+      The scale for QCD evolution is taken to be proportional to the
+mass for lowest order Drell-Yan and to the transverse momentum for
+high-pt Drell-Yan. The constant is adjusted to get reasonable agreement
+with the W + n jet cross sections calculated from the full QCD matrix
+elements by F.A. Berends, et al., Phys. Lett. B224, 237 (1989).
+
+      PHOTON: Single and double photon production through the lowest
+order QCD processes:
+      gluon + quark     --> photon + quark
+      quark + antiquark --> photon + gluon
+      quark + antiquark --> photon + photon
+Higher order corrections are not included. But photons, W's, and Z's are
+radiated from final state quarks in all processes, allowing study of the
+bremsstrahlung contributions.
+
+      WPAIR: Production of pairs of W bosons in the standard model
+through quark-antiquark annihilation,
+      quark + antiquark --> W+ + W-,
+                        --> Z0 + Z0,
+                        --> W+ + Z0, W- + Z0
+                        --> W+ + gamma, W- + gamma.
+The full matrix element for the W decays, calculated in the narrow
+resonance approximation, is included. However, the higher order
+processes, e.g.
+      quark + quark --> quark + quark + W+ + W-
+are ignored, although they in fact dominate at high enough mass.
+
+      HIGGS: Production and decay of the standard model Higgs boson. The
+production processes are
+      gl + gl --> HIGGS  (through a quark loop)
+      qk + qb --> HIGGS  (with tp + tb dominant)
+      W+ + W- --> HIGGS  (with longitudinally polarized W)
+      Z0 + Z0 --> HIGGS  (with longitudinally polarized Z)
+If the Higgs is lighter than 2 * mw, then it will decay into pairs of
+fermions with branching ratios proportional to mf**2. If it is heavier
+than 2 * mw, then it will decay primarily into W+ W- and Z0 Z0 pairs
+with widths given approximately by
+      Gamma(HIGGS --> W+ W-) = GF * mh**3 / ( 8 * pi * sqrt(2) )
+      Gamma(HIGGS --> Z0 Z0) = GF * mh**3 / ( 16 * pi * sqrt(2) )
+Numerically these give approximately
+      Gamma(H) = .5 TeV * ( mh / 1 TeV )**3
+The width proportional to mh**3 arises from decays into longitudinal
+gauge bosons, which like Higgs bosons have couplings proportional to
+mass.
+
+      Since a heavy Higgs is wide, the narrow resonance approximation is
+not valid. To obtain a cross section with good high energy behavior, it
+is necessary to include a complete gauge-invariant set of graphs for the
+processes
+      W+ W- --> W+ W-
+      W+ W- --> Z0 Z0
+      Z0 Z0 --> W+ W-
+      Z0 Z0 --> Z0 Z0
+with longitudinally polarized W+, W-, and Z0 bosons in the initial
+state. This set of graphs and the corresponding angular distributions
+for the W+, W-, and Z0 decays have been calculated in the effective W
+approximation and included in HIGGS. The W structure functions are
+obtained by integrating the EHLQ parameterization of the quark ones
+term by term. The Cabibbo-allowed branchings
+      qk --> W+ + qk'
+      qk --> W- + qk'
+      qk --> Z0 + qk
+are generated by backwards evolution, and the standard QCD evolution is
+performed. This correctly describes the W collinear singularity and so
+contains the same physics as the effective W approximation.
+
+      If the Higgs is lighter than 2*mw, then its decay to gamma-gamma
+through W and t-quark loops may be important. This is also included in
+the HIGGS process and may be selected by choosing 'GM' as the jet type
+for the decay.
+
+      If the Higgs has mz < mh < 2*mz, then decays into one real and one
+virtual Z0 are generated if the Z0 Z0 decay mode is selected, using the
+calculation of Keung and Marciano, Phys. Rev. D30, 248 (1984). Since the
+calculation assumes that one Z0 is exactly on shell, it is not reliable
+within of order the Z0 width of mh = 2*mz; Higgs and and Z0 Z0 masses in
+this region should be avoided. The analogous Higgs decays into one real
+and one virtual charged W are not included.
+
+      Note that while HIGGS contains the dominant graphs for Higgs
+production and graphs for W pair production related by gauge invariance,
+it does not contain the processes
+      qk + qb --> W+ W-
+      qk + qb --> Z0 Z0
+which give primarily transverse gauge bosons. These must be generated
+with WPAIR.
+
+      SUPERSYM or SUSY: Generates pairs of supersymmetric particles
+from gluon-quark or quark-antiquark fusion. If the parameters MSSM1,
+MSSM2, and MSSM3 defined in Section 6 below are not specified, then only
+gluinos and squarks are generated:
+      gluon + gluon --> gluino + gluino,
+      quark + antiquark --> gluino + gluino,
+      gluon + quark --> gluino + squark,
+      gluon + gluon --> squark + antisquark.
+      quark + antiquark --> squark + antisquark
+      quark + quark --> squark + squark
+Left and right squarks are distinguished but assumed to be degenerate.
+Masses can be specified using the GAUGINO, SQUARK, and SLEPTON
+parameters described in Section 6. No decay modes are specified, since
+these depend strongly on the masses. The user can either add new modes
+to the decay table (see Section 9) or use the FORCE or FORCE1 commands
+(see Section 6).
+
+      If MSSM1, MSSM2, and MSSM3 are specified, then the ISASUSY package
+is used to calculate the masses and decay modes in the minimal
+supersymmetric extension of the standard model (MSSM), assuming SUSY
+grand unification constraints in the neutralino and chargino mass matrix
+but allowing some additional flexibility in the masses. Left and right
+squarks are assumed to be degenerate except for the stop and sbottom.
+Stop_1 and stop_2 production and decays are now included. The three
+generations of left sleptons are assumed to be degenerate, as are the
+three generations of right sleptons and sneutrinos. The lightest SUSY
+particle is assumed to be the lightest neutralino Z1SS. If the MSSM
+parameters are specified, then the following additional processes are
+included using the MSSM couplings for the production cross sections:
+      gluon + quark --> gaugino + squark
+      quark + antiquark --> gaugino + gluino
+      quark + antiquark --> chargino + neutralino
+      quark + antiquark --> chargino + chargino
+      quark + antiquark --> slepton pairs
+Only the direct channel gamma and Z contribution is included for
+chargino pair cross sections; squark exchange is included for
+chargino+neutralino production. Additional processes will be added as
+the physics interest warrants. Processes can be selected using the
+optional parameters described in Section 6 below.
+
+      The ISASUSY package can also be used independently of the rest of
+ISAJET, either to produce a listing of decays or in conjunction with
+another event generator. Its physics assumptions are described in more
+detail in patch ISASSDOC in the ISAJET PAM.
+
+      Generally the MSSM option should be used to study supersymmetry
+signatures. The more general option may be useful to study alternative
+SUSY models. It can also be used, e.g., to generate pointlike color-3
+leptoquarks in technicolor models by selecting squark production and
+setting the gluino mass to be very large.
+
+      TCOLOR: Production of a technirho of arbitrary mass and width
+decaying into W+- Z0 or W+ W- pairs. The cross section is based on an
+elastic resonance in the WW cross section with the effective W
+approximation plus a W mixing term taken from EHLQ. Additional
+technicolor processes may be added in the future.
+
+      (2) QCD Radiative Corrections:
+      After the primary hard scattering is generated, QCD radiative
+corrections are added to allow the possibility of many jets. This is
+essential to get the correct event structure, especially at high
+energy.
+
+      Consider the emission of one extra gluon from an initial or a
+final quark line,
+      quark(p) --> quark(p1) + gluon(p2).
+From QCD perturbation theory, for small p**2 the cross section is
+given by the lowest order cross section multiplied by a factor
+      sigma = sigma0 * alphas(p**2)/(2*pi*p**2) * P(z)
+where z=p1/p and P(z) is an Altarelli-Parisi function. The same form
+holds for the other allowed branchings,
+      gluon(p) --> gluon(p1) + gluon(p2),
+      gluon(p) --> quark(p1) + antiquark(p2).
+These factors represent the collinear singularities of perturbation
+theory, and they produce the leading log QCD scaling violations for the
+structure functions and the jet fragmentation functions. They also
+determine the shape of a QCD jet, since the jet mass**2 is of order
+alphas * pt**2 and hence small.
+
+      The branching approximation consists of keeping just these
+factors which dominate in the collinear limit but using exact,
+non-collinear kinematics. Thus higher order QCD is reduced to a
+classical cascade process, which is easy to implement in a Monte Carlo
+program. To avoid infrared and collinear singularities, each parton in
+the cascade is required to have a mass (spacelike or timelike) greater
+than some cutoff tc. The assumption is that all physics at lower
+scales is incorporated in the nonperturbative model for hadronization.
+In ISAJET the cutoff is taken to be a rather large value, (6 GeV)**2,
+because independent fragmentation is used for the jet fragmentation; a
+low cutoff would give too many hadrons from overlapping partons. It
+turns out that the branching approximation not only incorporates the
+correct scaling violations and jet structure but also reproduces the
+exact three-jet cross section within factors of order 2 over all of
+phase space.
+
+      This approximation was introduced for final state radiation by
+Fox and Wolfram. The QCD cascade is determined by the probability for
+going from mass t0 to mass t1 emitting no resolvable radiation. For a
+resolution cutoff zc < z < 1-zc, this is given by a simple expression,
+      P(t0,t1)=(alphas(t0)/alphas(t1))**(2*gamma(zc)/b0)
+where
+      gamma(zc)=integral(dz*P(z)) over (zc,1-zc)
+      b0=(33-2*nf)/(12*pi)
+Clearly if P(t0,t1) is the integral probability, then
+      d(P)/d(t1)
+is the probability for the first radiation to occur at t1. It is
+straightforward to generate this distribution and then iteratively to
+correct it to get a cutoff at fixed tc rather than at fixed zc.
+
+      For the initial state it is necessary to take account of the
+spacelike kinematics and of the structure functions. Sjostrand has
+shown how to do this by starting at the hard scattering and evolving
+backwards, forcing the ordering of the spacelike masses t. The
+probability that a given step does not radiate can be derived from the
+Altarelli-Parisi equations for the structure functions. It has a form
+somewhat similar to P(t0,t1) but involving a ratio of the structure
+functions for the new and old partons. It is possible to find a bound
+for this ratio in each case and so to generate a new t and z as for
+the final state. Then branchings for which the ratio is small are
+rejected in the usual Monte Carlo fashion. This ratio suppresses the
+radiation of very energetic partons. It also forces the branching
+      gluon --> t + tbar
+for a t quark if the t structure function vanishes at small momentum
+transfer.
+
+      At low energies, the branching of an initial heavy quark into a
+gluon sometimes fails; these events are discarded and a warning is
+printed.
+
+      Since tc is quite large, the radiation of soft gluons is cut off.
+To compensate for this, equal and opposite transverse boosts are made
+to the jet system and to the beam jets after fragmentation with a mean
+value
+      pt**2 = (.1 GeV) * sqrt(Q**2)
+The dependence on Q**2 is the same as the cutoff used for DRELLYAN and
+the coefficient is adjusted to fit the pt distribution for the W.
+
+      Radiation of gluons from gluinos and scalar quarks is also
+included in the same approximation, but the production of gluino or
+scalar quark pairs from gluons is ignored. Very little radiation is
+expected for heavy particles produced near threshold.
+
+      Radiation of photons, W's, and Z's from final state quarks is
+treated in the same approximation as QCD radiation except that the
+coupling constant is fixed. Initial state electroweak radiation is not
+included; it seems rather unimportant. The W+'s, W-'s and Z's are
+decayed into the modes allowed by the WPMODE, WMMODE, and Z0MODE
+commands respectively. **WARNING**: The branching ratios implied by
+these commands are NOT included in the cross section because an
+arbitrary number of W's and Z's can in principle be radiated.
+
+      (3) Jet Fragmentation:
+      Quarks and gluons are fragmented into hadrons using the
+independent fragmentation ansatz of Field and Feynman. For a quark q, a
+new quark-antiquark pair q1-q1bar is generated with
+      u : d : s = .43 : .43 : .14.
+A meson q-q1bar is formed carrying a fraction z of the momentum,
+      E' + pz' = z * ( E + pz ),
+and having a transverse momentum pt with <pt> = .35 GeV. Baryons are
+included by generating a diquark with probability .10 instead of a
+quark; adjacent diquarks are not allowed, so no exotic mesons are
+formed. For light quarks z is generated with the splitting function
+      f(z) = 1-a + a*(b+1)*(1-z)**b,
+      a = .96, b = 3
+while for heavy quarks the Peterson form
+      f(z) = x * (1-x)**2 / ( (1-x)**2 + epsilon*x )**2
+is used with
+         epsilon = .80 / mc**2  for c,
+         epsilon = .50 / mq**2  for q = b, t, y, x.
+Hadrons with longitudinal momentum less than zero are discarded. The
+procedure is then iterated for the new quark q1 until all the momentum
+is used. A gluon is fragmented like a randomly selected u, d, or s quark
+or antiquark.
+
+      In the fragmentation of gluinos and scalar quarks, supersymmetric
+hadrons are not distinguished from partons. This should not matter
+except possibly for very light masses. The Peterson form for f(x) is
+used with the same value of epsilon as for quarks,
+       epsilon = .5 / m**2.
+
+      Independent fragmentation correctly describes the fast hadrons in
+a jet, but it fails to conserve energy or flavor exactly. Energy
+conservation is imposed after the event is generated by boosting the
+hadrons to the appropriate rest frame, rescaling all of the
+three-momenta, and recalculating the energies.
+
+      (4) Beam Jets
+      There is now experimental evidence that beam jets are different in
+minimum bias events and in hard scattering events. ISAJET therefore uses
+similar a algorithm but different parameters in the two cases.
+
+      The standard models of particle production are based on pulling
+pairs of particles out of the vacuum by the QCD confining field, leading
+naturally to only short-range rapidity correlations and to essentially
+Poisson multiplicity fluctuations. The minimum bias data exhibit KNO
+scaling and long-range correlations. A natural explanation of this was
+given by the model of Abramovskii, Kanchelli and Gribov. In their model
+the basic amplitude is a single cut Pomeron with Poisson fluctuations
+around an average multiplicity <n>, but unitarity then produces graphs
+giving K cut Pomerons with multiplicity K<n>.
+
+      A simplified version of the AKG model is used in ISAJET. The
+number of cut Pomerons is chosen with a distribution adjusted to fit the
+data. For a minimum bias event this distribution is
+      P(K) = ( 1 + 4 * K**2 ) * exp( -1.8 * K )
+while for hard scattering
+      P(1) --> .1 * P(1),  P(2) --> .2 * P(2),  P(3) --> .5 * P(3).
+For each side of each event an x(0) for the leading baryon is selected
+with a distribution varying from flat for K = 1 to like that for mesons
+for large K:
+      f(x) = N(K) * ( 1- x(0) ) ** c(K)
+      c(K) = 1/K + ( 1 - 1/K ) * b(s)
+The x(i) for the cut Pomerons are generated uniformly and then rescaled
+to 1-x(0). Each cut Pomeron is then hadronized in its own center of mass
+using a modified independent fragmentation model with an energy dependent
+splitting function to reproduce the rise in dN/dy:
+      f(x) = 1 - a  +  a * ( b(s) + 1 ) ** b(s),
+      b(s) = b0 + b1 * log( s ).
+The energy dependence is put into f(x) rather than P(K) because in the
+AKG scheme the single particle distribution comes only from the single
+chain. The probabilities for different flavors are taken to be
+      u : d : s = .46 : .46 : .08
+to reproduce the experimental K/pi ratio.
+
+
+
+[3] SAMPLE JOB
+
+      The simplest ISAJET job reads a user-supplied parameter file and
+writes a data file and a listing file. The following is an example of
+a parameter file which generates each type of event:
+
+SAMPLE TWOJET JOB
+800.,100,2,50/
+TWOJET
+PT
+50,100,50,100/
+JETTYPE1
+'GL'/
+JETTYPE2
+'UP','UB','DN','DB','ST','SB'/
+END
+SAMPLE DRELLYAN JOB
+800.,100,2,50/
+DRELLYAN
+QMW
+80,100/
+WTYPE
+'W+','W-'/
+END
+SAMPLE MINBIAS JOB
+800.,100,2,50/
+MINBIAS
+END
+SAMPLE WPAIR JOB
+800.,100,2,50/
+WPAIR
+PT
+50,100,50,100/
+JETTYPE1
+'W+','W-','Z0'/
+JETTYPE2
+'W+','W-','Z0'/
+WMODE1
+'E+','E-','NUS'/
+WMODE2
+'QUARKS'/
+END
+SAMPLE SUPERSYMMETRY JOB
+800.,100,1,1/
+SUPERSYM
+PT
+50,100,50,100/
+JETTYPE1
+'GL'/
+JETTYPE2
+'GL'/
+GAUGINO
+50,5,100,100/
+FORCE
+29,30,1,-1/
+END
+SAMPLE HIGGS JOB FOR SSC
+40000,100,1,1/
+HIGGS
+QMH
+400,1600/
+HMASS
+800/
+JETTYPE1
+'Z0'/
+JETTYPE2
+'Z0'/
+WMODE1
+'MU+','MU-'/
+WMODE2
+'E+','E-'/
+PT
+50,20000,50,20000/
+END
+SAMPLE MSSM JOB FOR TEVATRON
+1800.,100,1,1/
+SUPERSYM
+BEAMS
+'P','AP'/
+MSSM1
+100,200,150,150,150/
+MSSM2
+200,200,-100,200,200/
+MSSM3
+2.,-100,500/
+JETTYPE1
+'GLSS'/
+JETTYPE2
+'SQUARKS'/
+PT
+100,300,100,300/
+END
+STOP
+
+See the "Input" section of this manual for a complete list of the
+possible commands in a parameter file. Note that all input to ISAJET
+must be in UPPER case only.
+
+      Subroutine RDTAPE is supplied to read events from an ISAJET data
+file, which is a machine-dependent binary file. A Zebra output format
+is also available.
+
+      On a VAX a compiled version of ISAJET can be created from
+ISAJET.CAR by executing the following .COM file (with each \+ replaced
+by a +):
+
+$ YTOBIN
+ISAJET ISAJET - - MAKE_PAM .GO
+$!
+$ YPATCHY
+ISAJET ISATEXT.TXT TTY MAKE_TXT .GO
+\+USE,*ISATEXT,VAX
+\+EXE
+\+PAM
+\+QUIT
+$!
+$ YPATCHY
+ISAJET ISAJET TTY MAKE_FOR .GO
+\+USE,*ISAJET,VAX
+\+USE,*ISAPLT
+\+EXE
+\+PAM
+\+QUIT
+$!
+$ YPATCHY
+ISAJET ISADECAY.DAT TTY MAKE_DAT .GO
+\+USE,*ISADECAY
+\+EXE
+\+PAM
+\+QUIT
+$!
+$ CREATE ISARUN.FOR
+      PROGRAM ISARUN
+C          MAIN PROGRAM FOR ISAJET
+      OPEN(UNIT=1,STATUS='OLD',FORM='FORMATTED',READONLY)
+      OPEN(UNIT=2,STATUS='NEW',FORM='UNFORMATTED')
+      OPEN(UNIT=3,STATUS='OLD',FORM='FORMATTED')
+      OPEN(UNIT=4,STATUS='NEW',FORM='FORMATTED')
+      CALL ISAJET(-1,2,3,4)
+      STOP
+      END
+$ FORTRAN ISARUN
+$!
+$ FORTRAN/LIST ISAJET
+$ LIBRARY/CREATE ISAJET ISAJET
+$ LINK/EXE=ISAJET ISARUN,ISAJET/L/I=ALDATA
+
+Then a parameter file <JOBNAME>.PAR can be read and corresponding data
+and listing files <JOBNAME>.DAT and <JOBNAME.LIS> created using the
+command
+      @ISAJET <JOBNAME>
+where ISAJET.COM is the following DCL command file:
+
+$ ASSIGN $2$DUA9:[PAIGE.ISAJET] ISA:
+$!
+$ ASSIGN ISA:DECAY.DAT  FOR001
+$ ASSIGN 'P1'.DAT       FOR002
+$ ASSIGN 'P1'.PAR       FOR003
+$ ASSIGN 'P1'.LIS       FOR004
+$!
+$ RUN ISA:ISAJET
+
+      There is also an simple interactive interface to ISAJET which
+will prompt the user for commands, write a parameter file, and
+optionally execute it.
+
+      This section only describes running ISAJET as a standalone
+program and generating output in machine-dependent binary form. The
+user may elect to analyze events as they are generated; this is
+discussed in the "Main Program" section of this manual.
+
+
+
+[4] PATCHY
+
+      PATCHY is a code management system developed at CERN and used to
+maintain the CERN Library. It is used to provide versions of ISAJET for
+a wide variety of computers. Instructions for using PATCHY and a
+PATCHY installation tape are available on request from the CERN DD
+Division.
+
+   The ISAJET PAM file is divided into the following patches:
+
+ISACDE     contains all common blocks, etc. These are divided into
+           decks based on their usage.
+ISADATA    contains block data ALDATA. This must always be loaded when
+           using ISAJET.
+ISAJET     contains the code for generating events. Each subroutine is
+           in a separate deck with the same name.
+ISASSRUN   contains the main program for ISASUSY, which prompts for
+           input parameters and prints out all the decay modes. It is
+           selected by *ISASUSY.
+ISASUSY    contains code to calculate all the decay widths and branching
+           fractions in the minimal supersymmetric model.
+ISATAPE    contains the code for reading and writing tapes, again with
+           each subroutine on a separate deck.
+ISARUN     contains a main program and a simple interactive interface.
+           It is selected by IF=INTERACT.
+ISAZEB     contains Zebra format output routines, an alternative to the
+           ISATAPE routines.
+ISZRUN     contains the analog of ISAPLT for the Zebra format.
+ISAPLT     contains a simple calorimeter simulation and the skeleton of
+           a histogramming job using HBOOK.
+ISATEXT    contains the instructions for using ISAJET, i.e. the text of
+           this document.
+ISZTEXT    contains the instructions for the Zebra output routines and
+           a description of the Zebra banks.
+ISASSDOC   contains documentation for ISASUSY.
+ISADECAY   contains the input decay table.
+
+      The code is actually maintained using CMS on the BNL VAX Cluster;
+Patchy is used primarily to handle common blocks and machine dependent
+code.
+
+      The input to YPATCHY must contain both +USE cards, which define
+the wanted program version, and +EXE cards, which determine which
+patches or decks are written to the ASM file. To facilitate this
+selection, the ISAJET PAM contains the following pilot patches:
+
+*ISADECAY  +USE selects ISADECAY and all corrections to it.
+*ISAJET    +USE selects ISACDE, ISADATA, ISAJET, ISATAPE, ISARUN and
+           all corrections to them. Note that ISARUN is not actually
+           selected without +USE,INTERACT.
+*ISAPLT    +USE selects ISASEQ, ISAPLT, and all corrections to them.
+*ISASUSY   +USE selects CDESUSY, ISASUSY, and ISASSRUN to create a
+           program to calculate all the MSSM decay modes.
+*ISATEXT   +USE selects ISACDE, ISATEXT, and all corrections to them.
+*ISAZEB    +USE selects ISAJET with a Zebra output format.
+*ISZRUN    +USE selects the Zebra analysis package.
+
+      Patches are provided to select the machine dependent features for
+specific computers:
+
+ANSI         ANSI standard Fortran (no time or date functions)
+CDC          CDC 7600 and 60-bit CYBER (obsolete)
+CRAY         CRAY 2 with UNICOS
+DECS         DEC Station with Ultrix
+ETA          ETA 10 running Unix System V (obsolete)
+HPUX         H9/9000 7xx running Unix System V
+IBM          IBM 370 and 30xx running VM
+IBMRT        IBM RS/6000 running AIX 3.x
+SGI          Silicon Graphics, Inc., 4D/xx running Unix System V.
+SUN          Sun Sparcstation running Unix BSD 4.3
+VAX          DEC VAX running VMS
+
+These patches in turn select a variety of patches and IF flags, allowing
+one to select more specific features, as indicated below. (Replace \+
+by + everywhere.)
+
+\+PATCH,ANSI.                      GENERIC ANSI FORTRAN.
+\+USE,DOUBLE.                      DOUBLE PRECISION.
+\+USE,STDIO.                       STANDARD FORTRAN 77 TAPE INPUT/OUTPUT.
+\+USE,MOVEFTN.                     FORTRAN REPLACEMENT FOR MOVLEV.
+\+USE,RANFFTN,IF=-CERN.            FORTRAN RANF.
+\+USE,RANFCALL.                    STANDARD RANSET AND RANGET CALLS.
+\+USE,NOCERN,IF=-CERN.             NO CERN LIBRARY.
+\+EOD
+
+\+PATCH,CDC.                       CDC 7600 OR CYBER 175.
+\+USE,SINGLE.                      SINGLE PRECISION.
+\+USE,LEVEL2.                      LEVEL 2 STORAGE.
+\+USE,CDCPACK.                     PACK 2 WORDS PER WORD FOR INPUT/OUTPUT.
+\+USE,RANFCALL.                    STANDARD RANSET AND RANGET CALLS.
+\+USE,NOCERN,IF=-CERN.             NO CERN LIBRARY.
+\+EOD
+
+\+PATCH,CRAY.                      CRAY XMP OR 2.
+\+USE,SINGLE.                      SINGLE PRECISION.
+\+USE,STDIO.                       STANDARD FORTRAN 77 TAPE INPUT/OUTPUT.
+\+USE,MOVEFTN.                     FORTRAN REPLACEMENT FOR MOVLEV.
+\+USE,NOCERN,IF=-CERN.             NO CERN LIBRARY.
+\+EOD
+
+\+PATCH,DECS.                      DEC STATION (ULTRIX)
+\+USE,SUN.
+\+EOD
+
+\+PATCH,ETA.                       ETA-10.
+\+USE,SINGLE.                      SINGLE PRECISION.
+\+USE,STDIO.                       STANDARD FORTRAN 77 TAPE INPUT/OUTPUT.
+\+USE,MOVEFTN.                     FORTRAN REPLACEMENT FOR MOVLEV.
+\+USE,RANFCALL.                    STANDARD RANSET AND RANGET CALLS.
+\+USE,NOCERN,IF=-CERN.             NO CERN LIBRARY.
+\+EOD
+
+\+PATCH,HPUX.                      HP/9000 7XX RUNNING UNIX.
+\+USE,DOUBLE.                      DOUBLE PRECISION.
+\+USE,STDIO.                       STANDARD FORTRAN 77 TAPE INPUT/OUTPUT.
+\+USE,MOVEFTN.                     FORTRAN REPLACEMENT FOR MOVLEV.
+\+USE,RANFFTN,IF=-CERN.            FORTRAN RANF.
+\+USE,RANFCALL.                    STANDARD RANSET AND RANGET CALLS.
+\+USE,NOCERN,IF=-CERN.             NO CERN LIBRARY.
+\+USE,IMPNONE.                     IMPLICIT NONE
+\+EOD
+
+\+PATCH,IBM.                       IBM 370 OR 30XX.
+\+USE,DOUBLE.                      DOUBLE PRECISION.
+\+USE,STDIO.                       STANDARD FORTRAN 77 TAPE INPUT/OUTPUT.
+\+USE,MOVEFTN.                     FORTRAN REPLACEMENT FOR MOVLEV.
+\+USE,RANFFTN,IF=-CERN.            FORTRAN RANF.
+\+USE,RANFCALL.                    STANDARD RANSET AND RANGET CALLS.
+\+USE,NOCERN,IF=-CERN.             NO CERN LIBRARY.
+\+EOD
+
+\+PATCH,IBMRT.                     IBM RS/6000 WITH AIX 3.1
+\+USE,DOUBLE.                      DOUBLE PRECISION.
+\+USE,STDIO.                       STANDARD FORTRAN 77 TAPE INPUT/OUTPUT.
+\+USE,MOVEFTN.                     FORTRAN REPLACEMENT FOR MOVLEV.
+\+USE,RANFFTN,IF=-CERN.            FORTRAN RANF.
+\+USE,RANFCALL.                    STANDARD RANSET AND RANGET CALLS.
+\+USE,NOCERN,IF=-CERN.             NO CERN LIBRARY.
+\+USE,IMPNONE.                     IMPLICIT NONE
+\+EOD
+
+\+PATCH,SGI.                       SILICON GRAPHICS 4D/XX.
+\+USE,DOUBLE.                      DOUBLE PRECISION.
+\+USE,STDIO.                       STANDARD FORTRAN 77 TAPE INPUT/OUTPUT.
+\+USE,MOVEFTN.                     FORTRAN REPLACEMENT FOR MOVLEV.
+\+USE,RANFFTN,IF=-CERN.            FORTRAN RANF.
+\+USE,RANFCALL.                    STANDARD RANSET AND RANGET CALLS.
+\+USE,NOCERN,IF=-CERN.             NO CERN LIBRARY.
+\+EOD
+
+\+PATCH,SUN.                       SUN (SPARC)
+\+USE,DOUBLE.                      DOUBLE PRECISION.
+\+USE,STDIO.                       STANDARD FORTRAN 77 TAPE INPUT/OUTPUT.
+\+USE,MOVEFTN.                     FORTRAN REPLACEMENT FOR MOVLEV.
+\+USE,RANFFTN,IF=-CERN.            FORTRAN RANF.
+\+USE,RANFCALL.                    STANDARD RANSET AND RANGET CALLS.
+\+USE,NOCERN,IF=-CERN.             NO CERN LIBRARY.
+\+EOD
+
+\+PATCH,VAX.                       DEC VAX 11/780 OR 8600.
+\+USE,DOUBLE.                      DOUBLE PRECISION.
+\+USE,STDIO.                       STANDARD FORTRAN 77 TAPE INPUT/OUTPUT.
+\+USE,MOVEFTN.                     FORTRAN REPLACEMENT FOR MOVLEV.
+\+USE,RANFFTN,IF=-CERN.            FORTRAN RANF.
+\+USE,RANFCALL.                    STANDARD RANSET AND RANGET CALLS.
+\+USE,NOCERN,IF=-CERN.             NO CERN LIBRARY.
+\+USE,IMPNONE.                     IMPLICIT NONE
+\+EOD
+
+      An empty patch INTERACT selects a main program and an interactive
+interface which will prompt the user for parameters and do some error
+checking. A patch CERN allows ISAJET to take the random number generator
+RANF and several other routines from the CERN Library; to use this
+include the Patchy command
+
+\+USE,CERN.
+
+      In general it should be sufficient to run YPATCHY with the
+following cradle (replace \+ with + everywhere):
+
+\+USE,(*ISAJET,*ISATEXT,*ISADECAY,*ISAPLT).     CHOOSE ONE.
+\+USE,(ANSI,CDC,CRAY,IBM,VAX).                  CHOOSE ONE.
+\+[USE,INTERACT].                               FOR INTERACTIVE MODE.
+\+[USE,CERN.]                                   FOR CERN LIBRARY.
+\+[USE,HBOOK3.]                                 HBOOK 3 FOR ISAPLT.
+\+EXE.
+\+PAM.
+\+QUIT.
+
+      The input to YPATCHY can also contain changes by the user. It is
+suggested that these not be made permanent parts of the PAM to avoid
+possible conflicts with later corrections.
+
+
+
+[5] MAIN PROGRAM
+
+      A main program is not supplied with ISAJET. To generate events
+and write them to disk, the user should provide a main program which
+opens the files and then calls subroutine ISAJET. In the following
+sample, i,j,m,n are arbitrary unit numbers:
+
+      PROGRAM RUNJET
+C
+C          MAIN PROGRAM FOR ISAJET ON BNL VAX CLUSTER.
+C
+      OPEN(UNIT=i,FILE='$2$DUA14:[ISAJET.ISALIBRARY]DECAY.DAT',
+     $STATUS='OLD',FORM='FORMATTED',READONLY)
+      OPEN(UNIT=j,FILE='myjob.dat',STATUS='NEW',FORM='UNFORMATTED')
+      OPEN(UNIT=m,FILE='myjob.par',STATUS='OLD',FORM='FORMATTED')
+      OPEN(UNIT=n,FILE='myjob.lis',STATUS='NEW',FORM='FORMATTED')
+C
+      CALL ISAJET(+-i,+-j,m,n)
+C
+      STOP
+      END
+
+      The arguments of ISAJET are tape numbers for files, all of which
+should be opened by the main program.
+      TAPEi: Decay table (formatted).
+         +i: Print the decay table on the output listing.
+         -i: Suppress printing of the decay table.
+      TAPEj: Output file for events (unformatted).
+         +j: Write out both resonances and stable particles.
+         -j: Write out only stable particles.
+      TAPEm: Commands as defined in Section 6 (formatted).
+      TAPEn: Output listing (formatted).
+In the sample jobs in Section 3, TAPEm is the default Fortran input,
+and TAPEn is the default Fortran output.
+
+      To use the interactive interface, replace the call to ISAJET in
+the above main program by
+      CALL ISASET(+-i,+-j,m,n)
+      CALL ISAJET(+-i,+-j,m,n)
+ISASET calls DIALOG, which prompts the user for possible commands,
+does a limited amount of error checking, and writes a command file on
+TAPEm. This command file is rewound for execution by ISAJET. A main
+program is included in patch ISARUN to open the necessary files and to
+call ISASET and ISAJET.
+
+      If the user wishes to integrate ISAJET with another program and
+have control over the event generation, he can call the driving
+subroutines himself. The driving subroutines are:
+
+ ISAINI(+-i,+-j,m,n)   initialize ISAJET. The arguments are the same as
+                       for subroutine ISAJET.
+ ISABEG(IFL)           to begin a run. IFL is a return flag: IFL=0 for a
+                       good set of commands; IFL=1001 for a STOP;
+                       any other value means an error.
+ ISAEVT(I,OK,DONE)     generate event I. Logical flag OK signifies a good
+                       event (almost always .TRUE.); logical flag DONE
+                       signifies the end of a run.
+ ISAEND                to end a run
+
+There are also subroutines provided to write standard ISAJET records,
+or Zebra records if the Zebra option is selected:
+
+ISAWBG    to write a begin-of-run record, should be called immediately
+          after ISABEG
+ISAWEV    to write an event record, should be called immediately after
+          ISAEVT
+ISAWND    to write an end-of-run record, should be called immediately
+          after ISAEND
+
+The control of the event loop is somewhat complicated to accomodate
+multiple evolution and fragmentation as described in Section 11. Note
+in particular that after calling ISAEVT one should process or write
+out the event only if OK=.TRUE. The check on the DONE flag is
+essential if one is doing multiple evolution and fragmentation. The
+following example indicates how events might be generated, analyzed,
+and discarded:
+
+      PROGRAM SAMPLE
+C
+      IMPLICIT NONE
+      COMMON/ITAPES/ITDKY,ITEVT,ITCOM,ITLIS
+      SAVE /ITAPES/
+      INTEGER   ITDKY,ITEVT,ITCOM,ITLIS
+      COMMON/IDRUN/IDVER,IDG(2),IEVT,IEVGEN
+      SAVE /IDRUN/
+      INTEGER   IDVER,IDG,IEVT,IEVGEN
+      COMMON/PRIMAR/NJET,SCM,HALFE,ECM,IDIN(2),NEVENT,NTRIES,NSIGMA
+      SAVE /PRIMAR/
+      INTEGER   NJET,IDIN,NEVENT,NTRIES,NSIGMA
+      REAL      SCM,HALFE,ECM
+      COMMON/ISLOOP/NEVOLV,NFRGMN,IEVOL,IFRG
+      SAVE /ISLOOP/
+      INTEGER NEVOLV,NFRGMN,IEVOL,IFRG
+C
+      INTEGER JTDKY,JTEVT,JTCOM,JTLIS,IFL,ILOOP
+      LOGICAL OK,DONE
+      SAVE ILOOP
+C---------------------------------------------------------------------
+C>         Open files as above
+C>         Call user initialization
+C---------------------------------------------------------------------
+C
+C          Initialize ISAJET
+C
+      CALL ISAINI(-i,0,m,n)
+    1 IFL=0
+      CALL ISABEG(IFL)
+      IF(IFL.NE.0) STOP
+C
+C          Event loop
+C
+      ILOOP=0
+  101 CONTINUE
+        ILOOP=ILOOP+1
+C          Generate one event - discard if .NOT.OK
+        CALL ISAEVT(ILOOP,OK,DONE)
+        IF(OK) THEN
+C---------------------------------------------------------------------
+C>         Call user analysis for event
+C---------------------------------------------------------------------
+        ENDIF
+      IF(.NOT.DONE) GO TO 101
+C
+C          Calculate cross section and luminosity
+C
+      CALL ISAEND
+C---------------------------------------------------------------------
+C>         Call user summary
+C---------------------------------------------------------------------
+      GO TO 1
+      END
+
+      It may be desirable to generate several different kinds of events
+simultaneously to study pileup effects. While normally one would want
+to superimpose minimum bias or low-pt jet events on a signal of
+interest, other combinations might also be interesting. It would be
+very inefficient to reinitialize ISAJET for each event. Therefore, a
+pair of subroutines is provided to save and restore the context, i.e.
+all of the initialization information, in an array. The syntax is
+      CALL CTXOUT(NC,VC,MC)
+      CALL CTXIN(NC,VC,MC)
+where VC is a real array of dimension MC and NC is the number of words
+used, about 20000 in the standard case. If NC exceeds MC, a warning is
+printed and the job is terminated. The use of these routines is
+illustrated in the following example, which opens the files with names
+read from the standard input and then superimposes on each event of
+the signal sample three events of a pileup sample. It is assumed that
+a large number of events is specified in the parameter file for the
+pileup sample so that it does not terminate.
+
+      PROGRAM SAMPLE
+C
+C          Example of generating two kinds of events.
+C
+      CHARACTER*60 FNAME
+      REAL VC1(20000),VC2(20000)
+      LOGICAL OK1,DONE1,OK2,DONE2
+      INTEGER NC1,NC2,IFL,ILOOP,I2,ILOOP2
+C
+C          Open decay table
+      READ 1000, FNAME
+1000  FORMAT(A)
+      OPEN(1,FILE=FNAME,STATUS='OLD',FORM='FORMATTED')
+C          Open user files
+      READ 1000, FNAME
+      OPEN(3,FILE=FNAME,STATUS='OLD',FORM='FORMATTED')
+      READ 1000, FNAME
+      OPEN(4,FILE=FNAME,STATUS='NEW',FORM='FORMATTED')
+      READ 1000,FNAME
+      OPEN(13,FILE=FNAME,STATUS='OLD',FORM='FORMATTED')
+      READ 1000,FNAME
+      OPEN(14,FILE=FNAME,STATUS='NEW',FORM='FORMATTED')
+C
+C          Initialize ISAJET
+      CALL ISAINI(-1,0,3,4)
+      CALL CTXOUT(NC1,VC1,20000)
+      CALL ISAINI(-1,0,13,14)
+      IFL=0
+      CALL ISABEG(IFL)
+      IF(IFL.NE.0) STOP1
+      CALL CTXOUT(NC2,VC2,20000)
+      ILOOP2=0
+      CALL user_initialization_routine
+C
+1     IFL=0
+      CALL CTXIN(NC1,VC1,20000)
+      CALL ISABEG(IFL)
+      CALL CTXOUT(NC1,VC1,20000)
+      IF(IFL.NE.0) GO TO 999
+      ILOOP=0
+C
+C          Main event
+C
+101   CONTINUE
+        ILOOP=ILOOP+1
+        CALL CTXIN(NC1,VC1,20000)
+        CALL ISAEVT(ILOOP,OK1,DONE1)
+        CALL CTXOUT(NC1,VC1,20000)
+        IF(.NOT.OK1) GO TO 101
+        CALL user_analysis_routine
+C
+C          Pileup
+C
+        CALL CTXIN(NC2,VC2,20000)
+        I2=0
+201     CONTINUE
+          ILOOP2=ILOOP2+1
+          CALL ISAEVT(ILOOP2,OK2,DONE2)
+          IF(OK2) I2=I2+1
+          IF(DONE2) STOP2
+          CALL user_analysis_routine
+        IF(I2.LT.3) GO TO 201
+        CALL CTXOUT(NC2,VC2,20000)
+C
+      IF(.NOT.DONE1) GO TO 101
+C
+C          Calculate cross section and luminosity
+C
+      CALL CTXIN(NC1,VC1,20000)
+      CALL ISAEND
+      GO TO 1
+C
+999   CALL CTXIN(NC2,VC2,20000)
+      CALL ISAEND
+      CALL user_termination_routine
+      STOP
+      END
+
+It is possible to superimpose arbitrary combinations of events,
+including events of the same reaction type with different parameters.
+In general the number of events would be selected randomly based on the
+cross sections and the luminosity.
+
+      At this time CTXOUT and CTXIN cannot be used with the Zebra
+output routines.
+
+
+
+[6] INPUT
+
+      ISAJET is controlled by commands read from the specified input
+file by subroutine READIN. (In the interactive version, this file is
+first created by subroutine DIALOG.) Syntax errors will generate a
+message and stop execution. Based on these commands, subroutine LOGIC
+will setup limits for all variables and check for inconsistencies.
+Several runs with different parameters can be combined into one job.
+The required input format is:
+
+Title
+Ecm,Nevent,Nprint,Njump/
+Reaction
+(Optional parameters)
+END
+(Optional additional runs)
+STOP
+
+with all cards starting in column 1 and typed in UPPER case. These
+cards are explained below.
+
+      Title card: Up to 80 characters long. If the first four letters
+are STOP, control is returned to main program. If the first four letters
+are SAME, the parameters from previous run are used excepting those
+which are explicitly changed.
+
+      Ecm card: This card must always be given even if the title is
+SAME. It must give the center of mass energy (Ecm) and the number of
+events (Nevent) to be generated. One may also specify the number of
+events to be printed (Nprint) and the increment (Njump) for printing.
+The first event is always printed if Nprint.gt.0. For example:
+800.,1000,10,100/
+generates 1000 events at Ecm=800 GeV and prints 10 events. The events
+printed are: 1,100,200,.... Note that an event typically takes several
+pages of output. This card is read with a list directed format (READ*).
+
+     After Nprint events have been printed, a single line containing the
+run number, the event number, and the random number seed is printed
+every Njump events (if Njump is nonzero). This seed can be used to start
+a new job with the given event if in the new run NSIGMA is set equal to
+zero:
+SEED
+value/
+NSIGMA
+0/
+In general the same events will only be generated on the same type of
+computer.
+
+      Reaction card: This card must be given unless title is SAME, when
+it must be omitted. It selects the type of events to be generated. The
+present version can generate TWOJET, E+E-, DRELLYAN, MINBIAS, WPAIR,
+SUPERSYM, HIGGS, PHOTON, or TCOLOR events. This card is read with an A8
+format.
+
+      Optional parameters: Each optional parameter requires two cards.
+The first card is a keyword specifying the parameter and the second
+card gives the values for the parameter. The parameters can be given in
+any order. Numerical values are read with a list directed format
+(READ*), jet and particle types are read with a character format and
+must be enclosed in quotes, and logical flags with an L1 format. All
+momenta are in GeV and all angles are in radians.
+
+      The parameters can be classified in several groups:
+
+Jet Limits:    W Limits:      Decays:        Constants:     Other:
+
+JETTYPE1       PHIW           FORCE          CUTJET         BEAMS
+JETTYPE2       QMH            FORCE1         CUTOFF         NPOMERON
+JETTYPE3       QMW            NODECAY        FRAGMENT       NSIGMA
+P              QTW            NOETA          GAUGINO        NTRIES
+PHI            THW            NOEVOLVE       HMASS          SEED
+PT             WTYPE          NOFRGMNT       HMASSES        STRUC
+TH             XW             NOPI0          LAMBDA         WFUDGE
+X              YW                            MSSM1          WMMODE
+Y                                            MSSM2          WPMODE
+WMODE1                                       MSSM3          Z0MODE
+WMODE2                                       SIGQT
+                                             SIN2W
+                                             SLEPTON
+                                             SQUARK
+                                             TCMASS
+                                             TMASS
+                                             WMASS
+                                             XGEN
+                                             XGENSS
+
+      It may be helpful to know that TWOJET, WPAIR, and SUPERSYM use the
+same controlling routines and so share many of the same variables. In
+particular, PT limits should normally be set for these processes, and
+JETTYPE1 and JETTYPE2 are used to select the reactions. Similarly, the
+DRELLYAN, HIGGS, and TCOLOR processes use the same controlling routines
+since they both generate s-channel resonances. The mass limits for both
+processes are set by QMW. Normally the QMW limits will surround the W+-,
+Z0, or Higgs mass, but this is not required. (QMH is a synonym for QMW
+for the Higgs process.) For historical reasons, JETTYPE1 and JETTYPE2
+are used to select the W decay modes in DRELLYAN, while WMODE1 and
+WMODE2 select the W decay modes for WPAIR and HIGGS. Also, QTW can be
+used to generate DRELLYAN events with non-zero transverse momentum,
+whereas HIGGS automatically fixes QTW to be zero. (Of course, non-zero
+transverse momentum will be generated by gluon radiation.)
+
+
+      A complete list of keywords and their default values follows:
+
+Keyword                                     Explanation
+Values                   Default values
+
+BEAMS                                       Initial beams. Allowed are
+type1,type2              'P','P'            'P','AP','N','AN'.
+
+CUTJET                                      Cutoff mass for QCD jet
+mu                       6.                 evolution.
+
+CUTOFF                                      Cutoff qt**2=mu2*Q**nu for
+mu2,nu                   .200,1.0           DRELLYAN events.
+
+FORCE                                       Force decay of particles,
+i,i1,...,i5/             NONE               +-i --> +-(i1+...+i5).
+                                            Can call 20 times.
+                                            See note for i = quark.
+
+FORCE1                                      Force decay i --> i1+...+i5.
+i,i1,...,i5/             NONE               Can call 40 times.
+                                            See note for i = quark.
+
+FRAGMENT                                    Fragmentation parameters.
+Pud,...                  .4,...             See also sigqt, etc.
+
+GAUGINO                                     Masses for GLSS, GMSS,
+m1,m2,m3,m4              50,0,100,100       W+SS, and Z0SS
+
+HMASS                    0                  Mass for standard Higgs.
+m
+
+HMASSES                                     Higgs meson masses for
+m1,...,m9                0,...,0            charges 0,0,0,0,0,1,1,2,2.
+
+
+JETTYPE1                                    )Select types for jets:
+'GL','UP',...            'ALL'              )'ALL'; 'GL'; 'QUARKS'='UP',
+                                            )'UB','DN','DB','ST','SB',
+JETTYPE2                                    )'CH','CB','BT','BB','TP',
+'GL','UP',...            'ALL'              )'TB','X','XB','Y','YB';
+                                            )'LEPTONS'='E-','E+','MU-',
+JETTYPE3                                    )'MU+','TAU-','TAU+'; 'NUS';
+'GL','UP',...            'ALL'              )'GM','W+','W-','Z0'
+                                            ) See note for SUSY types.
+
+LAMBDA                                      QCD scale
+Lambda                   .2
+
+MSSM1                                       MSSM mass parameters
+m(g),m(qk),m(ll),m(lr),  none               Masses of gluino, light squarks,
+m(snu)                                      sleptons, sneutrinos
+
+MSSM2                                       MSSM mass parameters
+m(tl),m(tr),A_t,         none               Masses of 3rd generation particles
+m(bl),m(br)                                 and A_t parameter
+
+MSSM3                                       MSSM other parameters
+tan(beta),mu,m(ha)       none               tan(beta), mu=-2*m1, m(ha)
+
+NODECAY                                     Suppress all decays.
+TRUE or FALSE            FALSE
+
+NOETA                                       Suppress eta decays.
+TRUE or FALSE            FALSE
+
+NOEVOLVE                                    Suppress QCD evolution and
+TRUE or FALSE            FALSE              hadronization.
+
+NOHADRON                                    Suppress hadronization of
+TRUE or FALSE            FALSE              jets and beam jets.
+
+NONUNU                                      Suppress Z0 neutrino decays.
+TRUE or FALSE            FALSE
+
+NOPI0                                       Suppress pi0 decays.
+TRUE or FALSE            FALSE
+
+NPOMERON                                    Allow n1<n<n2 cut pomerons.
+n1,n2                    1,20               Controls beam jet mult.
+
+NSIGMA                                      Generate n unevolved events
+n                        20                 for SIGF calculation.
+
+NTRIES                                      Stop if after n tries
+n                        1000               cannot find a good event.
+
+P                                           Momentum limits for jets.
+pmin(1),...,pmax(3)      1.,.5*Ecm
+
+PHI                                         Phi limits for jets.
+phimin(1),...,phimax(3)  0,2*pi
+
+
+PHIW                                        Phi limits for W.
+phimin,phimax            0,2*pi
+
+PT or PPERP                                 Pt limits for jets.
+ptmin(1),...,ptmax(3)    .05*Ecm,.2*Ecm     Default for TWOJET only.
+
+QMH                                         Mass limits for Higgs.
+qmin,qmax                .05*Ecm,.2*Ecm     Equivalent to QMW.
+
+QMW                                         Mass limits for W.
+qmin,qmax                .05*Ecm,.2*Ecm
+
+QTW                                         Qt limits for W. Fix qt=0
+qtmin,qtmax              .1,.025*ecm        for standard Drell-Yan.
+
+SEED                                        Random number seed (double
+real                     0                  precision if 32 bit).
+
+SIGQT                                       Internal kt parameter for
+sigma                    .35                jet fragmentation.
+
+SIN2W                                       Weinberg angle. See WMASS.
+sin**2(th)               .230
+
+SLEPTON                                     Masses for NESS, E-SS, NMSS,
+m1,...,m6                100,...,101.8      M-SS,NTSS,T-SS
+
+SQUARK                                      Masses for UPSS, DNSS, STSS,
+m1,...,m6                100.3,...,240.     CHSS, BTSS, TPSS
+
+STRUC                                       Structure functions. EICHTEN
+name                     'EICHTEN'          (EHLQ) or DUKE (DO).
+
+TH or THETA                                 Theta limits for jets. Do
+thmin(1),...,thmax(3)    0,pi               not set both th and y.
+
+THW                                         Theta limits for W. Do not
+thmin,thmax              0,pi               set both TH and Y.
+
+TCMASS                                      Technicolor mass and width.
+m,gam                    1000,100
+
+TMASS                                       t, y, and x quark masses.
+mt,my,mx                 140.,-1.,-1.
+
+WFUDGE                                      Fudge factor for DRELLYAN
+value                    1.85               evolution scale.
+
+WMASS                                       W and Z masses. See SIN2W.
+mw,mz                    80.0,91.0
+
+WMMODE                                      Decay modes for W- in parton
+'UP',...,'TAU+'          'ALL'              cascade. See JETTYPE.
+
+WMODE1                                      )
+'UP','UB',...            'ALL'              )Decay modes for WPAIR.
+                                            )Same code for quarks and
+WMODE2                                      )leptons as JETTYPE.
+'UP','UB',...            'ALL'              )
+
+WPMODE                                      Decay modes for W+ in parton
+'UP',...,'TAU+'          'ALL'              cascade. See JETTYPE.
+
+WTYPE                                       Select W type: W+,W-,GM,Z0.
+type1,type2              'GM','Z0'          Do not mix W+,W- and GM,Z0.
+
+X                                           Feynman x limits for jets.
+xmin(1),...,xmax(3)      -1.,1.
+
+XGEN                                        Jet fragmentation, Peterson
+a(1),...,a(8)            .96,3,0,.8,.5,...  with Eps=xgen/m**2, n=4-8.
+
+XGENSS                                      Fragmentation of GLSS, UPSS,
+a(1),...,a(7)            .5,.5,...          etc. with eps=xgenss/m**2
+
+XW                                          Feynman x limits for W.
+xmin,xmax                -1.,1.
+
+Y                                           Y limits for each jet.
+ymin(1),...,ymax(3)      from pt            Do not set both Y and TH.
+
+YW                                          Y limits for W.
+ymin,ymax                from qt,q          Do not set both Y and TH.
+
+Z0MODE                                      Decay modes for Z0 in parton
+'UP',...,'TAU+'          'ALL'              cascade. See JETTYPE.
+
+
+      For example the cards
+P
+40.,50.,10.,100./
+would set limits for the momentum of jet 1 between 40. and 50. GeV, and
+for jet 2 between 10. and 100. GeV. As another example the cards
+WTYPE
+'W+'/
+would specify that for DRELLYAN events only W+ events will be generated.
+If for a kinematic variable only the lower limit is specified then that
+parameter is fixed to the given value. Thus the cards
+P
+40.,,10./
+will fix the momentum for jet 1 to be 40. GeV and for jet 2 to be 10.
+GeV. If only the upper limit is specified then the default value is used
+for the lower limit. Jet 1 or jet 2 parameters for DRELLYAN events refer
+to the W decay products and cannot be fixed. If QTW is fixed to 0, then
+standard Drell-Yan events are generated.
+
+      Note that if the limits given cover too large a kinematic range,
+the program can become very inefficient, since it makes a fit to the
+cross section over the specified range. NTRIES has to be increased if
+narrow limits are set for X, XW or for jet 1 and jet 2 parameters in
+DRELLYAN events. For larger ranges several runs can be combined together
+using the integrated cross section per event SIGF/NEVENT as the weight.
+This cross section is calculated for each run by Monte Carlo integration
+over the specified kinematic limits and is printed at the end of the
+run. It is corrected for JETTYPEi, WTYPE, and WMODEi selections; it
+cannot be corrected for branching ratios of forced decays or for WPMODE,
+WMMODE, or Z0MODE selections, since these can affect an arbitrary number
+of particles.
+
+      Normally the user should set PT limits for TWOJET, PHOTON, WPAIR,
+and SUPERSYM events and QMW and QTW limits for DRELLYAN, HIGGS, and
+TCOLOR events. If these limits are not set, they will be selected as
+fractions of Ecm. This can give nonsense. For TWOJET the pt range should
+usually be less than about a factor of two except for b and t jets at
+low pt to produce uniform statistics. For W+, W-, or Z0 events or for
+Higgs events the QMW (QMH) range should usually include the mass. But
+one can select different limits to study, e.g., virtual W production or
+the effect of a lighter or heavier Higgs on WW scattering. If only t
+decays are selected, then the lower QMW limit must be above the t
+threshold. For standard Drell-Yan events QTW should be fixed to zero,
+QTW
+0/
+Transverse momenta will then be generated by initial state gluon
+radiation. A range of QTW can also be given. For SUPERSYM the masses and
+decay modes should be specified. For fourth generation quarks it is
+necessary to specify the quark masses and the decay modes for hadrons
+made of x,y plus u,d,s quarks.
+
+      SAME cannot be used to combine standard DRELLYAN events (QTW fixed
+equal to 0) and DRELLYAN events with nonzero QTW.
+
+      For HIGGS with W+ W- or Z0 Z0 decays allowed it is generally
+necessary to set PT limits for the W's, e.g.
+PT
+50,20000,50,20000/
+If this is not done, then the default lower limit of 1 GeV is used, and
+the t-channel exchanges will dominate, as they should in the effective W
+approximation. Depending on the other parameters, the program may fail
+to generate an event in NTRIES tries.
+
+      SUPERSYM (SUSY) by default generates just gluinos and squarks in
+pairs. There are no default masses or decay modes. Masses can be set
+using GAUGINO, SQUARK, SLEPTON, and HMASSES. Decay modes can be
+specified with FORCE or by modifying the decay table. Left and right
+squarks are distinguished but assumed to be degenerate, except
+for stops. Types can be
+selected with JETTYPEi using either the normal names or their
+supersymmetric analogs. For example
+JETTYPE1
+'GL','UP'/
+selects GLSS, UPSSL, UPSSR. So does
+JETTYPE1
+'GLSS','UPSSL','UPSSR'/
+Generation of pure photinos, winos, and zinos is no longer supported.
+
+      If MSSM1, MSSM2 and MSSM3 are given, then the specified parameters
+are used to calculate all the masses and decay modes with the ISASUSY
+package assuming the minimal supersymmetric extension of the standard
+model (MSSM). There are no default values, so you must specify parameters
+for each MSSMi. The parameters and the use of the MSSM is
+preserved if the title is SAME. FORCE can be used to override the
+calculated branching ratios. The MSSM option also generates charginos
+and neutralinos with cross sections based on the MSSM mixing angles in
+addition to squarks and sleptons. These can be selected with JETTYPEi;
+the complete list of supersymmetric options is:
+'GLSS',
+'UPSSL','UBSSL','DNSSL','DBSSL','STSSL','SBSSL','CHSSL','CBSSL',
+'BTSSL','BBSSL','TPSS1','TBSS1',
+'UPSSR','UBSSR','DNSSR','DBSSR','STSSR','SBSSR','CHSSR','CBSSR',
+'BTSSR','BBSSR','TPSS2','TBSS2',
+'W1SS+','W1SS-','W2SS+','W2SS-','Z1SS','Z2SS','Z3SS','Z4SS',
+'NUEL','ANUEL','EL-','EL+','NUML','ANUML',MUL-','MUL+','NUTL',
+'ANUTL','TAUL-','TAUL+','ER-','ER+','MUR-','MUR+','TAUR-','TAUR+',
+'SQUARKS','GAUGINOS','SLEPTONS'.
+Note that mixing between L and R stop states results in 1 (light) and 2
+(heavy) stop eigenstates, which depend on the input parameters of left-
+and right- stop masses, plus A_t, mu and tan(beta). The last three
+JETTYPE's generate respectively all allowed combinations of squarks and
+antisquarks, all combinations of charginos and neutralinos, and all
+combinations of sleptons and sneutrinos.
+
+      The FORCE keyword requires special care. Its list must contain the
+numerical particle IDENT codes, e.g.
+FORCE
+140,130,-120/
+The charge-conjugate mode is also forced for its antiparticle. Thus the
+above example forces both AD0 --> K+ PI- and D0 --> K- PI+. If only a
+specific decay is wanted one should use the FORCE1 command; e.g.
+FORCE1
+140,130,-120/
+only forces AD0 --> K+ PI-.
+
+      To force a heavy quark decay one must generally separately force
+each hadron containing it. If the decay is into three leptons or quarks,
+then the real or virtual W propagator is inserted automatically. One can
+force all particles containing a top or 4th generation quark to decay in
+a given mode by forcing a quark decay. This automatically generates the
+equivalent FORCE's for the corresponding hadrons. For example,
+FORCE1
+6,-12,11,5/
+forces all particles containing a top quark to decay into an positron,
+neutrino and a b-quark (which will be hadronized). If the top mass is
+greater than the W mass, then the positron and neutrino will come from a
+real W.
+
+      Forced modes included in the decay table will automatically be put
+into the correct order. Modes not listed in the decay table are allowed,
+but caution is advised because a wrong decay mode can cause an infinite
+loop or other unexpected effects.
+
+      FORCE (FORCE1) can be called at most 20 (40) times in any run plus
+all subsequent 'SAME' runs. If it is called more than once for a given
+parent, all calls are listed, and the last call is used. Note that FORCE
+applies to particles only, but that for gamma, W+, W-, Z0 and
+supersymmetric particles the same IDENT codes are used both as jet types
+and as particles.
+
+
+[7] OUTPUT TAPE
+
+      The output tape or file contains three types of records. A
+beginning record is written by a call to ISAWBG before generating a set
+of events; an event record is written by a call to ISAWEV for each
+event; and an end record is written for each run by a call to ISAWND.
+These subroutines load the common blocks described below into a single
+COMMON/ZEVEL/ZEVEL(1024) and write it out when it is full. A subroutine
+RDTAPE, described in the next section, inverts this process so that the
+user can analyse the event.
+
+      ZEVEL is written out to TAPEj by a call to BUFOUT. For the CDC
+version IF=PAIRPAK is selected; BUFOUT first packs two words from
+ZEVEL into one word in COMMON/ZVOUT/ZVOUT(512) using subroutine
+PAIRPAK and then does a buffer out of ZVOUT to TAPEj. Typically at
+least two records are written per event. For all other computers
+IF=STDIO is selected, and ZEVEL is written out with a standard FORTRAN
+unformatted write.
+
+      Beginning Record: At the start of each run ISAWBG is called. It
+writes out the following common blocks:
+
+      COMMON/DYLIM/QMIN,QMAX,QTMIN,QTMAX,YWMIN,YWMAX,XWMIN,XWMAX,THWMIN,
+     2  THWMAX,PHWMIN,PHWMAX
+     3  ,SETLMQ(12)
+      SAVE /DYLIM/
+      LOGICAL SETLMQ
+      EQUIVALENCE(BLIM1(1),QMIN)
+      REAL      QMIN,QMAX,QTMIN,QTMAX,YWMIN,YWMAX,XWMIN,XWMAX,THWMIN,
+     +          THWMAX,PHWMIN,PHWMAX,BLIM1(12)
+QMIN,QMAX          =W mass limits
+QTMIN,QTMAX        =W qt limits
+YWMIN,YWMAX        =W rapidity limits
+XWMIN,XWMAX        =W xf limits
+THWMIN,THWMAX      =W theta limits
+PHWMIN,PHWMAX      =W phi limits
+
+      COMMON/IDRUN/IDVER,IDG(2),IEVT,IEVGEN
+      SAVE /IDRUN/
+      INTEGER   IDVER,IDG,IEVT,IEVGEN
+IDVER              =program version
+IDG(1)             =run date (10000*month+100*day+year)
+IDG(2)             =run time (10000*hour+100*minute+second)
+IEVT               =event number
+
+      COMMON/JETLIM/PMIN(3),PMAX(3),PTMIN(3),PTMAX(3),YJMIN(3),YJMAX(3)
+     1 ,PHIMIN(3),PHIMAX(3),XJMIN(3),XJMAX(3),THMIN(3),THMAX(3)
+     2 ,SETLMJ(36)
+      SAVE /JETLIM/
+      EQUIVALENCE(BLIMS(1),PMIN(1))
+      LOGICAL SETLMJ
+      COMMON/FIXPAR/FIXP(3),FIXPT(3),FIXYJ(3),FIXPHI(3),FIXXJ(3)
+     2   ,FIXQM,FIXQT,FIXYW,FIXXW,FIXPHW
+      LOGICAL FIXQM,FIXQT,FIXYW,FIXXW,FIXPHW
+      LOGICAL FIXP,FIXPT,FIXYJ,FIXPHI,FIXXJ
+      COMMON/SGNPAR/CTHS(2,3),THS(2,3),YJS(2,3),XJS(2,3)
+      REAL      PMIN,PMAX,PTMIN,PTMAX,YJMIN,YJMAX,PHIMIN,PHIMAX,XJMIN,
+     +          XJMAX,THMIN,THMAX,BLIMS(36),CTHS,THS,YJS,XJS
+PMIN,PMAX          =jet momentum limits
+PTMIN,PTMAX        =jet pt limits
+YJMIN,YJMAX        =jet rapidity limits
+PHIMIN,PHIMAX      =jet phi limits
+THMIN,THMAX        =jet theta limits
+
+      COMMON/KEYS/IKEYS,KEYON,KEYS(10)
+      COMMON/XKEYS/REAC
+      SAVE /KEYS/,/XKEYS/
+      LOGICAL KEYS
+      LOGICAL KEYON
+      CHARACTER*8 REAC
+      INTEGER   IKEYS
+KEYON              =normally TRUE, FALSE if no good reaction
+KEYS               =TRUE if reaction I is chosen
+                    1 for TWOJET
+                    2 for E+E-
+                    3 for DRELLYAN
+                    4 for MINBIAS
+                    5 for SUPERSYM
+                    6 for WPAIR
+REAC               =character reaction code
+
+      COMMON/PRIMAR/NJET,SCM,HALFE,ECM,IDIN(2),NEVENT,NTRIES,NSIGMA
+      SAVE /PRIMAR/
+      INTEGER   NJET,IDIN,NEVENT,NTRIES,NSIGMA
+      REAL      SCM,HALFE,ECM
+NJET               =number of jets per event
+SCM                =square of com energy
+HALFE              =beam energy
+ECM                =com energy
+IDIN               =ident code for initial beams
+NEVENT             =number of events to be generated
+NTRIES             =maximum number of tries for good jet parameters
+NSIGMA            =number of extra events to determine SIGF
+
+      INTEGER MXGOQ
+      PARAMETER (MXGOQ=51)
+      COMMON/Q1Q2/GOQ(MXGOQ,3),GOALL(3),GODY(4),STDDY,GOWW(25,2),
+     $ALLWW(2),GOWMOD(25,3)
+      SAVE /Q1Q2/
+      LOGICAL GOQ,GOALL,GODY,STDDY,GOWW,ALLWW,GOWMOD
+GOQ(I,K)           =TRUE if quark type I allowed for jet k
+                    I= 1  2  3  4  5  6  7  8  9 10 11 12 13
+                      GL UP UB DN DB ST SB CH CB BT BB TP TB
+                    I= 14   15 16 17  18   19  20  21  22   23   24   25
+                      NUE ANUE E- E+ NUM ANUM MU- MU+ NUT ANUT TAU- TAU+
+GOALL(K)           =TRUE if all jet types allowed
+GODY(I)            =TRUE if W type I is allowed.
+                    I= 1  2  3  4
+                      GM W+ W- Z0
+STDDY              =TRUE if standard DRELLYAN
+GOWW(I,K)          =TRUE if I is allowed in the decay of K for WPAIR.
+ALLWW(K)           =TRUE if all allowed in the decay of K for WPAIR.
+
+      COMMON/QCDPAR/ALAM,ALAM2,CUTJET,ISTRUC
+      SAVE /QCDPAR/
+      INTEGER   ISTRUC
+      REAL      ALAM,ALAM2,CUTJET
+ALAM               =QCD lambda
+ALAM2              =ALAM**2
+CUTJET             =cutoff for generating secondary partons
+ISTRUC             =3 for Eichten (EHLQ), 4 for Duke (DO) structure
+                    functions
+
+      COMMON/QLMASS/AMLEP(100),NQLEP,NMES,NBARY
+      SAVE /QLMASS/
+      INTEGER   NQLEP,NMES,NBARY
+      REAL      AMLEP
+AMLEP(6:8)         =t,y,x masses, only elements written
+
+
+      Event Record: For each event ISAWEV is called. It writes out the
+following common blocks:
+
+      COMMON/FINAL/NKINF,SIGF,ALUM,ACCEPT,NRECS
+      SAVE /FINAL/
+      INTEGER   NKINF,NRECS
+      REAL      SIGF,ALUM,ACCEPT
+SIGF              =integrated cross section, only element written
+
+      COMMON/IDRUN/IDVER,IDG(2),IEVT,IEVGEN
+      SAVE /IDRUN/
+      INTEGER   IDVER,IDG,IEVT,IEVGEN
+IDVER              =program version
+IDG                =run identification
+IEVT               =event number
+
+      COMMON/JETPAR/P(3),PT(3),YJ(3),PHI(3),XJ(3),TH(3),CTH(3),STH(3)
+     1 ,JETTYP(3),SHAT,THAT,UHAT,QSQ,X1,X2,PBEAM(2)
+     2 ,QMW,QW,QTW,YW,XW,THW,QTMW,PHIW,SHAT1,THAT1,UHAT1,JWTYP
+     3 ,ALFQSQ,CTHW,STHW,Q0W
+     4 ,INITYP(2),ISIGS,PBEAMS(5)
+      SAVE /JETPAR/
+      INTEGER   JETTYP,JWTYP,INITYP,ISIGS
+      REAL      P,PT,YJ,PHI,XJ,TH,CTH,STH,SHAT,THAT,UHAT,QSQ,X1,X2,
+     +          PBEAM,QMW,QW,QTW,YW,XW,THW,QTMW,PHIW,SHAT1,THAT1,UHAT1,
+     +          ALFQSQ,CTHW,STHW,Q0W,PBEAMS
+P                  =jet momentum
+PT                 =jet pt
+YJ                 =jet rapidity
+PHI                =jet phi
+XJ                 =jet xf
+TH                 =jet theta
+CTH                =jet cos(theta)
+STH                =jet sin(theta)
+JETTYP             =jet type. The code is listed under /q1q2/ above
+SHAT,THAT,UHAT     =hard scattering invariants
+QSQ                =effective Q**2
+X1,X2              =initial parton xf
+PBEAM              =remaining beam momentum
+QMW                =W mass
+QW                 =W momentum
+QTW                =W transverse momentum
+YW                 =W rapidity
+XW                 =W xf
+THW                =W theta
+QTMW               =SQRT(QTW**2+QMW**2)
+PHIW               =W phi
+SHAT1,THAT1,UHAT1  =invariants for W decay
+JWTYP              =W type. The code is listed under /q1q2/ above.
+ALFQSQ             =QCD coupling at QSQ
+CTHW               =W cos(theta)
+STHW               =W sin(theta)
+Q0W                =W energy
+
+      INTEGER   MXJSET,JPACK
+      PARAMETER (MXJSET=400,JPACK=1000)
+      COMMON/JETSET/NJSET,PJSET(5,MXJSET),JORIG(MXJSET),JTYPE(MXJSET),
+     $JDCAY(MXJSET)
+      SAVE /JETSET/
+      INTEGER   NJSET,JORIG,JTYPE,JDCAY
+      REAL      PJSET
+NJSET              =number of partons
+PJSET(1,I)         =px of parton I
+PJSET(2,I)         =py of parton I
+PJSET(3,I)         =pz of parton I
+PJSET(4,I)         =p0 of parton I
+PJSET(5,I)         =mass of parton I
+JORIG(I)           =JPACK*JET+K if I is a decay product of K.
+                    IF K=0 then i is a primary parton.
+                   (JET = 1,2,3 for final jets.)
+                   (JET = 11,12 for initial jets.)
+JTYPE(I)           =IDENT code for parton I
+JDCAY(I)           =JPACK*K1+K2 if K1 and K2 are decay products of I.
+                    If JDCAY(I)=0 then I is a final parton
+MXJSET             =dimension for /JETSET/ arrays.
+JPACK              =packing integer for /JETSET/ arrays.
+
+      INTEGER   MXSIGS,IOPAK
+      PARAMETER (MXSIGS=3000,IOPAK=100)
+      COMMON/JETSIG/SIGMA,SIGS(MXSIGS),NSIGS,INOUT(MXSIGS),SIGEVT
+      SAVE /JETSIG/
+      INTEGER   NSIGS,INOUT
+      REAL      SIGMA,SIGS,SIGEVT
+SIGMA              =cross section summed over types
+SIGS(I)            =cross section for reaction I (not written)
+NSIGS              =number of nonzero cross sections (not written)
+INOUT(I)           =packed partons for process I (not written)
+MXSIGS             =dimension for JETSIG arrays (not written)
+SIGEVT             =partial cross section for selected channel
+
+      INTEGER   MXPTCL,IPACK
+      PARAMETER (MXPTCL=4000,IPACK=10000)
+      COMMON/PARTCL/NPTCL,PPTCL(5,MXPTCL),IORIG(MXPTCL),IDENT(MXPTCL)
+     1,IDCAY(MXPTCL)
+      SAVE /PARTCL/
+      INTEGER   NPTCL,IORIG,IDENT,IDCAY
+      REAL      PPTCL
+NPTCL              =number of particles
+PPTCL(1,I)         =px for particle I
+PPTCL(2,I)         =py for particle I
+PPTCL(3,I)         =pz for particle I
+PPTCL(4,I)         =p0 for particle I
+PPTCL(5,I)         =mass for particle I
+IORIG(I)           =IPACK*JET+K if I is a decay product of K.
+                   =-(IPACK*JET+K) if I is a primary particle from
+                     parton K in /JETSET/.
+                   =0 if I is a primary beam particle.
+                   (JET = 1,2,3 for final jets.)
+                   (JET = 11,12 for initial jets.)
+IDENT(I)           =IDENT code for particle I
+IDCAY(I)           =IPACK*K1+K2 if decay products are K1-K2 inclusive.
+                    If IDCAY(I)=0 then particle I is stable.
+MXPTCL             =dimension for /PARTCL/ arrays.
+IPACK              =packing integer for /PARTCL/ arrays.
+
+      COMMON/PINITS/PINITS(5,2),IDINIT(2)
+      SAVE /PINITS/
+      INTEGER   IDINIT
+      REAL      PINITS
+PINITS(1,I)        =px for initial parton I
+PINITS(2,I)        =py for initial parton I
+PINITS(3,I)        =pz for initial parton I
+PINITS(4,I)        =p0 for initial parton I
+PINITS(5,I)        =mass for initial parton I
+IDINIT(I)          =IDENT for initial parton I
+
+      INTEGER MXJETS
+      PARAMETER (MXJETS=10)
+      COMMON/PJETS/PJETS(5,MXJETS),IDJETS(MXJETS),QWJET(5),IDENTW
+     $,PPAIR(5,4),IDPAIR(4),JPAIR(4),NPAIR,IFRAME(MXJETS)
+      SAVE /PJETS/
+      INTEGER   IDJETS,IDENTW,IDPAIR,JPAIR,NPAIR,IFRAME
+      REAL      PJETS,QWJET,PPAIR
+PJETS(1,I)         =px for jet I
+PJETS(2,I)         =py for jet I
+PJETS(3,I)         =pz for jet I
+PJETS(4,I)         =p0 for jet I
+PJETS(5,I)         =mass for jet I
+IDJETS(I)          =IDENT code for jet I
+QWJET(1)           =px for W
+QWJET(2)           =py for W
+QWJET(3)           =pz for W
+QWJET(4)           =p0 for W
+QWJET(5)           =mass for W
+IDENTW             =IDENT CODE for W
+PPAIR(1,I)         =px for WPAIR decay product I
+PPAIR(2,I)         =py for WPAIR decay product I
+PPAIR(3,I)         =pz for WPAIR decay product I
+PPAIR(4,I)         =p0 for WPAIR decay product I
+PPAIR(5,I)         =mass for WPAIR decay product I
+IDPAIR(I)          =IDENT code for WPAIR product I
+JPAIR(I)           =JETTYPE code for WPAIR product I
+NPAIR              =2 for W+- GM events, 4 otherwise.
+
+      COMMON/TOTALS/NKINPT,NWGEN,NKEEP,SUMWT,WT
+      SAVE /TOTALS/
+      INTEGER   NKINPT,NWGEN,NKEEP
+      REAL      SUMWT,WT
+NKINPT             =number of kinematic points generated.
+NWGEN              =number of W+jet events accepted.
+NKEEP              =number of events kept.
+SUMWT              =sum of weighted cross sections.
+WT                 =current weight. (SIGMA*WT gives event weight.)
+
+      COMMON/WSIG/SIGLLQ
+      SAVE /WSIG/
+      REAL      SIGLLQ
+SIGLLQ             =DRELLYAN cross section for W decay.
+
+Of course irrelevant common blocks such as /WSIG/ for TWOJET events are
+not written out.
+
+
+      End Record: At the end of a set ISAWND is called. It writes out
+the following common block:
+
+      COMMON/FINAL/NKINF,SIGF,ALUM,ACCEPT,NRECS
+      SAVE /FINAL/
+      INTEGER   NKINF,NRECS
+      REAL      SIGF,ALUM,ACCEPT
+NKINF             =number of points generated to calculate SIGF
+SIGF              =integrated cross section for this run
+ALUM              =equivalent luminosity for this run
+ACCEPT            =ratio of events kept over events generated
+NRECS             =number of physical records for this run
+
+      Events within a given run have uniform weight. Separate runs can
+be combined together using SIGF/NEVENT as the weight per event. This
+gives a true cross section in mb units.
+
+      The user can replace subroutines ISAWBG, ISAWEV, and ISAWND to
+write out the events in a different format or to update histograms
+using HBOOK or any similar package.
+
+
+
+[8] TAPE READING
+
+      The FORTRAN instruction
+      CALL RDTAPE(IDEV,IFL)
+will read a beginning record, an end record or an event (which can be
+more than one record). IDEV is the tape number and
+      IFL=0  for a good read,
+      IFL=-1 for an end of file.
+The information is restored to the common blocks described above. The
+type of record is contained in
+
+      COMMON/RECTP/IRECTP,IREC
+      SAVE /RECTP/
+      INTEGER   IRECTP,IREC
+IRECTP            =100 for an event record
+IRECTP            =200 for a beginning record
+IRECTP            =300 for an end record
+IREC              =no. of physical records in event record, 0 otherwise
+
+      The parton momenta from the primary hard scattering are
+contained in /PJETS/. The parton momenta generated by the QCD cascade
+are contained in /JETSET/. The hadron momenta both from the QCD jets
+and from the beam jets are contained in /PARTCL/. The final hadron
+momenta and the associated pointers should be used to calculate the
+jet momenta, since they are changed both by the QCD cascade and by
+hadronization. Particles with IDCAY=0 are stable, while the others are
+resonances.
+
+      The weight per event needed to produce a weighted histogram in
+millibarn units is SIGF/NEVENT. The integrated cross section SIGF is
+calculated by Monte Carlo integration during the run for the given
+kinematic limits and JETTYPE, WTYPE, and WMODE selections. Any of three
+methods can be used to find the value of SIGF:
+      (1) The current value, which is written out with each event, can
+be used. To prevent enormous fluctuations at the beginning of a run,
+NSIGMA extra primary parton events are generated first. The default
+value, NSIGMA = 20, gives negligible overhead but may not be large
+enough for good accuracy.
+      (2) The value SIGF calculated with the full statistics of the run
+can be obtained by reading through the tape until an end record
+(IRECTP=300) is found. After SIGF is saved with a different name, the
+first event record for the run can be found by backspacing the tape
+NRECS times.
+      (3) Unweighted histograms can be made for the run and the weight
+added after the end record is found. An implementation of this using
+special features of HBOOK is contained in ISAPLT.
+
+      The functions AMASS(IDENT), CHARGE(IDENT), and LABEL(IDENT) are
+available to determine the mass, charge, and character label in A8
+format. Subroutine FLAVOR returns the quark content of any hadron and
+may be useful to convert IDENT codes to other schemes. CALL PRTEVT(0)
+prints an event.
+
+
+
+[9] DECAY TABLE
+
+      ISAJET uses an external table of decay modes. Particles can be
+put into the table in arbitrary order, but all modes for each particle
+must be grouped together. The table is rewound and read in before each
+run with a READ* format. Each entry must have the form
+
+IDENT,ITYPE,CBR,ID1,ID2,ID3,ID4,ID5/
+
+where IDENT is the code for the parent particle, ITYPE specifies the
+type of decay,
+      ITYPE=1 for strong,
+      ITYPE=2 for electromagnetic,
+      ITYPE=3 for weak,
+CBR is the cumulative branching ratio, and ID1,...,ID5 are the IDENT
+codes for the decay products. The parent IDENT must be positive; the
+charge conjugate mode is used for the antiparticle. The values of CBR
+must of course be positive and monotonically increasing for each mode,
+with the last value being 1.00 for each parent IDENT. The last parent
+IDENT code must be zero. Care should be taken in adding new modes,
+since there is no checking for validity. In some cases order is
+important; note in particular that quarks and gluons must always
+appear last so that they can be removed and fragmented into hadrons.
+
+      After the decay table there is a space for text, which is printed
+under the heading of ISAJET NOTES for each run. It must be terminated
+by a line containing ////. This feature is used at BNL to announce new
+versions and other changes.
+
+      The decay table is contained in patch ISADECAY.
+
+
+
+[10] IDENT CODES
+
+      ISAJET uses a numerical ident code for particle types. Quarks
+and leptons are numbered in order of mass:
+         UP     = 1             NUE    = 11
+         DN     = 2             E-     = 12
+         ST     = 3             NUM    = 13
+         CH     = 4             MU-    = 14
+         BT     = 5             NUT    = 15
+         TP     = 6             TAU-   = 16
+with a negative sign for antiparticles. Arbitrary conventions are:
+         GL     = 9
+         GM     = 10
+         KS     = 20
+         KL     =-20
+         W+     = 80
+         Z0     = 90
+The supersymmetric particle IDENT codes distinguish between the
+partners of left and right handed fermions and include the Higgs
+sector of the minimal supersymmetric model:
+         UPSSL ... TPSS1 = 21 ... 26
+         NUEL ... TAUL- = 31 ... 36
+         UPSSR ... TPSS2 = 41 ... 46
+         NUER ... TAUR- = 51 ... 56
+         GLSS = 29
+         Z1SS = 30             Z2SS = 40
+         Z3SS = 50             Z4SS = 60
+         W1SS+ = 39            W2SS+ = 49
+
+         HL0 = 82              HH0 = 83
+         HA0 = 84              H+ = 86
+The code for a meson is a compound integer +-JKL, where J.LE.K are the
+quarks and L is the spin. The sign is for the J quark. Glueball IDENT
+codes have not been selected, but the choice GL=9 clearly allows 990,
+9990, etc. Flavor singlet mesons are ordered by mass,
+         PI0    = 110
+         ETA    = 220
+         ETAP   = 330
+         ETAC   = 440
+which is natural for the heavy quarks. Similarly, the code for a
+baryon is a compound integer +-IJKL formed from the three quarks I,J,K
+and a spin label L=0,1. The code for a diquark is +-IJ00.
+
+      A routine PRTLST is provided to print out a complete list of valid
+IDENT codes and associated information. The usage is
+
+      CALL PRTLST(LUN, AMY, AMX)
+
+where LUN is the unit number and AMY and AMX are the masses of the Y and
+X quarks respectively. This routine should be linked with the ISAJET
+library and with ALDATA.
+
+      The complete list of ident codes follows:
+
+      IDENT     LABEL           MASS    CHARGE
+          1     UP        .30000E+00       .67
+         -1     UB        .30000E+00      -.67
+          2     DN        .30000E+00      -.33
+         -2     DB        .30000E+00       .33
+          3     ST        .50000E+00      -.33
+         -3     SB        .50000E+00       .33
+          4     CH        .16000E+01       .67
+         -4     CB        .16000E+01      -.67
+          5     BT        .49000E+01      -.33
+         -5     BB        .49000E+01       .33
+          6     TP        TMASS            .67
+         -6     TB        TMASS           -.67
+
+          9     GL       0.               0.00
+
+         10     GM       0.               0.00
+
+         11     NUE      0.               0.00
+        -11     ANUE     0.               0.00
+         12     E-        .51100E-03     -1.00
+        -12     E+        .51100E-03      1.00
+         13     NUM      0.               0.00
+        -13     ANUM     0.               0.00
+         14     MU-       .10566E+00     -1.00
+        -14     MU+       .10566E+00      1.00
+         15     NUT      0.               0.00
+        -15     ANUT     0.               0.00
+         16     TAU-      .18070E+01     -1.00
+        -16     TAU+      .18070E+01      1.00
+
+         20     KS        .49767E+00      0.00
+        -20     KL        .49767E+00      0.00
+
+         21     UPSSL     none            0.67
+        -21     UBSSL     none           -0.67
+         22     DNSSL     none           -0.33
+        -22     DBSSL     none            0.33
+         23     STSSL     none           -0.33
+         23     SBSSL     none            0.33
+         24     CHSSL     none            0.67
+        -24     CBSSL     none           -0.67
+         25     BTSSL     none           -0.33
+        -25     BBSSL     none            0.33
+         26     TPSS1     none            0.67
+        -26     TBSS1     none           -0.67
+
+         29     GLSS      none            0.00
+         30     Z1SS      none            0.00
+
+         31     NUEL      none            0.00
+        -31     ANUEL     none            0.00
+         32     EL-       none           -1.00
+        -32     EL+       none           +1.00
+         33     NUML      none            0.00
+        -33     ANUML     none            0.00
+         34     MUL-      none           -1.00
+        -34     MUL+      none           +1.00
+         35     NUTL      none            0.00
+        -35     ANUTL     none            0.00
+         36     TAUL-     none           -1.00
+        -36     TAUL+     none           -1.00
+
+         39     W1SS+     none            1.00
+        -39     W1SS-     none           -1.00
+         40     Z2SS      none            0.00
+
+         41     UPSSR     none            0.67
+        -41     UBSSR     none           -0.67
+         42     DNSSR     none           -0.33
+        -42     DBSSR     none            0.33
+         43     STSSR     none           -0.33
+         43     SBSSR     none            0.33
+         44     CHSSR     none            0.67
+        -44     CBSSR     none           -0.67
+         45     BTSSR     none           -0.33
+        -45     BBSSR     none            0.33
+         46     TPSS2     none            0.67
+        -46     TBSS2     none           -0.67
+
+         49     W2SS+     none            1.00
+        -49     W2SS-     none           -1.00
+         50     Z3SS      none            0.00
+
+         51     NUER      none            0.00
+        -51     ANUER     none            0.00
+         52     ER-       none           -1.00
+        -52     ER+       none           +1.00
+         53     NUMR      none            0.00
+        -53     ANUMR     none            0.00
+         54     MUR-      none           -1.00
+        -54     MUR+      none           +1.00
+         55     NUTR      none            0.00
+        -55     ANUTR     none            0.00
+         56     TAUR-     none           -1.00
+        -56     TAUR+     none           -1.00
+         60     Z4SS      none            0.00
+
+         80     W+        WMASS           1.00
+         81     HIGGS     HMASS           0.00
+         82     HL0       none            0.00
+         83     HH0       none            0.00
+         84     HA0       none            0.00
+         86     H+        none            1.00
+         90     Z0        WMASS           0.00
+
+
+        110     PI0       .13496E+00      0.00
+        120     PI+       .13957E+00      1.00
+       -120     PI-       .13957E+00     -1.00
+        220     ETA       .54880E+00      0.00
+        130     K+        .49367E+00      1.00
+       -130     K-        .49367E+00     -1.00
+        230     K0        .49767E+00      0.00
+       -230     AK0       .49767E+00      0.00
+        330     ETAP      .95760E+00      0.00
+        140     AD0       .18633E+01      0.00
+       -140     D0        .18633E+01      0.00
+        240     D-        .18683E+01     -1.00
+       -240     D+        .18683E+01      1.00
+        340     F-        .20300E+01     -1.00
+       -340     F+        .20300E+01      1.00
+        440     ETAC      .29760E+01      0.00
+        150     UB.       .51700E+01      1.00
+       -150     BU.       .51700E+01     -1.00
+        250     DB.       .51700E+01      0.00
+       -250     BD.       .51700E+01      0.00
+        350     SB.       .53700E+01      0.00
+       -350     BS.       .53700E+01      0.00
+        450     CB.       .64700E+01      1.00
+       -450     BC.       .64700E+01     -1.00
+        550     BB.       .97700E+01      0.00
+        160     UT.       TMASS           0.00
+       -160     TU.       TMASS           0.00
+        260     DT.       TMASS          -1.00
+       -260     TD.       TMASS           1.00
+        360     ST.       TMASS          -1.00
+       -360     TS.       TMASS           1.00
+        460     CT.       TMASS           0.00
+       -460     TC.       TMASS           0.00
+        560     BT.       TMASS          -1.00
+       -560     TB.       TMASS           1.00
+        660     TT.       TMASS           0.00
+
+        111     RHO0      .77600E+00      0.00
+        121     RHO+      .77600E+00      1.00
+       -121     RHO-      .77600E+00     -1.00
+        221     OMEG      .78260E+00      0.00
+        131     K*+       .88810E+00      1.00
+       -131     K*-       .88810E+00     -1.00
+        231     K*0       .89220E+00      0.00
+       -231     AK*0      .89220E+00      0.00
+        331     PHI       .10196E+01      0.00
+        141     AD*0      .20060E+01      0.00
+       -141     D*0       .20060E+01      0.00
+        241     D*-       .20086E+01     -1.00
+       -241     D*+       .20086E+01      1.00
+        341     F*-       .21400E+01     -1.00
+       -341     F*+       .21400E+01      1.00
+        441     JPSI      .30970E+01      0.00
+        151     UB*       .52100E+01      1.00
+       -151     BU*       .52100E+01     -1.00
+        251     DB*       .52100E+01      0.00
+       -251     BD*       .52100E+01      0.00
+        351     SB*       .54100E+01      0.00
+       -351     BS*       .54100E+01      0.00
+        451     CB*       .65100E+01      1.00
+       -451     BC*       .65100E+01     -1.00
+        551     UPSL      .98100E+01      0.00
+        161     UT*       TMASS           0.00
+       -161     TU*       TMASS           0.00
+        261     DT*       TMASS          -1.00
+       -261     TD*       TMASS           1.00
+        361     ST*       TMASS          -1.00
+       -361     TS*       TMASS           1.00
+        461     CT*       TMASS           0.00
+       -461     TC*       TMASS           0.00
+        561     BT*       TMASS          -1.00
+       -561     TB*       TMASS           1.00
+        661     TT*       TMASS           0.00
+
+
+       1120     P         .93828E+00      1.00
+      -1120     AP        .93828E+00     -1.00
+       1220     N         .93957E+00      0.00
+      -1220     AN        .93957E+00      0.00
+       1130     S+        .11894E+01      1.00
+      -1130     AS-       .11894E+01     -1.00
+       1230     S0        .11925E+01      0.00
+      -1230     AS0       .11925E+01      0.00
+       2130     L         .11156E+01      0.00
+      -2130     AL        .11156E+01      0.00
+       2230     S-        .11974E+01     -1.00
+      -2230     AS+       .11974E+01      1.00
+       1330     XI0       .13149E+01      0.00
+      -1330     AXI0      .13149E+01      0.00
+       2330     XI-       .13213E+01     -1.00
+      -2330     AXI+      .13213E+01      1.00
+       1140     SC++      .24300E+01      2.00
+      -1140     ASC--     .24300E+01     -2.00
+       1240     SC+       .24300E+01      1.00
+      -1240     ASC-      .24300E+01     -1.00
+       2140     LC+       .22600E+01      1.00
+      -2140     ALC-      .22600E+01     -1.00
+       2240     SC0       .24300E+01      0.00
+      -2240     ASC0      .24300E+01      0.00
+       1340     USC.      .25000E+01      1.00
+      -1340     AUSC.     .25000E+01     -1.00
+       3140     SUC.      .24000E+01      1.00
+      -3140     ASUC.     .24000E+01     -1.00
+       2340     DSC.      .25000E+01      0.00
+      -2340     ADSC.     .25000E+01      0.00
+       3240     SDC.      .24000E+01      0.00
+      -3240     ASDC.     .24000E+01      0.00
+       3340     SSC.      .26000E+01      0.00
+      -3340     ASSC.     .26000E+01      0.00
+       1440     UCC.      .35500E+01      2.00
+      -1440     AUCC.     .35500E+01     -2.00
+       2440     DCC.      .35500E+01      1.00
+      -2440     ADCC.     .35500E+01     -1.00
+       3440     SCC.      .37000E+01      1.00
+      -3440     ASCC.     .37000E+01     -1.00
+       1150     UUB.      .54700E+01      1.00
+      -1150     AUUB.     .54700E+01     -1.00
+       1250     UDB.      .54700E+01      0.00
+      -1250     AUDB.     .54700E+01      0.00
+       2150     DUB.      .54700E+01      0.00
+      -2150     ADUB.     .54700E+01      0.00
+       2250     DDB.      .54700E+01     -1.00
+      -2250     ADDB.     .54700E+01      1.00
+       1350     USB.      .56700E+01      0.00
+      -1350     AUSB.     .56700E+01      0.00
+       3150     SUB.      .56700E+01      0.00
+      -3150     ASUB.     .56700E+01      0.00
+       2350     DSB.      .56700E+01     -1.00
+      -2350     ADSB.     .56700E+01      1.00
+       3250     SDB.      .56700E+01     -1.00
+      -3250     ASDB.     .56700E+01      1.00
+       3350     SSB.      .58700E+01     -1.00
+      -3350     ASSB.     .58700E+01      1.00
+       1450     UCB.      .67700E+01      1.00
+      -1450     AUCB.     .67700E+01     -1.00
+       4150     CUB.      .67700E+01      1.00
+      -4150     ACUB.     .67700E+01     -1.00
+       2450     DCB.      .67700E+01      0.00
+      -2450     ADCB.     .67700E+01      0.00
+       4250     CDB.      .67700E+01      0.00
+      -4250     ACDB.     .67700E+01      0.00
+       3450     SCB.      .69700E+01      0.00
+      -3450     ASCB.     .69700E+01      0.00
+       4350     CSB.      .69700E+01      0.00
+      -4350     ACSB.     .69700E+01      0.00
+       4450     CCB.      .80700E+01      1.00
+      -4450     ACCB.     .80700E+01     -1.00
+       1550     UBB.      .10070E+02      0.00
+      -1550     AUBB.     .10070E+02      0.00
+       2550     DBB.      .10070E+02     -1.00
+      -2550     ADBB.     .10070E+02      1.00
+       3550     SBB.      .10270E+02     -1.00
+      -3550     ASBB.     .10270E+02      1.00
+       4550     CBB.      .11370E+02      0.00
+      -4550     ACBB.     .11370E+02      0.00
+       1160     UUT.      TMASS           2.00
+      -1160     AUUT.     TMASS          -2.00
+       1260     UDT.      TMASS           1.00
+      -1260     AUDT.     TMASS          -1.00
+       2160     DUT.      TMASS           1.00
+      -2160     ADUT.     TMASS          -1.00
+       2260     DDT.      TMASS           0.00
+      -2260     ADDT.     TMASS           0.00
+       1360     UST.      TMASS           1.00
+      -1360     AUST.     TMASS          -1.00
+       3160     SUT.      TMASS           1.00
+      -3160     ASUT.     TMASS          -1.00
+       2360     DST.      TMASS           0.00
+      -2360     ADST.     TMASS           0.00
+       3260     SDT.      TMASS           0.00
+      -3260     ASDT.     TMASS           0.00
+       3360     SST.      TMASS           0.00
+      -3360     ASST.     TMASS           0.00
+       1460     UCT.      TMASS           2.00
+      -1460     AUCT.     TMASS          -2.00
+       4160     CUT.      TMASS           2.00
+      -4160     ACUT.     TMASS          -2.00
+       2460     DCT.      TMASS           1.00
+      -2460     ADCT.     TMASS          -1.00
+       4260     CDT.      TMASS           1.00
+      -4260     ACDT.     TMASS          -1.00
+       3460     SCT.      TMASS           1.00
+      -3460     ASCT.     TMASS          -1.00
+       4360     CST.      TMASS           1.00
+      -4360     ACST.     TMASS          -1.00
+       4460     CCT.      TMASS           2.00
+      -4460     ACCT.     TMASS          -2.00
+       1560     UBT.      TMASS           1.00
+      -1560     AUBT.     TMASS          -1.00
+       5160     BUT.      TMASS           1.00
+      -5160     ABUT.     TMASS          -1.00
+       2560     DBT.      TMASS           0.00
+      -2560     ADBT.     TMASS           0.00
+       5260     BDT.      TMASS           0.00
+      -5260     ABDT.     TMASS           0.00
+       3560     SBT.      TMASS           0.00
+      -3560     ASBT.     TMASS           0.00
+       5360     BST.      TMASS           0.00
+      -5360     ABST.     TMASS           0.00
+       4560     CBT.      TMASS           1.00
+      -4560     ACBT.     TMASS          -1.00
+       5460     BCT.      TMASS           1.00
+      -5460     ABCT.     TMASS          -1.00
+       5560     BBT.      TMASS           0.00
+      -5560     ABBT.     TMASS           0.00
+       1660     UTT.      TMASS           2.00
+      -1660     AUTT.     TMASS          -2.00
+       2660     DTT.      TMASS           1.00
+      -2660     ADTT.     TMASS          -1.00
+       3660     STT.      TMASS           1.00
+      -3660     ASTT.     TMASS          -1.00
+       4660     CTT.      TMASS           2.00
+      -4660     ACTT.     TMASS          -2.00
+       5660     BTT.      TMASS           1.00
+      -5660     ABTT.     TMASS          -1.00
+
+       1111     DL++      .12320E+01      2.00
+      -1111     ADL--     .12320E+01     -2.00
+       1121     DL+       .12320E+01      1.00
+      -1121     ADL-      .12320E+01     -1.00
+       1221     DL0       .12320E+01      0.00
+      -1221     ADL0      .12320E+01      0.00
+       2221     DL-       .12320E+01     -1.00
+      -2221     ADL+      .12320E+01      1.00
+       1131     S*+       .13823E+01      1.00
+      -1131     AS*-      .13823E+01     -1.00
+       1231     S*0       .13820E+01      0.00
+      -1231     AS*0      .13820E+01      0.00
+       2231     S*-       .13875E+01     -1.00
+      -2231     AS*+      .13875E+01      1.00
+       1331     XI*0      .15318E+01      0.00
+      -1331     AXI*0     .15318E+01      0.00
+       2331     XI*-      .15350E+01     -1.00
+      -2331     AXI*+     .15350E+01      1.00
+       3331     OM-       .16722E+01     -1.00
+      -3331     AOM+      .16722E+01      1.00
+       1141     UUC*      .26300E+01      2.00
+      -1141     AUUC*     .26300E+01     -2.00
+       1241     UDC*      .26300E+01      1.00
+      -1241     AUDC*     .26300E+01     -1.00
+       2241     DDC*      .26300E+01      0.00
+      -2241     ADDC*     .26300E+01      0.00
+       1341     USC*      .27000E+01      1.00
+      -1341     AUSC*     .27000E+01     -1.00
+       2341     DSC*      .27000E+01      0.00
+      -2341     ADSC*     .27000E+01      0.00
+       3341     SSC*      .28000E+01      0.00
+      -3341     ASSC*     .28000E+01      0.00
+       1441     UCC*      .37500E+01      2.00
+      -1441     AUCC*     .37500E+01     -2.00
+       2441     DCC*      .37500E+01      1.00
+      -2441     ADCC*     .37500E+01     -1.00
+       3441     SCC*      .39000E+01      1.00
+      -3441     ASCC*     .39000E+01     -1.00
+       4441     CCC*      .48000E+01      2.00
+      -4441     ACCC*     .48000E+01     -2.00
+       1151     UUB*      .55100E+01      1.00
+      -1151     AUUB*     .55100E+01     -1.00
+       1251     UDB*      .55100E+01      0.00
+      -1251     AUDB*     .55100E+01      0.00
+       2251     DDB*      .55100E+01     -1.00
+      -2251     ADDB*     .55100E+01      1.00
+       1351     USB*      .57100E+01      0.00
+      -1351     AUSB*     .57100E+01      0.00
+       2351     DSB*      .57100E+01     -1.00
+      -2351     ADSB*     .57100E+01      1.00
+       3351     SSB*      .59100E+01     -1.00
+      -3351     ASSB*     .59100E+01      1.00
+       1451     UCB*      .68100E+01      1.00
+      -1451     AUCB*     .68100E+01     -1.00
+       2451     DCB*      .68100E+01      0.00
+      -2451     ADCB*     .68100E+01      0.00
+       3451     SCB*      .70100E+01      0.00
+      -3451     ASCB*     .70100E+01      0.00
+       4451     CCB*      .81100E+01      1.00
+      -4451     ACCB*     .81100E+01     -1.00
+       1551     UBB*      .10110E+02      0.00
+      -1551     AUBB*     .10110E+02      0.00
+       2551     DBB*      .10110E+02     -1.00
+      -2551     ADBB*     .10110E+02      1.00
+       3551     SBB*      .10310E+02     -1.00
+      -3551     ASBB*     .10310E+02      1.00
+       4551     CBB*      .11410E+02      0.00
+      -4551     ACBB*     .11410E+02      0.00
+       5551     BBB*      .14710E+02     -1.00
+      -5551     ABBB*     .14710E+02      1.00
+       1161     UTT*      TMASS           2.00
+      -1161     AUTT*     TMASS          -2.00
+       1261     UDT*      TMASS           1.00
+      -1261     AUDT*     TMASS          -1.00
+       2261     DDT*      TMASS           0.00
+      -2261     ADDT*     TMASS           0.00
+       1361     UST*      TMASS           1.00
+      -1361     AUST*     TMASS          -1.00
+       2361     DST*      TMASS           0.00
+      -2361     ADST*     TMASS           0.00
+       3361     SST*      TMASS           0.00
+      -3361     ASST*     TMASS           0.00
+       1461     UCT*      TMASS           2.00
+      -1461     AUCT*     TMASS          -2.00
+       2461     DCT*      TMASS           1.00
+      -2461     ADCT*     TMASS          -1.00
+       3461     SCT*      TMASS           1.00
+      -3461     ASCT*     TMASS          -1.00
+       4461     CCT*      TMASS           2.00
+      -4461     ACCT*     TMASS          -2.00
+       1561     UBT*      TMASS           1.00
+      -1561     AUBT*     TMASS          -1.00
+       2561     DBT*      TMASS           0.00
+      -2561     ADBT*     TMASS           0.00
+       3561     SBT*      TMASS           0.00
+      -3561     ASBT*     TMASS           0.00
+       4561     CBT*      TMASS           1.00
+      -4561     ACBT*     TMASS          -1.00
+       5561     BBT*      TMASS           0.00
+      -5561     ABBT*     TMASS           0.00
+       1661     UTT*      TMASS           2.00
+      -1661     AUTT*     TMASS          -2.00
+       2661     DTT*      TMASS           1.00
+      -2661     ADTT*     TMASS          -1.00
+       3661     STT*      TMASS           1.00
+      -3661     ASTT*     TMASS          -1.00
+       4661     CTT*      TMASS           2.00
+      -4661     CTT*      TMASS          -2.00
+       5661     BTT*      TMASS           1.00
+      -5661     ABTT*     TMASS          -1.00
+       6661     TTT*      TMASS           2.00
+      -6661     ATTT*     TMASS          -2.00
+
+
+       1100     UU0.      .60000E+00      0.67
+      -1100     AUU0.     .60000E+00     -0.67
+       1200     UD0.      .60000E+00      0.33
+      -1200     AUD0.     .60000E+00     -0.33
+       2200     DD0.      .60000E+00     -0.67
+      -2200     ADD0.     .60000E+00      0.67
+       1300     US0.      .80000E+00      0.33
+      -1300     AUS0.     .80000E+00     -0.33
+       2300     DS0.      .80000E+00     -0.67
+      -2300     ADS0.     .80000E+00      0.67
+       3300     SS0.      .10000E+01     -0.67
+      -3300     ASS0.     .10000E+01      0.67
+       1400     UC0.      .19000E+01      1.33
+      -1400     AUC0.     .19000E+01     -1.33
+       2400     DC0.      .19000E+01      0.33
+      -2400     ADC0.     .19000E+01     -0.33
+       3400     SC0.      .21000E+01      0.33
+      -3400     ASC0.     .21000E+01     -0.33
+       4400     CC0.      .32000E+01      1.33
+      -4400     ACC0.     .32000E+01     -1.33
+       1500     UB0.      .49000E+01      0.33
+      -1500     AUB0.     .49000E+01     -0.33
+       2500     DB0.      .49000E+01     -0.67
+      -2500     ADB0.     .49000E+01      0.67
+       3500     SB0.      .51000E+01     -0.67
+      -3500     ASB0.     .51000E+01      0.67
+       4500     CB0.      .65000E+01      0.33
+      -4500     ACB0.     .65000E+01     -0.33
+       5500     BB0.      .98000E+01     -0.67
+      -5500     ABB0.     .98000E+01      0.67
+       1600     UT0.      TMASS           1.33
+      -1600     AUT0.     TMASS          -1.33
+       2600     DT0.      TMASS           0.33
+      -2600     ADT0.     TMASS          -0.33
+       3600     ST0.      TMASS           0.33
+      -3600     AST0.     TMASS          -0.33
+       4600     CT0.      TMASS           1.33
+      -4600     CT0.      TMASS          -1.33
+       5600     BT0.      TMASS           0.33
+      -5600     ABT0.     TMASS          -0.33
+       6600     TT0.      TMASS           1.33
+      -6600     ATT0.     TMASS          -1.33
+
+
+
+[11] HIGHER ORDER PROCESSES
+
+      Higher order processes can be generated either by the QCD
+evolution or by supplying partons from an external generator.
+
+      Frequently it is interesting to generate higher-order processes
+with a particular branching in the QCD evolution or with a particular
+particle or group of particles being produced from the fragmentation.
+Examples include
+      (1) Branching of jets into heavy quarks (e.g., g -> b + bbar);
+      (2) Decay of such a heavy quark into a lepton or neutrino;
+      (3) Radiation of a photon, W, or Z from a jet.
+It is important to realize that all of the cross sections and the QCD
+evolution in ISAJET are based on leading-log QCD, so generating such
+processes does not give the correct higher order QCD cross sections or
+"K factors", even though it may produce better agreement with them in
+some cases.
+
+       ISAJET does produce events with particular topologies which
+in many cases are the most important effect of higher order processes.
+In the heavy quark example, the lowest order process
+      g + g -> Q + Qbar
+produces back-to-back heavy quark pairs, whereas the splitting process
+      g + g -> g + g
+                   |
+                   +--> Q + Qbar
+produces collinear pairs. Such collinear pairs are essential to obtain
+agreement with  experimental data on b bbar production, and they often
+are the dominant background for processes of interest.
+
+      Branchings such as the emission of a heavy quark pair, a photon,
+or a W+- or Z0 are rare, and since they may occur at any step in the
+evolution, one cannot force them to occur. Therefore, generation of such
+events is very slow. M. Della Negra (UA1) suggested first doing n1 QCD
+evolutions for each hard scattering and rejecting events without the
+desired partons, then doing n2 fragmentations for each successful
+evolution. This generates the equivalent of n1 * n2 events for each hard
+scattering, so the cross section must be divided by n1 * n2. This
+algorithm can speed up the generation of g -> b + bbar splitting by a
+factor of ten for n1 = n2 = 10.
+
+      Since the evolution and fragmentation steps are executed n1 * n2
+even if good events are found, a single hard scattering can lead to
+multiple events. This does not change the inclusive cross sections, but
+it does mean that the fluctuations may be larger than expected. Hence it
+is important to choose the numbers n1 and n2 carefully.
+
+      The following entities are used in ISAJET for generating events
+with multiple evolution and fragmentation:
+
+NEVENT     The number of primary hard scatterings to be generated. Set
+           as usual on the input line with the energy.
+
+SIGF       The cross section for the selected hard scatterings divided
+           by n1 * n2. Hence the correct weight is SIGF/NEVENT, just as
+           for normal running. (The cross section printed at the end of
+           a run does not contain this factor.)
+
+NEVOLVE    The number n1 of evolutions per hard scattering. This should
+           never be set unless you supply a REJJET function. Do not
+           confuse this with NOEVOLVE.
+
+NHADRON    The number n2 of fragmentations for a given evolution. This
+           should never be set unless you supply a REJFRG function. Do
+           not confuse this with NOHADRON.
+
+REJJET     A logical function which if true causes the evolution to be
+           rejected. The user must supply one to make the selections
+           which he wants. The default always .FALSE. but includes an
+           example as a comment.
+
+REJFRG     A logical function which if true causes the fragmentation to
+           be rejected. The user must supply one to make the selections
+           which he wants. The default always .FALSE. but includes an
+           example as a comment.
+
+Note that one can also use function EDIT to make a final selection of
+the events. Of course ISAJET must be relinked if EDIT, REJJET or REJFRG
+is modified.
+
+      At the end of a run, the jet cross section, the cross section for
+the selected events, and the number and fraction of events selected are
+printed. The cross section SIGF stored internally is divided by n1 * n2
+so that if the events are used to make histograms, then the correct
+weight per event is
+      SIGF/NEVENT
+just as for normal events. Of course NEVENT now has a different meaning;
+it is in general larger than the number of events in the file but might
+be smaller if NEVOLVE and NHADRON are badly chosen.
+
+      NEVOLVE and NHADRON are set as parameters in the input. One wants
+to choose them to give better acceptance of the primary hard scatterings
+but not to give multiple events for one hard scattering. For lepton
+production from heavy quarks the values
+NEVOLVE
+10/
+NHADRON
+10/
+seem appropriate, giving reasonable efficiency. For radiation of photons
+from jets, NEVOLVE can be somewhat larger but NHADRON should be one, and
+REJFRG should always return .FALSE., since the selection is just on the
+parton process, not on the hadronization.
+
+      The loops over evolutions and fragmentations are done inside of
+subroutine ISAEVT and are always executed the same number of times even
+though ISAEVT returns after each generated event. Logical flag OK
+signals a good event, and logical flag DONE signals that the run is
+finished. If you control the event generation loop yourself, you should
+make use of these flags as in the following extract from subroutine
+ISAJET:
+      ILOOP=0
+  101 CONTINUE
+        ILOOP=ILOOP+1
+        CALL ISAEVT(ILOOP,OK,DONE)
+        IF(OK) CALL ISAWEV
+      IF(.NOT.DONE) GO TO 101
+Otherwise you may get the wrong weights.
+
+      It is possible to supply to ISAJET events with partons generated
+by some other program that may have more accurate matrix elements for
+higher order processes. Because any such calculation must involve
+cutoffs ISAJET assumes that the partons were generated imposing some R
+cutoff, where R=SQRT(phi**2+eta**2), and some Et cutoff. Given that
+information ISAJET will generate initial state radiation partons only
+below the Et cutoff and final state radiation inside the R cutoff. The
+external partons can be supplied to ISAJET by calls to 2 subroutines. To
+initialize ISAJET for externally supplied partons, use
+
+      CALL INISAP(CMSE,REACTION,BEAMS,WZ,NDCAYS,DCAYS,ETMIN,RCONE,OK)
+
+where the inputs are
+
+      CMSE             = center of mass energy
+      REACTION         = reaction (only TWOJET and DRELLYAN are implemented
+                         so far)
+      BEAMS(2)         = chose 'P ' or 'AP'
+      ETMIN            = minimum ET of supplied partons
+      RCONE            = minimum cone (R) between supplied partons
+      WZ               = option 'W' or 'Z', ' ' no Ws or Zs
+      NDCAYS           = number of decay options (if 0, assume decay has
+                         already been done)
+      DCAYS            = list of particles W or Z are allowed to decay into
+
+and the output is
+
+      OK   = true if initialization is possible
+
+Then for each event use
+
+      CALL IPARTNS(NPRTNS,IDS,PRTNS,IDQ,WEIGHT,WZDK)
+
+where the inputs are
+
+       NPRTNS          = number of partons, <= 10
+       IDS(NPRTNS)     = ids of final partons
+       PRTNS(4,NPRTNS) = parton 4 vectors
+       IDQ(2)          = ids of initial partons
+       WEIGHT          = weight
+       WZDK            = if true last 2 partons are from W,Z decay
+
+Further QCD  radiation is then  generated consistent  with ETMIN and RCONE,
+and the partons are fragmented into  hadrons as usual. If RCONE is set to a
+value  greater  than 1.5  no  cone  restriction  is  applied  during parton
+evolution.
+
+
+
+                             ISASUSY 1.01
+            Decay Modes in the Minimal Supersymmetric Model
+
+                              Howard Baer
+                       Florida State University
+                         Talahassee, FL 32306
+
+                            Frank E. Paige
+               Superconducting Super Collider Laboratory
+                           Dallas, TX 75237
+
+                           S.D. Protopopescu
+                    Brookhaven National Laboratory
+                            Upton, NY 11973
+
+                              Xerxes Tata
+                         University of Hawaii
+                          Honolulu, HI 96822
+
+
+
+      The code in patch ISASUSY of ISAJET calculates decay modes of
+supersymmetric particles based on the work of H. Baer, M. Bisset, D.
+Dzialo (Karatas), X. Tata, J. Woodside, and their collaborators.
+The calculations assume the minimal supersymmetric extension of the
+standard model.  Supersymmetric SU(5) grand unification is assumed
+in the chargino and neutralino mass matrices, but the squark, left
+and right slepton and sneutrino masses are
+treated as arbitrary.  Most calculations are done at the tree level,
+but one-loop results for gluino loop decays, H -> GM GM and H -> GL GL,
+t loop corrections to the Higgs mass spectrum and couplings, and QCD
+corrections to H -> q qbar are included.  The following are NOT included
+in this version:
+
+    * Higgs decays into sleptons and squarks (which are likely small
+      except for decays into thrid generation sparticles).
+
+    * Breaking of sbottom degeneracy
+
+These and other decays may be added in future versions as the physics
+interest warrants.  Note that the details of the masses and the decay
+modes can be quite sensitive to choices of standard model parameters
+such as the QCD coupling ALFA3 and the quark masses.  To change these,
+you must modify subroutine SSMSSM. By default, ALFA3=.12.
+
+      All the mass spectrum and branching ratio calculations in ISASUSY
+are performed by the call to
+
+      SUBROUTINE SSMSSM(XMG,XMS,XMTL,XMTR,XMLL,XMLR,XMNL
+     $,XTANB,XMHA,XMU,XMT,XAT)
+
+where the following are taken to be independent parameters:
+
+      XMG   = gluino mass
+      XMS   = common u,d,s,c,b squark mass
+      XMTL  = left stop mass
+      XMTR  = right stop mass
+      XMLL  = left slepton mass
+      XMLR  = right slepton mass
+      XMNL  = sneutrino mass
+      XTANB = tan(beta) = ratio of vev's
+            = 1/R ( of old Baer-Tata notation).
+      XMU   = mu = SUSY Higgs mass
+            = -2*m_1 of Baer et al.
+      XMHA  = pseudo-scalar Higgs mass
+      XMT   = top quark mass
+      XAT   = stop squark trilinear term
+
+All variables are of type REAL, and all masses are in GeV.  The notation
+is taken to correspond to that of Haber and Kane, although the Tata
+Lagrangian uses a slightly different Higgs representation. In effect, when the
+3rd generation is incorporated correctly, it is possible the mu used here
+won't correspond exactly to that of Haber and Kane. All other standard model
+parameters are hard wired in this subroutine; they are not obtained
+from the rest of ISAJET. The theoretically favored range of these
+parameters is
+
+      50 < M(gluino) < 2000 GeV
+      50 < M(squark) < 2000 GeV
+      50 < M(slepton) < 2000 GeV
+      -1000 < mu < 1000 GeV
+      1 < tan(beta) < mt/mb
+      100 < M(top) < 200 GeV
+      50 < M(HA) < 1000 GeV
+      -500 < A_t < 500 GeV
+
+It is assumed that the lightest supersymmetric particle is the lightest
+neutralino Z1; some choices of the above parameters may violate this
+assumption, yielding a light chargino or light stop squark
+lighter than Z1SS. At the present
+time no check of the parameters against existing experimental data is
+provided.
+
+      SSMSSM first calculates the other SUSY masses and mixings and puts
+them in the common block /SSPAR/:
+
+C          SUSY parameters
+C          AMGLSS               = gluino mass
+C          AMQKSS               = squark mass
+C          AMLLSS               = left-slepton mass
+C          AMLRSS               = right-slepton mass
+C          AMNLSS               = sneutrino mass
+C          TWOM1                = Higgsino mass = - mu
+C          RV2V1                = ratio v2/v1 of vev's
+C          AMTLSS,AMTRSS        = left,right stop masses
+C          AMBLSS,AMBRSS        = left,right sbottom masses
+C          AMT1SS,AMT2SS        = light,heavy stop masses
+C          AMZiSS               = signed mass of Zi
+C          ZMIXSS               = Zi mixing matrix
+C          AMWiSS               = signed Wi mass
+C          GAMMAL,GAMMAR        = Wi left, right mixing angles
+C          AMHL,AMHH,AMHA       = neutral Higgs h0, H0, A0 masses
+C          AMHC                 = charged Higgs H+ mass
+C          ALFAH                = Higgs mixing angle
+C          AAT                  = stop trilinear term
+C          THETAT               = stop mixing angle
+      COMMON/SSPAR/AMGLSS,AMQKSS,AMLLSS,AMLRSS,AMNLSS
+     $,TWOM1,RV2V1,AMTLSS,AMTRSS,AMT1SS,AMT2SS,AMBLSS,AMBRSS
+     $,AMZ1SS,AMZ2SS,AMZ3SS,AMZ4SS,ZMIXSS(4,4),AMW1SS,AMW2SS
+     $,GAMMAL,GAMMAR,AMHL,AMHH,AMHA,AMHC,ALFAH,AAT,THETAT
+      REAL AMGLSS,AMQKSS,AMLLSS,AMLRSS,AMNLSS
+     $,TWOM1,RV2V1,AMTLSS,AMTRSS,AMT1SS,AMT2SS,AMBLSS,AMBRSS
+     $,AMZ1SS,AMZ2SS,AMZ3SS,AMZ4SS,ZMIXSS,AMW1SS,AMW2SS
+     $,GAMMAL,GAMMAR,AMHL,AMHH,AMHA,AMHC,ALFAH,AAT,THETAT
+      REAL AMZISS(4)
+      EQUIVALENCE (AMZISS(1),AMZ1SS)
+      SAVE /SSPAR/
+
+It then calculates the widths and branching ratios and puts them in the
+common block /SSMODE/:
+
+C          MXSS                 = maximum number of modes
+C          NSSMOD               = number of modes
+C          ISSMOD               = initial particle
+C          JSSMOD               = final particles
+C          GSSMOD               = width
+C          BSSMOD               = branching ratio
+      INTEGER MXSS
+      PARAMETER (MXSS=1000)
+      COMMON/SSMODE/NSSMOD,ISSMOD(MXSS),JSSMOD(5,MXSS),GSSMOD(MXSS)
+     $,BSSMOD(MXSS)
+      INTEGER NSSMOD,ISSMOD,JSSMOD
+      REAL GSSMOD,BSSMOD
+      SAVE /SSMODE/
+
+Decay modes for a given particle are not necessarily adjacent in this
+common block.  Note that the branching ratio calculations use the full
+matrix elements, which in general will give nonuniform distributions in
+phase space, but this information is not saved in /SSMODE/.  In
+particular, the decays H -> Z + Z* -> Z + f + fbar give no indication
+that the f + fbar mass is strongly peaked near the upper limit.
+
+      All IDENT codes are defined by parameter statements in the Patchy
+keep sequence SSTYPE:
+
+C          SM ident code definitions. These are standard ISAJET but
+C          can be changed.
+      INTEGER IDUP,IDDN,IDST,IDCH,IDBT,IDTP
+      INTEGER IDNE,IDE,IDNM,IDMU,IDNT,IDTAU
+      INTEGER IDGL,IDGM,IDW,IDZ
+      PARAMETER (IDUP=1,IDDN=2,IDST=3,IDCH=4,IDBT=5,IDTP=6)
+      PARAMETER (IDNE=11,IDE=12,IDNM=13,IDMU=14,IDNT=15,IDTAU=16)
+      PARAMETER (IDGL=9,IDGM=10,IDW=80,IDZ=90)
+C          SUSY ident code definitions. They are chosen to be similar
+C          to those in versions < 6.50 but may be changed.
+      INTEGER ISUPL,ISDNL,ISSTL,ISCHL,ISBTL,ISTP1
+      INTEGER ISNEL,ISEL,ISNML,ISMUL,ISNTL,ISTAUL
+      INTEGER ISUPR,ISDNR,ISSTR,ISCHR,ISBTR,ISTP2
+      INTEGER ISNER,ISER,ISNMR,ISMUR,ISNTR,ISTAUR
+      INTEGER ISZ1,ISZ2,ISZ3,ISZ4,ISW1,ISW2,ISGL
+      INTEGER ISHL,ISHH,ISHA,ISHC
+      PARAMETER (ISUPL=21,ISDNL=22,ISSTL=23,ISCHL=24,ISBTL=25,ISTP1=26)
+      PARAMETER (ISNEL=31,ISEL=32,ISNML=33,ISMUL=34,ISNTL=35,ISTAUL=36)
+      PARAMETER (ISUPR=41,ISDNR=42,ISSTR=43,ISCHR=44,ISBTR=45,ISTP2=46)
+      PARAMETER (ISNER=51,ISER=52,ISNMR=53,ISMUR=54,ISNTR=55,ISTAUR=56)
+      PARAMETER (ISGL=29)
+      PARAMETER (ISZ1=30,ISZ2=40,ISZ3=50,ISZ4=60,ISW1=39,ISW2=49)
+      PARAMETER (ISHL=82,ISHH=83,ISHA=84,ISHC=86)
+
+These are based on standard ISAJET but can be changed to interface with
+other generators.  Since masses except the t mass are hard wired, one
+should check the kinematics for any decay before using it with possibly
+different masses.
+
+      Patch ISASSRUN of ISAJET provides a main program SSRUN and some
+utility programs to produce human readable output.  These utilities must
+be rewritten if the IDENT codes in /SSTYPE/ are modified.  To create the
+stand-alone version of ISASUSY with SSRUN, run ypatchy on isajet.pam
+with the following cradle:
+
+\+USE,*ISASUSY.                         Select all code
+\+USE,NOCERN.                           No CERN Library
+\+USE,IMPNONE.                          Use IMPLICIT NONE
+\+EXE.                                  Write everything to ASM
+\+PAM.                                  Read PAM file
+\+QUIT.                                 Quit
+
+Compile, link, and run the resulting program, and follow the prompts for
+input.  To produce the documentation, run ypatchy with the following
+cradle:
+
+\+USE,CDESUSY,ISASSDOC
+\+EXE
+\+PAM
+\+QUIT
+
+This documentation is automatically appended to that for ISAJET.
+
+      ISASUSY is written in ANSI standard Fortran 77 except that
+IMPLICIT NONE is used if +USE,IMPNONE is selected in the Patchy cradle.
+All variables are explicitly typed, and variables starting with
+I,J,K,L,M,N are not necessarily integers.  All external names such as
+the names of subroutines and common blocks start with the letters SS.
+Most calculations are done in double precision.  If +USE,NOCERN is
+selected in the Patchy cradle, then the Cernlib routines EISRS1 and its
+auxiliaries to calculate the eigenvalues of a real symmetric matrix and
+DDILOG to calculate the dilogarithm function are included.  Hence it is
+not necessary to link with Cernlib.
+
+      The physics assumptions and details of incorporating the Minimal
+Supersymmetric Model into ISAJET have appeared in a preprint entitled
+
+        "Simulating Supersymmetry with ISAJET 7.0/ISASUSY 1.0",
+                           by
+          H. Baer, F. Paige, S. Protopopescu and X. Tata,
+
+          Florida State University preprint FSU-HEP-930329,
+
+to appear in proceedings of the workshop on
+"Physics at Current Accelerators and the Supercollider", Argonne, IL,
+June, 1993. Detailed references may be found therein.
+Users wishing to cite an appropriate source may cite the above preprint.
+
