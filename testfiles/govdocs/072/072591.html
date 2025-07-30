@@ -1,0 +1,1882 @@
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+
+  
+
+<head>
+<meta http-equiv="Content-Type" content="text/html;" />
+<title>61441 - Fact Sheet - American FactFinder</title>
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta name="Title" content="61441 - Fact Sheet - American FactFinder" />
+<meta name="Author" content="American FactFinder, United States Census Bureau" />
+<meta name="Category" content="Products" />
+<meta name="Keywords" content="American,Fact,Finder,FactFinder,Housing,Population,Race,Economic,Social,Zip,Code,Tabulation,Area,61441" />
+<meta name="Description" content="Fact Sheet for 61441" />
+
+<script type="text/javascript" src="/javascript/common/browser_ver.js"></script>
+<script type="text/javascript" src="/javascript/string_util.js"></script>
+<script type="text/javascript" src="/javascript/openMetadataBrowser.js"></script>
+<script type="text/javascript" src="/javascript/openFeedback.js"></script>
+<script type="text/javascript" src="/javascript/panel_id.js"></script>
+<script type="text/javascript" src="/javascript/epss_open.js"></script>
+<script type="text/javascript" src="/javascript/gotoMainPage.js"></script>
+<script type="text/javascript" src="/javascript/saff/links.js"></script>
+<script type="text/javascript" src="/javascript/saff_cws_common/search.js"></script>
+<script type="text/javascript" src="/javascript/common/layer_util.js"></script>
+<script type="text/javascript" src="/javascript/common/saffmenu.js"></script>
+<script type="text/javascript" src="/javascript/saff_util.js"></script>
+<script type="text/javascript" src="/javascript/saff_iterations.js"></script>
+<script type="text/javascript">
+<!--
+function mark_row(t) {
+t.style.backgroundColor = '#DDDDDD';
+}
+function unmark_row(t) {
+t.style.backgroundColor = '#FFFFFF';
+}
+function gnRefresh(geo_id) {
+gnRefresh_int(geo_id, true);
+} 
+function gnRefresh_int(geo_id, flag) {
+if (flag == true) {
+
+gnShowFactSheet(geo_id, 'factsheet_1');
+
+}
+else {
+showServletPage(geo_id, '', 'factsheet_1')
+}
+}
+function init(){} 
+setLangDir("en");
+function selectString(saffString, cwsString) {
+if ('saff' == 'saff') {
+return saffString;
+}
+else {
+return cwsString;
+}
+}
+function gnChangeGeoContext(geo_id) {
+document.hidden_navigation_form._event.value = "ChangeGeoContext";
+gnRefresh(geo_id);
+}
+function tabChanged(servlet){
+document.hidden_navigation_form.action = servlet;
+document.hidden_navigation_form.submit();	
+}
+function tabChanged2(servlet, year, program){
+document.hidden_navigation_form._useEV.value = "Y";
+document.hidden_navigation_form.submit();	
+}
+function gnSearchForGeo() {
+var streetFld	= document.form1._street;
+var countyFld	= document.form1._county;
+var cityTownFld	= document.form1._cityTown;
+var stateFld	= document.form1._state;
+var zipFld		= document.form1._zip;
+streetFld.value	= trimStringBothSides(streetFld.value, " ");
+countyFld.value	= trimStringBothSides(countyFld.value, " ");
+cityTownFld.value = trimStringBothSides(cityTownFld.value, " ");
+stateFld.value	= trimStringBothSides(stateFld.value, " ");
+zipFld.value	= trimStringBothSides(zipFld.value, " ");
+if (hasValidSearchData(streetFld, countyFld, cityTownFld, stateFld, zipFld)) {
+document.hidden_navigation_form._event.value		= "Search";
+document.hidden_navigation_form._street.value		= streetFld.value;
+document.hidden_navigation_form._county.value		= countyFld.value;
+document.hidden_navigation_form._cityTown.value	= cityTownFld.value;
+document.hidden_navigation_form._state.value		= stateFld.value;
+document.hidden_navigation_form._zip.value			= zipFld.value;
+// work around ns4 issue
+if (ns4 && !ns5) {
+document.hidden_navigation_form._state.value	= stateFld.options[stateFld.selectedIndex].value;
+}
+gnRefresh_int(null, false);
+}  
+} 
+function gnSearchForGeoAddress() {
+var streetFld	= document.form1._street;
+var cityTownFld;
+if (document.form1._cityTown) {
+cityTownFld	= document.form1._cityTown;
+}
+var stateFld;
+if (document.form1._state) {
+stateFld	= document.form1._state;
+}
+var zipFld		= document.form1._zip;
+streetFld.value	= trimStringBothSides(streetFld.value, " ");
+if (document.form1._cityTown) {
+cityTownFld.value = trimStringBothSides(cityTownFld.value, " ");
+}
+if (document.form1._state) {
+stateFld.value	= trimStringBothSides(stateFld.value, " ");	
+}
+zipFld.value	= trimStringBothSides(zipFld.value, " ");
+if (hasValidSearchDataAddress(streetFld, cityTownFld, stateFld, zipFld)) {
+document.hidden_navigation_form._event.value		= "Search";
+document.hidden_navigation_form._street.value		= streetFld.value;
+document.hidden_navigation_form._county.value		= "";
+if (document.form1._cityTown) {
+document.hidden_navigation_form._cityTown.value	= cityTownFld.value;
+}
+if (document.form1._state) {
+document.hidden_navigation_form._state.value		= stateFld.value;
+}
+document.hidden_navigation_form._zip.value			= zipFld.value;
+document.hidden_navigation_form.ActiveGeoDiv.value	= "search_by_address";
+// work around ns4 issue
+if (ns4 && !ns5) {
+document.hidden_navigation_form._state.value	= stateFld.options[stateFld.selectedIndex].value;
+}	
+gnRefresh_int(null, false);
+}  
+} 
+function gnSearchForGeoAddressCWS() {
+var streetFld	= document.form1._street;
+var cityTownFld;
+if (document.form1._cityTown) {
+cityTownFld	= document.form1._cityTown;
+}
+var stateFld;
+if (document.form1._state) {
+stateFld	= document.form1._state;
+}
+var zipFld		= document.form1._zip;
+streetFld.value	= trimStringBothSides(streetFld.value, " ");
+if (document.form1._cityTown) {
+cityTownFld.value = trimStringBothSides(cityTownFld.value, " ");
+}
+if (document.form1._state) {
+stateFld.value	= trimStringBothSides(stateFld.value, " ");	
+}
+zipFld.value	= trimStringBothSides(zipFld.value, " ");
+if (hasValidSearchDataAddressForCWS(streetFld, cityTownFld, stateFld, zipFld)) {
+document.hidden_navigation_form._event.value		= "Search";
+document.hidden_navigation_form._street.value		= streetFld.value;
+document.hidden_navigation_form._county.value		= "";
+if (document.form1._cityTown) {
+document.hidden_navigation_form._cityTown.value	= cityTownFld.value;
+}
+if (document.form1._state) {
+document.hidden_navigation_form._state.value		= stateFld.value;
+}
+document.hidden_navigation_form._zip.value			= zipFld.value;
+document.hidden_navigation_form.ActiveGeoDiv.value	= "search_by_address";
+// work around ns4 issue
+if (ns4 && !ns5) {
+document.hidden_navigation_form._state.value	= stateFld.options[stateFld.selectedIndex].value;
+}	
+// Uncomment this portion if it is desired that after a user
+//searches the same page should be loaded instead of the fact sheet.
+gnRefresh_int(null, false);
+/*
+gnRefresh_int(null, true);
+*/
+}  
+} 
+function gnSearchForGeoNameSearch() {
+var countyFld	= document.form2._county;
+var stateFld	= document.form2._state;
+countyFld.value	= trimStringBothSides(countyFld.value, " ");
+stateFld.value	= trimStringBothSides(stateFld.value, " ");
+if (hasValidSearchDataNameSearch(countyFld, stateFld)) {
+document.hidden_navigation_form._event.value		= "Search";
+document.hidden_navigation_form._street.value		= "";
+document.hidden_navigation_form._state.value		= stateFld.value;
+document.hidden_navigation_form.ActiveGeoDiv.value	= "geoSelect";
+if (countyFld.value.match(/^\d\d\d\d\d$/) || countyFld.value.match(/^\d\d\dXX$/) || countyFld.value.match(/^\d\d\dHH$/)) {
+document.hidden_navigation_form._zip.value			= countyFld.value;
+document.hidden_navigation_form._county.value		= '';		
+document.hidden_navigation_form._cityTown.value	= '';;
+}
+else {
+document.hidden_navigation_form._zip.value			= '';
+document.hidden_navigation_form._county.value		= countyFld.value;		
+document.hidden_navigation_form._cityTown.value	= countyFld.value;;
+}
+// work around ns4 issue
+if (ns4 && !ns5) {
+document.hidden_navigation_form._state.value	= stateFld.options[stateFld.selectedIndex].value;
+}	
+gnRefresh_int(null, false);
+}	
+} 
+function gnClearSearchParametersNew() {
+var streetFld	= document.form1._street;
+var cityTownFld	= document.form1._cityTown;
+var countyFld	= document.form2._county;
+var stateFld	= document.form1._state;
+var stateFld1	= document.form2._state;
+var zipFld		= document.form1._zip;	
+streetFld.value	= "";
+cityTownFld.value = "";
+countyFld.value	= "";
+stateFld.selectedIndex = 0;
+stateFld1.selectedIndex = 0;
+zipFld.value = "";
+}
+function gnClearSearchParameters() {
+var streetFld	= document.form1._street;
+var countyFld	= document.form1._county;
+var cityTownFld	= document.form1._cityTown;
+var stateFld	= document.form1._state;
+var zipFld		= document.form1._zip;
+streetFld.value	= "";
+countyFld.value	= "";
+cityTownFld.value = "";
+stateFld.selectedIndex = 0;
+zipFld.value = "";
+}
+function goButtonState(){
+selObj = document.form1._state;
+opt =  getSelectedOption( selObj ); 
+if ( validateGoClick( opt ) ) {
+document.hidden_navigation_form._state.value = opt.value;
+gnChangeGeoContext(opt.value);        
+}
+else {
+alert ( ALERT_MSG1 );
+}
+}
+function goButtonCongDistrict(){
+selObj = document.form1._cd;
+opt =  getSelectedOption( selObj ); 
+if ( validateGoClick( opt ) ) {
+document.hidden_navigation_form._cd.value = opt.value;
+gnChangeGeoContext(opt.value);        
+}
+else {
+alert ( ALERT_MSG1 );
+}
+}
+function goButtonCounty(){
+selObj = document.form1._county;
+opt =  getSelectedOption( selObj ); 
+if ( validateGoClick( opt ) ) {
+document.hidden_navigation_form._county.value = opt.value;
+gnChangeGeoContext(opt.value);        
+}
+else {
+alert ( ALERT_MSG1 );
+}
+}
+setLangDir("en");
+function selectString(saffString, cwsString) {
+if ('saff' == 'saff') {
+return saffString;
+}
+else {
+return cwsString;
+}
+}
+function gnChangeGeoContext(geo_id) {
+document.hidden_navigation_form._event.value = "ChangeGeoContext";
+gnRefresh(geo_id);
+}
+function tabChanged(servlet){
+document.hidden_navigation_form.action = servlet;
+document.hidden_navigation_form.submit();	
+}
+function tabChanged2(servlet, year, program){
+document.hidden_navigation_form._useEV.value = "Y";
+document.hidden_navigation_form.submit();	
+}
+function gnSearchForGeo() {
+var streetFld	= document.form1._street;
+var countyFld	= document.form1._county;
+var cityTownFld	= document.form1._cityTown;
+var stateFld	= document.form1._state;
+var zipFld		= document.form1._zip;
+streetFld.value	= trimStringBothSides(streetFld.value, " ");
+countyFld.value	= trimStringBothSides(countyFld.value, " ");
+cityTownFld.value = trimStringBothSides(cityTownFld.value, " ");
+stateFld.value	= trimStringBothSides(stateFld.value, " ");
+zipFld.value	= trimStringBothSides(zipFld.value, " ");
+if (hasValidSearchData(streetFld, countyFld, cityTownFld, stateFld, zipFld)) {
+document.hidden_navigation_form._event.value		= "Search";
+document.hidden_navigation_form._street.value		= streetFld.value;
+document.hidden_navigation_form._county.value		= countyFld.value;
+document.hidden_navigation_form._cityTown.value	= cityTownFld.value;
+document.hidden_navigation_form._state.value		= stateFld.value;
+document.hidden_navigation_form._zip.value			= zipFld.value;
+// work around ns4 issue
+if (ns4 && !ns5) {
+document.hidden_navigation_form._state.value	= stateFld.options[stateFld.selectedIndex].value;
+}
+gnRefresh_int(null, false);
+}  
+} 
+function gnSearchForGeoAddress() {
+var streetFld	= document.form1._street;
+var cityTownFld;
+if (document.form1._cityTown) {
+cityTownFld	= document.form1._cityTown;
+}
+var stateFld;
+if (document.form1._state) {
+stateFld	= document.form1._state;
+}
+var zipFld		= document.form1._zip;
+streetFld.value	= trimStringBothSides(streetFld.value, " ");
+if (document.form1._cityTown) {
+cityTownFld.value = trimStringBothSides(cityTownFld.value, " ");
+}
+if (document.form1._state) {
+stateFld.value	= trimStringBothSides(stateFld.value, " ");	
+}
+zipFld.value	= trimStringBothSides(zipFld.value, " ");
+if (hasValidSearchDataAddress(streetFld, cityTownFld, stateFld, zipFld)) {
+document.hidden_navigation_form._event.value		= "Search";
+document.hidden_navigation_form._street.value		= streetFld.value;
+document.hidden_navigation_form._county.value		= "";
+if (document.form1._cityTown) {
+document.hidden_navigation_form._cityTown.value	= cityTownFld.value;
+}
+if (document.form1._state) {
+document.hidden_navigation_form._state.value		= stateFld.value;
+}
+document.hidden_navigation_form._zip.value			= zipFld.value;
+document.hidden_navigation_form.ActiveGeoDiv.value	= "search_by_address";
+// work around ns4 issue
+if (ns4 && !ns5) {
+document.hidden_navigation_form._state.value	= stateFld.options[stateFld.selectedIndex].value;
+}	
+gnRefresh_int(null, false);
+}  
+} 
+function gnSearchForGeoAddressCWS() {
+var streetFld	= document.form1._street;
+var cityTownFld;
+if (document.form1._cityTown) {
+cityTownFld	= document.form1._cityTown;
+}
+var stateFld;
+if (document.form1._state) {
+stateFld	= document.form1._state;
+}
+var zipFld		= document.form1._zip;
+streetFld.value	= trimStringBothSides(streetFld.value, " ");
+if (document.form1._cityTown) {
+cityTownFld.value = trimStringBothSides(cityTownFld.value, " ");
+}
+if (document.form1._state) {
+stateFld.value	= trimStringBothSides(stateFld.value, " ");	
+}
+zipFld.value	= trimStringBothSides(zipFld.value, " ");
+if (hasValidSearchDataAddressForCWS(streetFld, cityTownFld, stateFld, zipFld)) {
+document.hidden_navigation_form._event.value		= "Search";
+document.hidden_navigation_form._street.value		= streetFld.value;
+document.hidden_navigation_form._county.value		= "";
+if (document.form1._cityTown) {
+document.hidden_navigation_form._cityTown.value	= cityTownFld.value;
+}
+if (document.form1._state) {
+document.hidden_navigation_form._state.value		= stateFld.value;
+}
+document.hidden_navigation_form._zip.value			= zipFld.value;
+document.hidden_navigation_form.ActiveGeoDiv.value	= "search_by_address";
+// work around ns4 issue
+if (ns4 && !ns5) {
+document.hidden_navigation_form._state.value	= stateFld.options[stateFld.selectedIndex].value;
+}	
+// Uncomment this portion if it is desired that after a user
+//searches the same page should be loaded instead of the fact sheet.
+gnRefresh_int(null, false);
+/*
+gnRefresh_int(null, true);
+*/
+}  
+} 
+function gnSearchForGeoNameSearch() {
+var countyFld	= document.form2._county;
+var stateFld	= document.form2._state;
+countyFld.value	= trimStringBothSides(countyFld.value, " ");
+stateFld.value	= trimStringBothSides(stateFld.value, " ");
+if (hasValidSearchDataNameSearch(countyFld, stateFld)) {
+document.hidden_navigation_form._event.value		= "Search";
+document.hidden_navigation_form._street.value		= "";
+document.hidden_navigation_form._state.value		= stateFld.value;
+document.hidden_navigation_form.ActiveGeoDiv.value	= "geoSelect";
+if (countyFld.value.match(/^\d\d\d\d\d$/) || countyFld.value.match(/^\d\d\dXX$/) || countyFld.value.match(/^\d\d\dHH$/)) {
+document.hidden_navigation_form._zip.value			= countyFld.value;
+document.hidden_navigation_form._county.value		= '';		
+document.hidden_navigation_form._cityTown.value	= '';;
+}
+else {
+document.hidden_navigation_form._zip.value			= '';
+document.hidden_navigation_form._county.value		= countyFld.value;		
+document.hidden_navigation_form._cityTown.value	= countyFld.value;;
+}
+// work around ns4 issue
+if (ns4 && !ns5) {
+document.hidden_navigation_form._state.value	= stateFld.options[stateFld.selectedIndex].value;
+}	
+gnRefresh_int(null, false);
+}	
+} 
+function gnClearSearchParametersNew() {
+var streetFld	= document.form1._street;
+var cityTownFld	= document.form1._cityTown;
+var countyFld	= document.form2._county;
+var stateFld	= document.form1._state;
+var stateFld1	= document.form2._state;
+var zipFld		= document.form1._zip;	
+streetFld.value	= "";
+cityTownFld.value = "";
+countyFld.value	= "";
+stateFld.selectedIndex = 0;
+stateFld1.selectedIndex = 0;
+zipFld.value = "";
+}
+function gnClearSearchParameters() {
+var streetFld	= document.form1._street;
+var countyFld	= document.form1._county;
+var cityTownFld	= document.form1._cityTown;
+var stateFld	= document.form1._state;
+var zipFld		= document.form1._zip;
+streetFld.value	= "";
+countyFld.value	= "";
+cityTownFld.value = "";
+stateFld.selectedIndex = 0;
+zipFld.value = "";
+}
+function goButtonState(){
+selObj = document.form1._state;
+opt =  getSelectedOption( selObj ); 
+if ( validateGoClick( opt ) ) {
+document.hidden_navigation_form._state.value = opt.value;
+gnChangeGeoContext(opt.value);        
+}
+else {
+alert ( ALERT_MSG1 );
+}
+}
+function goButtonCongDistrict(){
+selObj = document.form1._cd;
+opt =  getSelectedOption( selObj ); 
+if ( validateGoClick( opt ) ) {
+document.hidden_navigation_form._cd.value = opt.value;
+gnChangeGeoContext(opt.value);        
+}
+else {
+alert ( ALERT_MSG1 );
+}
+}
+function goButtonCounty(){
+selObj = document.form1._county;
+opt =  getSelectedOption( selObj ); 
+if ( validateGoClick( opt ) ) {
+document.hidden_navigation_form._county.value = opt.value;
+gnChangeGeoContext(opt.value);        
+}
+else {
+alert ( ALERT_MSG1 );
+}
+}
+
+-->
+</script>
+<link rel="start" type="text/html" href="http://factfinder.census.gov" title="American FactFinder" />
+<link rel="stylesheet" type="text/css" href="/css/saff/saff_global.css" />
+<link rel="stylesheet" type="text/css" href="/css/saff/saff_popfinder.css" />
+<link rel="stylesheet" type="text/css" href="/css/saff/saff_geo.css" />
+<link rel="stylesheet" type="text/css" href="/css/methodtabs.css" />
+
+<style type="text/css" media="all">
+.geosection { background: transparent url("/img/saff/liberty.jpg") left no-repeat; }
+</style>
+<script language="JavaScript" type="text/javascript">
+<!--
+if (ie5 && !ie6) {
+document.write('<'+'link rel="stylesheet" href="/css/saff/global_ie5.css" />');
+}
+if (is_ie50) {
+document.write('<'+'link rel="stylesheet" href="/css/saff/global_ie50.css" />');
+}
+-->
+</script>
+<link rel="stylesheet" type="text/css" href="/css/saff/global_print.css" media="print" /> 
+</head>
+<body onload="javascript:displayDiv();init();">
+<a href="#subnavigation"><img src="/img/1px.gif" width="1" height="1" alt="Skip global navigation menu" /></a><br />
+<form name="breadcrumbHref" method="get" style="display: inline" action="">
+<input type="hidden" name="_lang" value="en" />
+<input type="hidden" name="_ts" value="" />
+</form>
+<form name="breadcrumbDataSetsHref" method="get" style="display: inline" action="">
+<input type="hidden" name="_ds_name" />
+<input type="hidden" name="_program" />
+<input type="hidden" name="_lang" value="en" />
+<input type="hidden" name="_ts" value="" />
+</form>
+<form name="breadcrumbProgramHref" method="get" style="display: inline" action="">
+<input type="hidden" name="_program" />
+<input type="hidden" name="_submenuId" value="factsheet_1" />
+<input type="hidden" name="_lang" value="en" />
+<input type="hidden" name="_ts" value="" />
+</form>
+<form name="hidden_simple_navigation_form" method="get" style="display: inline" action="">
+<input type="hidden" name="_sse" value="on" />
+<input type="hidden" name="ActiveGeoDiv" value="" />
+<input type="hidden" name="currTab" value="DEC_2000_SAFF" />
+<input type="hidden" name="prevTab" value="" />
+<input type="hidden" name="_program" value="dec" />
+<input type="hidden" name="_submenuId" value="factsheet_1" />
+<input type="hidden" name="_ci_nbr" value="null" />
+<input type="hidden" name="ds_name" value="DEC_2000_SAFF" />
+<input type="hidden" name="reg" value="" />
+<input type="hidden" name="qr_name" value="null" />
+<input type="hidden" name="_industry" value="" />
+</form>
+<form name="hidden_simple_static_page_form" method="get" style="display: inline" action="">
+<input type="hidden" name="_pageId" value="" />
+<input type="hidden" name="ds_name" value="DEC_2000_SAFF" />
+<input type="hidden" name="_submenuId" value="factsheet_1" />
+<input type="hidden" name="_ci_nbr" value="null" />
+<input type="hidden" name="qr_name" value="null" />
+<input type="hidden" name="_industry" value="" />
+</form>
+<form name="hidden_navigation_form" method="get" style="display: inline" action="">
+<input type="hidden" name="_event" value="" />
+<input type="hidden" name="geo_id" value="86000US61441" />
+<input type="hidden" name="_geoContext" value="01000US|86000US61441" />
+<input type="hidden" name="_street" value="" />
+<input type="hidden" name="_county" value="" />
+<input type="hidden" name="_cityTown" value="" />
+<input type="hidden" name="_state" value="" />
+<input type="hidden" name="_zip" value="61441" />
+<input type="hidden" name="_lang" value="en" />
+<input type="hidden" name="_sse" value="on" />
+<input type="hidden" name="ActiveGeoDiv" value="" />
+<input type="hidden" name="_useEV" value="" />
+<input type="hidden" name="pctxt" value="fph" />
+<input type="hidden" name="pgsl" value="860" />
+<input type="hidden" name="_submenuId" value="factsheet_1" />
+<input type="hidden" name="ds_name" value="DEC_2000_SAFF" />
+<input type="hidden" name="_ci_nbr" value="null" />
+<input type="hidden" name="qr_name" value="null" />
+<input type="hidden" name="reg" value="" />
+<input type="hidden" name="_keyword" value="" />
+<input type="hidden" name="_industry" value="" />
+</form>
+<form name="hidden_static_page_form" method="get" style="display: inline" action="">
+<input type="hidden" name="geo_id" value="86000US61441" />
+<input type="hidden" name="_geoContext" value="01000US|86000US61441" />
+<input type="hidden" name="_street" value="" />
+<input type="hidden" name="_county" value="" />
+<input type="hidden" name="_cityTown" value="" />
+<input type="hidden" name="_state" value="" />
+<input type="hidden" name="_zip" value="61441" />
+<input type="hidden" name="_pageId" value="" />
+<input type="hidden" name="_submenuId" value="" />
+<input type="hidden" name="_ci_nbr" value="null" />
+</form>
+<form name="hidden_dt_form" method="get" style="display: inline" action="">
+<input type="hidden" name="geo_id" value="86000US61441" />
+<input type="hidden" name="ds_name" value="" />
+<input type="hidden" name="mt_name" value="" />
+<input type="hidden" name="_lang" value="en" />
+<input type="hidden" name="_sse" value="on" />
+</form>
+<form name="hidden_gct_form" method="get" style="display: inline" action="">
+<input type="hidden" name="geo_id" value="86000US61441" />
+<input type="hidden" name="ds_name" value="" />
+<input type="hidden" name="_box_head_nbr" value="" />
+<input type="hidden" name="format" value="" />
+<input type="hidden" name="_lang" value="en" />
+<input type="hidden" name="_sse" value="on" />
+</form>
+<form name="hidden_qt_form" method="get" style="display: inline" action="">
+<input type="hidden" name="geo_id" value="86000US61441" />
+<input type="hidden" name="ds_name" value="" />
+<input type="hidden" name="qr_name" value="" />
+<input type="hidden" name="_lang" value="en" />
+<input type="hidden" name="_sse" value="on" />
+</form>
+<form name="hidden_iqt_form" method="get" style="display: inline" action="">
+<input type="hidden" name="geo_id" value="86000US61441" />
+<input type="hidden" name="ds_name" value="" />
+<input type="hidden" name="qr_name" value="" />
+<input type="hidden" name="_ci_nbr" value="null" />
+<input type="hidden" name="_submenuId" value=""/>
+<input type="hidden" name="_lang" value="en" />
+<input type="hidden" name="_sse" value="on" />
+</form>
+<form name="hidden_tm_form" method="get" style="display: inline" action="">
+<input type="hidden" name="geo_id" value="86000US61441" />
+<input type="hidden" name="ds_name" value="" />
+<input type="hidden" name="tm_name" value="" />
+<input type="hidden" name="_dBy" value="" />
+<input type="hidden" name="_MapEvent" value="displayBy" />
+<input type="hidden" name="_lang" value="en" />
+<input type="hidden" name="_sse" value="on" />
+</form>
+<form name='gotoMainPageForm' method='get' style="display:inline" action="">
+<input type='hidden' name='_lang' value='' />
+</form>
+
+
+<div class="screen-only">
+<div class="cbhead">
+<a href="http://www.census.gov"><img src="/img/cb_head.gif" width="639" height="25" alt="US Census Bureau" /></a>
+</div>
+<div class="montage">
+<img src="/img/montage2.jpg" width="496" height="48" alt="" />
+</div>
+<div class="affhead">
+<img src="/img/saff/aff2.gif" width="271" height="39" alt="American FactFinder" /><br />
+</div>
+</div>
+<div class="print-only">
+<img src="/img/saff/en/printbanner.jpg" width="677" height="50" alt="" />
+</div>
+<div class="pagewatermark">
+<img src="/img/saff/en/factsheet_watermark.gif" width="164" height="45" alt="" />
+</div>
+<div class="globalnavbkg">
+<img src="/img/1px.gif" width="1" height="1" alt ="" />
+</div>
+<div class="globalnav">
+<a href="javascript:gtShowMainPage()" title="Show Main Page">Main</a><br /><a href="javascript:gtShowSearch()" title="Show Search Page">Search</a><br /><a href="javascript:gtOpenFeedback()" title="Open Feedback in a new window">Feedback</a><br /><a href="javascript:gtOpenFAQ()" title="Open FAQs in a new window">FAQs</a><br /><a href="javascript:gtOpenGlossary()" title="Open Glossary in a new window">Glossary</a><br /><a href="javascript:gtShowSiteMap()" title="Show Site Map">Site&nbsp;Map</a><br /><a href="javascript:gtOpenHelp()" title="Open Help in a new window">Help</a><br />
+</div>
+
+
+
+<a name="subnavigation"></a>
+<a href="#contentwell"><img alt="Skip left navigation menu" src="/img/1px.gif" width="4" height="4" border="0" /></a>
+<div class="leftnav">
+<div class="sidelinks">
+<a id="population_0" href="javascript:gnShowPopulation('86000US61441','population_0')">Population Finder</a>
+<a id="factsheet_0" href="javascript:gnShowFactSheet('86000US61441','factsheet_0')" onmouseover="showmenu('factsheet_0')">Fact Sheet</a>
+<div id="factsheet_0div" class="lnmenu">
+<div>
+<a id="factsheet_1" href="javascript:gnShowFactSheet('86000US61441','factsheet_1')">Fact Sheet</a>
+<a id="factsheet_2" href="javascript:gnShowIteratedFactSheet('86000US61441','factsheet_2','DEC_2000_SAFF')">Fact Sheet for a Race, Ethnic, or Ancestry Group</a>
+</div>
+</div>
+<a id="people_0" href="javascript:gnShowPeople('86000US61441','people_0')" onmouseover="showmenu('people_0')">People</a>
+<div id="people_0div" class="lnmenu">
+<div>
+<a id="people_1" href="javascript:gnShowPeople('86000US61441','people_1')">Basic Counts / Population</a>
+<a id="people_2" href="javascript:gnShowPeople('86000US61441','people_2')">Age and Sex</a>
+<a id="people_3" href="javascript:gnShowPeople('86000US61441','people_3')">Aging</a>
+<a id="people_4" href="javascript:gnShowPeople('86000US61441','people_4')">Disability</a>
+<a id="people_5" href="javascript:gnShowPeople('86000US61441','people_5')">Education</a>
+<a id="people_6" href="javascript:gnShowPeople('86000US61441','people_6')">Employment</a>
+<a id="people_7" href="javascript:gnShowPeople('86000US61441','people_7')">Income</a>
+<a id="people_8" href="javascript:gnShowPeople('86000US61441','people_8')">Origins and Language</a>
+<a id="people_9" href="javascript:gnShowPeople('86000US61441','people_9')">Poverty</a>
+<a id="people_10" href="javascript:gnShowPeople('86000US61441','people_10')">Race and Ethnicity</a>
+<a id="people_11" href="javascript:gnShowPeople('86000US61441','people_11')">Relationships</a>
+<a id="people_12" href="javascript:gnShowPeople('86000US61441','people_12')">Veterans</a>
+</div>
+</div>
+<a id="housing_0" href="javascript:gnShowHousing('86000US61441','housing_0')" onmouseover="showmenu('housing_0')">Housing</a>
+<div id="housing_0div" class="lnmenu">
+<div>
+<a id="housing_1" href="javascript:gnShowHousing('86000US61441','housing_1')">Physical Characteristics</a>
+<a id="housing_2" href="javascript:gnShowHousing('86000US61441','housing_2')">Financial Characteristics</a>
+</div>
+</div>
+<a id="business_0" href="javascript:gnShowEconFactSheet('86000US61441','business_0','')" onmouseover="showmenu('business_0')">Business and Government</a>
+<div id="business_0div" class="lnmenu">
+<div>
+<a id="business_1" href="javascript:gnShowEconFactSheet('86000US61441','business_1','')">Economic Fact Sheet</a>
+<a id="business_2" href="javascript:gnShowEconIndustrySearch('86000US61441','business_2')">Economic Fact Sheet for an Industry</a>
+<a id="business_3" href="javascript:gnShowBusiness('86000US61441','business_3')">Business and Industry</a>
+<a id="business_4" href="javascript:gnShowBusiness('86000US61441','business_4')">Foreign Trade</a>
+<a id="business_5" href="javascript:gnShowBusiness('86000US61441','business_5')">Government</a>
+</div>
+</div>
+<span class="spacer"><img src="/img/1px.gif" width="1" height="1" alt="" /></span>
+<a id="aboutdata_0" href="/jsp/saff/SAFFInfo.jsp?_submenuId=aboutdata_0&amp;_pageId=censuses_surveys" onmouseover="showmenu('aboutdata_0')">About the Data</a>
+<div id="aboutdata_0div" class="lnmenu">
+<div>
+<a id="aboutdata_1" href="/jsp/saff/SAFFInfo.jsp?_submenuId=aboutdata_1&amp;_pageId=censuses_surveys">Censuses and Surveys</a>
+<a id="aboutdata_2" href="/jsp/saff/SAFFInfo.jsp?_submenuId=aboutdata_2&amp;_pageId=tables_maps">Table and Map Formats</a>	
+<a id="aboutdata_3" href="/jsp/saff/SAFFInfo.jsp?_submenuId=aboutdata_3&amp;_pageId=geography">Geography</a>		
+</div>
+</div>
+<a id="datasets_0" href="javascript:gnShowDataSets('86000US61441','datasets_0','DEC')" onmouseover="showmenu('datasets_0')">Data Sets</a>
+<div id="datasets_0div" class="lnmenu">
+<div>
+<a id="datasets_1" href="javascript:gnShowDataSets('86000US61441','datasets_1','DEC')">Decennial Census</a>
+<a id="datasets_2" href="javascript:gnShowDataSets('86000US61441','datasets_2','ACS')">American Community Survey</a>
+<a id="datasets_6" href="javascript:gnShowDataSets('86000US61441','datasets_6','ACS')">Puerto Rico Community Survey</a>
+<a id="datasets_3" href="javascript:gnShowDataSets('86000US61441','datasets_3','PEP')">Annual Population Estimates</a>
+<a id="datasets_4" href="javascript:gnShowDataSets('86000US61441','datasets_4','ECN')">Economic Census</a>
+<a id="datasets_5" href="javascript:gnShowDataSets('86000US61441','datasets_5','EAS')">Annual Economic Surveys</a>
+</div>
+</div>
+<a id="downloadcenter_0" href="javascript:saffShowPage('/servlet/DownloadDatasetServlet?_lang=en')">Download Center</a><br />
+<span class="spacer"><img src="/img/1px.gif" width="1" height="1" alt="" /></span>
+<a id="maps_0" href="/jsp/saff/SAFFInfo.jsp?_pageId=thematicmaps&amp;_submenuId=maps_0&amp;geoID=86000US61441" onmouseover="showmenu('maps_0')">Maps</a>
+<div id="maps_0div" class="lnmenu">
+<div>
+<a id="maps_1" href="/jsp/saff/SAFFInfo.jsp?_pageId=thematicmaps&amp;_submenuId=maps_1&amp;geo_id=86000US61441">Thematic Maps (data)</a>
+<a id="maps_2" href="/jsp/saff/SAFFInfo.jsp?_pageId=referencemaps&amp;_submenuId=maps_2&amp;geo_id=86000US61441">Reference Maps (boundaries)</a>
+</div>	
+</div>
+<a id="tools_0" href="javascript:gnShowTools('86000US61441','tools_0')" onmouseover="showmenu('tools_0')">Tools and References</a>
+<div id="tools_0div" class="lnmenu">
+<div>
+<a id="tools_1" href="javascript:gnShowTools('86000US61441','tools_1')">Tools</a>
+<a id="tools_2" href="javascript:gnShowReferenceShelf('86000US61441','tools_2')">Reference Shelf</a>
+</div>
+</div>
+</div>
+<a name="leftsearch"></a>
+<a href="#contentwell"><img alt="Skip to content well" src="/img/1px.gif" width="4" height="4" border="0" /></a>
+</div>
+<!-- Highlight selected menu and submenu (faster than calling function from body onLoad) -->
+<script type="text/javascript">
+ln_init('factsheet_1');
+</script>
+<img src="/img/1px.gif" width="1" height="1" alt="" /><br />
+<img src="/img/1px.gif" width="1" height="1" alt="" /><br />
+<div id="contentwell">
+<a name="contentwell"></a>
+
+
+
+
+
+
+
+
+
+<div class="breadcrumb">
+<a href="javascript:gtShowMainPage()">Main</a> <img src="/img/saff/bc_arrow.gif" width="8" height="9" alt="-&gt;" />
+<b>Fact Sheet</b>
+</div>
+<div class="sectiontitle">
+Fact Sheet
+</div>
+<div class="screen-only">
+
+<script language="JavaScript" type="text/javascript">
+function submitOnEnter(event,type) {
+if (event.keyCode == 13) {
+if (!type) {
+if (!(ie5 && !ie6)) {
+document.form2.submit();
+return(false)
+}
+} else {
+document.form1.submit();
+return(false)
+}
+}
+return(true);
+}
+function back(){	
+document.getElementById('search_by_address').style.visibility = 'hidden'; 
+document.getElementById('geoSelect').style.visibility = 'visible'; 
+document.hidden_navigation_form.ActiveGeoDiv.value	= "geoSelect";		
+}
+function searchByAddress(){	
+document.getElementById('search_by_address').style.visibility = 'visible'; 
+document.getElementById('geoSelect').style.visibility = 'hidden'; 	
+document.hidden_navigation_form.ActiveGeoDiv.value	= "search_by_address";	
+//document.form1._zip.value	= "";
+}
+function displayDiv(){
+var divName = "geoSelect"; 
+if ( divName == 'search_by_address'){   
+document.getElementById('search_by_address').style.visibility = 'visible'; 
+document.getElementById('geoSelect').style.visibility = 'hidden'; 
+}else{
+document.getElementById('search_by_address').style.visibility = 'hidden'; 
+document.getElementById('geoSelect').style.visibility = 'visible';    
+}
+
+}
+</script>
+<style type="text/css">
+.whichgeo { border-bottom: 1px solid #ccc; margin-left: -12px; }
+</style>
+<div id="search_by_address" style="visibility:hidden; position:absolute;" class="geoaddrsection">
+<div class="geoaddrsectionleft">
+<div class="geobreadcrumb">
+<a href="javascript:gnRefresh_int('01000US',false)">United States</a>&nbsp;|&nbsp;<b>61441</b>
+</div>
+<div class="geoname">Zip Code Tabulation Area 61441</div>
+</div>
+<div class="geoaddress">
+<form name="form1" action="javascript:gnSearchForGeoAddress();">
+<table border="0" cellspacing="0" cellpadding="0">
+<tr valign="bottom">
+<td colspan="3"><span class="selgeolabel"><label for="tx_address">street address</label>
+<img src="/img/1px.gif" width="56" height="1" alt="" />
+<a href="javascript:openEPSS('en', 'saff_searchtips')">search tips</a></span></td>
+</tr>
+<tr>
+<td colspan="3"><input type="text" class="form" onkeypress="submitOnEnter(event,'sba');" name="_street" value="" id="tx_address"  size="32"   style="width: 186px;" /></td>			
+</tr>
+<tr>
+<td nowrap="nowrap"><span class="selgeolabel"><label for="tx_city">city or town</label></span><br />
+<input type="text" class="form" onkeypress="submitOnEnter(event,'sba');" name="_cityTown"  id="tx_city"
+value="" 
+size="18" style="width: 88px;" /><img src="/img/1px.gif" width="10" height="1" alt="" /></td>
+<td nowrap="nowrap"><span class="selgeolabel"><label for="lb_stat1e">state</label></span><br />
+<select name="_state" id="lb_state" onkeypress="submitOnEnter(event,'sba');">
+<option value="">-- select a state --</option>			
+<option value="04000US01">Alabama</option>
+<option value="04000US02">Alaska</option>
+<option value="04000US04">Arizona</option>
+<option value="04000US05">Arkansas</option>
+<option value="04000US06">California</option>
+<option value="04000US08">Colorado</option>
+<option value="04000US09">Connecticut</option>
+<option value="04000US10">Delaware</option>
+<option value="04000US11">District of Columbia</option>
+<option value="04000US12">Florida</option>
+<option value="04000US13">Georgia</option>
+<option value="04000US15">Hawaii</option>
+<option value="04000US16">Idaho</option>
+<option value="04000US17">Illinois</option>
+<option value="04000US18">Indiana</option>
+<option value="04000US19">Iowa</option>
+<option value="04000US20">Kansas</option>
+<option value="04000US21">Kentucky</option>
+<option value="04000US22">Louisiana</option>
+<option value="04000US23">Maine</option>
+<option value="04000US24">Maryland</option>
+<option value="04000US25">Massachusetts</option>
+<option value="04000US26">Michigan</option>
+<option value="04000US27">Minnesota</option>
+<option value="04000US28">Mississippi</option>
+<option value="04000US29">Missouri</option>
+<option value="04000US30">Montana</option>
+<option value="04000US31">Nebraska</option>
+<option value="04000US32">Nevada</option>
+<option value="04000US33">New Hampshire</option>
+<option value="04000US34">New Jersey</option>
+<option value="04000US35">New Mexico</option>
+<option value="04000US36">New York</option>
+<option value="04000US37">North Carolina</option>
+<option value="04000US38">North Dakota</option>
+<option value="04000US39">Ohio</option>
+<option value="04000US40">Oklahoma</option>
+<option value="04000US41">Oregon</option>
+<option value="04000US42">Pennsylvania</option>
+<option value="04000US72">Puerto Rico</option>
+<option value="04000US44">Rhode Island</option>
+<option value="04000US45">South Carolina</option>
+<option value="04000US46">South Dakota</option>
+<option value="04000US47">Tennessee</option>
+<option value="04000US48">Texas</option>
+<option value="04000US49">Utah</option>
+<option value="04000US50">Vermont</option>
+<option value="04000US51">Virginia</option>
+<option value="04000US53">Washington</option>
+<option value="04000US54">West Virginia</option>
+<option value="04000US55">Wisconsin</option>
+<option value="04000US56">Wyoming</option>
+
+</select><img src="/img/1px.gif" width="12" height="1" alt="" /></td>
+<td nowrap="nowrap"><span class="selgeolabel">
+<label for="tx_zip">ZIP code</label></span><br />
+<input type="text" class="form" onkeypress="submitOnEnter(event,'sba');" name="_zip" id="tx_zip" 
+value="61441"
+size="3" style="width: 36px;" /><img src="/img/1px.gif" width="10" height="1" alt="" /><a href="javascript:gnSearchForGeoAddress()"><img src="/img/saff/en/go_btn_mp.gif" width="23" height="19" alt="GO" align="top" /></a></td>
+</tr>
+<tr>
+<td colspan="2"><span class="selgeolabel"><a href="javascript:gnClearSearchParametersNew()" title="clear all fields">clear</a></span></td>
+<td align="right"><span class="selgeolabel"><a href="javascript:back();">&laquo; back</a></span></td>
+</tr>
+</table>
+</form>
+</div>
+</div>
+
+<form name="form2" action="javascript:gnSearchForGeoNameSearch();"     >
+<div  id="geoSelect"  style="visibility:hidden;"  class="geosection">
+<div class="geosectionleft">
+<div class="geobreadcrumb">
+<a href="javascript:gnRefresh_int('01000US',false)">United States</a>&nbsp;|&nbsp;<b>61441</b>
+</div>
+<div class="geoname">Zip Code Tabulation Area 61441</div>
+</div>
+<div class="geosearch">
+<span class="selgeolabel"><label for="tx_city_cnty">city/ town, county, or zip</label></span><br />
+<input type="text" class="form" onkeypress="submitOnEnter(event);" name="_county" value="61441" id="tx_county" size="24" /><br />
+<span class="selgeolabel"><label for="lb_state">state</label></span><br />
+<select name="_state" id="lb_state" onkeypress="submitOnEnter(event);">
+<option value="">-- select a state --</option>			
+<option value="04000US01">Alabama</option>
+<option value="04000US02">Alaska</option>
+<option value="04000US04">Arizona</option>
+<option value="04000US05">Arkansas</option>
+<option value="04000US06">California</option>
+<option value="04000US08">Colorado</option>
+<option value="04000US09">Connecticut</option>
+<option value="04000US10">Delaware</option>
+<option value="04000US11">District of Columbia</option>
+<option value="04000US12">Florida</option>
+<option value="04000US13">Georgia</option>
+<option value="04000US15">Hawaii</option>
+<option value="04000US16">Idaho</option>
+<option value="04000US17">Illinois</option>
+<option value="04000US18">Indiana</option>
+<option value="04000US19">Iowa</option>
+<option value="04000US20">Kansas</option>
+<option value="04000US21">Kentucky</option>
+<option value="04000US22">Louisiana</option>
+<option value="04000US23">Maine</option>
+<option value="04000US24">Maryland</option>
+<option value="04000US25">Massachusetts</option>
+<option value="04000US26">Michigan</option>
+<option value="04000US27">Minnesota</option>
+<option value="04000US28">Mississippi</option>
+<option value="04000US29">Missouri</option>
+<option value="04000US30">Montana</option>
+<option value="04000US31">Nebraska</option>
+<option value="04000US32">Nevada</option>
+<option value="04000US33">New Hampshire</option>
+<option value="04000US34">New Jersey</option>
+<option value="04000US35">New Mexico</option>
+<option value="04000US36">New York</option>
+<option value="04000US37">North Carolina</option>
+<option value="04000US38">North Dakota</option>
+<option value="04000US39">Ohio</option>
+<option value="04000US40">Oklahoma</option>
+<option value="04000US41">Oregon</option>
+<option value="04000US42">Pennsylvania</option>
+<option value="04000US72">Puerto Rico</option>
+<option value="04000US44">Rhode Island</option>
+<option value="04000US45">South Carolina</option>
+<option value="04000US46">South Dakota</option>
+<option value="04000US47">Tennessee</option>
+<option value="04000US48">Texas</option>
+<option value="04000US49">Utah</option>
+<option value="04000US50">Vermont</option>
+<option value="04000US51">Virginia</option>
+<option value="04000US53">Washington</option>
+<option value="04000US54">West Virginia</option>
+<option value="04000US55">Wisconsin</option>
+<option value="04000US56">Wyoming</option>
+
+</select><img src="/img/1px.gif" width="12" height="1" alt="" /><a href="javascript:gnSearchForGeoNameSearch()"><img src="/img/saff/en/go_btn_mp.gif" width="23" height="19" alt="GO" align="top" /></a><br />
+<img src="/img/1px.gif" width="1" height="2" alt="" /><br />
+<div style="text-align: right;"><a href="javascript:searchByAddress()">search by address &raquo;</a>
+</div>		
+</div> <!-- end geoselection -->
+</div>
+</form>
+
+<form name="panelForm" style="display: inline">
+<input type="hidden" name="PANEL_ID" value="saff_gn2_fact_sheet_860">
+<input type="hidden" name="HELP_ID" value="saff_factsheet">
+</form>
+
+
+
+<table width="614" border="0" cellspacing="0" cellpadding="0" bgcolor="#f4f4f4">
+<tr>
+<td bgcolor="#ffffff">
+<table class="methodtabs" cellspacing="0" cellpadding="0">
+<tr valign="bottom">
+
+
+<td><span>2000</span></td>
+
+
+
+<td><div class="methodtabs-text">2005-2007 data <a href="javascript:openEPSS('en','explain_ACS_2006_EST_G00_')">not available</a> for this geography</div></td>
+
+
+</tr>
+</table>	
+</td>
+</tr>  
+<tr>
+<td height="3" bgcolor="#366EA7"><img src="/img/1px.gif" width="1" height="3" alt="" /></td>
+</tr>
+</table>
+ 
+
+</div>
+<div class="print-only" style="margin-left: 3px;">
+<div class="geoname">Zip Code Tabulation Area 61441</div>
+</div>
+
+<div style="font-size: 8pt; padding: 4px 12px 4px 0; text-align: right;">
+View a Fact Sheet for a <a href="javascript:gnShowIteratedFactSheet('86000US61441','factsheet_2','DEC_2000_SAFF')"><b>race, ethnic, or ancestry group</b></a>
+</div>
+
+<div class="refmaplink" style="float: right; margin: 5px 10px 0 0;"><a href="javascript:openRM('86000US61441')">Reference Map</a></div>
+
+
+<div style="font-weight: bold; color: #144A6C; font-size: 9pt; margin: 5px 3px 8px 3px;">Census 2000 Demographic Profile Highlights:</div>
+
+<table id="factsheet" cellspacing="0" cellpadding="0" width="600" border="0">
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td class="header" width="50%" id="C1" align="LEFT"><p style="text-align:left;font-weight:bold;">
+<b>General Characteristics - <a href="javascript:showQT('DEC_2000_SF1_U','86000US61441','DEC_2000_SF1_U_DP1')">show more</a> >></b></p></td>
+<td class="header" width="15%" id="C2" align="RIGHT"><p style="text-align:right;font-weight:bold;">
+Number</p></td>
+<td class="header" width="10%" id="C3" align="RIGHT"><p style="text-align:right;font-weight:bold;">
+Percent</p></td>
+<td class="header" width="11%" id="C4" align="RIGHT"><p style="text-align:right;font-weight:bold;">
+U.S.</p></td>
+<td class="header" width="7%" id="C5">
+&nbsp;</td>
+<td class="header" width="7%" id="C6">
+&nbsp;</td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R1" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Total population</p></td>
+<td  headers="R1 C2" align="RIGHT"><p style="text-align:right;">
+1,007</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Persons per Square Mile: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00090')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Population Change and Distribution: 1990 - 2000 (PDF - 522KB), opens in new window" href="http://www.census.gov/prod/2001pubs/c2kbr01-2.pdf" target="_blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R2" align="LEFT"><p style="margin-left:20px;text-align:left;">
+Male</p></td>
+<td  headers="R1 R2 C2" align="RIGHT"><p style="text-align:right;">
+520</p></td>
+<td  headers="R1 R2 C3" align="RIGHT"><p style="text-align:right;">
+51.6</p></td>
+<td headers="R1 R2 C4" align="RIGHT"><p style="text-align:right;">
+49.1%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Males Per 100 Females: 2000"href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00172')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Gender: 2000 (PDF - 477KB), opens in new window" href="http://www.census.gov/prod/2001pubs/c2kbr01-9.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R3" align="LEFT"><p style="margin-left:20px;text-align:left;">
+Female</p></td>
+<td  headers="R1 R3 C2" align="RIGHT"><p style="text-align:right;">
+487</p></td>
+<td  headers="R1 R3 C3" align="RIGHT"><p style="text-align:right;">
+48.4</p></td>
+<td headers="R1 R3 C4" align="RIGHT"><p style="text-align:right;">
+50.9%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Males Per 100 Females: 2000"href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00172')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Gender: 2000 (PDF - 477KB), opens in new window" href="http://www.census.gov/prod/2001pubs/c2kbr01-9.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R4" align="LEFT"><p style="margin-left:10px;text-align:left;">
+<a title="Opens glossary in new window" class="glossary" href="javascript:openGlossary('glossary_m.html#median_age')">Median age</a> (years)</p></td>
+<td  headers="R4 C2" align="RIGHT"><p style="text-align:right;">
+41.3</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+(X)</p></td>
+<td  headers="R4 C4" align="RIGHT"><p style="text-align:right;">
+35.3</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Median Age: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00022')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Age: 2000 (PDF -507KB), opens in new window" href="http://www.census.gov/prod/2001pubs/c2kbr01-12.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R5" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Under 5 years</p></td>
+<td  headers="R5 C2" align="RIGHT"><p style="text-align:right;">
+57</p></td>
+<td  headers="R5 C3" align="RIGHT"><p style="text-align:right;">
+5.7</p></td>
+<td headers="R5 C4" align="RIGHT"><p style="text-align:right;">
+6.8%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent of Persons Under 5 years: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00155')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R6" align="LEFT"><p style="margin-left:10px;text-align:left;">
+18 years and over</p></td>
+<td  headers="R6 C2" align="RIGHT"><p style="text-align:right;">
+767</p></td>
+<td  headers="R6 C3" align="RIGHT"><p style="text-align:right;">
+76.2</p></td>
+<td headers="R6 C4" align="RIGHT"><p style="text-align:right;">
+74.3%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R7" align="LEFT"><p style="margin-left:10px;text-align:left;">
+65 years and over</p></td>
+<td  headers="R7 C2" align="RIGHT"><p style="text-align:right;">
+170</p></td>
+<td  headers="R7 C3" align="RIGHT"><p style="text-align:right;">
+16.9</p></td>
+<td headers="R7 C4" align="RIGHT"><p style="text-align:right;">
+12.4%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent of Persons 65 and Over: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00073')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="The 65 Years and Over Population: 2000 (PDF - 581KB), opens in new window" href="http://www.census.gov/prod/2001pubs/c2kbr01-10.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td class="thin-grey" id="R8" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R9" align="LEFT"><p style="margin-left:10px;text-align:left;">
+One <a title="Opens glossary in new window" class="glossary" href="javascript:openGlossary('glossary_r.html#race')">race</a></p></td>
+<td  headers="R9 C2" align="RIGHT"><p style="text-align:right;">
+1,001</p></td>
+<td  headers="R9 C3" align="RIGHT"><p style="text-align:right;">
+99.4</p></td>
+<td headers="R9 C4" align="RIGHT"><p style="text-align:right;">
+97.6%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R10" align="LEFT"><p style="margin-left:20px;text-align:left;">
+White</p></td>
+<td  headers="R9 R10 C2" align="RIGHT"><p style="text-align:right;">
+991</p></td>
+<td  headers="R9 R10 C3" align="RIGHT"><p style="text-align:right;">
+98.4</p></td>
+<td headers="R9 R10 C4" align="RIGHT"><p style="text-align:right;">
+75.1%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent of Persons Who Are White Alone: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00265')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="The White Population: 2000 (PDF - 506KB), opens in new window" href="http://www.census.gov/prod/2001pubs/c2kbr01-4.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R11" align="LEFT"><p style="margin-left:20px;text-align:left;">
+Black or African American</p></td>
+<td  headers="R9 R11 C2" align="RIGHT"><p style="text-align:right;">
+0</p></td>
+<td  headers="R9 R11 C3" align="RIGHT"><p style="text-align:right;">
+0.0</p></td>
+<td headers="R9 R11 C4" align="RIGHT"><p style="text-align:right;">
+12.3%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent of Persons Who Are Black or African American Alone: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00083')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="The Black Population: 2000 (PDF - 505KB), opens in new window" href="http://www.census.gov/prod/2001pubs/c2kbr01-5.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R12" align="LEFT"><p style="margin-left:20px;text-align:left;">
+American Indian and Alaska Native</p></td>
+<td  headers="R9 R12 C2" align="RIGHT"><p style="text-align:right;">
+6</p></td>
+<td  headers="R9 R12 C3" align="RIGHT"><p style="text-align:right;">
+0.6</p></td>
+<td headers="R9 R12 C4" align="RIGHT"><p style="text-align:right;">
+0.9%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent of Persons Who Are American Indian and Alaska Native Alone: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00078')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="The American Indian and Alaska Native Population: 2000 (PDF - 454KB), opens in new window" href="http://www.census.gov/prod/2002pubs/c2kbr01-15.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R13" align="LEFT"><p style="margin-left:20px;text-align:left;">
+Asian</p></td>
+<td  headers="R9 R13 C2" align="RIGHT"><p style="text-align:right;">
+2</p></td>
+<td  headers="R9 R13 C3" align="RIGHT"><p style="text-align:right;">
+0.2</p></td>
+<td headers="R9 R13 C4" align="RIGHT"><p style="text-align:right;">
+3.6%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent of Persons Who Are Asian Alone: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00080')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="The Asian Population: 2000 (PDF - 419KB), opens in new window" href="http://www.census.gov/prod/2002pubs/c2kbr01-16.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R14" align="LEFT"><p style="margin-left:20px;text-align:left;">
+Native Hawaiian and Other Pacific Islander</p></td>
+<td  headers="R9 R14 C2" align="RIGHT"><p style="text-align:right;">
+0</p></td>
+<td  headers="R9 R14 C3" align="RIGHT"><p style="text-align:right;">
+0.0</p></td>
+<td headers="R9 R14 C4" align="RIGHT"><p style="text-align:right;">
+0.1%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent of Persons Who Are Native Hawaiian and Other Pacific Islander Alone: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00086')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="The Native Hawaiian and Other Pacific Islander Population: 2000 (PDF - 481KB), opens in new window" href="http://www.census.gov/prod/2001pubs/c2kbr01-14.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R15" align="LEFT"><p style="margin-left:20px;text-align:left;">
+Some other race</p></td>
+<td  headers="R9 R15 C2" align="RIGHT"><p style="text-align:right;">
+2</p></td>
+<td  headers="R9 R15 C3" align="RIGHT"><p style="text-align:right;">
+0.2</p></td>
+<td headers="R9 R15 C4" align="RIGHT"><p style="text-align:right;">
+5.5%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent of Persons Who Are Some Other Race Alone: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00223')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R16" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Two or more races</p></td>
+<td  headers="R9 R16 C2" align="RIGHT"><p style="text-align:right;">
+6</p></td>
+<td  headers="R9 R16 C3" align="RIGHT"><p style="text-align:right;">
+0.6</p></td>
+<td headers="R9 R16 C4" align="RIGHT"><p style="text-align:right;">
+2.4%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent of Persons of Two or More Races: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00077')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="The Two or More Races Population: 2000 (PDF - 499KB), opens in new window" href="http://www.census.gov/prod/2001pubs/c2kbr01-6.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td class="thin-grey" id="R17" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R18" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Hispanic or Latino (of any race)</p></td>
+<td  headers="R18 C2" align="RIGHT"><p style="text-align:right;">
+13</p></td>
+<td  headers="R18 C3" align="RIGHT"><p style="text-align:right;">
+1.3</p></td>
+<td headers="R18 C4" align="RIGHT"><p style="text-align:right;">
+12.5%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent of Persons Who Are Hispanic or Latino (of any race): 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00085')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="The Hispanic Population (PDF - 510KB), opens in new window" href="http://www.census.gov/prod/2001pubs/c2kbr01-3.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td class="thin-grey" id="R19" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R20" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Household population</p></td>
+<td  headers="R20 C2" align="RIGHT"><p style="text-align:right;">
+1,007</p></td>
+<td  headers="R20 C3" align="RIGHT"><p style="text-align:right;">
+100.0</p></td>
+<td headers="R20 C4" align="RIGHT"><p style="text-align:right;">
+97.2%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Household Population: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00288')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Households and Families: 2000 (PDF - 469KB), opens in new window" href="http://www.census.gov/prod/2001pubs/c2kbr01-8.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R21" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Group quarters population</p></td>
+<td  headers="R21 C2" align="RIGHT"><p style="text-align:right;">
+0</p></td>
+<td  headers="R21 C3" align="RIGHT"><p style="text-align:right;">
+0.0</p></td>
+<td headers="R21 C4" align="RIGHT"><p style="text-align:right;">
+2.8%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Group Quarters Population: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00162')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td class="thin-grey" id="R22" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R23" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Average <a title="Opens glossary in new window" class="glossary" href="javascript:openGlossary('glossary_h.html#household')">household</a> size</p></td>
+<td  headers="R23 C2" align="RIGHT"><p style="text-align:right;">
+2.40</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+(X)</p></td>
+<td  headers="R23 C4" align="RIGHT"><p style="text-align:right;">
+2.59</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Average Household Size: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00001')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Households and Families (PDF - 469KB), opens in new window" href="http://www.census.gov/prod/2001pubs/c2kbr01-8.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R24" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Average family size</p></td>
+<td  headers="R24 C2" align="RIGHT"><p style="text-align:right;">
+2.92</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+(X)</p></td>
+<td  headers="R24 C4" align="RIGHT"><p style="text-align:right;">
+3.14</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Average Family Size: 2000"href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00166')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td class="thin-grey" id="R25" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+<td class="thin-grey" align="RIGHT"><p style="text-align:right;">
+<img src="/img/cws/1px.gif" width=1 height=1 alt=""></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R26" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Total housing units</p></td>
+<td  headers="R26 C2" align="RIGHT"><p style="text-align:right;">
+458</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Total Housing Units: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00091')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R27" align="LEFT"><p style="margin-left:20px;text-align:left;">
+Occupied housing units</p></td>
+<td  headers="R26 R27 C2" align="RIGHT"><p style="text-align:right;">
+419</p></td>
+<td  headers="R26 R27 C3" align="RIGHT"><p style="text-align:right;">
+91.5</p></td>
+<td headers="R26 R27 C4" align="RIGHT"><p style="text-align:right;">
+91.0%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Housing Characteristics (PDF - 490KB), opens in new window" href="http://www.census.gov/prod/2001pubs/c2kbr01-13.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R28" align="LEFT"><p style="margin-left:30px;text-align:left;">
+Owner-occupied housing units</p></td>
+<td  headers="R26 R27 R28 C2" align="RIGHT"><p style="text-align:right;">
+343</p></td>
+<td  headers="R26 R27 R28 C3" align="RIGHT"><p style="text-align:right;">
+81.9</p></td>
+<td headers="R26 R27 R28 C4" align="RIGHT"><p style="text-align:right;">
+66.2%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent Owner-Occupied Housing Units: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00071')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R29" align="LEFT"><p style="margin-left:30px;text-align:left;">
+Renter-occupied housing units</p></td>
+<td  headers="R26 R27 R29 C2" align="RIGHT"><p style="text-align:right;">
+76</p></td>
+<td  headers="R26 R27 R29 C3" align="RIGHT"><p style="text-align:right;">
+18.1</p></td>
+<td headers="R26 R27 R29 C4" align="RIGHT"><p style="text-align:right;">
+33.8%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent Renter-Occupied Housing Units: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00211')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Housing Costs of Renters: 2000 (PDF - 877KB), opens in new window" href="http://www.census.gov/prod/2003pubs/c2kbr-21.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R30" align="LEFT"><p style="margin-left:20px;text-align:left;">
+Vacant housing units</p></td>
+<td  headers="R26 R30 C2" align="RIGHT"><p style="text-align:right;">
+39</p></td>
+<td  headers="R26 R30 C3" align="RIGHT"><p style="text-align:right;">
+8.5</p></td>
+<td headers="R26 R30 C4" align="RIGHT"><p style="text-align:right;">
+9.0%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent Vacant Housing Units: 2000" href="javascript:showTM('DEC_2000_SF1_U','86000US61441','140','DEC_2000_SF1_U_M00200')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R31" align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td class="thick-grey" id="R32" align="LEFT"><p style="text-align:left;font-weight:bold;">
+<b>Social Characteristics - <a href="javascript:showQT('DEC_2000_SF3_U','86000US61441','DEC_2000_SF3_U_DP2')">show more</a> >></b></p></td>
+<td class="thick-grey" align="RIGHT"><p style="text-align:right;font-weight:bold;">
+Number</p></td>
+<td class="thick-grey" align="RIGHT"><p style="text-align:right;font-weight:bold;">
+Percent</p></td>
+<td class="thick-grey" align="RIGHT"><p style="text-align:right;font-weight:bold;">
+U.S.</p></td>
+<td class="thick-grey" align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td class="thick-grey" align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R33" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Population 25 years and over</p></td>
+<td  headers="R33 C2" align="RIGHT"><p style="text-align:right;">
+778</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R34" align="LEFT"><p style="margin-left:20px;text-align:left;">
+High school graduate or higher</p></td>
+<td  headers="R33 R34 C2" align="RIGHT"><p style="text-align:right;">
+631</p></td>
+<td  headers="R33 R34 C3" align="RIGHT"><p style="text-align:right;">
+81.1</p></td>
+<td headers="R33 R34 C4" align="RIGHT"><p style="text-align:right;">
+80.4%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent High School Graduate or More: 2000"href="javascript:showTM('DEC_2000_SF3_U','86000US61441','140','DEC_2000_SF3_U_M00160')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Educational Attainment: 2000 (PDF - 501KB), opens in new window" href="http://www.census.gov/prod/2003pubs/c2kbr-24.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R35" align="LEFT"><p style="margin-left:20px;text-align:left;">
+Bachelor's degree or higher</p></td>
+<td  headers="R33 R35 C2" align="RIGHT"><p style="text-align:right;">
+66</p></td>
+<td  headers="R33 R35 C3" align="RIGHT"><p style="text-align:right;">
+8.5</p></td>
+<td headers="R33 R35 C4" align="RIGHT"><p style="text-align:right;">
+24.4%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent with Bachelor's Degree or Higher: 2000"href="javascript:showTM('DEC_2000_SF3_U','86000US61441','140','DEC_2000_SF3_U_M00072')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R36" align="LEFT"><p style="margin-left:10px;text-align:left;">
+<a title="Opens glossary in new window" class="glossary" href="javascript:openGlossary('glossary_v.html#veteran_status')">Civilian veterans </a> (civilian population 18 years and over)</p></td>
+<td  headers="R36 C2" align="RIGHT"><p style="text-align:right;">
+125</p></td>
+<td  headers="R36 C3" align="RIGHT"><p style="text-align:right;">
+15.5</p></td>
+<td headers="R36 C4" align="RIGHT"><p style="text-align:right;">
+12.7%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent of Civilian Persons 18 Years and Over Who Are Veterans: 2000"href="javascript:showTM('DEC_2000_SF3_U','86000US61441','140','DEC_2000_SF3_U_M00262')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Veterans: 2000 (PDF - 882KB), opens in new window" href="http://www.census.gov/prod/2003pubs/c2kbr-22.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R37" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Disability status (population 5 years and over)</p></td>
+<td  headers="R37 C2" align="RIGHT"><p style="text-align:right;">
+179</p></td>
+<td  headers="R37 C3" align="RIGHT"><p style="text-align:right;">
+18.8</p></td>
+<td headers="R37 C4" align="RIGHT"><p style="text-align:right;">
+19.3%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent of Persons 21 to 64 Years With A Disability: 2000" href="javascript:showTM('DEC_2000_SF3_U' ,'86000US61441' , '140' , 'DEC_2000_SF3_U_M00256')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Disability Status: 2000 (PDF - 879.1KB), opens in a new window" href="http://www.census.gov/prod/2003pubs/c2kbr-17.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R38" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Foreign born</p></td>
+<td  headers="R38 C2" align="RIGHT"><p style="text-align:right;">
+12</p></td>
+<td  headers="R38 C3" align="RIGHT"><p style="text-align:right;">
+1.2</p></td>
+<td headers="R38 C4" align="RIGHT"><p style="text-align:right;">
+11.1%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent of Persons Who Are Foreign Born: 2000" href="javascript:showTM('DEC_2000_SF3_U','86000US61441','140','DEC_2000_SF3_U_M00084')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="The Foreign-Born Population: 2000 (PDF - 472.4KB), opens in a new window" href="http://www.census.gov/prod/2003pubs/c2kbr-34.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R39" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Male, Now married, except separated (population 15 years and over)</p></td>
+<td  headers="R39 C2" align="RIGHT"><p style="text-align:right;">
+296</p></td>
+<td  headers="R39 C3" align="RIGHT"><p style="text-align:right;">
+71.5</p></td>
+<td headers="R39 C4" align="RIGHT"><p style="text-align:right;">
+56.7%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Marital Status: 2000 (PDF - 530.3KB), opens in a new window" href="http://www.census.gov/prod/2003pubs/c2kbr-30.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R40" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Female, Now married, except separated (population 15 years and over)</p></td>
+<td  headers="R40 C2" align="RIGHT"><p style="text-align:right;">
+297</p></td>
+<td  headers="R40 C3" align="RIGHT"><p style="text-align:right;">
+67.8</p></td>
+<td headers="R40 C4" align="RIGHT"><p style="text-align:right;">
+52.1%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Marital Status: 2000 (PDF - 530.3KB), opens in a new window" href="http://www.census.gov/prod/2003pubs/c2kbr-30.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R41" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Speak a language other than English at home (population 5 years and over)</p></td>
+<td  headers="R41 C2" align="RIGHT"><p style="text-align:right;">
+11</p></td>
+<td  headers="R41 C3" align="RIGHT"><p style="text-align:right;">
+1.1</p></td>
+<td headers="R41 C4" align="RIGHT"><p style="text-align:right;">
+17.9%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent of Persons 5 Years and Over Who Speak a Language Other Than English at Home: 2000" href="javascript:showTM('DEC_2000_SF3_U','86000US61441','140','DEC_2000_SF3_U_M00167')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Language Use and English-Speaking Ability: 2000 (PDF - 481.2KB), opens in a new window" href="http://www.census.gov/prod/2003pubs/c2kbr-29.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R42" align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td class="thick-grey" id="R43" align="LEFT"><p style="text-align:left;font-weight:bold;">
+<b>Economic Characteristics - <a href="javascript:showQT('DEC_2000_SF3_U','86000US61441','DEC_2000_SF3_U_DP3')">show more</a> >></b></p></td>
+<td class="thick-grey" align="RIGHT"><p style="text-align:right;font-weight:bold;">
+Number</p></td>
+<td class="thick-grey" align="RIGHT"><p style="text-align:right;font-weight:bold;">
+Percent</p></td>
+<td class="thick-grey" align="RIGHT"><p style="text-align:right;font-weight:bold;">
+U.S.</p></td>
+<td class="thick-grey" align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td class="thick-grey" align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R44" align="LEFT"><p style="margin-left:10px;text-align:left;">
+In labor force (population 16 years and over)</p></td>
+<td  headers="R44 C2" align="RIGHT"><p style="text-align:right;">
+505</p></td>
+<td  headers="R44 C3" align="RIGHT"><p style="text-align:right;">
+60.0</p></td>
+<td headers="R44 C4" align="RIGHT"><p style="text-align:right;">
+63.9%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Employment Status: 2000 (PDF - 493.2KB), opens in new window" href="http://www.census.gov/prod/2003pubs/c2kbr-18.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R45" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Mean travel time to work in minutes (workers 16 years and older)</p></td>
+<td  headers="R45 C2" align="RIGHT"><p style="text-align:right;">
+35.5</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+(X)</p></td>
+<td  headers="R45 C4" align="RIGHT"><p style="text-align:right;">
+25.5</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Mean Travel Time to Work: 2000"href="javascript:showTM('DEC_2000_SF3_U','86000US61441','140','DEC_2000_SF3_U_M00175')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Journey to Work: 2000 (PDF - 502KB), opens in new window" href="http://www.census.gov/prod/2004pubs/c2kbr-33.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R46" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Median household <a title="Opens glossary in new window" class="glossary" href="javascript:openGlossary('glossary_i.html#income')">income</a> in 1999 (dollars)</p></td>
+<td  headers="R46 C2" align="RIGHT"><p style="text-align:right;">
+34,554</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+(X)</p></td>
+<td  headers="R46 C4" align="RIGHT"><p style="text-align:right;">
+41,994</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Median Household Income in 1999" href="javascript:showTM('DEC_2000_SF3_U','86000US61441','140','DEC_2000_SF3_U_M00024')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R47" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Median family income in 1999 (dollars)</p></td>
+<td  headers="R47 C2" align="RIGHT"><p style="text-align:right;">
+43,056</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+(X)</p></td>
+<td  headers="R47 C4" align="RIGHT"><p style="text-align:right;">
+50,046</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Median Family Income in 1999" href="javascript:showTM('DEC_2000_SF3_U','86000US61441','140','DEC_2000_SF3_U_M00266')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R48" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Per capita income in 1999 (dollars)</p></td>
+<td  headers="R48 C2" align="RIGHT"><p style="text-align:right;">
+17,475</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+(X)</p></td>
+<td  headers="R48 C4" align="RIGHT"><p style="text-align:right;">
+21,587</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Per Capita Income in 1999" href="javascript:showTM('DEC_2000_SF3_U','86000US61441','140','DEC_2000_SF3_U_M00270')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R49" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Families below poverty level</p></td>
+<td  headers="R48 R49 C2" align="RIGHT"><p style="text-align:right;">
+31</p></td>
+<td  headers="R48 R49 C3" align="RIGHT"><p style="text-align:right;">
+9.9</p></td>
+<td headers="R48 R49 C4" align="RIGHT"><p style="text-align:right;">
+9.2%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent of Families Below the Poverty Level in 1999 "href="javascript:showTM('DEC_2000_SF3_U','86000US61441','140','DEC_2000_SF3_U_M00279')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Poverty: 1999 (PDF - 850KB), opens in new window" href="http://www.census.gov/prod/2003pubs/c2kbr-19.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R50" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Individuals below poverty level</p></td>
+<td  headers="R48 R50 C2" align="RIGHT"><p style="text-align:right;">
+115</p></td>
+<td  headers="R48 R50 C3" align="RIGHT"><p style="text-align:right;">
+11.5</p></td>
+<td headers="R48 R50 C4" align="RIGHT"><p style="text-align:right;">
+12.4%</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Percent of Persons Below the Poverty Level in 1999 "href="javascript:showTM('DEC_2000_SF3_U','86000US61441','140','DEC_2000_SF3_U_M00075')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R51" align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td class="thick-grey" id="R52" align="LEFT"><p style="text-align:left;font-weight:bold;">
+<b>Housing Characteristics - <a href="javascript:showQT('DEC_2000_SF3_U','86000US61441','DEC_2000_SF3_U_DP4')">show more</a> >></b></p></td>
+<td class="thick-grey" align="RIGHT"><p style="text-align:right;font-weight:bold;">
+Number</p></td>
+<td class="thick-grey" align="RIGHT"><p style="text-align:right;font-weight:bold;">
+Percent</p></td>
+<td class="thick-grey" align="RIGHT"><p style="text-align:right;font-weight:bold;">
+U.S.</p></td>
+<td class="thick-grey" align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td class="thick-grey" align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R53" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Single-family owner-occupied homes</p></td>
+<td  headers="R53 C2" align="RIGHT"><p style="text-align:right;">
+255</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Structural and Occupancy Characteristics of Housing: 2000 (PDF - 880KB), opens in new window" href="http://www.census.gov/prod/2003pubs/c2kbr-32.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R54" align="LEFT"><p style="margin-left:20px;text-align:left;">
+Median value (dollars)</p></td>
+<td  headers="R53 R54 C2" align="RIGHT"><p style="text-align:right;">
+39,600</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+(X)</p></td>
+<td  headers="R53 R54 C4" align="RIGHT"><p style="text-align:right;">
+119,600</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Median Value: 2000" href="javascript:showTM('DEC_2000_SF3_U','86000US61441','140','DEC_2000_SF3_U_M00026')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Home Values: 2000 (PDF - 816KB), opens in new window" href="http://www.census.gov/prod/2003pubs/c2kbr-20.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R55" align="LEFT"><p style="margin-left:10px;text-align:left;">
+Median of selected monthly owner costs</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+(X)</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+(X)</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Housing Costs of Homeowners: 2000 (PDF - 913KB), opens in new window" href="http://www.census.gov/prod/2003pubs/c2kbr-27.pdf" target="blank">brief</a></p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R56" align="LEFT"><p style="margin-left:20px;text-align:left;">
+With a <a title="Opens glossary in new window" class="glossary" href="javascript:openGlossary('glossary_m.html#mortgage_status')">mortgage</a> (dollars)</p></td>
+<td  headers="R55 R56 C2" align="RIGHT"><p style="text-align:right;">
+573</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+(X)</p></td>
+<td  headers="R55 R56 C4" align="RIGHT"><p style="text-align:right;">
+1,088</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+<a title="Map of Median of Selected Monthly Owner Costs: 2000" href="javascript:showTM('DEC_2000_SF3_U','86000US61441','140','DEC_2000_SF3_U_M00202')">map</a></p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+<tr onmouseover="mark_row(this)" onmouseout="unmark_row(this)">
+<td id="R57" align="LEFT"><p style="margin-left:20px;text-align:left;">
+Not mortgaged (dollars)</p></td>
+<td  headers="R55 R57 C2" align="RIGHT"><p style="text-align:right;">
+234</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+(X)</p></td>
+<td  headers="R55 R57 C4" align="RIGHT"><p style="text-align:right;">
+295</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+<td align="RIGHT"><p style="text-align:right;">
+&nbsp;</p></td>
+</tr>
+</table>
+<table cellspacing="0" cellpadding="0" width="600" border="0">
+<tr><td>
+ (X) Not applicable.<BR>
+ Source: U.S. Census Bureau, Summary File 1 (SF 1) and Summary File 3 (SF 3)<BR>
+<br>
+</td></tr>
+</table>
+
+<img src="/img/saff/graypx.gif" width="596" height="1" alt="" />
+
+<div class="screen_only">
+<br />
+<table border="0" cellpadding="0" cellspacing="0" width="580" summary="">
+<tr>
+<td class="small">The letters PDF or symbol <img src="/img/pdftrans.gif" alt="Adobe PDF" border="0" /> indicate a document is in the <a href="http://www.census.gov/main/www/pdf.html">Portable Document Format (PDF)</a>. To view the file you will need the <a href="http://www.adobe.com/products/acrobat/readstep.html">Adobe&reg; Acrobat&reg; Reader</a>, which is available for <strong>free</strong> from the Adobe web site.</td>
+</tr>  
+</table>
+<br />
+</div>
+
+<div class="screen-only">
+<br />
+<!-- census footer 9-2004 -->
+<a href="#skip" title="Skip Navigation"><img alt="Skip this main site navigation menu"
+src="/img/1px.gif" width="4" height="4" /></a><br />
+<div id="cb_footer">
+Census Bureau Links: &nbsp;
+<a href="http://www.census.gov" target="_top">Home</a>
+&#183; <a href="http://www.census.gov/main/www/srchtool.html" target="_top">Search</a>
+&#183; <a href="http://www.census.gov/main/www/subjects.html" target="_top">Subjects A-Z</a>
+&#183; <a href="http://ask.census.gov">FAQs</a>
+&#183; <a href="http://www.census.gov/main/www/access.html" target="_top">Data Tools</a>
+&#183; <a href="/home/redir.html?http://www.census.gov/mp/www/cat/" target="_top">Catalog</a>
+&#183; <a href="http://www.census.gov/main/www/cen2000.html">Census 2000</a>
+&#183; <a href="http://www.census.gov/qdocs/www/">Quality</a>
+&#183; <a href="http://www.census.gov/privacy/" target="_top">Privacy&nbsp;Policy</a>
+&#183; <a href="http://www.census.gov/main/www/contacts.html" target="_top">Contact Us</a>
+<br /> 
+<br /> 
+<img src="/img/wordmarktl.gif" width="248" height="41" alt="U.S. Census Bureau: Helping You Make Informed Decisions" />
+</div>
+<a name="skip"> </a>
+<!-- end census footer -->
+</div>
+</div>
+
+</body>
+</html>

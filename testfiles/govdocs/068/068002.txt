@@ -1,0 +1,1194 @@
+/* SGY_IO.C - source code for functions in GPR_IO.LIB
+ *
+ * Jeff Lucius
+ * Geophysicist
+ * U.S. Geological Survey
+ * Geologic Division, Branch of Geophysics
+ * Box 25046  Denver Federal Center  MS 964
+ * Denver, CO  80225-0046
+ * 303-236-1413 (office), 303-236-1212 (secretary), 303-236-1425 (fax)
+ * email: lucius@musette.cr.usgs.gov
+ *
+ * To compile for use in GPR_IO.LIB:
+ *  icc /F /xnovm /zmod486 /zfloatsync /c SGY_IO.C
+ *
+ *     /F removes the floating point emulator, reduces binary size
+ *     /xnovm specifies no virtual memory manager, disk access is too slow
+ *     /zmod486 generates specific 80486 instructions, speeds up program.
+ *     /zfloatsync insures the FPU is operand-synchronized with the CPU.
+ *     /c compiles only, no linking.
+ *
+ * Functions in this module:
+ *   GetSegyReelHdr
+ *   GetSegyTrace
+ *   PrintSegyReelHdr
+ *   PrintSegyTraceHdr
+ *   PrintSuTraceHdr
+ *   ReadSegyReelHdr
+ *   SetSgyFileHeader
+ *   SetSgyTraceHeader
+ *   SetSuTraceHeader
+ */
+
+/* Include header files */
+#include "gpr_io.h"
+
+/* Declare globals */
+/* These are the recognized descriptors to the left of the equal sign, "=",
+   in the ASCII part of the SEG-Y file header.  First 15 are same as those
+   found in SS_HD_CMDS[][] in dt1_pgms.h.
+ */
+const char *SEGY_ASCII_CMDS[] =
+{   "NUMBER OF TRACES","NUMBER OF PTS/TRC","TIMEZERO AT POINT","TOTAL TIME WINDOW","STARTING POSITION",
+    "FINAL POSITION","STEP SIZE USED","POSITION UNITS","NOMINAL FREQUENCY","ANTENNA SEPARATION",
+    "PULSER VOLTAGE (V)","NUMBER OF STACKS","SURVEY MODE","TRACES PER SECOND","METERS PER MARK",
+    "NUMBER OF GAIN PTS","GAIN POINTS",NULL,
+} ;
+
+const char *GetSegyReelHdrMsg[] =
+{   "GetSegyReelHdr(): No errors.",
+    "GetSegyReelHdr() ERROR: NULL pointer in parameter list.",
+    "GetSegyReelHdr() ERROR: Short count from fread().",
+    "GetSegyReelHdr() WARNING: ftell() returned error.",
+} ;
+const char *GetSegyTraceMsg[] =
+{   "GetSegyTrace(): No errors.",
+    "GetSegyTrace() ERROR: NULL pointer in parameter list.",
+    "GetSegyTrace() ERROR: Short count from fread().",
+} ;
+const char *ReadSegyReelHdrMsg[] =
+{   "ReadSegyReelHdr(): No errors.",
+    "ReadSegyReelHdr() ERROR: NULL pointer in parameter list.",
+    "ReadSegyReelHdr() ERROR: Opening file.  File or path name not found.",
+    "ReadSegyReelHdr() ERROR: Opening file.  Read Access denied.",
+    "ReadSegyReelHdr() ERROR: Opening file.  Unknown access error.",
+    "ReadSegyReelHdr() ERROR: Short count from fread().",
+    "ReadSegyReelHdr() WARNING: ftell() returned error.",
+    "ReadSegyReelHdr() ERROR: Header format is not standard SEG-Y.",
+} ;
+
+/**************************** ReadSegyReelHdr() *****************************/
+/* Opens a file.  Reads the SEG-Y reel header.  Closes the file.
+ * If the data stored in the header is in big-endian format (opposite of
+ * the little-endian Intel scheme), "swap_bytes" is set to 1 to inform the
+ * calling function and the bytes in the header are reversed (except for
+ * the 3200-byte ASCII block).
+ *
+ * Parameters:
+ *  char *filename  - pointer to buffer holding filename
+ *  int *swap_bytes - address of variable, will return 0 if byte order OK,
+ *                    non-zero if byte order must be reversed for PC usage
+ *  long *num_traces - address of variable, will hold number of GPR scans on return
+ *  struct SegyReelHdrStruct *hdrPtr - address of reel header structure
+ *
+ * NOTE: Storage for variables pointed to in parameters list must have been
+ *       allocated prior to calling this function.
+ *
+ * Requires: <access.h>, <errno.h>, <stdio.h>, "gpr_io.h", "jl_defs.h".
+ * Calls: access, fread, rewind, fseek, ftell, SWAP_2BYTES, SWAP_4BYTES.
+ * Returns: 0 on success,
+ *         >0 on error (offset into an array of strings).
+ *
+const char *ReadSegyReelHdrMsg[] =
+{   "ReadSegyReelHdr(): No errors.",
+    "ReadSegyReelHdr() ERROR: NULL pointer in parameter list.",
+    "ReadSegyReelHdr() ERROR: Opening file.  File or path name not found.",
+    "ReadSegyReelHdr() ERROR: Opening file.  Read Access denied.",
+    "ReadSegyReelHdr() ERROR: Opening file.  Unknown access error.",
+    "ReadSegyReelHdr() ERROR: Short count from fread().",
+    "ReadSegyReelHdr() WARNING: ftell() returned error."
+    "ReadSegyReelHdr() ERROR: Header format is not standard SEG-Y.",
+} ;
+ *
+ * Author: Jeff Lucius   USGS   Branch of Geophysics   Golden, CO
+ * Date: April 12, 1995
+ */
+int ReadSegyReelHdr (char *filename,int *swap_bytes, long *num_traces,
+                    struct SegyReelHdrStruct *hdrPtr)
+{
+    int i, error;
+    long start_byte,last_byte,num_bytes,data_block_bytes;
+    FILE *infile;
+
+    /* Verify parameter list */
+    if (hdrPtr == NULL || num_traces == NULL || filename == NULL ||
+        swap_bytes == NULL) return 1;
+
+    /* Open file */
+    if ((infile = fopen(filename,"rb")) == NULL)
+    {   if (access(filename,4))
+        {   if      (errno == ENOENT) error = 2;
+            else if (errno == EACCES) error = 3;
+            else                      error = 4;
+        }
+        return error;
+    }
+
+    /* Get header */
+    if (fread((void *)hdrPtr,sizeof(struct SegyReelHdrStruct),1,infile) < 1)
+    {   fclose(infile);
+        return 5;
+    }
+
+    /* Determine if bytes must be swapped for PC usage */
+    if (hdrPtr->format <= 255)
+        *swap_bytes = 0;              /* order is Intel 80x86 little-endian */
+    else
+        *swap_bytes = 1;              /* order is Motorola 86000 big-endian */
+    if (*swap_bytes)
+    {   SWAP_4BYTES(hdrPtr->jobid);
+        SWAP_4BYTES(hdrPtr->lino);
+        SWAP_4BYTES(hdrPtr->reno);
+        SWAP_2BYTES(hdrPtr->ntrpr);
+        SWAP_2BYTES(hdrPtr->nart);
+        SWAP_2BYTES(hdrPtr->hdt);
+        SWAP_2BYTES(hdrPtr->dto);
+        SWAP_2BYTES(hdrPtr->hns);
+        SWAP_2BYTES(hdrPtr->nso);
+        SWAP_2BYTES(hdrPtr->format);
+        SWAP_2BYTES(hdrPtr->fold);
+        SWAP_2BYTES(hdrPtr->tsort);
+        SWAP_2BYTES(hdrPtr->vscode);
+        SWAP_2BYTES(hdrPtr->hsfs);
+        SWAP_2BYTES(hdrPtr->hsfe);
+        SWAP_2BYTES(hdrPtr->hslen);
+        SWAP_2BYTES(hdrPtr->hstyp);
+        SWAP_2BYTES(hdrPtr->schn);
+        SWAP_2BYTES(hdrPtr->hstas);
+        SWAP_2BYTES(hdrPtr->hstae);
+        SWAP_2BYTES(hdrPtr->htatyp);
+        SWAP_2BYTES(hdrPtr->hcorr);
+        SWAP_2BYTES(hdrPtr->bgrcv);
+        SWAP_2BYTES(hdrPtr->rcvm);
+        SWAP_2BYTES(hdrPtr->mfeet);
+        SWAP_2BYTES(hdrPtr->polyt);
+        SWAP_2BYTES(hdrPtr->vpol);
+        for (i=0; i<170; i++)
+            SWAP_2BYTES(hdrPtr->hunass[i]);
+    }
+
+    /* Verify we have a SEG-Y file header */
+    if (hdrPtr->format < 1 || hdrPtr->format > 4) return 7;
+
+    /* Determine number of GPR traces in file */
+    *num_traces = -1;                    /* default is error value */
+    start_byte = ftell(infile);          /* get current location (byte) */
+    if (start_byte < 0)                  /* report error */
+    {   fclose(infile);
+        return 6;
+    }
+    fseek(infile, 0L, SEEK_END);         /* go to end of file */
+    last_byte = ftell(infile);           /* get last location (byte) */
+    if (last_byte < 0)                   /* report error */
+    {    fclose(infile);
+        return 6;
+    }
+    fseek(infile, start_byte, SEEK_SET); /* return file pointer to first scan */
+    num_bytes = last_byte - start_byte;  /* number of bytes left in file */
+    data_block_bytes = hdrPtr->hns;      /* number of samples per trace */
+
+    /* Multiply data_block_bytes by number of bytes per sample */
+    switch(hdrPtr->format)
+    {   case 3:
+            data_block_bytes *= 2;
+            break;
+        default:
+            data_block_bytes *= 4;
+            break;
+    }
+
+    /* Add size of trace header */
+    data_block_bytes += sizeof(struct SegyTraceHdrStruct);
+
+    /* Calculate number of traces */
+    *num_traces = num_bytes / data_block_bytes;
+
+    /* Close file and return success */
+    fclose(infile);
+    return 0;
+}
+/***************************** PrintSegyReelHdr() ***************************/
+/* Print out the contents of a SEGY reel header to an output device
+ * (stdout, stderr, a disk file, etc.)..
+ *
+ * Parameters:
+ *   int swap_bytes     - if != 0, then must swap bytes for PC usage
+ *   int num_traces     - number of radar scans, <=0 if unknown
+ *   char *out_filename - "stdout", "stderr", or a DOS filename
+ *   char *sgy_filename - DOS name of the SEGY file
+ *   struct SegyReelHdrStruct *hdrPtr1 - address of the reel header structure
+ *
+ * Requires: <string.h>, <stdio.h>, <conio.h>, "gpr_io.h".
+ * Calls: strstr, strncpy, fprintf, getch, kbhit, fopen, fclose.
+ * Returns: void.
+ *
+ * Author: Jeff Lucius   USGS   Branch of Geophysics   Golden, CO
+ * Date: April 11, 1995
+ */
+void PrintSegyReelHdr (int swap_bytes,long num_traces,char *out_filename,
+                       char *sgy_filename,struct SegyReelHdrStruct *hdrPtr)
+{
+    char ctemp[80],*cptr;
+    int i;
+    int isfile   = 0;
+    FILE *stream = NULL;
+
+    /* Assign or open stream */
+    if      (strstr(out_filename,"stdout"))  stream = stdout;
+    else if (strstr(out_filename,"stderr"))  stream = stderr;
+    else
+    {   stream = fopen(out_filename,"wt");
+        isfile = 1;
+    }
+    if (stream == NULL) stream = stdout;
+
+    /* Print the header information */
+    while (kbhit()) getch();           /* clear keyboard buffer */
+    fprintf(stream,"\n\nSEG-Y reel header for file %s:\n",sgy_filename);
+    if (num_traces > 0)  fprintf(stream,"number of GPR traces  = %d\n",num_traces);
+    if (swap_bytes)
+        fprintf(stream,"Byte storage order is big-endian (Motorola style)\n");
+    else
+        fprintf(stream,"Byte storage order is little-endian (Intel style)\n");
+    cptr = hdrPtr->comment;            /* point to start of comment area */
+    for (i=0; i<40; i++)
+    {   strncpy(ctemp,cptr,80);        /* copy to buffer */
+        ctemp[79] = 0;                 /* terminate buffer */
+        fprintf(stream,"%s\n",ctemp);
+        cptr += 80;                    /* step by 80 characters */
+        if (i>0 && !(i%20)) getch();   /* pause for a screen full */
+    }
+    getch();
+    if (swap_bytes)
+        fprintf(stream,"NOTE: byte storage order has been reversed for Intel PC use\n");
+    fprintf(stream,"SEG-Y job ID         = %ld\n",hdrPtr->jobid);
+    fprintf(stream,"line number          = %ld\n",hdrPtr->lino);
+    fprintf(stream,"reel number          = %ld\n",hdrPtr->reno);
+    fprintf(stream,"data traces/record   = %hd\n",hdrPtr->ntrpr);
+    fprintf(stream,"aux. traces/record   = %hd\n",hdrPtr->nart);
+    fprintf(stream,"reel sample interval = %hd\n",hdrPtr->hdt);
+    fprintf(stream,"fld. sample interval = %hd\n",hdrPtr->dto);
+    fprintf(stream,"samples per trace    = %hd\n",hdrPtr->hns);
+    fprintf(stream,"orig. samples/trace  = %hd\n",hdrPtr->nso);
+    fprintf(stream,"sample format code   = %hd\n",hdrPtr->format);
+    fprintf(stream,"CDP fold             = %hd\n",hdrPtr->fold);
+    fprintf(stream,"trace sorting code   = %hd\n",hdrPtr->tsort);
+    fprintf(stream,"vertical sum code    = %hd\n",hdrPtr->vscode);
+    fprintf(stream,"start sweep freq.    = %hd\n",hdrPtr->hsfs);
+    fprintf(stream,"end sweep freq.      = %hd\n",hdrPtr->hsfe);
+	fprintf(stream,"sweep length         = %hd\n",hdrPtr->hslen);
+    fprintf(stream,"sweep type code      = %hd\n",hdrPtr->hstyp);
+    fprintf(stream,"trace no. of sweep ch= %hd\n",hdrPtr->schn);
+    fprintf(stream,"sweep taper length   = %hd\n",hdrPtr->hstas);
+    fprintf(stream,"sweep taper length   = %hd\n",hdrPtr->hstae);
+    fprintf(stream,"sweep taper type     = %hd\n",hdrPtr->htatyp);
+    fprintf(stream,"correl. trace code   = %hd\n",hdrPtr->hcorr);
+    fprintf(stream,"bin. gain rec. code  = %hd\n",hdrPtr->bgrcv);
+    fprintf(stream,"amp. rec. method     = %hd\n",hdrPtr->rcvm);
+    getch();
+    fprintf(stream,"meas. system code    = %hd\n",hdrPtr->mfeet);
+    fprintf(stream,"impuls sig. pol. code= %hd\n",hdrPtr->polyt);
+    fprintf(stream,"vib. pol. code       = %hd\n",hdrPtr->vpol);
+    fprintf(stream,"Unassigned (optional buffer) not displayed\n");
+
+    if (isfile) fclose(stream);
+    return;
+}
+/**************************** SetSgyFileHeader() ****************************/
+/* Set fields in a SEG-Y file header structure.  The Sensors & Software
+ * style for writing SEG-Y files is used.
+ *
+ * Parameters:
+ *  int day                -
+ *  int month              -
+ *  int year               -
+ *  long num_traces        -
+ *  long num_samples       -
+ *  long time_zero_sample  -
+ *  int total_time_ns      -
+ *  double start_pos       -
+ *  double final_pos       -
+ *  double step_size       -
+ *  char *pos_units        -
+ *  double ant_freq        -
+ *  double ant_sep         -
+ *  double pulser_voltage  -
+ *  int num_stacks         -
+ *  char *survey_mode      -
+ *  char *proc_hist;       -
+ *  char *text             -
+ *  char *job_number       -
+ *  char *title1           -
+ *  char *title2           -
+ *  char *source_filename  -
+ *  double traces_per_sec  -
+ *  double meters_per_mark -
+ *  int num_gain_pts       -
+ *  double gain_pts        -
+ *  struct SegyReelHdrStruct *HdrPtr - address of file header structure
+ *
+ * NOTE: Storage for variables pointed to in parameters list must have been
+ *       allocated prior to calling this function.
+ *
+ * Requires: <stdio.h>, <string.h>, "gpr_io.h", "assertjl.h".
+ * Calls: assert, memset, strchr, strncpy, sprintf, strlen, strstr, strlwr,
+ *        strcat.
+ * Returns: 0 on success,
+ *         >0 on error (offset into an array of strings).
+ *
+ * Author: Jeff Lucius   USGS   Branch of Geophysics   Golden, CO
+ * Date: February 14, 1996
+ */
+void SetSgyFileHeader (int day,int month,int year,long num_traces,
+                       long num_samples,long time_zero_sample,
+					   int total_time_ns,double start_pos,double final_pos,
+                       double step_size,char *pos_units,double ant_freq,
+                       double ant_sep,double pulser_voltage,int num_stacks,
+                       char *survey_mode,char *proc_hist,char *text,
+					   char *job_number,char *title1,char *title2,
+					   char *source_filename,double traces_per_sec,
+					   double meters_per_mark,int num_gain_pts,
+					   double *gain_pts,struct SegyReelHdrStruct *HdrPtr)
+{
+	char *cp1,*cp_next,str[80],str2[80];
+	int i;
+	int offset,comment_size,record_length;  /* bytes */
+	int max_records;
+	extern int Debug;
+
+	/* Reality check */
+	assert(HdrPtr != NULL);
+
+	/* Set all characters to spaces */
+	comment_size = sizeof(HdrPtr->comment);      /* should be 3200 */
+	memset((void *)HdrPtr->comment,' ',comment_size);
+
+	/* Initialize ASCII field as 40 80-character string records */
+	record_length = 80;                          /* bytes */
+	max_records = comment_size / record_length;  /* should be 40 */
+	for (i=0, offset=0; i<max_records; i++,offset+=record_length)
+		sprintf((HdrPtr->comment + offset),"C%02d ",i+1); /* sprintf adds NULL */
+
+	/* copy info to "records" */
+	offset = 4;  /* first record, NULL terminator after space character */
+	if (job_number && job_number[0] != 0)
+	{   strncpy((HdrPtr->comment + offset),job_number,10);
+		if (Debug)
+		{   printf("offset = %d  job_number = %s||\n",offset,job_number);
+			getch();
+		}
+		offset += record_length;
+	} else
+		offset += record_length;         /* skip 1st line */
+	if (title1 && title1[0] != 0)
+	{   strncpy((HdrPtr->comment + offset),title1,69);
+		if (Debug)
+		{   printf("offset = %d  title1 = %s||\n",offset,title1);
+			getch();
+		}
+		offset += record_length;
+		if (title2 && title2[0] != 0)
+		{   strncpy((HdrPtr->comment + offset),title2,69);
+			if (Debug)
+			{   printf("offset = %d  title2 = %s||\n",offset,title2);
+				getch();
+			}
+			offset += record_length;
+		}
+	} else if (text && (text[0] != 0))
+	{   cp_next = text;
+		for (i=0; i<2; i++)              /* only use first 2 lines */
+		{   cp1 = strchr(cp_next,'\n');
+			if (cp1 != NULL)
+			{   *cp1 = 0;                /* terminate string at \n */
+				strncpy((HdrPtr->comment + offset),cp_next,69);
+				if (Debug)
+				{   printf("offset = %d  cp_next = %s||\n",offset,cp_next);
+					getch();
+				}
+				offset += record_length;            /* point to next record */
+				cp_next = cp1 + 1;       /* point to next character after \n */
+			} else
+			{   strncpy((HdrPtr->comment + offset),cp_next,69); /* strncat adds NULL */
+				if (Debug)
+				{   printf("offset = %d  cp_next = %s||\n",offset,cp_next);
+					getch();
+				}
+				offset += record_length;            /* point to next record */
+				break; /* out of for loop */
+			}
+		}
+	}
+	sprintf((HdrPtr->comment + offset),"%02d/%02d/%02d  (DD/MM/YY)",day,month,year);
+	offset += record_length;
+	sprintf((HdrPtr->comment + offset),"NUMBER OF TRACES     = %ld",num_traces);
+	offset += record_length;
+	sprintf((HdrPtr->comment + offset),"NUMBER OF PTS/TRC    = %ld",num_samples);
+	offset += record_length;
+	sprintf((HdrPtr->comment + offset),"TIMEZERO AT POINT    = %ld",time_zero_sample);
+	offset += record_length;
+	sprintf((HdrPtr->comment + offset),"TOTAL TIME WINDOW    = %d  ns",total_time_ns);
+	offset += record_length;
+	sprintf((HdrPtr->comment + offset),"STARTING POSITION    = %f",start_pos);
+	offset += record_length;
+	sprintf((HdrPtr->comment + offset),"FINAL POSITION       = %f",final_pos);
+	offset += record_length;
+	sprintf((HdrPtr->comment + offset),"STEP SIZE USED       = %f",step_size);
+	offset += record_length;
+	if (pos_units && pos_units[0])
+		sprintf((HdrPtr->comment + offset),"POSITION UNITS       = %s",pos_units);
+	else
+		sprintf((HdrPtr->comment + offset),"POSITION UNITS       = unknown");
+	offset += record_length;
+	sprintf((HdrPtr->comment + offset),"NOMINAL FREQUENCY    = %f  MHz",ant_freq);
+	offset += record_length;
+	sprintf((HdrPtr->comment + offset),"ANTENNA SEPARATION   = %f",ant_sep);
+	offset += record_length;
+	sprintf((HdrPtr->comment + offset),"PULSER VOLTAGE (V)   = %f",pulser_voltage);
+	offset += record_length;
+	sprintf((HdrPtr->comment + offset),"NUMBER OF STACKS     = %d",num_stacks);
+	offset += record_length;
+	if (survey_mode && survey_mode[0])
+		sprintf((HdrPtr->comment + offset),"SURVEY MODE          = %s",survey_mode);
+	else
+		sprintf((HdrPtr->comment + offset),"SURVEY MODE          = unknown");
+	offset += record_length;
+	if (source_filename && source_filename[0])
+	{   sprintf((HdrPtr->comment + offset),"SOURCE DATA FILE     = %s",source_filename);
+		offset += record_length;
+	}
+	if (traces_per_sec > 0)
+	{   sprintf((HdrPtr->comment + offset),"TRACES PER SECOND    = %f",traces_per_sec);
+		offset += record_length;
+	}
+	if (meters_per_mark > 0)
+	{   sprintf((HdrPtr->comment + offset),"METERS PER MARK      = %f",meters_per_mark);
+		offset += record_length;
+	}
+	if (gain_pts && num_gain_pts > 0)
+	{   sprintf((HdrPtr->comment + offset),"NUMBER OF GAIN PTS   = %d",num_gain_pts);
+		offset += record_length;
+		sprintf(str,"GAIN POINTS (db) =");
+		for (i=0; i<num_gain_pts; i++)
+		{   if (strlen(str) >= 66)  /* can't fit any more on line */
+			{   sprintf((HdrPtr->comment + offset),"%s",str);
+				offset += record_length;
+				sprintf(str,"GAIN POINTS (db) = ");
+			}
+			sprintf(str2," %7.3f",gain_pts[i]);
+			strcat(str,str2);
+		}
+		/* make sure all strings have been printed */
+		if (strlen(str) > strlen("GAIN POINTS (db) = "))
+		{   sprintf((HdrPtr->comment + offset),"%s",str);
+			offset += record_length;
+		}
+	}
+	if (proc_hist && proc_hist[0] != 0)
+	{   for (i=1; proc_hist[i]; i++)
+		{   if ( (proc_hist[i-1] == 0x0D) && (proc_hist[i] == 0x0A) )
+			{   proc_hist[i-1] = ' ';
+			}
+		}
+		cp_next = proc_hist;
+		while ((offset/record_length) < max_records)  /* truncation expected */
+		{   cp1 = strchr(cp_next,'\n');
+			if (cp1 != NULL)
+			{   *cp1 = 0;                /* terminate string at \n */
+				strncpy((HdrPtr->comment + offset),cp_next,74);
+				offset += record_length; /* point to next record */
+				cp_next = cp1 + 1;       /* point to next character after \n */
+			} else
+			{   strncpy((HdrPtr->comment + offset),cp_next,74);
+				break; /* out of while block */
+			}
+		}
+	}
+
+	/* Replace all terminators and unprintable characters */
+	for (i=0; i<comment_size; i++)
+	{   if (HdrPtr->comment[i] < 0x21 || HdrPtr->comment[i] > 0x7E)
+			HdrPtr->comment[i] = ' ';   /* with space characters */
+	}
+
+	/* Initialize binary part of header to all 0s */
+	memset((void *)((char *)HdrPtr + comment_size), 0,
+			sizeof(struct SegyReelHdrStruct) - comment_size);
+
+	/* Set relavent values in binary portion using S&S style */
+	/* STANDARD values: note rescaling of 'dto' (SEG-Y is micro-seconds) */
+	HdrPtr->ntrpr  = 1;             /* number of data traces per record */
+	HdrPtr->hdt    = (total_time_ns * 1000.0) /
+					 (num_samples - 1); /* sample interval in pico-seconds */
+	HdrPtr->dto    = HdrPtr->hdt;   /* same for original field recording */
+	HdrPtr->hns    = num_samples;   /* number of samples per trace */
+	HdrPtr->nso    = num_samples;   /* same for original field recording */
+	HdrPtr->format = 3;             /* data sample format code (fixed point, 2 bytes) */
+	HdrPtr->tsort  = 3;             /* trace sorting code (single fold continuous profile) */
+	if (num_gain_pts > 0)
+	{   HdrPtr->bgrcv = 1;          /* binary gain recovered code (yes) */
+		HdrPtr->rcvm  = 4;          /* amplitude recovery method code (other) */
+	} else
+	{   HdrPtr->bgrcv = 2;          /* binary gain recovered code (no) */
+		HdrPtr->rcvm  = 1;          /* amplitude recovery method code (none) */
+	}
+	if (strstr(strlwr(pos_units),"meter") || strstr(pos_units,"metre"))
+		HdrPtr->mfeet = 1;          /* measurement system code (meters) */
+	else if (strstr(strlwr(pos_units),"feet") || strstr(pos_units,"inches"))
+		HdrPtr->mfeet = 2;          /* measurement system code (feet) */
+	else
+		HdrPtr->mfeet = 0;          /* unassigned */
+	/* NON-STANDARD - as assigned by S&S; strncat works because all bytes
+	   were set to 0 */
+	cp_next = cp1 = (char *)HdrPtr + comment_size + 60; /* point to start of area */
+	*((short int *)cp_next) = num_traces;
+	cp_next = cp1 + 140;            /* 10-char pulseEKKO job number */
+	if (job_number && job_number[0] != 0)
+	{   strncat(cp_next,job_number,9); /* strncat adds NULL */
+    }
+	if (title1 && title1[0] != 0)
+    {   cp_next = cp1 + 150;        /* 70-char pulseEKKO title 1 */
+		strncat(cp_next,title1,69);
+		if (title2 && title2[0] != 0)
+        {   cp_next = cp1 + 220;    /* 70-char pulseEKKO title 2 */
+			strncat(cp_next,title2,69);
+        }
+    } else if (text && text[0] != 0)
+    {   char *cp2,*cp3;
+        cp_next = cp1 + 150;        /* 70-char pulseEKKO title 1 */
+        cp3 = text;
+        cp2 = strchr(cp3,'\n');
+        if (cp2 != NULL)
+        {   *cp2 = 0;                /* terminate string at \n */
+            strncat(cp_next,cp3,69); /* strncat adds NULL */
+            cp_next = cp1 + 220;     /* 70-char pulseEKKO title 2 */
+            cp3 = cp2 + 1;           /* point to next character after \n */
+			cp2 = strchr(cp3,'\n');
+            if (cp2 != NULL)  *cp2 = 0; /* terminate string at \n */
+            strncat(cp_next,cp3,69); /* strncat adds NULL */
+        } else
+            strncat(cp_next,cp3,69); /* strncat adds NULL */
+    }
+    cp_next = cp1 + 290;             /* 20-char pulseEKKO data */
+    sprintf(str,"%02d/%02d/%02d (D/M/Y)",day,month,year);
+    strncat(cp_next,str,19);
+    cp_next = cp1 + 310;             /* 2-byte pulseEKKO number of stacks */
+    *((short int*)cp_next) = num_stacks;
+    cp_next = cp1 + 312;             /* 2-byte pulseEKKO number pulser voltage */
+    *((short int*)cp_next) = pulser_voltage;
+    cp_next = cp1 + 314;             /* 20-char pulseEKKO survey mode */
+    strncat(cp_next,survey_mode,19);
+    cp_next = cp1 + 334;             /* 4-byte pulseEKKO frequency */
+    *((float*)cp_next) = ant_freq;
+    cp_next = cp1 + 338;             /* 2-byte pulseEKKO dewow (0-not done 1-done) */
+    /* not set */
+
+	/* NON-STANDARD - as assigned by GSSI; strncat works because all bytes
+       were set to 0 */
+    /* HERE after talking to GSSI */
+}
+/*************************** SetSgyTraceHeader() ****************************/
+/* Set the fields in the SEG-Y trace header.
+ *
+ * Parameters:
+ *  long trace_num      - trace sequence number within line
+ *  double ant_sep      - meters between antennas
+ *  double elev         - elevation at trace
+ *  double postion      - position along trace
+ *  long timezero       - timezero in ns
+ *  long num_samps      - number of samples in this trace
+ *  long sample_int     - in pico-seconds
+ *  struct SegyTraceHdrStruct *HdrPtr - address of trace header structure
+ *
+ * NOTE: Storage for variables pointed to in parameters list must have been
+ *       allocated prior to calling this function.
+ *
+ * Requires: <string.h>, "gpr_io.h".
+ * Calls: memset.
+ * Returns: void.
+ *
+ * Author: Jeff Lucius   USGS   Branch of Geophysics   Golden, CO
+ * Date: April 11, 1995
+ */
+void SetSgyTraceHeader (long trace_num,double ant_sep,double elev,
+        double position,long timezero,long num_samps,long sample_int,
+        struct SegyTraceHdrStruct *HdrPtr)
+{
+    /* Initialize all fields to 0 */
+    memset((void *)HdrPtr,0,sizeof(struct SegyTraceHdrStruct));
+
+    /* Set relavent fields */
+    HdrPtr->tracl  = trace_num;        /* trace sequence number within line */
+    HdrPtr->tracr  = trace_num;        /* trace sequence number within reel */
+    HdrPtr->fldr   = trace_num;        /* field record number */
+    HdrPtr->tracf  = 1;                /* trace number within field record */
+    HdrPtr->trid   = 100;              /* trace ID code; pulseEKKO standard */
+	HdrPtr->nvs    = 1;                /* pulseEKKO standard */
+    HdrPtr->nhs    = 1;                /* pulseEKKO standard */
+    HdrPtr->duse   = 1;                /* pulseEKKO standard */
+    HdrPtr->offset = ant_sep * 1000;
+    HdrPtr->gelev  = elev;
+    HdrPtr->selev  = elev;
+    HdrPtr->scalel = -1000;            /* pulseEKKO standard */
+    HdrPtr->scalco = -1000;            /* pulseEKKO standard */
+    HdrPtr->sx     = position * 1000;
+    HdrPtr->counit = 1;                /* coordinate units code: length */
+    HdrPtr->laga   = timezero;         /* ns */
+    HdrPtr->ns     = num_samps;        /* number of samples in this trace */
+    HdrPtr->dt     = sample_int;       /* sample interval; in pico-seconds */
+    HdrPtr->gain   = 1;                /* gain type code: fixed */
+}
+/****************************** GetSegyTrace() ******************************/
+/*   Read one SEG-Y trace header and trace data.  The file must have been
+ * previously opened using fopen() and the file pointer must be at the start
+ * of the trace data block and header.
+ *   If the data stored in the header is in big-endian format (opposite of
+ * the little-endian Intel scheme), "swap_bytes" should be set to 1 and the
+ * byte storage order will be reversed before returning.
+ *
+ * Parameters:
+ *  int swap_bytes - non-zero if byte order must be reversed for PC usage
+ *  int format     - dat sample format code from reel header
+ *  long data_block_bytes - number of bytes in data block excluding header
+ *  struct SegyTraceHdrStruct  *hdrPtr - address of trace header structure
+ *  void *data     - pointer to allocated storage buffer of correct size
+ *  FILE *infile   - pointer to FILE structure for the input file, assigned
+ *
+ * NOTE: Storage for variables pointed to in parameters list must have been
+ *       allocated prior to calling this function.
+ *
+ * Requires: <stdio.h>, "gpr_io.h", "jl_defs.h".
+ * Calls: fread, SWAP_2BYTES, SWAP_4BYTES.
+ * Returns: 0 on success,
+ *         >0 on error (offset into an array of strings).
+ *
+const char *GetSegyTraceMsg[] =
+{   "GetSegyTrace(): No errors.",
+    "GetSegyTrace() ERROR: NULL pointer in parameter list.",
+    "GetSegyTrace() ERROR: Short count from fread().",
+}
+ *
+ * Author: Jeff Lucius   USGS   Branch of Geophysics   Golden, CO
+ * Date: October 31, 1995
+ */
+int GetSegyTrace (int swap_bytes,int format,long data_block_bytes,
+                  int num_samps,struct SegyTraceHdrStruct *hdrPtr,
+                  void *v_data,FILE *infile)
+{
+    int i;
+
+    /* Verify parameter list */
+    if (hdrPtr == NULL || v_data == NULL || infile == NULL) return 1;
+
+    /* Get header */
+    if (fread((void *)hdrPtr,sizeof(struct SegyTraceHdrStruct),1,infile) < 1)
+        return 2;
+
+    /* Get data */
+    if (fread(v_data,data_block_bytes,1,infile) < 1)
+        return 2;
+
+    /* Swap bytes if neccessary */
+    if (swap_bytes)
+    {   SWAP_4BYTES(hdrPtr->tracl);
+        SWAP_4BYTES(hdrPtr->tracr);
+        SWAP_4BYTES(hdrPtr->fldr);
+        SWAP_4BYTES(hdrPtr->tracf);
+        SWAP_4BYTES(hdrPtr->ep);
+        SWAP_4BYTES(hdrPtr->cdp);
+        SWAP_4BYTES(hdrPtr->cdpt);
+        SWAP_2BYTES(hdrPtr->trid);
+        SWAP_2BYTES(hdrPtr->nvs);
+        SWAP_2BYTES(hdrPtr->nhs);
+        SWAP_2BYTES(hdrPtr->duse);
+        SWAP_4BYTES(hdrPtr->offset);
+        SWAP_4BYTES(hdrPtr->gelev);
+        SWAP_4BYTES(hdrPtr->selev);
+        SWAP_4BYTES(hdrPtr->sdepth);
+        SWAP_4BYTES(hdrPtr->gdel);
+        SWAP_4BYTES(hdrPtr->sdel);
+        SWAP_4BYTES(hdrPtr->swdep);
+        SWAP_4BYTES(hdrPtr->gwdep);
+        SWAP_2BYTES(hdrPtr->scalel);
+        SWAP_2BYTES(hdrPtr->scalco);
+        SWAP_4BYTES(hdrPtr->sx);
+        SWAP_4BYTES(hdrPtr->sy);
+        SWAP_4BYTES(hdrPtr->gx);
+        SWAP_4BYTES(hdrPtr->gy);
+        SWAP_2BYTES(hdrPtr->counit);
+        SWAP_2BYTES(hdrPtr->wevel);
+        SWAP_2BYTES(hdrPtr->swevel);
+        SWAP_2BYTES(hdrPtr->sut);
+        SWAP_2BYTES(hdrPtr->gut);
+        SWAP_2BYTES(hdrPtr->sstat);
+        SWAP_2BYTES(hdrPtr->gstat);
+        SWAP_2BYTES(hdrPtr->tstat);
+        SWAP_2BYTES(hdrPtr->laga);
+        SWAP_2BYTES(hdrPtr->lagb);
+        SWAP_2BYTES(hdrPtr->delrt);
+        SWAP_2BYTES(hdrPtr->muts);
+        SWAP_2BYTES(hdrPtr->mute);
+        SWAP_2BYTES(hdrPtr->ns);
+        SWAP_2BYTES(hdrPtr->dt);
+        SWAP_2BYTES(hdrPtr->gain);
+        SWAP_2BYTES(hdrPtr->igc);
+        SWAP_2BYTES(hdrPtr->igi);
+        SWAP_2BYTES(hdrPtr->corr);
+        SWAP_2BYTES(hdrPtr->sfs);
+        SWAP_2BYTES(hdrPtr->sfe);
+        SWAP_2BYTES(hdrPtr->slen);
+        SWAP_2BYTES(hdrPtr->styp);
+        SWAP_2BYTES(hdrPtr->stas);
+        SWAP_2BYTES(hdrPtr->stae);
+        SWAP_2BYTES(hdrPtr->tatyp);
+        SWAP_2BYTES(hdrPtr->afilf);
+        SWAP_2BYTES(hdrPtr->afils);
+        SWAP_2BYTES(hdrPtr->nofilf);
+        SWAP_2BYTES(hdrPtr->nofils);
+        SWAP_2BYTES(hdrPtr->lcf);
+        SWAP_2BYTES(hdrPtr->hcf);
+        SWAP_2BYTES(hdrPtr->lcs);
+        SWAP_2BYTES(hdrPtr->hcs);
+        SWAP_2BYTES(hdrPtr->year);
+        SWAP_2BYTES(hdrPtr->day);
+        SWAP_2BYTES(hdrPtr->hour);
+        SWAP_2BYTES(hdrPtr->minute);
+        SWAP_2BYTES(hdrPtr->sec);
+        SWAP_2BYTES(hdrPtr->timbas);
+        SWAP_2BYTES(hdrPtr->trwf);
+        SWAP_2BYTES(hdrPtr->grnors);
+        SWAP_2BYTES(hdrPtr->grnofr);
+        SWAP_2BYTES(hdrPtr->grnlof);
+        SWAP_2BYTES(hdrPtr->gaps);
+        SWAP_2BYTES(hdrPtr->otrav);
+        for (i=0; i<30; i++) SWAP_2BYTES(hdrPtr->unass[i]);
+        switch (format)
+        {   case 1:
+            {   float *f_data = (float *)v_data;
+                for (i=0; i<num_samps; i++);
+                    SWAP_4BYTES(f_data[i]);
+                break;
+            }
+            case 2:  case 4:
+            {   long int *l_data = (long int *)v_data;;
+                for (i=0; i<num_samps; i++);
+                    SWAP_4BYTES(l_data[i]);
+                break;
+            }
+            case 3:
+            {   short int *s_data = (short int *)v_data;;
+                for (i=0; i<num_samps; i++);
+                    SWAP_2BYTES(s_data[i]);
+                break;
+            }
+        }
+    }
+    return 0;
+}
+/***************************** GetSegyReelHdr() *****************************/
+/*   Read the SEG-Y reel header.  The file must have been previously opened
+ * using fopen().
+ *   If the data stored in the header is in big-endian format (opposite of
+ * the little-endian Intel scheme), "swap_bytes" is set to 1 to inform the
+ * calling function and the bytes in the header are reversed (except for
+ * the 3200-byte ASCII block).
+ *
+ * Parameters:
+ *  int *swap_bytes - address of variable, will return 0 if byte order OK,
+ *                    non-zero if byte order must be reversed for PC usage
+ *  int *num_traces - address of variable, will hold number of GPR scans on return
+ *  struct SegyReelHdrStruct *hdrPtr - address of reel header structure
+ *  FILE *infile   - pointer to FILE structure for the input file, assigned
+ *
+ * NOTE: Storage for variables pointed to in parameters list must have been
+ *       allocated prior to calling this function.
+ *
+ * Requires: <stdio.h>, "gpr_io.h", "jl_defs.h".
+ * Calls: fread, rewind, fseek, ftell, SWAP_2BYTES, SWAP_4BYTES.
+ * Returns: 0 on success,
+ *         >0 on error (offset into an array of strings).
+ *
+const char *GetSegyReelHdrMsg[] =
+{   "GetSegyReelHdr(): No errors.",
+    "GetSegyReelHdr() ERROR: NULL pointer in parameter list.",
+    "GetSegyReelHdr() ERROR: Short count from fread().",
+    "GetSegyReelHdr() WARNING: ftell() returned error."
+}
+ *
+ * Author: Jeff Lucius   USGS   Branch of Geophysics   Golden, CO
+ * Date: December 13, 1994
+ */
+int GetSegyReelHdr (int *swap_bytes, int *num_traces,
+                    struct SegyReelHdrStruct *hdrPtr, FILE *infile)
+{
+    int i;
+    long start_byte,last_byte,num_bytes,data_block_bytes;
+
+    /* Verify parameter list */
+    if (hdrPtr == NULL || num_traces == NULL || infile == NULL) return 1;
+
+    /* Get header */
+    rewind(infile);
+    if (fread((void *)hdrPtr,sizeof(struct SegyReelHdrStruct),1,infile) < 1)
+        return 2;
+
+    /* Determine if bytes must be swapped for PC usage */
+    if (hdrPtr->format <= 255)
+        *swap_bytes = 0;              /* order is Intel 80x86 little-endian */
+    else
+        *swap_bytes = 1;              /* order is Motorola 86000 big-endian */
+    if (*swap_bytes)
+    {   SWAP_4BYTES(hdrPtr->jobid);
+        SWAP_4BYTES(hdrPtr->lino);
+        SWAP_4BYTES(hdrPtr->reno);
+        SWAP_2BYTES(hdrPtr->ntrpr);
+        SWAP_2BYTES(hdrPtr->nart);
+        SWAP_2BYTES(hdrPtr->hdt);
+        SWAP_2BYTES(hdrPtr->dto);
+        SWAP_2BYTES(hdrPtr->hns);
+        SWAP_2BYTES(hdrPtr->nso);
+        SWAP_2BYTES(hdrPtr->format);
+        SWAP_2BYTES(hdrPtr->fold);
+        SWAP_2BYTES(hdrPtr->tsort);
+        SWAP_2BYTES(hdrPtr->vscode);
+        SWAP_2BYTES(hdrPtr->hsfs);
+        SWAP_2BYTES(hdrPtr->hsfe);
+        SWAP_2BYTES(hdrPtr->hslen);
+        SWAP_2BYTES(hdrPtr->hstyp);
+        SWAP_2BYTES(hdrPtr->schn);
+        SWAP_2BYTES(hdrPtr->hstas);
+        SWAP_2BYTES(hdrPtr->hstae);
+        SWAP_2BYTES(hdrPtr->htatyp);
+        SWAP_2BYTES(hdrPtr->hcorr);
+        SWAP_2BYTES(hdrPtr->bgrcv);
+        SWAP_2BYTES(hdrPtr->rcvm);
+        SWAP_2BYTES(hdrPtr->mfeet);
+        SWAP_2BYTES(hdrPtr->polyt);
+        SWAP_2BYTES(hdrPtr->vpol);
+        for (i=0; i<170; i++)
+            SWAP_2BYTES(hdrPtr->hunass[i]);
+    }
+
+    /* Determine number of GPR scans in file */
+    *num_traces = -1;                    /* default is error value */
+    start_byte = ftell(infile);          /* get current location (byte) */
+    if (start_byte < 0) return 3;        /* report error */
+    fseek(infile, 0L, SEEK_END);         /* go to end of file */
+    last_byte = ftell(infile);           /* get last location (byte) */
+    if (last_byte < 0) return 3;         /* report error */
+    fseek(infile, start_byte, SEEK_SET); /* return file pointer to first scan */
+    num_bytes = last_byte - start_byte;  /* number of bytes left in file */
+    data_block_bytes = hdrPtr->hns;      /* number of samples per trace */
+
+    /* multiply data_block_bytes by number of bytes per sample */
+    switch(hdrPtr->format)
+    {   case 3:
+            data_block_bytes *= 2;
+            break;
+        default:
+            data_block_bytes *= 4;
+            break;
+    }
+    /* add size of trace header */
+    data_block_bytes += sizeof(struct SegyTraceHdrStruct);
+    /* calculate number of traces */
+    *num_traces = num_bytes / data_block_bytes;
+
+    return 0;
+}
+/**************************** PrintSegyTraceHdr() ***************************/
+/* Print out the contents of a SEGY trace header to an output device
+ * (stdout, stderr, a disk file, etc.)..
+ *
+ * Parameters:
+ *   char *out_filename - "stdout", "stderr", or a DOS filename
+ *   struct SegyTraceHdrStruct *hdrPtr1 - address of the trace header structure
+ *
+ * Requires: <string.h>, <stdio.h>, <conio.h>, "gpr_io.h".
+ * Calls: strstr, fprintf, fopen, fclose, getch, kbhit.
+ * Returns: void.
+ *
+ * Author: Jeff Lucius   USGS   Branch of Geophysics   Golden, CO
+ * Date: April 12, 1994
+ */
+void PrintSegyTraceHdr (char *out_filename,struct SegyTraceHdrStruct *hdrPtr)
+{
+    int isfile   = 0;
+    FILE *stream = NULL;
+
+    /* Assign or open stream */
+    if      (strstr(out_filename,"stdout"))  stream = stdout;
+    else if (strstr(out_filename,"stderr"))  stream = stderr;
+    else
+    {   stream = fopen(out_filename,"wt");
+        isfile = 1;
+    }
+    if (stream == NULL) stream = stdout;
+
+    /* Print the header information */
+    while (kbhit()) getch();           /* clear keyboard buffer */
+    fprintf(stream,"SEG-Y header for trace number %ld:\n",hdrPtr->tracl);
+    fprintf(stream,"trace seq. in reel   = %ld\n",hdrPtr->tracr);
+    fprintf(stream,"field record number  = %ld\n",hdrPtr->fldr);
+    fprintf(stream,"trace num in fld num = %ld\n",hdrPtr->tracf);
+    fprintf(stream,"energy src pt num    = %ld\n",hdrPtr->ep);
+    fprintf(stream,"CDP ensemble num     = %ld\n",hdrPtr->cdp);
+    fprintf(stream,"trace num in CDP ens = %ld\n",hdrPtr->cdpt);
+    fprintf(stream,"trace ID code        = %hd\n",hdrPtr->trid);
+    fprintf(stream,"num vert sum traces  = %hd\n",hdrPtr->nvs);
+    fprintf(stream,"num horiz sum traces = %hd\n",hdrPtr->nhs);
+    fprintf(stream,"data use             = %hd\n",hdrPtr->duse);
+    fprintf(stream,"dist from src to rec = %ld\n",hdrPtr->offset);
+    fprintf(stream,"rec elev above SL    = %ld\n",hdrPtr->gelev);
+    fprintf(stream,"src elev above SL    = %ld\n",hdrPtr->selev);
+    fprintf(stream,"src depth below surf = %ld\n",hdrPtr->sdepth);
+    fprintf(stream,"rec datum elevation  = %ld\n",hdrPtr->gdel);
+    fprintf(stream,"src datum elevation  = %ld\n",hdrPtr->sdel);
+    fprintf(stream,"water depth at src   = %ld\n",hdrPtr->swdep);
+    fprintf(stream,"water depth at rec   = %ld\n",hdrPtr->gwdep);
+    fprintf(stream,"scale factor prev 7  = %hd\n",hdrPtr->scalel);
+    fprintf(stream,"scale factor next 4  = %hd\n",hdrPtr->scalco);
+    fprintf(stream,"X source coord       = %ld\n",hdrPtr->sx);
+    fprintf(stream,"Y source coord       = %ld\n",hdrPtr->sy);
+    fprintf(stream,"X group coord        = %ld\n",hdrPtr->gx);
+    getch();
+    fprintf(stream,"Y group coord        = %ld\n",hdrPtr->gy);
+    fprintf(stream,"coord units code     = %hd\n",hdrPtr->counit);
+    fprintf(stream,"weathering velocity  = %hd\n",hdrPtr->wevel);
+    fprintf(stream,"subweathering vel    = %hd\n",hdrPtr->swevel);
+    fprintf(stream,"src uphole time      = %hd\n",hdrPtr->sut);
+    fprintf(stream,"rec group uphole time= %hd\n",hdrPtr->gut);
+    fprintf(stream,"src static correction= %hd\n",hdrPtr->sstat);
+    fprintf(stream,"group static correct = %hd\n",hdrPtr->gstat);
+    fprintf(stream,"total static applied = %hd\n",hdrPtr->tstat);
+    fprintf(stream,"lag time A           = %hd\n",hdrPtr->laga);
+    fprintf(stream,"lag time B           = %hd\n",hdrPtr->lagb);
+    fprintf(stream,"delay record time    = %hd\n",hdrPtr->delrt);
+    fprintf(stream,"mute time--start     = %hd\n",hdrPtr->muts);
+    fprintf(stream,"mute time--end       = %hd\n",hdrPtr->mute);
+    fprintf(stream,"num samps in trace   = %hu\n",hdrPtr->ns);
+    fprintf(stream,"sample interval      = %hu\n",hdrPtr->dt);
+    fprintf(stream,"gain type code       = %hd\n",hdrPtr->gain);
+    fprintf(stream,"instrum gain const   = %hd\n",hdrPtr->igc);
+    fprintf(stream,"instrum early gain   = %hd\n",hdrPtr->igi);
+    fprintf(stream,"correlated (y/n)     = %hd\n",hdrPtr->corr);
+    fprintf(stream,"sweep freq start     = %hd\n",hdrPtr->sfs);
+    fprintf(stream,"sweep freq end       = %hd\n",hdrPtr->sfe);
+    fprintf(stream,"sweep length         = %hd\n",hdrPtr->slen);
+    fprintf(stream,"sweep type code      = %hd\n",hdrPtr->styp);
+    getch();
+    fprintf(stream,"sweep taper at start = %hd\n",hdrPtr->stas);
+    fprintf(stream,"sweep taper at end   = %hd\n",hdrPtr->stae);
+    fprintf(stream,"taper type           = %hd\n",hdrPtr->tatyp);
+    fprintf(stream,"alias filter freq    = %hd\n",hdrPtr->afilf);
+    fprintf(stream,"alias filter slope   = %hd\n",hdrPtr->afils);
+    fprintf(stream,"notch filter freq    = %hd\n",hdrPtr->nofilf);
+    fprintf(stream,"notch filter slope   = %hd\n",hdrPtr->nofils);
+    fprintf(stream,"low cut freq         = %hd\n",hdrPtr->lcf);
+    fprintf(stream,"high cut freq        = %hd\n",hdrPtr->hcf);
+    fprintf(stream,"low cut slope        = %hd\n",hdrPtr->lcs);
+    fprintf(stream,"high cut slope       = %hd\n",hdrPtr->hcs);
+    fprintf(stream,"year data recorded   = %hd\n",hdrPtr->year);
+    fprintf(stream,"day of year          = %hd\n",hdrPtr->day);
+    fprintf(stream,"hour of day          = %hd\n",hdrPtr->hour);
+    fprintf(stream,"minute of hour       = %hd\n",hdrPtr->minute);
+    fprintf(stream,"second of minute     = %hd\n",hdrPtr->sec);
+    fprintf(stream,"time basis code      = %hd\n",hdrPtr->timbas);
+    fprintf(stream,"trace wgt factor     = %hd\n",hdrPtr->trwf);
+    fprintf(stream,"geoph grp no roll sw = %hd\n",hdrPtr->grnors);
+    fprintf(stream,"geoph grp no trace 1 = %hd\n",hdrPtr->grnofr);
+    fprintf(stream,"geoph grp no last tr = %hd\n",hdrPtr->grnlof);
+    fprintf(stream,"gap size             = %hd\n",hdrPtr->gaps);
+    fprintf(stream,"overtravel taper code= %hd\n",hdrPtr->otrav);
+    fprintf(stream,"Unassigned (optional buffer) not displayed\n");
+
+    if (isfile) fclose(stream);
+    return;
+}
+
+/**************************** SetSuTraceHeader() ****************************/
+/* Set the fields in the SEG-Y trace header.
+ *
+ * Parameters:
+ *  long trace_num      - trace sequence number within line, indexed from 1
+ *  double ant_sep      - meters between antennas
+ *  double elev         - elevation at trace in meters
+ *  double Tx_x         - transmitter X position in meters
+ *  double Tx_y         - transmitter Y position in meters
+ *  double Rc_x         - receiver X position in meters
+ *  double Rc_y         - receiver Y position in meters
+ *  long timezero       - timezero in nanoseconds
+ *  long num_samps      - number of samples in this trace
+ *  long sample_int     - sample rate in nanoseconds
+ *  long year           - year data recorded/modified/created; 0 - 3000
+ *  long day            - day of year; 1 - 366
+ *  long hour           - hour of day; 0 - 23
+ *  long minute         - minute of hour; 0 - 59
+ *  long second         - second of minute; 0 - 59
+ *  struct SuTraceHdrStruct *HdrPtr - address of allocated trace header struct
+ *
+ * NOTE: Storage for variables pointed to in parameters list must have been
+ *       allocated prior to calling this function.
+ *
+ * Requires: <string.h>, "gpr_io.h".
+ * Calls: memset.
+ * Returns: void.
+ *
+ * Author: Jeff Lucius   USGS   Crustal Imaging and Characterization Team
+ * Date: December 21, 2000
+ */
+void SetSuTraceHeader (long trace_num,double ant_sep,double elev,
+        double Tx_x,double Tx_y,double Rc_x,double Rc_y,
+        long timezero,long num_samps,long sample_int,
+        long year, long day, long hour, long minute, long second,
+        struct SuTraceHdrStruct *HdrPtr)
+{
+    /* Initialize all fields to 0 */
+    memset((void *)HdrPtr,0,sizeof(struct SuTraceHdrStruct));
+
+    /* Set relavent fields */
+    HdrPtr->tracl  = trace_num;        /* trace sequence number within line */
+    HdrPtr->tracr  = trace_num;        /* trace sequence number within reel */
+    HdrPtr->fldr   = trace_num;        /* field record number */
+    HdrPtr->tracf  = 1;                /* trace number within field record */
+    HdrPtr->trid   = 200;              /* trace ID code 200=USGS GPR*/
+	HdrPtr->nvs    = 1;                /* pulseEKKO standard */
+    HdrPtr->nhs    = 1;                /* pulseEKKO standard */
+    HdrPtr->duse   = 1;                /* pulseEKKO standard */
+    HdrPtr->offset = ant_sep * 1000;   /* truncation expected */
+    HdrPtr->gelev  = elev * 1000;      /* truncation expected */
+    HdrPtr->selev  = elev * 1000;      /* truncation expected */
+    HdrPtr->gdel   = elev * 1000;      /* truncation expected */
+    HdrPtr->sdel   = elev * 1000;      /* truncation expected */
+    HdrPtr->scalel = -1000;            /* divide values by 1000 to get original */
+    HdrPtr->scalco = -1000;            /* divide values by 1000 to get original */
+    HdrPtr->sx     = Tx_x * 1000;      /* truncation expected*/
+    HdrPtr->sy     = Tx_y * 1000;      /* truncation expected */
+    HdrPtr->gx     = Rc_x * 1000;      /* truncation expected */
+    HdrPtr->gy     = Rc_y * 1000;      /* truncation expected */
+    HdrPtr->cdp    = 0;      /* should this be something else? */
+    HdrPtr->cdpt   = 0;
+    HdrPtr->counit = 1;                /* coordinate units code: length */
+    HdrPtr->laga   = timezero * 1000;  /* timezero */
+    HdrPtr->ns     = num_samps;        /* number of samples in this trace */
+    HdrPtr->dt     = sample_int * 1000;/* sample interval */
+    HdrPtr->gain   = 0;                /* gain type code: fixed=1 */
+    HdrPtr->year   = _LIMIT(0,year,4000);
+    HdrPtr->day    = _LIMIT(0,day,366);
+    HdrPtr->hour   = _LIMIT(0,hour,23);
+    HdrPtr->minute = _LIMIT(0,minute,59);
+    HdrPtr->sec    = _LIMIT(0,second,59);
+    HdrPtr->timbas = 1;                /* time basis: local */
+    strcpy((char *)HdrPtr->unass,"GPR_XSU lucius@usgs.gov"); /* 28 bytes available */
+}
+
+/***************************** PrintSuTraceHdr() ***************************/
+/* Print out the contents of a SEGY trace header to an output device
+ * (stdout, stderr, a disk file, etc.)..
+ *
+ * Parameters:
+ *   char *out_filename - "stdout", "stderr", or a DOS filename
+ *   struct SuTraceHdrStruct *hdrPtr1 - address of the trace header structure
+ *
+ * Requires: <string.h>, <stdio.h>, <conio.h>, "gpr_io.h".
+ * Calls: strstr, fprintf, fopen, fclose, getch, kbhit.
+ * Returns: void.
+ *
+ * Author: Jeff Lucius   lucius@usgs.gov
+ * Date: December 21, 2000
+ */
+void PrintSuTraceHdr (char *out_filename,struct SuTraceHdrStruct *hdrPtr)
+{
+    int isfile   = 0;
+    FILE *stream = NULL;
+
+    /* Assign or open stream */
+    if      (strstr(out_filename,"stdout"))  stream = stdout;
+    else if (strstr(out_filename,"stderr"))  stream = stderr;
+    else
+    {   stream = fopen(out_filename,"wt");
+        isfile = 1;
+    }
+    if (stream == NULL) stream = stdout;
+
+    /* Print the header information */
+    while (kbhit()) getch();           /* clear keyboard buffer */
+    fprintf(stream,"SU header for trace number %ld:\n",hdrPtr->tracl);
+    fprintf(stream,"trace seq. in reel   = %ld\n",hdrPtr->tracr);
+    fprintf(stream,"field record number  = %ld\n",hdrPtr->fldr);
+    fprintf(stream,"trace num in fld num = %ld\n",hdrPtr->tracf);
+    fprintf(stream,"energy src pt num    = %ld\n",hdrPtr->ep);
+    fprintf(stream,"CDP ensemble num     = %ld\n",hdrPtr->cdp);
+    fprintf(stream,"trace num in CDP ens = %ld\n",hdrPtr->cdpt);
+    fprintf(stream,"trace ID code        = %hd\n",hdrPtr->trid);
+    fprintf(stream,"num vert sum traces  = %hd\n",hdrPtr->nvs);
+    fprintf(stream,"num horiz sum traces = %hd\n",hdrPtr->nhs);
+    fprintf(stream,"data use             = %hd\n",hdrPtr->duse);
+    fprintf(stream,"dist from src to rec = %ld\n",hdrPtr->offset);
+    fprintf(stream,"rec elev above SL    = %ld\n",hdrPtr->gelev);
+    fprintf(stream,"src elev above SL    = %ld\n",hdrPtr->selev);
+    fprintf(stream,"src depth below surf = %ld\n",hdrPtr->sdepth);
+    fprintf(stream,"rec datum elevation  = %ld\n",hdrPtr->gdel);
+    fprintf(stream,"src datum elevation  = %ld\n",hdrPtr->sdel);
+    /* fprintf(stream,"water depth at src   = %ld\n",hdrPtr->swdep); */
+    /* fprintf(stream,"water depth at rec   = %ld\n",hdrPtr->gwdep); */
+    fprintf(stream,"scale factor prev 7  = %hd\n",hdrPtr->scalel);
+    fprintf(stream,"scale factor next 4  = %hd\n",hdrPtr->scalco);
+    fprintf(stream,"X source coord       = %ld\n",hdrPtr->sx);
+    fprintf(stream,"Y source coord       = %ld\n",hdrPtr->sy);
+    fprintf(stream,"X group coord        = %ld\n",hdrPtr->gx);
+    fprintf(stream,"Y group coord        = %ld\n",hdrPtr->gy);
+    fprintf(stream,"coord units code     = %hd\n",hdrPtr->counit);
+    getch();
+    /* fprintf(stream,"weathering velocity  = %hd\n",hdrPtr->wevel);
+    fprintf(stream,"subweathering vel    = %hd\n",hdrPtr->swevel);
+    fprintf(stream,"src uphole time      = %hd\n",hdrPtr->sut);
+    fprintf(stream,"rec group uphole time= %hd\n",hdrPtr->gut);
+    fprintf(stream,"src static correction= %hd\n",hdrPtr->sstat);
+    fprintf(stream,"group static correct = %hd\n",hdrPtr->gstat);
+    fprintf(stream,"total static applied = %hd\n",hdrPtr->tstat); */
+    fprintf(stream,"lag time A           = %hd\n",hdrPtr->laga);
+    /* fprintf(stream,"lag time B           = %hd\n",hdrPtr->lagb);
+    fprintf(stream,"delay record time    = %hd\n",hdrPtr->delrt);
+    fprintf(stream,"mute time--start     = %hd\n",hdrPtr->muts);
+    fprintf(stream,"mute time--end       = %hd\n",hdrPtr->mute); */
+    fprintf(stream,"num samps in trace   = %hu\n",hdrPtr->ns);
+    fprintf(stream,"sample interval      = %hu\n",hdrPtr->dt);
+    fprintf(stream,"gain type code       = %hd\n",hdrPtr->gain);
+    /* fprintf(stream,"instrum gain const   = %hd\n",hdrPtr->igc);
+    fprintf(stream,"instrum early gain   = %hd\n",hdrPtr->igi);
+    fprintf(stream,"correlated (y/n)     = %hd\n",hdrPtr->corr);
+    fprintf(stream,"sweep freq start     = %hd\n",hdrPtr->sfs);
+    fprintf(stream,"sweep freq end       = %hd\n",hdrPtr->sfe);
+    fprintf(stream,"sweep length         = %hd\n",hdrPtr->slen);
+    fprintf(stream,"sweep type code      = %hd\n",hdrPtr->styp);
+    getch();
+    fprintf(stream,"sweep taper at start = %hd\n",hdrPtr->stas);
+    fprintf(stream,"sweep taper at end   = %hd\n",hdrPtr->stae);
+    fprintf(stream,"taper type           = %hd\n",hdrPtr->tatyp);
+    fprintf(stream,"alias filter freq    = %hd\n",hdrPtr->afilf);
+    fprintf(stream,"alias filter slope   = %hd\n",hdrPtr->afils);
+    fprintf(stream,"notch filter freq    = %hd\n",hdrPtr->nofilf);
+    fprintf(stream,"notch filter slope   = %hd\n",hdrPtr->nofils);
+    fprintf(stream,"low cut freq         = %hd\n",hdrPtr->lcf);
+    fprintf(stream,"high cut freq        = %hd\n",hdrPtr->hcf);
+    fprintf(stream,"low cut slope        = %hd\n",hdrPtr->lcs);
+    fprintf(stream,"high cut slope       = %hd\n",hdrPtr->hcs);   */
+    fprintf(stream,"year data recorded   = %hd\n",hdrPtr->year);
+    fprintf(stream,"day of year          = %hd\n",hdrPtr->day);
+    fprintf(stream,"hour of day          = %hd\n",hdrPtr->hour);
+    fprintf(stream,"minute of hour       = %hd\n",hdrPtr->minute);
+    fprintf(stream,"second of minute     = %hd\n",hdrPtr->sec);
+    /* fprintf(stream,"time basis code      = %hd\n",hdrPtr->timbas);
+    fprintf(stream,"trace wgt factor     = %hd\n",hdrPtr->trwf);
+    fprintf(stream,"geoph grp no roll sw = %hd\n",hdrPtr->grnors);
+    fprintf(stream,"geoph grp no trace 1 = %hd\n",hdrPtr->grnofr);
+    fprintf(stream,"geoph grp no last tr = %hd\n",hdrPtr->grnlof);
+    fprintf(stream,"gap size             = %hd\n",hdrPtr->gaps);
+    fprintf(stream,"overtravel taper code= %hd\n",hdrPtr->otrav);
+    fprintf(stream,"Unassigned (optional buffer) not displayed\n"); */
+
+    if (isfile) fclose(stream);
+    return;
+}
+

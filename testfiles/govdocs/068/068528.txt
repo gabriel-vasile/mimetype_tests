@@ -1,0 +1,3004 @@
+Thu Apr  1 10:22:27 EST 2004
+
+notes on v04_0
+
+Implement some upgrades for new TDR.
+1. angular dep of KL beam DONE
+2. extended target DONE
+3. larger DS beam hole DONE detector.18.dat 14apr04
+4. move decay region to 1015-1415 DONE
+5. BV/OV position,angle,energy resolution NOT DONE
+
+should probly do 1,2 at the same time.
+given x,y,z at target, GEANT can calculate angular acceptance
+in Px/Pz and Py/Pz range
+
+************************************
+Fri Apr  2 11:20:56 EST 2004
+
+for creating vertex in extended tgt, need to bring
+over gen_vertex.F from GEANT and corresponding parameters
+from control file with card PKIN
+
+source/gen_vertex.v07_2.f			- new "generate vtx in extended tgt from KOPIO GEANT v07_2"
+source/primary_beam.inc			- new "common of params of extended tgt from  KOPIO GEANT v07_2"
+DataBase/primary_beam.dat			- new "params of extended tgt from  KOPIO GEANT v07_2"
+source/
+in FastMC  units are MeV, cm, ns
+
+source/Makefile 				- modified "add gen_vertex.v07_2"
+source/fastmc.f				- modified "add call gen_vertex TEMPORARY NEED SWITCH"
+
+OK in test job. need to put switches to decide if initial vertex,time
+are taken as 0,0,0,0 or from gen_vertex
+
+now work on collimation
+some other day
+Fri Apr  2 17:09:04 EST 2004
+*******************************************
+Mon Apr 12 16:04:06 EDT 2004
+
+E787 style PV function?
+
+***********************************
+Tue Apr 13 10:07:51 EDT 2004
+
+source/pve787.f				- new "approx E787 PV ineffy"
+pve787.kumac				- new "plot std & E787 PV ineffy"
+
+source/initanal.f			- modified "add plots for pve787"
+source/flags.inc			- modified "add usepve787"
+source/setupanal.f			- modified "add usepve787"
+source/usveto.f				- modified "add usepve787"
+source/Makefile.anal			- modified "add pve787"
+source/select_signal.f			- modified "add usepve787"
+
+note that the code in setupanal must be modified to select PVE787
+
+remove object files, recompile anal. ok
+
+% analysis.script aspect1.zeller.pr.list ../geometry/detector.13.dat &
+logfile is ../log/anal.aspect1.zeller.130603.0838.log
+
+made compare.std.pv.and.pve787.ps in /e787u/djaffe/KOPIO/fastmc
+
+job crashed cuz files it needed were gzipped.
+
+scripts/unzipper.script				- new "unzips a list of files"
+scripts/analysis.script				- modified "add unzipper"
+
+********************************
+Wed Apr 14 09:19:19 EDT 2004
+
+% Trim.to.File /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.pr.130404.1410.log  e787.pv.aspect1.zeller.summary
+% Trim.to.File /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.130603.0838.log  std.pv.aspect1.zeller.summary
+
+restore anal code to use std PV veto
+done.
+
+add new file zip.f that can gunzip or gzip ntuples as needed.
+modify anal.f so that each input ntuple is gunzipped, processed and gzipped.
+
+source/Makefile.anal				- modified "add zip.f"
+source/zip.f					- new "has s/r unzip & rezip"
+source/anal.f					- modified "use unzip,rezip"
+
+test it.
+
+% analysis.script test.list ../geometry/detector.13.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.test.140404.1344.log
+
+scripts/analysis.script				- modified "remove unzipper"
+
+OK. and test it again, now the input files are gzipped.
+% analysis.script test.list ../geometry/detector.13.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.test.140404.1347.log
+
+geometry/detector.18.dat			- new "larger DS beam hole 220.5 x 23.1"
+
+try it with signal only
+% analysis.script aspect1.zeller.pnn.only.list ../geometry/detector.18.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.pnn.only.140404.1416.log
+
+try again
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.pnn.only.140404.1417.log
+
+nope. gotta set clearance negative and BEAM HOLE size properly
+ Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.pnn.only.140404.1424.log
+
+OK. Comparison shows a loss of acceptance of 8.6% to 9.3% depending on 
+cut set
+
+now work on extended target collimation.
+run GEANT MC v07_4 with ISWIT(10) = 3 to get debug output:
+ BEAM_COLLIMATOR2: aperture#  1 Z_coll=  100.00000 X_coll=  200.00000 tantheta=    1.96720 theta=    1.10050
+ BEAM_COLLIMATOR2: aperture#  1 Z_coll=  100.00000 Y_coll=    0.26000 tantheta=    0.00376 theta=    0.00376
+ BEAM_COLLIMATOR2: aperture#  2 Z_coll=  200.00000 X_coll=  200.00000 tantheta=    1.00117 theta=    0.78598
+ BEAM_COLLIMATOR2: aperture#  2 Z_coll=  200.00000 Y_coll=    0.52000 tantheta=    0.00317 theta=    0.00317
+ BEAM_COLLIMATOR2: aperture#  3 Z_coll=  200.00000 X_coll=    9.60000 tantheta=    0.06617 theta=    0.06608
+ BEAM_COLLIMATOR2: aperture#  3 Z_coll=  200.00000 Y_coll=    0.52000 tantheta=    0.00317 theta=    0.00317
+ BEAM_COLLIMATOR2: aperture#  4 Z_coll=  300.00000 X_coll=   16.40000 tantheta=    0.06678 theta=    0.06668
+ BEAM_COLLIMATOR2: aperture#  4 Z_coll=  300.00000 Y_coll=    0.83500 tantheta=    0.00316 theta=    0.00316
+ BEAM_COLLIMATOR2: aperture#  5 Z_coll=  350.00000 X_coll=   19.80000 tantheta=    0.06695 theta=    0.06685
+ BEAM_COLLIMATOR2: aperture#  5 Z_coll=  350.00000 Y_coll=    0.99250 tantheta=    0.00316 theta=    0.00316
+ BEAM_COLLIMATOR2: aperture#  6 Z_coll=  450.00000 X_coll=   26.60000 tantheta=    0.06718 theta=    0.06708
+ BEAM_COLLIMATOR2: aperture#  6 Z_coll=  450.00000 Y_coll=    1.36179 tantheta=    0.00328 theta=    0.00328
+ BEAM_COLLIMATOR2: aperture#  7 Z_coll=  500.00000 X_coll=   30.00000 tantheta=    0.06726 theta=    0.06716
+ BEAM_COLLIMATOR2: aperture#  7 Z_coll=  500.00000 Y_coll=    1.54643 tantheta=    0.00332 theta=    0.00332
+ BEAM_COLLIMATOR2: aperture#  8 Z_coll=  600.00000 X_coll=   36.80000 tantheta=    0.06738 theta=    0.06728
+ BEAM_COLLIMATOR2: aperture#  8 Z_coll=  600.00000 Y_coll=    2.05571 tantheta=    0.00362 theta=    0.00362
+ BEAM_COLLIMATOR2: aperture#  9 Z_coll=  650.00000 X_coll=   40.20000 tantheta=    0.06743 theta=    0.06733
+ BEAM_COLLIMATOR2: aperture#  9 Z_coll=  650.00000 Y_coll=    2.31036 tantheta=    0.00373 theta=    0.00373
+ BEAM_COLLIMATOR2: aperture# 10 Z_coll=  850.00000 X_coll=   62.41539 tantheta=    0.07766 theta=    0.07750
+ BEAM_COLLIMATOR2: aperture# 10 Z_coll=  850.00000 Y_coll=    4.25201 tantheta=    0.00515 theta=    0.00515
+
+
+******************************
+Thu Apr 15 09:34:20 EDT 2004
+
+source/beam_collimator.F			- new "beam collimation from GEANT"
+geometry/collimator.v07_4.dat			- new "beam collimator positions from GEANT"
+source/Makefile					- modified "add beam_collimator"
+source/fastmc.f					- modified "mods for beam_collimator"
+
+source/bookanal.f				- modified "add hist of E of other gammas"
+source/fillanal.f				- modified "fill hist of E of other gammas"
+
+
+Laur asked about photon energy of kp3  & kp2 events
+
+% analysis.script aspect1.zeller.1.kp3.file.list ../geometry/detector.13.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.1.kp3.file.150404.0955.log
+
+% analysis.script aspect1.zeller.3.kp2.file.list ../geometry/detector.13.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.3.kp2.file.150404.0958.log
+
+kp3 job crashed cuz it tried to gzip a symbollically linked file. i modified
+rezip, anal to keep going if this happens. 
+
+i also decided to gzip all my ntskim files on /home to reduce
+space now that the program will automatically gunzip them
+
+try again
+% analysis.script aspect1.zeller.1.kp3.file.list ../geometry/detector.13.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.1.kp3.file.150404.1044.log
+could not unzip file, not enough space
+
+
+try again
+% analysis.script aspect1.zeller.1.kp3.file.list ../geometry/detector.13.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.1.kp3.file.150404.1103.log
+
+
+recalled that skimmed kp2 is not the same as unskimmed. how much difference
+is there?
+% analysis.script aspect1.zeller.unskimmed.kp2.list  ../geometry/detector.13.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.unskimmed.kp2.150404.1401.log
+
+source/detector.inc			- modified "add target_angle"
+source/detector.f			- modified "add target_angle"
+source/init.f				- modified "add target_angle"
+source/event.inc			- modified "add BEAM_COLLIMATION, EXTENDED_TARGET"
+source/control.f			- modified "add BEAM_COLLIMATION, EXTENDED_TARGET"
+Templates/control.template		- modified "add BEAM_COLLIMATION, EXTENDED_TARGET"
+source/kapinos2.f			- new "angular dep for KL beam"
+source/userinit.f			- modified "add hists for beam collimation"
+
+I think I've gotten the bugs out.
+generate 100000 events, zeller pr, 100x5 with kapinos2 beam:
+% run.fastmc.script kpnn 1 100000 1950 0 2 1 detector.13.dat X 1.1 0 &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../locallog/kpnn.1950.21.150404.1825.log
+
+% ls ../ntuples/kpnn.1950.21.rzn > aspect1.zeller.kpnn.kapinos2.list
+essentially no change in acceptance wrt kapinos1.
+
+now use collimation and extended target and kapinos2
+% run.fastmc.script kpnn 1 100000 1951 0 2 1 detector.13.dat X 1.1 0 &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../locallog/kpnn.1951.21.150404.2116.log
+
+
+% ls ../ntuples/kpnn.1951.21.rzn > aspect1.zeller.kapinos2.coll.extended.tgt.list
+% analysis.script aspect1.zeller.kapinos2.coll.extended.tgt.list ../geometry/detector.13.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.kapinos2.coll.extended.tgt.150404.2119.log
+
+
+immediately get
+% STOP  CHGVETO: Invalid ID statement executed
+
+from logfile:
+
+USveto ERROR: JMAP is ZERO.itk=  1 id=  8 Q=  0
+          *** Track history. Event#      3 USveto debug. jmap=0 (Analysis job) *******
+  # ID Name Mom     Px      Py      Pz       E    Ptot  Xbirth  Ybirth  Zbirth  Xdeath  Ydeath  Zdeath  Tbirth   Tdeath    Weight Smeared Fate
+  1  8  K0L   0    29.2    -0.8   578.8   763.9   579.5    -1.0     0.0    -1.1    -0.9     0.0     0.0     0.1     0.2 0.117       0      2 Hit US end Beam pipe
+                   29.2    -0.8   578.8   763.9 at death
+                    0.0     0.0     0.0   497.7 in  K0L CMS
+  CHGVETO: Invalid ID= 0 ABORT!!!
+Finish time is Thu Apr 15 21:19:34 EDT 2004
+
+problem is apparently that geometry in detector.13 is not compatible with
+extended target and collimators. that is, it is too small in some dimension.
+altho one amazing thing about this track is the 'death' positions are all zero....
+hmmmm.
+
+need to work on this...
+
+************************************************************************
+Fri Apr 16 08:57:51 EDT 2004
+
+beam pipe is too small. 47.5 x 4 in half-height at z=950cm
+collimator is 62.4 x 4.25 at z=850cm
+
+make detector.19.dat = same as detector.13.dat but with 65x5 at 950cm beampipe
+
+
+% run.fastmc.script kpnn 1 100000 1951 0 2 1 detector.19.dat X 1.1 0 &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../locallog/kpnn.1951.21.160404.0903.log
+
+also have a problem with KL produced US of Z=0 being stopped at US end of
+beam pipe.
+
+source/detector.f			- modified "accomodate extended tgt in beam pipe defn"
+
+this seems to have fixed the problem. maybe i don't need a larger
+beam pipe
+% run.fastmc.script kpnn 1 10000 1951 0 2 1 detector.13.dat X 1.1 0 &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../locallog/kpnn.1951.21.160404.0926.log
+
+nope, a larger pipe is needed. about 4.4% of KL strike sidewalls.
+
+% run.fastmc.script kpnn 1 10000 1951 0 2 1 detector.19.dat X 1.1 0 &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../locallog/kpnn.1951.21.160404.0928.log
+
+OK. that fixed it. try longer job
+% run.fastmc.script kpnn 1 100000 1951 0 2 1 detector.19.dat X 1.1 0 &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../locallog/kpnn.1951.21.160404.0929.log
+
+looks ok, now analyze it
+% analysis.script aspect1.zeller.kapinos2.coll.extended.tgt.list ../geometry/detector.13.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.kapinos2.coll.extended.tgt.160404.0937.log
+
+oops, wrong geometry file!
+% analysis.script aspect1.zeller.kapinos2.coll.extended.tgt.list ../geometry/detector.19.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.kapinos2.coll.extended.tgt.160404.0938.log
+
+now move decay region from (950,1350) to (1015,1415) => detector.20.dat
+
+still have extended target, collimation, kapinos2 beam:
+% run.fastmc.script kpnn 1 100 1952 0 2 1 detector.20.dat X 1.1 0 &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../locallog/kpnn.1952.21.160404.0957.log
+
+seems ok, run big job:
+% run.fastmc.script kpnn 1 10000 1952 0 2 1 detector.20.dat X 1.1 0 &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../locallog/kpnn.1952.21.160404.0959.log
+
+no, really big job:
+% run.fastmc.script kpnn 1 100000 1952 0 2 1 detector.20.dat X 1.1 0 &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../locallog/kpnn.1952.21.160404.1010.log
+
+% ls ../ntuples/kpnn.1952.21.rzn > aspect1.zeller.kapinos2.coll.ext.tgt.zdk.ds.list
+% analysis.script aspect1.zeller.kapinos2.coll.ext.tgt.zdk.ds.list ../geometry/detector.20.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.kapinos2.coll.ext.tgt.zdk.ds.160404.1019.log
+
+make fastmc ntuple output automatically gzipped
+
+source/userend.f			- modified "gzip ntuple files"
+source/Makefile				- modified "add zip"
+
+make 
+detector.21 = detector.20 with larger DS hole
+
+geometry/detector.19.dat		- new "same as detector.13 but larger beampipe aperture"
+geometry/detector.20.dat		- new "same as detector.19 but with decay region (1015,1415)"
+geometry/detector.21.dat		- new "same as detector.20 but with larger DS hole"
+
+short test:
+% run.fastmc.script kpnn 1 100 1953 0 2 1 detector.21.dat X 1.1 0 &
+OK
+
+% run.fastmc.script kpnn 1 100000 1953 0 2 1 detector.21.dat X 1.1 0 &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../locallog/kpnn.1953.21.160404.1130.log
+% echo ../localntuples/kpnn.1953.21.rzn > aspect1.zeller.kapinos2.coll.ext.tgt.zdk.ds.big.ds.hole.list
+
+% analysis.script aspect1.zeller.kapinos2.coll.ext.tgt.zdk.ds.big.ds.hole.list ../geometry/detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.kapinos2.coll.ext.tgt.zdk.ds.big.ds.hole.160404.1142.log
+
+
+DEFAULT IN TEMPLATE IS NOW KAPINOS2, EXTENDED TARGET, COLLIMATOR
+
+% submit.standard.bunch.of.jobs.script
+ submit.all.beam.size.jobs detector.21.dat 10
+ logfile is ../log/standard.bunch.of.jobs.detector.21.dat.10.160404.1720.log
+
+source/init.f			- modified "seeds always within limits"
+
+% submit.standard.bunch.of.jobs.script
+ submit.standard.bunch.of.jobs.script detector.21.dat key 10
+ logfile is ../log/standard.bunch.of.jobs.detector.21.dat.10.160404.1730.log
+
+********************************************************************
+Mon Apr 19 09:54:28 EDT 2004
+
+standard bunch of jobs completed. i made 
+aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list
+and ran analysis.script using 
+../geometry/detector.21.dat
+
+uncertainties in kp2, kp3 bkgds is too high. neither bkgd
+has a single high-weight event so it is purely stats.
+
+modify submit.standard.bunch.of.jobs to include kpgg, and
+create 4x kp2 as before and 4x kp3 as before:
+
+% submit.standard.bunch.of.jobs.script
+ submit.standard.bunch.of.jobs.script detector.21.dat key 10
+ logfile is ../log/standard.bunch.of.jobs.detector.21.dat.10.190404.1018.log
+
+*******************************************
+Tue Apr 20 09:32:23 EDT 2004
+
+all jobs completed OK
+
+concatenate all ntuples into aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list
+and run:
+% analysis.script aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list ../geometry/detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.200404.0931.log
+
+
+also accidentally submitted
+% analysis.script aspect1.zeller.kapinos2.coll.ext.tgt.zdk.ds.big.ds.hole.list ../geometry/detector.21.dat &
+
+**********************
+Tue Apr 20 22:31:51 EDT 2004
+
+add some plots to study timing of chgd
+tracks : (Ttrk - TK) - (Vtrk - VK)/c where Ttrk = time of track's demise,
+Vtrk = 3vtx of track's demise, VK = recon KL decay vtx, TK = time of recon KL
+decay. exclude tracks into US hole. exclude tracks that annihilate or
+decay before hitting something.
+
+
+% analysis.script aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list ../geometry/detector.21.dat &
+
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.200404.2241.log 
+
+*************************************
+Wed Apr 21 08:52:58 EDT 2004
+
+should plot weight with weight of chg trk removed
+
+% analysis.script aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list ../geometry/detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.210404.0912.log
+
+fillanal.f			- modified "hist filling added"
+bookanal.f			- modified "hists added"
+anal.f				- modified "dump some events if enabled"
+
+
+run some more kcp3, ke3g jobs to get more stats on tails of timing distributions
+% submit.many.fastmc.script kcp3 6 100000 61010 61020 0 1.1 1 detector.21.dat &
+% submit.many.fastmc.script ke3g 9 100000 91010 91020 1 1.1 1 detector.21.dat &
+
+**********************************
+Thu Apr 22 09:17:51 EDT 2004
+
+kcp3 jobs done.
+
+% ls ../ntuples/kcp3.6101?.21.rzn.ntskim.gz ../ntuples/kcp3.61020.21.rzn.ntskim.gz -1 | sed -e s/.gz// >> aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list
+
+also added 91010-91016 runs to aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list
+
+% analysis.script aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list ../geometry/detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.220404.0926.log
+
+add ke3g run 91017 to aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list
+% analysis.script aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list ../geometry/detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.220404.1101.log
+
+hists xxxxx39 and xxxxx40 assoc. with above log file have incorrect entries. dtdx was calculated without betamax
+
+and dump events with dtdx> 20
+
+cvtime.kumac plots the dumped events
+cvtime.ke3g.kcp3.with.dtdx.gt.20.ps
+
+scan indicates that simulation of D4 would be useful.
+approximate by ending flight at a plane consistent with DS end of
+D4. in v07_4 of kopio geant mc distance from front of PR to
+front of D4 mirror plate is 190cm
+center D4 field is 365cm
+end D4 iron 501cm 
+all approx. determined with display and 'measure'
+
+source/Makefile.anal				- modified "add getparatz"
+
+add runs 91019 and 91020 to aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list
+% analysis.script aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list ../geometry/detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.220404.1435.log
+
+bug, correct, resub
+
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.220404.1441.log
+
+source/getparatz.f				- modified "add debug"
+source/Makefile.anal				- modified "remove getparatz"
+
+
+weird 
+ FILLANAL: jtrk=  2 at endD4.X=    nan    nan 1915.0 T=    nan P=  -32.2   -6.5  681.4  696.3
+          *** Track history. Event#     98 FILLANAL: at endD4 (Analysis job) *******
+for same event:
+ FILLANAL: jtrk=  2 at endD4.X=   22.7   -2.7 1915.0 T=   70.4 P=  -32.2   -6.5  681.4  696.3
+          *** Track history. Event#     98 FILLANAL: at endD4 (Analysis job) *******
+
+'fixed' it with 
+
+                     iloop = 0
+89332                dz = D4end - Zbirth(jtk)
+                     if (dz.ne.dz) then
+                        iloop = iloop + 1
+                        print *,' dz=',dz,' try again. iloop=',iloop
+                        if (iloop.gt.100) STOP 'FILLANAL: REALLY NAN!!!!           '
+                        goto 89332
+                     endif
+
+unbelievable???
+
+add 91020 to  aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list
+& update aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list to include all new kcp3, ke3g files
+
+latest log file
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.220404.1734.log
+
+
+full analysis job:
+
+% analysis.script aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list  ../geometry/detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.220404.1748.log
+
+
+*****************************
+Fri Apr 23 10:11:27 EDT 2004
+
+don't use end of D4 as estimate of Z where all chgd tracks get stopped,
+use US end since slow tracks are the problem.
+
+modified fillanal, recompiled and resubmit
+
+% analysis.script aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list ../geometry/detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.230404.1022.log
+
+*********************************************
+Sat Apr 24 20:54:22 EDT 2004
+run some more kcp3, ke3g jobs to get more stats on tails of timing distributions
+% submit.many.fastmc.script kcp3 6 100000 61021 61050 0 1.1 1 detector.21.dat >& kcp3.jobs.log &
+% submit.many.fastmc.script ke3g 9 100000 91021 91050 1 1.1 1 detector.21.dat >& ke3g.jobs.log &
+
+submit.many.fastmc.script ke4 12 100000 121000 121010 0 1.1 1 detector.21.dat >& ke4.jobs.log &
+
+first fix debug stmt in getparatz and recompile,relink fastmc.exe
+
+**********************************************
+Mon Apr 26 10:08:21 EDT 2004
+
+jobs 61021-61050, 121000-121010, 91021-91037 completed.
+collate them with aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list to  create
+aspect1.zeller.ke4.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list
+
+Laur's idea:
+
+Date: Mon, 26 Apr 2004 09:09:19 -0400
+From: littenbe@bnl.gov
+To: David E Jaffe <djaffe@bnl.gov>
+Subject: Scary Ke3g event
+
+
+David,
+
+        I'm wondering whether there isn't a cutable kinematic signature
+for the type of scary Ke3g event you showed at the meeting.  One starts
+with K = nu + pi + e + g.  To look like a signal and not be vetoed
+by the soft gamma from the positron annihilation, e+g should look just
+like a pi0.  For a very slow pi-, in the Lab frame the 4-vector pi- ~
+(m_pi,0).  Then solve for the 4-vector nu, nu = K - pi -pi0.  Squaring
+nu, one gets 0 = (K - pi - pi0)^2.  As I mentioned, although one wouldn't
+normally know pi, in this case, we have it to a pretty good approximation.
+Thus if we form this quantity and cut events near zero, that ought to
+do it.  What do you thnk?  Is this equivalent to some other cut we're
+already making?
+
+                                                        Laur
+
+------------------ end email
+
+0 = mK^2 + mpi0^2 + mpi^2 - 2mpi*(EK-Epi0) - 2(EK*Epi0 - Pvec(K).Pvec(pi0))
+
+modified fillanal, bookanal
+
+% analysis.script aspect1.zeller.ke4.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list  ../geometry/detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.ke4.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.260404.1116.log
+
+need to modify unzip,rezip to handle softlinks
+no burnt bridges:
+% cp /u1/djaffe/KOPIO/fastmc/ntuples/ke3g.91020.121.rzn.ntskim.gz /u1/djaffe/KOPIO/fastmc/ntuples/ke3g.91020.121.rzn.ntskim.gz.BACKUP.COPY
+
+OK, I think zip.f is all set.
+
+try again
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.ke4.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.260404.1611.log
+
+oops, didn't get the right file.
+
+new log file: /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.ke4.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.260404.1648.log
+
+*************************************
+Mon Apr 26 21:13:36 EDT 2004
+
+
+fix formulation of pnu^2, recompile, resubmit
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.ke4.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.260404.2137.log 
+
+% run.fastmc.script kbet 14 1000 141000 0 2 1 detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../locallog/kbet.141000.21.260404.2140.log 
+
+% run.fastmc.script ke4 12 1000 121011 0 2 1 detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../locallog/ke4.121011.21.260404.2142.log 
+
+ok, big job now
+
+% run.fastmc.script kbet 14 100000 141000 0 2 1 detector.21.dat &
+ /e787u/djaffe/KOPIO/fastmc/scripts/../locallog/kbet.141000.21.260404.2146.log 
+
+%  run.fastmc.script ke4 12 100000 121011 0 2 1 detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../locallog/ke4.121011.21.260404.2146.log 
+
+*************************************************
+Tue Apr 27 09:31:40 EDT 2004
+
+did a study of Ke4 and Kbeta decays, looks harder than I thought
+to find Kbeta.
+
+E*pi, Ee, cos(pi0,pi) are best (only) variables for discrimination?
+
+relative rate is 
+ Br(K+=>pi+,pi0) * Br(KL->K,e,nu)/Br(KL->pi,pi0,e,nu)= 0.4405483E-04
+
+
+need to generate KL decays from Z=(815,1415) instead of Z=(1015,1415)cm
+cuz of K+ lifetime.
+
+
+following runs have  KL decays from Z=(815,1415)cm with no skimming
+ run.fastmc.script kbet 14 100000 141001 0 2 1 detector.21.dat &
+
+ run.fastmc.script ke4 12 100000 121012 0 2 1 detector.21.dat &
+ run.fastmc.script ke4 12 100000 121013 0 2 1 detector.21.dat &
+ run.fastmc.script ke4 12 100000 121014 0 2 1 detector.21.dat &
+ run.fastmc.script ke4 12 100000 121015 0 2 1 detector.21.dat &
+
+more ke4 stats:
+  run.fastmc.script ke4 12 200000 121017 0 2 1 detector.21.dat &
+  run.fastmc.script ke4 12 200000 121018 0 2 1 detector.21.dat &
+  run.fastmc.script ke4 12 200000 121019 0 2 1 detector.21.dat &
+  run.fastmc.script ke4 12 200000 121020 0 2 1 detector.21.dat &
+
+****************************************
+Tue Apr 27 21:21:41 EDT 2004
+
+more ke4 stats
+  run.fastmc.script ke4 12 200000 121021 0 2 1 detector.21.dat &
+  run.fastmc.script ke4 12 200000 121022 0 2 1 detector.21.dat &
+  run.fastmc.script ke4 12 200000 121023 0 2 1 detector.21.dat &
+  run.fastmc.script ke4 12 200000 121024 0 2 1 detector.21.dat &
+  run.fastmc.script ke4 12 200000 121025 0 2 1 detector.21.dat &
+  run.fastmc.script ke4 12 200000 121026 0 2 1 detector.21.dat &
+  run.fastmc.script ke4 12 200000 121027 0 2 1 detector.21.dat &
+  
+
+******************************************
+Wed Apr 28 09:18:16 EDT 2004
+
+made refined cuts in cos(track,pi0) vs E(e) plane
+taking direction of track from recon KL decay point
+and hit position. assumes perfect position resolution
+for track but no directional info.
+
+took weighting from expected N(KL), Br, effy
+
+**************************************
+Thu Apr 29 09:51:13 EDT 2004
+
+
+**************************************
+Wed May  5 16:27:44 EDT 2004
+
+continue study of cv timing
+
+first bring aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list up to date
+by including all relevant ke3g, ke4, kcp3 files produced on 24april04
+
+
+% analysis.script aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list  ../geometry/detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.050504.1650.log
+
+
+********************************
+Thu May  6 09:30:22 EDT 2004
+
+summary to aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.summary
+
+re-run old aspect1,zeller job to get all the same hists filled in anal
+(also check to see that results are the same):
+
+% analysis.script aspect1.zeller.pr.list ../geometry/detector.13.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.pr.060504.1103.log
+
+got 
+ ANAL: GUNZIP error for File=../ntuples/kp3.5110.21.rzn.ntskim
+
+no burnt bridges
+% cp ../ntuples/kp3.5120.21.rzn.ntskim.gz ../ntuples/kp3.5120.21.rzn.ntskim.gz.BACKUP
+
+write testzip.f to understand what is going on
+
+% ls -lrt ../ntuples/kp3.5110.21.rzn.ntskim
+lrwxrwxrwx    1 djaffe   djaffe         54 Mar 24  2003 ../ntuples/kp3.5110.21.rzn.ntskim -> /u1/djaffe/kopio/fastmc/ntuples/kp3.5110.21.rzn.ntskim
+% ls -Llrt ../ntuples/kp3.5110.21.rzn.ntskim
+ls: ../ntuples/kp3.5110.21.rzn.ntskim: No such file or directory
+% ls -Llrt ../ntuples/kp3.5110.21.rzn.ntskim.gz
+-rw-r--r--    1 djaffe   djaffe   431852644 Mar 11  2003 ../ntuples/kp3.5110.21.rzn.ntskim.gz
+
+so link for unzipped file exists, altho file does not.
+get rid of dead links and try again.
+
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.pr.060504.1344.log
+
+found potential minor bug in recon.f, beta of recon KL is calculated
+as 
+
+c                                                determine K0L 4momentum from time and POCA
+C                                      ==> ASSUMES THAT T=0 IS KNOWN PRODUCTION TIME OF K0L !!!
+                     gamma = 0.
+                     Do k = 1,3 !                                |time(K0L prod)
+                        Beta(k)=(Xmeet(k)-Origin(k))/(Tave - 0.)/cspeed
+                        gamma = gamma + beta(k)*beta(k)
+                     End do
+
+problem is that origin(k) is the generated KL position for the last
+KL generated, so there is a slightly better origin than can be
+achieved in reality. also, since T=0 is assumed, the actual origin may represent a bias.
+
+*** this can also affect neutron generation ***** 24may04
+
+================================================================
+================== TO DO ========== FIXED 27may04 recon.f makenn.f
+================================================================
+
+*************************
+Fri May  7 08:33:21 EDT 2004
+
+discovered bug in filling of E of non-candidate photons:
+
+                                                          ****
+            if (iType.eq.Kgamma .and. itk.ne.i1 .and.itk.ne.2) then
+               CALL HF1(id0+42,Ebirth(itk),HWT)
+            endif
+
+should be
+            if (iType.eq.Kgamma .and. itk.ne.i1 .and.itk.ne.i2) then
+               CALL HF1(id0+42,Ebirth(itk),HWT)
+            endif
+
+source/fillanal.f				- modified "fixed bug for hist xxx42"
+
+add ke4 generation to submit.standard.bunch.of.jobs.script
+
+scripts/submit.standard.bunch.of.jobs.script	- modified "add ke4"
+
+produce a bunch more events 
+
+%  submit.standard.bunch.of.jobs.script detector.21.dat key 10
+ logfile is ../log/standard.bunch.of.jobs.detector.21.dat.10.070504.0942.log
+
+another TO DO: check that x,y,z,t of KL in tgt is correctly generated: DONE 11may04
+================================
+
+***********************************
+Mon May 10 11:15:04 EDT 2004
+
+
+
+ ../log/standard.bunch.of.jobs.detector.21.dat.10.070504.0942.log
+completed
+
+
+update aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list
+with newly produced files and re-run
+
+% analysis.script aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list ../geometry/detector.21.dat &
+
+/e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.100504.1119.log
+
+job stopped due to
+ ANAL: File=../ntuples/kpnn.11009.21.rzn.ntskim     does not exist
+hmmm... what happened to it?
+remove it from the list and resubmit
+
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.100504.1127.log
+
+
+source/optimizer.inc				- new "for optimizing cuts"
+source/optbin.f					- new "for optimizing cuts"
+source/read_optedges.f				- new "for optimizing cuts"
+DataBase/optimizer.edges.dat			- new "for optimizing cuts"
+
+source/testopt.f				- new "TEMPORARY FOR TESTING"
+
+source/optunpacker.f				- new "for optimizing cuts"
+source/optpacker.f				- new "for optimizing cuts"
+
+
+still working on source/optimizer.f................
+
+**************************************************************
+Tue May 11 10:39:12 EDT 2004
+
+source/anal.f					- modified "for using cut optimizer"
+
+
+====================> TO DO !!!!!!!!!!!!!!!
+====================> fix getcandwt.f for both photons converting in CAL 
+====================> DONE 27may04
+
+source/load_optimizer.f				- new "for optimizing cuts"
+source/optimizer.f				- new "for optimizing cuts"
+source/Makefile.anal				- modified "add optbin, read_optedges, optunpacker, optpacker, load_optimizer, optimizer"
+
+I get
+
+Initialization of large (71280124-unit) aggregate area `optimizer1' at (^) currently very slow and takes lots of memory during g77 compile
+
+during compilation, so it is probably a good idea not to link in the optimizer code if 
+it will not be used
+
+create a short list to test optimizer:
+
+% grep kpnn aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list | head -1 > test.optimizer.list
+% grep kp2 aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list | head -1 >> test.optimizer.list
+% grep kp3 aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list | head -1 >> test.optimizer.list
+% grep ke3g aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list | head -1 >> test.optimizer.list
+% grep kcp3 aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list | head -1 >> test.optimizer.list
+% grep ke4 aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list | head -1 >> test.optimizer.list
+% grep kpgg aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list | head -1 >> test.optimizer.list
+% cat test.optimizer.list
+../ntuples/kpnn.11054.21.rzn.ntskim
+../ntuples/kp2.21064.21.rzn.ntskim
+../ntuples/kp3.51054.21.rzn.ntskim
+../ntuples/ke3g.91053.121.rzn.ntskim
+../ntuples/kcp3.61052.21.rzn.ntskim
+../ntuples/ke4.121060.21.rzn.ntskim
+../ntuples/kpgg.111051.21.rzn.ntskim
+
+
+modify script to point to DataBase/optimizer.edges.dat 
+
+
+scripts/analysis.script				- modified "add optimizer"
+
+source/gen_vertex.v07_2.f			- modified "fix bug in KL production time"
+
+with short test jobs, only O(50) bins that contribute for s/b>=0.5 . why? bug?
+
+% analysis.script test.optimizer.list ../geometry/detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.test.optimizer.110504.1658.log
+*************************************************
+Wed May 12 11:09:30 EDT 2004
+
+add a bunch of debug output
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.short.test.optimizer.120504.1122.log
+
+found that optbin was incorrectly written. now fixed.
+
+% analysis.script test.optimizer.list ../geometry/detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.test.optimizer.120504.1144.log
+
+seems to have worked, however stats may be a problem:
+Sample#1 is used to set cuts. Sample#2 is used to measure.
+
+ Sample# 1 scale factor= 2.0000
+  S/B(goal)  S/B(meas)   Signal   Total bkgd    kp2        kp3        ke3g       kcp3       ke4        kpgg
+  10.00      10.03      96.31      9.601      7.077     0.3811     0.3840      1.605     0.2036E-01 0.1340
+    Uncert. 0.7281      2.106     0.6644     0.5496     0.7555E-01 0.1992     0.2968     0.1241E-02 0.7668E-01
+  7.500      7.584      98.22      12.95      9.221     0.5378     0.6532      2.379     0.2097E-01 0.1380
+    Uncert. 0.5130      2.127     0.8298     0.6783     0.1538     0.2538     0.3668     0.1257E-02 0.7669E-01
+  5.000      5.020      101.1      20.15      12.79     0.5691      1.353      5.260     0.2292E-01 0.1503
+    Uncert. 0.3125      2.158      1.179     0.9222     0.1541     0.3877     0.5990     0.1309E-02 0.7674E-01
+  4.500      4.518      101.9      22.56      14.82     0.5711      1.524      5.471     0.2295E-01 0.1511
+    Uncert. 0.2742      2.165      1.282      1.032     0.1541     0.4224     0.6089     0.1309E-02 0.7674E-01
+  4.000      4.185      102.5      24.49      16.16     0.5729      1.828      5.753     0.2340E-01 0.1528
+    Uncert. 0.2470      2.171      1.349      1.083     0.1541     0.4759     0.6251     0.1323E-02 0.7674E-01
+  3.500      3.643      103.6      28.43      16.98     0.5877      2.418      8.265     0.2454E-01 0.1537
+    Uncert. 0.2081      2.183      1.509      1.119     0.1542     0.5641     0.8220     0.1353E-02 0.7674E-01
+  3.000      3.006      105.2      34.99      17.72     0.6760      2.844      13.51     0.2769E-01 0.2047
+    Uncert. 0.1600      2.200      1.713      1.130     0.1624     0.6404      1.102     0.1433E-02 0.9029E-01
+  2.500      2.557      106.5      41.65      20.20     0.6912      3.341      17.19     0.2878E-01 0.2065
+    Uncert. 0.1334      2.214      1.993      1.314     0.1624     0.6934      1.315     0.1459E-02 0.9029E-01
+  2.000      2.002      108.8      54.36      31.69     0.6936      3.517      18.22     0.2914E-01 0.2130
+    Uncert. 0.9472E-01  2.237      2.316      1.728     0.1625     0.7155      1.354     0.1467E-02 0.9030E-01
+  1.500      1.511      112.0      74.10      40.95     0.7087      4.060      28.03     0.3355E-01 0.3233
+    Uncert. 0.6373E-01  2.269      2.740      1.969     0.1625     0.7811      1.727     0.1563E-02 0.1139
+  1.000      1.001      117.4      117.3      63.68     0.7431      5.414      47.05     0.4130E-01 0.3864
+    Uncert. 0.4087E-01  2.323      4.189      3.328     0.1626     0.9690      2.343     0.1741E-02 0.1222
+ 0.5000     0.9760      117.8      120.7      63.72      1.003      5.606      49.95     0.4294E-01 0.3872
+    Uncert. 0.3940E-01  2.327      4.250      3.328     0.3037     0.9810      2.433     0.1781E-02 0.1222
+
+ Sample# 2 scale factor= 2.0000
+  S/B(goal)  S/B(meas)   Signal   Total bkgd    kp2        kp3        ke3g       kcp3       ke4        kpgg
+  10.00     0.4374      24.57      56.17      44.29      1.033      3.408      7.338     0.1908E-01 0.8913E-01
+    Uncert. 0.1274      1.069      16.17      16.11     0.6917     0.7574     0.9238     0.1183E-02 0.2658E-01
+  7.500     0.4196      25.34      60.40      47.17      1.043      3.615      8.464     0.1952E-01 0.9150E-01
+    Uncert. 0.1141      1.086      16.21      16.15     0.6918     0.7733     0.9972     0.1197E-02 0.2658E-01
+  5.000     0.3172      27.25      85.91      67.30      1.099      4.885      12.50     0.2162E-01 0.1046
+    Uncert. 0.8183E-01  1.126      21.88      21.81     0.6919     0.9569      1.178     0.1253E-02 0.2665E-01
+  4.500     0.3079      27.47      89.23      70.15      1.102      4.885      12.97     0.2165E-01 0.1050
+    Uncert. 0.7668E-01  1.130      21.92      21.85     0.6919     0.9569      1.223     0.1254E-02 0.2665E-01
+  4.000     0.2648      27.61      104.3      84.44      1.111      4.885      13.70     0.2241E-01 0.1064
+    Uncert. 0.6638E-01  1.133      25.79      25.73     0.6920     0.9569      1.267     0.1283E-02 0.2665E-01
+  3.500     0.2544      28.12      110.6      85.29      1.119      5.960      18.05     0.2425E-01 0.1085
+    Uncert. 0.6027E-01  1.144      25.81      25.73     0.6920      1.063      1.478     0.1336E-02 0.2666E-01
+  3.000     0.2462      28.84      117.1      85.94      1.213      6.074      23.75     0.2722E-01 0.1117
+    Uncert. 0.5518E-01  1.158      25.82      25.73     0.6929      1.068      1.708     0.1416E-02 0.2666E-01
+  2.500     0.2095      29.33      140.0      106.3      1.225      6.313      25.99     0.2786E-01 0.1176
+    Uncert. 0.4809E-01  1.168      31.65      31.57     0.6929      1.082      1.771     0.1428E-02 0.2707E-01
+  2.000     0.1997      30.64      153.4      118.6      1.269      6.497      26.94     0.2817E-01 0.1310
+    Uncert. 0.4197E-01  1.192      31.70      31.63     0.6938      1.090      1.791     0.1436E-02 0.2796E-01
+  1.500     0.1844      32.61      176.9      130.7      1.668      7.096      37.14     0.3175E-01 0.1830
+    Uncert. 0.3386E-01  1.231      31.78      31.68     0.7372      1.121      2.149     0.1521E-02 0.4677E-01
+  1.000     0.1593      36.32      228.0      161.1      2.463      8.749      55.46     0.3881E-01 0.2018
+    Uncert. 0.2308E-01  1.298      32.01      31.87     0.8434      1.242      2.569     0.1676E-02 0.4683E-01
+ 0.5000     0.1548      36.36      234.8      167.5      2.463      8.749      55.90     0.3891E-01 0.2018
+    Uncert. 0.2223E-01  1.299      32.64      32.51     0.8434      1.242      2.581     0.1677E-02 0.4683E-01
+
+hmm. some diag hist not being booked/filled in optimizer?
+
+test:
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.short.test.optimizer.120504.1322.log
+
+had to move call to hrput to end of program anal
+
+source/anal.f					- modified "moved hrput call to end of pgm"
+
+source/optreportbin.f				- new "for optimizer"
+source/Makefile.anal				- modified "add optreportbin"
+
+
+
+
+Wed May 12 21:50:26 EDT 2004
+
+ok submit big job to see if it will work at all
+% analysis.script aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list ../geometry/detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.120504.2149.log 
+
+**********************************b
+Fri May 14 08:52:00 EDT 2004
+
+results of long job
+ Sample# 1 scale factor= 2.0000
+  S/B(goal)  S/B(meas)   Signal   Total bkgd    kpgg       kp3        kp2        ke4        ke3g       kcp3
+  10.00      10.00      51.44      5.144     0.4582E-01 0.3878      2.695     0.3071E-01  1.489     0.4948
+    Uncert. 0.2252     0.5127     0.1039     0.3942E-02 0.1751E-01 0.6916E-01 0.7259E-02 0.6943E-01 0.2844E-01
+  7.500      7.500      56.96      7.595     0.5224E-01 0.4617      4.224     0.3394E-01  2.113     0.7099
+    Uncert. 0.1527     0.5395     0.1369     0.4030E-02 0.2044E-01 0.1008     0.7260E-02 0.8262E-01 0.3550E-01
+  5.000      5.004      65.70      13.13     0.9730E-01 0.5978      7.742     0.3959E-01  3.423      1.230
+    Uncert. 0.9040E-01 0.5795     0.2070     0.3196E-01 0.2485E-01 0.1624     0.7262E-02 0.1113     0.4906E-01
+  4.500      4.501      68.14      15.14     0.1014     0.6286      8.948     0.4147E-01  3.885      1.536
+    Uncert. 0.7808E-01 0.5902     0.2276     0.3197E-01 0.2574E-01 0.1799     0.7262E-02 0.1204     0.5645E-01
+  4.000      4.001      70.92      17.73     0.1066     0.6688      10.79     0.4287E-01  4.312      1.803
+    Uncert. 0.6655E-01 0.6021     0.2536     0.3199E-01 0.2751E-01 0.2055     0.7262E-02 0.1282     0.6187E-01
+  3.500      3.501      74.12      21.17     0.1122     0.6917      13.15     0.4505E-01  4.858      2.314
+    Uncert. 0.5617E-01 0.6153     0.2907     0.3203E-01 0.2770E-01 0.2429     0.7263E-02 0.1363     0.7126E-01
+  3.000      3.001      77.74      25.91     0.1198     0.7870      16.20     0.4748E-01  5.763      2.991
+    Uncert. 0.4551E-01 0.6299     0.3322     0.3208E-01 0.3566E-01 0.2791     0.7264E-02 0.1525     0.8287E-01
+  2.500      2.500      81.82      32.73     0.1303     0.8757      20.68     0.5055E-01  6.822      4.171
+    Uncert. 0.3557E-01 0.6463     0.3872     0.3231E-01 0.5105E-01 0.3274     0.7264E-02 0.1698     0.1009
+  2.000      2.000      86.37      43.18     0.1816     0.9847      27.96     0.8112E-01  8.107      5.864
+    Uncert. 0.2734E-01 0.6638     0.4881     0.4996E-01 0.5521E-01 0.4258     0.2389E-01 0.1900     0.1214
+  1.500      1.501      91.33      60.85     0.2303      1.128      41.17     0.1330      9.583      8.604
+    Uncert. 0.1964E-01 0.6827     0.6534     0.5253E-01 0.6815E-01 0.5917     0.4176E-01 0.2136     0.1484
+  1.000      1.003      97.26      96.95     0.2905      1.322      65.29     0.1452      11.28      18.62
+    Uncert. 0.1169E-01 0.7045     0.8853     0.6031E-01 0.8331E-01 0.8173     0.4228E-01 0.2376     0.2169
+ 0.5000     0.5004      109.8      219.5     0.5745      1.957      140.1     0.1928      16.26      60.40
+    Uncert. 0.5054E-02 0.7484      1.636     0.1118     0.1739      1.545     0.4664E-01 0.2896     0.3997
+ 
+
+ Sample# 2 scale factor= 2.0000
+  S/B(goal)  S/B(meas)   Signal   Total bkgd    kpgg       kp3        kp2        ke4        ke3g       kcp3
+  10.00      1.341      25.50      19.01     0.3452     0.9026      12.28     0.8844      3.649     0.9528
+    Uncert. 0.1308     0.3604      1.834     0.2741     0.1812      1.583     0.8539     0.1312     0.4792E-01
+  7.500      1.197      29.35      24.51     0.3528      1.075      16.68     0.8874      4.312      1.204
+    Uncert. 0.1313     0.3870      2.669     0.2741     0.1951      2.501     0.8539     0.1422     0.5454E-01
+  5.000      1.067      35.62      33.38     0.3686      1.857      22.10      1.944      5.332      1.781
+    Uncert. 0.9532E-01 0.4262      2.956     0.2741     0.6336      2.529      1.354     0.1583     0.6626E-01
+  4.500      1.056      37.19      35.22     0.3947      1.882      23.19      1.946      5.699      2.112
+    Uncert. 0.8952E-01 0.4354      2.957     0.2749     0.6336      2.530      1.354     0.1641     0.7234E-01
+  4.000     0.9962      39.29      39.44     0.3972      2.181      26.57      1.947      5.942      2.398
+    Uncert. 0.7706E-01 0.4477      3.017     0.2749     0.6805      2.588      1.354     0.1671     0.7751E-01
+  3.500     0.9235      41.66      45.11     0.4102      2.226      31.14      1.956      6.454      2.922
+    Uncert. 0.6842E-01 0.4611      3.305     0.2750     0.6808      2.917      1.354     0.1760     0.8607E-01
+  3.000     0.8820      44.17      50.08     0.4149      2.279      34.88      1.958      7.061      3.487
+    Uncert. 0.5922E-01 0.4749      3.319     0.2750     0.6809      2.933      1.354     0.1843     0.9360E-01
+  2.500     0.8261      47.27      57.22     0.4242      2.328      40.20      1.963      7.736      4.571
+    Uncert. 0.4926E-01 0.4914      3.360     0.2750     0.6809      2.978      1.354     0.1929     0.1081
+  2.000     0.6796      51.19      75.33     0.4438      2.432      53.96      3.764      8.667      6.056
+    Uncert. 0.4803E-01 0.5114      5.271     0.2750     0.6812      4.872      1.857     0.2036     0.1248
+  1.500     0.5844      55.10      94.28     0.4638      2.531      68.65      4.289      9.682      8.660
+    Uncert. 0.3457E-01 0.5306      5.503     0.2751     0.6815      5.095      1.929     0.2153     0.1486
+  1.000     0.4453      59.77      134.2     0.5665      2.624      96.28      4.295      11.29      19.17
+    Uncert. 0.1992E-01 0.5525      5.876     0.2836     0.6816      5.492      1.929     0.2353     0.2204
+ 0.5000     0.2615      70.76      270.6     0.6716      3.413      184.1      5.051      16.33      61.09
+    Uncert. 0.7300E-02 0.6009      7.198     0.2852     0.7249      6.835      2.057     0.2880     0.4024
+
+why the huge difference? statistics
+
+After conversation with GR, it seems a good idea to plot w and uncertainty vs ordered bin number.
+should give some idea of statistics and how to re-bin.
+can't do it in a single job cuz it runs out of space:
+/usr/bin/ld: final link failed: No space left on device
+
+so write results to binary file for later analysis
+
+test
+% analysis.script short.test.optimizer.list ../geometry/detector.21.dat &
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.short.test.optimizer.140504.1700.log
+
+try again:
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.short.test.optimizer.140504.1708.log
+*********************************************************
+Mon May 17 09:48:22 EDT 2004
+
+need to direct executable files to local (large) disk
+
+mkdir  /home/djaffe/KOPIO/fastmc/exe
+% pwd
+/e787u/djaffe/KOPIO/fastmc
+% ln -s /home/djaffe/KOPIO/fastmc/exe .
+
+source/Makefile.anal			-  modified "put executable in exe/anal.exe"
+source/Makefile				-  modified "put executable in exe/fastmc.exe"
+
+scripts/run.fastmc.script		-  modified "use executable in exe/fastmc.exe"
+scripts/simple.run.fastmc.script		-  modified "use executable in exe/fastmc.exe"
+scripts/wrap.run.fastmc.script		-  modified "use executable in exe/fastmc.exe"
+scripts/analysis.script			-  modified "use executable in exe"
+
+
+direct large output files, such as optimizer.results.dat, to local large disk:
+
+% pwd
+/e787u/djaffe/KOPIO/fastmc
+% mkdir /home/djaffe/KOPIO/fastmc/output
+% ln -s /home/djaffe/KOPIO/fastmc/output .
+
+scripts/analysis.script			- modified "write optimizer output to file"
+source/optimizer.f			- modified "write optimizer output to file"
+
+test
+% analysis.script short.test.optimizer.list ../geometry/detector.21.dat &
+Optimizer bin edge file    556 May 10 15:37 ../DataBase/optimizer.edges.dat
+Optimizer output file      ../output/optimizer.results.170504.1013.dat
+List of ntuples            71 May 11 15:45 short.test.optimizer.list with 2 ntuples files
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.short.test.optimizer.170504.1013.log
+
+*********************************************
+Wed May 19 20:48:31 EDT 2004
+
+test job ouptut ok, run long job
+
+% analysis.script aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list ../geometry/detector.21.dat &
+Optimizer bin edge file    556 May 10 15:37 ../DataBase/optimizer.edges.dat 
+Optimizer output file      ../output/optimizer.results.190504.2048.dat 
+List of ntuples            6236 May 10 11:27 aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list with 173 ntuples files
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.190504.2048.log 
+H
+
+now Makefile.opt produces ../exe/opt.exe that reads optimizer output file from
+anal and tries to smooth and do analysis
+
+source/optsmooth.f			- new "for optimizer"
+source/Makefile.opt			- new "for optimizer"
+
+prelim tests seem ok
+
+
+******************************************
+Fri May 21 16:21:42 EDT 2004
+
+make optimization separate from anal.f
+
+modify anal.f to call optwrite to write binary file of rates. do optimization
+using testopt.f and Makefile.opt
+
+
+source/optwrite.f				- new "for optimizer. write rates to file for later optimization"
+source/Makefile.anal				- modified "add optwrite, remove optimizer"
+
+hmmm. still don't have weighting correct. doesn't take
+stat unc into account correctly
+
+*********************************************
+Tue May 25 09:59:03 EDT 2004
+
+Documenting fastmc.
+
+README				- modified "describe exe directory"
+
+********************************************
+Thu May 27 16:46:02 EDT 2004
+
+would like to remove optimizer stuff and release new cvs version
+
+first fix bugs that i found
+
+source/recon.f			- modified "use local variable ZeroKL for assumed KL origin position,time"
+source/makenn.f			- modified "implement GEN_VERTEX, if selected" 
+source/getcandwt.f		- modified "handle case with both photons converting in CAL"
+
+instead of removing optimizer stuff, I disabled it in anal.f with Use_Optimizer/.false./
+and i set the size of MaxObin=1 in optimizer.inc so there is no (big) burden on the compiled code
+
+recompile and link all code and test
+
+% run.fastmc.script kpnn 1 10000 9999 0 2 1 detector.21.dat
+
+ JobName  kpnn
+ Generate 10000 events
+ Decay mode 1   Random seeds 9999 21
+ Annihilation option 0 : 0,1,2 = no e+ annih., true e+ annih, approximate E(g) = E(e+)
+ Conversion option 2 : 0,1,2,3 = Z(end of CAL), Z(middle PR), Z(front PR & Zeller PR model), Z(Rear PR)
+ K0L weighting 1 : 0,1 = no weight, weighted and required to decay in Z fiducial region
+run.fastmc.script kpnn 1 10000 9999 0 2 1 detector.21.dat default.decay.dat 1.1 0
+
+  input/output Files
+Executable                 1448515 May 27 18:38 ../exe/fastmc.exe*
+Template for control file  1510 Apr 27 21:24 /e787u/djaffe/KOPIO/fastmc/scripts/../Templates/control.template
+Control file               1536 May 27 18:39 /e787u/djaffe/KOPIO/fastmc/scripts/../condir/control.kpnn.9999.21
+Detector file              5248 Apr 16 11:07 /e787u/djaffe/KOPIO/fastmc/scripts/../geometry/detector.21.dat
+Branching fractions        274 Nov 21 2002 default.decay.dat
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../locallog/kpnn.9999.21.270504.1839.log
+Ntuple/hist file           ../localntuples/kpnn.9999.21.rzn
+ ---------------------
+
+% echo ../ntuples/kpnn.9999.21.rzn > test.list
+% analysis.script test.list ../geometry/detector.21.dat &
+[1] 2719
+bnlku24_djaffe[166]%
+ Here is the list of ntuple files that will be analyzed:
+../ntuples/kpnn.9999.21.rzn
+
+  input/output Files
+Executable                 1317415 May 27 18:37 ../exe/anal.exe*
+Detector file              5248 Apr 16 11:07 ../geometry/detector.21.dat
+Branching fractions file   274 Nov 21 2002 default.decay.dat
+Optimizer bin edge file    556 May 10 15:37 ../DataBase/optimizer.edges.dat
+Optimizer output file      ../output/optimizer.results.270504.1841.dat
+List of ntuples            28 May 27 18:41 test.list with 1 ntuples files
+Log file                   /e787u/djaffe/KOPIO/fastmc/scripts/../log/anal.test.270504.1841.log
+Histogram file             ../ntuples/anal.test.270504.1841.rzn
+ ---------------------------
+
+seems OK
+
+prepare to commit to CVS
+
+> Fri May 28 09:31:47 EDT 2004: before committing, lets remove all the debug output
+> I modified fillanal. this did not change size of executable given below
+
+
+############ sizes
+ls -lrt ../exe/*
+-rwxrwxr-x    1 djaffe   djaffe    1317415 May 27 18:37 ../exe/anal.exe
+-rwxrwxr-x    1 djaffe   djaffe    1448515 May 27 18:38 ../exe/fastmc.exe
+
+########### new files from % grep "\- new" ../Managefastmc/v0_4.notes | sort
+########### augmented with cvs.diff.now
+DataBase/optimizer.edges.dat                    - new "for optimizing cuts"
+DataBase/primary_beam.dat                       - new "params of extended tgt from  KOPIO GEANT v07_2"
+geometry/collimator.v07_4.dat                   - new "beam collimator positions from GEANT"
+geometry/detector.18.dat                        - new "larger DS beam hole 220.5 x 23.1"
+geometry/detector.19.dat                - new "same as detector.13 but larger beampipe aperture"
+geometry/detector.20.dat                - new "same as detector.19 but with decay region (1015,1415)"
+geometry/detector.21.dat                - new "same as detector.20 but with larger DS hole"
+pve787.kumac                            - new "plot std & E787 PV ineffy"
+scripts/unzipper.script                         - new "unzips a list of files"
+
+scripts/Create.avg.veto.ineffy.vectors.script   - new "create average veto ineffy vectors from logfile"
+
+scripts/control.dat.for.interbunch.studies      - new "for interbunch studies"
+
+source/beam_collimator.f                        - new "beam collimation from GEANT"
+source/gen_vertex.v07_2.f                       - new "generate vtx in extended tgt from KOPIO GEANT v07_2"
+
+source/get_pr_resolution.f			- new "for Bryman PR model"
+
+source/gspec.f					- new "return KL 4mom given average momentum, std dev. on momentum"
+
+source/kapinos2.f                       - new "angular dep for KL beam"
+source/load_optimizer.f                         - new "for optimizing cuts"
+source/Makefile.opt                     - new "for optimizer"
+source/optbin.f                                 - new "for optimizing cuts"
+source/optimizer.f                              - new "for optimizing cuts"
+source/optimizer.inc                            - new "for optimizing cuts"
+source/optpacker.f                              - new "for optimizing cuts"
+source/optreportbin.f                           - new "for optimizer"
+source/optsmooth.f                      - new "for optimizer"
+source/optunpacker.f                            - new "for optimizing cuts"
+source/optwrite.f                               - new "for optimizer. write rates to file for later optimization"
+source/primary_beam.inc                 - new "common of params of extended tgt from  KOPIO GEANT v07_2"
+source/pve787.f                         - new "approx E787 PV ineffy"
+source/read_optedges.f                          - new "for optimizing cuts"
+source/testopt.f                                - new "TEMPORARY FOR TESTING"
+source/zip.f                                    - new "has s/r unzip & rezip"
+
+Templates/control.template              - new "add BEAM_COLLIMATION, EXTENDED_TARGET"
+
+############# modified files from % grep "\- modified" ../Managefastmc/v0_4.notes | sort
+########### augmented with cvs.diff.now
+anal.f                          - modified "dump some events if enabled"
+bookanal.f                      - modified "hists added"
+fillanal.f                      - modified "hist filling added"
+README                          - modified "describe exe directory"
+scripts/analysis.script                         - modified "add optimizer, write optimizer output to file"
+
+scripts/control.dat		- modified "modified"
+scripts/control.for.trigger.studies.dat		- modified "modified"
+
+scripts/run.fastmc.script		- modified "add 12 argument, executable now in new directory"
+
+
+scripts/simple.run.fastmc.script	- modified "executable now in new directory"
+
+scripts/submit.many.fastmc.script	- modified "modified"
+
+scripts/submit.standard.bunch.of.jobs.script    - modified "add ke4"
+
+scripts/wrap.run.fastmc.script		- modified "executable now in new directory"
+
+**** STOPPED HERE
+
+source/acceptable.f			- modified "mods for g thru beam hole into PR"
+
+source/anal.f                                   - modified "add optimizer code; moved hrput call to end of pgm; use unzip,rezip"
+
+source/bookanal.f                               - modified "add hist of E of other gammas"
+
+source/control.f                        - modified "add BEAM_COLLIMATION, EXTENDED_TARGET"
+
+source/detector.f                       - modified "accomodate extended tgt in beam pipe defn, add target_angle"
+
+source/detector.inc                     - modified "add target_angle"
+source/event.inc                        - modified "add BEAM_COLLIMATION, EXTENDED_TARGET"
+source/fastmc.f                         - modified "add call gen_vertex, mods for beam_collimator"
+
+source/fillanal.f                               - modified "fill hist of E of other gammas, fixed bug for hist xxx42"
+
+source/flags.inc                        - modified "add usepve787"
+
+source/getcandwt.f              - modified "handle case with both photons converting in CAL"
+source/getparatz.f                              - modified "add debug"
+
+source/gettrkweight.f			- modified "add pve787 option"
+
+source/initanal.f                       - modified "add plots for pve787"
+
+source/init.f                           - modified "add target_angle, Bryman PR model; seeds always within limits"
+
+
+source/Makefile.anal                            - modified "add optbin,read_optedges,optunpacker,optpacker,load_optimizer,optreportbin,optwrite,pve787,zip"
+
+source/Makefile                                 - modified "add beam_collimator, gen_vertex.v07_2, zip"
+
+source/makenn.f                 - modified "implement GEN_VERTEX, if selected"
+
+source/recon.f                  - modified "use local variable ZeroKL for assumed KL origin position,time"
+source/select_signal.f                  - modified "add usepve787"
+source/setupanal.f                      - modified "add usepve787"
+
+source/smear.f				- modified "add Bryman PR model"
+
+source/userend.f                        - modified "gzip ntuple files"
+source/userinit.f                       - modified "add hists for beam collimation"
+source/usveto.f                         - modified "add usepve787"
+
+
+% cvs diff -D now > cvs.diff.now
+cvs server: Diffing .
+cvs server: Diffing DataBase
+cvs server: Diffing Templates
+cvs server: Diffing analysis
+cvs server: Diffing geometry
+cvs server: Diffing scripts
+cvs server: cannot find scripts/control.template
+cvs server: Diffing source
+
+
+
+$$$$$$$$$$$$$$$$$$$$> remove scripts/control.template since it is in Templates now
+cvs remove -f scripts/control.template
+cvs commit -m "move control.template from scripts/ to Templates/ " scripts/control.template
+
+$$$$$$$$$$$$$$$$$$$$> NEW FILES FOR CVS
+cvs add DataBase/optimizer.edges.dat
+cvs add DataBase/primary_beam.dat
+cvs add geometry/collimator.v07_4.dat
+cvs add geometry/detector.18.dat
+cvs add geometry/detector.19.dat
+cvs add geometry/detector.20.dat
+cvs add geometry/detector.21.dat
+
+cvs add pve787.kumac
+cvs add scripts/unzipper.script
+cvs add scripts/Create.avg.veto.ineffy.vectors.script
+cvs add scripts/control.dat.for.interbunch.studies
+cvs add source/beam_collimator.f
+cvs add source/gen_vertex.v07_2.f
+cvs add source/get_pr_resolution.f
+
+cvs add source/gspec.f
+cvs add source/kapinos2.f
+cvs add source/load_optimizer.f
+cvs add source/Makefile.opt
+cvs add source/optbin.f
+cvs add source/optimizer.f
+cvs add source/optimizer.inc
+cvs add source/optpacker.f
+cvs add source/optreportbin.f
+
+cvs add source/optsmooth.f
+cvs add source/optunpacker.f
+cvs add source/optwrite.f
+cvs add source/primary_beam.inc
+cvs add source/pve787.f
+cvs add source/read_optedges.f
+cvs add source/testopt.f
+cvs add source/zip.f
+>>> NOT NEEDED>>> cvs add Templates/control.template
+
+cvs commit -m "for optimizing cuts"             DataBase/optimizer.edges.dat
+cvs commit -m "params of extended tgt from KOPIO GEANT v07_2"        DataBase/primary_beam.dat
+cvs commit -m "beam collimator positions from GEANT"           geometry/collimator.v07_4.dat
+cvs commit -m "larger DS beam hole 220.5 x 23.1"         geometry/detector.18.dat
+cvs commit -m "same as detector.13 but larger beampipe aperture"         geometry/detector.19.dat
+cvs commit -m "same as detector.19 but with decay region (1015,1415)"        geometry/detector.20.dat
+cvs commit -m "same as detector.20 but with larger DS hole"        geometry/detector.21.dat
+
+cvs commit -m "plot std & E787 PV ineffy"          pve787.kumac
+cvs commit -m "unzips a list of files"           scripts/unzipper.script
+cvs commit -m "create average veto ineffy vectors from logfile"         scripts/Create.avg.veto.ineffy.vectors.script
+cvs commit -m "for interbunch studies"             scripts/control.dat.for.interbunch.studies
+cvs commit -m "beam collimation from GEANT"            source/beam_collimator.f
+cvs commit -m "generate vtx in extended tgt from KOPIO GEANT v07_2"       source/gen_vertex.v07_2.f
+cvs commit -m "for Bryman PR model"            source/get_pr_resolution.f
+cvs commit -m "return KL 4mom given average momentum, std dev. on momentum"      source/gspec.f
+cvs commit -m "angular dep for KL beam"           source/kapinos2.f
+cvs commit -m "for optimizing cuts"             source/load_optimizer.f
+
+cvs commit -m "for optimizer"              source/Makefile.opt
+cvs commit -m "for optimizing cuts"             source/optbin.f
+cvs commit -m "for optimizing cuts"             source/optimizer.f
+cvs commit -m "for optimizing cuts"             source/optimizer.inc
+cvs commit -m "for optimizing cuts"             source/optpacker.f
+cvs commit -m "for optimizer"              source/optreportbin.f
+cvs commit -m "for optimizer"              source/optsmooth.f
+cvs commit -m "for optimizing cuts"             source/optunpacker.f
+
+cvs commit -m "for optimizer. write rates to file for later optimization"       source/optwrite.f
+cvs commit -m "common of params of extended tgt from KOPIO GEANT v07_2"      source/primary_beam.inc
+cvs commit -m "approx E787 PV ineffy"            source/pve787.f
+cvs commit -m "for optimizing cuts"             source/read_optedges.f
+cvs commit -m "TEMPORARY FOR TESTING"             source/testopt.f
+cvs commit -m "has s/r unzip & rezip"           source/zip.f
+cvs commit -m "add BEAM_COLLIMATION, EXTENDED_TARGET"             Templates/control.template
+
+$$$$$$$$$$$$$$$$$$$$$$$$ MODIFIED FILES FOR CVS
+cvs commit -m "dump some events if enabled"           source/anal.f
+cvs commit -m "hists added"              source/bookanal.f
+cvs commit -m "hist filling added"             source/fillanal.f
+cvs commit -m "describe exe directory"             README
+cvs commit -m "add optimizer, write optimizer output to file"         scripts/analysis.script
+cvs commit -m "modified"               scripts/control.dat
+cvs commit -m "modified"               scripts/control.for.trigger.studies.dat
+
+cvs commit -m "add 12th argument, executable now in new directory"        scripts/run.fastmc.script
+cvs commit -m "executable now in new directory"           scripts/simple.run.fastmc.script
+cvs commit -m "modified"               scripts/submit.many.fastmc.script
+cvs commit -m "add ke4"              scripts/submit.standard.bunch.of.jobs.script
+cvs commit -m "executable now in new directory"           scripts/wrap.run.fastmc.script
+cvs commit -m "mods for g thru beam hole into PR"        source/acceptable.f
+>> DUPLICATE COMMIT: cvs commit -m "add optimizer code; moved hrput call to end of pgm; use unzip,rezip"    source/anal.f
+>> DUPLICATE COMMIT: cvs commit -m "add hist of E of other gammas"         source/bookanal.f
+
+cvs commit -m "add BEAM_COLLIMATION, EXTENDED_TARGET"             source/control.f
+cvs commit -m "accomodate extended tgt in beam pipe defn, add target_angle"       source/detector.f
+cvs commit -m "add target_angle"              source/detector.inc
+cvs commit -m "add BEAM_COLLIMATION, EXTENDED_TARGET"             source/event.inc
+cvs commit -m "add call gen_vertex, mods for beam_collimator"          source/fastmc.f
+cvs commit -m "fill hist of E of other gammas, fixed bug for hist xxx42"    source/fillanal.f
+cvs commit -m "add usepve787"              source/flags.inc
+cvs commit -m "handle case with both photons converting in CAL"        source/getcandwt.f
+
+cvs commit -m "add debug"              source/getparatz.f
+cvs commit -m "add pve787 option"             source/gettrkweight.f
+cvs commit -m "add plots for pve787"            source/initanal.f
+cvs commit -m "add target_angle, Bryman PR model; seeds always within limits"       source/init.f
+cvs commit -m "add optbin,read_optedges,optunpacker,optpacker,load_optimizer,optreportbin,optwrite,pve787,zip"              source/Makefile.anal
+cvs commit -m "add beam_collimator, gen_vertex.v07_2, zip"            source/Makefile
+cvs commit -m "implement GEN_VERTEX, if selected"            source/makenn.f
+cvs commit -m "use local variable ZeroKL for assumed KL origin position,time"       source/recon.f
+
+cvs commit -m "add usepve787"              source/select_signal.f
+cvs commit -m "add usepve787"              source/setupanal.f
+cvs commit -m "add Bryman PR model"            source/smear.f
+cvs commit -m "gzip ntuple files"             source/userend.f
+cvs commit -m "add hists for beam collimation"           source/userinit.f
+cvs commit -m "add usepve787"              source/usveto.f
+
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ NEW TAG
+cvs tag v1_0
+
+Response from CVS for tag v1_0, cutting and pasting from screen:
+? Notes
+? check.zellers.cuts
+? compare.std.pv.and.pve787.ps
+? condir
+? cvs.diff.now
+? diff.30dec02
+? last.kumac
+? last.kumacold
+? paw.metafile
+? geometry/detector.17.dat
+? scripts/1.2
+? scripts/a.2
+? scripts/a.3
+? scripts/aspect1.konaka.pr.list
+? scripts/aspect1.zeller.1.kp3.file.list
+? scripts/aspect1.zeller.3.kp2.file.list
+? scripts/aspect1.zeller.kapinos2.coll.ext.tgt.zdk.ds.big.ds.hole.list
+? scripts/aspect1.zeller.kapinos2.coll.ext.tgt.zdk.ds.list
+? scripts/aspect1.zeller.kapinos2.coll.extended.tgt.list
+? scripts/aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list
+? scripts/aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.summary
+? scripts/aspect1.zeller.kcp3.kapinos2.ext.tgt.coll.dk.ds.list
+? scripts/aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list
+? scripts/aspect1.zeller.ke4.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list
+? scripts/aspect1.zeller.kpnn.kapinos2.list
+? scripts/aspect1.zeller.pnn.only.list
+? scripts/aspect1.zeller.pr.kapinos1.summary
+? scripts/aspect1.zeller.pr.list
+? scripts/aspect1.zeller.unskimmed.kp2.list
+? scripts/aspect2.konaka.pr.list
+? scripts/aspect2.test.list
+? scripts/aspect2.zeller.pr.list
+? scripts/aspect2.zeller_kpnn_only.list
+? scripts/aspect2.zellerfull.pr.list
+? scripts/aspect3.konaka.pr.list
+? scripts/aspect3.zeller.pr.list
+? scripts/aspect4.konaka.pr.list
+? scripts/aspect4.zeller.pr.list
+? scripts/avg.veto.ineffy.kp2.m0.2
+? scripts/avg.veto.ineffy.kp2.m0.5
+? scripts/avg.veto.ineffy.kp2.m1
+? scripts/avg.veto.ineffy.kp2.m10
+? scripts/avg.veto.ineffy.kp2.m2
+? scripts/avg.veto.ineffy.kp2.m20
+? scripts/avg.veto.ineffy.kp2.m3
+? scripts/avg.veto.ineffy.kp2.m30
+? scripts/avg.veto.ineffy.kp2.m4
+? scripts/avg.veto.ineffy.kp2.m40
+? scripts/avg.veto.ineffy.kp2.m5
+? scripts/avg.veto.ineffy.kp2.m6
+? scripts/avg.veto.ineffy.kp2.p0
+? scripts/avg.veto.ineffy.kp2.p0.2
+? scripts/avg.veto.ineffy.kp2.p0.5
+? scripts/avg.veto.ineffy.kp2.p1
+? scripts/avg.veto.ineffy.kp2.p10
+? scripts/avg.veto.ineffy.kp2.p2
+? scripts/avg.veto.ineffy.kp2.p20
+? scripts/avg.veto.ineffy.kp2.p3
+? scripts/avg.veto.ineffy.kp2.p30
+? scripts/avg.veto.ineffy.kp2.p4
+? scripts/avg.veto.ineffy.kp2.p40
+? scripts/avg.veto.ineffy.kp2.p5
+? scripts/avg.veto.ineffy.kp2.p6
+? scripts/avg.veto.ineffy.kp3.m0.2
+? scripts/avg.veto.ineffy.kp3.m1
+? scripts/avg.veto.ineffy.kp3.m10
+? scripts/avg.veto.ineffy.kp3.m2
+? scripts/avg.veto.ineffy.kp3.m20
+? scripts/avg.veto.ineffy.kp3.m3
+? scripts/avg.veto.ineffy.kp3.m30
+? scripts/avg.veto.ineffy.kp3.m4
+? scripts/avg.veto.ineffy.kp3.m40
+? scripts/avg.veto.ineffy.kp3.m5
+? scripts/avg.veto.ineffy.kp3.m6
+? scripts/avg.veto.ineffy.kp3.p0
+? scripts/avg.veto.ineffy.kp3.p0.2
+? scripts/avg.veto.ineffy.kp3.p1
+? scripts/avg.veto.ineffy.kp3.p10
+? scripts/avg.veto.ineffy.kp3.p2
+? scripts/avg.veto.ineffy.kp3.p20
+? scripts/avg.veto.ineffy.kp3.p3
+? scripts/avg.veto.ineffy.kp3.p30
+? scripts/avg.veto.ineffy.kp3.p4
+? scripts/avg.veto.ineffy.kp3.p40
+? scripts/avg.veto.ineffy.kp3.p5
+? scripts/avg.veto.ineffy.kp3.p6
+? scripts/b.1
+? scripts/bkgdgivesn.rzn
+? scripts/e787.pv.aspect1.zeller.summary
+? scripts/kcp3.jobs.log
+? scripts/ke3g.bkgd.aspect1.konaka
+? scripts/ke3g.bkgd.aspect1.konaka.nohole
+? scripts/ke3g.bkgd.aspect1.zeller
+? scripts/ke3g.bkgd.aspect1.zeller.before.dif.fix
+? scripts/ke3g.bkgd.aspect1.zeller.nohole
+? scripts/ke3g.bkgd.aspect2.konaka
+? scripts/ke3g.bkgd.aspect2.konaka.nohole
+? scripts/ke3g.bkgd.aspect2.zeller
+? scripts/ke3g.bkgd.aspect2.zeller.before.dif.fix
+? scripts/ke3g.bkgd.aspect2.zeller.nohole
+? scripts/ke3g.bkgd.aspect3.konaka
+? scripts/ke3g.bkgd.aspect3.konaka.nohole
+? scripts/ke3g.bkgd.aspect3.zeller
+? scripts/ke3g.bkgd.aspect3.zeller.before.dif.fix
+? scripts/ke3g.bkgd.aspect3.zeller.nohole
+? scripts/ke3g.bkgd.aspect4.konaka
+? scripts/ke3g.bkgd.aspect4.konaka.nohole
+? scripts/ke3g.bkgd.aspect4.zeller
+? scripts/ke3g.bkgd.aspect4.zeller.before.dif.fix
+? scripts/ke3g.bkgd.aspect4.zeller.nohole
+? scripts/ke3g.bkgd.kp2.m0.2
+? scripts/ke3g.bkgd.kp2.m0.5
+? scripts/ke3g.bkgd.kp2.m1
+? scripts/ke3g.bkgd.kp2.m10
+? scripts/ke3g.bkgd.kp2.m2
+? scripts/ke3g.bkgd.kp2.m20
+? scripts/ke3g.bkgd.kp2.m3
+? scripts/ke3g.bkgd.kp2.m30
+? scripts/ke3g.bkgd.kp2.m4
+? scripts/ke3g.bkgd.kp2.m40
+? scripts/ke3g.bkgd.kp2.m5
+? scripts/ke3g.bkgd.kp2.m6
+? scripts/ke3g.bkgd.kp2.p0
+? scripts/ke3g.bkgd.kp2.p0.2
+? scripts/ke3g.bkgd.kp2.p0.5
+? scripts/ke3g.bkgd.kp2.p1
+? scripts/ke3g.bkgd.kp2.p10
+? scripts/ke3g.bkgd.kp2.p2
+? scripts/ke3g.bkgd.kp2.p20
+? scripts/ke3g.bkgd.kp2.p3
+? scripts/ke3g.bkgd.kp2.p30
+? scripts/ke3g.bkgd.kp2.p4
+? scripts/ke3g.bkgd.kp2.p40
+? scripts/ke3g.bkgd.kp2.p5
+? scripts/ke3g.bkgd.kp2.p6
+? scripts/ke3g.bkgd.kp3.m0.2
+? scripts/ke3g.bkgd.kp3.m1
+? scripts/ke3g.bkgd.kp3.m10
+? scripts/ke3g.bkgd.kp3.m2
+? scripts/ke3g.bkgd.kp3.m20
+? scripts/ke3g.bkgd.kp3.m3
+? scripts/ke3g.bkgd.kp3.m30
+? scripts/ke3g.bkgd.kp3.m4
+? scripts/ke3g.bkgd.kp3.m40
+? scripts/ke3g.bkgd.kp3.m5
+? scripts/ke3g.bkgd.kp3.m6
+? scripts/ke3g.bkgd.kp3.p0
+? scripts/ke3g.bkgd.kp3.p0.2
+? scripts/ke3g.bkgd.kp3.p1
+? scripts/ke3g.bkgd.kp3.p10
+? scripts/ke3g.bkgd.kp3.p2
+? scripts/ke3g.bkgd.kp3.p20
+? scripts/ke3g.bkgd.kp3.p3
+? scripts/ke3g.bkgd.kp3.p30
+? scripts/ke3g.bkgd.kp3.p4
+? scripts/ke3g.bkgd.kp3.p40
+? scripts/ke3g.bkgd.kp3.p5
+? scripts/ke3g.bkgd.kp3.p6
+? scripts/ke3g.bkgd.zeller.pr
+? scripts/ke3g.jobs.log
+? scripts/ke4.jobs.log
+? scripts/kp2.bkgd.aspect1.konaka
+? scripts/kp2.bkgd.aspect1.konaka.nohole
+? scripts/kp2.bkgd.aspect1.zeller
+? scripts/kp2.bkgd.aspect1.zeller.before.dif.fix
+? scripts/kp2.bkgd.aspect1.zeller.nohole
+? scripts/kp2.bkgd.aspect2.konaka
+? scripts/kp2.bkgd.aspect2.konaka.nohole
+? scripts/kp2.bkgd.aspect2.zeller
+? scripts/kp2.bkgd.aspect2.zeller.before.dif.fix
+? scripts/kp2.bkgd.aspect2.zeller.nohole
+? scripts/kp2.bkgd.aspect3.konaka
+? scripts/kp2.bkgd.aspect3.konaka.nohole
+? scripts/kp2.bkgd.aspect3.zeller
+? scripts/kp2.bkgd.aspect3.zeller.before.dif.fix
+? scripts/kp2.bkgd.aspect3.zeller.nohole
+? scripts/kp2.bkgd.aspect4.konaka
+? scripts/kp2.bkgd.aspect4.konaka.nohole
+? scripts/kp2.bkgd.aspect4.zeller
+? scripts/kp2.bkgd.aspect4.zeller.before.dif.fix
+? scripts/kp2.bkgd.aspect4.zeller.nohole
+? scripts/kp2.bkgd.kp2.m0.2
+? scripts/kp2.bkgd.kp2.m0.5
+? scripts/kp2.bkgd.kp2.m1
+? scripts/kp2.bkgd.kp2.m10
+? scripts/kp2.bkgd.kp2.m2
+? scripts/kp2.bkgd.kp2.m20
+? scripts/kp2.bkgd.kp2.m3
+? scripts/kp2.bkgd.kp2.m30
+? scripts/kp2.bkgd.kp2.m4
+? scripts/kp2.bkgd.kp2.m40
+? scripts/kp2.bkgd.kp2.m5
+? scripts/kp2.bkgd.kp2.m6
+? scripts/kp2.bkgd.kp2.p0
+? scripts/kp2.bkgd.kp2.p0.2
+? scripts/kp2.bkgd.kp2.p0.5
+? scripts/kp2.bkgd.kp2.p1
+? scripts/kp2.bkgd.kp2.p10
+? scripts/kp2.bkgd.kp2.p2
+? scripts/kp2.bkgd.kp2.p20
+? scripts/kp2.bkgd.kp2.p3
+? scripts/kp2.bkgd.kp2.p30
+? scripts/kp2.bkgd.kp2.p4
+? scripts/kp2.bkgd.kp2.p40
+? scripts/kp2.bkgd.kp2.p5
+? scripts/kp2.bkgd.kp2.p6
+? scripts/kp2.bkgd.kp3.m0.2
+? scripts/kp2.bkgd.kp3.m1
+? scripts/kp2.bkgd.kp3.m10
+? scripts/kp2.bkgd.kp3.m2
+? scripts/kp2.bkgd.kp3.m20
+? scripts/kp2.bkgd.kp3.m3
+? scripts/kp2.bkgd.kp3.m30
+? scripts/kp2.bkgd.kp3.m4
+? scripts/kp2.bkgd.kp3.m40
+? scripts/kp2.bkgd.kp3.m5
+? scripts/kp2.bkgd.kp3.m6
+? scripts/kp2.bkgd.kp3.p0
+? scripts/kp2.bkgd.kp3.p0.2
+? scripts/kp2.bkgd.kp3.p1
+? scripts/kp2.bkgd.kp3.p10
+? scripts/kp2.bkgd.kp3.p2
+? scripts/kp2.bkgd.kp3.p20
+? scripts/kp2.bkgd.kp3.p3
+? scripts/kp2.bkgd.kp3.p30
+? scripts/kp2.bkgd.kp3.p4
+? scripts/kp2.bkgd.kp3.p40
+? scripts/kp2.bkgd.kp3.p5
+? scripts/kp2.bkgd.kp3.p6
+? scripts/kp2.bkgd.zeller.pr
+? scripts/kp2.m0.1.list
+? scripts/kp2.m0.2.list
+? scripts/kp2.m0.3.list
+? scripts/kp2.m0.5.list
+? scripts/kp2.m1.list
+? scripts/kp2.m10.list
+? scripts/kp2.m2.list
+? scripts/kp2.m20.list
+? scripts/kp2.m3.list
+? scripts/kp2.m30.list
+? scripts/kp2.m4.list
+? scripts/kp2.m40.list
+? scripts/kp2.m5.list
+? scripts/kp2.m6.list
+? scripts/kp2.p0.1.list
+? scripts/kp2.p0.2.list
+? scripts/kp2.p0.3.list
+? scripts/kp2.p0.5.list
+? scripts/kp2.p0.list
+? scripts/kp2.p1.list
+? scripts/kp2.p10.list
+? scripts/kp2.p2.list
+? scripts/kp2.p20.list
+? scripts/kp2.p3.list
+? scripts/kp2.p30.list
+? scripts/kp2.p4.list
+? scripts/kp2.p40.list
+? scripts/kp2.p5.list
+? scripts/kp2.p6.list
+? scripts/kp3.bkgd.aspect1.konaka
+? scripts/kp3.bkgd.aspect1.konaka.nohole
+? scripts/kp3.bkgd.aspect1.zeller
+? scripts/kp3.bkgd.aspect1.zeller.before.dif.fix
+? scripts/kp3.bkgd.aspect1.zeller.nohole
+? scripts/kp3.bkgd.aspect2.konaka
+? scripts/kp3.bkgd.aspect2.konaka.nohole
+? scripts/kp3.bkgd.aspect2.zeller
+? scripts/kp3.bkgd.aspect2.zeller.before.dif.fix
+? scripts/kp3.bkgd.aspect2.zeller.nohole
+? scripts/kp3.bkgd.aspect3.konaka
+? scripts/kp3.bkgd.aspect3.konaka.nohole
+? scripts/kp3.bkgd.aspect3.zeller
+? scripts/kp3.bkgd.aspect3.zeller.before.dif.fix
+? scripts/kp3.bkgd.aspect3.zeller.nohole
+? scripts/kp3.bkgd.aspect4.konaka
+? scripts/kp3.bkgd.aspect4.konaka.nohole
+? scripts/kp3.bkgd.aspect4.zeller
+? scripts/kp3.bkgd.aspect4.zeller.before.dif.fix
+? scripts/kp3.bkgd.aspect4.zeller.nohole
+? scripts/kp3.bkgd.kp2.m0.2
+? scripts/kp3.bkgd.kp2.m0.5
+? scripts/kp3.bkgd.kp2.m1
+? scripts/kp3.bkgd.kp2.m10
+? scripts/kp3.bkgd.kp2.m2
+? scripts/kp3.bkgd.kp2.m20
+? scripts/kp3.bkgd.kp2.m3
+? scripts/kp3.bkgd.kp2.m30
+? scripts/kp3.bkgd.kp2.m4
+? scripts/kp3.bkgd.kp2.m40
+? scripts/kp3.bkgd.kp2.m5
+? scripts/kp3.bkgd.kp2.m6
+? scripts/kp3.bkgd.kp2.p0
+? scripts/kp3.bkgd.kp2.p0.2
+? scripts/kp3.bkgd.kp2.p0.5
+? scripts/kp3.bkgd.kp2.p1
+? scripts/kp3.bkgd.kp2.p10
+? scripts/kp3.bkgd.kp2.p2
+? scripts/kp3.bkgd.kp2.p20
+? scripts/kp3.bkgd.kp2.p3
+? scripts/kp3.bkgd.kp2.p30
+? scripts/kp3.bkgd.kp2.p4
+? scripts/kp3.bkgd.kp2.p40
+? scripts/kp3.bkgd.kp2.p5
+? scripts/kp3.bkgd.kp2.p6
+? scripts/kp3.bkgd.kp3.m0.2
+? scripts/kp3.bkgd.kp3.m1
+? scripts/kp3.bkgd.kp3.m10
+? scripts/kp3.bkgd.kp3.m2
+? scripts/kp3.bkgd.kp3.m20
+? scripts/kp3.bkgd.kp3.m3
+? scripts/kp3.bkgd.kp3.m30
+? scripts/kp3.bkgd.kp3.m4
+? scripts/kp3.bkgd.kp3.m40
+? scripts/kp3.bkgd.kp3.m5
+? scripts/kp3.bkgd.kp3.m6
+? scripts/kp3.bkgd.kp3.p0
+? scripts/kp3.bkgd.kp3.p0.2
+? scripts/kp3.bkgd.kp3.p1
+? scripts/kp3.bkgd.kp3.p10
+? scripts/kp3.bkgd.kp3.p2
+? scripts/kp3.bkgd.kp3.p20
+? scripts/kp3.bkgd.kp3.p3
+? scripts/kp3.bkgd.kp3.p30
+? scripts/kp3.bkgd.kp3.p4
+? scripts/kp3.bkgd.kp3.p40
+? scripts/kp3.bkgd.kp3.p5
+? scripts/kp3.bkgd.kp3.p6
+? scripts/kp3.bkgd.zeller.pr
+? scripts/kp3.m0.2.list
+? scripts/kp3.m1.list
+? scripts/kp3.m10.list
+? scripts/kp3.m2.list
+? scripts/kp3.m20.list
+? scripts/kp3.m3.list
+? scripts/kp3.m30.list
+? scripts/kp3.m4.list
+? scripts/kp3.m40.list
+? scripts/kp3.m5.list
+? scripts/kp3.m6.list
+? scripts/kp3.p0.2.list
+? scripts/kp3.p0.list
+? scripts/kp3.p1.list
+? scripts/kp3.p10.list
+? scripts/kp3.p2.list
+? scripts/kp3.p20.list
+? scripts/kp3.p3.list
+? scripts/kp3.p30.list
+? scripts/kp3.p4.list
+? scripts/kp3.p40.list
+? scripts/kp3.p5.list
+? scripts/kp3.p6.list
+? scripts/last.kumac
+? scripts/last.kumacold
+? scripts/llll
+? scripts/mover
+? scripts/neutron.beam.list
+? scripts/neutron.dshalo.list
+? scripts/neutron.ushalo.list
+? scripts/neutron.zushalo.list
+? scripts/one.ke3g.file.list
+? scripts/paw.metafile
+? scripts/remover
+? scripts/short.for.test.list
+? scripts/short.test.optimizer.list
+? scripts/sob.bkg.aspect1.konaka
+? scripts/sob.bkg.aspect1.konaka.nohole
+? scripts/sob.bkg.aspect1.zeller
+? scripts/sob.bkg.aspect1.zeller.before.dif.fix
+? scripts/sob.bkg.aspect1.zeller.nohole
+? scripts/sob.bkg.aspect2.konaka
+? scripts/sob.bkg.aspect2.konaka.nohole
+? scripts/sob.bkg.aspect2.zeller
+? scripts/sob.bkg.aspect2.zeller.before.dif.fix
+? scripts/sob.bkg.aspect2.zeller.nohole
+? scripts/sob.bkg.aspect3.konaka
+? scripts/sob.bkg.aspect3.konaka.nohole
+? scripts/sob.bkg.aspect3.zeller
+? scripts/sob.bkg.aspect3.zeller.before.dif.fix
+? scripts/sob.bkg.aspect3.zeller.nohole
+? scripts/sob.bkg.aspect4.konaka
+? scripts/sob.bkg.aspect4.konaka.nohole
+? scripts/sob.bkg.aspect4.zeller
+? scripts/sob.bkg.aspect4.zeller.before.dif.fix
+? scripts/sob.bkg.aspect4.zeller.nohole
+? scripts/sob.bkg.kp2.m0.2
+? scripts/sob.bkg.kp2.m0.5
+? scripts/sob.bkg.kp2.m1
+? scripts/sob.bkg.kp2.m10
+? scripts/sob.bkg.kp2.m2
+? scripts/sob.bkg.kp2.m20
+? scripts/sob.bkg.kp2.m3
+? scripts/sob.bkg.kp2.m30
+? scripts/sob.bkg.kp2.m4
+? scripts/sob.bkg.kp2.m40
+? scripts/sob.bkg.kp2.m5
+? scripts/sob.bkg.kp2.m6
+? scripts/sob.bkg.kp2.p0
+? scripts/sob.bkg.kp2.p0.2
+? scripts/sob.bkg.kp2.p0.5
+? scripts/sob.bkg.kp2.p1
+? scripts/sob.bkg.kp2.p10
+? scripts/sob.bkg.kp2.p2
+? scripts/sob.bkg.kp2.p20
+? scripts/sob.bkg.kp2.p3
+? scripts/sob.bkg.kp2.p30
+? scripts/sob.bkg.kp2.p4
+? scripts/sob.bkg.kp2.p40
+? scripts/sob.bkg.kp2.p5
+? scripts/sob.bkg.kp2.p6
+? scripts/sob.bkg.kp3.m0.2
+? scripts/sob.bkg.kp3.m1
+? scripts/sob.bkg.kp3.m10
+? scripts/sob.bkg.kp3.m2
+? scripts/sob.bkg.kp3.m20
+? scripts/sob.bkg.kp3.m3
+? scripts/sob.bkg.kp3.m30
+? scripts/sob.bkg.kp3.m4
+? scripts/sob.bkg.kp3.m40
+? scripts/sob.bkg.kp3.m5
+? scripts/sob.bkg.kp3.m6
+? scripts/sob.bkg.kp3.p0
+? scripts/sob.bkg.kp3.p0.2
+? scripts/sob.bkg.kp3.p1
+? scripts/sob.bkg.kp3.p10
+? scripts/sob.bkg.kp3.p2
+? scripts/sob.bkg.kp3.p20
+? scripts/sob.bkg.kp3.p3
+? scripts/sob.bkg.kp3.p30
+? scripts/sob.bkg.kp3.p4
+? scripts/sob.bkg.kp3.p40
+? scripts/sob.bkg.kp3.p5
+? scripts/sob.bkg.kp3.p6
+? scripts/sob.bkg.zeller.pr
+? scripts/std.pv.aspect1.zeller.summary
+? scripts/temp.for.zip
+? scripts/test.list
+? scripts/test.optimizer.list
+? scripts/trimmed.aspect1.zeller.13jun03
+? scripts/trimmed.aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.23apr04
+? scripts/zeller.pr.list
+? scripts/zippy
+? source/Makefile.try
+? source/anal.exe.save1
+? source/cvs.diff.now
+? source/fastmc.exe.save0
+? source/fastmc.exe.save1
+? source/fastmc.exe.save2
+? source/get_pr_resolution.F
+? source/last.kumac
+? source/oldzip.f
+? source/packer.f
+? source/paw.metafile
+? source/temp.for.zip
+? source/testsys.f
+? source/testzip.f
+? source/try
+? source/try.f
+cvs server: Tagging .
+T README
+T RUNME
+T pve787.kumac
+cvs server: Tagging DataBase
+T DataBase/Al.photon.attenuation.length.txt
+T DataBase/Be.photon.attenuation.length.txt
+T DataBase/C.photon.attenuation.length.txt
+T DataBase/optimizer.edges.dat
+T DataBase/preradiator.resolution.txt
+T DataBase/primary_beam.dat
+T DataBase/skim.statistics.and.log
+cvs server: Tagging Templates
+T Templates/control.copy.job.template
+T Templates/control.template
+T Templates/multik.template
+T Templates/multik.template.no.fit
+T Templates/multik.template.no.smear.no.fit
+cvs server: Tagging analysis
+T analysis/acceptance_2g.kumac
+T analysis/akira.offline.grafici.new.f
+T analysis/akira_ntuple.f
+T analysis/bookakira.f
+T analysis/catcher.forpaw
+T analysis/catcher_hit.forpaw
+T analysis/chiprob.forpaw
+T analysis/epiwrap.forpaw
+T analysis/fillakira.f
+T analysis/init.kumac
+T analysis/ke3g_chveto.forpaw
+T analysis/ke3g_chveto_mike.forpaw
+T analysis/kinfit.cmn
+T analysis/kl.inc
+T analysis/konaka_kwt.f
+T analysis/kpi3_cut.forpaw
+T analysis/last.kumac
+T analysis/last.kumacold
+T analysis/load.akira.var.f
+T analysis/lorpl.f
+T analysis/lorpl.forpaw
+T analysis/mike.forpaw
+T analysis/mike_test.forpaw
+T analysis/offline.f
+T analysis/offline.forpaw
+T analysis/offline.may1.forpaw
+T analysis/offline_01aug.forpaw
+T analysis/offline_1g.forpaw
+T analysis/offline_1g_original.forpaw
+T analysis/offline_2p.forpaw
+T analysis/offline_original.forpaw
+T analysis/offline_tmp.forpaw
+T analysis/partprop.inc
+T analysis/path.forpaw
+T analysis/path_1g.forpaw
+T analysis/paw.metafile
+T analysis/print.forpaw
+T analysis/pvnew.f
+T analysis/pvnew.forpaw
+T analysis/pvnew3.forpaw
+T analysis/pvnew_e926.forpaw
+T analysis/pvnew_kami.forpaw
+T analysis/pvnew_kami_1MeV.forpaw
+T analysis/pvnew_kami_1mev.forpaw
+T analysis/pvpi0.forpaw
+T analysis/trackinfo_2.inc
+T analysis/wrap_cut.forpaw
+cvs server: Tagging geometry
+T geometry/collimator.v07_4.dat
+T geometry/detector.1.dat
+T geometry/detector.10.dat
+T geometry/detector.11.dat
+T geometry/detector.12.dat
+T geometry/detector.13.dat
+T geometry/detector.14.dat
+T geometry/detector.15.dat
+T geometry/detector.16.dat
+T geometry/detector.18.dat
+T geometry/detector.19.dat
+T geometry/detector.2.dat
+T geometry/detector.20.dat
+T geometry/detector.21.dat
+T geometry/detector.3.dat
+T geometry/detector.4.dat
+T geometry/detector.6.dat
+T geometry/detector.7.dat
+T geometry/detector.8.dat
+T geometry/detector.9.dat
+T geometry/detector.dat
+T geometry/detector.dat.Geometry.V
+cvs server: Tagging scripts
+T scripts/Create.avg.veto.ineffy.vectors.script
+T scripts/Create.nnpi.bkg.vectors.script
+T scripts/Create.sob.bkg.vectors.script
+T scripts/Trim.Down.ANAL
+T scripts/Trim.to.File
+T scripts/analysis.script
+T scripts/control.copy.job.template
+T scripts/control.dat
+T scripts/control.dat.for.interbunch.studies
+T scripts/control.for.trigger.studies.dat
+T scripts/control.wrap.multi
+T scripts/default.decay.dat
+T scripts/list.for.analysis
+T scripts/run.fastmc.script
+T scripts/simple.run.fastmc.script
+T scripts/submit.ALL.fastmc.script
+T scripts/submit.all.beam.size.jobs
+T scripts/submit.kp2.beam.size.jobs.script
+T scripts/submit.many.fastmc.script
+T scripts/submit.signal.beam.size.jobs
+T scripts/submit.standard.bunch.of.jobs.script
+T scripts/unzipper.script
+T scripts/wrap.run.fastmc.script
+cvs server: Tagging source
+T source/Makefile
+T source/Makefile.anal
+T source/Makefile.opt
+T source/acceptable.f
+T source/acceptance.inc
+T source/akira.catcher.f
+T source/akira.epiwrap.f
+T source/akira.geom.inc
+T source/akira.kl.inc
+T source/akira.kpi3_cut.f
+T source/akira.offline.f
+T source/akira.offline_1g.f
+T source/akira.path.f
+T source/akira.wrap_cut.f
+T source/anal.f
+T source/analvar.inc
+T source/annihilate.f
+T source/backward.f
+T source/beam_collimator.f
+T source/bethe.f
+T source/blank.inc
+T source/bookanal.f
+T source/boostf.f
+T source/brems.f
+T source/catcha.f
+T source/catchnlay.f
+T source/catchp.f
+T source/cern.ranmar.f
+T source/cfun.f
+T source/cfun_0g.f
+T source/cfun_1g.f
+T source/checkgenbod.f
+T source/checkodd.f
+T source/chgveto.f
+T source/cleo.boostf.f
+T source/cleo.dalitz.decay.f
+T source/cleo.rotat.f
+T source/control.f
+T source/cutewrap.f
+T source/cuts.inc
+T source/dalitz.f
+T source/decayit.f
+T source/decayspec.inc
+T source/dedx_scin.f
+T source/defineplane.f
+T source/detector.f
+T source/detector.inc
+T source/dfact.f
+T source/dinv.f
+T source/dumptopofstack.f
+T source/ehistory.f
+T source/event.inc
+T source/evolve.f
+T source/fact.inc
+T source/fastmc.f
+T source/fillallbut1.f
+T source/fillanal.f
+T source/firstmom.f
+T source/fitpi0.f
+T source/flags.inc
+T source/ganni.f
+T source/gannii.f
+T source/gdrot.f
+T source/geant.inc
+T source/gekbin.f
+T source/gen_vertex.v07_2.f
+T source/genbod.f
+T source/geninout.inc
+T source/gentk0l.f
+T source/get_pr_resolution.f
+T source/getannigamlist.f
+T source/getcandwt.f
+T source/getdedx.f
+T source/getnextvol.f
+T source/getngen.f
+T source/getparatz.f
+T source/getpath.f
+T source/gettmax.f
+T source/gettrkweight.f
+T source/getxyatz.f
+T source/gety0int.f
+T source/getzvest.f
+T source/gfang.f
+T source/goodphoton.f
+T source/gphysi.f
+T source/gprob.f
+T source/gspec.f
+T source/init.f
+T source/initanal.f
+T source/initdecayit.f
+T source/inside.f
+T source/iopar.inc
+T source/jump2dir.f
+T source/kamipv.f
+T source/kapinos.f
+T source/kapinos2.f
+T source/kinema.cmn
+T source/kinfit.cmn
+T source/kinfit.f
+T source/kparam.inc
+T source/kspec.f
+T source/kwt.f
+T source/ll.f
+T source/load.akira.var.f
+T source/load_optimizer.f
+T source/lorpl.f
+T source/make.std
+T source/makebox.f
+T source/makenn.f
+T source/makeplane.f
+T source/makeslopedbox.f
+T source/marvins.genbod.f
+T source/meet.f
+T source/my.phsp.f
+T source/myranmar.f
+T source/n_n_pi0.f
+T source/nearmiss.f
+T source/neutronnorm.f
+T source/new.anal.f
+T source/normco.f
+T source/nspectrum.f
+T source/nt1.anal.inc
+T source/ntspec.f
+T source/odd.pair.inc
+T source/optbin.f
+T source/optimizer.f
+T source/optimizer.inc
+T source/optpacker.f
+T source/optreportbin.f
+T source/optsmooth.f
+T source/optunpacker.f
+T source/optwrite.f
+T source/pair_prod.f
+T source/parser.f
+T source/particleid.f
+T source/partprop.inc
+T source/pdk.f
+T source/photonatten.f
+T source/phsp.f
+T source/pigg.f
+T source/prerad.f
+T source/primary_beam.inc
+T source/pstart.f
+T source/pv.f
+T source/pve787.f
+T source/ranmar.f
+T source/read_optedges.f
+T source/readevent.f
+T source/recon.f
+T source/reconinfo.inc
+T source/report.f
+T source/rhistory.f
+T source/rnpssn.f
+T source/rotat.f
+T source/rotzeller.f
+T source/select_signal.f
+T source/setupanal.f
+T source/skimevent.f
+T source/smear.f
+T source/smear.inc
+T source/stack.inc
+T source/stats.f
+T source/study.f
+T source/tcopy.f
+T source/tellbox.f
+T source/test.genbod.f
+T source/testopt.f
+T source/trackatvacvesl.f
+T source/trackinfo.inc
+T source/transfer2_1.f
+T source/transport.routines.f
+T source/trigger.f
+T source/triggerinfo.inc
+T source/truexyatanyz.f
+T source/truexyatz.f
+T source/umc.wtau.f
+T source/usegetenv.f
+T source/userend.f
+T source/userevent.f
+T source/userinit.f
+T source/userselect.f
+T source/usveto.f
+T source/vprint.f
+T source/vtrue.f
+T source/vvloss.f
+T source/wl3.f
+T source/wl3g.f
+T source/wl4.f
+T source/wpigg.f
+T source/wrapepi.f
+T source/writemtx.f
+T source/wtau.charged.f
+T source/wtau0.f
+T source/wtinfo.f
+T source/xpar.f
+T source/ypjunk.f
+T source/zip.f
+
+$$$$$$$$$$$$$$$$$$$$$ ADD/COMMIT OVERLOOKED FILES
+
+
+cvs add geometry/detector.17.dat
+cvs commit -m "new geom" geometry/detector.17.dat
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ NEW TAG
+cvs tag v1_1
+
+Response from CVS for tag v1_1:
+
+? Notes
+? check.zellers.cuts
+? compare.std.pv.and.pve787.ps
+? condir
+? cvs.diff.now
+? diff.30dec02
+? last.kumac
+? last.kumacold
+? paw.metafile
+? scripts/1.2
+? scripts/a.2
+? scripts/a.3
+? scripts/aspect1.konaka.pr.list
+? scripts/aspect1.zeller.1.kp3.file.list
+? scripts/aspect1.zeller.3.kp2.file.list
+? scripts/aspect1.zeller.kapinos2.coll.ext.tgt.zdk.ds.big.ds.hole.list
+? scripts/aspect1.zeller.kapinos2.coll.ext.tgt.zdk.ds.list
+? scripts/aspect1.zeller.kapinos2.coll.extended.tgt.list
+? scripts/aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.list
+? scripts/aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.summary
+? scripts/aspect1.zeller.kcp3.kapinos2.ext.tgt.coll.dk.ds.list
+? scripts/aspect1.zeller.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list
+? scripts/aspect1.zeller.ke4.ke3g.kcp3.kapinos2.ext.tgt.coll.dk.ds.list
+? scripts/aspect1.zeller.kpnn.kapinos2.list
+? scripts/aspect1.zeller.pnn.only.list
+? scripts/aspect1.zeller.pr.kapinos1.summary
+? scripts/aspect1.zeller.pr.list
+? scripts/aspect1.zeller.unskimmed.kp2.list
+? scripts/aspect2.konaka.pr.list
+? scripts/aspect2.test.list
+? scripts/aspect2.zeller.pr.list
+? scripts/aspect2.zeller_kpnn_only.list
+? scripts/aspect2.zellerfull.pr.list
+? scripts/aspect3.konaka.pr.list
+? scripts/aspect3.zeller.pr.list
+? scripts/aspect4.konaka.pr.list
+? scripts/aspect4.zeller.pr.list
+? scripts/avg.veto.ineffy.kp2.m0.2
+? scripts/avg.veto.ineffy.kp2.m0.5
+? scripts/avg.veto.ineffy.kp2.m1
+? scripts/avg.veto.ineffy.kp2.m10
+? scripts/avg.veto.ineffy.kp2.m2
+? scripts/avg.veto.ineffy.kp2.m20
+? scripts/avg.veto.ineffy.kp2.m3
+? scripts/avg.veto.ineffy.kp2.m30
+? scripts/avg.veto.ineffy.kp2.m4
+? scripts/avg.veto.ineffy.kp2.m40
+? scripts/avg.veto.ineffy.kp2.m5
+? scripts/avg.veto.ineffy.kp2.m6
+? scripts/avg.veto.ineffy.kp2.p0
+? scripts/avg.veto.ineffy.kp2.p0.2
+? scripts/avg.veto.ineffy.kp2.p0.5
+? scripts/avg.veto.ineffy.kp2.p1
+? scripts/avg.veto.ineffy.kp2.p10
+? scripts/avg.veto.ineffy.kp2.p2
+? scripts/avg.veto.ineffy.kp2.p20
+? scripts/avg.veto.ineffy.kp2.p3
+? scripts/avg.veto.ineffy.kp2.p30
+? scripts/avg.veto.ineffy.kp2.p4
+? scripts/avg.veto.ineffy.kp2.p40
+? scripts/avg.veto.ineffy.kp2.p5
+? scripts/avg.veto.ineffy.kp2.p6
+? scripts/avg.veto.ineffy.kp3.m0.2
+? scripts/avg.veto.ineffy.kp3.m1
+? scripts/avg.veto.ineffy.kp3.m10
+? scripts/avg.veto.ineffy.kp3.m2
+? scripts/avg.veto.ineffy.kp3.m20
+? scripts/avg.veto.ineffy.kp3.m3
+? scripts/avg.veto.ineffy.kp3.m30
+? scripts/avg.veto.ineffy.kp3.m4
+? scripts/avg.veto.ineffy.kp3.m40
+? scripts/avg.veto.ineffy.kp3.m5
+? scripts/avg.veto.ineffy.kp3.m6
+? scripts/avg.veto.ineffy.kp3.p0
+? scripts/avg.veto.ineffy.kp3.p0.2
+? scripts/avg.veto.ineffy.kp3.p1
+? scripts/avg.veto.ineffy.kp3.p10
+? scripts/avg.veto.ineffy.kp3.p2
+? scripts/avg.veto.ineffy.kp3.p20
+? scripts/avg.veto.ineffy.kp3.p3
+? scripts/avg.veto.ineffy.kp3.p30
+? scripts/avg.veto.ineffy.kp3.p4
+? scripts/avg.veto.ineffy.kp3.p40
+? scripts/avg.veto.ineffy.kp3.p5
+? scripts/avg.veto.ineffy.kp3.p6
+? scripts/b.1
+? scripts/bkgdgivesn.rzn
+? scripts/e787.pv.aspect1.zeller.summary
+? scripts/kcp3.jobs.log
+? scripts/ke3g.bkgd.aspect1.konaka
+? scripts/ke3g.bkgd.aspect1.konaka.nohole
+? scripts/ke3g.bkgd.aspect1.zeller
+? scripts/ke3g.bkgd.aspect1.zeller.before.dif.fix
+? scripts/ke3g.bkgd.aspect1.zeller.nohole
+? scripts/ke3g.bkgd.aspect2.konaka
+? scripts/ke3g.bkgd.aspect2.konaka.nohole
+? scripts/ke3g.bkgd.aspect2.zeller
+? scripts/ke3g.bkgd.aspect2.zeller.before.dif.fix
+? scripts/ke3g.bkgd.aspect2.zeller.nohole
+? scripts/ke3g.bkgd.aspect3.konaka
+? scripts/ke3g.bkgd.aspect3.konaka.nohole
+? scripts/ke3g.bkgd.aspect3.zeller
+? scripts/ke3g.bkgd.aspect3.zeller.before.dif.fix
+? scripts/ke3g.bkgd.aspect3.zeller.nohole
+? scripts/ke3g.bkgd.aspect4.konaka
+? scripts/ke3g.bkgd.aspect4.konaka.nohole
+? scripts/ke3g.bkgd.aspect4.zeller
+? scripts/ke3g.bkgd.aspect4.zeller.before.dif.fix
+? scripts/ke3g.bkgd.aspect4.zeller.nohole
+? scripts/ke3g.bkgd.kp2.m0.2
+? scripts/ke3g.bkgd.kp2.m0.5
+? scripts/ke3g.bkgd.kp2.m1
+? scripts/ke3g.bkgd.kp2.m10
+? scripts/ke3g.bkgd.kp2.m2
+? scripts/ke3g.bkgd.kp2.m20
+? scripts/ke3g.bkgd.kp2.m3
+? scripts/ke3g.bkgd.kp2.m30
+? scripts/ke3g.bkgd.kp2.m4
+? scripts/ke3g.bkgd.kp2.m40
+? scripts/ke3g.bkgd.kp2.m5
+? scripts/ke3g.bkgd.kp2.m6
+? scripts/ke3g.bkgd.kp2.p0
+? scripts/ke3g.bkgd.kp2.p0.2
+? scripts/ke3g.bkgd.kp2.p0.5
+? scripts/ke3g.bkgd.kp2.p1
+? scripts/ke3g.bkgd.kp2.p10
+? scripts/ke3g.bkgd.kp2.p2
+? scripts/ke3g.bkgd.kp2.p20
+? scripts/ke3g.bkgd.kp2.p3
+? scripts/ke3g.bkgd.kp2.p30
+? scripts/ke3g.bkgd.kp2.p4
+? scripts/ke3g.bkgd.kp2.p40
+? scripts/ke3g.bkgd.kp2.p5
+? scripts/ke3g.bkgd.kp2.p6
+? scripts/ke3g.bkgd.kp3.m0.2
+? scripts/ke3g.bkgd.kp3.m1
+? scripts/ke3g.bkgd.kp3.m10
+? scripts/ke3g.bkgd.kp3.m2
+? scripts/ke3g.bkgd.kp3.m20
+? scripts/ke3g.bkgd.kp3.m3
+? scripts/ke3g.bkgd.kp3.m30
+? scripts/ke3g.bkgd.kp3.m4
+? scripts/ke3g.bkgd.kp3.m40
+? scripts/ke3g.bkgd.kp3.m5
+? scripts/ke3g.bkgd.kp3.m6
+? scripts/ke3g.bkgd.kp3.p0
+? scripts/ke3g.bkgd.kp3.p0.2
+? scripts/ke3g.bkgd.kp3.p1
+? scripts/ke3g.bkgd.kp3.p10
+? scripts/ke3g.bkgd.kp3.p2
+? scripts/ke3g.bkgd.kp3.p20
+? scripts/ke3g.bkgd.kp3.p3
+? scripts/ke3g.bkgd.kp3.p30
+? scripts/ke3g.bkgd.kp3.p4
+? scripts/ke3g.bkgd.kp3.p40
+? scripts/ke3g.bkgd.kp3.p5
+? scripts/ke3g.bkgd.kp3.p6
+? scripts/ke3g.bkgd.zeller.pr
+? scripts/ke3g.jobs.log
+? scripts/ke4.jobs.log
+? scripts/kp2.bkgd.aspect1.konaka
+? scripts/kp2.bkgd.aspect1.konaka.nohole
+? scripts/kp2.bkgd.aspect1.zeller
+? scripts/kp2.bkgd.aspect1.zeller.before.dif.fix
+? scripts/kp2.bkgd.aspect1.zeller.nohole
+? scripts/kp2.bkgd.aspect2.konaka
+? scripts/kp2.bkgd.aspect2.konaka.nohole
+? scripts/kp2.bkgd.aspect2.zeller
+? scripts/kp2.bkgd.aspect2.zeller.before.dif.fix
+? scripts/kp2.bkgd.aspect2.zeller.nohole
+? scripts/kp2.bkgd.aspect3.konaka
+? scripts/kp2.bkgd.aspect3.konaka.nohole
+? scripts/kp2.bkgd.aspect3.zeller
+? scripts/kp2.bkgd.aspect3.zeller.before.dif.fix
+? scripts/kp2.bkgd.aspect3.zeller.nohole
+? scripts/kp2.bkgd.aspect4.konaka
+? scripts/kp2.bkgd.aspect4.konaka.nohole
+? scripts/kp2.bkgd.aspect4.zeller
+? scripts/kp2.bkgd.aspect4.zeller.before.dif.fix
+? scripts/kp2.bkgd.aspect4.zeller.nohole
+? scripts/kp2.bkgd.kp2.m0.2
+? scripts/kp2.bkgd.kp2.m0.5
+? scripts/kp2.bkgd.kp2.m1
+? scripts/kp2.bkgd.kp2.m10
+? scripts/kp2.bkgd.kp2.m2
+? scripts/kp2.bkgd.kp2.m20
+? scripts/kp2.bkgd.kp2.m3
+? scripts/kp2.bkgd.kp2.m30
+? scripts/kp2.bkgd.kp2.m4
+? scripts/kp2.bkgd.kp2.m40
+? scripts/kp2.bkgd.kp2.m5
+? scripts/kp2.bkgd.kp2.m6
+? scripts/kp2.bkgd.kp2.p0
+? scripts/kp2.bkgd.kp2.p0.2
+? scripts/kp2.bkgd.kp2.p0.5
+? scripts/kp2.bkgd.kp2.p1
+? scripts/kp2.bkgd.kp2.p10
+? scripts/kp2.bkgd.kp2.p2
+? scripts/kp2.bkgd.kp2.p20
+? scripts/kp2.bkgd.kp2.p3
+? scripts/kp2.bkgd.kp2.p30
+? scripts/kp2.bkgd.kp2.p4
+? scripts/kp2.bkgd.kp2.p40
+? scripts/kp2.bkgd.kp2.p5
+? scripts/kp2.bkgd.kp2.p6
+? scripts/kp2.bkgd.kp3.m0.2
+? scripts/kp2.bkgd.kp3.m1
+? scripts/kp2.bkgd.kp3.m10
+? scripts/kp2.bkgd.kp3.m2
+? scripts/kp2.bkgd.kp3.m20
+? scripts/kp2.bkgd.kp3.m3
+? scripts/kp2.bkgd.kp3.m30
+? scripts/kp2.bkgd.kp3.m4
+? scripts/kp2.bkgd.kp3.m40
+? scripts/kp2.bkgd.kp3.m5
+? scripts/kp2.bkgd.kp3.m6
+? scripts/kp2.bkgd.kp3.p0
+? scripts/kp2.bkgd.kp3.p0.2
+? scripts/kp2.bkgd.kp3.p1
+? scripts/kp2.bkgd.kp3.p10
+? scripts/kp2.bkgd.kp3.p2
+? scripts/kp2.bkgd.kp3.p20
+? scripts/kp2.bkgd.kp3.p3
+? scripts/kp2.bkgd.kp3.p30
+? scripts/kp2.bkgd.kp3.p4
+? scripts/kp2.bkgd.kp3.p40
+? scripts/kp2.bkgd.kp3.p5
+? scripts/kp2.bkgd.kp3.p6
+? scripts/kp2.bkgd.zeller.pr
+? scripts/kp2.m0.1.list
+? scripts/kp2.m0.2.list
+? scripts/kp2.m0.3.list
+? scripts/kp2.m0.5.list
+? scripts/kp2.m1.list
+? scripts/kp2.m10.list
+? scripts/kp2.m2.list
+? scripts/kp2.m20.list
+? scripts/kp2.m3.list
+? scripts/kp2.m30.list
+? scripts/kp2.m4.list
+? scripts/kp2.m40.list
+? scripts/kp2.m5.list
+? scripts/kp2.m6.list
+? scripts/kp2.p0.1.list
+? scripts/kp2.p0.2.list
+? scripts/kp2.p0.3.list
+? scripts/kp2.p0.5.list
+? scripts/kp2.p0.list
+? scripts/kp2.p1.list
+? scripts/kp2.p10.list
+? scripts/kp2.p2.list
+? scripts/kp2.p20.list
+? scripts/kp2.p3.list
+? scripts/kp2.p30.list
+? scripts/kp2.p4.list
+? scripts/kp2.p40.list
+? scripts/kp2.p5.list
+? scripts/kp2.p6.list
+? scripts/kp3.bkgd.aspect1.konaka
+? scripts/kp3.bkgd.aspect1.konaka.nohole
+? scripts/kp3.bkgd.aspect1.zeller
+? scripts/kp3.bkgd.aspect1.zeller.before.dif.fix
+? scripts/kp3.bkgd.aspect1.zeller.nohole
+? scripts/kp3.bkgd.aspect2.konaka
+? scripts/kp3.bkgd.aspect2.konaka.nohole
+? scripts/kp3.bkgd.aspect2.zeller
+? scripts/kp3.bkgd.aspect2.zeller.before.dif.fix
+? scripts/kp3.bkgd.aspect2.zeller.nohole
+? scripts/kp3.bkgd.aspect3.konaka
+? scripts/kp3.bkgd.aspect3.konaka.nohole
+? scripts/kp3.bkgd.aspect3.zeller
+? scripts/kp3.bkgd.aspect3.zeller.before.dif.fix
+? scripts/kp3.bkgd.aspect3.zeller.nohole
+? scripts/kp3.bkgd.aspect4.konaka
+? scripts/kp3.bkgd.aspect4.konaka.nohole
+? scripts/kp3.bkgd.aspect4.zeller
+? scripts/kp3.bkgd.aspect4.zeller.before.dif.fix
+? scripts/kp3.bkgd.aspect4.zeller.nohole
+? scripts/kp3.bkgd.kp2.m0.2
+? scripts/kp3.bkgd.kp2.m0.5
+? scripts/kp3.bkgd.kp2.m1
+? scripts/kp3.bkgd.kp2.m10
+? scripts/kp3.bkgd.kp2.m2
+? scripts/kp3.bkgd.kp2.m20
+? scripts/kp3.bkgd.kp2.m3
+? scripts/kp3.bkgd.kp2.m30
+? scripts/kp3.bkgd.kp2.m4
+? scripts/kp3.bkgd.kp2.m40
+? scripts/kp3.bkgd.kp2.m5
+? scripts/kp3.bkgd.kp2.m6
+? scripts/kp3.bkgd.kp2.p0
+? scripts/kp3.bkgd.kp2.p0.2
+? scripts/kp3.bkgd.kp2.p0.5
+? scripts/kp3.bkgd.kp2.p1
+? scripts/kp3.bkgd.kp2.p10
+? scripts/kp3.bkgd.kp2.p2
+? scripts/kp3.bkgd.kp2.p20
+? scripts/kp3.bkgd.kp2.p3
+? scripts/kp3.bkgd.kp2.p30
+? scripts/kp3.bkgd.kp2.p4
+? scripts/kp3.bkgd.kp2.p40
+? scripts/kp3.bkgd.kp2.p5
+? scripts/kp3.bkgd.kp2.p6
+? scripts/kp3.bkgd.kp3.m0.2
+? scripts/kp3.bkgd.kp3.m1
+? scripts/kp3.bkgd.kp3.m10
+? scripts/kp3.bkgd.kp3.m2
+? scripts/kp3.bkgd.kp3.m20
+? scripts/kp3.bkgd.kp3.m3
+? scripts/kp3.bkgd.kp3.m30
+? scripts/kp3.bkgd.kp3.m4
+? scripts/kp3.bkgd.kp3.m40
+? scripts/kp3.bkgd.kp3.m5
+? scripts/kp3.bkgd.kp3.m6
+? scripts/kp3.bkgd.kp3.p0
+? scripts/kp3.bkgd.kp3.p0.2
+? scripts/kp3.bkgd.kp3.p1
+? scripts/kp3.bkgd.kp3.p10
+? scripts/kp3.bkgd.kp3.p2
+? scripts/kp3.bkgd.kp3.p20
+? scripts/kp3.bkgd.kp3.p3
+? scripts/kp3.bkgd.kp3.p30
+? scripts/kp3.bkgd.kp3.p4
+? scripts/kp3.bkgd.kp3.p40
+? scripts/kp3.bkgd.kp3.p5
+? scripts/kp3.bkgd.kp3.p6
+? scripts/kp3.bkgd.zeller.pr
+? scripts/kp3.m0.2.list
+? scripts/kp3.m1.list
+? scripts/kp3.m10.list
+? scripts/kp3.m2.list
+? scripts/kp3.m20.list
+? scripts/kp3.m3.list
+? scripts/kp3.m30.list
+? scripts/kp3.m4.list
+? scripts/kp3.m40.list
+? scripts/kp3.m5.list
+? scripts/kp3.m6.list
+? scripts/kp3.p0.2.list
+? scripts/kp3.p0.list
+? scripts/kp3.p1.list
+? scripts/kp3.p10.list
+? scripts/kp3.p2.list
+? scripts/kp3.p20.list
+? scripts/kp3.p3.list
+? scripts/kp3.p30.list
+? scripts/kp3.p4.list
+? scripts/kp3.p40.list
+? scripts/kp3.p5.list
+? scripts/kp3.p6.list
+? scripts/last.kumac
+? scripts/last.kumacold
+? scripts/llll
+? scripts/mover
+? scripts/neutron.beam.list
+? scripts/neutron.dshalo.list
+? scripts/neutron.ushalo.list
+? scripts/neutron.zushalo.list
+? scripts/one.ke3g.file.list
+? scripts/paw.metafile
+? scripts/remover
+? scripts/short.for.test.list
+? scripts/short.test.optimizer.list
+? scripts/sob.bkg.aspect1.konaka
+? scripts/sob.bkg.aspect1.konaka.nohole
+? scripts/sob.bkg.aspect1.zeller
+? scripts/sob.bkg.aspect1.zeller.before.dif.fix
+? scripts/sob.bkg.aspect1.zeller.nohole
+? scripts/sob.bkg.aspect2.konaka
+? scripts/sob.bkg.aspect2.konaka.nohole
+? scripts/sob.bkg.aspect2.zeller
+? scripts/sob.bkg.aspect2.zeller.before.dif.fix
+? scripts/sob.bkg.aspect2.zeller.nohole
+? scripts/sob.bkg.aspect3.konaka
+? scripts/sob.bkg.aspect3.konaka.nohole
+? scripts/sob.bkg.aspect3.zeller
+? scripts/sob.bkg.aspect3.zeller.before.dif.fix
+? scripts/sob.bkg.aspect3.zeller.nohole
+? scripts/sob.bkg.aspect4.konaka
+? scripts/sob.bkg.aspect4.konaka.nohole
+? scripts/sob.bkg.aspect4.zeller
+? scripts/sob.bkg.aspect4.zeller.before.dif.fix
+? scripts/sob.bkg.aspect4.zeller.nohole
+? scripts/sob.bkg.kp2.m0.2
+? scripts/sob.bkg.kp2.m0.5
+? scripts/sob.bkg.kp2.m1
+? scripts/sob.bkg.kp2.m10
+? scripts/sob.bkg.kp2.m2
+? scripts/sob.bkg.kp2.m20
+? scripts/sob.bkg.kp2.m3
+? scripts/sob.bkg.kp2.m30
+? scripts/sob.bkg.kp2.m4
+? scripts/sob.bkg.kp2.m40
+? scripts/sob.bkg.kp2.m5
+? scripts/sob.bkg.kp2.m6
+? scripts/sob.bkg.kp2.p0
+? scripts/sob.bkg.kp2.p0.2
+? scripts/sob.bkg.kp2.p0.5
+? scripts/sob.bkg.kp2.p1
+? scripts/sob.bkg.kp2.p10
+? scripts/sob.bkg.kp2.p2
+? scripts/sob.bkg.kp2.p20
+? scripts/sob.bkg.kp2.p3
+? scripts/sob.bkg.kp2.p30
+? scripts/sob.bkg.kp2.p4
+? scripts/sob.bkg.kp2.p40
+? scripts/sob.bkg.kp2.p5
+? scripts/sob.bkg.kp2.p6
+? scripts/sob.bkg.kp3.m0.2
+? scripts/sob.bkg.kp3.m1
+? scripts/sob.bkg.kp3.m10
+? scripts/sob.bkg.kp3.m2
+? scripts/sob.bkg.kp3.m20
+? scripts/sob.bkg.kp3.m3
+? scripts/sob.bkg.kp3.m30
+? scripts/sob.bkg.kp3.m4
+? scripts/sob.bkg.kp3.m40
+? scripts/sob.bkg.kp3.m5
+? scripts/sob.bkg.kp3.m6
+? scripts/sob.bkg.kp3.p0
+? scripts/sob.bkg.kp3.p0.2
+? scripts/sob.bkg.kp3.p1
+? scripts/sob.bkg.kp3.p10
+? scripts/sob.bkg.kp3.p2
+? scripts/sob.bkg.kp3.p20
+? scripts/sob.bkg.kp3.p3
+? scripts/sob.bkg.kp3.p30
+? scripts/sob.bkg.kp3.p4
+? scripts/sob.bkg.kp3.p40
+? scripts/sob.bkg.kp3.p5
+? scripts/sob.bkg.kp3.p6
+? scripts/sob.bkg.zeller.pr
+? scripts/std.pv.aspect1.zeller.summary
+? scripts/temp.for.zip
+? scripts/test.list
+? scripts/test.optimizer.list
+? scripts/trimmed.aspect1.zeller.13jun03
+? scripts/trimmed.aspect1.zeller.kapinos2.ext.tgt.coll.dk.ds.23apr04
+? scripts/zeller.pr.list
+? scripts/zippy
+? source/Makefile.try
+? source/anal.exe.save1
+? source/cvs.diff.now
+? source/fastmc.exe.save0
+? source/fastmc.exe.save1
+? source/fastmc.exe.save2
+? source/get_pr_resolution.F
+? source/last.kumac
+? source/oldzip.f
+? source/packer.f
+? source/paw.metafile
+? source/temp.for.zip
+? source/testsys.f
+? source/testzip.f
+? source/try
+? source/try.f
+cvs server: Tagging .
+T README
+T RUNME
+T pve787.kumac
+cvs server: Tagging DataBase
+T DataBase/Al.photon.attenuation.length.txt
+T DataBase/Be.photon.attenuation.length.txt
+T DataBase/C.photon.attenuation.length.txt
+T DataBase/optimizer.edges.dat
+T DataBase/preradiator.resolution.txt
+T DataBase/primary_beam.dat
+T DataBase/skim.statistics.and.log
+cvs server: Tagging Templates
+T Templates/control.copy.job.template
+T Templates/control.template
+T Templates/multik.template
+T Templates/multik.template.no.fit
+T Templates/multik.template.no.smear.no.fit
+cvs server: Tagging analysis
+T analysis/acceptance_2g.kumac
+T analysis/akira.offline.grafici.new.f
+T analysis/akira_ntuple.f
+T analysis/bookakira.f
+T analysis/catcher.forpaw
+T analysis/catcher_hit.forpaw
+T analysis/chiprob.forpaw
+T analysis/epiwrap.forpaw
+T analysis/fillakira.f
+T analysis/init.kumac
+T analysis/ke3g_chveto.forpaw
+T analysis/ke3g_chveto_mike.forpaw
+T analysis/kinfit.cmn
+T analysis/kl.inc
+T analysis/konaka_kwt.f
+T analysis/kpi3_cut.forpaw
+T analysis/last.kumac
+T analysis/last.kumacold
+T analysis/load.akira.var.f
+T analysis/lorpl.f
+T analysis/lorpl.forpaw
+T analysis/mike.forpaw
+T analysis/mike_test.forpaw
+T analysis/offline.f
+T analysis/offline.forpaw
+T analysis/offline.may1.forpaw
+T analysis/offline_01aug.forpaw
+T analysis/offline_1g.forpaw
+T analysis/offline_1g_original.forpaw
+T analysis/offline_2p.forpaw
+T analysis/offline_original.forpaw
+T analysis/offline_tmp.forpaw
+T analysis/partprop.inc
+T analysis/path.forpaw
+T analysis/path_1g.forpaw
+T analysis/paw.metafile
+T analysis/print.forpaw
+T analysis/pvnew.f
+T analysis/pvnew.forpaw
+T analysis/pvnew3.forpaw
+T analysis/pvnew_e926.forpaw
+T analysis/pvnew_kami.forpaw
+T analysis/pvnew_kami_1MeV.forpaw
+T analysis/pvnew_kami_1mev.forpaw
+T analysis/pvpi0.forpaw
+T analysis/trackinfo_2.inc
+T analysis/wrap_cut.forpaw
+cvs server: Tagging geometry
+T geometry/collimator.v07_4.dat
+T geometry/detector.1.dat
+T geometry/detector.10.dat
+T geometry/detector.11.dat
+T geometry/detector.12.dat
+T geometry/detector.13.dat
+T geometry/detector.14.dat
+T geometry/detector.15.dat
+T geometry/detector.16.dat
+T geometry/detector.17.dat
+T geometry/detector.18.dat
+T geometry/detector.19.dat
+T geometry/detector.2.dat
+T geometry/detector.20.dat
+T geometry/detector.21.dat
+T geometry/detector.3.dat
+T geometry/detector.4.dat
+T geometry/detector.6.dat
+T geometry/detector.7.dat
+T geometry/detector.8.dat
+T geometry/detector.9.dat
+T geometry/detector.dat
+T geometry/detector.dat.Geometry.V
+cvs server: Tagging scripts
+T scripts/Create.avg.veto.ineffy.vectors.script
+T scripts/Create.nnpi.bkg.vectors.script
+T scripts/Create.sob.bkg.vectors.script
+T scripts/Trim.Down.ANAL
+T scripts/Trim.to.File
+T scripts/analysis.script
+T scripts/control.copy.job.template
+T scripts/control.dat
+T scripts/control.dat.for.interbunch.studies
+T scripts/control.for.trigger.studies.dat
+T scripts/control.wrap.multi
+T scripts/default.decay.dat
+T scripts/list.for.analysis
+T scripts/run.fastmc.script
+T scripts/simple.run.fastmc.script
+T scripts/submit.ALL.fastmc.script
+T scripts/submit.all.beam.size.jobs
+T scripts/submit.kp2.beam.size.jobs.script
+T scripts/submit.many.fastmc.script
+T scripts/submit.signal.beam.size.jobs
+T scripts/submit.standard.bunch.of.jobs.script
+T scripts/unzipper.script
+T scripts/wrap.run.fastmc.script
+cvs server: Tagging source
+T source/Makefile
+T source/Makefile.anal
+T source/Makefile.opt
+T source/acceptable.f
+T source/acceptance.inc
+T source/akira.catcher.f
+T source/akira.epiwrap.f
+T source/akira.geom.inc
+T source/akira.kl.inc
+T source/akira.kpi3_cut.f
+T source/akira.offline.f
+T source/akira.offline_1g.f
+T source/akira.path.f
+T source/akira.wrap_cut.f
+T source/anal.f
+T source/analvar.inc
+T source/annihilate.f
+T source/backward.f
+T source/beam_collimator.f
+T source/bethe.f
+T source/blank.inc
+T source/bookanal.f
+T source/boostf.f
+T source/brems.f
+T source/catcha.f
+T source/catchnlay.f
+T source/catchp.f
+T source/cern.ranmar.f
+T source/cfun.f
+T source/cfun_0g.f
+T source/cfun_1g.f
+T source/checkgenbod.f
+T source/checkodd.f
+T source/chgveto.f
+T source/cleo.boostf.f
+T source/cleo.dalitz.decay.f
+T source/cleo.rotat.f
+T source/control.f
+T source/cutewrap.f
+T source/cuts.inc
+T source/dalitz.f
+T source/decayit.f
+T source/decayspec.inc
+T source/dedx_scin.f
+T source/defineplane.f
+T source/detector.f
+T source/detector.inc
+T source/dfact.f
+T source/dinv.f
+T source/dumptopofstack.f
+T source/ehistory.f
+T source/event.inc
+T source/evolve.f
+T source/fact.inc
+T source/fastmc.f
+T source/fillallbut1.f
+T source/fillanal.f
+T source/firstmom.f
+T source/fitpi0.f
+T source/flags.inc
+T source/ganni.f
+T source/gannii.f
+T source/gdrot.f
+T source/geant.inc
+T source/gekbin.f
+T source/gen_vertex.v07_2.f
+T source/genbod.f
+T source/geninout.inc
+T source/gentk0l.f
+T source/get_pr_resolution.f
+T source/getannigamlist.f
+T source/getcandwt.f
+T source/getdedx.f
+T source/getnextvol.f
+T source/getngen.f
+T source/getparatz.f
+T source/getpath.f
+T source/gettmax.f
+T source/gettrkweight.f
+T source/getxyatz.f
+T source/gety0int.f
+T source/getzvest.f
+T source/gfang.f
+T source/goodphoton.f
+T source/gphysi.f
+T source/gprob.f
+T source/gspec.f
+T source/init.f
+T source/initanal.f
+T source/initdecayit.f
+T source/inside.f
+T source/iopar.inc
+T source/jump2dir.f
+T source/kamipv.f
+T source/kapinos.f
+T source/kapinos2.f
+T source/kinema.cmn
+T source/kinfit.cmn
+T source/kinfit.f
+T source/kparam.inc
+T source/kspec.f
+T source/kwt.f
+T source/ll.f
+T source/load.akira.var.f
+T source/load_optimizer.f
+T source/lorpl.f
+T source/make.std
+T source/makebox.f
+T source/makenn.f
+T source/makeplane.f
+T source/makeslopedbox.f
+T source/marvins.genbod.f
+T source/meet.f
+T source/my.phsp.f
+T source/myranmar.f
+T source/n_n_pi0.f
+T source/nearmiss.f
+T source/neutronnorm.f
+T source/new.anal.f
+T source/normco.f
+T source/nspectrum.f
+T source/nt1.anal.inc
+T source/ntspec.f
+T source/odd.pair.inc
+T source/optbin.f
+T source/optimizer.f
+T source/optimizer.inc
+T source/optpacker.f
+T source/optreportbin.f
+T source/optsmooth.f
+T source/optunpacker.f
+T source/optwrite.f
+T source/pair_prod.f
+T source/parser.f
+T source/particleid.f
+T source/partprop.inc
+T source/pdk.f
+T source/photonatten.f
+T source/phsp.f
+T source/pigg.f
+T source/prerad.f
+T source/primary_beam.inc
+T source/pstart.f
+T source/pv.f
+T source/pve787.f
+T source/ranmar.f
+T source/read_optedges.f
+T source/readevent.f
+T source/recon.f
+T source/reconinfo.inc
+T source/report.f
+T source/rhistory.f
+T source/rnpssn.f
+T source/rotat.f
+T source/rotzeller.f
+T source/select_signal.f
+T source/setupanal.f
+T source/skimevent.f
+T source/smear.f
+T source/smear.inc
+T source/stack.inc
+T source/stats.f
+T source/study.f
+T source/tcopy.f
+T source/tellbox.f
+T source/test.genbod.f
+T source/testopt.f
+T source/trackatvacvesl.f
+T source/trackinfo.inc
+T source/transfer2_1.f
+T source/transport.routines.f
+T source/trigger.f
+T source/triggerinfo.inc
+T source/truexyatanyz.f
+T source/truexyatz.f
+T source/umc.wtau.f
+T source/usegetenv.f
+T source/userend.f
+T source/userevent.f
+T source/userinit.f
+T source/userselect.f
+T source/usveto.f
+T source/vprint.f
+T source/vtrue.f
+T source/vvloss.f
+T source/wl3.f
+T source/wl3g.f
+T source/wl4.f
+T source/wpigg.f
+T source/wrapepi.f
+T source/writemtx.f
+T source/wtau.charged.f
+T source/wtau0.f
+T source/wtinfo.f
+T source/xpar.f
+T source/ypjunk.f
+T source/zip.f
+
+% cd /u1/djaffe/KOPIO/fastmc/checkout/
+% mv fastmc old_fastmc
+% cvs checkout -d fastmc mc/fastmc
+
+test
+% chmod 744 RUNME
+% RUNME
+% ls
+analysis  condir  CVS  DataBase  geometry  locallog  localntuples  log  ntuples  pve787.kumac  README  RUNME  scripts  source  Templates
+% cd source
+% make
+[snip]
+/usr/bin/ld: cannot open output file ../exe/fastmc.exe: No such file or directory
+collect2: ld returned 1 exit status
+make: *** [fastmc.exe] Error 1
+
+Need to create exe directory
+
+% ln -s /home/djaffe/KOPIO/fastmc/exe ../exe
+% make
+
+OK
+
+% make -f Makefile.anal
+% ls -lrt ../exe/*
+-rwxrwxr-x    1 djaffe   djaffe    1448515 May 28 10:00 ../exe/fastmc.exe
+-rwxrwxr-x    1 djaffe   djaffe    1317415 May 28 10:00 ../exe/anal.exe
+
+sizes identical.ok
+
+% cd ../scripts/
+
+test
+
+% run.fastmc.script kpnn 1 10000 9999 0 2 1 detector.21.dat
+
+ JobName  kpnn
+ Generate 10000 events
+ Decay mode 1   Random seeds 9999 21
+ Annihilation option 0 : 0,1,2 = no e+ annih., true e+ annih, approximate E(g) = E(e+)
+ Conversion option 2 : 0,1,2,3 = Z(end of CAL), Z(middle PR), Z(front PR & Zeller PR model), Z(Rear PR)
+ K0L weighting 1 : 0,1 = no weight, weighted and required to decay in Z fiducial region
+run.fastmc.script kpnn 1 10000 9999 0 2 1 detector.21.dat default.decay.dat 1.1 0
+
+  input/output Files
+Executable                 1448515 May 28 10:00 ../exe/fastmc.exe*
+Template for control file  1510 May 28 09:42 /u1/djaffe/KOPIO/fastmc/checkout/fastmc/scripts/../Templates/control.template
+Control file               1536 May 28 10:02 /u1/djaffe/KOPIO/fastmc/checkout/fastmc/scripts/../condir/control.kpnn.9999.21
+Detector file              5248 May 28 09:40 /u1/djaffe/KOPIO/fastmc/checkout/fastmc/scripts/../geometry/detector.21.dat
+Branching fractions        274 Nov 21 2002 default.decay.dat
+Log file                   /u1/djaffe/KOPIO/fastmc/checkout/fastmc/scripts/../locallog/kpnn.9999.21.280504.1002.log
+Ntuple/hist file           ../localntuples/kpnn.9999.21.rzn
+ ----------
+
+compare with previously produced test file:
+% ls /e787u/djaffe/KOPIO/fastmc/scripts/../localntuples/kpnn.9999.21.rzn.gz -lrt
+-rw-r--r--    1 djaffe   djaffe    4574491 May 27 18:40 /e787u/djaffe/KOPIO/fastmc/scripts/../localntuples/kpnn.9999.21.rzn.gz
+bnlku24_djaffe[350]% ls ../localntuples/kpnn.9999.21.rzn.gz -lrt
+-rw-r--r--    1 djaffe   djaffe    4574693 May 28 10:02 ../localntuples/kpnn.9999.21.rzn.gz
+
+hmmm... size is different. check logfiles.
+logfiles are identical except for times. random seeds & nskip identical
+perhaps ntuples contain date/time?
+
+let's analyze it and compare
+
+% echo  ../localntuples/kpnn.9999.21.rzn > test.list
+% analysis.script test.list ../geometry/detector.21.dat &
+[1] 4308
+bnlku24_djaffe[362]%
+ Here is the list of ntuple files that will be analyzed:
+../localntuples/kpnn.9999.21.rzn
+
+  input/output Files
+Executable                 1317415 May 28 10:00 ../exe/anal.exe*
+Detector file              5248 May 28 09:40 ../geometry/detector.21.dat
+Branching fractions file   274 Nov 21 2002 default.decay.dat
+Optimizer bin edge file    556 May 28 09:40 ../DataBase/optimizer.edges.dat
+Optimizer output file      ../output/optimizer.results.280504.1009.dat
+List of ntuples            33 May 28 10:08 test.list with 1 ntuples files
+Log file                   /u1/djaffe/KOPIO/fastmc/checkout/fastmc/scripts/../log/anal.test.280504.1009.log
+Histogram file             ../ntuples/anal.test.280504.1009.rzn
+ ---------------------------
+
+OK.calculated signal yields are identical.
+
+
+SUMMARY OF MODIFICATIONS
+=========================
+1. Bryman PR model
+2. angular dependence of KL beam 
+3. extended target
+4. enlarged DS hole
+5. decay region moved to 1015-1415cm
+6. preliminary cut optimizer code added (probably not ready for general use)
+7. E787 PV option
+8. ntuple files automatically gzipped/gunzipped to save space
+9. hists to study CV timing
+
+KNOWN PROBLEMS
+==============
+1. No magnetic fields
+2. No CAL, BV or OV 'smearing' model
+
+Fri May 28 10:15:22 EDT 2004

@@ -1,0 +1,421 @@
+// Text.cxx
+
+#include "dataset_util/Text.h"
+#include "dataset_util/getcwd.h"
+#include "dataset_util/XmlElement.h"
+#include "dataset_util/FileName.h"
+#include "dataset_util/FileStatus.h"
+#include "dataset_util/WorkingDirectory.h"
+#include <vector>
+#include <fstream>
+#include <iostream>
+
+using std::string;
+using std::ostream;
+using std::ifstream;
+using std::ofstream;
+using std::cerr;
+using std::endl;
+
+typedef Text::size_type size_type;
+typedef Text::Line Line;
+
+namespace {
+  const unsigned int MAX = 256;
+}
+
+//**********************************************************************
+// Local definitions.
+//**********************************************************************
+
+namespace {
+
+// Convert plain text to XML text.
+//   < --> &lt;
+//   > --> &gt;
+//   & -->  &amp;
+
+// Return the mapping of special characters between text and XML.
+typedef std::pair<Line, Line> XmlRepPair;
+typedef std::vector<XmlRepPair> XmlRepMap;
+typedef XmlRepMap::size_type RepIndex;
+const XmlRepMap& xmlreps() {
+  static XmlRepMap reps;
+  if ( reps.size() == 0 ) {
+    reps.push_back(XmlRepPair("&", "&amp;"));
+    reps.push_back(XmlRepPair("<", "&lt;"));
+    reps.push_back(XmlRepPair(">", "&gt;"));
+  }
+  return reps;
+}
+
+// Warning flag.
+bool& warning_flag() {
+  static bool flag = false;
+  return flag;
+}
+
+}  // end unnamed namespace
+
+//**********************************************************************
+// Static member functions.
+//**********************************************************************
+
+// DTD.
+
+const Text& Text::dtd() {
+  static Text txt;
+  if ( txt.size() == 0 ) {
+    txt.append("<!ELEMENT Line EMPTY>");
+    txt.append("<!ATTLIST Line");
+    txt.append("  number  CDATA  #REQUIRED");
+    txt.append("  text    CDATA  #REQUIRED");
+    txt.append(">");
+    txt.append("");
+    txt.append("<!ELEMENT Text (Line*)>");
+    txt.append("<!ATTLIST Text");
+    txt.append("  name   CDATA  #IMPLIED");
+    txt.append("  nline  CDATA  #REQUIRED");
+    txt.append(">");
+  }
+  return txt;
+}
+
+//**********************************************************************
+
+// Split and append.
+
+int Text::
+split(Line line, WordList& words, Line delimiters, bool skipblank) {
+  WordList::size_type size0 = words.size();
+  Line::size_type lastPos = 0;
+  if ( skipblank ) {
+    lastPos = line.find_first_not_of(delimiters, 0);
+  }
+  Line::size_type pos = line.find_first_of(delimiters, lastPos);
+  while ( lastPos != string::npos ) {
+    words.push_back(line.substr(lastPos, pos - lastPos));
+    if ( skipblank ) {
+      lastPos = line.find_first_not_of(delimiters, pos);
+    } else {
+      if ( pos == string::npos ) break;
+      lastPos = pos + 1;
+    }
+    pos = line.find_first_of(delimiters, lastPos);
+  }
+  return words.size() - size0;
+}
+
+//**********************************************************************
+
+// Split.
+
+Text::WordList Text::split(Line line, Line delimiters, bool skipb) {
+  WordList words;
+  split(line, words, delimiters, skipb);
+  return words;
+}
+
+//**********************************************************************
+
+// Convert a line from text to XML.
+
+void Text::text_to_xml(Line& line) {
+  const XmlRepMap& reps = xmlreps();
+  for ( RepIndex irep=0; irep<reps.size(); ++irep ) {
+    string oldrep = reps[irep].first;
+    string newrep = reps[irep].second;
+    Line::size_type ipos = 0;
+    while ( ipos < line.size() ) {
+      ipos = line.find(oldrep, ipos);
+      if ( ipos == Line::npos ) break;
+      line.replace(ipos, oldrep.size(), newrep);
+      ipos += newrep.size();
+    }
+  }
+}
+
+//**********************************************************************
+
+// Convert a line from XML to text.
+
+void Text::xml_to_text(Line& line) {
+  const XmlRepMap& reps = xmlreps();
+  RepIndex irep = reps.size();
+  while ( irep-- > 0 ) {
+    string oldrep = reps[irep].second;
+    string newrep = reps[irep].first;
+    Line::size_type ipos = 0;
+    while ( ipos < line.size() ) {
+      ipos = line.find(oldrep, ipos);
+      if ( ipos == Line::npos ) break;
+      line.replace(ipos, oldrep.size(), newrep);
+      ipos += newrep.size();
+    }
+  }
+}
+
+//**********************************************************************
+
+// Set the unprintable warning flag.
+
+void Text::set_warn(bool flag) {
+  warning_flag() = flag;
+}
+//**********************************************************************
+
+// Return the unprintable warning flag.
+
+bool Text::warn() {
+  return warning_flag();
+}
+
+//**********************************************************************
+// Member functions.
+//**********************************************************************
+
+// Default constructor.
+
+Text::Text() : m_valid(true) { }
+
+//**********************************************************************
+
+// Constructor from a file.
+
+Text::Text(Name name, bool read, bool read_required)
+: m_name(name), m_valid(true) {
+  if ( ! read ) return;
+  FileStatus fstat(name);
+  bool readfail = false;
+  // File already exists.
+  if ( fstat.exists() ) {
+    // File is readable.
+    if ( fstat.is_regular() && fstat.is_readable() ) {
+      // If filename is relative, wait until we have control of the
+      // working directory.
+      WorkingDirectory* pwd = 0;
+      if ( FileName(name).is_relative() ) {
+        pwd = new WorkingDirectory();
+      }
+      ifstream file(name.c_str());
+      while ( file && !file.eof() ) {
+        string line;
+        getline(file, line);
+        if ( ! file ) break;
+        // Verify all characters are printable.
+        for ( string::size_type ipos=0; ipos<line.size(); ++ipos ) {
+          char ch = line[ipos];
+          if ( !isprint(ch) && ch!='\t' && ch!='\f' ) {
+            if ( read_required && warn() ) {
+               cerr << "Text::ctor: found unprintable character on line "
+                   << size()+1 << " at position " << ipos+1
+                   << "." << endl;
+              cerr << "  File: " << name << endl;
+              cerr << "  Text object left empty." << endl;
+            }
+            readfail = true;
+            break;
+          }
+        }
+        append(line);
+      }
+      if ( readfail ) {
+        *this = Text();
+      }
+      file.close();
+      delete pwd;
+    // File is not readable.
+    } else {
+      readfail = true;
+      if ( read_required && warn() ) {
+        cerr << "Text::ctor: Unable to read file" << endl;
+        cerr << "  name: " << name << endl;
+        if ( FileName(name).is_relative() ) {
+          cerr << "   pwd: " << getcwd() << endl;
+        }
+        if ( ! fstat.is_regular() ) {
+          cerr << "  File is not regular" << endl;
+        }
+        if ( ! fstat.is_readable() ) {
+          cerr << "  File is not readable" << endl;
+        }
+      }
+    }
+  } else {
+    readfail = true;
+    if ( read_required && warn() ) {
+      cerr << "Text::ctor: File does not exist" << endl;
+      cerr << "  name: " << name << endl;
+    }
+  }
+  if ( readfail && read_required ) {
+    m_valid = false;
+  }
+  return;
+}
+
+//**********************************************************************
+
+// XML constructor.
+
+Text::Text(const XmlElement& ele)
+: m_name(""),
+  m_lines(ele.attribute_as_unsigned_int("nline"), Line("")),
+  m_valid(true) {
+  if ( ele.name() != Text::xml_name() ) return;
+  if ( ele.has_attribute("name") ) {
+    m_name = ele.attribute("name");
+  }
+  size_type nline = ele.attribute_as_unsigned_int("nline");
+  size_type count = 0;
+  for ( XmlElement::ElementList::const_iterator
+        ichild=ele.children().begin();
+        ichild!=ele.children().end(); ++ichild ) {
+    const XmlElement& child = **ichild;
+    size_type iline = child.attribute_as_unsigned_int("number");
+    Line line = child.attribute("text");
+    xml_to_text(line);
+    m_lines[iline] = line;
+    assert(iline == count);
+    ++count;
+  }
+  assert( count == nline );
+}
+    
+//**********************************************************************
+
+// Validity.
+
+bool Text::is_valid() const {
+  return m_valid;
+}
+
+//**********************************************************************
+
+// Change the name.
+
+int Text::set_name(string name) {
+  if ( ! is_valid() ) {
+    return 1;
+  }
+  m_name = name;
+  return 0;
+}
+
+//**********************************************************************
+
+// Append a line.
+
+void Text::append(Line line) {
+  m_lines.push_back(line);
+}
+
+//**********************************************************************
+
+// Append txt.
+
+void Text::append(const Text& txt) {
+  for ( Text::size_type iline=0; iline<txt.size(); ++iline ) {
+    m_lines.push_back(txt.line(iline));
+  }
+}
+
+//**********************************************************************
+
+// Number of lines.
+
+size_type Text::size() const {
+  return m_lines.size();
+}
+
+//**********************************************************************
+
+// Return a line.
+
+Line Text::line(size_type iline) const {
+  if ( iline >= size() ) return Line();
+  return m_lines[iline];
+}
+
+//**********************************************************************
+
+// Write to a file.
+
+int Text::write(Name iname) const {
+  Name fname = iname;
+  if ( fname == "" ) fname = name();
+  if ( fname == "" ) return 1;
+  // If filename is relative, wait until we have control of the
+  // working directory.
+  WorkingDirectory* pwd = 0;
+  if ( FileName(fname).is_relative() ) {
+    pwd = new WorkingDirectory();
+  }
+  ofstream file(fname.c_str());
+  delete pwd;
+  if ( ! file ) return 2;
+  for ( Text::size_type iline=0; iline<size(); ++iline ) {
+    file << line(iline) << endl;
+  }
+  return 0;
+}
+
+//**********************************************************************
+
+// Write XML.
+
+XmlElement* Text::xml() const {
+  if ( ! is_valid() ) {
+    return 0;
+  }
+  XmlElement* pele = new XmlElement(Text::xml_name());
+  if ( name().size() ) {
+    pele->add_attribute("name", name());
+  }
+  pele->add_attribute_as_unsigned_int("nline", size());
+  for ( Text::size_type iline=0; iline<size(); ++iline ) {
+    XmlElement* pchild = new XmlElement("Line");
+    pchild->add_attribute_as_unsigned_int("number", iline);
+    Line ln = line(iline);
+    text_to_xml(ln);
+    pchild->add_attribute("text", ln);
+    pele->add_child(pchild);
+  }
+  return pele;
+}
+
+//**********************************************************************
+// Free functions.
+//**********************************************************************
+
+// Output stream.
+
+ostream& operator<<(ostream& lhs, const Text& rhs) {
+  for ( Text::size_type iline=0; iline<rhs.size(); ++iline ) {
+    lhs << rhs.line(iline);
+    if ( iline < rhs.size()-1 ) lhs << endl;
+  }
+  return lhs;
+}
+
+//**********************************************************************
+
+// Equality.
+
+bool operator==(const Text& lhs, const Text& rhs) {
+  if ( lhs.size() != rhs.size() ) return false;
+  for ( size_type iline=0; iline<lhs.size(); ++iline ) {
+    if ( lhs.line(iline) != rhs.line(iline) ) return false;
+  }
+  return true;
+}
+
+//**********************************************************************
+
+// Inequality.
+
+bool operator!=(const Text& lhs, const Text& rhs) {
+  return ! ( lhs == rhs );
+}
+
+//**********************************************************************

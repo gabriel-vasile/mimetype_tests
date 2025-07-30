@@ -1,0 +1,416 @@
+<html><head><!--
+*file member=objects 
+*file language=html leading_source library=cxx_crib date=08:Nov:1998-->
+<title>OO Concepts: Objects & Classes</title>
+</head>
+ 
+<body>
+<h1><img src="../pedestrians.gif" align=top width="43" height="43">
+OO Concepts: Objects & Classes</h1> 
+ 
+<h2>Objects</h2>
+
+<h3>Interacting with Objects</h3>
+
+Objects are miniature programs that are complete with their own
+private copy of all internal data.  The designer of the object
+decides exactly how the object can be used.  This can be
+done <i>independently of the application in which it is used</i>
+Properly designed and tested objects are robust and can be
+reused in new applications.  The secret is in the way a user
+interacts with an object.
+<p>
+<center>
+<img src="object1.gif" align=middle width="304" height="281">
+</center>
+<p>
+
+The user sends a message to an object and gets a reply.  The message may
+result in the object changing state.  The designer of the object decides
+what messages are allowed and how the object will react and so can test it
+before the user gets hold of it.
+<p>
+
+In this series of OO concept talks we shall illustrate some of the concepts 
+by developing a series of track objects.  We can make a start on this now, by 
+deciding a few fundamentals about such objects.  Clearly one of the properties 
+of a track is its energy.  If we have a track called MyTrack, then we could 
+ask it for its energy using the assignment:-
+<pre>
+energy = MyTrack.GetEnergy();
+</pre>
+There is quite a lot to take in here:-
+<ol>
+<li> First comes MyTrack -the name, or identifier of the object MyObject.  
+Objects have names just like variables in FORTRAN. Identifiers consist of 
+alphanumeric and underscore, although underscore is not popular in ROOT, they 
+use the character heavily for special names so, by not using the character, 
+potential conflicts are avoided. To break up compound name, capitalisation of
+the first letter is preferred. This brings up another point that a FORTRAN 
+programmer had better get used to: <font color=red> variable identifiers are 
+case sensitive in C++; </font> MyTrack is not the same as mytrack!! 
+
+<li> Next comes a dot.  This is the 
+<a href="../cxx_crib/member_selection.html">member selection operator</a>
+and is use to indicate which member (i.e. which bit)
+ of the object you want to deal with.
+
+<li> Finally comes GetEnergy() - which looks a bit like a function only there 
+isn't anything in it argument list.  The reason is looks like a function is 
+because that's exactly what it is. Strictly it should be called a
+<a href="../glossary/member_function.html">member function</a>.
+This brings us to another fundamental 
+point: <font color=red>Sending a message to an object means calling one of its 
+member functions.</font> The reason that there isn't an argument list is that 
+there is no need to qualify this particular message; we just want the track's 
+energy. Typically an object will have a number of member functions that start
+"Get" that simply return some information about its state. These are often 
+referred to collectively as "getters". Often there will be 
+a parallel series of functions that start "Set", that change them.  So we might 
+change the state of our track by:-
+
+<pre>
+MyTrack.SetEnergy(energy);
+</pre>
+Now we have to supply additional information, via the argument list,
+the energy we want to set.
+</ol>
+
+<h3>No Free Lunches</h3>
+
+Just to underline a very important point, <i>if</i> we can change the energy 
+of the track, its because the designer of the track object permits it, not 
+because the user of the track object thought up a new way of using the 
+software.  When software development breaks previously 
+tested code it is often because it 
+is being used in ways that were not anticipated when it was written ("Oh, I 
+never expected the code to be used like that").  So robustness come from the 
+fact that the object designer has to look beyond the current application to 
+see the object as an entire concept, independent of any one application.  This 
+forces a better design but at the price of more work - there are no free 
+lunches!  
+
+<h3>Beyond FORTRAN</h3>
+
+To a FORTRAN programmer, this may seem to be rather like a subroutine with
+local data and a set of entries points, one for each message.  This is not
+a bad model for a single object, but OO allows two fundamental changes:-
+
+<ul>
+<p>
+<center>
+<img src="object3.gif" align=middle width="523" height="267">
+</center>
+<p>
+<li>  There can be as many independent copies of the object as are required. 
+The above diagram shows an array.  If we had an array of track objects, called 
+say MyTracks, we could asked the energy of the 5th:-
+<pre>
+energy = MyTracks[5].GetEnergy();
+</pre>
+Now we first select the array element, which in C++ uses
+<a href="../cxx_crib/array.html"> [..] </a>
+so as not to confuse it with a function call (in FORTRAN they can look very 
+similar!) and then the selected object is sent the GetEnergy message.
+<p>
+It is unlikely that a fixed length array of objects is going to be 
+satisfactory in most cases.  Normally the number of objects is not known until 
+execution time.  This is the problem that FORTRAN memory managers such as 
+ZEBRA were written to solve, 
+and the solution in OO is much the same: create the 
+object at execution time by allocating memory and then access the object via 
+some kind of a
+<a href="../glossary/pointer.html">pointer</a>
+(in ZEBRA terminology objects are banks and pointers are links). 
+Pointers are discussed in more detail in the
+later OO concept topic
+<a href="../cxx_crib/pointers.html">Pointers & References</a>
+but it is worthwhile introducing a bit of notation now.  If, instead of a track 
+object, we have a pointer to it, say MyTrackPtr, then to get its 
+energy:-
+<pre>
+energy = MyTrackPtr->GetEnergy();
+</pre>
+all that changes is that the dot becomes a ->.  There is no convention that 
+says pointers have to be called Ptr or something, indeed, pointers are so 
+prolific in C++ code that names rarely indicate that they are, but its 
+something to watch out for when reading code!
+<p>
+Just as FORTRAN memory managers allow banks to be organised into data 
+structures, so in OO there are special objects, called
+<a href="../glossary/container.html">containers</a> 
+whose function it is to form collections of objects.
+These collections include such organisations as arrays, 
+lists, queues and trees. So the passive central data structure of a FORTRAN 
+program now becomes a dynamic structure of objects. Containers is the subject 
+of the later OO concept talk
+<a href="../cxx_crib/containers.html">Containers</a>.
+
+<p>
+<center>
+<img src="object2.gif" align=middle width="456" height="439">
+</center>
+<p>
+<li> Just as objects jealously guard their own privacy so they respect the 
+privacy of others.  Rather than try to make a object do too much and break
+the idea of a simple
+<a href="abstraction.html">abstraction</a>
+a designer will give it knowledge of other objects in the problem
+domain. Messages flow between objects far more freely than between 
+a set of FORTRAN routines.
+It very typical in an OO program to send a message to
+one object and receive an object in return with which to continue the interaction.
+<p>
+Let's consider this for our track objects.  Suppose we have another type of 
+object, a vertex, and further suppose each track can be sent the message 
+GetParentVertex that will return a pointer to the vertex that produced it.  We 
+might ask that vertex for its interaction type by:-
+<pre>
+interaction = MyTrackPtr->GetParentVertex()->GetInteractionType();
+</pre>
+The member selection operator -> works left to right, so the above means:-
+<pre>
+interaction = ( MyTrackPtr->GetParentVertex() ) -> GetInteractionType();
+</pre>
+i.e. get the vertex pointer from MyTrack and then ask the vertex for its 
+interaction type.  In principle, we could have given the track object the 
+member function GetInteractionType, but that is not the OO way, the user knows 
+that tracks connect to vertices, so its part of the model 
+(the <a href="../glossary/abstraction.html">abstraction</a>)
+so its not the track's job to talk on the vertex on the user's behalf. 
+That would require a track to know everything about a vertex.  
+On the other hand, a 
+track object may privately own objects that are part of what makes it a track.
+Such objects are would be part of the implementation
+(i.e. should be <a href="../glossary/encapsulation.html">encapsulated</a>)
+and in this case messages would be sent internally and answers returned, 
+rather than returning the objects themselves,
+The litmus test is always the question: Is this part of the model or 
+part of the implementation?
+</ul>
+
+
+<h2>Class</h2>
+
+<p>
+<center>
+<img src="object4.gif" align=middle width="626" height="264">
+</center>
+<p>
+
+<h3>A Module Factory</h3>
+
+A class is rather like an object factory.  Each time a new object is required 
+it is created using the information in the class.  The class holds the code 
+shared by all of its objects.  It also contains details of an object's 
+internal data and this used to reserve space and initialise it when an object 
+is brought into existence, a process called 
+<a href="../glossary/instantiation.html">instantiation</a>'. 
+<p>
+Continuing with our track object, lets look at a (slightly incomplete) 
+definition of a track class.  To flesh out the track model a little more we 
+will add both mass and momentum to the model:-
+<pre>
+class Track {
+
+  Float_t fEnergy;
+  Float_t fMass;
+  Float_t fMomentum;
+
+  Float_t GetEnergy() { 
+    return fEnergy; 
+  }
+
+  void  SetEnergy( Float_t energy ) {
+    fEnergy = energy;
+    fMomentum = sqrt( fEnergy*fEnergy - fMass*fMass );
+  }
+
+};
+</pre>
+
+We will pick this apart, statement by statement.
+<ul>
+
+<li>
+<pre>
+class Track {
+</pre>
+The first line declares that what follows is a class called Track. This is 
+followed by a
+<a href="../glossary/compound_statement.html">compound statement</a>,
+that is to say a series of statements within a pair of curly braces. 
+Convention dictates that the open brace ends the line.
+
+<li>
+<pre>
+  Float_t fEnergy;
+  Float_t fMass;
+  Float_t fMomentum;
+</pre>
+Next come a list of 
+<a href="../glossary/data_member.html">data members</a>,
+that is to say the data each object owns.  In this case 3 Float_t variables,
+fEnergy, fMass, fMomentum.  Float_t is one of ROOT's
+<a href="../root_crib/data_types.html">Data Types</a>,
+but its just a bread and butter floating point number like FORTRAN's REAL.
+Each variable starts with a lowercase f. This is a naming convention
+and is important  
+here so that, when reading class code, it is at once obvious which are
+data members, and which are just local variables.  Its rather like having a 
+convention in FORTRAN to differentiate between COMMON variables and local 
+variables.  The convention used here is the one used by ROOT.  The f stands 
+for field, because an object is rather like a record with a set of fields.  
+Another popular convention has a lowercase m for member.
+
+<li>
+<pre>
+  Float_t GetEnergy() { 
+    return fEnergy; 
+  }
+</pre>
+
+Here we see a member function. The function takes no arguments and returns a 
+Float_t. The function itself simply uses the
+<a href="../cxx_crib/return.html">return</a>
+statement to return the object's energy.  "Getters" for the object's other data 
+members could be written in the same manner.
+
+<li>
+<pre>
+  void  SetEnergy( Float_t energy ) {
+    fEnergy = energy;
+    fMomentum = sqrt( fEnergy*fEnergy - fMass*fMass );
+  }
+</pre>
+The second member function returns void (i.e. nothing).  It has a single 
+Float_t argument.  This time it takes two statements to realise, the first 
+updates the energy and the second the momentum.  Clearly c=1 in the object's 
+units of mass and energy.  Note how the momentum has been changed to  ensure 
+that the object's internal data remains consistent.  The user cannot break the 
+object the model.  Of course you should by now be smugly saying what if the 
+user supplies an energy that is less than the particle's rest mass? O.K., so 
+the model does break, when writing this function we should have thought of 
+that.  Once again: its down to the class designer to think of everything!
+</ul>
+<p>
+
+O.K., now we have our object factory, so lets build some objects:-
+<ul>
+<li>
+<pre>
+Track MyTrack;
+</pre>
+This creates a single track object named MyTrack.  The syntax is identical to 
+that for defining a built-in data type.  Part of the C++ philosophy is that 
+user data types, which objects are, become an extension of the language and 
+are manipulated using the same syntax.
+<p>
+
+<li>
+<pre>
+Track MyTracks[10];
+</pre>
+This builds 10 objects, it would have been just as easy to make 1,000 or 
+1,000,000!
+<p>
+
+<li>
+<pre>
+Track *MyTrackPtr = new Track;
+</pre>
+This last example shows the creation of an object dynamically.  
+Despite its appearance,
+<a href="../cxx_crib/new.html">new</a>
+is an operator that creates an object of the class supplied.  The result of 
+the expression is the address of the newly formed object.
+In the 
+previous two examples the compiler/linker knows about the objects and where 
+they will be in memory.  This time the address of the object isn't known until
+the statement is executed so we need a pointer to a track object to hold it.
+That is 
+what the * at the start of the name means.  So this statement should be read
+"Define a pointer to Track and initialise it with the address of a new Track 
+object".
+
+</ol>
+
+<h3>Headers and Implementation Files</h3>
+
+So far our Track class is just a few lines of code,
+but most real classes are much 
+larger. Then typically the source code for a class is divided into 2 files. 
+For example
+MyClass:- 
+<ul>
+
+<li>MyClass.h - the 
+<a href="../glossary/header_file.html">header file</a>
+
+<li>MyClass.cxx - the 
+<a href="../glossary/implementation_file.html">implementation file</a> 
+
+</ul>
+
+The header file provides the compiler with all the information it
+needs to create objects and send them messages. The implementation file 
+contains the member function code. So, a class's header file loosely
+corresponds to its abstraction while the implementation file corresponds to 
+its encapsulation. 
+<p>
+If we were to divide out our Track class into two files then Track.h would 
+contain:-
+<pre>
+class Track {
+
+  Float_t fEnergy;
+  Float_t fMass;
+  Float_t fMomentum;
+
+  Float_t GetEnergy();
+  void  SetEnergy( Float_t energy);
+
+};
+</pre>
+
+i.e. a declaration of all its data and functions, but no function code.
+Track.cxx would contain:-
+
+<pre>
+
+#include "Track.h"
+
+  Float_t Track::GetEnergy() { 
+    return fEnergy; 
+  }
+
+  void  Track::SetEnergy( Float_t energy ) {
+    fEnergy = energy;
+    fMomentum = sqrt( fEnergy*fEnergy - fMass*fMass );
+  }
+
+</pre>
+Note that the function names have a preceding Track::. :: is called the 
+scoping operator: Track:: means "is a member of Track".  This was implied when 
+the function appears inside the class statement (indeed there Track:: would mean
+Track::Track:: !), but has to be explicitly
+stated when outside.  Note also that the implementation file has to include 
+the header file as it has to know how the class is defined.
+<p>
+When coding real classes, simply member functions such as these "getters" and 
+"setters" are normally left in the header file for reasons of performance. 
+This will be explained in the OO topic 
+<a href="../cxx_crib/private.html">Private & Public</a>
+<hr>
+ 
+Go Back to the
+<a href="index.html">The C++ Crib Top Page</a><p>
+<hr>
+<address>
+If you have any comments about this page please send them to
+<a href=mailto:n.west1@physics.ox.ac.uk>Nick West</a><br>
+</address>
+</body>
+</html>
+<!--
+*endfile member=objects -->

@@ -1,0 +1,166 @@
+Index: /cf-conventions/branches/devel/docbooksrc/introduction.xml
+===================================================================
+--- /cf-conventions/branches/devel/docbooksrc/introduction.xml (revision 7)
++++ /cf-conventions/branches/devel/docbooksrc/introduction.xml (revision 45)
+@@ -1,3 +1,3 @@
+-<preface>
++<preface id="preface">
+     <title>Preface</title>
+     <para>
+@@ -20,8 +20,12 @@
+                 <listitem>
+                     <para>
+-                        This document will updated as required to correct mistakes
+-                        or add new material required for completeness or clarity.
++                        This document will be updated 
++<emphasis role="deletedtext">as required to correct mistakes or add new material required for completeness or clarity.</emphasis>
++<emphasis role="newtext">to reflect agreed changes to the standard and to correct mistakes according to the rules of CF governance.</emphasis>
+                         See <xref linkend="revhistory"/> for the full revision history.
+-                        Changes in the document use the following
++                        Changes 
++<emphasis role="deletedtext">in the document</emphasis>
++<emphasis role="newtext">with provisional status</emphasis>
++                        use the following
+                         mark-up style: <emphasis role="newtext">new text</emphasis>, 
+                         <emphasis role="deletedtext">deleted text</emphasis>, and 
+@@ -291,5 +295,7 @@
+ 			We recommend that the NUG defined attribute
+ 			<varname>Conventions</varname>
+-			be given the string value "<varname>CF-1.0</varname>"
++			be given the string value 
++                        <emphasis role="deletedtext">"<varname>CF-1.0</varname>"</emphasis>
++                        <emphasis role="newtext">"<varname>CF-1.1</varname>"</emphasis>
+ 			to identify datasets that conform to these
+ 			conventions.
+Index: /cf-conventions/branches/devel/docbooksrc/netcdf-files-and-components.xml
+===================================================================
+--- /cf-conventions/branches/devel/docbooksrc/netcdf-files-and-components.xml (revision 1)
++++ /cf-conventions/branches/devel/docbooksrc/netcdf-files-and-components.xml (revision 45)
+@@ -326,5 +326,8 @@
+         attribute 
+         <varname>Conventions</varname> 
+-        to the string value "<varname>CF-1.0</varname>". The string is interpreted as a
++        to the string value
++        <emphasis role="deletedtext">"<varname>CF-1.0</varname>"</emphasis>
++        <emphasis role="newtext">"<varname>CF-1.1</varname>"</emphasis>       
++        . The string is interpreted as a
+         directory name relative to a directory
+         that is a repository of documents
+Index: /cf-conventions/branches/devel/docbooksrc/coordinate-types.xml
+===================================================================
+--- /cf-conventions/branches/devel/docbooksrc/coordinate-types.xml (revision 20)
++++ /cf-conventions/branches/devel/docbooksrc/coordinate-types.xml (revision 45)
+@@ -36,8 +36,16 @@
+     that the <varname>axis</varname> attribute be attached to these
+     coordinates and given one of the values <varname>X</varname>, 
+-    <varname>Y</varname> or <varname>Z</varname>. We attach no
++    <varname>Y</varname> or <varname>Z</varname>. 
++<emphasis role="deletedtext">We attach no
+     specific meaning to the <varname>axis</varname> values in this case,
+     but note that they may provide a useful hint to an application that
+-    plots spatially oriented data. We strongly recommend that coordinate
++    plots spatially oriented data.</emphasis>
++<emphasis role="newtext">The values <varname>X</varname> and <varname>Y</varname>
++    for the axis attribute should be used to identify horizontal coordinate
++    variables. If both X- and Y-axis are identified, <varname>X-Y-up</varname>
++    should define a right-handed coordinate system, i.e. rotation from the
++    positive X direction to the positive Y direction is anticlockwise if 
++    viewed from above.</emphasis>
++    We strongly recommend that coordinate
+     variables be used for all coordinate types whenever they are applicable.
+   </para>
+@@ -95,8 +103,9 @@
+     or equivalents, because applications which use the units to identify
+     axes would have no means of distinguishing such an axis from real
+-    latitude, and might draw incorrect coastlines, for instance. It would
++    latitude, and might draw incorrect coastlines, for instance. 
++<emphasis role="deletedtext">It would
+     also not generally be appropriate to attach an axis attribute to a
+     rotated-latitude coordinate variable. Such a variable can be identified
+-    by a <varname>standard_name</varname> of <varname>grid_latitude</varname>.
++    by a <varname>standard_name</varname> of <varname>grid_latitude</varname>.</emphasis>
+     </para>
+     
+@@ -150,8 +159,9 @@
+       which use the units to identify axes would have no means of
+       distinguishing such an axis from real longitude, and might draw
+-      incorrect coastlines, for instance. It would also not generally be
++      incorrect coastlines, for instance. 
++<emphasis role="deletedtext">It would also not generally be
+       appropriate to attach an axis attribute to a rotated-longitude
+       coordinate variable. Such a variable can be identified by a
+-      <varname>standard_name</varname> of <varname>grid_longitude</varname>.
++      <varname>standard_name</varname> of <varname>grid_longitude</varname>.</emphasis>
+     </para>
+   </section>
+Index: /cf-conventions/branches/devel/docbooksrc/coordinate-systems.xml
+===================================================================
+--- /cf-conventions/branches/devel/docbooksrc/coordinate-systems.xml (revision 44)
++++ /cf-conventions/branches/devel/docbooksrc/coordinate-systems.xml (revision 45)
+@@ -54,5 +54,11 @@
+     is permissible, but optional, to list coordinate variables as well as
+     auxiliary coordinate variables in the <varname>coordinates</varname>
+-    attribute.
++    attribute. <emphasis role="newtext">The <varname>axis</varname> attribute 
++    is not allowed for auxiliary coordinate variables. Auxiliary coordinate
++    variables which lie on the horizontal surface can be identified as such
++    by their dimensions being horizontal, which can in turn be inferred from 
++    their having an axis attribute of <varname>X</varname> or <varname>Y</varname>
++    , or from their units in the case of latitude and longitude 
++    (see <xref linkend="coordinate-types"/>).</emphasis>  
+   </para>
+   <para>
+@@ -64,4 +70,7 @@
+     two-dimensional latitude and longitude variables that are identified
+     via the <varname>coordinates</varname> attribute.
++<emphasis role="newtext">The use of the <varname>axis</varname> attribute with
++    values <varname>X</varname> and <varname>Y</varname> is recommended
++    for the coordinate variables(see <xref linkend="coordinate-types"/>).</emphasis>
+   </para>
+   <para>
+@@ -133,7 +142,9 @@
+     T:coordinates = "lon lat" ;
+   float xc(xc) ;
++<emphasis role="newtext">    xc:axis = "X" ;</emphasis>
+     xc:long_name = "x-coordinate in Cartesian system" ;
+     xc:units = "m" ;
+   float yc(yc) ;
++<emphasis role="newtext">    yc:axis = "Y" ;</emphasis>
+     yc:long_name = "y-coordinate in Cartesian system" ;
+     yc:units = "m" ;
+@@ -349,5 +360,5 @@
+     T:units = "K" ;
+     T:coordinates = "lon lat" ;
+-    T:grid_mapping="rotated_pole"
++    T:grid_mapping = "rotated_pole" ;
+   char rotated_pole
+     rotated_pole:grid_mapping_name = "rotated_latitude_longitude" ;
+Index: /cf-conventions/branches/devel/docbooksrc/the-book-info.xml
+===================================================================
+--- /cf-conventions/branches/devel/docbooksrc/the-book-info.xml (revision 7)
++++ /cf-conventions/branches/devel/docbooksrc/the-book-info.xml (revision 45)
+@@ -1,5 +1,5 @@
+ <bookinfo>
+     <title>NetCDF Climate and Forecast (CF) Metadata Conventions</title>
+-    <subtitle>Version 1.0, 28 October, 2003</subtitle>
++    <subtitle>Version 1.1, 10 January, 2008</subtitle>
+     <authorgroup>
+         <author>
+@@ -120,4 +120,17 @@
+             </revdescription>
+         </revision>
++
++        <revision>
++            <date>10 January 2008</date>
++            <revdescription>
++                <para>
++                    <orderedlist spacing="compact">
++                        <listitem><para><xref linkend="preface"/>: Changed text to refer to rules of CF governance, and provisional status.</para></listitem>
++                        <listitem><para><xref linkend="coordinate-types"/>, <xref linkend="coordinate-system"/>: Made changes regarding use of the axis attribute to identify horizontal coordinate variables.</para></listitem>
++                        <listitem><para>Changed document version to 1.1.</para></listitem>
++                    </orderedlist>
++                </para>
++            </revdescription>
++        </revision>
+         
+     </revhistory>

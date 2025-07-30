@@ -1,0 +1,102 @@
+                                     Table 4: Some routing results
+
+          Weight       Number                                              % of tops where
+          function     of terms   AveP   PS    P30    P100     RP    Rd    AveP > median
+          BM1/BM15     variable   0.356  0.692 0.561  0.449   0.388 0.680        78
+          BM1          top 20     0.315  0.628 0.533  0.432   0.361 0.648        70
+          BM11         variable   0.394  0.700 0.599  0.48t   0.429 0.713        92
+          BM11         top 20     0.362  0.684 0.605  0.459   0.397 0.707        80
+                  Best predictive run for comparison (BM11, qif with large k3, source TCD)
+                                  0.300  0.612 0.524  0.394   0.345 0.632        68
+          Database: disk 3. Topics: 51-100
+
+5   Manual queries with feedback
+5.1  The user interface
+The interface allowed the entry of any number of
+find commands operating on "natural language" search
+terms. By default, the system would combine the result-
+ing sets using the BM1S function described in Section
+2.6, but any operation specified by the searcher would
+override this. All user-entered terms were added to a
+pool of terms for potential use in query expansion. Ev-
+ery set produced had any documents previously seen by
+the user removed from it.
+  The show (document display) command displayed
+the full text of a single document (or as much as the
+user wished to see) with the retrieval terms highlighted
+(sometimes inaccurately). Unless specified by the user
+this would be the highest-weighted remaining document
+from the most recent set. At the end of a document dis-
+play the relevance question
+
+    "Is this relevant (yin!?)"
+
+appeared; the system counted documents eliciting the
+"?" response as relevant3. The DOCNO was then out-
+put to a results file, together with the iteration number.
+  Once some documents had been judged r~levant the
+exiraci command would produce a list of terms drawn
+from the pool consisting of user-entered terms and terms
+extracted from all relevant documents.  Terms in the
+pool were given w(i) weights. User-entered terms were
+weighted as if they had occurred in four out of five fic-
+titious relevant documents (in addition to any real rele-
+vant documents they might have been present in). Thus
+for user-entered terms the numerator in equation 1 be-
+comes (r+4+0.5)/(R+5-r-4+0.5) [2].
+  Query expansion terms were selected from the term
+pool in descending order of the selection value [11]
+termweight x (r + 4)/(R + 5) for user-entered terms
+
+  31t was possible for searchers to change their minds about the
+relevance of a document. Subsequent feedback iterations handled
+this correctly, but the DOCNO would be duplicated in the search
+output. This appears to have led to some minor errors in the
+frozen ranks evaluation in a few topics.
+
+
+                                                   27
+
+otherwise iermweight ~ r/R, subject to not all docu-
+ments containing the term having been displayed, and
+the term not being a semi-stopword4 (unless it was en-
+tered by the user). A maximum of 20 terms was used.
+These selected terms were then used automatically in
+an expansion search, again with the BM1S weighting
+function.
+  Each invocation of exiraci used all the available rele-
+vance information, and there was no "new search" com-
+mand. This was intended to encourage compliance with
+the TREC guidelines; it was not possible for a dissat-
+isfied user to restart a search. When the searcher de-
+cided to finish, after some sequence of find, show and
+exiraci commands, the resulis command invoked a final
+iteration of exiraci (provided there had been at least
+three positive relevance judgments).  Finally, the top
+1000 DOCNOs from the current set were output to the
+results file. Apart from the aforementioned commands,
+users could do info seis and hisiory.
+
+5.2  Searchers and search procedure
+The searches were done by a panel of five staff and re-
+search students from City University's Department of
+Information Science. Search procedure was not rigidly
+prescribed, although some guidelines were given. There
+was a short briefing session and searchers were encour-
+aged to experiment with the system before starting.
+Procedures seemed to be considerably influenced by in-
+dividual preferences and styles.  Some searches were
+done collaboratively.
+  Searchers tried to find relevant documents by any
+means they liked within a single session. The number of
+iterations of query expansion varied between zero and
+four, with a mean of two.  The IDs of all documents
+looked at were output to the results file, together with
+the iteration number. At the end of the session, if at
+least three relevant documents had been found the sys-
+tem did a final iteration of query expansion and output
+  4Semi-stopwords are words which, while they may be useful
+search terms if entered by a user, are likely to be detrimental if
+used in query expansion: numerals, month-names, common ad-
+verbs etc.
+

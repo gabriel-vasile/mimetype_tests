@@ -1,0 +1,464 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+		"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+	<link rel="stylesheet" type="text/css" href="http://www.pnl.gov/shared/basic.css" />
+<!--<link rel="stylesheet" type="text/css" href="../stylesheets/basic.css" />-->
+<link rel="stylesheet" type="text/css" href="http://www.pnl.gov/shared/pnnl.css" />
+<!--<link rel="stylesheet" type="text/css" href="../stylesheets/pnnl.css" />-->
+<link rel="stylesheet" type="text/css" href="../stylesheets/local.css" />
+<link rel="stylesheet" type="text/css" media="print" href="http://www.pnl.gov/shared/print.css" />
+<link rel="stylesheet" type="text/css" media="handheld" href="http://www.pnl.gov/shared/handheld.css" />
+<script type="text/javascript" src="../shared/pnnl_nc.js"></script>
+<link rel="icon" type="image/png" href="../images/favicon.png" />
+<script type="text/javascript" src="../scripts/prototype.js" ></script>
+<script type="text/javascript" src="../scripts/scriptaculous.js" ></script>
+<script type="text/javascript" src="/resources/styles/pwc/javascripts/window.js" ></script>
+<script type="text/javascript" src="../scripts/sha1.js" ></script>
+<script type="text/javascript" src="../scripts/loginSetup.js" ></script>
+<script type="text/javascript" src="/resources/scripts/lightbox.js"></script>
+<link href="/resources/styles/pwc/themes/default.css" rel="stylesheet" type="text/css" />
+<link href="/resources/styles/pwc/themes/alphacube.css" rel="stylesheet" type="text/css" />
+<link href="/resources/styles/pwc/themes/lighting.css" rel="stylesheet" type="text/css" />
+<link href="/resources/styles/pwc/themes/spread.css" rel="stylesheet" type="text/css" />
+<link href="/resources/styles/lightbox.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+//<![CDATA[
+		Event.observe(window, 'load', function() { checkJS() });
+		var pathPrefix = '../';
+		function checkJS() {
+			var params = encodeURI("js=1&token=1237178428");
+			new Ajax.Request('../scriptCheck.php', {
+				parameters:params,
+				asynchronous:true
+			});
+			if($('login_response_static')) {
+				$('login_response_static').hide();
+			}
+		}
+
+		function encode_password() {
+			var submitting = arguments[0];
+			var seed = '03acf7e2f2633d01014c5a8e40d0ba3ec36bf804';
+			var cleartextPW = document.getElementById('password');
+			var encodedPW = document.getElementById('salted_encoded_password');
+			var seedID = document.getElementById('seed_id');
+			
+			encodedPW.value = hex_hmac_sha1(seed,hex_sha1(cleartextPW.value));
+			seedID.value = 531530;
+			if(submitting == true) {
+				document.getElementById('password').value = '';
+				location.reload(true);
+			}
+
+		}
+//]]>
+</script>
+		
+		<style type="text/css">
+		/*
+		
+		This is one of the free scripts from www.dhtmlgoodies.com
+		You are free to use this script as long as this copyright message is kept intact
+		
+		(c) Alf Magne Kalleland, http://www.dhtmlgoodies.com - 2005
+		
+		*/	
+		#dhtmlgoodies_tree li{
+			list-style-type:none;	
+			font-size:12px;
+			margin-bottom: 0px;
+		}
+		#dhtmlgoodies_topNodes{
+			margin-left:0px;
+			padding-left:0px;
+			margin-bottom:0px;
+		}
+		#dhtmlgoodies_topNodes ul{
+			margin: 0px;
+			margin-top:0px;
+			padding: 0px;
+			padding-left:0px;
+			display:none;
+		}
+		#dhtmlgoodies_tree .tree_link{
+			list-style-position: outside;
+		}
+		
+		#dhtmlgoodies_tree img{
+			padding:0px;
+			border: 0px;
+		}
+		#dhtmlgoodies_tree img.doc{
+			padding:0px;
+			vertical-align:top;
+		}
+		#dhtmlgoodies_tree a{
+			color: #000000;
+		
+		}
+		#dhtmlgoodies_tree .tree_link a {
+			color:#000000;
+		}
+		#dhtmlgoodies_tree .tree_link a:hover {
+			text-decoration: underline;
+			color: blue;
+		}
+		.activeNodeLink{
+			background-color: #316AC5;
+			color: #FFFFFF;
+			font-weight:bold;
+		}
+				</style>		
+				<script type="text/javascript">
+//<![CDATA[
+		/*
+		
+		This is one of the free scripts from www.dhtmlgoodies.com
+		You are free to use this script as long as this copyright message is kept intact
+		
+		(c) Alf Magne Kalleland, http://www.dhtmlgoodies.com - 2005
+		
+		*/		
+		var plusNode = '../images/closedarrow.png';
+		var minusNode = '../images/openarrow.png';
+		var localPlusNode = 'images/closedarrow.png';
+		var localMinusNode = 'images/openarrow.png';
+		
+		
+		var nameOfCookie = 'dhtmlgoodies_expanded';
+		var initExpandedNodes ="";
+		
+		/*
+		These cookie functions are downloaded from 
+		http://www.mach5.com/support/analyzer/manual/html/General/CookiesJavaScript.htm
+		*/
+	
+		String.prototype.trim = function() {
+			var a = this.replace(/^\s+/, '');
+			return a.replace(/\s+$/, '');
+		}
+	
+		function Get_Cookie(name) { 
+		   var start = document.cookie.indexOf(name+"="); 
+		   var len = start+name.length+1; 
+		   if ((!start) && (name != document.cookie.substring(0,name.length))) return null; 
+		   if (start == -1) return null; 
+		   var end = document.cookie.indexOf(";",len); 
+		   if (end == -1) end = document.cookie.length; 
+		   return unescape(document.cookie.substring(len,end)); 
+		} 
+		// This function has been slightly modified
+		function Set_Cookie(name,value,expires,path,domain,secure) { 
+			expires = expires * 60*60*24*1000;
+			var today = new Date();
+			var expires_date = new Date( today.getTime() + (expires) );
+		    var cookieString = name + "=" +escape(value) + 
+		       ( (expires) ? ";expires=" + expires_date.toGMTString() : "") + 
+		       ( (path) ? ";path=" + path : "") + 
+		       ( (domain) ? ";domain=" + domain : "") + 
+		       ( (secure) ? ";secure" : ""); 
+		    document.cookie = cookieString; 
+		} 
+		/*
+		End downloaded cookie functions
+		*/
+		
+		function expandAll()
+		{	
+			var treeObj = document.getElementById('dhtmlgoodies_tree');
+			if(treeObj == null) return 0;
+			var images = treeObj.getElementsByTagName('IMG');
+			for(var no=0;no<images.length;no++){
+				if(images[no].className=='tree_plusminus' && images[no].src.indexOf(localPlusNode)>=0)expandNode(false,images[no]);
+			}
+		}
+		function collapseAll()
+		{
+			var treeObj = document.getElementById('dhtmlgoodies_tree');
+			if(treeObj == null) return 0;
+			var images = treeObj.getElementsByTagName('IMG');
+			for(var no=0;no<images.length;no++){
+				if(images[no].className=='tree_plusminus' && images[no].src.indexOf(localMinusNode)>=0)expandNode(false,images[no]);
+			}
+		}
+		
+		
+		function expandNode(e,inputNode)
+		{
+			if(initExpandedNodes.length==0)initExpandedNodes=",";
+			if(!inputNode)inputNode = this; 
+			if(inputNode.tagName.toLowerCase()!='img')inputNode = inputNode.parentNode.getElementsByTagName('IMG')[0];	
+			
+			var inputId = inputNode.id.replace(/[^\d]/g,'');			
+			
+			var parentUl = inputNode.parentNode;
+			var subUl = parentUl.getElementsByTagName('UL');
+
+			if(subUl.length==0)return;
+			if(this.firstChild) {
+				if(this.firstChild.className == 'button_1' || this.firstChild.className == 'button_2')return;
+			}
+			if(subUl[0].style.display=='' || subUl[0].style.display=='none'){
+			
+				if(subUl[0].firstChild.className == 'last_node') {
+					updateTargetNode(inputNode.parentNode,subUl[0]);
+				}
+			
+				subUl[0].style.display = 'block';
+				inputNode.src = minusNode;
+				initExpandedNodes = initExpandedNodes.replace(',' + inputId+',',',');
+				initExpandedNodes = initExpandedNodes + inputId + ',';
+				
+			}else{
+				subUl[0].style.display = '';
+				inputNode.src = plusNode;	
+				initExpandedNodes = initExpandedNodes.replace(','+inputId+',',',');			
+			}
+			Set_Cookie(nameOfCookie,initExpandedNodes,60);
+		}
+		
+		
+				
+
+			
+		function initTree()
+		{
+			// Assigning mouse events
+			var parentNode = document.getElementById('dhtmlgoodies_tree');
+			if(parentNode == null) return 0;
+			var lis = parentNode.getElementsByTagName('LI'); // Get reference to all the images in the tree
+			for(var no=0;no<lis.length;no++){
+				var subNodes = lis[no].getElementsByTagName('UL');
+				if(subNodes.length>0){
+					lis[no].childNodes[0].style.visibility='visible';	
+				}else{
+					lis[no].childNodes[0].style.visibility='hidden';
+				}
+			}	
+			var cursor = 'pointer';
+			if(document.all)cursor = 'hand';
+		
+			var images = parentNode.getElementsByTagName('IMG');
+			for(var no=0;no<images.length;no++){
+				if(images[no].className=='tree_plusminus') {
+					images[no].onclick = expandNode;
+					images[no].style.cursor = cursor;	
+				}
+				/*if(images[no].className=='folder') {
+					images[no].onclick = expandNode;
+					images[no].style.cursor = cursor;
+				}*/
+			}	
+
+			var aTags = parentNode.getElementsByTagName('A');
+			for(var no=0;no<aTags.length;no++){
+				//aTags[no].onclick = expandNode;		
+				aTags[no].style.cursor = cursor;		
+			}
+			var initExpandedArray = initExpandedNodes.split(',');
+
+			for(var no=0;no<initExpandedArray.length;no++){
+				if(document.getElementById('plusMinus' + initExpandedArray[no])){
+					var obj = document.getElementById('plusMinus' + initExpandedArray[no]);	
+					expandNode(false,obj);
+				}
+			}				
+		}
+		
+		//window.onload = initTree;
+		Event.observe(window, 'load', function() { initTree() });
+//]]>
+		</script>	
+		
+<title>PNNL: Biological MS Data and Software - Details for Dataset #100699</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+	<meta  name="description" content="" />
+	<meta name="keywords" content="" />
+</head>
+
+<body>
+<div id="page">
+<div id="topBanner">
+	<a id="pnnlLogo" href="http://www.pnl.gov/">Pacific Northwest National Laboratory</a>
+	<a id="skipNav" href="#main">Skip to Main Content</a>
+	<a id="doeLink" href="http://www.energy.gov/">U.S. Department of Energy</a>
+	
+	<div id="siteNav">
+		<form method="get" action="http://websearch.pnl.gov/search" name="pnnlsearch" id="pnnlSearch">		
+			<input type="hidden" name="site" value="PNNL-External" />
+	     	<input type="hidden" name="client" value="PNNL-External" />
+	     	<input type="hidden" name="proxystylesheet" value="PNNL-External" />
+	     	<input type="hidden" name="output" value="xml_no_dtd" />		
+			<label for="q">Search PNNL</label>
+			<input type="text" name="q" id="q" maxlength="2047" value="" />
+			<input type="image" id="searchSubmit" src="http://www.pnl.gov/images/search_button.png" alt="Search" />
+		</form>
+		
+		<ul id="pnnlNav">
+			<li><a href="http://www.pnl.gov/" id="home">PNNL Home</a></li>
+			<li><a href="http://www.pnl.gov/about/" id="about">About</a></li>
+			<li><a href="http://www.pnl.gov/research/" id="research">Research</a></li>
+			<li><a href="http://www.pnl.gov/publications/" id="publications">Publications</a></li>
+			<li><a href="http://jobs.pnl.gov" id="jobs">Jobs</a></li>
+			<li><a href="http://www.pnl.gov/news/" id="news">Newsroom</a></li>
+			<li><a href="http://www.pnl.gov/contacts/" id="contacts">Contacts</a></li>
+		</ul>
+	</div>
+</div><div id="subBanner"><img src="images/banner_sm.jpg" width="940" height="51" alt="Details for Dataset #100699" /></div>
+<div id="container">
+	<div id="main">
+		<div id="pagename">
+			<a href="experiment_37509.html" title="Go up one level to the parent experiment">Up to Parent Experiment</a>			<h1 style="font-size:1.2em;">Details for Dataset QC_Shew_07_02-pt5-a_16Nov07_Falcon_07-11-02		</div>
+<div id="dhtmlgoodies_tree"><li class="tree_node" id="node_1"><img id="plusMinus1" class="tree_plusminus" src="../images/closedarrow.png" alt="disclosure triangle" /><a class="tree_link"><img src="images/dhtmlgoodies_folder.gif" class="folder" alt="folder" /> Data Analysis Jobs belonging to this Dataset</a><ul><li class="tree_node" id="node_2"><img class="tree_plusminus" id="plusMinus2" src="../images/closedarrow.png" alt="&gt;" /><img src="images/Document_14_Mod.png" class="folder, doc" alt="&gt;" /> <a class="tree_link" href="analysis_job_263710.html"> MASIC_Finnigan Analysis Job (ID:263710;created: 2007-11-16 18:15:00)</a></li><li class="tree_node" id="node_3"><img class="tree_plusminus" id="plusMinus3" src="../images/closedarrow.png" alt="&gt;" /><img src="images/Document_14_Mod.png" class="folder, doc" alt="&gt;" /> <a class="tree_link" href="analysis_job_263711.html"> Sequest Analysis Job (ID:263711;created: 2007-11-16 18:15:00)</a></li><li class="tree_node" id="node_4"><img class="tree_plusminus" id="plusMinus4" src="../images/closedarrow.png" alt="&gt;" /><img src="images/Document_14_Mod.png" class="folder, doc" alt="&gt;" /> <a class="tree_link" href="analysis_job_263712.html"> XTandem Analysis Job (ID:263712;created: 2007-11-16 18:15:00)</a></li></ul></li></div><div class='infoblock'>
+<table>
+	<tr>
+		<td class='fieldname'>Acquisition Start</td>
+		<td class='fieldvalue'>Nov 16 2007  3:13PM</td>
+	</tr>
+	<tr class='alternate'>
+		<td class='fieldname'>Well Number</td>
+		<td class='fieldvalue'>na</td>
+	</tr>
+	<tr>
+		<td class='fieldname'>Type</td>
+		<td class='fieldvalue'>MS-MSn</td>
+	</tr>
+	<tr class='alternate'>
+		<td class='fieldname'>Operator</td>
+		<td class='fieldvalue'>Ronald Moore</td>
+	</tr>
+	<tr>
+		<td class='fieldname'>Rating</td>
+		<td class='fieldvalue'>Released</td>
+	</tr>
+	<tr class='alternate'>
+		<td class='fieldname'>Created</td>
+		<td class='fieldvalue'>Nov 16 2007  6:14PM</td>
+	</tr>
+	<tr>
+		<td class='fieldname'>Compressed Date</td>
+		<td class='fieldvalue'>NULL</td>
+	</tr>
+	<tr class='alternate'>
+		<td class='fieldname'>Folder Name</td>
+		<td class='fieldvalue'>QC_Shew_07_02-pt5-a_16Nov07_Falcon_07-11-02</td>
+	</tr>
+	<tr>
+		<td class='fieldname'>File Size MB</td>
+		<td class='fieldvalue'>99</td>
+	</tr>
+	<tr class='alternate'>
+		<td class='fieldname'>Acquisition End</td>
+		<td class='fieldvalue'>Nov 16 2007  4:53PM</td>
+	</tr>
+	<tr>
+		<td class='fieldname'>Request</td>
+		<td class='fieldvalue'>88499</td>
+	</tr>
+	<tr class='alternate'>
+		<td class='fieldname'>Name</td>
+		<td class='fieldvalue'>QC_Shew_07_02-pt5-a_16Nov07_Falcon_07-11-02</td>
+	</tr>
+	<tr>
+		<td class='fieldname'>Scan Count</td>
+		<td class='fieldvalue'>18913</td>
+	</tr>
+	<tr class='alternate'>
+		<td class='fieldname'>State</td>
+		<td class='fieldvalue'>Complete</td>
+	</tr>
+	<tr>
+		<td class='fieldname'>ID</td>
+		<td class='fieldvalue'>100699</td>
+	</tr>
+	<tr class='alternate'>
+		<td class='fieldname'>Instrument</td>
+		<td class='fieldvalue'>LTQ_ETD_1</td>
+	</tr>
+	<tr>
+		<td class='fieldname'>Compressed State</td>
+		<td class='fieldvalue'>NULL</td>
+	</tr>
+	<tr class='alternate'>
+		<td class='fieldname'>Separation Type</td>
+		<td class='fieldvalue'>LC-ISCO-Standard</td>
+	</tr>
+	<tr>
+		<td class='fieldname'>LC Column</td>
+		<td class='fieldvalue'>07-11-02</td>
+	</tr>
+	<tr class='alternate'>
+		<td class='fieldname'>Experiment</td>
+		<td class='fieldvalue'>QC_Shew_07_02</td>
+	</tr>
+	<tr>
+		<td class='fieldname'>Comment</td>
+		<td class='fieldvalue'></td>
+	</tr>
+	<tr class='alternate'>
+		<td class='fieldname'>Archive State</td>
+		<td class='fieldvalue'>complete</td>
+	</tr>
+	<tr>
+		<td class='fieldname'>Wellplate Number</td>
+		<td class='fieldvalue'>na</td>
+	</tr>
+</table>
+</div>
+
+	</div><!--main-->
+</div><!--container-->
+<!--leftNav Content-->
+<div id='leftNav'>
+	<h2 class='first'>Site Links</h2>
+<ul>
+<li><a href=".././">Home</a></li>
+<li><a href="../browse/">Browse Available Data</a></li>
+<li><a href="../search/">Search Available Data</a></li>
+<li><a href="../software/">Download Software</a></li>
+<li><a href="../register/">Register New Account</a></li>
+<li><a href="../sponsors/">Research Sponsors</a></li>
+<li><a href="http://ncrr.pnl.gov/posters/" target="_Posters">Posters and Presentations</a></li>
+</ul>
+
+</div>
+<!--rightNav Content-->
+<div id="rightCol"><h2>Additional Information</h2><h3>Contacts</h3><p>Content Owner<br /><a href="mailto:gordon@pnl.gov" class="email">Gordon Anderson</a></p><p>WebMaster<br /><a href="mailto:ken.auberry@pnl.gov"  class="email">Ken Auberry</a></p><h2>Login</h2>
+	<ul id='loginpanel'>
+ 		<li>
+ 			<form action='http://omics.pnl.gov/view/dataset_100699.html' onsubmit='encode_password(true);' method='post'>
+ 				<label for='username'>User Name:</label> <input class='themed' type='text' name='username' id='username' size='9' /><br />
+ 				<label for='password'>Password:</label> <input class='themed' type='password' name='password' id='password' size='9' /><br />
+ 				<input type='hidden' name='salted_encoded_password' id='salted_encoded_password' />
+ 				<input type='hidden' name='seed_id' id='seed_id' />
+ 				<input type='hidden' name='sublogin' id='sublogin' />
+				<noscript><input type='hidden' name='noscript' id='noscript' /></noscript>
+				<input id="loginButton" type="image" alt="Login" src="images/login.png"/>
+ <noscript><div id='login_response_static' class='login_response'>JavaScript is not available:<br /><br />Password will be<br />sent in cleartext</div></noscript>
+ <div id='login_response' class='login_response'></div>
+			</form>
+ 		</li>
+ 	</ul>
+ </div>
+<div id="footer">
+	<div id="footerBar">
+		<span id="tagline"></span>
+		<a id="officeOfScience" href="http://www.er.doe.gov/">Enabled by the Office of Science</a>
+	</div>
+	<div id="footerLinks">
+		<a href="http://www.pnl.gov/disclaimer.asp">Security &amp; Privacy</a> | <a href="http://www.pnl.gov/siteindex.asp">Site Index</a> | <a href="http://www.pnl.gov/contacts/">Contact PNNL</a>
+	</div>
+	<span class="footerItem">Last Update: <span class="updatedDate">September 2008</span></span> | <span class="footerItem">Pacific Northwest National Laboratory</span> | <span class="footerItem">Operated by Battelle for the U.S. Department of Energy</span>
+</div>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-3164036-1");
+pageTracker._trackPageview();
+</script></div>
+</body>
+</html>

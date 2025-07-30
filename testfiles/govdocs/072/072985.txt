@@ -1,0 +1,19 @@
+#! /usr/bin/perl
+
+$RT_HOME='/va/realtime/rt';
+
+$file = "/var/ftp/pub/www/".shift(@ARGV);
+
+open(FILE, "< $file");
+open(OUT,  "> /var/ftp/pub/www/tmp");
+
+while (<FILE>) {
+   $_ =~ s/1 172019/1 100065/ ;
+   print OUT $_;
+};
+
+close(FILE);
+close(OUT);
+
+rename("/var/ftp/pub/www/tmp", $file);
+

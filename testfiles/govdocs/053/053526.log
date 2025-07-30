@@ -1,0 +1,1563 @@
+commit 55dac3a5553b13891f0ae4bbd11920619b5436d4
+Merge: 0bc77ec... be44f01...
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed Dec 17 15:05:26 2008 -0800
+
+    Merge branch 'i2c-fixes' of git://aeryn.fluff.org.uk/bjdooks/linux
+    
+    * 'i2c-fixes' of git://aeryn.fluff.org.uk/bjdooks/linux:
+      i2c-s3c2410: fix check for being in suspend.
+      i2c-cpm: Detect and report NAK right away instead of timing out
+
+commit 0bc77ecbe4f69ff8ead1d2abfe84ca9ba2a7bca4
+Merge: 3797455... a977218...
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed Dec 17 15:01:23 2008 -0800
+
+    Merge branch 'upstream-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/mfasheh/ocfs2
+    
+    * 'upstream-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/mfasheh/ocfs2:
+      ocfs2: Add JBD2 compat feature bit.
+      ocfs2: Always update xattr search when creating bucket.
+
+commit 3797455fd269f6ae0bc228d5206b502830af03f4
+Merge: 5b8bd54... af4b851...
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed Dec 17 15:01:06 2008 -0800
+
+    Merge git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb-2.6
+    
+    * git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb-2.6:
+      USB: pl2303: add id for Hewlett-Packard LD220-HP POS pole display
+      USB: set correct configuration in probe of ti_usb_3410_5052
+      USB: add 5372:2303 to pl2303
+      USB: skip Set-Interface(0) if already in altsetting 0
+      USB: fix comment about endianness of descriptors
+      USB: Documentation/usb/gadget_serial.txt: update to match driver use_acm behaviour
+      usbmon: drop bogus 0t from usbmon.txt
+      USB: gadget: fix rndis working at high speed
+      USB: ftdi_sio: Adding Ewert Energy System's CANdapter PID
+      USB: tty: SprogII DCC controller identifiers
+      usb-storage: update unusual_devs entry for Nokia 5310
+      USB: Unusual devs patch for Nokia 3500c
+      USB: storage: unusual_devs.h: Nokia 3109c addition
+      USB: fix problem with usbtmc driver not loading properly
+
+commit 5b8bd54d5d38649a0a61e1146525212e81061971
+Merge: 331c313... 4b4cdf3...
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed Dec 17 15:00:54 2008 -0800
+
+    Merge git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/driver-core-2.6
+    
+    * git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/driver-core-2.6:
+      STAGING: Move staging drivers back to staging-specific menu
+      driver core: add newlines to debugging enabled/disabled messages
+      xilinx_hwicap: remove improper wording in license statement
+      driver core: fix using 'ret' variable in unregister_dynamic_debug_module
+
+commit 331c31351044888916805c9cb32d8bb9e40c12e9
+Author: Jeff Layton <jlayton@redhat.com>
+Date:   Wed Dec 17 06:31:53 2008 -0500
+
+    cifs: fix buffer overrun in parse_DFS_referrals
+    
+    While testing a kernel with memory poisoning enabled, I saw some warnings
+    about the redzone getting clobbered when chasing DFS referrals. The
+    buffer allocation for the unicode converted version of the searchName is
+    too small and needs to take null termination into account.
+    
+    Signed-off-by: Jeff Layton <jlayton@redhat.com>
+    Acked-by: Steve French <sfrench@us.ibm.com>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit a52519f2ce180890069fa7b1a92fa51d4448a0ba
+Merge: 1bda712... af4d364...
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed Dec 17 14:58:56 2008 -0800
+
+    Merge branch 'merge' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/powerpc
+    
+    * 'merge' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/powerpc:
+      powerpc: Fix corruption error in rh_alloc_fixed()
+      powerpc/fsl-booke: Fix the miss interrupt restore
+
+commit 4b4cdf3979c32fa3d042d150f49449c74d048553
+Author: Dmitry Baryshkov <dbaryshkov@gmail.com>
+Date:   Fri Nov 28 00:01:28 2008 +0300
+
+    STAGING: Move staging drivers back to staging-specific menu
+    
+    Signed-off-by: Dmitry Baryshkov <dbaryshkov@gmail.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit aa6f3c640781c8ac213a4ed3011dcced36f899e3
+Author: Marcel Holtmann <marcel@holtmann.org>
+Date:   Sun Nov 30 14:01:26 2008 +0100
+
+    driver core: add newlines to debugging enabled/disabled messages
+    
+    Both messages are missing the newline and thus dmesg output gets
+    scrambled.
+    
+    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 09a35ce00fa6bbb8bd130a828807e237488aa7ea
+Author: Greg Kroah-Hartman <gregkh@suse.de>
+Date:   Sat Dec 6 21:10:51 2008 -0800
+
+    xilinx_hwicap: remove improper wording in license statement
+    
+    GPLv2 doesn't allow additional restrictions to be imposed on any
+    code, so this wording needs to be removed from these files.
+    
+    Signed-off-by: Stephen Neuendorffer <stephen.neuendorffer@xilinx.com>
+    Cc: stable <stable@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 1c93ca09863a544cec24fc8e33491f645df80e59
+Author: Johann Felix Soden <johfel@users.sourceforge.net>
+Date:   Thu Oct 30 22:44:39 2008 +0100
+
+    driver core: fix using 'ret' variable in unregister_dynamic_debug_module
+    
+    The 'ret' variable is assigned, but not used in the return statement. Fix this.
+    
+    Signed-off-by: Johann Felix Soden <johfel@users.sourceforge.net>
+    Acked-by: Jason Baron <jbaron@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit af4b8514aafd53d97b05a0a30b7d4cfd2cbb7b81
+Author: Mike Provencher <mike.provencher@hp.com>
+Date:   Tue Dec 16 14:30:14 2008 -0600
+
+    USB: pl2303: add id for Hewlett-Packard LD220-HP POS pole display
+    
+    Add id for the Hewlett-Packard LD220-HP POS pole display.
+    
+    Bus 002 Device 002: ID 03f0:3524 Hewlett-Packard
+    
+    Signed-off-by: Mike Provencher <mike.provencher@hp.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 413ba6fb51fa8dc77be09552e506d00f31234e0d
+Author: Oliver Neukum <oliver@neukum.org>
+Date:   Tue Dec 16 12:25:55 2008 +0100
+
+    USB: set correct configuration in probe of ti_usb_3410_5052
+    
+    This driver transfers firmware. It may just as well set the correct
+    configuration.
+    
+    Signed-off-by: Oliver Neukum <oneukum@suse.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 7c99200142c04d0f1ed3f048014591f841efdaed
+Author: Matthew Arnold <Matthew.Arnold-1@uts.edu.au>
+Date:   Sat Dec 13 22:42:53 2008 +1100
+
+    USB: add 5372:2303 to pl2303
+    
+    This patch adds the "Superial" USB-Serial converter to pl2303 so that it
+    is detected, by the correct driver.  Adds the relevant vendor:product
+    (5372:2303) to the device tables in pl2303.c & pl2303.h.  The patch has
+    been tested against 2.6.24-22-generic.
+    
+    Signed-off-by: Matthew D Arnold <matthew.arnold-1@uts.edu.au>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 24c0996a6b73e2554104961afcc8659534503e0d
+Author: Alan Stern <stern@rowland.harvard.edu>
+Date:   Mon Dec 1 10:24:41 2008 -0500
+
+    USB: skip Set-Interface(0) if already in altsetting 0
+    
+    When a driver unbinds from an interface, usbcore always sends a
+    Set-Interface request to reinstall altsetting 0.  Unforunately, quite
+    a few devices have buggy firmware that crashes when it receives this
+    request.
+    
+    To avoid such problems, this patch (as1180) arranges to send the
+    Set-Interface request only when the interface is not already in
+    altsetting 0.
+    
+    Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 9a9fafb89433c5fd1331bac0c84c4b321e358b42
+Author: Phil Endecott <usb_endian_patch@chezphil.org>
+Date:   Mon Dec 1 10:22:33 2008 -0500
+
+    USB: fix comment about endianness of descriptors
+    
+    This patch fixes a comment and clarifies the documentation about the
+    endianness of descriptors. The current policy is that descriptors will
+    be little-endian at the API even on big-endian systems; however the
+    /proc/bus/usb API predates this policy and presents descriptors with
+    some multibyte fields byte-swapped.
+    
+    Signed-off-by: Phil Endecott <usb_endian_patch@chezphil.org>
+    Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit c33ba392147a8506b1b43899fdea6069e27e4277
+Author: Peter Korsgaard <jacmet@sunsite.dk>
+Date:   Thu Dec 4 16:30:53 2008 +0100
+
+    USB: Documentation/usb/gadget_serial.txt: update to match driver use_acm behaviour
+    
+    Commit 7bb5ea54 (usb gadget serial: use composite gadget framework)
+    changed the default for the use_acm parameter from 0 to 1.
+    Update the documentation to match.
+    
+    Signed-off-by: Peter Korsgaard <jacmet@sunsite.dk>
+    Acked-by: David Brownell <dbrownell@users.sourceforge.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit aacf4a0135a330e68df412a6797a9b9689d8d9a3
+Author: Pete Zaitcev <zaitcev@redhat.com>
+Date:   Thu Dec 4 16:17:00 2008 -0700
+
+    usbmon: drop bogus 0t from usbmon.txt
+    
+    The example is incorrect: there is no 0t socket (the '1t' format has no
+    bus number in it). Also, correct the broken sentence for USB Tag.
+    
+    Signed-off-by: Pete Zaitcev <zaitcev@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 7c12414955e9b44a3e33d54e578bf008caa4475d
+Author: David Brownell <dbrownell@users.sourceforge.net>
+Date:   Mon Nov 24 23:11:03 2008 -0800
+
+    USB: gadget: fix rndis working at high speed
+    
+    Fix a bug specific to highspeed mode in the recently updated RNDIS
+    support:  it wasn't setting up the high speed notification endpoint,
+    which prevented high speed RNDIS links from working.
+    
+    Signed-off-by: David Brownell <dbrownell@users.sourceforge.net>
+    Tested-by: Anand Gadiyar <gadiyar@ti.com>
+    Cc: stable <stable@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 01ba0856e9352e3c4e1c7d8c0a2a7defb456a5f9
+Author: Andrew Ewert <andrew@ewertenergy.com>
+Date:   Thu Dec 4 09:09:59 2008 -0600
+
+    USB: ftdi_sio: Adding Ewert Energy System's CANdapter PID
+    
+    The following patch adds in the USB PID for Ewert Energy System's CANdapter
+    device (CANBUS to USB-Serial which uses the FTDI 245R chipset) to the ftdi_sio
+    device driver.
+    
+    The patch was tested successfully on Linux kernel 2.6.27 under Ubuntu.
+    
+    Relevant output from /proc/bus/usb/devices (With patch installed):
+    
+    T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
+    D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+    P:  Vendor=0403 ProdID=9f80 Rev= 6.00
+    S:  Manufacturer=Ewert Energy Systems
+    S:  Product=CANdapter
+    S:  SerialNumber=A6RGB3Z3
+    C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr= 90mA
+    I:* If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=ftdi_sio
+    E:  Ad=81(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+    E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+    
+    
+    Signed-off-by: Andrew Ewert <andrew@ewertenergy.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit f2ee695554d9b4d163361a63f196ad7d8d0fe935
+Author: Alan Cox <alan@redhat.com>
+Date:   Sat Dec 6 23:46:04 2008 -0800
+
+    USB: tty: SprogII DCC controller identifiers
+    
+    Someone on rmweb reminded me this had been overlooked from ages ago..
+    
+    Add the identifiers for the Sprog II USB. This is a DCC control interface
+    using the FTDI-SIO hardware: http://www.sprog-dcc.co.uk/. People have been
+    using it with insmod options for ages, this just puts it into the driver
+    data.
+    
+    Signed-off-by: Alan Cox <alan@redhat.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit a4b188095912eee83d065f000dfe06f25919750b
+Author: Alan Stern <stern@rowland.harvard.edu>
+Date:   Mon Dec 1 10:23:43 2008 -0500
+
+    usb-storage: update unusual_devs entry for Nokia 5310
+    
+    This patch (as1179) updates the unusual_devs entry for Nokia's 5310
+    phone to include a more recent firmware revision.
+    
+    This fixes Bugzilla #12099.
+    
+    Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+    Tested-by: Robson Roberto Souza Peixoto <robsonpeixoto@gmail.com>
+    Cc: stable <stable@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 48e1a540e1e9ea62a2b3088a69ecf934f3172b14
+Author: Ozan Sener <themgzzy@gmail.com>
+Date:   Mon Dec 8 19:15:45 2008 +0200
+
+    USB: Unusual devs patch for Nokia 3500c
+    
+    T:  Bus=02 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
+    D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+    P:  Vendor=0421 ProdID=0060 Rev= 5.51
+    S:  Manufacturer=Nokia
+    S:  Product=Nokia 3500c
+    S:  SerialNumber=357687010280751
+    C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=100mA
+    I:* If#= 0 Alt= 0 #EPs= 2 Cls=08(stor.) Sub=06 Prot=50 Driver=usb-storage
+    E:  Ad=81(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+    E:  Ad=01(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+    
+    From: Ozan Sener <themgzzy@gmail.com>
+    Cc: stable <stable@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 1393fce7189427bdb4d6115ca5566ca8d0fc86f3
+Author: CSÉCSY László <boobaa@frugalware.org>
+Date:   Tue Dec 9 23:39:14 2008 +0100
+
+    USB: storage: unusual_devs.h: Nokia 3109c addition
+    
+    2.6.26(.x, cannot remember) could handle the microSD card in my Nokia
+    3109c attached via USB as mass storage, 2.6.27(.x, up to and included
+    2.6.27.8) cannot. Please find the attached patch which fixes this
+    regression, and a copy of /proc/bus/usb/devices with my phone plugged in
+    running with this patch on Frugalware.
+    
+    T:  Bus=02 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
+    D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+    P:  Vendor=0421 ProdID=0063 Rev= 6.01
+    S:  Manufacturer=Nokia
+    S:  Product=Nokia 3109c
+    S:  SerialNumber=359561013742570
+    C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=100mA
+    I:* If#= 0 Alt= 0 #EPs= 2 Cls=08(stor.) Sub=06 Prot=50 Driver=usb-storage
+    E:  Ad=81(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+    E:  Ad=01(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+    
+    From: CSÉCSY László <boobaa@frugalware.org>
+    Cc: Phil Dibowitz <phil@ipom.com>
+    Cc: stable <stable@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 5413aa467806578bf5f78a83893cb9426b815231
+Author: Greg Kroah-Hartman <gregkh@suse.de>
+Date:   Wed Dec 3 16:33:09 2008 -0800
+
+    USB: fix problem with usbtmc driver not loading properly
+    
+    The usbtmc driver forgot to export its device table to userspace.
+    Without this, it is never loaded properly when such a device is seen by
+    the system.
+    
+    Cc: Marcel Janssen <marcel.janssen@admesy.nl>
+    Cc: stable <stable@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit af4d3643864ee5fcba0c97d77a424fa0b0346f8e
+Author: Guillaume Knispel <gknispel@proformatique.com>
+Date:   Tue Dec 9 15:28:34 2008 +0100
+
+    powerpc: Fix corruption error in rh_alloc_fixed()
+    
+    There is an error in rh_alloc_fixed() of the Remote Heap code:
+    If there is at least one free block blk won't be NULL at the end of the
+    search loop, so -ENOMEM won't be returned and the else branch of
+    "if (bs == s || be == e)" will be taken, corrupting the management
+    structures.
+    
+    Signed-off-by: Guillaume Knispel <gknispel@proformatique.com>
+    Acked-by: Timur Tabi <timur@freescale.com>
+    Signed-off-by: Kumar Gala <galak@kernel.crashing.org>
+
+commit 28707af01b8912e701e3c5b619ff8f6dde8f2e81
+Author: Dave Liu <daveliu@freescale.com>
+Date:   Wed Dec 17 18:24:15 2008 +0800
+
+    powerpc/fsl-booke: Fix the miss interrupt restore
+    
+    The commit e5e774d8833de1a0037be2384efccadf16935675
+    powerpc/fsl-booke: Fix problem with _tlbil_va being interrupted
+    introduce one issue. that casue the problem like this:
+    
+    Kernel BUG at c00b19fc [verbose debug info unavailable]
+    Oops: Exception in kernel mode, sig: 5 [#1]
+    MPC8572 DS
+    Modules linked in:
+    NIP: c00b19fc LR: c00b1c34 CTR: c0064e88
+    REGS: ef02b7b0 TRAP: 0700   Not tainted  (2.6.28-rc8-00057-g1bda712)
+    MSR: 00021000 <ME>  CR: 44048028  XER: 20000000
+    TASK = ef02c000[1] 'init' THREAD: ef02a000
+    GPR00: 00000001 ef02b860 ef02c000 eec201a0 c0dec2c0 00000000 000078a1 00000400
+    GPR08: c00b4e40 000078a1 c048ec00 a1780000 44048028 ecd26917 00000001 ef02b948
+    GPR16: ffffffea 0000020c 00000000 00000000 00000003 0000000a 00000000 000078a1
+    GPR24: eec201a0 00000000 ed849000 00000400 ef02b95c 00000001 ef02b978 ef02b984
+    NIP [c00b19fc] __find_get_block+0x24/0x238
+    LR [c00b1c34] __getblk+0x24/0x2a0
+    Call Trace:
+    [ef02b860] [c017b768] generic_make_request+0x290/0x328 (unreliable)
+    [ef02b8b0] [c00b1c34] __getblk+0x24/0x2a0
+    [ef02b910] [c00b4ae4] __bread+0x14/0xf8
+    [ef02b920] [c00fc228] ext2_get_branch+0xf0/0x138
+    [ef02b940] [c00fcc88] ext2_get_block+0xb8/0x828
+    [ef02ba00] [c00bbdc8] do_mpage_readpage+0x188/0x808
+    [ef02bac0] [c00bc5b4] mpage_readpages+0xec/0x144
+    [ef02bb50] [c00fba38] ext2_readpages+0x24/0x34
+    [ef02bb60] [c006ade0] __do_page_cache_readahead+0x150/0x230
+    [ef02bbb0] [c0064bdc] filemap_fault+0x31c/0x3e0
+    [ef02bbf0] [c00728b8] __do_fault+0x60/0x5b0
+    [ef02bc50] [c0011e0c] do_page_fault+0x2d8/0x4c4
+    [ef02bd10] [c000ed90] handle_page_fault+0xc/0x80
+    [ef02bdd0] [c00c7adc] set_brk+0x74/0x9c
+    [ef02bdf0] [c00c9274] load_elf_binary+0x70c/0x1180
+    [ef02be70] [c00945f0] search_binary_handler+0xa8/0x274
+    [ef02bea0] [c0095818] do_execve+0x19c/0x1d4
+    [ef02bed0] [c000766c] sys_execve+0x58/0x84
+    [ef02bef0] [c000e950] ret_from_syscall+0x0/0x3c
+    [ef02bfb0] [c009c6fc] sys_dup+0x24/0x6c
+    [ef02bfc0] [c0001e04] init_post+0xb0/0xf0
+    [ef02bfd0] [c046c1ac] kernel_init+0xcc/0xf4
+    [ef02bff0] [c000e6d0] kernel_thread+0x4c/0x68
+    Instruction dump:
+    4bffffa4 813f000c 4bffffac 9421ffb0 7c0802a6 7d800026 90010054 bf210034
+    91810030 7c0000a6 68008000 54008ffe <0f000000> 3d20c04e 3b29ffb8 38000008
+    
+    The issue was the beqlr returns early but we haven't reenabled interrupts.
+    
+    Signed-off-by: Dave Liu <daveliu@freescale.com>
+    Signed-off-by: Kumar Gala <galak@kernel.crashing.org>
+
+commit a97721894a6dc0f9ebfe1dbaa4bb112eaf399273
+Author: Joel Becker <Joel.Becker@oracle.com>
+Date:   Tue Dec 16 18:10:18 2008 -0800
+
+    ocfs2: Add JBD2 compat feature bit.
+    
+    Define the OCFS2_FEATURE_COMPAT_JBD2 bit in the filesystem header.
+    
+    Signed-off-by: Joel Becker <joel.becker@oracle.com>
+    Signed-off-by: Mark Fasheh <mfasheh@suse.com>
+
+commit 83099bc647688d816c2f7fac8e51921bdfe8db73
+Author: Tao Ma <tao.ma@oracle.com>
+Date:   Fri Dec 5 09:14:10 2008 +0800
+
+    ocfs2: Always update xattr search when creating bucket.
+    
+    When we create xattr bucket during the process of xattr set, we always
+    need to update the ocfs2_xattr_search since even if the bucket size is
+    the same as block size, the offset will change because of the removal
+    of the ocfs2_xattr_block header.
+    
+    Signed-off-by: Tao Ma <tao.ma@oracle.com>
+    Signed-off-by: Mark Fasheh <mfasheh@suse.com>
+
+commit be44f01e8af3862767f466f89c12640a2f2b0038
+Author: Ben Dooks <ben-linux@fluff.org>
+Date:   Fri Oct 31 16:10:22 2008 +0000
+
+    i2c-s3c2410: fix check for being in suspend.
+    
+    As noted by Julia Lawall <julia@diku.dk>, we can never
+    trigger the check for being in suspend due to the result
+    of !readl(i2c->regs + S3C2410_IICCON) & S3C2410_IICCON_IRQEN
+    always being 0.
+    
+    Add suspend/resume hooks to stop i2c transactions happening
+    until the driver has been resumed.
+    
+    Signed-off-by: Ben Dooks <ben-linux@fluff.org>
+
+commit a804644a1a31a0b85e4c7d3c49f30419513cb6c1
+Author: Mike Ditto <mditto@consentry.com>
+Date:   Tue Dec 16 20:17:09 2008 +0000
+
+    i2c-cpm: Detect and report NAK right away instead of timing out
+    
+    Make the driver report an ENXIO error immediately upon NAK instead of
+    waiting for another interrupt and getting a timeout.
+    
+    When reading from a device that is not present or declines to respond
+    to, e.g., a non-existent register address, CPM immediately reports a
+    NAK condition in the TxBD, but the driver kept waiting until a timeout,
+    which takes 1 second and causes an ugly console error message.
+    
+    Signed-off-by: Mike Ditto <mditto@consentry.com>
+    Acked-by: Jochen Friedrich <jochen@scram.de>
+    [ben-linux@fluff.org: reordered description text]
+    Signed-off-by: Ben Dooks <ben-linux@fluff.org>
+
+commit 1bda71282ded6a2e09a2db7c8884542fb46bfd4f
+Merge: 7a62b17... 25a41b2...
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue Dec 16 09:49:10 2008 -0800
+
+    Merge branch 'for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/ieee1394/linux1394-2.6
+    
+    * 'for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/ieee1394/linux1394-2.6:
+      ieee1394: add quirk fix for Freecom HDD
+
+commit 7a62b17694e278b1cde659f85aa6149052baa811
+Merge: 3bd8226... 3ee89f1...
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue Dec 16 09:48:53 2008 -0800
+
+    Merge branch 'upstream-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/jgarzik/libata-dev
+    
+    * 'upstream-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/jgarzik/libata-dev:
+      pata_hpt366: no ATAPI DMA
+      pata_hpt366: fix cable detection,
+      libata: fix Seagate NCQ+FLUSH blacklist
+
+commit 3bd82263a0d770d2ab3efd37144993f4433a179c
+Merge: eef70b2... f9d62c0...
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue Dec 16 09:47:58 2008 -0800
+
+    Merge branch 'sh/for-2.6.28' of git://git.kernel.org/pub/scm/linux/kernel/git/lethal/sh-2.6
+    
+    * 'sh/for-2.6.28' of git://git.kernel.org/pub/scm/linux/kernel/git/lethal/sh-2.6:
+      sh: Disable GENERIC_HARDIRQS_NO__DO_IRQ for unconverted platforms.
+      sh: maple: Do not pass SLAB_POISON to kmem_cache_create()
+
+commit eef70b217a7ab46e8e0cf75982ad75d8305d5591
+Merge: c095adb... 23e0e8a...
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue Dec 16 09:47:43 2008 -0800
+
+    Merge branch 'merge' of git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc
+    
+    * 'merge' of git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc:
+      powerpc/cell/axon-msi: Fix MSI after kexec
+      powerpc: Fix bootmem reservation on uninitialized node
+      powerpc: Check for valid hugepage size in hugetlb_get_unmapped_area
+
+commit c095adbc211f9f4e990eac7d6cb440de35e4f05f
+Author: KOSAKI Motohiro <kosaki.motohiro@jp.fujitsu.com>
+Date:   Tue Dec 16 16:06:43 2008 +0900
+
+    mm: Don't touch uninitialized variable in do_pages_stat_array()
+    
+    Commit 80bba1290ab5122c60cdb73332b26d288dc8aedd removed one necessary
+    variable initialization.  As a result following warning happened:
+    
+        CC      mm/migrate.o
+      mm/migrate.c: In function 'sys_move_pages':
+      mm/migrate.c:1001: warning: 'err' may be used uninitialized in this function
+    
+    More unfortunately, if find_vma() failed, kernel read uninitialized
+    memory.
+    
+    Signed-off-by: KOSAKI Motohiro <kosaki.motohiro@jp.fujitsu.com>
+    CC: Brice Goglin <Brice.Goglin@inria.fr>
+    Cc: Christoph Lameter <clameter@sgi.com>
+    Cc: KAMEZAWA Hiroyuki <kamezawa.hiroyu@jp.fujitsu.com>
+    Cc: Nick Piggin <npiggin@suse.de>
+    Cc: Hugh Dickins <hugh@veritas.com>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 3ee89f177e3cef0b5b024bcb6df683a3fa7d795f
+Author: Tejun Heo <tj@kernel.org>
+Date:   Tue Dec 9 17:14:04 2008 +0900
+
+    pata_hpt366: no ATAPI DMA
+    
+    IDE hpt366 driver doesn't allow DMA for ATAPI devices and MWDMA2 on
+    ATAPI device locks up pata_hpt366.  Follow the suit.
+    
+    Signed-off-by: Tejun Heo <tj@kernel.org>
+    Signed-off-by: Jeff Garzik <jgarzik@redhat.com>
+
+commit bab5b32a537edc83ff86bff91e46f328339f49f8
+Author: Tejun Heo <tj@kernel.org>
+Date:   Tue Dec 9 17:13:19 2008 +0900
+
+    pata_hpt366: fix cable detection,
+    
+    pata_hpt366 is strange in that its two channels occupy two PCI
+    functions and both are primary channels and bit1 of PCI configuration
+    register 0x5A indicates cable for both channels.
+    
+    Signed-off-by: Tejun Heo <tj@kernel.org>
+    Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>
+    Cc: Sergei Shtylyov <sshtylyov@ru.mvista.com>
+    Signed-off-by: Jeff Garzik <jgarzik@redhat.com>
+
+commit d10d491f842243e2e3bf5a2714020f9d649e1e38
+Author: Tejun Heo <tj@kernel.org>
+Date:   Thu Dec 11 13:42:42 2008 +0900
+
+    libata: fix Seagate NCQ+FLUSH blacklist
+    
+    Due to miscommunication, P/N was mistaken as firmware revision
+    strings.  Update it.
+    
+    Signed-off-by: Tejun Heo <tj@kernel.org>
+    Signed-off-by: Jeff Garzik <jgarzik@redhat.com>
+
+commit f9d62c009637f9581cdd7f6e430f8eec511c8587
+Author: Paul Mundt <lethal@linux-sh.org>
+Date:   Mon Dec 8 11:45:37 2008 +0900
+
+    sh: Disable GENERIC_HARDIRQS_NO__DO_IRQ for unconverted platforms.
+    
+    Presently limited to Cayman, Dreamcast, Microdev, and SystemH 7751.
+    Re-enable it for everyone once these have been fixed up.
+    
+    Signed-off-by: Paul Mundt <lethal@linux-sh.org>
+
+commit 93d546399c2b7d66a54d5fbd5eee17de19246bf6
+Author: Matt Fleming <mjf@gentoo.org>
+Date:   Tue Dec 16 09:15:31 2008 +0900
+
+    sh: maple: Do not pass SLAB_POISON to kmem_cache_create()
+    
+    SLAB_POISON is not a valid flag for kmem_create_cache() unless
+    CONFIG_DEBUG_SLAB is set, so remove it from the flags argument.
+    
+    Acked-by: Adrian McMenamin <adrian@newgolddream.dyndns.info>
+    Signed-off-by: Matt Fleming <mjf@gentoo.org>
+    Signed-off-by: Paul Mundt <lethal@linux-sh.org>
+
+commit 23e0e8afafd9ac065d81506524adf3339584044b
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Fri Dec 12 09:19:50 2008 +0000
+
+    powerpc/cell/axon-msi: Fix MSI after kexec
+    
+    Commit d015fe995 'powerpc/cell/axon-msi: Retry on missing interrupt'
+    has turned a rare failure to kexec on QS22 into a reproducible
+    error, which we have now analysed.
+    
+    The problem is that after a kexec, the MSIC hardware still points
+    into the middle of the old ring buffer.  We set up the ring buffer
+    during reboot, but not the offset into it.  On older kernels, this
+    would cause a storm of thousands of spurious interrupts after a
+    kexec, which would most of the time get dropped silently.
+    
+    With the new code, we time out on each interrupt, waiting for
+    it to become valid.  If more interrupts come in that we time
+    out on, this goes on indefinitely, which eventually leads to
+    a hard crash.
+    
+    The solution in this commit is to read the current offset from
+    the MSIC when reinitializing it.  This now works correctly, as
+    expected.
+    
+    Reported-by: Dirk Herrendoerfer <d.herrendoerfer@de.ibm.com>
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Acked-by: Michael Ellerman <michael@ellerman.id.au>
+    Signed-off-by: Paul Mackerras <paulus@samba.org>
+
+commit a4c74ddd5ea3db53fc73d29c222b22656a7d05be
+Author: Dave Hansen <dave@linux.vnet.ibm.com>
+Date:   Thu Dec 11 08:36:06 2008 +0000
+
+    powerpc: Fix bootmem reservation on uninitialized node
+    
+    careful_allocation() was calling into the bootmem allocator for
+    nodes which had not been fully initialized and caused a previous
+    bug:  http://patchwork.ozlabs.org/patch/10528/  So, I merged a
+    few broken out loops in do_init_bootmem() to fix it.  That changed
+    the code ordering.
+    
+    I think this bug is triggered by having reserved areas for a node
+    which are spanned by another node's contents.  In the
+    mark_reserved_regions_for_nid() code, we attempt to reserve the
+    area for a node before we have allocated the NODE_DATA() for that
+    nid.  We do this since I reordered that loop.  I suck.
+    
+    This is causing crashes at bootup on some systems, as reported
+    by Jon Tollefson.
+    
+    This may only present on some systems that have 16GB pages
+    reserved.  But, it can probably happen on any system that is
+    trying to reserve large swaths of memory that happen to span other
+    nodes' contents.
+    
+    This commit ensures that we do not touch bootmem for any node which
+    has not been initialized, and also removes a compile warning about
+    an unused variable.
+    
+    Signed-off-by: Dave Hansen <dave@linux.vnet.ibm.com>
+    Signed-off-by: Paul Mackerras <paulus@samba.org>
+
+commit 48f797de550d39ea35552646c34149991362ff7f
+Author: Brian King <brking@linux.vnet.ibm.com>
+Date:   Thu Dec 4 04:07:54 2008 +0000
+
+    powerpc: Check for valid hugepage size in hugetlb_get_unmapped_area
+    
+    It looks like most of the hugetlb code is doing the correct thing if
+    hugepages are not supported, but the mmap code is not.  If we get into
+    the mmap code when hugepages are not supported, such as in an LPAR
+    which is running Active Memory Sharing, we can oops the kernel.  This
+    fixes the oops being seen in this path.
+    
+    oops: Kernel access of bad area, sig: 11 [#1]
+    SMP NR_CPUS=1024 NUMA pSeries
+    Modules linked in: nfs(N) lockd(N) nfs_acl(N) sunrpc(N) ipv6(N) fuse(N) loop(N)
+    dm_mod(N) sg(N) ibmveth(N) sd_mod(N) crc_t10dif(N) ibmvscsic(N)
+    scsi_transport_srp(N) scsi_tgt(N) scsi_mod(N)
+    Supported: No
+    NIP: c000000000038d60 LR: c00000000003945c CTR: c0000000000393f0
+    REGS: c000000077e7b830 TRAP: 0300   Tainted: G
+    (2.6.27.5-bz50170-2-ppc64)
+    MSR: 8000000000009032 <EE,ME,IR,DR>  CR: 44000448  XER: 20000001
+    DAR: c000002000af90a8, DSISR: 0000000040000000
+    TASK = c00000007c1b8600[4019] 'hugemmap01' THREAD: c000000077e78000 CPU: 6
+    GPR00: 0000001fffffffe0 c000000077e7bab0 c0000000009a4e78 0000000000000000
+    GPR04: 0000000000010000 0000000000000001 00000000ffffffff 0000000000000001
+    GPR08: 0000000000000000 c000000000af90c8 0000000000000001 0000000000000000
+    GPR12: 000000000000003f c000000000a73880 0000000000000000 0000000000000000
+    GPR16: 0000000000000000 0000000000000000 0000000000000000 0000000000010000
+    GPR20: 0000000000000000 0000000000000003 0000000000010000 0000000000000001
+    GPR24: 0000000000000003 0000000000000000 0000000000000001 ffffffffffffffb5
+    GPR28: c000000077ca2e80 0000000000000000 c00000000092af78 0000000000010000
+    NIP [c000000000038d60] .slice_get_unmapped_area+0x6c/0x4e0
+    LR [c00000000003945c] .hugetlb_get_unmapped_area+0x6c/0x80
+    Call Trace:
+    [c000000077e7bbc0] [c00000000003945c] .hugetlb_get_unmapped_area+0x6c/0x80
+    [c000000077e7bc30] [c000000000107e30] .get_unmapped_area+0x64/0xd8
+    [c000000077e7bcb0] [c00000000010b140] .do_mmap_pgoff+0x140/0x420
+    [c000000077e7bd80] [c00000000000bf5c] .sys_mmap+0xc4/0x140
+    [c000000077e7be30] [c0000000000086b4] syscall_exit+0x0/0x40
+    Instruction dump:
+    fac1ffb0 fae1ffb8 fb01ffc0 fb21ffc8 fb41ffd0 fb61ffd8 fb81ffe0 fbc1fff0
+    fbe1fff8 f821fef1 f8c10158 f8e10160 <7d49002e> f9010168 e92d01b0 eb4902b0
+    
+    Signed-off-by: Brian King <brking@linux.vnet.ibm.com>
+    Signed-off-by: Paul Mackerras <paulus@samba.org>
+
+commit a3dd15444baa9c7522c8457ab564c41219dfb44c
+Merge: 7004405... 1ada144...
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Dec 15 16:31:05 2008 -0800
+
+    Merge master.kernel.org:/home/rmk/linux-2.6-arm
+    
+    * master.kernel.org:/home/rmk/linux-2.6-arm:
+      [ARM] 5348/1: fix documentation wrt location of the alignment trap interface
+      [ARM] Ensure linux/hardirqs.h is included where required
+      [ARM] fix kernel-doc syntax
+      [ARM] arch/arm/common/sa1111.c: Correct error handling code
+      [ARM] 5341/2: there is no copy_page on nommu ARM
+
+commit 7004405cb85cdc10074740705963d9ce3e887f47
+Merge: d2ff911... 4798a2b...
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Dec 15 16:30:22 2008 -0800
+
+    Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-2.6
+    
+    * git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-2.6:
+      Phonet: keep TX queue disabled when the device is off
+      SCHED: netem: Correct documentation comment in code.
+      netfilter: update rwlock initialization for nat_table
+      netlabel: Compiler warning and NULL pointer dereference fix
+      e1000e: fix double release of mutex
+      IA64: HP_SIMETH needs to depend upon NET
+      netpoll: fix race on poll_list resulting in garbage entry
+      ipv6: silence log messages for locally generated multicast
+      sungem: improve ethtool output with internal pcs and serdes
+      tcp: tcp_vegas cong avoid fix
+      sungem: Make PCS PHY support partially work again.
+
+commit d2ff911882b6bc693d86ca9566daac70aacbb2b3
+Author: Rusty Russell <rusty@rustcorp.com.au>
+Date:   Mon Dec 15 19:04:35 2008 +1030
+
+    Define smp_call_function_many for UP
+    
+    Otherwise those using it in transition patches (eg. kvm) can't compile
+    with CONFIG_SMP=n:
+    
+    arch/x86/kvm/../../../virt/kvm/kvm_main.c: In function 'make_all_cpus_request':
+    arch/x86/kvm/../../../virt/kvm/kvm_main.c:380: error: implicit declaration of function 'smp_call_function_many'
+    
+    Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 307257cf475aac25db30b669987f13d90c934e3a
+Author: Paul Menage <menage@google.com>
+Date:   Mon Dec 15 13:54:22 2008 -0800
+
+    cgroups: fix a race between rmdir and remount
+    
+    When a cgroup is removed, it's unlinked from its parent's children list,
+    but not actually freed until the last dentry on it is released (at which
+    point cgrp->root->number_of_cgroups is decremented).
+    
+    Currently rebind_subsystems checks for the top cgroup's child list being
+    empty in order to rebind subsystems into or out of a hierarchy - this can
+    result in the set of subsystems bound to a hierarchy being
+    removed-but-not-freed cgroup.
+    
+    The simplest fix for this is to forbid remounts that change the set of
+    subsystems on a hierarchy that has removed-but-not-freed cgroups.  This
+    bug can be reproduced via:
+    
+    mkdir /mnt/cg
+    mount -t cgroup -o ns,freezer cgroup /mnt/cg
+    mkdir /mnt/cg/foo
+    sleep 1h < /mnt/cg/foo &
+    rmdir /mnt/cg/foo
+    mount -t cgroup -o remount,ns,devices,freezer cgroup /mnt/cg
+    kill $!
+    
+    Though the above will cause oops in -mm only but not mainline, but the bug
+    can cause memory leak in mainline (and even oops)
+    
+    Signed-off-by: Paul Menage <menage@google.com>
+    Reviewed-by: Li Zefan <lizf@cn.fujitsu.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 38aefbc585c5d86df101e7644bff2c47112783d4
+Author: Frederik Deweerdt <frederik.deweerdt@xprog.eu>
+Date:   Mon Dec 15 13:54:19 2008 -0800
+
+    ACPI toshiba: only register rfkill if bt is enabled
+    
+    Part of the rfkill initialization was done whenever BT was on or not.  The
+    following patch checks for BT presence before registering the rfkill to
+    the input layer.  Some minor cleanups (> 80 char lines) were also added in
+    the process.
+    
+    On Tue, Oct 28, 2008 at 10:10:37PM +0300, Andrey Borzenkov wrote:
+    [...]
+    > [   66.633036] toshiba_acpi: Toshiba Laptop ACPI Extras version 0.19
+    > [   66.633054] toshiba_acpi:     HCI method: \_SB_.VALD.GHCI
+    > [   66.637764] input: Toshiba RFKill Switch as /devices/virtual/input/input3
+    [...]
+    > [  113.920753] ------------[ cut here ]------------
+    > [  113.920828] kernel BUG at /home/bor/src/linux-git/net/rfkill/rfkill.c:347!
+    > [  113.920845] invalid opcode: 0000 [#1]
+    > [  113.920877] last sysfs file: /sys/devices/pci0000:00/0000:00:04.0/host0/target0:0:0/0:0:0:0/block/sda/size
+    > [  113.920900] Dumping ftrace buffer:
+    > [  113.920919]    (ftrace buffer empty)
+    > [  113.920933] Modules linked in: af_packet irnet ppp_generic slhc ircomm_tty ircomm binfmt_misc loop dm_mirror dm_region_hash dm_log dm_round_robin dm_multipath dm_mod alim15x3 ide_core nvram toshiba cryptomgr aead crypto_blkcipher michael_mic crypto_algapi orinoco_cs orinoco hermes_dld hermes pcmcia firmware_class snd_ali5451 snd_ac97_codec ac97_bus snd_seq_dummy snd_seq_oss snd_seq_midi_event snd_seq snd_seq_device smsc_ircc2 snd_pcm_oss snd_pcm rtc_cmos irda snd_timer snd_mixer_oss rtc_core snd crc_ccitt yenta_socket rtc_lib rsrc_nonstatic i2c_ali1535 pcmcia_core pcspkr psmouse soundcore i2c_core evdev sr_mod snd_page_alloc alim1535_wdt cdrom fan sg video output toshiba_acpi rfkill thermal backlight ali_agp processor ac button input_polldev battery agpgart ohci_hcd usbcore reiserfs pata_ali libata sd_mod scsi_mod [last unloaded: scsi_wait_scan]
+    > [  113.921765]
+    > [  113.921785] Pid: 3272, comm: ipolldevd Not tainted (2.6.28-rc2-1avb #3) PORTEGE 4000
+    > [  113.921801] EIP: 0060:[<dfaa4683>] EFLAGS: 00010246 CPU: 0
+    > [  113.921854] EIP is at rfkill_force_state+0x53/0x90 [rfkill]
+    > [  113.921870] EAX: 00000000 EBX: 00000000 ECX: 00000003 EDX: 00000000
+    > [  113.921885] ESI: 00000000 EDI: ddd50300 EBP: d8d7af40 ESP: d8d7af24
+    > [  113.921900]  DS: 007b ES: 007b FS: 0000 GS: 0000 SS: 0068
+    > [  113.921918] Process ipolldevd (pid: 3272, ti=d8d7a000 task=d8d93c90 task.ti=d8d7a000)
+    > [  113.921933] Stack:
+    > [  113.921945]  d8d7af38 00000246 dfb029d8 dfb029c0 dfb029d8 dfb029c0 ddd50300 d8d7af5c
+    > [  113.922014]  dfb018e2 01000246 01000000 ddd50300 ddd50314 ddabb8a0 d8d7af68 dfb381c1
+    > [  113.922098]  00000000 d8d7afa4 c012ec0a 00000000 00000002 00000000 c012eba8 ddabb8c0
+    > [  113.922240] Call Trace:
+    > [  113.922240]  [<dfb018e2>] ? bt_poll_rfkill+0x5c/0x82 [toshiba_acpi]
+    > [  113.922240]  [<dfb381c1>] ? input_polled_device_work+0x11/0x40 [input_polldev]
+    > [  113.922240]  [<c012ec0a>] ? run_workqueue+0xea/0x1f0
+    > [  113.922240]  [<c012eba8>] ? run_workqueue+0x88/0x1f0
+    > [  113.922240]  [<dfb381b0>] ? input_polled_device_work+0x0/0x40 [input_polldev]
+    > [  113.922240]  [<c012f047>] ? worker_thread+0x87/0xf0
+    > [  113.922240]  [<c0132b00>] ? autoremove_wake_function+0x0/0x50
+    > [  113.922240]  [<c012efc0>] ? worker_thread+0x0/0xf0
+    > [  113.922240]  [<c013280f>] ? kthread+0x3f/0x80
+    > [  113.922240]  [<c01327d0>] ? kthread+0x0/0x80
+    > [  113.922240]  [<c01040d7>] ? kernel_thread_helper+0x7/0x10
+    > [  113.922240] Code: 43 54 89 73 54 39 c6 74 11 89 d9 ba 01 00 00 00 b8 40 68 aa df e8 3e 35 69 e0 89 f8 e8 77 fd 85 e0 31 c0 83 c4 10 5b 5e 5f 5d c3 <0f> 0b eb fe 89 f6 8d bc 27 00 00 00 00 be f4 4d aa df bb 5f 01
+    > [  113.922240] EIP: [<dfaa4683>] rfkill_force_state+0x53/0x90 [rfkill] SS:ESP 0068:d8d7af24
+    > [  113.924700] ---[ end trace 0e404eb40cadd5f0 ]---
+    
+    Signed-off-by: Frederik Deweerdt <frederik.deweerdt@gmail.com>
+    Tested-by: Andrey Borzenkov <arvidjaar@mail.ru>
+    Acked-by: Len Brown <len.brown@intel.com>
+    Cc: Richard Purdie <rpurdie@rpsys.net>
+    Acked-by: Philip Langdale <philipl@overt.org>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 6dc7516eba9ccbd78af0036d391b831cda5c7dc7
+Author: Michael Halcrow <mhalcrow@us.ibm.com>
+Date:   Mon Dec 15 13:54:17 2008 -0800
+
+    eCryptfs: Update maintainers
+    
+    Tyler Hicks and Dustin Kirkland are now the primary contact points for
+    eCryptfs issues that may arise from this point forward.
+    
+    Signed-off-by: Michael Halcrow <mhalcrow@us.ibm.com>
+    Acked-by: Tyler Hicks <tyhicks@linux.vnet.ibm.com>
+    Acked-by: Dustin Kirkland <kirkland@canonical.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 5e18e2b8b3d453e68accc3e295643fe4b5bbc295
+Author: Catalin Marinas <catalin.marinas@arm.com>
+Date:   Mon Dec 15 13:54:16 2008 -0800
+
+    slob: do not pass the SLAB flags as GFP in kmem_cache_create()
+    
+    The kmem_cache_create() function in the slob allocator passes the SLAB
+    flags as GFP flags to the slob_alloc() function.  The patch changes this
+    call to pass GFP_KERNEL as the other allocators seem to do.
+    
+    Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
+    Acked-by: Matt Mackall <mpm@selenic.com>
+    Cc: Cyrill Gorcunov <gorcunov@gmail.com>
+    Cc: Christoph Lameter <cl@linux-foundation.org>
+    Cc: Pekka Enberg <penberg@cs.helsinki.fi>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 35024c384ba4faaeac361a1ffee05a1475f9a9ed
+Author: Mike Frysinger <vapier.adi@gmail.com>
+Date:   Mon Dec 15 13:54:14 2008 -0800
+
+    pcmcia: blackfin: fix bug - add missing ; to MODULE macro
+    
+    Cc: Michael Hennerich <michael.hennerich@analog.com>
+    Signed-off-by: Mike Frysinger <vapier.adi@gmail.com>
+    Signed-off-by: Bryan Wu <cooloney@kernel.org>
+    Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 1ada1441e73a0f51296bfae527acbeae61ff0d52
+Author: Nicolas Pitre <nico@cam.org>
+Date:   Mon Dec 15 03:09:15 2008 +0100
+
+    [ARM] 5348/1: fix documentation wrt location of the alignment trap interface
+    
+    Signed-off-by: Nicolas Pitre <nico@marvell.com>
+    Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+
+commit 67306da610a3e4824192e92888634d3d8700bfc1
+Author: Russell King <rmk@dyn-67.arm.linux.org.uk>
+Date:   Sun Dec 14 18:01:44 2008 +0000
+
+    [ARM] Ensure linux/hardirqs.h is included where required
+    
+    ... for the removal of it from asm-generic/local.h
+    
+    Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+
+commit 4798a2b84ea5a98e4f36a815a646cb48ff521684
+Author: Rémi Denis-Courmont <remi.denis-courmont@nokia.com>
+Date:   Mon Dec 15 00:53:57 2008 -0800
+
+    Phonet: keep TX queue disabled when the device is off
+    
+    Signed-off-by: Rémi Denis-Courmont <remi.denis-courmont@nokia.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit eb9b851b980e20ba5f6bdfd6ec24f4bc77623ce6
+Author: Jesper Dangaard Brouer <hawk@comx.dk>
+Date:   Mon Dec 15 00:39:17 2008 -0800
+
+    SCHED: netem: Correct documentation comment in code.
+    
+    The netem simulator is no longer limited by Linux timer resolution HZ.
+    Not since Patrick McHardy changed the QoS system to use hrtimer.
+    
+    Signed-off-by: Jesper Dangaard Brouer <hawk@comx.dk>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit be70ed189bc0d16e1609a1c6c04ec9418b4dd11a
+Author: Steven Rostedt <srostedt@redhat.com>
+Date:   Mon Dec 15 00:19:14 2008 -0800
+
+    netfilter: update rwlock initialization for nat_table
+    
+    The commit e099a173573ce1ba171092aee7bb3c72ea686e59
+    (netfilter: netns nat: per-netns NAT table) renamed the
+    nat_table from __nat_table to nat_table without updating the
+    __RW_LOCK_UNLOCKED(__nat_table.lock).
+    
+    Signed-off-by: Steven Rostedt <srostedt@redhat.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit cefb3d02cad6fae49369cdde24526c4c4806b20f
+Merge: ae8d04e... e5e774d...
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun Dec 14 16:25:19 2008 -0800
+
+    Merge branch 'merge' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/powerpc
+    
+    * 'merge' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/powerpc:
+      powerpc/fsl-booke: Fix problem with _tlbil_va being interrupted
+
+commit ae8d04e2ecbb233926860e9ce145eac19c7835dc
+Author: Zachary Amsden <zach@vmware.com>
+Date:   Sat Dec 13 12:36:58 2008 -0800
+
+    x86 Fix VMI crash on boot in 2.6.28-rc8
+    
+    VMI initialiation can relocate the fixmap, causing early_ioremap to
+    malfunction if it is initialized before the relocation.  To fix this,
+    VMI activation is split into two phases; the detection, which must
+    happen before setting up ioremap, and the activation, which must happen
+    after parsing early boot parameters.
+    
+    This fixes a crash on boot when VMI is enabled under VMware.
+    
+    Signed-off-by: Zachary Amsden <zach@vmware.com>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit ca7e716c7833aeaeb8fedd6d004c5f5d5e14d325
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun Dec 14 15:46:01 2008 -0800
+
+    Revert "sched_clock: prevent scd->clock from moving backwards"
+    
+    This reverts commit 5b7dba4ff834259a5623e03a565748704a8fe449, which
+    caused a regression in hibernate, reported by and bisected by Fabio
+    Comolli.
+    
+    This revert fixes
+    
+     http://bugzilla.kernel.org/show_bug.cgi?id=12155
+     http://bugzilla.kernel.org/show_bug.cgi?id=12149
+    
+    Bisected-by: Fabio Comolli <fabio.comolli@gmail.com>
+    Requested-by: Rafael J. Wysocki <rjw@sisk.pl>
+    Acked-by: Dave Kleikamp <shaggy@linux.vnet.ibm.com>
+    Cc: Peter Zijlstra <a.p.zijlstra@chello.nl>
+    Cc: Ingo Molnar <mingo@elte.hu>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 3909845e26439148a484d1ac30bb65e5e0ff63ec
+Author: Randy Dunlap <randy.dunlap@oracle.com>
+Date:   Mon Dec 1 14:15:37 2008 -0800
+
+    [ARM] fix kernel-doc syntax
+    
+    Fix kernel-doc notation to use correct syntax.  Even though this should be
+    moved to where the function is actually implemented...
+    
+    Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+
+commit 442a902262e1dfc3f1298ceea5f3120fe2043904
+Author: Julia Lawall <julia@diku.dk>
+Date:   Sat Dec 13 16:37:59 2008 +0100
+
+    [ARM] arch/arm/common/sa1111.c: Correct error handling code
+    
+    If it is reasonable to apply PTR_ERR to the result of calling clk_get, then
+    that result should first be tested with IS_ERR, not with !.
+    
+    The semantic patch that makes this change is as follows:
+    (http://www.emn.fr/x-info/coccinelle/)
+    
+    // <smpl>
+    @@
+    expression E,E1;
+    @@
+    
+    if (
+    -   E == NULL
+    +   IS_ERR(E)
+       ) { <+... when != E = E1
+            PTR_ERR(E)
+           ...+> }
+    // </smpl>
+    
+    Signed-off-by: Julia Lawall <julia@diku.dk>
+    Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+
+commit 25a41b280083259d05d68f61633194344a1f8a9f
+Author: Stefan Richter <stefanr@s5r6.in-berlin.de>
+Date:   Sat Dec 13 01:43:59 2008 +0100
+
+    ieee1394: add quirk fix for Freecom HDD
+    
+    According to http://bugzilla.kernel.org/show_bug.cgi?id=12206, Freecom
+    FireWire Hard Drive 1TB reports max_rom=2 but returns garbage if block
+    read requests are used to read the config ROM.  Force max_rom=0 to limit
+    them to quadlet read requests.
+    
+    Reported-by: Christian Mueller <cm1@mumac.de>
+    Signed-off-by: Stefan Richter <stefanr@s5r6.in-berlin.de>
+
+commit e5e774d8833de1a0037be2384efccadf16935675
+Author: Kumar Gala <galak@kernel.crashing.org>
+Date:   Sat Dec 13 17:01:37 2008 -0600
+
+    powerpc/fsl-booke: Fix problem with _tlbil_va being interrupted
+    
+    An example calling sequence which we did see:
+    
+    copy_user_highpage -> kmap_atomic -> flush_tlb_page -> _tlbil_va
+    
+    We got interrupted after setting up the MAS registers before the
+    tlbwe and the interrupt handler that caused the interrupt also did
+    a kmap_atomic (ide code) and thus on returning from the interrupt
+    the MAS registers no longer contained the proper values.
+    
+    Since we dont save/restore MAS registers for normal interrupts we
+    need to disable interrupts in _tlbil_va to ensure atomicity.
+    
+    Signed-off-by: Kumar Gala <galak@kernel.crashing.org>
+
+commit 5279585ff2bedc8180da5bdf8aa3ff1736466de2
+Merge: 68b32d4... 9f3eefc...
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat Dec 13 11:32:24 2008 -0800
+
+    Merge branch 'merge' of git://git.kernel.org/pub/scm/linux/kernel/git/jwboyer/powerpc-4xx
+    
+    * 'merge' of git://git.kernel.org/pub/scm/linux/kernel/git/jwboyer/powerpc-4xx:
+      powerpc/40x: Add proper BOOTCFLAGS for cuboot-acadia
+
+commit 68b32d4499fd910b85b263c3afe92687d18abc3f
+Merge: 8d9c02e... 2b895c3...
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat Dec 13 11:32:04 2008 -0800
+
+    Merge branch 'i2c-for-linus' of git://jdelvare.pck.nerim.net/jdelvare-2.6
+    
+    * 'i2c-for-linus' of git://jdelvare.pck.nerim.net/jdelvare-2.6:
+      i2c-highlander: Trivial endian casting fixes
+      i2c-pmcmsp: Fix endianness misannotation
+
+commit 8d9c02ec76f228a8fed745725ad92d7bb3167859
+Merge: fae1aa4... febd7a5...
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat Dec 13 11:28:13 2008 -0800
+
+    Merge branch 'for-linus' of git://git.kernel.dk/linux-2.6-block
+    
+    * 'for-linus' of git://git.kernel.dk/linux-2.6-block:
+      Commands needing to be retried require a complete re-initialization.
+
+commit fae1aa4a0bcfdd35735a38949650216aee964474
+Merge: 1c55f18... 6d8a52d...
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat Dec 13 11:26:34 2008 -0800
+
+    Merge branch 'upstream' of git://ftp.linux-mips.org/pub/scm/upstream-linus
+    
+    * 'upstream' of git://ftp.linux-mips.org/pub/scm/upstream-linus:
+      MIPS: IP32: Update defconfig
+      MIPS: Add missing calls to plat_unmap_dma_mem.
+      MIPS: Kconfig: Fix the arch-specific header path
+      MIPS: Use EI/DI for MIPS R2.
+
+commit 1c55f18717304100a5f624c923f7cb6511b4116d
+Author: Ingo Brueckl <ib@wupperonline.de>
+Date:   Wed Dec 10 23:35:00 2008 +0100
+
+    console ASCII glyph 1:1 mapping
+    
+    For the console, there is a 1:1 mapping of glyphs which cannot be found
+    in the current font.  This seems to be meant as a kind of 'emergency
+    fallback' for fonts without unicode mapping which otherwise would
+    display nothing readable on the screen.
+    
+    At the moment it affects all chars for which no substitution character
+    is defined.  In particular this means that for all chars (>= 128) where
+    there is no iso88591-1/unicode character (e.g.  control character area)
+    you'll get the very strange 1:1 mapping of the (cp437) graphics card
+    glyphs.
+    
+    I'm pretty sure that the 1:1 mapping should only affect strict ASCII
+    code characters, i.e.  chars < 128.
+    
+    The patch limits the mapping as it probably was meant anyway.
+    
+    Signed-off-by: Ingo Brueckl <ib@wupperonline.de>
+    Acked-by: H. Peter Anvin <hpa@zytor.com>
+    Cc: Egmont Koblinger <egmont@uhulinux.hu>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit f75bc06e5d00a827d3ec5d57bbb5b73a4adec855
+Author: Ingo Brueckl <ib@wupperonline.de>
+Date:   Wed Dec 10 23:34:00 2008 +0100
+
+    unicode table for cp437
+    
+    There is a major bug in the cp437 to unicode translation table.  Char
+    0x7c is mapped to U+00a5 which is the Yen sign and wrong.  The right
+    mapping is U+00a6 (broken bar).
+    
+    Furthermore, a mapping for U+00b4 (a widely used character) is missing
+    even though easily possible.
+    
+    The patch fixes these, as well as it provides a few other useful
+    mappings.
+    
+    The changes are as follows:
+    
+      0x0f (enhancement) enables a sort of currency symbol
+      0x27 (bug) enables a sort of acute accent which is a widely used character
+      0x44 (enhancement) enables a sort of icelandic capital letter eth
+      0x7c (major bug) corrects mapping
+      0xeb (enhancement) enables a sort of icelandic small letter eth
+      0xee (enhancement) enables a sort of math 'element of'
+    
+    Signed-off-by: Ingo Brueckl <ib@wupperonline.de>
+    Acked-by: H. Peter Anvin <hpa@zytor.com>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 6d8a52d7f09babf6cff1df32fe0b8ea47cf753f3
+Author: David Daney <ddaney@caviumnetworks.com>
+Date:   Wed Dec 10 15:27:13 2008 -0800
+
+    MIPS: IP32: Update defconfig
+    
+    Signed-off-by: David Daney <ddaney@caviumnetworks.com>
+    Signed-off-by: Ralf Baechle <ralf@linux-mips.org>
+
+commit 11531ac2d3f24c3dc4df3861d72d1e8b9b8b6317
+Author: David Daney <ddaney@caviumnetworks.com>
+Date:   Wed Dec 10 18:14:45 2008 -0800
+
+    MIPS: Add missing calls to plat_unmap_dma_mem.
+    
+    dma_free_noncoherent() and dma_free_coherent() are missing calls to
+    plat_unmap_dma_mem().  This patch adds them.
+    
+    Signed-off-by: David Daney <ddaney@caviumnetworks.com>
+    Signed-off-by: Ralf Baechle <ralf@linux-mips.org>
+
+commit 00ace207164cb414efba406830256721f45c1c62
+Author: Dmitri Vorobiev <dmitri.vorobiev@movial.fi>
+Date:   Wed Dec 10 22:38:36 2008 +0200
+
+    MIPS: Kconfig: Fix the arch-specific header path
+    
+    The header path in the help text for the RUNTIME_DEBUG config option is
+    obsolete and needs to be updated to match the new location of
+    architecture-specific header files. While at it, fix the spelling mistake.
+    
+    Signed-off-by: Dmitri Vorobiev <dmitri.vorobiev@movial.fi>
+    Signed-off-by: Ralf Baechle <ralf@linux-mips.org>
+
+commit b6354db5bbbc538bf009cae6c019810b4a3ef21d
+Author: David Daney <ddaney@caviumnetworks.com>
+Date:   Wed Dec 10 08:37:25 2008 -0800
+
+    MIPS: Use EI/DI for MIPS R2.
+    
+    For MIPS R2, use the EI and DI instructions to enable and disable
+    interrupts.
+    
+    Signed-off-by: Tomaso Paoletti <tpaoletti@caviumnetworks.com>
+    Signed-off-by: David Daney <ddaney@caviumnetworks.com>
+    Signed-off-by: Ralf Baechle <ralf@linux-mips.org>
+
+commit febd7a5c131433ea128b54dd5712e260c79eb3ab
+Author: Alan D. Brunelle <Alan.Brunelle@hp.com>
+Date:   Tue Dec 9 15:52:15 2008 +0100
+
+    Commands needing to be retried require a complete re-initialization.
+    
+    The test-unit-ready portion of this patch was causing boots to fail on
+    my test machine (as in http://lkml.org/lkml/2008/12/5/161). With this
+    patch in place, the system is booting reliably.
+    
+    Mike Anderson found the same problem in the hp_hw_start_stop code,
+    and I applied the same solution in cdrom_read_cdda_bpc.
+    
+    Signed-off-by: Alan D. Brunelle <alan.brunelle@hp.com>
+    Cc: Mike Anderson <andmike@linux.vnet.ibm.com>
+    Signed-off-by: Jens Axboe <jens.axboe@oracle.com>
+
+commit ec8f2375d7584969501918651241f91eca2a6ad3
+Author: Paul Moore <paul.moore@hp.com>
+Date:   Thu Dec 11 21:31:50 2008 -0800
+
+    netlabel: Compiler warning and NULL pointer dereference fix
+    
+    Fix the two compiler warnings show below.  Thanks to Geert Uytterhoeven for
+    finding and reporting the problem.
+    
+     net/netlabel/netlabel_unlabeled.c:567: warning: 'entry' may be used
+       uninitialized in this function
+     net/netlabel/netlabel_unlabeled.c:629: warning: 'entry' may be used
+       uninitialized in this function
+    
+    Signed-off-by: Paul Moore <paul.moore@hp.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 30bb0e0dce78427f3e5cb728d6b5ea73acbefffa
+Author: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+Date:   Thu Dec 11 21:28:11 2008 -0800
+
+    e1000e: fix double release of mutex
+    
+    During a reset, releasing the swflag after it failed to be acquired would
+    cause a double unlock of the mutex.  Instead, test whether acquisition of
+    the swflag was successful and if not, do not release the swflag.  The reset
+    must still be done to bring the device to a quiescent state.
+    
+    This resolves [BUG 12200] BUG: bad unlock balance detected! e1000e
+    http://bugzilla.kernel.org/show_bug.cgi?id=12200
+    
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 9f3eefc4f9b02404e89d624a6cd40e7b468b5fd5
+Author: Josh Boyer <jwboyer@linux.vnet.ibm.com>
+Date:   Tue Nov 25 06:33:35 2008 +0000
+
+    powerpc/40x: Add proper BOOTCFLAGS for cuboot-acadia
+    
+    The cuboot-acadia.c wrapper can cause assembler errors on some
+    toolchains due to the lack of the proper BOOTCFLAGS.  This adds
+    the proper flags for the file.
+    
+    Signed-off-by: Josh Boyer <jwboyer@linux.vnet.ibm.com>
+
+commit 2b895c3f35d3ead0e9409b59da94094c7873f96d
+Author: Harvey Harrison <harvey.harrison@gmail.com>
+Date:   Thu Dec 11 12:11:21 2008 +0100
+
+    i2c-highlander: Trivial endian casting fixes
+    
+    Fixes sparse warnings:
+    drivers/i2c/busses/i2c-highlander.c:95:26: warning: incorrect type in argument 1 (different base types)
+    drivers/i2c/busses/i2c-highlander.c:95:26:    expected restricted __be16 const [usertype] *p
+    drivers/i2c/busses/i2c-highlander.c:95:26:    got unsigned short [usertype] *<noident>
+    drivers/i2c/busses/i2c-highlander.c:106:15: warning: incorrect type in assignment (different base types)
+    drivers/i2c/busses/i2c-highlander.c:106:15:    expected unsigned short [unsigned] [short] [usertype] <noident>
+    drivers/i2c/busses/i2c-highlander.c:106:15:    got restricted __be16
+    
+    Signed-off-by: Harvey Harrison <harvey.harrison@gmail.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Ben Dooks <ben-linux@fluff.org>
+    Acked-by: Paul Mundt <lethal@linux-sh.org>
+    Signed-off-by: Jean Delvare <khali@linux-fr.org>
+
+commit d9d38ca07d5187b3082074934e73f014f5d31409
+Author: Harvey Harrison <harvey.harrison@gmail.com>
+Date:   Thu Dec 11 12:11:20 2008 +0100
+
+    i2c-pmcmsp: Fix endianness misannotation
+    
+    tmp is used as host-endian and is loaded from a be64, fix the cast and the
+    endian accessor used.
+    
+    Signed-off-by: Harvey Harrison <harvey.harrison@gmail.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Ben Dooks <ben-linux@fluff.org>
+    Signed-off-by: Jean Delvare <khali@linux-fr.org>
+
+commit 674a0a6939a954ab92fdd9833943e2277550bb0a
+Author: Nicolas Pitre <nico@cam.org>
+Date:   Tue Dec 9 03:13:39 2008 +0100
+
+    [ARM] 5341/2: there is no copy_page on nommu ARM
+    
+    ... as it is defined with memcpy, therefore no copy_page symbol to
+    export.
+    
+    Signed-off-by: Nicolas Pitre <nico@cam.org>
+    Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+
+commit 6c34bc2976b30dc8b56392c020e25bae1f363cab
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed Dec 10 09:26:17 2008 -0800
+
+    Revert "radeonfb: accelerate imageblit and other improvements"
+    
+    This reverts commit b1ee26bab14886350ba12a5c10cbc0696ac679bf, along with
+    the "fixes" for it that all just caused problems:
+    
+     - c4c6fa9891f3d1bcaae4f39fb751d5302965b566 "radeonfb: fix problem with
+       color expansion & alignment"
+    
+     - f3179748a157c21d44d929fd3779421ebfbeaa93 "radeonfb: Disable new color
+       expand acceleration unless explicitely enabled"
+    
+    because even when disabled, it breaks for people. See
+    
+    	http://bugzilla.kernel.org/show_bug.cgi?id=12191
+    
+    for the latest example.
+    
+    Acked-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+    Acked-by: David S. Miller <davem@davemloft.net>
+    Cc: Krzysztof Halasa <khc@pm.waw.pl>
+    Cc: James Cloos <cloos@jhcloos.com>
+    Cc: "Rafael J. Wysocki" <rjw@sisk.pl>
+    Cc: Krzysztof Helt <krzysztof.h1@poczta.fm>
+    Cc: Jean-Luc Coulon <jean.luc.coulon@gmail.com>
+    Cc: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit bb49eed4221092fde4e2337534ae51d8f28a2fbe
+Author: Alexander Beregalov <a.beregalov@gmail.com>
+Date:   Wed Dec 10 15:24:50 2008 -0800
+
+    IA64: HP_SIMETH needs to depend upon NET
+    
+    From: Alexander Beregalov <a.beregalov@gmail.com>
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 7b363e440021a1cf9ed76944b2685f48dacefb3e
+Author: Neil Horman <nhorman@tuxdriver.com>
+Date:   Tue Dec 9 23:22:26 2008 -0800
+
+    netpoll: fix race on poll_list resulting in garbage entry
+    
+    	A few months back a race was discused between the netpoll napi service
+    path, and the fast path through net_rx_action:
+    http://kerneltrap.org/mailarchive/linux-netdev/2007/10/16/345470
+    
+    A patch was submitted for that bug, but I think we missed a case.
+    
+    Consider the following scenario:
+    
+    INITIAL STATE
+    CPU0 has one napi_struct A on its poll_list
+    CPU1 is calling netpoll_send_skb and needs to call poll_napi on the same
+    napi_struct A that CPU0 has on its list
+    
+    
+    
+    CPU0						CPU1
+    net_rx_action					poll_napi
+    !list_empty (returns true)			locks poll_lock for A
+    						 poll_one_napi
+    						  napi->poll
+    						   netif_rx_complete
+    						    __napi_complete
+    						    (removes A from poll_list)
+    list_entry(list->next)
+    
+    
+    In the above scenario, net_rx_action assumes that the per-cpu poll_list is
+    exclusive to that cpu.  netpoll of course violates that, and because the netpoll
+    path can dequeue from the poll list, its possible for CPU0 to detect a non-empty
+    list at the top of the while loop in net_rx_action, but have it become empty by
+    the time it calls list_entry.  Since the poll_list isn't surrounded by any other
+    structure, the returned data from that list_entry call in this situation is
+    garbage, and any number of crashes can result based on what exactly that garbage
+    is.
+    
+    Given that its not fasible for performance reasons to place exclusive locks
+    arround each cpus poll list to provide that mutal exclusion, I think the best
+    solution is modify the netpoll path in such a way that we continue to guarantee
+    that the poll_list for a cpu is in fact exclusive to that cpu.  To do this I've
+    implemented the patch below.  It adds an additional bit to the state field in
+    the napi_struct.  When executing napi->poll from the netpoll_path, this bit will
+    be set. When a driver calls netif_rx_complete, if that bit is set, it will not
+    remove the napi_struct from the poll_list.  That work will be saved for the next
+    iteration of net_rx_action.
+    
+    I've tested this and it seems to work well.  About the biggest drawback I can
+    see to it is the fact that it might result in an extra loop through
+    net_rx_action in the event that the device is actually contended for (i.e. the
+    netpoll path actually preforms all the needed work no the device, and the call
+    to net_rx_action winds up doing nothing, except removing the napi_struct from
+    the poll_list.  However I think this is probably a small price to pay, given
+    that the alternative is a crash.
+    
+    Signed-off-by: Neil Horman <nhorman@tuxdriver.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 24fc7b86dc0470616803be2f921c8cd5c459175d
+Author: Jan Sembera <jsembera@suse.cz>
+Date:   Tue Dec 9 15:48:32 2008 -0800
+
+    ipv6: silence log messages for locally generated multicast
+    
+    This patch fixes minor annoyance during transmission of unsolicited
+    neighbor advertisements from userspace to multicast addresses (as
+    far as I can see in RFC, this is allowed and the similar functionality
+    for IPv4 has been in arping for a long time).
+    
+    Outgoing multicast packets get reinserted into local processing as if they
+    are received from the network. The machine thus sees its own NA and fills
+    the logs with error messages. This patch removes the message if NA has been
+    generated locally.
+    
+    Signed-off-by: Jan Sembera <jsembera@suse.cz>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit fbf0229e946deb9e6c711f9eaa5c8d670c3a28fd
+Author: Hermann Lauer <Hermann.Lauer@iwr.uni-heidelberg.de>
+Date:   Tue Dec 9 15:39:14 2008 -0800
+
+    sungem: improve ethtool output with internal pcs and serdes
+    
+    From: Hermann Lauer <Hermann.Lauer@iwr.uni-heidelberg.de>
+    
+    Attached is a patch which improves the output of ethtool (see below)
+    to some sensefull values with a sungem fibre card which uses the
+    sungem interal pcs connected to a serdes chip. The seriallink case in
+    the driver is untouched.
+    
+    Most values are hardcoded, because gigabit fibre autoneg is anyways
+    limited and the driver don't really support much at the moment with
+    that hardware.
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 8d3a564da34e5844aca4f991b73f8ca512246b23
+Author: Doug Leith <doug.leith@nuim.ie>
+Date:   Tue Dec 9 00:13:04 2008 -0800
+
+    tcp: tcp_vegas cong avoid fix
+    
+    This patch addresses a book-keeping issue in tcp_vegas.c.  At present
+    tcp_vegas does separate book-keeping of cwnd based on packet sequence
+    numbers.  A mismatch can develop between this book-keeping and
+    tp->snd_cwnd due, for example, to delayed acks acking multiple
+    packets.  When vegas transitions to reno operation (e.g. following
+    loss), then this mismatch leads to incorrect behaviour (akin to a cwnd
+    backoff).  This seems mostly to affect operation at low cwnds where
+    delayed acking can lead to a significant fraction of cwnd being
+    covered by a single ack, leading to the book-keeping mismatch.  This
+    patch modifies the congestion avoidance update to avoid the need for
+    separate book-keeping while leaving vegas congestion avoidance
+    functionally unchanged.  A secondary advantage of this modification is
+    that the use of fixed-point (via V_PARAM_SHIFT) and 64 bit arithmetic
+    is no longer necessary, simplifying the code.
+    
+    Some example test measurements with the patched code (confirming no functional
+    change in the congestion avoidance algorithm) can be seen at:
+    
+    http://www.hamilton.ie/doug/vegaspatch/
+    
+    Signed-off-by: Doug Leith <doug.leith@nuim.ie>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 8c83f80b2d335176f72d8729fe1dfe19c5812cb1
+Author: David S. Miller <davem@davemloft.net>
+Date:   Tue Dec 9 00:10:11 2008 -0800
+
+    sungem: Make PCS PHY support partially work again.
+    
+    As reported by Hermann Lauer, PCS PHY support in the sungem
+    driver simply doesn't work.
+    
+    When the chip is reset due to open, or some other similar operation,
+    the PCS is reset too but we don't program it back into a running
+    state.  The result is no link when the device is brought up.
+    
+    This partially rectifies the situation for the moment, by kicking
+    the PCS after a sungem chip reset so that it will renegotiate and
+    be re-enabled again.
+    
+    The behavior is still a little bit dodgy as the added renegotiate
+    make the link take some time after bringing the interface up,
+    but this is a significant improvement in that things actually work
+    now :-)
+    
+    Based almost entirely upon an initial patch by Hermann.
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>

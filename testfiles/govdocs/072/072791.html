@@ -1,0 +1,698 @@
+<TITLE> mc.doc </TITLE>
+<H1>CHARMM c30a1 mc.doc</H1>
+<PRE>
+
+</PRE><HR><H4><I>File:</I> mc  -=-  <I> Node:</I><A NAME=" Top"> Top</A><BR> <I> Up</I>: (<a href="commands.html"><b>commands.doc</b></a>) -=- <I> Next</I>:<A HREF="# Syntax"> Syntax</A></H4><PRE>
+
+                               Monte Carlo
+
+The Monte Carlo commands in CHARMM have been designed to allow construction 
+and use of an almost arbitrary move set with only a few atom selections.  
+This goal is accomplished by providing a pre-defined set of move types which 
+can be combined to specify the allowed movements of an arbitrary CHARMM 
+molecule.  Speed and flexibility are gained by separating the bookkeeping 
+associated with a move (MOVE subcommands) from the actual application of 
+that move to the molecule (MC).
+
+* Menu:
+
+*<A HREF="# Syntax"> Syntax</A>::              Syntax of MOVE and MC commands
+*<A HREF="# Description"> Description</A>::         Description of MOVE and MC commands
+*<A HREF="# Examples"> Examples</A>::            Examples of MOVE and MC commands
+*<A HREF="# Data Structures"> Data Structures</A>::     Data structures shared by the MOVE and MC commands
+*<A HREF="# Shortcomings"> Shortcomings</A>::        Known problems and limitations
+*<A HREF="# References"> References</A>::          Some references of use
+
+
+</PRE><HR><H4><I>File:</I> mc  -=-  <I> Node:</I><A NAME=" Syntax"> Syntax</A><BR> <I> Up</I>:<A HREF="# Top"> Top</A> -=- <I> Next</I>:<A HREF="# Description"> Description</A> -=- <I> Previous</I>:<A HREF="# Top"> Top</A></H4><PRE>
+             
+                      Syntax for MOVE and MC commands
+
+[Syntax MOVE &lt; ADD | DELEte | EDIT | READ | WRITe | LINK &gt; ]
+
+MOVE ADD  1{ MVTP move-type } nsele{ SELE...END } -
+           [ WEIGht  1.0 ] [ DMAX      1.0 ] [ TFACtor     1.0  ] -
+           [ FEWEr     0 ] [ NLIMit      1 ] [ LABEL move-label ] -
+           [ opt-spec    ] [ mini-spec     ] [ hmc-spec         ]
+
+           where nsele, the number of SELE...END statements, 
+           depends on move-type
+
+move-type (nsele)::= &lt; RTRN rig-unit ( 1 ) |   ! Rigid translations
+                       RROT rig-unit ( 1+) |   ! Rigid rotations
+                       CART          ( 1 ) |   ! Single atom displacements
+                       TORS          ( 2 ) |   ! Simple torsion rotations
+                       CROT [PIMC]   ( 1+) |   ! Concerted torsion rotations
+                       HMC           ( 1 ) |   ! Hybrid Monte Carlo
+                       VOLU rig-unit ( 1 ) &gt;   ! Volume scalings
+
+rig-unit ::= &lt; BYREsidue | BYALl | BYHEavy | BYATom &gt;
+
+opt-spec ::= [ ARMP   -1.0 ] [ ARMA      0.0 ] [ ARMB        0.0 ] -
+             [ DOMCf  -1.0 ] [ ANISotropic 0 ] 
+
+mini-spec::= [ MINI                      &lt; SD (default) | CONJ &gt; ] -
+             [ NSTEps    0 ] [ NPRInt      0 ] [STEP         0.2 ] -
+             [ TOLEner 0.0 ] [ TOLGrad   0.0 ] [TOLStep      0.0 ] -
+             [ INBFrq   -1 ] 
+
+hmc-spec ::= [ NMDSteps  0 ] [ TIMEstep  0.0 ] 
+
+MOVE DELEte &lt; MVINdex move-index | LABEL move-label &gt; -
+
+MOVE EDIT   &lt; MVINdex move-index | LABEL move-label &gt; -
+            [ WEIGht prev  ] [ DMAX        prev ] [ TFACtor prev ] -
+            [ NLIMit  prev ] [ opt-spec         ] [ mini-spec    ] -
+            [ hmc-spec     ]
+
+prev ::= previous value
+
+MOVE WRITE [UNIT -1]
+
+MOVE READ  [UNIT -1] [APPEnd 1]
+
+MOVE LINK  &lt; MVI1 move-index  |  LAB1 move-label &gt; -
+           [ MVI2 move-index ] [ LAB2 move-label ] 
+
+[Syntax MC]
+
+MC [ NSTEps          0 ] [ ISEEd   prev ] [ IACCept   0 ] [ PICK      0 ] -
+   [ TEMPerature 300.0 ] [ PRESsure 0.0 ] [ VOLUme prev ] [ ACECut 0.01 ] -
+   [ INBFrq          0 ] [ IMGFrq     0 ] [ IECHeck   0 ] -
+   [ IUNCrd         -1 ] [ NSAVc      0 ] [ IMULti   -1 ] -
+   [ RESTart           ] [ IUNRead   -1 ] [ IUNWrite -1 ] -
+   [ IARMfrq         0 ] [ IDOMcfrq   0 ] 
+
+
+</PRE><HR><H4><I>File:</I> mc  -=-  <I> Node:</I><A NAME=" Description"> Description</A><BR> <I> Up</I>:<A HREF="# Top"> Top</A> -=- <I> Next</I>:<A HREF="# Examples"> Examples</A> -=- <I> Previous</I>:<A HREF="# Syntax "> Syntax </A></H4><PRE>
+
+                                   MOVE                               
+
+     The MOVE subcommands are associated with construction of the move set.  
+
+     The primary MOVE subcommand is MOVE ADD, which determines all of the 
+locations in a subset of atoms to which a move type can be applied.   For 
+each location (or &quot;move instance&quot;), MOVE ADD also determines the rotation 
+axes and centers, the moving atoms, and the relevant bonded terms.  Thus, 
+each call of MOVE ADD results in a group of move instances of the same move 
+type (the number of instances is stored in the substitution variable ?NMVI).  
+By repeatedly calling the MOVE ADD command, the user can employ several 
+different types of moves in conjunction, which typically yields the most 
+efficient and complete sampling.
+
+     The available pre-defined move types are rigid translations (RTRN), rigid 
+rotations (RROT), single atom displacements (RTRN), rotations of individual 
+torsions (TORS), concerted rotation of seven (or, in the case of a chain end, 
+six) torsions (CROT) to deform the system locally (Dinner, 2000; Dinner, 1999; 
+Go and Scheraga, 1970; Dodd et al., 1993; Leontidis et al., 1994), hybrid 
+Monte Carlo propagations (HMC) (Duane et al., 1987; Mehlig et al., 1992),
+and volume scaling moves for constant pressure simulations (Eppenga and 
+Frenkel, 1984).  Each of these can be applied to an arbitrary subset of atoms 
+using standard CHARMM SELE...END statements.  
+
+     MVTP rig-unit nsele Description
+     ---- -------- ----- -----------
+     RTRN BYALl       1  The entire atom selection is rigidly translated.
+
+     RTRN BYREsidue   1  The residue containing each selected atom is 
+                         rigidly translated.  If more than one atom in 
+                         a residue is selected, each counts as a separate 
+                         move instance.
+
+     RTRN BYHEavy    1   Each heavy atom and its associated hydrogen atoms
+                         are rigidly translated.
+
+     RTRN BYATom     1   Each instance is a displacement of a single atom by
+                         a random vector distributed uniformly in an ellipsoid
+                         (see the description of the ANISotropic keyword).
+                         For historic reasons, the CART keyword is a synonym 
+                         for RTRN BYATom, but use of the former is discouraged 
+                         since the moves are not actually based on Cartesian 
+                         coordinates.
+
+     RROT BYALl     1-2  The entire first atom selection specifies the rigid
+                         body of atoms to be rotated, and each of the atoms in
+                         the second atom selection is an allowed rotation 
+                         center.  The second selection need not be a subset of
+                         the first, so rotations around atoms outside the
+                         rigid body can occur.  If no second atom selection is 
+                         given (or one is given, but no atoms are selected),
+                         the rotations are made around the center of mass of
+                         the first atom selection.
+
+     RROT BYREsidue  1   There is only a single atom selection, and each 
+                         selected atom is a center of rotation (around a 
+                         randomly selected axis) for its residue.  If more
+                         than one atom in a residue is selected, each counts 
+                         as a separate move instance.
+
+     RROT BYHEavy    1   The hydrogens attached to a heavy atom are rigidly
+                         rotated around the heavy atom.  A move instance is
+                         counted for each selected heavy atom with at least 
+                         one hydrogen attached (whether or not the hydrogens 
+                         are selected does not matter).
+
+     TORS            2   The two selections define the middle atoms (JK in
+                         IJKL) of the rotatable torsions.  If the FEWEr keyword
+                         is set to 1, the directionality of the selection will
+                         be ignored and each rotatable bond will be included
+                         only once in the move set (such as to rotate the end
+                         with fewer atoms).  Otherwise, each rotatable bond
+                         will be included either once or twice depending on
+                         whether the atom selections match the bond in only
+                         one direction (JK) or both (JK and KJ).
+                         Only torsions in the PSF are enumerated.
+
+     CROT            1+  The first atom selection defines the &quot;backbone&quot; 
+                         along which the 7 (or in the case of a chain end, 6)
+                         dihedrals lie.  Each additional pair of selections 
+                         defines non-rotatable bonds.  The first bond in a set 
+                         of 6 or 7 is the driver torsion.  Non-rotatable bonds 
+                         are not allowed at the third or fifth bonds following 
+                         the driver (counting only rotatable ones).  Note that 
+                         there is no checking for whether bonds selected to be 
+                         rotatable are indeed so.  NLIMit is the number of 
+                         torsions in addition to the driver torsion that are 
+                         restricted by the maximum rotation (DMAX); only 0 and 
+                         1 are implemented at present.  In general, NLIMit 1 
+                         is recommended since it speeds up the root finding 
+                         process and moves with large changes to the torsions 
+                         are likely to be rejected anyway.  Concerted rotations
+                         of path integral &quot;polymers&quot; require the PIMC keyword.
+
+     HMC              1  The selected atoms are propagated with the specified 
+                         TIMEstep for NMDSteps molecular dynamics steps.  The 
+                         change in total energy is used for the acceptance 
+                         criterion.  SHAKE constraints are respected.  The 
+                         standard fixed atom list is ignored, but note that,
+                         in the present implementation, selections that move 
+                         only small parts of the system will be inefficient.  
+                         The non-bond list update during dynamics is separate 
+                         from that used in MC and is controlled by a common 
+                         variable set by the DYNAmics command.  To suppress
+                         updates of the non-bond list, it is necessary to 
+                         issue a dummy dynamics statement prior to MC:
+                         DYNAmics NSTEps 0 INBFrq 0 NSAVC 0.  If IACCept=2, 
+                         the dynamics take place on a transformed potential
+                         (Andricioaei and Straub, 1996; Andricioaei and Straub,
+                         1997); use of the Tsallis method with HMC requires 
+                         that the TSALLIS keyword be included in pref.dat 
+                         during compilation.
+
+     VOLUme rig-unit  1  Volume scaling moves.  Changes in ln V are selected
+                         uniformly from the allowed range, and the scaling is
+                         around the image center.  The possible rigid units 
+                         are the same as for RTRN and RROT.  If a &quot;mixed&quot;
+                         scaling move is desired (e.g., solvent atoms are
+                         scaled by residue while solute atoms are scaled 
+                         individually), it is necessary to couple two or more
+                         &quot;pure&quot; scaling moves (see MOVE LINK).
+
+     In addition, MOVE ADD associates with each group of move instances a set 
+of parameters.  
+
+     The values of the following parameters are used in all MC calls. 
+
+     WEIGht       The relative weight of that group of move instances in 
+                  the complete move set.  The probability of picking a 
+                  group of move instances with weight w_i is w_i/(sum_j w_j)
+                  where (sum_j w_j) is the total of all the WEIGht values.
+
+     DMAX         The initial maximum displacement of each instance in a 
+                  group.  Translations are in angstroms and rotations are in
+                  degrees.  In cases where anisotropic automatic optimization 
+                  is to be performed, the initial assignment is isotropic.
+
+     TFACtor      A multiplicative factor to scale the TEMPerature in the 
+                  acceptance criterion.  TFACtor is not used in assigning
+                  the initial velocities in HMC moves.
+
+     LABEL        An optional tag for the group of move instances.
+                  Only the first four characters are retained.  All sets of
+                  move instances are also given an integer index which can
+                  be used instead.
+
+     The following optional parameters are associated with automatic 
+optimization of the volumes from which individual move instances are chosen
+(the timestep in HMC moves).  The two available methods are the Acceptance 
+Ratio Method (ARM) and Dynamically Optimized Monte Carlo (DOMC); both are 
+described in detail by Bouzida et al.  (1992).  The latter has the advantage 
+that it allows optimization of anisotropic volumes.
+
+     ARMP         ARM target probability of move instance acceptance.
+
+     ARMA, ARMB   Parameters to avoid taking the logarithm of zero in ARM:
+        
+                  DMAX(new) = DMAX(old)*ln(ARMA*ARMP+ARMB)/ln(ARMA*obsP+ARMB)
+ 
+                  where obsP is the observed probability of accepting that
+                  move instance.  
+     
+     DOMCF        The F factor in DOMC:
+
+                  DMAX(new) = DOMCF*SQRT[(d2ave*TEMP)/Eave]
+ 
+                  where d2ave is the observed average square of the
+                  displacement and Eave is the observed average change in 
+                  energy (both averages are done over all moves, not just those
+                  accepted).  DOMCF is used for the anisotropic version of
+                  this equation as well.   In the event that the square 
+                  root of a negative number must be taken, the routine 
+                  branches to ARM optimization, so ARMA, ARMB, and ARMP 
+                  should be set even if one plans on using DOMC.
+
+     ANISotropic  DOMC anisotropic optimization of the volume from which the 
+                  moves are chosen.  If ANISotropic is 0, it is off (isotropic)
+                  and, if ANISotropic is non-zero, it is on.  At present, 
+                  only 3D translation moves (RTRN and CART) allow anisotropic 
+                  optimization.
+
+     The parameters NSTEps, NPRInt, STEP, TOLEner, TOLGrad, TOLstep, and 
+INBFrq are associated with minimization prior to application of the acceptance 
+criterion (Li and Scheraga, 1987) and have the same meanings as for MINImization
+(see minimiz.doc).  Note that the INBFrq used for minimization (set in MOVE) 
+is distinct from that used for Monte Carlo (set in MC) even though the command-
+line keywords are the same; moreover, INBFrq and NPRInt access common variables
+associated with minimization directly and thus are not stored with the rest of 
+the move set by MOVE WRITE.  During the minimization phase of a move, all atoms
+that have not been constrained with CONS FIX are considered mobile.  At present,
+the minimization algorithms available are steepest descents (SD) and conjugate
+gradients (CONJ); in the case of CONJ, the following parameters are fixed:  
+NCGC = 100, PCUT = 0.9999, and TOLIter = 100.  It is important that the user 
+keep in mind that MC with minimization does not satisfy the detailed balance 
+condition (microscopic reversibility) and thus should be used only for 
+conformational searching, not calculating equilibrium averages.  Minimization
+following HMC moves is not allowed.
+
+     MOVE DELEte allows the user to delete a group of move instances.   The 
+group to be deleted is the first that matches the four-character tag specified 
+by LABEL or the integer specified by MVINdex; if there is a conflict, the 
+LABEL is used.
+
+     MOVE EDIT allows one to change the values of the parameters associated 
+with a group of move instances.   The matching rules are the same as those for 
+MOVE DELEte (as a result, the LABEL parameter itself cannot be changed with 
+MOVE EDIT).  Any parameter not specified retains its current value.  If a 
+positive value is specified for DMAX, all move instances will be reset to 
+that (isotropic) value; if a negative value (default) is specified, the 
+maximum displacements retain their current values.  If DMAX is not specified 
+and the ANISotropic flag changes such that anisotropy is no longer allowed 
+(when it was previously), the maximum displacements are assigned as the 
+geometric mean of the eigenvalues of the matrix used to calculate the allowed 
+ellipsoid from the unit sphere.
+
+    MOVE WRITe writes out the current move set to a formatted file opened
+with OPEN WRITe CARD.
+
+    MOVE READ reads in a move set.  If APPEnd is 0, existing moves
+are eliminated; otherwise they are preserved and the new moves are appended.  
+MOVE ADD calls can follow to expand the move set further.
+
+    MOVE LINK links two existing moves such that they are always performed 
+together before applying the acceptance criterion.  For example, one might
+wish to perform both a rigid body translation and a rigid body rotation of 
+a butane molecule in the same MC step.  The first move group [specified by 
+either its label (LAB1) or index (MVI1)] remains &quot;active&quot;, while the second 
+move group becomes &quot;slaved&quot; to the first.  In other words, a move from the 
+second group can no longer be selected by itself (as a result, only the WEIGht
+parameter of the first move group matters).  At present, move instances within
+the groups are matched by indices, so the two move groups must have the same 
+numbers of instances.  MOVE LINK can be called repeatedly to create a chain 
+of moves.  In the example mentioned above, one might also want to change the 
+central dihedral of the butane molecule in the same MC step.  In the second 
+MOVE LINK call, the second move group from the first call would become the 
+first move group, and the new move group would be the second:
+
+    MOVE LINK LAB1 RTRN LAB2 RROT   !Resulting chain is RTRN-&gt;RROT
+    MOVE LINK LAB1 RROT LAB2 DIHE   !Resulting chain is RTRN-&gt;RROT-&gt;DIHE
+
+Moves can be decoupled (in the reverse order by which they were linked) by 
+specifying only a single move label (LAB1) or index (IND1):
+
+    MOVE LINK LAB1 RROT             !Resulting chain is RTRN-&gt;RROT
+    MOVE LINK LAB1 RTRN             !All moves are treated separately
+
+If minimization before applying the acceptance criterion is desired, it must 
+be associated with the first move group in the chain (RTRN in the example); 
+other minimization parameters will be ignored.  By the same token, only the 
+TFACtor for the first move group will be used.  Linking is not allowed with 
+Hybrid Monte Carlo moves (HMC).  
+
+Please note that the MOVE LINK command is presently under development.  
+Consequently, the syntax might change in future versions.  Moreover, its 
+compatibility with certain other features, such as automatic optimization 
+of the move limits, is not guarranteed.
+
+
+
+                                     MC
+
+
+     The MC command performs the loop over the appropriate number of Monte 
+Carlo steps.  Each step consists of (1) randomly picking a group of move 
+instances (weighted), (2) randomly picking an instance from that group 
+(unweighted), (3) calculating the energetic contribution of the moving 
+atoms and their images, (4) applying the move, (5) calculating the energetic 
+contribution in the new configuration, (6) applying the acceptance criterion, 
+(7) if necessary updating the statistics for automatic optimization of the 
+move limits, and finally (8) performing any desired I/O (at present, only 
+trajectory writing is enabled).
+
+     NSTEps       The number of loop iterations.  Each pick of a single move
+                  instance and subsequent application of the acceptance 
+                  criterion counts.
+
+     ISEEd        The seed for the random number generator.  If it is not
+                  specified, it is unchanged, so that a script can be seeded
+                  once initially and then loop over an MC command and yield
+                  different behavior with each call.
+
+     IACCept      The acceptance criterion to be used.  
+                  If IACCept is 0, Boltzmann (Metropolis) weighting is used.
+                  If IACCept is 1, multicanonical (constant entropy) weighting
+                  is used (in which case TEMPerature is ignored).
+                  If IACCept is 2, Tsallis (generalized) weighting is used.
+
+     TEMPerature  The absolute temperature in degrees Kelvin.
+
+     PRESsure     The pressure in atmospheres.
+
+     VOLUme       The starting volume for constant pressure simulations.
+                  It is only necessary to specify if the images are created
+                  by an IMAGe TRANsformation rather than the CRYStal command.
+
+     EMIN         The estimated minimum energy of the system in Tsallis MC.
+
+     QTSAllis     The Tsallis q parameter (see Andricioaei and Straub, 1997).
+
+     IMULti       The I/O unit for reading in the multicanonical weights.
+                  The file format (subject to change) is:
+
+                       CHARMM title
+                       Emin  Emax   Nbin
+                       i     E_i    ln[n(E_i)]   
+                              .
+                              .
+                              .
+                       Nbin  E_Nbin ln[n(E_Nbin)]
+
+                  Note that MC closes this file, so that it must be reopened
+                  before each MC call with multicanonical weighting.
+
+     INBFrq       The non-bond list update frequency.
+
+                  If INBFrq = 0, the list is not updated.
+                  If INBFrq &lt; 0, a heuristic is applied every -INBFrq steps;  
+                  the list is updated if any atom during a checking step moved 
+                  more than 0.5*(CUTNB - CTOFNB). 
+
+                  Note that a call to ENERgy or UPDAte must be made before 
+                  MC to initialize parameters for non-bond list generation.
+
+     IMGFrq       The image list update frequency.  
+
+                  An image update will force a non-bond list update.  
+                  If IMGFrq = 0, the list is not updated.
+                  If IMGFrq &lt; 0, the list is updated if a heuristic non-bond
+                  list update is done; this option should be used only if
+                  INBFrq is also negative.
+
+     IECHeck      The total energy check frequency.
+                  If IECHeck = 0, the energy is not checked.
+                  If IECHeck &lt; 0, the energy is checked if a heuristic non-bond
+                  list update is done; this option should be used only if
+                  INBFrq is also negative.
+
+                  The difference between the MC running total and the current
+                  total is printed in the Delta-E column of the table.  
+
+     IUNCrd       The I/O unit for trajectory writing.
+
+     RESTart      If present, this keyword indicates that the run is a restart.
+
+     IUNRead      The I/O unit from which to read  the restart information.
+
+     IUNWrite     The I/O unit to   which to write the restart information.
+
+     NSAVc        The frequency of writing out the trajectory.
+                  If NSAVc is 0, no coordinates are written.
+
+     IARMfrq      The frequency of updating the move size by ARM.   Note that
+                  this counter runs separately for each move instance.
+                  If IARMfrq is 0, the move size is not updated.
+
+     IDOMcfrq     The frequency of updating the move size by DOMC.  Note that
+                  this counter runs separately for each move instance.
+                  If IDOMcfrq is 0, the move size is not updated.
+
+                  If both IARMfrq and IDOMcfrq are non-zero, IARMfrq takes 
+                  priority.
+
+     PICK         Flag for method of selecting moves from the move set:
+                       0 = Random move group and random instance (default)
+                       1 = Try each move group and instance sequentially
+                       2 = Random move group but sequential instances within 
+                           a group
+                  At present, the PICK flag is considered to be an unsupported
+                  feature and may be changed without backwards compatibility in
+                  future versions.  
+
+     The parameter ACECut allows approximation of the ACE screening energy 
+term to accelerate MC simulations which employ the ACE/ACS solvation model.  
+In calculating the total screening energy, as in molecular dynamics, one 
+performs two summations:  the first determines the Born radii (b_i) and self 
+energies of the atoms and the second determines the screening energy given 
+the Born radii.  In MC, this scheme becomes inefficient.  One typically moves 
+only a small part of the system in each step, but one must update all the 
+pairwise interactions (between atoms i and j) in which b_i, b_j, or both 
+change (even if the distance between i and j remains the same).  In CHARMM, 
+this problem is overcome by neglecting the contribution to the change in 
+screening energy from atom pairs in which both S_i and S_j are less than 
+ACECut, where S_i = Sum_k.ne.i [E_ik^self/(tau*q_i^2)] (see equations 22, 28, 
+and 31 of Schaefer and Karplus, 1996).  For peptides, a choice of ACECut = 
+0.01/Angstrom has been found to yield close to the maximum increase in speed
+with errors of less than 0.001 kcal/mol/step.  Note that HMC moves and moves 
+involving minimization employ the standard ACE energy routines and thus 
+calculate the ACE energy exactly.
+
+
+</PRE><HR><H4><I>File:</I> mc  -=-  <I> Node:</I><A NAME=" Examples"> Examples</A><BR> <I> Up</I>:<A HREF="# Top"> Top</A> -=- <I> Next</I>:<A HREF="# Data Structures"> Data Structures</A> -=- <I> Previous</I>:<A HREF="# Description"> Description</A></H4><PRE>
+
+                                 EXAMPLE
+
+     No special actions must be taken during PSF generation to run an MC 
+simulation.  Essentially, input files set up for dynamics can be turned into 
+MC input files by replacing the DYNAmics call with a series of MOVE ADD calls 
+(or a MOVE READ call) followed by a MC call.  For example, to simulate a 
+peptide in water, one could add to the CHARMM script:
+
+           .
+           .
+           .
+      
+     ! Standard PSF generation above
+
+     ! Create the MC move set
+     ! Allow waters to move by rigid translations and rotations.
+     ! Allow anisotropic optimization of the volume from which the 
+     !     translation vectors are chosen.
+     MOVE ADD MVTP RTRN BYREsidue WEIGht 2.0 DMAX 0.10 SELE (TYPE OH2) END -
+              ARMP 0.2 ARMA 0.8 ARMB 0.1 DOMCF 2.0 ANISo 1
+     MOVE ADD MVTP RROT BYREsidue WEIGht 2.0 DMAX 30.0 SELE (TYPE OH2) END -
+              ARMP 0.2 ARMA 0.8 ARMB 0.1 DOMCF 2.0 ANISo 0
+     ! Allow all torsions to move by simple rotations
+     MOVE ADD MVTP TORS WEIGht 0.1 DMAX 30.0 FEWEr 1 -
+              SELE ALL END SELE ALL END 
+     ! Allow the backbone to move by concerted rotations with non-rotatable
+     ! peptide bonds and N-CA proline bonds.  If disulfides are present, the 
+     ! cysteine phi and psi should be restricted too.
+     MOVE ADD MVTP CROT WEIGht 0.5 DMAX 10.0 NLIMit 1 LABEL PEPTide -
+              SELE ((TYPE N).OR.(TYPE CA).OR.(TYPE C)) END -
+              SELE (TYPE C) END  SELE (TYPE N) END -
+              SELE (RESNAME PRO .AND. TYPE CA) END -
+              SELE (RESNAME PRO .AND. TYPE  N) END 
+
+     ! Seed the generator (for this example, this could be done below)
+     MC ISEEd 391004
+
+     OPEN WRITE UNFOrmatted UNIT 32 NAME example.trj
+     ! Do 20000 steps at 300 K, writing energy 100 steps. 
+     ! Update the non-bonded list every 200 and 
+     !     the maximum displacements every 5 picks of that move instance
+     MC IACCept 0 NSTEp 20000 TEMP 300 -
+        INBFrq 200 IECHeck 400 IMGFrq 400 IDOMcfrq 10 -
+        IUNC 32 NSAVc 100
+
+     In this example, there are four groups of move instances (one for 
+each MOVE ADD call).  
+
+     It should be mentioned that it is also possible to use moves in MC 
+apart from those which can be generated by MOVE ADD since the MOVE READ 
+command does not do any checking as it reads in the necessary move set 
+information.  For example, it is straightforward to make rigid rotations 
+around a pseudo-dihedral simply by changing the pivot and moving atom lists
+of a dihedral rotation.  An understanding of the following section 
+(Data Structures) will aid in manual move creation.
+
+
+
+</PRE><HR><H4><I>File:</I> mc  -=-  <I> Node:</I><A NAME=" Data Structures"> Data Structures</A><BR> <I> Up</I>:<A HREF="# Top"> Top</A> -=- <I> Next</I>:<A HREF="# Shortcomings"> Shortcomings</A> -=- <I> Previous</I>:<A HREF="# Examples"> Examples</A></H4><PRE>
+
+                                Data Structures
+
+     MOVE ADD establishes each of the following pointers for all move types.
+Each is a pointer to a dynamically allocated array that is n-instance elements
+long, where n-instance is equal to the number of move instances in that group.
+In all cases, if the array does not apply to a particular move, it is not
+allocated.
+     
+     MDXP       This array contains the information about the limits of the
+                move.  For isotropic or one-dimensional moves, it is simply
+                an n-instance-long array of REAL*8 elements containing the 
+                maximum displacement.  If the displacements are to be drawn 
+                from an anisotropic volume, the array is a list of pointers, 
+                each of which points to an array of 9 REAL*8 elements which
+                make up the matrix that transforms the unit sphere into the 
+                appropriate ellipsoid.
+
+     IBLSTP     A list of n-instance pointers, each of which points to
+                the list of bonded terms changing under that move instance.  
+                For each element in the four-element array QBND (bonds=1, 
+                angles=2, dihedrals=3, impropers=4) that is true, there is 
+                an element listing the index of the final element containing
+                indices of that bonded term type followed by the list of 
+                terms themselves.  This list is then followed by a similar 
+                one for the next bonded term type with QBND(i) set to true.  
+
+                For example, if bonds 3, 8, and 10 and angles 16 and 17 
+                were changing, the QBND array would contain (T T F F) and the 
+                list would contain (4 3 8 10 7 16 17).
+
+                Urey-Bradley terms are handled with the lists generated for
+                angle terms, so do not get their own entries.
+
+     IPIVTP     This array keeps track of any pivot or special atoms.
+                If there is only one pivot atom, then it is stored in the
+                array.  If there are multiple (e.g., 2 for a TORS move
+                and 14 for a CROT move), the list stores a pointer to 
+                a list containing the pivot atoms.
+
+     IMVNGP     This array contains a compact list of the moving atoms.
+                Each element contains a pointer to a list of the following
+                form.  The first element in the list is 1 more than the 
+                number of rigid groups (NG).  Elements 2 to NG contain the
+                index of the last array element with information about that
+                rigid group.  The atoms in a rigid group are stored as 
+                the first and last atoms in a contiguous range of atom indices.
+
+
+</PRE><HR><H4><I>File:</I> mc  -=-  <I> Node:</I><A NAME=" Shortcomings"> Shortcomings</A><BR> <I> Up</I>:<A HREF="# Top"> Top</A> -=- <I> Next</I>:<A HREF="# References"> References</A> -=- <I> Previous</I>:<A HREF="# Data Structures"> Data Structures</A></H4><PRE>
+
+                                Shortcomings
+
+     In the interest of computational efficiency, Monte Carlo calls specific
+energy routines directly, rather than through the main ENERGY routine.  As a
+result, not all energy terms are supported.  Those that are supported are
+bonds, angles, Urey-Bradley, dihedrals, impropers, vdw, electrostatic, 
+image vdw, image electrostatic, QM/MM (MOPAC only), path integral, asp-EEF1, 
+asp-ACE/ACS, NOE constraints, and user.  All non-bonded calculations can be 
+either atom- or group-based.  Terms not listed above are not included in the 
+present implementation.
+
+     No warnings are printed for attempts to move a bonded (or patched)
+residue by rigid translation and rotation.
+
+     Attempts to move cross-linked residues will break MOVE ADD if 
+MVTP is CROT.  If there is a large drift in the bond energies when
+bonds lengths and angles are fixed, it is probably because a non-rotatable
+bond (for example, the N-CA bond in proline) is being rotated by CROT.
+Someday, a flag might be provided to choose between automatic elimination 
+of such moves and CROT-type relaxation of the cross-link (correct Jacobian 
+weighting is necessary to meet the detailed balance condition in the latter),
+but such a flag is not on the immediate agenda of the MC developer.
+
+
+</PRE><HR><H4><I>File:</I> mc  -=-  <I> Node:</I><A NAME=" References"> References</A><BR> <I> Up</I>:<A HREF="# Top"> Top</A> -=- <I> Previous</I>:<A HREF="# Shortcomings"> Shortcomings</A></H4><PRE>
+
+
+                                REFERENCES
+
+All studies that employ the MOVE and MC commands should reference:
+
+Dinner, A. R. (1999) Monte Carlo Simulations of Protein Folding.  
+     Ph.D. Thesis (Harvard University, Cambridge, MA).
+
+The following references may also be of interest:
+
+Andricioaei, I. and Straub, J. (1997) On Monte Carlo and molecular dynamics
+     methods inspired by Tsallis statistics:  Methodology, optimization, and
+     application to atomic clusters.  J. Chem. Phys. 107, 9117-9124.
+
+Andricioaei, I. and Straub, J. (1996) Generalized simulated annealing
+     algorithms using Tsallis statistics:  Application to conformational 
+     optimization of a tetrapeptide.  Phys. Rev. E 53, R3055-R3058.
+
+Berg, B. A. and Neuhaus, T. (1992) Multicanonical ensemble:  A new approach 
+     to simulate first-order phase transitions.  Phys. Rev. Lett. 68, 9-12.
+
+Bouzida, D., Kumar, S. and Swendsen, R. H. (1992) Efficient Monte Carlo
+     methods for the computer simulation of biological molecules.  
+     Phys. Rev. A 45, 8894-8901.
+
+Dinner, A. R. (2000) Local deformations of polymers with nonplanar rigid 
+     main chain internal coordinates.  J. Comp. Chem., in press.
+
+Dodd, L. R., Boone, T. D. and Theodorou, D. N. (1993) A concerted 
+     rotation algorithm for atomistic Monte Carlo simulation of polymer 
+     melts and glasses.  Mol. Phys. 78, 961-996.
+
+Duane, S., Kennedy, A. D., Pendleton, B. J. and Roweth, D. (1987) Hybrid 
+     Monte Carlo.  Phys. Lett. B 195, 216-222.
+
+Eppenga, R. and Frenkel, D. (1984) Monte Carlo study of the isotropic and
+     nematic phases of infinitely thin hard platelets.  Mol. Phys. 52, 
+     1303-1334.
+
+Go, N. and Scheraga, H. A. (1970) Ring closure and local conformational
+     deformations of chain molecules.  Macromolecules 3, 178-187.
+
+Leontidis, E., de Pablo, J. J., Laso, M. and Suter, U. W. (1994)
+     A critical evaluation of novel algorithms for the off-lattice Monte Carlo 
+     simulation of condensed polymer phases.  Adv. Polymer Sci. 116, 285-318.
+
+Lee, J. (1993) New Monte Carlo algorithm:  Entropic sampling.  
+     Phys. Rev. Lett. 71, 211-214.
+
+Li, Z. and Scheraga, H. A. (1987) Monte Carlo-minimization approach to the 
+     multiple-minima problem in protein folding.  Proc. Natl. Acad. Sci. USA
+     84, 6611-6615.
+
+Mehlig, B., Heermann, D. W. and Forrest, B. M. (1992) Hybrid Monte Carlo 
+     method for condensed-matter systems.  Phys. Rev. B 45, 679-685.
+
+Metropolis, N., Rosenbluth, A. W., Rosenbluth, M. N., Teller, A. H. and
+     Teller, E. (1953) Equation of state calculations by fast computing
+     machines.  J. Chem. Phys. 21, 1087-1092.
+
+Okamoto, Y. and Hansmann, U. H. E. (1995) Thermodynamics of helix-coil 
+     transitions studied by multicanonical algorithms.  J. Phys. Chem. 99,
+     11276-11287.
+
+Schaefer, M. and Karplus, M. (1996) A comprehensive analytical treatment of
+     continuum electrostatics.  J. Phys. Chem. 100, 1578-1599.
+
+Tsallis, C. (1988) Possible generalization of Bolzmann-Gibbs statistics.
+     J. Stat. Phys. 52, 479-487.
+</PRE>
+<HR>
+<CENTER>
+<H4>
+<A HREF="http://www.lobos.nih.gov/"> NHLBI/LBC Computational Biophysics</A><BR>
+
+</H4>
+<P>
+<ADDRESS>
+CHARMM Documentation / <A HREF="mailto:Rick_Venable@nih.gov"> Rick_Venable@nih.gov </A>
+</ADDRESS>
+<P>
+<HR>

@@ -1,0 +1,96 @@
+
+pro sb_imbcub,cdw,pbcub,cds,pfarr,renew_all=renew,update_only=updat, $
+              autoscale=auto
+
+;+
+; $Id$
+;
+; Project : STEREO SECCHI
+;
+; Name    : sb_imbcub
+;
+; Purpose : creates or updates the image byte cube that is the basis for
+;           the image overlay in one window of go_secchi.  Uses various
+;           parameters in common block sb_com
+;
+; Use     : 3 options:
+;           1. calculate bcub from scratch (default if only cdw,bcub given):
+;           IDL> sb_imbcub,cdw,pbcub,cds,pfarr,/renew_all
+;                sb_imbcub,cdw,pbcub
+;           2. renew only current data set bcub[*,*,cds], farr optional
+;                sb_imbcub,cdw,pbcub,cds
+;                sb_imbcub,cdw,pbcub,cds,pfarr             
+;           3. use farr as input to update bcub[*,*,cds]
+;                sb_imbcub,cdw,pbcub,cds,pfarr,/update_only
+; Inputs  :
+;    cdw = display number (between 0 and 3, depending on setup in sb_initcom)
+;    cds = dataset number (optional, but required to create farr)
+; Outputs :
+;    pbcub = pointer to bytarr(nx[0],nx[1],maxds), cube of byte scaled images
+;    pfarr = pointer to fltarr(nx[0],nx[1]), float image of dataset cds
+;            Note: is input in case of /update_only!
+; Keywords:
+;           /renew_all  : recalculate bcub (and farrfarr, if present)
+;                         renew_all is default if cds and farr are not present
+;           /update_only : update bcub[*,*,cds], using farr as input
+;           /autoscale : autoscale byte image to min/max values and update
+;                        scaling parameters in common block accordingly
+;                        (usually in combination with /update_only)
+; Common  : sb_com
+;
+; Restrictions:
+;    No error checking is done.  It is assumed that bcub a farr are correct
+;    unless they are to be renewed.  It is also assumed that cdw,cds are in
+;    range.
+;
+; Side effects:
+;
+; Category    : Image processing
+;
+; Prev. Hist. :
+;
+; Written     : Jean-Pierre Wuelser, LMSAL, 3-Oct-2006
+;
+; $Log$
+;-
+
+common sb_com
+
+ss = ptr_valid(cdss[*,cdw].ptrds)
+
+if keyword_set(updat) eq 0 then begin
+
+  ; prepare for looping through datasets
+  disp = cimd[cdw].disp
+  maxds = n_elements(ss)
+  if n_params() le 2 or keyword_set(renew) then begin  ; renew
+    if ptr_valid(pbcub) eq 0 then pbcub=ptr_new(-1)    ; create ptr if needed
+    *pbcub = bytarr(disp.naxis[0],disp.naxis[1],maxds) ; create byte cube
+    i0 = 0
+    i1 = maxds-1
+  endif else begin                                     ; just cds
+    if ss[cds] eq 0 then (*pbcub)[*,*,cds] = 0B        ; if data undef: clear
+    i0 = cds
+    i1 = cds
+  endelse
+
+  ; loop through dataset(s) that are defined (if not renew: only 1 dataset)
+  for i=i0,i1 do if ss[i] gt 0 then begin
+     col = cimd[cdw].col[i]
+     d = sb_getimagecom(cdw,i)
+     if i eq cds and n_params() eq 4 then begin
+        if ptr_valid(pfarr) eq 0 then pfarr=ptr_new(-1)
+        *pfarr=d
+     endif
+     (*pbcub)[0,0,i] = sb_bytscl(d,col,autoscale=auto)
+  endif
+
+endif else if n_params() eq 4 then begin       ; /update_only
+  if ss[cds] gt 0 then begin
+     col = cimd[cdw].col[cds]
+     (*pbcub)[0,0,cds] = sb_bytscl(*pfarr,col,autoscale=auto)
+     if keyword_set(auto) then cimd[cdw].col[cds]=col    ; copy min/max back
+  endif else (*pbcub)[*,*,cds] = 0B
+endif
+
+end

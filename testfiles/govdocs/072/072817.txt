@@ -1,0 +1,356 @@
+;compute flow maps for the TRACE 7 day series
+ ;try several ways, first just the set of rigidly aligned wl images, no lat/long mapping
+ulib, getenv('ANA_WLIB') + '/'
+ ;============================================================================
+func zdsgridsubciter3(m1,m2,z1,z2,n,nwin,ngwin)
+ ;modified from dsgridsubciter3, this checks cells for zero's to avoid
+ ;"over the edge" problems with some long data sets
+ ;actually doesn't do the dsgrid pre-pass yet so ignore next 4 lines
+ ;also checks for
+ ;large shifts using a pre-pass with the old dsgrid, it is intended to
+ ;be suspicious of large shifts and verifies them, not sure how well this
+ ;will work yet
+
+ ;this version does support gaussian apodization
+ ;currently only intended for small shifts of less than one image pixel
+ narg=!narg
+ nx=dimen(m1,0)
+ ny=dimen(m1,1)
+ ;defaults for nwin and ngwin
+ if narg lt 7 then ngw=fix(2.*(nx)/n)  else ngw=ngwin
+ if narg lt 6 then nw=fix(1.25*ngw)       else nw=nwin
+ nxg=n
+ nyg=rfix(float(n)*ny/nx)
+ ;;ty,'nxg, nyg =',nxg,nyg
+ ;note the wx calculation should be FP, 3/18/89
+ wx=float(nx)/nxg
+ wy=float(ny)/nyg
+ ;this is supposed to compute the grid the same way as Stu's programs
+ gx=indgen(fltarr(nxg,nyg),0)*wx+wx/2.-1
+ gy=indgen(fltarr(nxg,nyg),1)*wy+wy/2.-1
+ dx=nw
+ dy=nw
+ ;for the iterative version, add a border to allow for shifts (these get
+ ;removed, only needed for shifting the edges properly, does affect center of
+ ;edge cells however)
+ dx = dx +2
+ dy = dy +2
+ ;;ty,'dx, dy =', dx, dy
+ gwid=ngw
+ ;;ty,'gwid, nw =', gwid, nw
+ ;ty,'gx,gy,dx,dy,gwid =', gx,gy,dx,dy,gwid
+ grid = fltarr(2, nxg, nyg)
+ ;make a gaussian mask array, note it uses nw, not dx
+ gaussx = gauss( (indgen(fltarr(nw))- (nw-1)/2.)/gwid )
+ gaussy = gaussx
+ redim, gaussx, nw, 1
+ redim, gaussy, 1, nw
+ mask = doub(gaussx * gaussy)
+ ;for the shiftc version, we use the mask at the cell centers, so it is dx-1
+ mask = mask(1:*,*)+mask(0:(nw-2),*)
+ mask = mask(*,1:*)+mask(*,0:(nw-2))
+ mask = mask/max(mask)	;normalization not needed actually
+
+ #badconvergence = 0
+ #badmerit = 0
+ for j=0,nyg-1 do {
+ for i=0,nxg-1 do {
+ ix=gx(i,j)	iy=gy(i,j)
+ ix=fix(ix)	iy=fix(iy)
+ i1=ix-dx/2	i2=i1+dx-1
+ j1=iy-dy/2	j2=j1+dy-1
+ gi1=0	gj1=0	gi2=dx-4	gj2=dy-4
+ if i1 lt 0 then { gi1 = -i1	i1=0 }
+ if i2 ge nx then { gi2=dx-5-i2+nx	i2=nx-1 }
+ if j1 lt 0 then { gj1=-j1	j1=0 }
+ if j2 ge ny then { gj2=dy-5-j2+ny	j2=ny-1 }
+ ;also make sure the widths and heights are even
+ ;iq=i2-i1+1  if iq%2 ne 0 then { i2=i2-1 }
+ ;iq=j2-j1+1  if iq%2 ne 0 then { j2=j2-1 }
+ ;if (i2-i1+1)%2 ne 0 then ty,'i,j,i1,i2,j1,j2',i,j,i1,i2,j1,j2
+ ;if (j2-j1+1)%2 ne 0 then ty,'i,j,i1,i2,j1,j2',i,j,i1,i2,j1,j2
+ s1=doub(m1(i1:i2,j1:j2)
+ s2=doub(m2(i1:i2,j1:j2)
+ r1 = z1(i1:i2,j1:j2)
+ r2 = z2(i1:i2,j1:j2)
+ ;if any pixels are zero, we assume a bad cell, usually over the edge
+ ;in an aligned series. Because we might be filtering (unsharp mask common)
+ ;we have to have the original arrays in z1 and z2 for zero testing
+ if min(r1) gt 0.0 and min(r2) gt 0.0 then {
+   msk2 = mask(gi1:gi2, gj1:gj2)
+   if dimen(msk2,0) ne (dimen(s1,0)-3) then {
+    ty,'problem - i,j,i1,i2,gi1,gi2,gj1,gj2='
+    ty,i,j,i1,i2,gi1,gi2,gj1,gj2
+    }
+   if dimen(msk2,1) ne (dimen(s1,1)-3) then {
+    ty,'problem - i,j,j1,j2,gi1,gi2,gj1,gj2='
+    ty,i,j,j1,j2,gi1,gi2,gj1,gj2
+    }
+   subpixelcellciter3, s1, s2, ux, uy, msk2
+ } else {
+   ;bad cells get 0's
+   ;;ty,'bad cell at', i, j
+   ux = 0.0   uy = 0.0
+ }
+ grid(0, i, j)  = ux	grid(1, i, j) = uy
+ } }
+ ty,'# of cells with bicubic convergence problems =', #badconvergence
+ ty,'# of cells with merit problems =', #badmerit
+ return, grid
+ endfunc
+ ;=======================================================================
+func safegrid(m1,m2,z1,z2,n,nwin,ngwin)
+ ;modified from dsgridsubciter3, this checks cells for zero's to avoid
+ ;"over the edge" problems with some long data sets
+ ;large shifts using a pre-pass with the old dsgrid, it is intended to
+ ;be suspicious of large shifts and verifies them, not sure how well this
+ ;will work yet
+
+ ;this version does support gaussian apodization
+ ;currently only intended for small shifts of less than one image pixel
+ narg=!narg
+ nx=dimen(m1,0)
+ ny=dimen(m1,1)
+ if narg lt 7 then ngw=fix(2.*(nx)/n)  else ngw=ngwin
+ if narg lt 6 then nw=fix(1.25*ngw)       else nw=nwin
+ nxg=n
+ nyg=rfix(float(n)*ny/nx)
+ ty,'nxg, nyg =',nxg,nyg
+ ;note the wx calculation should be FP, 3/18/89
+ wx=float(nx)/nxg
+ wy=float(ny)/nyg
+ ;this is supposed to compute the grid the same way as Stu's programs
+ gx=indgen(fltarr(nxg,nyg),0)*wx+wx/2.-1
+ gy=indgen(fltarr(nxg,nyg),1)*wy+wy/2.-1
+ dx=nw
+ dy=nw
+ ;get a gridmatch result to move to nearest integer pixel
+ !bad_value = 0
+ !bad_cell_flag = 1
+ dd = gridmatch(m1,m2,gx,gy,dx,dy,ngw)
+ ty,'# of cells with zeros =', !nbad_cells
+ ddi = rint(dd)
+ 
+ ;for the iterative version, add a border to allow for shifts (these get
+ ;removed, only needed for shifting the edges properly, does affect center of
+ ;edge cells however)
+ dx = dx +2
+ dy = dy +2
+ ty,'dx, dy =', dx, dy
+ gwid=ngw
+ ty,'gwid, nw =', gwid, nw
+ ;ty,'gx,gy,dx,dy,gwid =', gx,gy,dx,dy,gwid
+ grid = fltarr(2, nxg, nyg)
+ ;make a gaussian mask array, note it uses nw, not dx
+ gaussx = gauss( (indgen(fltarr(nw))- (nw-1)/2.)/gwid )
+ gaussy = gaussx
+ redim, gaussx, nw, 1
+ redim, gaussy, 1, nw
+ mask = doub(gaussx * gaussy)
+ ;for the shiftc version, we use the mask at the cell centers, so it is dx-1
+ mask = mask(1:*,*)+mask(0:(nw-2),*)
+ mask = mask(*,1:*)+mask(*,0:(nw-2))
+ mask = mask/max(mask)	;normalization not needed actually
+
+ #badconvergence = 0
+ #badmerit = 0
+ for j=0,nyg-1 do {
+ for i=0,nxg-1 do {
+ ix=gx(i,j)	iy=gy(i,j)
+ ix=fix(ix)	iy=fix(iy)
+ i1=ix-dx/2	i2=i1+dx-1
+ j1=iy-dy/2	j2=j1+dy-1
+ gi1=0	gj1=0	gi2=dx-4	gj2=dy-4
+ if i1 lt 0 then { gi1 = -i1	i1=0 }
+ if i2 ge nx then { gi2=dx-5-i2+nx	i2=nx-1 }
+ if j1 lt 0 then { gj1=-j1	j1=0 }
+ if j2 ge ny then { gj2=dy-5-j2+ny	j2=ny-1 }
+ ;the second image will have the dsgrid results applied, this complicates things
+ i1s = i1 + ddi(0,i,j)
+ if i1s lt 0 then { i1=i1-ils   gi1=gi1-ils  ils=0 }
+ i2s = i2 + ddi(0,i,j)
+ if i2s ge nx then { gi2=gi2-ddi(0,i,j)	i2=i2-ddi(0,i,j)  i2s=nx-1 }
+ j1s = j1 + ddi(1,i,j)
+ if j1s lt 0 then { j1=j1-j1s   gj1=gj1-j1s  j1s=0 }
+ j2s = j2 + ddi(1,i,j)
+ if j2s ge ny then { gj2=gj2-ddi(1,i,j)	j2=j2-ddi(1,i,j)  j2s=ny-1 }
+ ;also make sure the widths and heights are even
+ iq=i2-i1+1  if iq%2 ne 0 then { i2=i2-1 gi2=gi2-1 }
+ iq=j2-j1+1  if iq%2 ne 0 then { j2=j2-1 gj2=gj2-1 }
+ ;if (i2-i1+1)%2 ne 0 then ty,'i,j,i1,i2,j1,j2',i,j,i1,i2,j1,j2
+ ;if (j2-j1+1)%2 ne 0 then ty,'i,j,i1,i2,j1,j2',i,j,i1,i2,j1,j2
+ s1=doub(m1(i1:i2,j1:j2)
+ s2=doub(m2(i1s:i2s,j1s:j2s)
+ r1 = z1(i1:i2,j1:j2)
+ r2 = z2(i1s:i2s,j1s:j2s)
+ ;if any pixels are zero, we assume a bad cell, usually over the edge
+ ;in an aligned series. Because we might be filtering (unsharp mask common)
+ ;we have to have the original arrays in z1 and z2 for zero testing
+ if min(r1) gt 0.0 and min(r2) gt 0.0 then {
+   msk2 = mask(gi1:gi2, gj1:gj2)
+   if dimen(msk2,0) ne (dimen(s1,0)-3) then {
+    ty,'problem - i,j,i1,i2,gi1,gi2,gj1,gj2='
+    ty,i,j,i1,i2,gi1,gi2,gj1,gj2
+    }
+   if dimen(msk2,1) ne (dimen(s1,1)-3) then {
+    ty,'problem - i,j,j1,j2,gi1,gi2,gj1,gj2='
+    ty,i,j,j1,j2,gi1,gi2,gj1,gj2
+    }
+   subpixelcellciter3, s1, s2, ux, uy, msk2
+ } else {
+   ;bad cells get 0's
+   ty,'bad cell at', i, j
+   ux = 0.0   uy = 0.0
+ }
+ grid(0, i, j)  = ux	grid(1, i, j) = uy
+ } }
+ ty,'# of cells with bicubic convergence problems =', #badconvergence
+ ty,'# of cells with merit problems =', #badmerit
+ ;add in the ddi result for the final answer
+ grid = grid + ddi
+ return, grid
+ endfunc
+ ;=======================================================================
+subr subpixelcellciter3(s1b, s2b, xoff, yoff, mask)
+ ;this version uses a faster bicubic shift routine
+ nx = dimen(s1b,0)	ny = dimen(s1b,1)
+ ;need to remove border on s1b
+ s1 = s1b(1:(nx-2), 1:(ny-2))
+ dxa = 0.0	dya = 0.0
+ cc = s2b
+ limit = 20
+ ic = 0
+ lastmerit = -1
+ while (1) {
+ s2 = cc(1:(nx-2), 1:(ny-2))
+ subshiftc,s1,s2,dx,dy,mask
+ if lastmerit ge 0 then {
+ ;check the merit situation
+ if !meritc ge lastmerit {
+ 	;this means we may be getting worse
+	;ty,'merit degrading at ic =', ic
+	#badmerit += 1
+	break
+	}
+ }
+ lastmerit = !meritc
+ dxa += dx	dya += dy
+ ;ty,'dx, dy, dxa, dya', dx, dy, dxa, dya
+ if abs(dx) lt 1.e-3 and abs(dy) lt 1.e-3) then break
+ ic += 1
+ if ic gt limit or abs(dxa) gt 1.0 or abs(dya) gt 1.0 then {
+     #badconvergence += 1  xoff = 0  yoff = 0
+     ;type,'convergence problem'     
+     return }
+ ;still going, make a shifted version for next iteration
+ cc = shift3(s2b, dxa, dya)
+ }
+ xoff = dxa	yoff = dya
+ endsubr 
+ ;============================================================================
+func dsmethod(type, m1, m3, z1, z3, ngx)
+ ;just a way to allow the type to be specified
+ ;0 = old LCT, 1 = linear interpolation in 4 cells,
+ ;2 = central linear interpolation, 3 = optical flux,
+ ;4 = (2) with bi-cubic iteration, 5 = (3)  with bi-cubic iteration
+ ;5/28/97 added 6, the iteration with a merit check
+ ncase type
+  return, dsgrid(m1, m3, ngx)
+  return, dsgridsub(m1, m3, ngx)
+  return, dsgridsubc(m1, m3, ngx)
+  return, dsfluxgridmask(m1, m3, ngx)
+  return, dsgridsubciter2(m1, m3, ngx)
+  return, dsfluxgriditer(m1, m3, ngx)
+  return, zdsgridsubciter3(m1, m3, z1, z3, ngx)
+ endcase
+ endfunc
+ ;=======================================================================
+func readin(name, k, tai, z)
+ ;for derived TRACE data
+ ;return tai
+ dataread,m3,fns(name,k),h
+ ;try to fix the radiation damaged ones
+ ;(this helps quite a bit)
+ mq = mean(sieve(m3, m3 gt 10))  ;don't use over the edge values
+ in = sieve(m3 gt 1.2*mq)
+ if isarray(in) then m3(in) = mq
+ tai = $data_time_tai
+ if #cutout eq 1 then { z = m3(#i1:#i2, #j1:#j2) } else switch, z, m3
+ ;11/2/96 added unsharp option
+ if #unsharp_flag eq 1 then  ms = z - gsmooth2(z, 2) else ms = z
+ if k%10 then tv,ft(ms),0,0,0
+ return, ms
+ endfunc
+ ;=================================================================
+block test
+ ;read in the 2 test inages
+ fzread, x0, '/Users/shine/lp/stretchtest0.fz'
+ fzread, x1, '/Users/shine/lp/stretchtest1.fz'
+ debug = 1
+ ;first look at the dsgrid result
+ z0 = x0
+ z1 = x1
+ t1 = !systime
+ dd0 = dsgrid(x0,x1,16)
+ t2 = !systime
+ ty,'dsgrid, time =', t2 - t1
+
+ t1 = !systime
+ dd6 = safegrid(x0,x1,x0,x1,16)
+ t2 = !systime
+ ty,'safegrid, time =', t2 - t1
+
+ vg = [8,16,16,16]
+ clips = [7,3,2,0]
+ t1 = !systime
+ dd1 = dsgridnest(x0,x1,vg,clips)
+ t2 = !systime
+ ty,'dsgridnest 4 levels, time =', t2 - t1
+
+ vg = [8,16,16,16,16,16]
+ clips = [7,3,2,0,0,0]
+ t1 = !systime
+ dd2 = dsgridnest(x0,x1,vg,clips)
+ t2 = !systime
+ ty,'dsgridnest 6 levels, time =', t2 - t1
+ 
+ vg = [8,16,16,16,16,16,16,16,16,16]
+ clips = [7,3,2,0,0,0,0,0,0,0]
+ t1 = !systime
+ dd3 = dsgridnest(x0,x1,vg,clips)
+ t2 = !systime
+ ty,'dsgridnest 10 levels, time =', t2 - t1
+
+ vg = [8,16,16,16,16,16]
+ clips = [7,3,2,0,0,0]
+ t1 = !systime
+ dd4 = zdsgridnest(x0,x1,x0,x1,vg,clips)
+ t2 = !systime
+ ty,'zdsgridnest 6 levels, time =', t2 - t1
+ 
+ vg = [8,16,16,16,16,16,16,16,16,16]
+ clips = [7,3,2,0,0,0,0,0,0,0]
+ t1 = !systime
+ dd5 = zdsgridnest(x0,x1,x0,x1,vg,clips)
+ t2 = !systime
+ ty,'zdsgridnest 10 levels, time =', t2 - t1
+
+ a1 = stretch(x1, dd0)
+ b1 = stretch(x1, dd1)
+ c1 = stretch(x1, dd2)
+ d1 = stretch(x1, dd3)
+ e1 = stretch(x1, dd4)
+ f1 = stretch(x1, dd5)
+ g1 = stretch(x1, dd6)
+ tv,ft(x0),0,0,0
+ tv,ft(x1),0,0,1
+ tv,ft(a1),0,0,2
+ tv,ft(b1),0,0,3
+ tv,ft(c1),0,0,4
+ tv,ft(d1),0,0,5
+ tv,ft(e1),0,0,6
+ tv,ft(f1),0,0,7
+ tv,ft(g1),0,0,8
+
+ endblock
+ 

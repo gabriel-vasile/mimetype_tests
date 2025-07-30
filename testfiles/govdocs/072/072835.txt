@@ -1,0 +1,597 @@
+TO: TACDFIPSFKMI Members                                                            
+DATE: 01 OCT 97
+
+I apologize for being late (one day late as I write this) with this document. I 
+want you to know that the members of Working Group 1 (aka Frameworks)  submitted 
+their input in sufficient time to put this together and get it out on time. It 
+was my travel schedule that prevented us from meeting the target date and 
+prevented me from completing the final tasks listed below.    Roger French
+
+
+1.1   OVERVIEW
+Overview
+ Below is version 2.0 of the Overview and it is for review by the TACDFIPSFKMI. 
+It represents the changes I thought were appropriate after reviewing the NIST 
+comments, Santosh's mark-up, and the notes I took, and can barely read, at the 
+Seattle meeting. Please review this before the Orlando meeting in less than two 
+weeks.. NOTE: I have to add something about Interoperability to the Overview, 
+but have not done that yet. Also note that the paragraph on supporting 
+components will need to be changed to align with the whatever components are 
+described in section 1.3. 
+
+
+
+	The Federal Government has a right and a responsibility to protect the 
+information and data contained in, processed by, and transmitted between its IT 
+systems. Ownership of the information is often shared with individuals, 
+companies, and organizations and therefore requires that the government protect 
+that information on its own behalf and on behalf of those co-owners. That 
+protection needs to be meet Federal Government standards and the standards of 
+those co-owners.
+	Protection of information on IT systems is complicated and evolving. One 
+aspect of such protection is the requirement that certain information or 
+information in specific states provide its own protection. An example of such a 
+state is information in transit on the Internet. The method of such self 
+protection is encryption, the process whereby the information is scrambled using 
+methods which make it easy for authorized entities to decrypt and difficult for 
+all others to decrypt. When sufficient strength and protection of the decryption 
+key is provided, encryption can adequately protect the information from 
+disclosure to unauthorized parties. However, the unavailability, loss, or 
+corruption of those keys will also prevent disclosure to authorized parties. The 
+solution to this problem is to provide a method of recovering decryption keys by 
+authorized parties.
+	The generation, storage, and recovery of decryption keys is a complex 
+process. This process needs to be rigidly defined, stringently implemented, and 
+conscientiously managed and operated. Such requirements are needed to ensure 
+that the process provides its proposed benefit and prevents an inappropriate 
+increase in vulnerability. The FIPS addresses those aspects of the encryption 
+process, the recovery process, and the supporting components of both processes.
+	The encryption process described in the FIPS includes their components, 
+their actions and interfaces, and the sum of their interactions. Such components 
+include the Encrypting Party (often the Sender for transmitted data,) the 
+Encrypted Data Medium, the Decrypting Party (often the Receiver for transmitted 
+data,) the Recovery Data Medium, and the Key Recovery Agent. It should be noted 
+that the preparation of recovery information is the responsibility of the 
+encryption process, not the recovery process.
+	The recovery process described in the FIPS includes processes and 
+requirements for recovery requesters; structure, process and requirements 
+including performance of the key recovery agents; and a description of the 
+interactions between the parties involved in the recovery.  
+	The supporting components described in the FIPS are integral parts of the 
+key recovery process, and are needed to ensure the functionality of the key 
+recovery process and the security of the keys. Such supporting components 
+include the vendor products for the users, for the key recovery agents, and for 
+the requesters. They also include the registration agent or process, the methods 
+to authenticate the key sources, licensing agents, and system policy 
+authorities.
+	To further the understanding of the overall key recovery process, examples 
+will be presented to describe general key recovery methods. Such examples 
+include Stored Files, Encrypted Email, Real-time Communications, and the 
+recovery of a specific key. 
+
+NOTE: It should be noted that the output of the TACDFIPSFKMI (TAC) is technical 
+advice to the Secretary of Commerce regarding the technology of and technical 
+use of key recovery. The TAC has not addressed and will not provide policy 
+advice regarding the extent of usage of key recovery on any IT systems nor the 
+scope of systems covered by the proposed FIPS.
+
+
+
+For Your Consideration: "It is not the purpose of the FIPS to make existing 
+systems that do not interoperate, interoperate now with Key Recovery." Does a 
+statement like that belong in the FIPS. If so, is it enough to state it early, 
+perhaps in the overview. The Overview, and perhaps other parts of Section 1.0, 
+need  
+It is the intent of the FIPS that Key Recovery shouild not effect the 
+interoperability of systems, protocols, or applications. Any entities that 
+interoperate without Key Recovery should, if possible, interoperate with it. The 
+exception is when either the Key Recovery systems technical structure requires 
+less or no interaction or when the application and its usage either require no 
+interoperation or when such interoperation will preclude a specific requirement 
+or capability of the system or of the implementation.
+
+
+
+
+1.2 Key Recovery System
+
+A key recovery system enables authorized persons to access plaintext from 
+encrypted data when the decryption key is not otherwise available.   Key 
+recovery is a broad term that applies to many different techniques.
+
+The key recovery system model defines the minimal set of system components 
+needed to perform key recovery.  The key recovery system model is a generalized 
+model, which supports a wide variety of different key recovery techniques and 
+data  applications.  The data applications supported by the key recovery system 
+model include:
+
+* Interactive communication sessions.
+* Store-and-Forward applications.
+* Data Storage.
+
+The key recovery system model contains the following components:
+
+* System A (Encryption-Enabled)
+* System B (Encryption-Enabled)
+* Encrypted Data Medium
+* Recovery Information Medium
+* Requester
+* Key Recovery Agent(s)
+
+The model depicts a key recovery system capable of encrypting data, creating key 
+recovery information -- for the key to be recovered -- and recovering the key 
+from the key recovery information, for an authorized request.
+
+1.2.1 Encryption and Enablement Process
+
+The four components -- System A, System B, Encrypted Data Medium, and Recovery
+Information Medium -- collectively define a subset of the model called the
+"Encryption and Enablement Process."
+
+The process of encrypting data and creating key recovery information is 
+performed by one or more encryption-enabled systems, denoted in the key recovery 
+system model as System A and System B.   An encryption-enabled system is one 
+that can communicate using cryptography, i.e., it can encrypt and decrypt data.  
+It is assumed that System A or System B or both Systems A and B have the 
+capability to create key recovery information.  However, the key recovery system 
+model does not prescribe which system or systems must have a key recovery 
+capability.  The encrypted data and key recovery information produced by these 
+systems are maintained on some appropriate medium, denoted in the key recovery 
+system model as the Encrypted Data Medium and Recovery Information Medium, 
+respectively.   The Recovery Information Medium may be the same or different 
+from the Encrypted Data Medium.
+
+1.2.1.1 Components and Their Interactions
+
+1.2.1.1.1 Systems A & B
+
+Systems A and B are systems capable of communicating with each other using 
+cryptography (i.e., they are encryption-enabled).
+
+Each system contains a cryptographic application capable of interacting with a 
+like cryptographic application in the other system.  Each system  contains a 
+cryptographic subsystem that provides a set of cryptographic services to the 
+cryptographic application.  At least one system (A or B) must have a  key 
+recovery subsystem capable of providing a set of key recovery services to the 
+cryptographic application which, at a minimum, includes services for creating 
+key recovery information.  It is also possible for one system (A or B) to 
+implement a set of key recovery services capable of "handling" the key recovery 
+information provided by another system, but has no capability to create key 
+recovery information by itself.  A system that meets this minimal requirement is 
+said to be key recovery aware.  Thus, the standard assumes that two systems can 
+interoperate in compliance with the standard as long as both systems are key 
+recovery aware and at least one of the systems is capable !
+ of creating key recovery information.
+
+NOTE:  In situations where it is convenient to show a directional flow of the 
+encrypted data, System A may be optionally labeled "Sender" or "Encryptor" and 
+System B may be optionally labeled "Receiver" or "Decryptor."  However, the key 
+recovery system model itself is intended to be a generalized model, covering  
+interactive sessions, where each system may be both a sender and receiver.
+
+1.2.1.1.1.1 Sender
+
+The Sender is the system that encrypts data, either for storage or for 
+transmission to a Receiver.
+
+The Sender may or may not create key recovery information.
+
+Typically, the Sender will create key recovery information (i.e., enable key 
+recovery) in order to comply with an established key recovery policy.  The key 
+recovery policy specifies the conditions under which key recovery information 
+must be created; the policy may also indicate the allowable key recovery agents, 
+and how and where the key recovery information must be maintained (stored or 
+transmitted).  However, the Sender may elect to create key recovery information 
+in situations where key recovery is deemed desirable, although not specifically 
+required by the Sender's key recovery policy.  The Sender may also create key 
+recovery information for the Receiver, in situations where the Receiver is 
+incapable of creating its own key recovery information.   If key recovery is not 
+required by the key recovery policy and the Sender does not desire key recovery, 
+then no key recovery information will be created.
+
+1.2.1.1.1.2 Receiver
+
+The Receiver is the system that receives encrypted data and decrypts its.
+
+The Receiver may or may not create key recovery information.
+
+Typically, the Receiver will create key recovery information in order to comply 
+with an established key recovery policy (see also 1.2.1.1.1.1 Sender).  However, 
+the Receiver may elect to create key recovery information in situations where 
+key recovery is deemed desirable, although not specifically required by the 
+Receiver's key recovery policy.  The Receiver may also create key recovery 
+information for the Sender, in situations where the Sender is incapable of 
+creating its own key recovery information.  If key recovery is not required by 
+the key recovery policy and the Receiver does not desire key recovery, then no 
+key recovery information will be created.
+
+In situations where key recovery information is received from the Sender, the 
+Receiver may perform a verification step to validate the correctness or 
+integrity of the key recovery information.  The verification step could consist 
+of checking all or part of the received key recovery information, or any other 
+information that could be used beneficially to determine the correctness or 
+integrity of the received key recovery information.
+
+In situations where the Receiver creates key recovery information for the 
+Sender, the Sender may receive the key recovery information and perform a 
+simiilar verification step to validate the correctness or integrity of the key 
+recovery information.
+
+1.2.1.1.2 Encrypted Data Medium
+
+The encrypted data medium represents the "location"  where the encrypted data is 
+stored or communicated, such as a storage device or communications channel.  The 
+key recovery system model does not prescribe how or where the encrypted data 
+must be stored or communicated, as long as it can be accessed by an authorized 
+Requester.
+
+The key recovery system model assumes that both systems (A and B) can access to 
+the Encrypted Data Medium.
+
+1.2.1.1.3 Recovery Information Medium
+
+The recovery information medium represents the "location" where the recovery 
+information is stored or communicated, such as a storage device or a 
+communications channel.  The key recovery system model does not prescribe how or 
+where the recovery information must be stored or communicated, as long as it can 
+be accessed by an authorized Requester.
+
+The recovery information itself can be managed or handled in a variety of ways.  
+It may exist for only a brief time, during electronic transmission, or it may 
+exist for a relatively long time, on a storage device.
+
+The key recovery system model assumes that both systems (A and B) are able, 
+where needed or desired, to access the Recovery Information Medium.
+
+1.2.1.2 Interaction Summary
+
+Both systems (A and B) have access to the Encrypted Data Medium.  Thus, the key 
+recovery system model simultaneously embraces the following three separate 
+applications:  (a) interactive session, (b) store-and-forward, e.g., E-mail, and 
+(c) file storage.
+
+Both systems (A and B) are able to access the Recovery Information Medium.  
+Thus, the key recovery system model embraces key recovery systems where one or 
+both systems have the capability to create recovery information and one or both 
+systems can make that recovery information available by putting it on a Recovery 
+Information Medium.  The model also embraces key recovery systems where one or 
+both systems have access to the recovery information created by the other 
+system, thus allowing each system to potentially validate the recovery 
+information created by the other system in order to ensure that it is authentic.
+
+In a typical interaction scenario, System A (acting as a sender) encrypts an e-
+mail message and sends it to System B (acting as a receiver).   In this case, 
+the Encrypted Data Medium is a communications path.  System A also creates key 
+recovery information, which is appended to the encrypted message in the form of 
+a message header.  In this case, the Recovery Information Medium is also the 
+same communications path used to transmit the encrypted data, i.e., the 
+Encrypted Data Medium and the Recovery Information Medium are one and the same.  
+Upon receipt of the encrypted message, System B validates the recovery 
+information and decrypts the message.
+
+1.2.2 Recovery Process
+
+The Requester and the Key Recovery Agents form another subportion of the key 
+recovery system model called the "Recovery Process."
+
+The process of recovering a key from the key recovery information is handled by 
+additional  key recovery system components -- denoted in the key recovery system 
+model as Requester and Key Recovery Agents.  An authorized Requester -- with 
+access to the Encrypted Data Medium and the Recovery Information Medium -- 
+interacts with one or more Key Recovery Agents to recover the cryptographic key 
+from the key recovery information.
+
+A recovered key can then be used to recover the data, either directly or 
+indirectly.  The data encrypting key is said to be recovered directly when the 
+recovered key is the same key that was used to encrypt the data.  Indirect key 
+recovery occurs when the recovered key is a key encrypting key which is then 
+used to decrypt or recover the data encrypting key.
+
+1.2.2.1 Components and Their Interactions
+
+1.2.2.1.1 Requester
+
+The Requester is an entity who seeks to recover information that will allow the 
+decryption of encrypted data.  To this end, the Requester always performs the 
+step of key recovery; the step of data recovery is optional.
+
+The Requester is defined as the entity who interacts with one or more Key 
+Recovery Agents -- using key recovery information -- to recover a key.  Many 
+different algorithms and procedures can be used to recover a key.  For example, 
+the Requester might interact with one Key Recovery Agent to recover a whole key, 
+or the Requester might interact with two or more Key Recovery Agents to recover 
+several pieces of information that, in turn, permit the Requester to recover or 
+reconstruct the whole key.
+
+The Requester must always have access to the recovery information corresponding 
+to the (desired) key to be recovered.  However, the Requester will need access 
+to the encrypted data only if it performs the additional step of data recovery.
+
+A request for a key recovery service, made by a Requester to a Key Recovery 
+Agent, must be an authorized request.  In other words, the Requester issuing a 
+request for key recovery service must have a legal and lawful right to access 
+the data, in whole or in part, that can be decrypted, either directly or 
+indirectly, using the key which is recovered from the given set of key recovery 
+information.  Furthermore, the Requester must prove its right to access that 
+data.
+
+Those with the right to access the data "unlocked" by a given set of key 
+recovery information would include the individual or enterprise that "owns" the 
+data, and any person or party with a lawful right to access the data, e.g., law 
+enforcement acting under the authority of a valid warrant or court order, or an 
+agent acting under the authority of another party with a right-of-access to the 
+data.
+
+NOTE:  The functions performed by a Requester may be separated and performed by 
+two or more components, if doing so would be advantageous.  For example, it may 
+be more cost effective for an individual or enterprise to employ the services of 
+a trusted third party who assumes the role of the Requester on behalf of the 
+individual or enterprise.  Under such an arrangement, the Requester could 
+recover the key, which in turn would be provided to the individual or 
+enterprise, and the individual or enterprise could then recover the data using 
+the recovered key.
+
+1.2.2.1.2 Key Recovery Agent
+
+The Key Recovery Agent is a trusted entity who performs a recovery service in 
+response to an authorized request made by a Requester.  Before honoring such a 
+request, the Key Recovery Agent authenticates the Requester's right to receive 
+the requested recovery service.  The recovery service consists of processing all 
+or part of the recovery information provided by the Requester to the Key 
+Recovery Agent, and returning an output value to the Requester.
+
+The algorithm for processing the recovery information is dependent on the 
+algorithm originally used to create the recovery information, i.e. it is 
+algorithm specific.   There are also many algorithms for creating and processing 
+the recovery information.  For example, the output value calculated by the Key 
+Recovery Agent could be a whole key, or it could be a key part or piece of 
+information that the Requester will use in combination with other recovered 
+parts or pieces of information to reconstruct or recover the whole key.
+
+Note:  The present standard does not prescribe a particular algorithm or method 
+for creating and processing the recovery information, or for recovering or 
+reconstructing the key.
+
+NOTE:  It is assumed that, where necessary, the components in the key recovery 
+system model can make use of cryptography to protect the secrecy and integrity 
+of the information transmitted from one component to another.
+
+1.2.2.2 Interaction Summary
+
+In a typical key recovery scenario, the Requester -- who is provided with, or 
+who acquires, a set of key recovery information, and who can "prove" its right 
+to access the data "unlocked" by the key to be recovered from that key recovery 
+information -- sends a request for key recovery service to one or more Key 
+Recovery Agents.  With each such request, the Requester provides an appropriate 
+portion of the recovery information to each Key Recovery Agent, which may be all 
+or part of the key recovery information.
+
+Before processing the key recovery service request, the Key Recovery Agent 
+authenticates the Requester's right to receive the requested key recovery 
+service.  Each Key Recovery Agent processes its respective portion of the 
+recovery information and constructs an output value, which is returned to the 
+Requester.
+
+If only one Key Recovery Agent is involved, the output value could be the whole 
+key, and the Requester is finished.  On the other hand, two or more Key Recovery 
+Agents could provide key parts or pieces of information that the Requester would 
+use to reconstruct or recover the whole key.
+
+If the Requester is a third party who performs a key recovery service on behalf 
+of some other person or party, then the Requester returns the recovered key to 
+that person or party.  However, if the Requester has also been engaged to 
+perform a data recovery service, the Requester -- who is provided the encrypted 
+data -- will decrypt the provided encrypted data with the aid of the recovered 
+key and return the recovered data to the person or party.
+
+
+
+
+1.3  Supporting Components
+
+Specific implementations of the Key Recovery System model may require 
+"supporting" components to support the interactions between the main Key 
+Recovery System components.  This section describes these supporting components 
+and provides example of how they may be used in a Key Recovery System.
+Product Vendors
+
+End User Product Vendors, Key Recovery Agent Product vendors, and Requester 
+Product Vendors produce products for use in the Key Recovery System, and provide 
+information to the Registration Agent as necessary.
+Registration Agent
+
+The Registration Agent receives and archives vendor-specific information 
+required by the Requester to find, acquire, and parse recovery information 
+obtained from the recovery information medium.
+
+Recovery information may include the following: (1) product serial number, (2) 
+vendor identification number, (3) recovery fields, (4) certificates, and (5) 
+session information.
+Authentic Public Key Source
+
+In some implementations, an Authentic Public Key Source will be used to provide 
+a certificate infrastructure to support the use of public key cryptography 
+within the Key Recovery System. In a Key Recovery System which provides Private 
+Key Escrow-based recovery, the Authentic Public Key Source may be very similar 
+to a conventional Certificate Authority, but will provide for the binding of 
+properly escrowed public keys to users.  In a Key Recovery System based on Key 
+Encapsulation, the Authentic Public Key Source may instead bind public keys to 
+legitimate Key Recovery Agents.
+Licensing Agent
+
+The Licensing Agent is responsible for evaluating and authorizing Key Recovery 
+Agents.
+Key Recovery System Implementation Examples
+
+The following two sections describe two possible types of implementations for 
+the Key Recovery System which require the use of supporting components.   
+Neither example purports to be the only method of satisfying this standard--
+instead these examples are intended to illustrate how these supporting 
+components fit into a Key Recovery System implementation.
+Private Key Escrow Example
+
+The core of a Private Key Escrow-based Key Recovery System is the escrow of 
+System A and System B's public/private key exchange keypairs with the Key 
+Recovery Agent(s).  This example discusses component interactions for three 
+phases: establishment, normal operation, and recovery.
+Establishment
+
+First, the Key Recovery System's Authentic Public Key Source must generate and 
+securely maintain a public/private keypair.  The public portion of this keypair 
+will be embedded or loaded into Key Recovery System components.  The private 
+portion of the keypair will be used to digitally sign component information to 
+authorize their use in the Key Recovery System.
+
+To establish a Private Key Escrow-based Key Recovery System, End User Product 
+Vendors must describe to the Registration Agent how their systems (A and B) 
+deposit the key exchange field into the Encrypted Data Medium and the Recovery 
+Information Medium.  End User Product Vendors must also embed the Authentic 
+Public Key Source root public key into their systems (A and B) to enable 
+authentication of interactions with other Key Recovery System components.
+
+Key Recovery Agent Product Vendors must also embed the Authentic Public Key 
+Source root public key into the Key Recovery Agent Product.  Key Recovery Agents 
+must demonstrate to the Licensing Agent that they will secure escrowed user 
+private keys in accordance with the Key Recovery System policy.  Once approved, 
+the Key Recovery Agent will be authorized via the Authentic Public Key Source.  
+This authorization will allow systems (A and B) and Requesters to verify the 
+legitimacy of a Key Recovery Agent.
+
+Systems (A and B) must securely escrow their public/private key exchange keypair 
+with a Key Recovery Agent prior to participating in the Key Recovery System.  
+Systems (A and B) can verify that they are communicating with a legitimate Key 
+Recovery Agent by verifying the Key Recovery Agent information using the 
+Authentic Public Key Source.  The Key Recovery Agent will then issue a 
+certificate to the System (A and B) verifying that the public/private keypair 
+was successfully escrowed.
+Normal Operation
+
+System A provides for key recovery whenever it performs a key exchange with 
+System B provided System B's public/private keypair is escrowed with a Key 
+Recovery Agent.  System A can determine if System B's public/private keypair was 
+escrowed by verifying System B's certificate (using the Authentic Public Key 
+Source root public key embedded in the product).  During key exchange, System A 
+deposits the key exchange field and key recovery information into the Recovery 
+Information Medium.  The encrypted data to be communicated to System B is 
+deposited into the Encrypted Data Medium.
+Recovery
+
+A properly authorized Requester may recover the encryption key by first 
+retrieving information from the Registration Agent on how the key recovery 
+information has been deposited in the Recovery Information Medium.  The 
+Requester then retrieves the key recovery information from the Recovery 
+Information Medium to determine the Key Recovery Agent.  Next, the Requester 
+retrieves the key exchange field and sends it to the Key Recovery Agent.  The 
+Key Recovery Agent verifies the authenticity of the request, decrypts the key 
+exchange field using the user's escrowed private key, and securely returns the 
+unwrapped encryption key to the Requester.
+
+The Requester uses the recovered encryption key to decrypt the encrypted data 
+which was gathered from the Encrypted Data Medium.
+Key Encapsulation Example
+
+The core of a Key Encapsulation-based Key Recovery System is the encapsulation 
+of the encryption key using the public key of a legitimate Key Recovery 
+Agent(s).  This example discusses component interactions for three phases: 
+establishment, normal operation, and recovery.
+Establishment
+
+First, the Key Recovery System's Authentic Public Key Source must generate and 
+securely maintain a public/private keypair.  The public portion of this keypair 
+will be embedded or loaded into Key Recovery System components.  The private 
+portion of the keypair will be used to digitally sign component information to 
+authorize their use in the Key Recovery System.
+
+To establish a Private Key Escrow-based Key Recovery System, End User Product 
+Vendors must describe to the Registration Agent how their systems (A and B) 
+deposit the key exchange field into the Recovery Information Medium.  End User 
+Product Vendors must also embed the Authentic Public Key Source root public key 
+into their systems (A and B) to enable authentication of interactions with other 
+Key Recovery System components.
+
+Key Recovery Agent Product Vendors must also embed the Authentic Public Key 
+Source root public key into the Key Recovery Agent Product.  Key Recovery Agents 
+must demonstrate to the Licensing Agent that they will secure their private keys 
+in accordance with the Key Recovery System policy.  Once approved, the Key 
+Recovery Agent will be authorized via the Authentic Public Key Source.  This 
+authorization will allow systems (A and B) and Requesters to verify the 
+legitimacy of a Key Recovery Agent.
+
+Systems (A and B) must load a public key from the Key Recovery Agent prior to 
+participating in the Key Recovery System.  The Key Recovery Agent issues a 
+certificate to the System (A and B) verifying that the public/private keypair is 
+secured and maintained by the Key Recovery Agent.
+Normal Operation
+
+System A provides for key recovery whenever it performs a key exchange by 
+encapsulating the encryption key in the public key(s) provided by the Key 
+Recovery Agent(s) and depositing the resulting key recovery field(s) into the 
+Recovery Information Medium.  System B can determine if System A has properly 
+provided for key recovery by verifying the integrity of the key recovery field.  
+The encrypted data to be communicated to System B is deposited into the 
+Encrypted Data Medium.
+Recovery
+
+A properly authorized Requester may recover the encryption key by first 
+retrieving information from the Registration Agent on how the key recovery 
+information has been deposited in the Recovery Information Medium.  The 
+Requester then retrieves the key recovery information from the Recovery 
+Information Medium to determine the Key Recovery Agent.  Next, the Requester 
+retrieves the key recovery field and sends it to the Key Recovery Agent.  The 
+Key Recovery Agent verifies the authenticity of the request, decrypts the key 
+recovery field using the corresponding private key, and securely returns the 
+recovered encryption key to the Requester.
+The Requester uses the recovered encryption key to decrypt the encrypted data 
+which was gathered from the Encrypted Data Medium.
+
+
+
+1.4    SYSTEM POLICY
+
+1.4	A Cryptographic Key Recovery System shall provide a policy establishment 
+mechanism that enables an appropriately designated administrator to implement 
+system policy.  Each installed instance of a CKRS should reference a system 
+policy, but the system policy may vary from instance to instance.  At a minimum, 
+the system policy shall define each of the following.
+1.4.1	Affected data types.
+1.4.1.1	The system policy shall define whether or not stored data is to be 
+made available for recovery.
+1.4.1.2	The system policy shall define whether or not electronic mail is to 
+made available for recovery.
+1.4.1.3	The system policy shall define whether or not real-time 
+communications are to be made available for recovery.
+1.4.2	Access policy.
+1.4.2.1	For each affected data type for which recovery has been selected, 
+the system policy shall define the recovery mechanism to be used, i.e. precisely 
+how the key recovery is to be done - particularly when a variety of key recovery 
+options are available.
+1.4.2.2	For each affected data type for which recovery has been selected, 
+the system policy shall define what recovery agent or agents shall be used.
+1.4.2.3	For each recovery agent selected, the system policy shall define 
+what requestors may recover the data.
+1.4.2.4	For each requestor selected, the system policy shall define the 
+conditions under which each recovery agent shall make the data available to the 
+requestor.
+1.4.2.5	For each recovery agent and affected data type, the system policy 
+shall define what measures are to be taken by the recovery agent to prevent 
+destruction of the data.
+1.4.3	Data integrity policy.
+1.4.3.1	For each recovery agent and affected data type, the system policy 
+shall define the requirements for maintaining integrity of the data.
+1.4.3.2	For each recovery agent and affected data type, the system policy 
+shall define whether a cryptographic "proof" of data integrity shall be required 
+(perhaps utilizing digital signature) and, if so, a security confidence level 
+for this "proof" (e.g. bit length).
+1.4.3.3	For each recovery agent and affected data type, the system policy 
+shall define what (if any) measures are required to provide "proof" (perhaps 
+utilizing digital signatures verifiable by a third party) of the source of the 
+recovered data.
+1.4.3.4	For each recovery agent and affected data type, the system policy 
+shall define the auditing procedures to be followed by the recovery agent.
+1.4.4	Interoperability policy.
+1.4.4.1	For each affected data type, the system policy shall define what (if 
+any) interoperability restrictions are to be placed on the system.
+1.4.4.2	For each affected data type, the system policy shall define what (if 
+any) interoperability conditions require a warning to the user.
+
+

@@ -1,0 +1,285 @@
+Langley DAAC Version Number:   LD_008_009_001_00_00_0_19990201
+
+
+
+                                    Biomass Burning Readme
+
+1.0  Introduction
+This file contains information about the Biomass Burning sample read software and data files. The table below lists the data set available through the Langley DAAC, the format of the data set and if sample read software is also available. The data set appears in the order as they became available to the user community. This is the data set that is available through the Langley DAAC:
+
+
+Data Set Name	         Sample Read Software Availability	Data Format
+-------------            ---------------------------------      -----------
+BIO_BURN_5X5_HAO_NAT	                Yes	                   ASCII
+
+
+
+This "readme" file includes the following five other sections:
+
+Section 2.0 - describes all sample C programs (source files).
+Section 3.0 - discusses how to create the executables from the C programs.
+Section 4.0 - demonstrates how to invoke the run-time executables.
+Section 5.0 - provides general information on the data sets.
+Section 6.0 - provides more detailed implementation notes.
+
+If users have questions while using the Biomass Burning sample read software, please contact the Langley User and Data Services office.
+
+EOSDIS Langley DAAC
+Science, Users and Data Services Office
+NASA Langley Research Center
+Mail Code 157D
+2 South Wright Street
+Hampton, Virginia 23681-2199
+U.S.A.
+
+E-mail:     larc@eos.nasa.gov
+Phone:      (757)864-8656
+FAX:        (757)864-8807
+
+
+2.0  Read Software Files
+There are three sets of sample read programs for the Biomass Burning data set. These codes are written in the C language. These C programs have been tested on the Sun, SGI, Dec Alpha and HP UNIX-based workstations. All library functions in the C source codes are tested for ANSI C conformance. These files and their purposes are listed as follows:
+
+bio_burn_res_fuel_read.c - reads the Biomass Burning 5 by 5 degree grid boxes residues and fuel 
+                           data collected by Dr. Wei Min Hao and Mei-Huey Liu formatted ASCII 
+                           files. This code is written in the C language.
+bio_burn_sav_for_read.c -  reads the Biomass Burning 5 by 5 degree grid boxes savanna and forest 
+                           data collected by Dr. Wei Min Hao and Mei-Huey Liu formatted ASCII 
+                           files. This code is written in the C language.
+bio_burn_total_read.c -    reads the Biomass Burning 5 by 5 degree grid boxes total biomass burned 
+                           data collected by Dr. Wei Min Hao and Mei-Huey Liu formatted ASCII 
+                           files. This code is written in the C language.
+
+
+3.0  Creating C Executable Files
+
+To build the executables for this data set from the command line, type out the following command:
+	% cc -o read_5x5_hao_res_fuel bio_burn_res_fuel_read.c
+	% cc -o read_5x5_hao_sav_for bio_burn_sav_for_read.c
+	% cc -o read_5x5_hao_total bio_burn_total_read.c
+
+
+4.0  Invoking Read Software
+This section illustrates the invocation of the executable files. Section 4.1 describes how to run the read programs for the 5 by 5 grid boxes data set, BIO_BURN_5X5_HAO_NAT.
+
+4.1  Running the Read Program for the BIO_BURN_5X5_HAO_NAT Data Set
+
+There are three sample read software programs to read this data set. All of the read software are written in C. The read programs do not accept command line arguments. When these programs are executed, they request an input filename. The output file name is automatically created by appending ".rpt" to the input file name. This code assumes that the data and code are located in the same area. The report file generated will also be included in the local working area. After entering the file name, the user is presented with a parameter selection list. At this point, the program generates the report file and exits. Each read software is able to read particular files of the 
+granules of data. 
+
+The following line will begin program execution for the data files that contain 
+residue and fuel data:
+
+		% read_5x5_hao_res_fuel
+
+The following line will begin program execution for the data files that contain savanna and forest data:
+		% read_5x5_hao_sav_for
+
+The following line will begin program execution for the data files that contain total data:
+		% read_5x5_hao_total
+
+A sample of the interactive program executions are provided in Section 6.0.
+
+
+5.0  Data Sets Information
+
+The following subsections provide information for the Biomass Burning data sets on-line at the Langley DAAC.
+
+Data Set Name	                      Section
+-------------                         -------
+BIO_BURN_5X5_HAO_NAT	                5.1
+
+ 
+Each set of the data set's information was obtained from the data files, documents, or directly from the data producer/provider. The high-level data set descriptions, the data files, the variables in the data files, and the contacts for data production are given under each data set. Some data sets contain the data producer's/provider's responses to questions on the data contents. These questions and/or responses are collected under the "NOTES ON DATA" section.
+
+5.1  BIO_BURN_5X5_HAO_HDF Data Set
+
+This data set is written in ASCII format. The data files are organized by study.
+
+LONG NAME FOR THIS DATA SET:  Biomass Burning 5 degree by 5 degree grid data by Dr. Wei Min Hao 
+                              and Dr. Mei-Huey Liu in Native Format (BIO_BURN_5X5_HAO_NAT)
+
+FILE NAMING CONVENTION:       All three granules have the same naming convention. All three 
+                              granules have the prefix "bio_burn_hao_" to indicate that they belong 
+                              to this data set. The last two letters in each granule name represent 
+                              location, "as" for Asia, "af" for Africa, and "am" for South America. 
+                              Each granule consists of five data files. There are data for the 
+                              forest, fuel, residue, savanna, and total data values.
+
+VARIABLES:                    This section will provide a list of variables for each of the data 
+                              files that make up a granule for this data set. 
+The variable names for the forest and savanna data are:
+	Variable	Units
+	Coordinate	Degrees, Degrees
+	Latitude	Degrees
+	Longitude	Degrees
+	Annual	(x 10^3 TONS/YEAR)
+	January	(x 10^3 TONS/MONTH)
+	February	(x 10^3 TONS/MONTH)
+	March	(x 10^3 TONS/MONTH)
+	April	(x 10^3 TONS/MONTH)
+	May	(x 10^3 TONS/MONTH)
+	June	(x 10^3 TONS/MONTH)
+	July	(x 10^3 TONS/MONTH)
+	August	(x 10^3 TONS/MONTH)
+	September	(x 10^3 TONS/MONTH)
+	October	(x 10^3 TONS/MONTH)
+	November	(x 10^3 TONS/MONTH)
+	December	(x 10^3 TONS/MONTH)
+
+The variable names for the fuel and residue, data are:
+	Variable	Units
+	Coordinate	Degrees, Degrees
+	Annual	(x 10^3 TONS/YEAR)
+	Monthly	(x 10^3 TONS/MONTH)
+
+The variable names for the total data are:
+	Variable	Units
+	Coordinate	Degrees, Degrees
+	January	(x 10^3 TONS/MONTH)
+	February	(x 10^3 TONS/MONTH)
+	March	(x 10^3 TONS/MONTH)
+	April	(x 10^3 TONS/MONTH)
+	May	(x 10^3 TONS/MONTH)
+	June	(x 10^3 TONS/MONTH)
+	July	(x 10^3 TONS/MONTH)
+	August	(x 10^3 TONS/MONTH)
+	September	(x 10^3 TONS/MONTH)
+	October	(x 10^3 TONS/MONTH)
+	November	(x 10^3 TONS/MONTH)
+	December	(x 10^3 TONS/MONTH)
+	Coordinate	Degrees, Degrees
+	Total	(x 10^3 TONS/YEAR)
+	Forest	(x 10^3 TONS/YEAR)
+	Savanna	(x 10^3 TONS/YEAR)
+	Fuelwood	(x 10^3 TONS/YEAR)
+	Residues	(x 10^3 TONS/YEAR)
+
+
+
+
+NOTES ON DATA:                The amount varies according to the geographic location of the data 
+                              collection.
+
+FIRST RECORD OF DATA FROM FIRST DATA GRANULE:   Sample data from the afforest.txt data file:
+
+*FORESTAF.WR1
+*BIOMASS BURNED ANNUALLY (x 10^3 TONS/YEAR) OR MONTHLY (x 10^3 TONS/MONTH) FROM DEFORESTATION AND SHIFTING CULTIVATION IN TROPICAL AFRICA
+ 
+COORDINATE  LAT  LON    ANNUAL   JANUARY  FEBRUARY     MARCH     APRIL       MAY      JUNE      JULY    AUGUST SEPTEMBER   OCTOBER  NOVEMBER  DECEMBER
+ (25N,0W)    25    0    493.05      0.00      0.00     14.79     54.24     83.82    138.05    138.05     64.10      0.00      0.00      0.00      0.00
+ (25N,15E)   25   15      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+ ... 
+
+INSTRUMENTATION:              All data were collected by human observers and then reported to the 
+                              United Nations Food and Agricultural Organization (FAO).
+
+CONTACT FOR DATA PRODUCT INFORMATION:          Dr. Joel S. Levine 
+                                               NASA Langley Research Center
+                                               Theoretical Studies Branch
+                                               Atmospheric Sciences Division
+                                               Mail Stop 401B
+                                               Hampton, Virginia 23681-2199
+                                               Phone:    (757) 864 5692
+                                               E-mail:   j.s.levine@larc.nasa.gov
+
+
+6.0  Implementation Notes
+
+Section 6.0 gives the user a brief explanation on how to run the sample read software.
+
+6.1  BIO_BURN_5X5_HAO_NAT Read Program
+
+There are three read software that support this data set. All three software run the same way. 
+The following represents a sample execution of the C program, bio_burn_res_fuel_read.c. 
+
+sorcerer% read_5x5_hao_res_fuel
+***************************************************************
+*                                                             *
+*               BIOMASS BURNING TROPICAL DATA                 *
+*      Agricultural Residues Burned and Fuelwood Burned       *
+*                                                             *
+*                        Read Program                         *
+*                                                             *
+* Version 2.0                              January 31, 1999   *
+***************************************************************
+ 
+ 
+Please enter the name of the data file to be read:  afresi.txt
+ 
+ 
+The data file to be read is afresi.txt 
+ 
+ 
+The following are the parameters on this data file: 
+ 
+ 
+No.   Parameter               Units 
+---   ---------               ----- 
+ 
+ 1.   Coordinate              Degrees
+ 2.   Annual Value            x 10^3 Tons/Year
+ 3.   Monthly Value           x 10^3 Tons/Month
+ 
+ 
+ Do you want all parameters to be printed 
+ Please select: a or A for All; S for Some; X to eXit: s
+ 
+ 
+****  Selection of parameters  ***
+Please enter parameter# you wish to view 
+Enter q to end selection process or X to exit the program--> 3
+Please enter parameter# you wish to view 
+Enter q to end selection process or X to exit the program--> 2
+Please enter parameter# you wish to view 
+Enter q to end selection process or X to exit the program--> 1
+   Monthly    Annual     Coordinate  
+      0.00        0.00   (25N,0W)  
+      0.00        0.00   (25N,15E) 
+      1.83       21.91   (25N,30E) 
+      3.76       45.13   (20N,20W) 
+      3.52       42.19   (20N,15W) 
+      2.22       26.62   (20N,10W) 
+      8.47      101.63   (20N,5W)  
+      0.00        0.00   (20N,OW)  
+      0.00        0.00   (20N,5E)  
+      0.00        0.00   (20N,10E) 
+      0.00        0.00   (20N,15E) 
+      1.49       17.83   (20N,20E) 
+     20.09      241.03   (20N,30E) 
+     14.39      172.74   (20N,35E) 
+     19.61      235.37   (15N,20W) 
+     37.01      444.15   (15N,15W) 
+     27.50      330.02   (15N,10W) 
+     15.16      181.87   (15N,5W)  
+     86.46     1037.52   (15N,0W)  
+    198.64     2383.66   (15N,5E)  
+    138.95     1667.43   (15N,10E) 
+     17.83      213.91   (15N,15E) 
+...
+      0.00        0.00   (20S,20E) 
+     18.95      227.45   (20S,25E) 
+     35.75      429.00   (20S,30E) 
+      2.81       33.70   (20S,35E) 
+     25.62      307.49   (20S,40E) 
+      8.54      102.50   (20S,45E) 
+ 
+ 
+****************************************************
+*                                                  *
+*              END OF FILE ENCOUNTERED             *
+*                                                  *
+*          90 records of data were read           *
+*                                                  *
+*  EXECUTION OF PROGRAM COMPLETED AND SUCCESSFUL   *
+*                                                  *
+****************************************************
+
+
+
+
+
+
+
+Updated:  February 1, 1999          LD_008_009_001_00_00_0_19990201
+Last Updated:   February 1, 1999    LD_008_009_001_00_00_0_19990201

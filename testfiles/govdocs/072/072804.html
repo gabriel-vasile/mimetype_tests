@@ -1,0 +1,553 @@
+<TITLE>c24n5 cons.doc</TITLE>
+<H1>NIH CHARMM c24n5 cons.doc</H1>
+<PRE>
+
+</PRE><HR><H4><I>File:</I> Cons  -=-  <I> Node:</I><A NAME=" Top"> Top</A><BR> <I> Up</I>: (<A HREF="Commands.Html">commands.doc</A>) -=- <I> Next</I>:<A HREF="# Harmonic Atom"> Harmonic Atom</A></H4><PRE>
+
+                            CONSTRAINTS
+
+        The following forms of constraints are available in CHARMM:
+
+* Menu:                          command
+
+*<A HREF="# Harmonic Atom"> Harmonic Atom</A>::       &quot;CONS HARM&quot; Hold atoms in place
+*<A HREF="# Dihedral"> Dihedral</A>::            &quot;CONS DIHE&quot; Hold dihedrals near selected values
+*<A HREF="# Internal Coord"> Internal Coord</A>::      &quot;CONS IC&quot;   Holds bonds, angles and
+                                    dihedrals near table values
+*<A HREF="# Quartic Droplet"> Quartic Droplet</A>::     &quot;CONS DROP&quot; Puts the entire molecule in a cage
+                                    about the center of mass
+*<A HREF="# Fixed Atom"> Fixed Atom</A>::          &quot;CONS FIX&quot;  Fix atoms rigidly (sets the IMOVE array)
+*<A HREF="# SHAKE"> SHAKE</A>::               &quot;SHAKE&quot;     Fix bond lengths during dynamics.
+*<A HREF="# NOE"> NOE</A>::                 &quot;NOE&quot;       Impose distance restraints from NOE data
+*<A HREF="# Restrained Distances"> Restrained Distances</A>:: &quot;RESD&quot;     Impose general distance restraints
+* Sbound: (<A HREF="sbound.html">sbound.doc</A>).      Solvent boundary potential
+
+</PRE><HR><H4><I>File:</I> Cons  -=-  <I> Node:</I><A NAME=" Harmonic Atom"> Harmonic Atom</A><BR> <I> Up</I>:<A HREF="# Top"> Top</A> -=- <I> Next</I>:<A HREF="# Dihedral"> Dihedral</A> -=- <I> Previous</I>:<A HREF="# Top"> Top</A></H4><PRE>
+
+                        Holding atoms in place
+
+[SYNTAX CONS HARMonic]
+
+Syntax:
+
+CONStraint HARMonic [FORCE real] atom-selection [MASS] [EXPO int] [COMP]
+                    [WEIGhting ]
+
+                       [ XSCAle real ]  [ YSCAle real ]  [ ZSCAle real ]
+
+
+        The potential energy has a harmonic constraint term which allows
+one to prevent large motions of individual atoms. The form for this
+potential is as follows for coordinates:
+
+        EC = sum over all atoms of k(i)* [mass(i)] * (x(i)-refx(i))**2
+
+where refx is a reference set of coordinates.  If MASS is specified in
+the command line, then k is multiplied by the mass of the atom
+resulting in a natural frequency of oscillation for the constraint 
+of sqrt(k) in AKMA units.   An atom constrained with MASS FORCE 1.0
+will oscillate at 8 cycles/picosecond if free of other interactions.
+For most operations involving harmonic constraints, mass weighting is
+recommended. There are three reasons for this. First, the results obtained
+will be similar regardless of what atom representation is used
+(extended vs. explicit) for hydrogen atoms. Second, Hydrogen atoms
+are allowed greater relative freedom if present. And third, The character
+of the normal modes of a molecule are unperturbed with mass weighting
+(essential if normal modes or low frequency motions are of interest).
+
+        Note, there is no longer a prefactor of 0.5 on the force
+constant specification. This is appropriate in that exponent values
+other than &quot;2&quot; are allowed. This differs from the earlier versions of
+CHARMM (up to version 16).
+
+        CHARMM supports a number of operations on the coordinate
+constraints. The constraint for any atom can be set to any positive
+value (specified by the FORCE keyword followed by the desired value).
+The reference coordinates can be the current set at the point when
+constraints are specified (the default) or a set can be the comparison
+set (COMP keyword). The force constants may also be obtained from the
+weight array, in which case the FORCe keyword is not read.
+
+        It is important to understand some aspects of how the
+constraints are set in order to get the most flexibility out of this
+command. When CHARMM is loaded, each atom has associated with it a
+harmonic force constant initially set to zero. Each call to the CONS
+HARM command changes the value of this constant for only those atoms
+specified.  When this command is invoked with an atom selection, only
+the reference coordinates (XREF,YREF,ZREF) for selected atoms are modified.
+If the CONS HARM command is invoked several times using different
+atom selections, different reference coordinates may be used.
+
+      The variables XSCAle, YSCAle, and ZSCAle are global scale factors
+for ALL harmonic restraint terms.  The default scale factor is 1.0 for all
+temrs.  The set of scale factors from the last CONS HARM command is used
+for ALL restraints.  This value is not remembered, in that if a scale
+factor is not specified in any CONS HARM command, it will revert to unity.
+
+
+Other commands:
+
+        The harmonic constraints may be read and written to files. The
+file name to be specified in the READ and WRITE command is CONS. The
+files may be read or written only in binary. The PRINT command will also
+work for constraints.  See *note io:(<A HREF="io.html">io.doc</A>), for more details.
+In addition, one may look at the contributions to the energy in detail
+using the analysis facility, see *note anal:(chmdoc/analys).
+
+        PRINT specifies that a listing of of all the atoms currently
+constrained should be printed out.  This is done by segments of
+constrained atoms, which is concise in most cases.  Unfortunately
+in the case of IUPAC specified constraints it is quite verbose.
+
+</PRE><HR><H4><I>File:</I> Cons  -=-  <I> Node:</I><A NAME=" Dihedral"> Dihedral</A><BR> <I> Up</I>:<A HREF="# Top"> Top</A> -=- <I> Next</I>:<A HREF="# Internal Coord"> Internal Coord</A> -=- <I> Previous</I>:<A HREF="# Harmonic Atom"> Harmonic Atom</A></H4><PRE>
+
+                  Holding dihedrals near selected values
+
+        Using this form of the CONS command, one may put constraints on
+the dihedral angles formed by sets of any four atoms. The improper
+torsion potential is used to maintain said angles.
+
+        The command for setting the dihedral constraints is as follows:
+
+Syntax:
+
+[SYNTAX CONS DIHEdral]
+
+CONStraint DIHEdral [BYNUM int int int int] [FORCE real] [MIN real] -
+                                                  [PERIod integer]
+                    [     4X(atom-spec)   ]
+CONS CLDH
+
+Syntactic ordering:  DIHE or CLDH must follow CONS, and FORCE, MIN and
+PERIod  must follow DIHE.
+
+where:      atom-spec ::= { segid resid iupac }
+                          { resnumber iupac   }
+
+
+        DIHEdral adds a torsion angle to the list of constrained angles
+using the specified atoms, force constant, minimum and periodicity.
+CLDH clears the list of constrained dihedrals so that different angles
+or new constraint parameters can be specified.
+
+Other commands:
+
+        The PRINT CONS command, see *note print:(<A HREF="io.html">io.doc</A>)print,
+will work for constraints.
+
+</PRE><HR><H4><I>File:</I> Cons  -=-  <I> Node:</I><A NAME=" Internal Coord"> Internal Coord</A><BR> <I> Up</I>:<A HREF="# Top"> Top</A> -=- <I> Next</I>:<A HREF="# Quartic Droplet"> Quartic Droplet</A> -=- <I> Previous</I>:<A HREF="# Dihedral"> Dihedral</A></H4><PRE>
+
+                Holding Internal Coordinates near selected values
+
+[SYNTAX CONS IC]
+
+Syntax:
+
+CONStraint IC  [BOND real [EXPOnent integer] [UPPEr]]
+                   [ANGLe real] [DIHEdral real]
+
+        Using this form of the CONS command, one may put constraints on
+any internal coordinate. For this energy term, the IC table is
+used. All nonzero bond entries are constrained with the bond constant,
+using the optional EXPOnent (default 2) in the potential K*(S-S0)**EXPOnent.
+Second derivatives are currently supported only with EXPOnent=2.
+If UPPEr is specified the reference bond length is taken as an upper
+limit and the constraint potential is applied only if S&gt;S0; this is
+intended for use with distance constraints from NMR NOE data.
+All nonzero angle entries are constrained with the angle constant. All
+dihedrals are constrained with the dihedral constant using the improper
+dihedral energy potential. If any IC entry contains an undefined atom
+(zeroes), then the associated bonds,angles, and dihedral will not be
+constrained.
+
+        This constraint term is very flexible in that the user may
+chose which bonds... to constrain by editing an IC table. The major
+drawback is that all bonds must have the same force constant. The same is
+true for angles and dihedrals. By listing some IC's several times, the
+effective force constant is increased. Also, if only angle constraints are
+desired, then the bond and dihedral constants can be set to zero eliminating
+their contribution.
+
+</PRE><HR><H4><I>File:</I> Cons  -=-  <I> Node:</I><A NAME=" Quartic Droplet"> Quartic Droplet</A><BR> <I> Up</I>:<A HREF="# Top"> Top</A> -=- <I> Next</I>:<A HREF="# Fixed Atom"> Fixed Atom</A> -=- <I> Previous</I>:<A HREF="# Internal Coord"> Internal Coord</A></H4><PRE>
+
+                        The Quartic Droplet Potential
+
+[SYNTAX CONS DROPlet]
+Syntax:
+
+CONStraint DROPlet [FORCe real] [EXPOnent integer] [NOMAss]
+
+        This constraint term is designed to put the entire molecule
+in a cage. Is is based on the center of mass (or center of geometry if
+NOMAss is specified) so that no net force or torque is introduced by this
+constraint term. The potential function is;
+
+        Edroplet= FORC* sum over atoms (( r-rcm )**EXPO )*mass(i))
+
+</PRE><HR><H4><I>File:</I>Cons  -=-  <I> Node:</I><A NAME=" Fixed Atom"> Fixed Atom</A><BR> <I> Up</I>:<A HREF="#Top">Top</A> -=- <I> Next</I>:<A HREF="# SHAKE"> SHAKE</A> -=- <I> Previous</I>:<A HREF="# Quartic Droplet"> Quartic Droplet</A></H4><PRE>
+
+                    How to fix atoms rigidly in place
+
+[SYNTAX CONS FIX]
+
+Syntax: CONS FIX atom-selection-spec { [PURG]                     }
+                                     { [BOND] [THET] [PHI] [IMPH] }
+
+        This command fixes atoms in place by setting flags in an array
+(IMOVE) which tells the minimization and dynamics alogrithms which atoms
+are free to move. If atoms are fixed, it is possible to save
+computer time by not calculating energy terms which involve only fixed
+atoms. The nonbond and hydrogen bond algorithms in CHARMM check IMOVE
+and delete pairs of atoms that are fixed in place from the nbond and
+hbond lists respectively. In addition the PURG or individual energy term
+options specified with the CONS FIX command allow all or some of the
+internal coordinate energies associated with fixed atoms to be deleted.
+Interactions between fixed and moving atoms are maintained.
+
+*** NOTE *** because some energy terms are deleted from fixed systems,
+the total energy calculated with fixed atoms will be different from the
+total energy of the same system with all atoms free. The forces on the
+moveable atoms will however be identical.  The purpose of this feature is
+to remove the computational cost of energy terms that do not change for
+simulations where a large fraction of the atoms are fixed.  It is not
+recommended for any other purpose.
+
+        The way CHARMM keeps track of fixed atoms is by the IMOVE array
+in the PSF. The IMOVE array is 0 if the atom is free to move, and has
+some other value if the atom is fixed. WARNING: the use of IMOVE is not
+yet universal in CHARMM. It is supported for dynamics, all forms of
+minimization except Newton-Raphson. The vibrational analysis does not
+support it. The fixing of atoms is also not respected with internal
+coordinate manipulations (IC BUILD) or the coordinate manipulation commands.
+
+***** WARNING ***** The purge options modify the PSF. The effects of
+this command cannot be undone by the subsequent releasing of atoms.
+
+</PRE><HR><H4><I>File:</I> Cons  -=-  <I> Node:</I><A NAME=" SHAKE"> SHAKE</A><BR> <I> Up</I>:<A HREF="# Top"> Top</A> -=- <I> Next</I>:<A HREF="# NOE"> NOE</A> -=- <I> Previous</I>:<A HREF="# Fixed Atom"> Fixed Atom</A></H4><PRE>
+
+                Fixing bond lengths or angles during dynamics.
+
+        SHAKE is a method of fixing bond lengths and, optionally, bond
+angles during dynamics, minimization (not ABNR and Newton-Raphson methods),
+coordinate modification (COOR SHAKe command), and vibrational analysis
+(explore command). The method was brought to CHARMM by Wilfred Van
+Gunsteren (WFVG), and is referenced in J. Comp. Phys. 23:327 (1977).
+When hydrogens are present in a structure, it will allow a two-fold
+increase in the dynamics step size if SHAKE is used on the bonds.
+
+        To use SHAKE, one specifies the SHAKE command before any
+SHAKE constraints usage. The SHAKE command has the following syntax:
+
+[SYNTAX SHAKe constraints]
+
+SHAKE [BONH] [BOND] [ANGH] [ANGL] { [MAIN]     } [TOL real] [MXITer integer]
+                                  { COMP       }
+                                  { PARAmeters }
+
+            2x(atom-selection) [SHKScale real]
+
+
+        BONH specifies that all bonds involving hydrogens are to be
+fixed. BOND specifies all bonds. ANGH specifies that all angles
+involving hydrogen must be fixed. ANGL specifies that all angles must be
+shaken. BOND must be specified if angles are fixed, otherwise, only the 1-3
+distances will be fixed. Coordinates must be read in before the SHAKE
+command is issued, unless the PARAmeter option is specified.
+
+      SHAKE constraints are applied only for atom pairs where one atom
+is in the first atom selection and one atom in the second atom selection.
+The default atom selection is ALL for both sets.  
+
+        TOL specifies the allowed relative deviations from the reference
+values (default: 10**-10). MXITer is the maximum number of iterations
+SHAKE tries before giving up (default: 500).
+
+        When the SHAKE command is used, it will check that there are
+degrees of freedom available for all atoms to satisfy all their
+constraints. Angles cannot be fixed with SHAKE if one has explicit
+hydrogen arginines in the structure as the CZ carbon has too many
+constraints. This is a general problem for any structure which has too
+many branches close together.
+
+        SHAKE is not recommended for fixing angles. The algorithm
+converges very slowly in the case where one has three angles centered on
+a tetravalent atom and the constraints are satisfiable only using out of
+plane motions.
+
+        The use of SHAKE modifies the output of the dynamics command.
+The number appearing to the right of the step number is the number of
+iterations SHAKE required to satisfy all the constraints. This number
+should generally be small.
+
+        When ST2's are present, SHAKE constraints are automatically
+applied for the O-H bonds and H-O-H angles.
+
+        There is a PARAmeter option for the SHAKe command. This option
+causes the shake bond distances to be found from the parameter table
+rather than from the current set of coordinates. This option is
+NOT compatible with the use on angle SHAKE constraints, and it will
+give an error if this is tried.
+
+        With these commands, the bond energy may be zeroed without
+any minimization with the command sequence;
+        SHAKE BOND PARA
+        COOR SHAKE [MASS]
+
+[SYNTAX SHAKe FAST constraints]
+SHAKe FAST [WATEr SELEct water_selection END] [OLDWatershake]
+         [ MXITer &lt;iterations&gt; TOL &lt;tolerance&gt; ] [PARAmeter] [COMP]
+   This command specifies the use of the new vector/parallel SHAKE
+   constraint routines. Certain assumptions are made when this command
+   is issued: The only bonds involved are between heavy atoms and hydrogens,
+   except for water molecules included in the WATEr selection ... end
+   sub-command.  This selection is used to indicate the water molecules
+   that have an H-H bond. It is assumed that the selection will include
+   all atoms in the water molecule and that said molecule contains exactly
+   two X-H bonds and one H-H bond where X is any heavy atom.  Testing
+   for &quot;hydrogen-ness&quot; is done via the CHARMm hydrog() function which
+   makes it's choice based on atomic mass.  The prefered selection is
+   through the use of the RESNAME selection specifier, eg:
+
+       ... WATEr SELEct RESNAME TIP3 END
+
+   By default, water molecules selected with the WATEr sub-command will
+   be constrained via the use of a special water-SHAKE routine which
+   uses the direct inversion method. This algorithm is from 25 to 30 %
+   faster than the normal iterative, scalar SHAKE routine. For the rest
+   of the heavy atom -hydrogen bonds, a vector/parallel version of
+   the original SHAKE routine is used.  This is about 5X the scalar SHAKE.
+   If the optional keyword OLDWatershake is used, the vector/parallel
+   (not the watershake) routines are used.
+
+   The rest of the keywords are the same as in the original SHAKE command.
+   Note: that FAST has to be the second word in command line.
+
+</PRE><HR><H4><I>File:</I> Cons  -=-  <I> Node:</I><A NAME=" NOE"> NOE</A><BR> <I> Up</I>:<A HREF="# Top"> Top</A> -=- <I> Previous</I>:<A HREF="# SHAKE"> SHAKE</A> -=- <I> Next</I>:<A HREF="# Restrained Distances"> Restrained Distances</A></H4><PRE>
+
+[SYNTAX NOE constraints]
+
+
+NOE
+            Invoke the module
+   RESEt 
+            Reset all NOE constraint lists. This command clears all
+            existing NOE constraints. Resets scale factor to 1.0
+
+ ASSIgn [KMIN real] [RMIN real] [KMAX real] [RMAX real] [FMAX real]
+                 [TCON real] [REXP real] 2X(atom_selection) 
+ 
+
+            Assign a constraining potential between the atoms the
+            first selection and the atoms of the second selection.
+
+            Where multiple atoms are selected, 
+                     R = [ average( Rij**(1/REXP) ) ]**REXP
+            The default REXP value is 1.0 (a simple average).
+            An REXP value of 3.0 may be optimal for NOE averaging.
+
+                   /  0.5*KMIN*(RAVE-RMIN)**2    R&lt;RMIN
+                  /
+                 /    0.0                        RMIN&lt;R&lt;RMAX
+            E(R)=
+                 \    0.5*KMAX*(RAVE-RMAX)**2    RMAX&lt;RAVE&lt;RLIM
+                  \
+                   \  FMAX*(RAVE-(RLIM+RMAX)/2)  RAVE&gt;RLIM
+
+            and
+                     RAVE=R                     TCON=0
+
+                     RAVE=RRAVE**(-1/3)         TCON&gt;0
+                     
+                     RRAVE=RRAVE*(1-DELTA/TCON)+R**(-3)*DELTA/TCON
+
+            for initial conditions, RRAVE=RMAX**(-3)
+            DELTA is the integration time step.  For minimization,
+            the value is either 0.001ps or the previous simulation value.
+
+            Where: RLIM = RMAX+FMAX/KMAX (the value of RAVE where the
+                                          force equals FMAX)
+
+            Defaults for each entry: KMIN=0.0, RMIN=0.0,
+                                     KMAX=0.0, RMAX=9999.0, FMAX=9999.0
+                                     TCON=0.0, REXP=1.0
+
+Also, the old sytax is supported:
+
+ ASSIgn rminvalue  minvariance  maxvariance  2X(atom_selection) 
+
+For this format, KMAX=0.5*Kb*TEMP/(maxvariance**2)
+                 KMIN=0.5*Kb*TEMP/(minvariance**2)
+                 RMIN=rminvalue
+                 RMAX=rminvalue
+
+
+   READ UNIT &lt;integer&gt;
+            Reads constraint data structure from card
+            file previously written.
+   WRITe UNIT &lt;integer&gt; [ANAL]
+            Writes out the constraint data in card format to a file on the
+            specified unit. A CHARMM title should follow the command.
+            SCALE are saved together with the lists in the NOE common block.
+            The ANAL option will print out the distances and energy data
+            computed with the current main coordinates.
+   PRINT [ANAL [CUT real]]
+            Same as the WRITe command except to the output file and slightly
+            more user friendly form. A positive CUT value will list only
+            those that have a distance that exceeds RMAX by more than DCUT.
+   SCALe [real]
+            Set the scale factor for the NOE energy and forces.
+            Default value: 1.0
+   TEMPerature real
+            Specify the temperature for the old format.
+   END
+            Return to main command parser.
+
+No other commands (I/O or loops) are supported inside the NOE module.
+Looping can be performed outside if necessary.  The units are Kcal/mol/A/A
+for force constants and Angstroms for all distances.
+
+EXAMPLE. Set up some NOE constraints for one strand of a DNA-hexamer
+in a file to be streamed to from CHARMM.
+
+*  SOME NOE CONSTRAINTS FOR DNA. ASSUME PSF, COORD ETC ARE ALREADY PRESENT
+*
+! First clear the lists
+NOE
+   RESET
+   END
+! Since there are many identical atom pairs we use a loop
+set 1 1
+label loop
+NOE
+!   Sugar protons, same in all six sugars (don't pay any attention to
+!     the numeric values)
+    ASSIgn  SELE ATOM A @1 H1' END SELE ATOM A @1 H2'' END -
+            KMIN 1.0 RMIN 2.7 KMAX 1.0 RMAX 3.0 FMAX 2.0
+    ASSIgn  SELE ATOM A @1 H3' END SELE ATOM A @1 H2'' END -
+            KMIN 1.0 RMIN 2.7 KMAX 1.0 RMAX 3.0 FMAX 2.0
+    END
+incr 1 by 1
+if 1 le 6 goto loop
+! Now do some more specific things
+
+OPEN WRITE UNIT 10 CARD NAME NOE.DAT
+NOE
+   SCALE 3.0  ! Multiply all energies and forces by 3
+   WRITE UNIT 10
+* NOE CONSTRAINT DATA FROM DOCUMENTATION EXAMPLE
+*
+   PRINT ANAL  ! See what we have so far
+   PRINT ANAL CUT 2.0 ! list 
+   END
+RETURN
+
+
+</PRE><HR><H4><I>File:</I> Cons  -=-  <I> Node:</I><A NAME=" Restrained Distances"> Restrained Distances</A><BR> <I> Up</I>:<A HREF="# Top"> Top</A> -=- <I> Previous</I>:<A HREF="# NOE"> NOE</A> -=- <I> Next</I>:<A HREF="# Top"> Top</A></H4><PRE>
+
+      Apply general restrained distances allowing multiple distances to
+be specified.  This restraint term has been added to allow for facile
+searching of a reaction coordinate, where the reaction coordinate is
+estimated to be a linear combination of several distances.
+
+      By Bernard R. Brooks - NIH - March, 1995
+
+[SYNTAX Restrained Distances]
+
+  
+RESDistance [ RESEt ] [ SCALE real ] [ KVAL real  RVAL real [EVAL integer] -
+                                    repeat( real  first-atom  second-atom ) ]
+
+
+   E = 1/EVAL *  Kval ( K1*R1 + K2*R2 + ... + Kn*Rn - Rval ) ** EVAL
+
+
+   RESEt       Reset the restraint lists. This command clears the
+               existing restraints. Resets the scale factor to 1.0
+
+   SCALe real  Set the scale factor for the energy and forces.
+               Default value: 1.0
+
+
+If anything else is on the command line then a new restraint is added to the
+list of distance restraints.
+      KVAL real     The force harmonic constrant
+      RVAL real     The target distance
+      EVAL integer  The exponent (default 2). EVAL must be positive.
+      repeat( real first-atom second-atom )
+            The real value is a scale factor for the distance between
+            the fist and second specified atoms in the pair.
+
+EXAMPLES:
+1. Create a reaction coordinate for QM/MM 
+2. Set up some restraints to force three atoms to make an equilateral triangle.
+
+
+!!! 1 !!!  Create a reaction coordinate for QM/MM 
+
+OPEN WRITE CARD UNIT 21 name reaction.energy
+OPEN WRITE FILE UNIT 22 name reaction.path
+TRAJECTORY IWRITE 22 NWRITE 1 NFILE 40 SKIP 1
+* trajectory of a minimized reaction path
+*
+
+SET ATOM1  MAIN 11 OG
+SET ATOM2  MAIN 11 HG
+SET ATOM3  MAIN 23 OD1
+
+SET 1 1
+SET V -5.0
+LABEL LOOP
+
+SKIP NONE             ! make sure all energy terms are enabled
+RESDistance  RESET KVAL 2000.0  RVAL @v - 
+   1.0   @atom1  @atom2    -1.0   @atom2  @atom3 
+
+MINI ABNR NSTEP 200 NPRINT 10
+PRINT RESDistances    ! print a check of distances
+TRAJ WRITE            ! write out the new minimized frame
+
+SKIP RESD             ! turn off the restraint energy term
+ENERGY                ! recompute the energy without restraints
+WRITE TITLE UNIT 21   ! write out the current restraint distance and energy
+* @V ?ENER
+*
+
+INCR 1 BY 1           ! increment the step counter
+INCR V BY 0.25        ! increment the restraint value
+IF 1 LT 40.5 GOTO LOOP
+
+RETURN
+
+!!! 2 !!! Make a water nearly an equilateral triangle
+
+set atom1  WAT 1 O
+set atom2  WAT 1 H1
+set atom3  WAT 1 H2
+
+RESDistance  RESEt
+
+RESDistance  KVAL 1000.0  RVAL 0.0 - 
+        1.0   @atom1  @atom2  -
+        1.0   @atom1  @atom3  -
+       -2.0   @atom2  @atom3
+RESDistance  KVAL 1000.0  RVAL 0.0 - 
+        1.0   @atom1  @atom2  -
+       -2.0   @atom1  @atom3  -
+        1.0   @atom2  @atom3
+RESDistance  KVAL 1000.0  RVAL 0.0 - 
+       -2.0   @atom1  @atom2  -
+        1.0   @atom1  @atom3  -
+        1.0   @atom2  @atom3
+
+print resdistances
+mini abnr nstep 200 nprint 10
+print resdistances
+stop
+</PRE>
+<HR>
+<H4><A HREF="Charmm24.Html">CHARMM .doc</A> Homepage</H4>
+<HR>
+<CITE>Information and HTML Formatting Courtesy of:</CITE><P>
+NIH/NHLBI/LBC Computational Biophysics Section<BR>
+FDA/CBER/OVRR Biophysics Laboratory<BR>
+<HR>

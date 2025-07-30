@@ -1,0 +1,944 @@
+<html><head><title>An MBone Recorder/Player</title></head>
+<body bgcolor=#ffffff>
+ 
+<a href="thesis.html">[Top]</a> <a href="thesis.html">[Prev]</a> <a href="thesis_appendices.html">[Next]</a> <a href="thesis_appendices.html">[Bottom]</a>
+<hr><br>
+ 
+<a name="442372"> </a>
+<h1 align="center">CHAPTER I </h1>
+<a name="433909"> </a>
+<h1 align="center"> INTRODUCTION</h1>
+<p><a name="434374"> </a>
+Videoconferencing-comprising audio, video, and possibly graphical data such as slides-requires timely transmission of potentially large amounts of data to and from multiple sources.  One way-the most obvious way-to transfer the data is via a transport infrastructure that provides explicit bandwidth and other service guarantees, such as traditional telephone circuits.  In such environments, resources are set aside for the sole use of the conference members and for the duration of the conference, guaranteeing that loss or delay because of bandwidth contention (congestion) will not occur.  
+</p><p><a name="434375"> </a>
+The Internet is a poor fit for this model of data transfer.  Its main transport protocols, TCP and UDP, provide neither timeliness guarantees nor resource reservation.  Congestion, while not inevitable, cannot be eliminated as a possibility by end users because they cannot control intermediate resources, i.e., the nodes that forward the data between the users.  And many-to-many communication is expensive in bandwidth terms: it requires transmitting multiple instances of the data, which exacerbates any existing congestion.  
+</p><p><a name="434376"> </a>
+However, by relaxing what is actually required for videoconferencing, and by adding a more efficient means of data distribution, Internet-based videoconferencing has become a reality.  The tools that receive data are designed to compensate gracefully for delay and loss of data, so completely reliable transmission is no longer necessary (although it is still desirable if it is available).  Many-to-many communication has been made efficient by the addition of multicasting capabilities to the Internet protocol suite.  
+</p><p><a name="417929"> </a>
+Today, a variety of tools exists to exchange multimedia information between many parties in real time over the Internet.  In particular, there are several widely available applications, both free and commercial, that enable videoconferencing using the Real-Time Transport Protocol (RTP) <a href="thesis_b.htm#443044">[34]</a>.  
+</p><p><a name="417930"> </a>
+With the advent of these conferencing tools, the need has arisen for ancillary utilities to record and to replay these conferences.  Several such tools are being or have been developed.  
+</p><p><a name="433852"> </a>
+This paper describes the DPSS Multimedia Recorder/Player (DMRP), which can capture data transmitted via one or more RTP sessions for later playback.  It uses the Distributed-Parallel Storage System (DPSS) <a href="thesis_b.htm#443016">[20]</a> to store the data.  The combination of the DMRP and DPSS makes possible a scalable, robust archival server for such multimedia data.  
+</p><p><a name="443575"> </a>
+<a href="thesis_b.htm#443580">Chapter II</a> provides background material on both the MBone (its history, protocols, and practices) and the DPSS.  <a href="thesis_b.htm#418002">Chapter III</a> describes the DMRP's design, including the functionality required (and provided) by the DMRP and some constraints that influenced that design.  <a href="thesis_b.htm#418332">Chapter IV</a> details the implementation of the DMRP, including a description of the major classes comprising it and a brief discussion of some non-obvious implementation decisions (the use of threads and the Standard Template Library <a href="thesis_b.htm#443048">[36]</a>) and the reasons for them.  <a href="thesis_b.htm#418017">Chapter V</a> provides a brief performance analysis of the finished software.  <a href="thesis_b.htm#418018">Chapter VI</a> outlines some of the improvements and modifications that are planned for the DMRP.  Finally, <a href="thesis_b.htm#439008">Chapter VII</a> presents a summary and concluding remarks.  
+</p><a name="443580"> </a>
+<h1 align="center">CHAPTER II </h1>
+<a name="433898"> </a>
+<h1 align="center"> BACKGROUND</h1>
+<p><a name="434268"> </a>
+Because they are still relatively new, <a href="thesis_b.htm#434078">Section II.1</a> reviews current multicasting practices and protocols, with particular emphasis on the multicast transport of multimedia data.  <a href="thesis_b.htm#417983">Section II.2</a> discusses the general purpose, functionality, and architecture of the DPSS.  
+</p><a name="434078"> </a>
+<h2 align="center">II.1   Multicasting</h2>
+<p><a name="417934"> </a>
+Peer-to-peer communication in a computer network can be characterized according to the scope of the intended audience.  <em>Unicasting</em> denotes the transmission of data from one computer to a single recipient on a network.  <em>Broadcasting</em> denotes the transmission of data from one computer to all computers on a network.  <em>Multicasting</em> denotes the transmission of data from one computer to a subset of all the computers on a network.  
+</p><p><a name="422537"> </a>
+Multicasting fills a critical gap between unicasting and broadcasting.  It makes more effective use of network bandwidth than unicasting by eliminating the need to duplicate data for each recipient; in fact, multicasting permits data distribution in parallel to a much larger number of recipients than is physically possible via unicasting.  At the same time, multicasting permits more discrimination than broadcasting, in principle allowing end nodes to avoid processing data not intended for them.  
+</p><a name="417936"> </a>
+<h3 align="center">II.1.1   Multicasting on the Internet</h3>
+<p><a name="417937"> </a>
+The Internet Protocol (IP) <a href="thesis_b.htm#443038">[31]</a> did not originally provide support for multicast.  However, in 1989 Steve Deering, then of Stanford University, proposed a set of modifications to IP to allow multicast <a href="thesis_b.htm#442992">[6]</a>.  The changes were designed to allow implementations that included support for <em>IP multicast</em> to interoperate with implementations lacking the modifications.  
+</p><p><a name="417938"> </a>
+Under IP multicast, class D IP addresses comprising the address range 224.0.0.0 - 239.255.255.255 are reserved for identifying <em>host groups,</em> &quot;a set of zero or more hosts identified by a single IP destination address&quot; (<a href="thesis_b.htm#442992">[6]</a>, 1).  Hosts send data to a host group by setting the destination address of their IP datagrams to the appropriate class D address, and similarly receive data by accepting datagrams sent to that address.  Forwarding of IP multicast datagrams is handled by <em>multicast routers.<a href="#418721"><sup>1</sup></a></em>  Receiving hosts use the <em>Internet Group Management Protocol</em> (IGMP) <a href="thesis_b.htm#442994">[8]</a> to indicate to the nearest multicast router their desire to join host groups and so to receive the traffic destined for those groups.<a href="#437978"><sup>2</sup></a>  (IP multicast is designed so that a host need not join a host group to send data to that group.)  
+</p><p><a name="418895"> </a>
+Broadly, IGMP requires a would-be receiver to signify its desire to receive traffic destined for a particular host group to the nearest multicast router.  Once a router has been advised that any host on a connected local network wishes to receive a host group's traffic, the router forwards that traffic to the local network.  The router periodically sends a query to all hosts on the local network, requesting that the hosts report which host groups they are (still) interested in receiving.  As long as any host reports its interest in a host group, the router continues to forward the group's traffic to the local network.  If no host expresses such an interest, the traffic is not so forwarded.  
+</p><p><a name="417940"> </a>
+IP multicast is scalable and dynamic because it places the responsibility for group membership on the receiver and the multicast routers; no host-including the sender-need keep information as to the location, or even the existence, of other participants.  Multicast routers need not know which hosts on a connected local network are participating in a host group, but only that at least one host is.  Furthermore, no matter how many hosts on a local network are members of a host group, only one copy of each datagram belonging to the group will be forwarded to the network by the router.  Finally, a sender need transmit only one instance of its data, no matter how many receivers there are.  Final delivery of data is via broadcast on a LAN, e.g., Ethernet, or multicast if supported by the end host's subnet (e.g., on an ATM network).  
+</p><p><a name="417941"> </a>
+The collection of IP multicast-enabled hosts connected by multicast routers and virtual point-to-point <em>tunnels</em> over non-multicast-enabled portions of the Internet is called the IP Multicast Backbone, or <em>MBone</em> <a href="thesis_b.htm#443567">[7]</a><em>.</em>  Eventually, as support for IP multicast becomes ubiquitous, the MBone will cease to be a distinct subset of the Internet.  
+</p><p><a name="426479"> </a>
+Note that IP multicast only provides the barest essentials for communication; like unicast IP, IP multicast requires higher-level protocols to be useful to applications.  These protocols must address not only problems analogous to those addressed by non-multicast protocols, such as reliable end-to-end delivery, but also issues pertinent to multicast in general, such as the monitoring of group membership, and issues relevant to IP multicast in particular, such as the apportioning of scarce resources (i.e., IP multicast addresses).  RTP, discussed in <a href="thesis_b.htm#417942">Section II.1.2</a>, provides multicast data transmission services to applications that can survive some unreliability, including misordering of data.  Other protocols, discussed in <a href="thesis_b.htm#417972">Section II.1.3</a>, address a different subset of the higher-level protocol issues: they attempt to impose some order and meaning to host groups by associating information with them and disseminating the information as needed.  These protocols are critical to the deployment of <em>session directories,</em> which are tools that provide meaningful descriptions of how host groups are currently being used--e.g., &quot;224.2.153.144, port 43654 is being used for H.261 video data exchange by the NASA Space Shuttle program&quot;--and which provide enough data to enable a user to join the host group using an appropriate tool for the data being exchanged.  Yet another set of protocols, also discussed in <a href="thesis_b.htm#417972">Section II.1.3</a>, are intended to govern the actual performance of multimedia data transmission, allowing control of data rates and dynamic, high-level coordination of sets of multimedia data streams.  
+</p><a name="417942"> </a>
+<h3 align="center">II.1.2   A New Protocol: RTP/RTCP</h3>
+<a name="420542"> </a>
+<h4>II.1.2.1	 Limitations of UDP and TCP</h4>
+<p><a name="417943"> </a>
+By itself, IP multicast is insufficient to support end-to-end data transport.  As with any IP datagrams, IP multicast datagrams may be lost or may arrive out of order <a href="thesis_b.htm#442992">[6]</a>.  Thus for IP multicast to be useful, some higher-level protocol must supply the necessary error detection-and if necessary, error compensation<em>-</em>facilities.  In addition, the higher-level protocol should support multiplexing of distinct multicast sessions between two or more hosts, and possibly support some organization of the data (e.g., by partitioning it into frames or segments).  
+</p><p><a name="417944"> </a>
+UDP and TCP, the most widely used transport-level protocols operating over IP, were designed to facilitate, respectively, message- and stream-oriented data transfers over a network or internetwork.  UDP offers applications multiplexing (i.e., the use of multiple, distinguishable communication endpoints (&quot;ports&quot;) on a single host) and some data integrity checking (error detection), while TCP provides reliable, ordered delivery (including error correction) in addition to multiplexing and integrity checking.  Both protocols impose some organization on the data they transport: UDP packages data in datagrams, while TCP treats data as ordered streams of bytes.  
+</p><p><a name="417945"> </a>
+TCP, however, is designed for unicast communication.  It establishes a duplex connection between two and only two hosts: its connection establishment, error detection and error correction algorithms are designed around this duplex communication.  TCP would have to be drastically modified to support simultaneous communication between more than two hosts.  
+</p><p><a name="417946"> </a>
+Lacking TCP's extensive error correction mechanisms, UDP might seem an appropriate candidate for an IP multicast transport protocol.  However, UDP does not itself provide enough information to determine whether datagrams are missing.  
+</p><p><a name="417948"> </a>
+If IP multicast is to be used to deliver real-time data like video, the higher-level protocol must provide the necessary mechanisms to ensure that the receiver can present the data as the sender intended in time (i.e., it must provide synchronization mechanisms).  It is important, for instance, to present video to an end user at the correct frame rate, just as it is important to preserve the pauses in speech since they may signify as much as the words.  Neither TCP nor UDP preserves this data-based timing.  
+</p><p><a name="438008"> </a>
+Human beings can tolerate some degree of loss in an audio or video stream: moviegoers, for example, endure splices in film reels without significant loss of understanding.  Complete reliability, therefore, is not required, only the ability to detect loss.  However, TCP does not allow reliability to be sacrificed, while UDP has no way of detecting loss.  
+</p><p><a name="417949"> </a>
+The <em>Real-time Transport Protocol</em> (RTP) <a href="thesis_b.htm#443044">[34]</a> is a stream-oriented, application-level datagram protocol.  Together with the <em>RTP Control Protocol</em> (RTCP), RTP provides enough information for a receiver to reconstruct the stream, or to detect gaps within the stream.<a href="#418735"><sup>3</sup></a>  RTP and RTCP also provide enough information to calculate the rate at which the datagrams were sent.  However, they deliberately do not define a mechanism to compensate for lost data: the designers believed that application developers might wish to use various strategies to recover from errors.  
+</p><p><a name="417950"> </a>
+Although RTP and RTCP were designed to support &quot;multi-participant multimedia conferences&quot; (<a href="thesis_b.htm#443044">[34]</a>, 3), the protocol is not explicitly limited to such applications.  However, when discussing RTP/RTCP usage below, examples will be in the context of such conferences.  
+</p><p><a name="420597"> </a>
+It should be noted that RTP/RTCP provides neither traditional port-based multiplexing (as used by UDP and TCP) nor data integrity checking, relying on an underlying protocol for these services.  The protocol's designers envisioned that UDP would be used for this purpose, although any equivalent protocol could be used.  RTP does require multiplexing of a different sort, however: each data source in a host group must distinguish itself using a unique identifier, the SSRC ID (see <a href="thesis_b.htm#420267">Section II.1.2.2</a>).  
+</p><p><a name="417951"> </a>
+RTP and RTCP were designed to provide a minimal common basis for real-time communication between a variety of applications while allowing those applications the flexibility to choose how, or whether, to enhance the basic set of offered services.  
+</p><p><a name="436800"> </a>
+In this paper, the protocol specification for RTP/RTCP is sometimes referred to as &quot;RFC 1889,&quot; the identifier assigned to it by the standards body that issued the specification.  
+</p><a name="420267"> </a>
+<h4>II.1.2.2	 RTP</h4>
+<p><a name="420523"> </a>
+RTP facilitates the dissemination of real-time data in a multicast group by providing key services that IP multicast lacks.  It identifies and distinguishes session members, and timestamps data so receivers can reconstruct a sender's data stream in time as well as space.  
+</p><p><a name="420662"> </a>
+An <em>RTP session,</em> in terms of IP multicast,<a href="#420661"><sup>4</sup></a> embodies all participants communicating via a particular multicast address and pair of port numbers (one for RTP, the other for RTCP).  In a multimedia conference, each medium typically warrants its own session; thus audio and video data are carried in different RTP sessions.  (Discussion is under way as to how mixed-media encodings-those that carry both audio and video, for example-should be treated by the protocol.)  
+</p><p><a name="420575"> </a>
+Central to RTP is the concept of the synchronization source.  A <em>synchronization source</em> (SSRC) is the origin of a stream of RTP data packets and defines both the ordering and the timing of the data stream it transmits.  Each audio or video source in an RTP session, for example, would be a separate SSRC.  Since in a typical multicast group any participant may be a data source, every participant usually is considered an SSRC.  Each SSRC must uniquely identify itself in a session by choosing a random <em>synchronization source ID.</em>  The SSRC ID allows receivers to associate packets, arriving in random order, with the streams of which they are a part.  Note that using packets' source addresses to multiplex between sources is inadequate, since a single host may originate multiple streams.  
+</p><p><a name="420651"> </a>
+An SSRC need not be a source of raw data, such as the input from a microphone or camera: it may also be an application that filters an existing RTP data stream or combines several such data streams in some way.  The input to such an application, known as a <em>mixer,</em> might require timing adjustments before the data could be retransmitted.  The mixer would then be the (new) data stream's synchronization source, because the timing and sequence of the data would no longer reflect that of the original data sources, or <em>contributing sources</em> (CSRCs).  A mixer identifies the CSRCs whose packets it is filtering so that a receiver may correctly attribute the packets' originators.  
+</p><p><a name="420430"> </a>
+RTP segments a raw data stream into packets and prepends a 12-byte fixed header of protocol information (see <a href="thesis_b.htm#417953">Figure 1</a>) followed by zero or more contributing source identifiers and possibly one header extension.  (Header extensions are beyond the scope of this discussion.)  
+</p><p><a name="417953"><img alt="image of RTP fixed packet header format" src="thesia11.gif"></a><p>
+The <em>V</em> field (version; 2 bits) indicates the protocol version number; the current version is 2.<a href="#420439"><sup>5</sup></a>  The <em>P</em> field (padding; 1 bit) indicates whether the packet contains padding following the payload, while the <em>X</em> (extension) bit, if set, indicates that the fixed header is followed by one header extension.  (Padding, like header extensions, is not relevant to this brief discussion of the protocol: the DMRP treats both opaquely.)  The <em>CC</em> field (CSRC count, 4 bits) is the number of 32-bit contributing source identifiers that follow the fixed header; zero is a valid count.  
+</p><p><a name="420464"> </a>
+The <em>M</em> field (marker; usually one bit) is interpreted according to the <em>profile</em><a href="#431846"><sup>6</sup></a> under which the application is operating (see <a href="thesis_b.htm#417969">Section II.1.2.4</a>); generally, it marks &quot;significant events such as frame boundaries . . . in the packet stream&quot; (<a href="thesis_b.htm#443044">[34]</a>, 11).  The <em>PT</em> field (payload type; usually 7 bits) tells an application what kind of data are in the packet; the interpretation of the RTP timestamp varies according to the payload type.  The size and permitted values of each field may vary depending on the profile, but together they are constrained to occupy only one octet.  
+</p><p><a name="431852"> </a>
+The <em>SEQ</em> field (sequence number; 16 bits) identifies the order in which the packets were transmitted.  It increments by one for each RTP data packet sent.  RTP does not ensure in-order presentation of packets, so the sequence number allows an application to detect an out-of-order packet.  A transmitter's initial SEQ value is randomly chosen to enhance encryption security, although the protocol does not require the use of encryption.  
+</p><p><a name="426521"> </a>
+Because the SEQ field only comprises 16 bits, it can only take on 65,536 unique values.  During a long-lived RTP session, it is likely that more than this number of packets will be transmitted by a continually sending source, so the source must reuse sequence numbers.  The protocol specification requires that session members note each time the SEQ has wrapped around, i.e., used all 65,536 values; each such sequence number wrap is called a <em>cycle.</em>  
+</p><p><a name="420386"> </a>
+The <em>RTP TS</em> field (RTP timestamp; 32 bits) &quot;reflects the sampling instant of the first octet in the RTP data packet&quot; (<a href="thesis_b.htm#443044">[34]</a>, 11).  The RTP timestamp does not represent the actual or wallclock time: rather, it represents the passage of time on a logical clock.  How this timestamp corresponds to wallclock time is format-dependent (see <a href="thesis_b.htm#417969">Section II.1.2.4</a>).  Receivers use the timestamps to synchronize presentation of data to the user, reproducing the playout rate of the source.  Like the SEQ, the initial value of the RTP TS is randomly chosen.  
+</p><p><a name="419024"> </a>
+The <em>SSRC ID</em> field (32 bits) is the SSRC's randomly chosen identifier for the duration of the RTP session.  Each SSRC ID must be unique during a session: if two SSRCs choose the same SSRC ID, one or both must select a new ID.  An SSRC must also change its SSRC ID if it changes its source transport address.  
+</p><p><a name="431833"> </a>
+If the packet was generated by a mixer, the CSRC IDs follow the SSRC ID field.  
+</p><p><a name="422578"> </a>
+The structure of the RTP fixed packet header does not vary across profiles (see <a href="thesis_b.htm#417969">Section II.1.2.4</a>) or for different payload types governed by a profile.  
+</p><a name="417959"> </a>
+<h4>II.1.2.3	 RTCP </h4>
+<p><a name="417960"> </a>
+According to RFC 1889, RTCP performs three main functions: 
+</p><ol>
+<a name="418258"> </a>
+<li> 	It provides &quot;feedback on the quality of the data distribution.&quot;  This feedback can be used by other participants (e.g., a sender might choose to reduce its bandwidth because of poor reception by other members of the session) or by third-party monitors that may act on that information (e.g., a network provider might elect to change bandwidth constraints for a session).
+<a name="418271"> </a>
+<li> 	It carries an RTP source's <em>canonical name,</em> which is a persistent identifier for the source, unlike the SSRC ID which may change during the course of a session.  The canonical name allows receivers to associate a meaningful identifier with a source, especially between concurrent sessions.  This cross-session persistence permits association between different media, with the foremost example being synchronized audio and video.
+<a name="418284"> </a>
+<li> 	Because every session participant must send RTCP packets, participants can determine the total number of session members dynamically.  The number of session members is one parameter determining the RTCP packet transmission rate, which must be controlled to allow RTP/RTCP to scale to a large number of participants.  Hence RTCP contributes to adjusting its own performance.<a href="#418755"><sup>7</sup></a>  
+</ol>
+<p>
+The structure of the first four bytes (32 bits) present in all RTCP packet headers is shown in <a href="thesis_b.htm#417962">Figure 2</a>.  
+<p><a name="417962"><img alt="image of RTCP common packet header format" src="thesisa9.gif"></a><p>
+</p><p><a name="421308"> </a>
+The <em>V</em> and <em>P</em> fields are the same size and have the same meaning as the fields of the same name in the RTP data packet header, and V currently also has the same value, 2.  
+</p><p><a name="421234"> </a>
+The <em>C</em> field (count; 5 bits) is a count of subsequent items in the packet.  Different RTCP packet types carry blocks of per-source data; C indicates how many such blocks are part of the packet, i.e., how many sources are being reported on in this packet.  (For one type of RTCP packet-the APP packet-the C field is called the <em>subtype</em> field and may be used in an application-specific way rather than as a count.  The field is the same size in either case.)  
+</p><p><a name="436303"> </a>
+The <em>PT</em> field (packet type; 8 bits) denotes the packet's type; there are five types (see <a href="thesis_b.htm#436314">Table 1</a>).  The <em>LEN</em> field (length; 16 bits) gives the RTCP packet's length in 32-bit words minus one, including the header and any padding.  Defining LEN in this way provides for slightly greater efficiency during packet validation and avoids a possible infinite-loop error when scanning compound packets; see RFC 1889 for details.  
+</p><p><a name="436310"> </a>
+<a href="thesis_b.htm#436314">Table 1</a> shows the five types of RTCP packets and the value of the PT field for each.   
+<Table Border="3">
+<caption><a name="436314"> </a>
+<h4 align="center">Table 1.  RTCP Packet Types</h4>
+</caption>
+<tr><th><br><a name="436320"> </a>
+<h4> Packet Type</h4>
+</th><th><br><a name="436322"> </a>
+<h4> Abbrev</h4>
+</th><th><br><a name="436324"> </a>
+<h4> PT value</h4>
+</th></tr>
+<tr><td><br><p><a name="436326"> </a>
+ Sender report
+</p></td><td><br><p><a name="436328"> </a>
+ SR
+</p></td><td><br><p><a name="436330"> </a>
+ 200
+</p></td></tr>
+<tr><td><br><p><a name="436332"> </a>
+ Receiver report
+</p></td><td><br><p><a name="436334"> </a>
+ RR
+</p></td><td><br><p><a name="436336"> </a>
+ 201
+</p></td></tr>
+<tr><td><br><p><a name="436338"> </a>
+ Source description
+</p></td><td><br><p><a name="436340"> </a>
+ SDES
+</p></td><td><br><p><a name="436342"> </a>
+ 202
+</p></td></tr>
+<tr><td><br><p><a name="436344"> </a>
+ Goodbye
+</p></td><td><br><p><a name="436346"> </a>
+ BYE
+</p></td><td><br><p><a name="436348"> </a>
+ 203
+</p></td></tr>
+<tr><td><br><p><a name="436350"> </a>
+ Application-defined
+</p></td><td><br><p><a name="436352"> </a>
+ APP
+</p></td><td><br><p><a name="436354"> </a>
+ 204
+</p></td></tr>
+
+</Table>
+
+<Table>
+<tr><td>
+</Table>
+
+</p><p><a name="421452"> </a>
+<em>Sender report</em> (SR) packets are sent only if the session member transmitted data since its last or next to last report (either SR or RR).  The structure of an SR packet is shown in <a href="thesis_b.htm#421452">Figure 3</a>.  
+<!-- <img src="thesisa1.gif">.  DOESN'T REPRODUCE SHADING CORRECTLY -->
+<img alt="image of RTCP SR packet format" src="thesis_body-3.gif">.  <!-- From FrameMaker-generated version -->
+</p><p><a name="421734"> </a>
+Following the RTCP common header are the sender's SSRC ID (32 bits) and 20 octets (five 32-bit words) of sender-specific information (shaded in <a href="thesis_b.htm#421452">Figure 3</a>), the most important of which for this discussion are the NTP and RTP timestamps.  The NTP (Network Time Protocol) <a href="thesis_b.htm#443030">[27]</a> timestamp represents the wallclock time at which the SR was sent, while the RTP timestamp is the representation of the NTP timestamp in the same units as the RTP data timestamp.  The two timestamps allow inter-media synchronization for SSRCs whose timekeeping is coordinated by NTP.  The NTP timestamp is represented as two 32-bit words, with the most significant word (MSW) preceding the least significant word (LSW) in the header.  
+</p><p><a name="421750"> </a>
+Zero or more <em>reception reports</em> follow the sender-specific data.  Each represents an SSRC from which the sender received data since transmitting its prior SR or RR.  A reception report includes, <em>inter alia</em>, the fraction of packets lost since the last report, the highest sequence number received, an estimate of the variance in data packet interarrival times (interarrival jitter), and the delay since the last SR from the SSRC.  The C field in the RTCP common header is defined as the <em>reception report count</em> (RC) for the SR (and RR, below).  
+</p><p><a name="421780"> </a>
+Finally, an SR may contain a profile-specific extension, discussion of which is beyond the scope of this overview of the protocol.  
+</p><p><a name="417963"> </a>
+<em>Receiver report</em> (RR) packets are identical to SR packets except that they do not contain the 20-octet block of sender-specific information, and their PT field is set to 201.  
+</p>
+<em>Source description</em> (SDES) packets convey identifying information for the named packet source(s).  The structure of an SDES packet is shown in <a href="thesis_b.htm#421771">Figure 4</a>.  
+</p><p><a name="421771"><img alt="image of RTCP SDES packet format" src="thesia10.gif"></a></p>
+SDES packets consist of the RTCP fixed header (with a value of 202 for the PT field) followed by zero or more units known as <em>chunks</em> which in turn each consist of an SSRC ID (or a CSRC ID if the reporter is a mixer) and one or more SDES <em>items.</em>  An SDES item is made up of a type, a length, and data, as shown in <a href="thesis_b.htm#422421">Figure 5</a>.  
+</p><p><a name="422421"><img alt="image of RTCP SDES item format" src="thesisa2.gif"></a></p>
+</p><p><a name="442913"> </a>
+SDES item types are listed in <a href="thesis_b.htm#422305">Table 2</a> 
+<Table Border="3">
+<caption><a name="422305"> </a>
+<h4 align="center">Table 2.  RTCP SDES Item Types</h4>
+</caption>
+<tr><th><br><a name="422268"> </a>
+<h4> Item Type</h4>
+</th><th><br><a name="422270"> </a>
+<h4> Value</h4>
+</th></tr>
+<tr><td><br><p><a name="422272"> </a>
+ CNAME
+</p></td><td><br><p><a name="422274"> </a>
+ 1
+</p></td></tr>
+<tr><td><br><p><a name="422276"> </a>
+ NAME
+</p></td><td><br><p><a name="422278"> </a>
+ 2
+</p></td></tr>
+<tr><td><br><p><a name="422280"> </a>
+ EMAIL
+</p></td><td><br><p><a name="422282"> </a>
+ 3
+</p></td></tr>
+<tr><td><br><p><a name="422284"> </a>
+ PHONE
+</p></td><td><br><p><a name="422286"> </a>
+ 4
+</p></td></tr>
+<tr><td><br><p><a name="422288"> </a>
+ LOC
+</p></td><td><br><p><a name="422290"> </a>
+ 5
+</p></td></tr>
+<tr><td><br><p><a name="422292"> </a>
+ TOOL
+</p></td><td><br><p><a name="422294"> </a>
+ 6
+</p></td></tr>
+<tr><td><br><p><a name="422296"> </a>
+ NOTE
+</p></td><td><br><p><a name="422298"> </a>
+ 7
+</p></td></tr>
+<tr><td><br><p><a name="422300"> </a>
+ PRIV
+</p></td><td><br><p><a name="422302"> </a>
+ 8
+</p></td></tr>
+
+</Table>
+
+<Table>
+<tr><td>
+</Table>
+.  
+</p><p><a name="442858"> </a>
+The LEN field (item length; 8 bits) in an SDES item indicates the size of the data in octets, not including the two octets of the item type and LEN fields.  Within a chunk, items are "stacked" contiguously and are not required to end on 32-bit boundaries.  However, each chunk as a whole must begin and end on a 32-bit boundary so there may be one or more null octets after the last item in a chunk.  The DMRP, like most existing MBone applications, encodes SDES item data in US-ASCII format.  
+</p><p><a name="431855"> </a>
+From the standpoint of a quick survey of the protocol, the most important SDES item type is the CNAME.  SDES CNAME chunks carry the source's <em>canonical end-point identifier,</em> which is a unique identifier for a source within a session that, unlike an SSRC ID, is guaranteed to remain constant for the session's duration.  One of its intended uses is as a means of cross-media synchronization, which implies that the CNAME should be fixed across multiple related RTP sessions.  The protocol specification strongly recommends that the CNAME be derived algorithmically (i.e., automatically) and should take the form &quot;user@host&quot;.  At minimum, an SDES packet must carry the sender's CNAME, and the CNAME is the only SDES item type that all RTP/RTCP applications must support.  
+</p><p><a name="437482"> </a>
+The TOOL item allows an application to identify itself to other session participants.  Current tools often include version identification information as well.  
+</p><p><a name="422324"> </a>
+The RTCP common header's C field is defined as the <em>source count</em> (SC) for an SDES packet and denotes the number of chunks in the packet.  
+</p><p><a name="422389"> </a>
+ &#32;<em>Goodbye</em> (BYE) packets indicate that a source is no longer active, i.e., that it has left the RTP session.  <em>Application-defined</em> (APP) packets are for experimental use: they obviate the need to register new RTCP packet types while the new types' utility is being tested.  Neither of these is important to understanding RTP/RTCP in the context of the DMRP, so they will not be discussed further.  
+</p><p><a name="422392"> </a>
+RTCP is designed to scale to large sessions without overwhelming either the associated RTP data traffic or the available network bandwidth.  To reduce the protocol's overhead, several RTCP packets are combined into a single <em>compound packet</em> before being sent.  More importantly, the frequency of a source's RTCP packet transmission is limited so that the aggregate rate of all members' RTCP traffic consumes no more than a small fraction of the bandwidth available to a given RTP session, with the suggested fraction being 5%.  Whatever the value, however, it must be fixed for a given profile (see <a href="thesis_b.htm#417969">Section II.1.2.4</a>), as each participant independently calculates its RTCP inter-packet transmission interval based on the available RTCP bandwidth.  
+</p><p><a name="417968"> </a>
+The share of the bandwidth allotted to a given participant, together with the average amount of data in an RTCP packet, determine the average interval between that participant's RTCP packets.  As more sites join an RTP session each site must send RTCP packets less often, assuming that the session's total available bandwidth does not change.  
+</p>
+<a name="417969"> </a>
+<h4>II.1.2.4	 Protocol Customization</h4>
+<p><a name="417970"> </a>
+RFC 1889 does not completely specify RTP and RTCP in the same way as their respective RFCs specify, e.g., TCP or IP.  The protocols' designers envisioned that RTP/RTCP would be implemented within applications rather than as separate modules or libraries, using the requirements of RFC 1889 as a basis for minimal interoperability.  
+</p><p><a name="417971"> </a>
+A complete specification of the protocols must include a <em>profile</em> and <em>payload format specifications.</em>  A profile characterizes an entire class of applications; among other things, a profile corresponds payload type identifiers to payload formats and, for each payload type, defines the RTP timestamp clock rate to be used.  Most existing RTP-based tools operate under the profile for audio and video applications, RFC 1890 <a href="thesis_b.htm#443042">[33]</a>.  A payload format specification describes how a particular kind of data format is to be carried by RTP.  There are payload specification documents for various audio and video formats such as H.261 <a href="thesis_b.htm#443056">[40]</a>, JPEG video <a href="thesis_b.htm#442982">[1]</a>, MPEG1/MPEG2 video <a href="thesis_b.htm#443010">[16]</a>, and redundant audio <a href="thesis_b.htm#443034">[29]</a>.  
+</p><a name="417972"> </a>
+<h3 align="center">II.1.3   Other Internet Conferencing Protocols</h3>
+<p><a name="427049"> </a>
+RTP and IP multicast are components of what is an emerging set of protocols to provide multimedia conferencing over the Internet; collectively, these protocols have been dubbed &quot;the Internet Multimedia Conferencing Architecture&quot; by the Internet Engineering Task Force (IETF) <a href="thesis_b.htm#443004">[13]</a>, which has been developing them.  The conferencing architecture's protocols fall into two categories, conference management and data distribution.  RTP is an example of an unreliable distribution protocol; the IETF's model also encompasses reliable (multicast) protocols such as SRM (see <a href="thesis_b.htm#426494">Section II.1.4</a>).  
+</p><p><a name="427056"> </a>
+<em>Conference management</em> protocols are concerned with the setup and high-level control of presentations.  For this discussion, a <em>presentation</em> or <em>conference</em> is a &quot;set of one or more streams presented to the client as a complete media feed,&quot; where a <em>stream</em> is a &quot;single media instance, e.g., an audio stream or a video stream as well as a single whiteboard or shared application group&quot; <a href="thesis_b.htm#443046">[35]</a>; an RTP session as defined in <a href="thesis_b.htm#420267">Section II.1.2.2</a> is thus an instance of a stream.  In the IETF architecture, conference management decomposes into conference setup and discovery, and conference course control (i.e., managing the bandwidth and possibly the membership of a presentation).  While RTCP can be used for limited conference course control-this is a fourth, optional function according to RFC 1889-more sophisticated protocols are being developed specifically for this purpose.  
+</p><p><a name="427064"> </a>
+For a limited number of participants, conferences can probably be arranged by email or telephone.  However, such informal methods clearly do not scale to a large number of participants, nor to conferences whose participants cannot be known in advance.  <em>Conference setup and discovery</em> protocols address the problem of creating, describing, and finding presentations.  These protocols fall into two domains.  The description of a presentation-which can be considered the aggregate of the descriptions of the constituent media-is logically distinct from the mechanism by which that description is made available to potential receivers.  
+</p><p><a name="427071"> </a>
+The <em>Session Description Protocol</em> (SDP) <a href="thesis_b.htm#443006">[14]</a> encodes all the relevant information about a presentation, where &quot;all the relevant information&quot; means that SDP provides enough information for a receiver to participate in the presentation.<a href="#427073"><sup>8</sup></a>  SDP includes both presentation-wide parameters, e.g., the presentation's name, and media-specific parameters such as the media type (audio, video, etc.) and address/port(s).  For maximum flexibility in handling, SDP data are entirely textual, with US-ASCII being a subset of the accepted encoding scheme.  
+</p><p><a name="442815"> </a>
+SDP describes a presentation, but does not attend to the other half of conference setup and discovery, the distribution of the information.  The IETF, in an overview of its proposed conferencing architecture <a href="thesis_b.htm#443004">[13]</a>, notes four protocols by which SDP data may be disseminated.  Two of these, the Hypertext Transfer Protocol (HTTP) <a href="thesis_b.htm#442996">[9]</a> and the Simple Mail Transfer Protocol (SMTP) <a href="thesis_b.htm#443040">[32]</a> are well known and in wide use on the Internet for exchanging much more than conference information, so they will not be discussed here.  The <em>Session Announcement Protocol</em> (SAP) <a href="thesis_b.htm#443002">[12]</a> and <em>Session Initiation Protocol</em> (SIP) <a href="thesis_b.htm#443008">[15]</a> are specifically designed to carry presentation information.  SAP and SIP represent two different distribution styles: &quot;announcement&quot; and &quot;invitation.&quot;  
+</p><p><a name="427109"> </a>
+SAP multicasts SDP-encoded packets to well-known multicast addresses and ports.  SAP permits an organization to restrict SAP packets to arbitrarily defined administrative domains by choosing particular local addresses, a practice known as <em>administrative scoping,</em> or to use a reserved address and port for more generally accessible <em>time-to-live scoped</em> announcements (see below).  The use of well-known addresses and ports (whether administratively scoped or not) permits the implementation of distributed directory tools-the session directories mentioned in <a href="thesis_b.htm#417936">Section II.1.1</a>-that list presentations announced via SAP; the best-known such tool is sdr (see <a href="thesis_b.htm#426494">Section II.1.4</a>).  SAP allows anyone to discover a presentation and, via SDP, provides enough information to join it.  
+</p><p><a name="427119"> </a>
+A <em>time-to-live</em> (TTL) mechanism determines the range of the packets' distribution.  All IP packets contain a TTL field which is decremented (by one) by each router through which the packet passes; a packet with a TTL of zero is destroyed, preventing it from circulating indefinitely.  In addition, a multicast router compares each packet's TTL to a <em>threshold</em> value.  Each multicast router interface and tunnel is configured with such a threshold, which denotes the minimum TTL that a packet must possess to be forwarded through the interface or tunnel.  Proper use of TTLs is necessary to ensure that SAP, RTP/RTCP, and other multicast protocols can scale to large numbers of presentations, as the traffic of non-global presentations (e.g., a high-bandwidth video conference within an organization) must not be allowed to congest network links outside the presentations' intended scope.  TTL-scoped SAP packets are assigned the same time-to-live value as the presentations they advertise.  
+</p><p><a name="431892"> </a>
+SAP is analogous to an advertisement that invites the public at large to attend a meeting (although SAP announcements can be encrypted so that only specific parties can decode them and participate in the announced conference).  SIP, in contrast, provides a means to invite select parties to a presentation in a manner reminiscent of a telephone conference call.  SIP is a complex protocol that supports &quot;some or all of four facets of establishing multimedia communications&quot; <a href="thesis_b.htm#443008">[15]</a>: (1) locating the invitee, (2) negotiating what media and media parameters are possible and appropriate for the invitee, (3) determining whether or not the invitee wants to join the presentation, and (4) establishing the &quot;call parameters&quot; of both the inviter and invitee, as a prelude to the invitee's actually joining the conference.  Like SAP, SIP typically will use SDP to encode the presentation information.  
+</p><p><a name="427153"> </a>
+What the IETF terms &quot;conference course control&quot; <a href="thesis_b.htm#443004">[13]</a> at present refers to <em>quality of service</em> (QoS) guarantees and dynamic control of active presentations.  QoS guarantees (e.g., loss rate) are handled by the <em>Resource ReSerVation Protocol</em> (RSVP) <a href="thesis_b.htm#442984">[2]</a>.  RSVP is used &quot;to request specific qualities of service from the network for particular data streams or flows,&quot; as well as &quot;to deliver [QoS] requests to all nodes along the path(s) of the flows and to establish and maintain state to provide the requested service&quot; (<a href="thesis_b.htm#442984">[2]</a>, 4).  RSVP is intended to be used in both routers and end hosts.  Like IGMP (<a href="thesis_b.htm#417936">Section II.1.1</a>), RSVP is receiver-oriented: receivers must issue RSVP requests, rather than senders.  This permits RSVP both to scale to potentially large numbers of receivers, and to adapt to group membership changes.  
+</p><p><a name="427159"> </a>
+RSVP requests propagate along the same path that data will take from the sender to the receiver, but in the opposite direction.  At each intermediate node, RSVP causes sufficient resources to be allocated for the QoS and bandwidth requested if possible.  If insufficient resources are available, or if the requester is not authorized to obtain the resources, an error is returned to the requester.  By default, a failure to obtain resources at a node does not release resources successfully allocated at other nodes closer to the receiver, however, because the receiver may be willing to settle for having the desired QoS along as much of the path as possible.  
+</p><p><a name="427171"> </a>
+All of the conference management protocols described so far operate prior to the start of the presentation; even RSVP, which affects the presentation's delivery to receivers, performs the bulk of its work before any data are transmitted.  The <em>Real Time Streaming Protocol</em> (RTSP) <a href="thesis_b.htm#443046">[35]</a> functions as a control protocol for continuous media streams (e.g., audio and video) while the presentation is active.  RTSP has three functions: (1) it can initiate retrieval of streams from a media server, (2) it can &quot;invite&quot; a media server to join an existing presentation, and (3) it can notify a receiver of the existence of newly available media (e.g., a media server can notify receivers that a new video source is available, perhaps corresponding to a new conference participant) for an existing, usually live, presentation.  A <em>media server</em> is defined as a &quot;network entity providing playback or recording services for one or more media streams&quot; (<a href="thesis_b.htm#443046">[35]</a>, 8).  Thus the first two functions explicitly apply to media recording and playback devices, making RTSP &quot;a 'network remote control' [protocol] for multimedia servers&quot; (<a href="thesis_b.htm#443046">[35]</a>, 5).  RTSP defines traditional VCR-like commands such as &quot;PLAY,&quot; &quot;PAUSE,&quot; and &quot;RECORD&quot; that control the allocation and usage of resources on a server.  
+</p><p><a name="427192"> </a>
+It should be noted that none of the conference management protocols described, including RTP/RTCP, requires the use of any of the other protocols, although they are designed to interoperate when available.  The DMRP does not use any of the protocols except RTP/RTCP, although it does indirectly take advantage of SDP-encoded presentation descriptions made available via sdr; see the discussion of the DMRP's configuration file in <a href="thesis_b.htm#425601">Section IV.3</a>.  
+</p><p><a name="427207"> </a>
+Finally, the IETF also acknowledges <a href="thesis_b.htm#443004">[13]</a> the need to control the allocation of IP multicast addresses and ports to avoid collisions between presentations.  However, no consensus has been reached on the proper means of doing so.  One suggestion <a href="thesis_b.htm#443008">[15]</a> is for address allocation to be managed by SAP, but others argue that where appropriate, &quot;[the] media server [should pick] the multicast address and port&quot; <a href="thesis_b.htm#443046">[35]</a>.  In practice, most if not all advertised presentations appear to have their address(es) and ports chosen by sdr, described in <a href="thesis_b.htm#426494">Section II.1.4</a>, via a mechanism that is not yet documented in any IETF specification.  
+</p><a name="426494"> </a>
+<h3 align="center">II.1.4   Existing MBone applications</h3>
+<p><a name="417973"> </a>
+A number of RTP-based conferencing tools are in use on the MBone to communicate audio, video, ASCII text, and PostScript (R), among other data formats.  In addition, there is a VCR-like tool for recording and playback of conferences as well as a session directory tool.  
+</p><p><a name="417974"> </a>
+The best-known applications for audio conferencing are the <em>Visual Audio Tool</em> (vat) <a href="thesis_b.htm#443032">[28]</a> and the <em>Robust-Audio Tool</em> (rat) <a href="thesis_b.htm#443022">[23]</a>.  Both vat and rat establish or join an RTP session for audio traffic.  A user can monitor session membership, adjust the volume of sent and received audio, and control the rate at which his own audio is sent, all via graphical interfaces.  
+</p><p><a name="418709"> </a>
+vat's existence actually predates RTP: in fact, vat's original communication protocol was the basis for the first version of RTP, RTPv0.  vat has evolved to become a useful multicast network debugging tool as well as a conferencing tool since a user can monitor several important RTP traffic statistics in real time.  rat, perhaps in the interest of minimizing confusion for the novice user, eschews most of vat's diagnostic options.  
+</p><p><a name="417976"> </a>
+vat's video complement is the <em>Video Conferencing Tool</em> (vic) <a href="thesis_b.htm#443028">[26]</a>.  vic establishes or joins an RTP session for video traffic.  As with vat, a user can extensively control and adjust vic's behavior, including the data transmission rate and image quality.  Also like vat, vic allows the user to monitor RTP traffic statistics and session membership in real time.  
+</p><p><a name="417977"> </a>
+The <em>whiteboard tool</em> (wb) [<a href="thesis_b.htm#443026">25</a>, <a href="thesis_b.htm#442998">10</a>] allows conferees to share and to modify whiteboard-like images; wb can thus serve as a distributed notepad during a conference or as a viewgraph viewer during a lecture.  The images can be divided into <em>pages</em>, each of which can be created or drawn upon by any session member.  A member's wb drawings generate messages called <em>drawops</em>.  Each drawop is timestamped and assigned a sequence number; together with the member's identifier, these ensure that every drawing is uniquely named and ordered within the context of that member's data stream. The drawops are multicast to the entire session.  
+</p><p><a name="437075"> </a>
+wb differs from other MBone tools because it requires a reliable multicast communication protocol: it cannot tolerate data loss.  wb implements such a protocol, dubbed <em>Scalable Reliable Multicast</em> (SRM) <a href="thesis_b.htm#442998">[10]</a>.  SRM's error recovery is receiver-driven, requiring receivers explicitly to request retransmission of missing data.  However, any member of the session-e.g., one that is &quot;close&quot; to the requester-may respond to such a request, not just the original sender.  SRM includes mechanisms to reduce the likelihood of redundant requests and responses that accompanies such a flexible recovery policy.  Because these mechanisms introduce some delay, SRM is probably not well suited to all, or perhaps any, contexts in which RTP is currently used.  (It should be noted that SRM is a separate protocol from RTP.)  
+</p><p><a name="417979"> </a>
+The <em>MBone VCR</em> <a href="thesis_b.htm#443012">[17]</a> serves the same purposes for MBone sessions as a conventional VCR serves for broadcast television.  It can record one or more RTP sessions, saving them to files on the local filesystem, and can later replay the data as MBone sessions.  It can be given a configuration file describing the sessions and a separate command file controlling when it starts recording or replaying, thus allowing automated use.  (The DMRP accepts the same configuration file format; see <a href="thesis_b.htm#425601">Section IV.3</a>.)  
+</p><p><a name="417981"> </a>
+<em>sdr</em> is a session directory of the type described in <a href="thesis_b.htm#417936">Section II.1.1</a>.  It disseminates announcements of MBone conferences, allowing prospective participants to learn about conferences that may interest them.  Conference organizers register their desire to transmit one or more RTP sessions, specifying how many media sessions are needed, the payload format for each, and other relevant information, including a human-readable description.  sdr encodes the presentation information via SDP and promulgates it using SAP; it receives, decodes, and displays SDP messages from remote sdr instances for the user; and it can launch the appropriate MBone conferencing tools for a multimedia session if they can be found.  
+</p><p><a name="417982"> </a>
+The foregoing is meant to illustrate the types of tools that are in common use on the MBone.  Other applications exist or are under development, but an exhaustive survey of MBone-related software is beyond the scope of this paper.  
+</p><a name="417983"> </a>
+<h2 align="center">II.2   The Distributed-Parallel Storage System</h2>
+<a name="417984"> </a>
+<h3 align="center">II.2.1   Purpose </h3>
+<p><a name="417985"> </a>
+The <em>Distributed-Parallel Storage System</em> (DPSS) was created to serve applications requiring high-speed access to very large data sets via high-bandwidth data streams.  The assumptions underlying the DPSS' existence are first, that the data of interest cannot readily be accommodated, even temporarily, within disk space and memory locally available to the client; and second, that the client requires high-speed, perhaps near-real-time, access to the data.  Moreover, because the connotation of &quot;very large&quot; is subject to change over time, the DPSS is intended to scale to accommodate nearly arbitrarily large data sets.  
+</p><p><a name="417986"> </a>
+The prototype DPSS client application, <em>TerraVision</em> <a href="thesis_b.htm#443024">[24]</a>, uses data sets that are on the order of 1-10 GB in size.  The data represent terrain imagery which TerraVision renders and displays in response to user actions. The user thus appears to be navigating through the terrain in three dimensions in real time.  To create such a realistic dynamic visualization, TerraVision requires 300-400 Mb/s of data.<a href="#418789"><sup>9</sup></a>  
+</p><p><a name="417987"> </a>
+In principle, the DPSS can be modified to support multiple lower-bandwidth data streams whose aggregate bandwidth is on the order of a single TerraVision data stream.  Thus, a DPSS potentially could support dozens or hundreds of MBone media streams.  
+</p><p><a name="437084"> </a>
+The DPSS is discussed in more detail in <a href="thesis_b.htm#443016">[20]</a>, <a href="thesis_b.htm#443018">[21]</a>, and <a href="thesis_b.htm#443054">[39]</a>.  
+</p><a name="417988"> </a>
+<h3 align="center">II.2.2   Functionality </h3>
+<p><a name="417989"> </a>
+At heart, the DPSS is a network-based block server cache.  The unit of data exchange between clients and the DPSS is a block; any other granularity required (e.g., obtaining a particular byte within a block, or aggregating multiple blocks as a single data element) is the responsibility of the client application.  
+</p><p><a name="417990"> </a>
+Blocks are organized at two levels.  A <em>data set</em> is a logically associated collection of blocks representing a distinct logical name space. The DPSS assigns to each data set a unique <em>set ID.</em>  Within a data set, each block has a unique <em>logical block name.</em>  An individual block on the DPSS is thus completely identified by its set ID and logical block name.  
+</p><p><a name="417991"> </a>
+The DPSS achieves high-bandwidth data streaming by exploiting the parallelism available via multiple disk servers, each operating multiple disks and attached to a high-bandwidth network.  A client's requests for data are broken down into requests for individual blocks which were distributed among the DPSS hosts during loading (see below for more details on data loading).  Multiple block requests can thus be satisfied in parallel by multiple disks on multiple hosts seeking and reading simultaneously.  As soon as a block is available, it is delivered to the client.  On a high-bandwidth network, multiple blocks can be sent simultaneously. Although blocks may-indeed, likely will-arrive out of order, each is &quot;tagged&quot; with its set ID and logical block name, allowing the client to determine what to do with the block.  
+</p><p><a name="417992"> </a>
+To date, DPSS clients have been designed to request multiple blocks at a time, each of which can to some extent be operated on independently, and this has influenced the evolution of the DPSS.  Most of the target data have been imagery, with the most prominent being the terrain visualization data used by TerraVision and the cardioangiography &quot;films&quot; used by the prototype medical imaging application <em>vplayer</em> <a href="thesis_b.htm#443052">[38]</a>.  However, there is no inherent design or implementation bias in favor of image data: the DPSS is intended to accommodate any large data collections, and more recently it has been proposed as a component for caching high-energy physics data <a href="thesis_b.htm#443000">[11]</a> and as a general-purpose staging cache for a high-performance storage system.  Each application has its own strategy for coping with out-of-order data.  In presenting the data to a user, TerraVision &quot;fills in&quot; the screen as each block arrives, while vplayer buffers blocks until a complete frame of the film is available.  Neither application relies on in-order delivery, nor could either application present its data usefully if forced to wait for blocks to be delivered sequentially.  
+</p><a name="417993"> </a>
+<h3 align="center">II.2.3   Architecture and Client Use</h3>
+<p><a name="417994"> </a>
+A DPSS is composed of multiple low-cost, medium-speed Unix workstations, each of which typically has multiple disks and at least one high-speed network interface attached.  
+</p><p><a name="417995"> </a>
+Each workstation runs two types of DPSS software.  The <em>disk server</em> is a Unix daemon that manages both reading from all the disks on a host as well as writing data to the network (i.e., to a client).  It also establishes and maintains a cache in memory of recently-requested blocks. The <em>scribe</em> is a Unix daemon that writes data to a single disk on a single host.  A single workstation may have multiple scribes running, but only one disk server.  
+</p><p><a name="417996"> </a>
+One host in a DPSS is designated the <em>master.</em>  The master loosely coordinates the activities of the disk servers: it presents lists of requested blocks for the servers to process and it maintains much of the DPSS' global state.  The master is also the initial point of contact for clients and manages all control communication between clients and the DPSS.  Clients establish an initial connection to the master, then typically establish connections to as many scribes or disk servers as necessary.  
+</p><p><a name="417997"> </a>
+When reading data from the DPSS, clients send lists of logical block names, representing the desired data blocks, to the master.  The master validates the list as necessary, verifying the existence of the requested blocks.<a href="#418799"><sup>10</sup></a>  Each valid block name is translated to a request for some number of bytes from a certain physical location specified by server host, disk, and disk offset, then forwarded to the appropriate disk servers for satisfaction.  The disk servers retrieve the requested data, either from disk or from their memory cache, and write the data to the client.  
+</p><p><a name="426366"> </a>
+Blocks read from disk are added to a memory cache maintained by the server.  Caching assists clients having high request rates, e.g., TerraVision, because by default each new set of block requests causes the DPSS server to disregard, or flush, any unsatisfied requests from the prior set of requests.  Since a block may have been read from disk but its still-pending request flushed before it could be sent to the client, caching the block keeps it available for subsequent access should the client re-request it, as is likely with TerraVision.  
+</p><p><a name="417998"> </a>
+When writing data to the DPSS, clients send data blocks directly to the scribes, sending only metainformation-specifically, the correspondence between each block's logical name and its physical location-to the master.
+</p><p><a name="417999"> </a>
+In each case, data are transferred directly between the client and the relevant disk server or scribe, preventing the master from becoming a bottleneck in the data transfer.  However, the master monitors all data transfers by virtue of its role as the DPSS name-translation module, corresponding logical block names and physical locations.  (By providing this mapping service, the DPSS allows clients to refer to their data in more meaningful ways, while simultaneously isolating clients from the details of physical location.  Such isolation, together with a redundant storage strategy, allows the master to perform transparent fault recovery at runtime by redirecting requests away from a failed disk or host to backup hosts and/or disks.)  
+</p><p><a name="418000"> </a>
+In order to ensure maximum efficient use of the DPSS-i.e., to achieve the greatest possible parallelism of operation at the server and disk levels when reading, and to achieve the highest possible network bandwidth from the disk servers to the client-client data can be written to the DPSS with special regard for characteristic or expected data access patterns.  Much effort, for example, has gone into optimizing block placement for TerraVision data sets based on expected access patterns <a href="thesis_b.htm#442990">[5]</a>.  However, in practice it appears that random placement with a high degree of parallelism works nearly as well in most cases.  
+</p><p><a name="422715"> </a>
+The data rates of current MBone sessions are several orders of magnitude smaller than typical TerraVision data rates.  However, the MBone is not intrinsically limited to these low average data rates: rather they are an attempt to accommodate the many portions of the Internet connected via low-bandwidth links such as modems.  MBone conferences can and will consume more bandwidth as it becomes available.  Indeed, MBone sessions of multi-megabit data streams have been and are being held within high-speed, high-bandwidth networking environments, e.g., BAGNet <a href="thesis_b.htm#443058">[41]</a>.  
+</p><a name="418002"> </a>
+<h1 align="center">CHAPTER III </h1>
+<a name="433923"> </a>
+<h1 align="center"> FUNCTIONALITY AND DESIGN ISSUES</h1>
+<p><a name="418361"> </a>
+Conceptually, the DMRP can be considered an RTP packet filter and generator, coupled with a mechanism for storing these packets on, and retrieving them from, the DPSS.  The two functions are largely separable, linked only by the data being stored or played back, and the DMRP's design reflects this natural separation.  
+</p><a name="418004"> </a>
+<h2 align="center">III.1   RTP/RTCP Packet Management</h2>
+<p><a name="418342"> </a>
+The DMRP is intended to be a fully interoperable RTPv2 application, which means that it must implement the protocol requirements of RFC 1889 and RFC 1890.  Reviewing these documents, it became clear that RTP and RTCP packets would require separate filtering mechanisms since the packets have quite different internal structures.  However, corresponding RTCP and RTP streams must share a significant amount of state information.  These two imperatives determined the DMRP packet manager's basic conceptual design, as illustrated in <a href="thesis_b.htm#418342">Figure 6</a>:<img alt="image of DMRP Packet Manager (conceptual design)" src="thesis_a.gif">
+</p><p><a name="418392"> </a>
+The data and control handlers process RTP and RTCP packets, respectively, as their names suggest.  The shared state database is the mutually accessible repository representing the data to which both handlers require access.  Note that the shared state includes the information conveyed by every other participant's RTP and RTCP packets, so the database is organized by source.  
+</p><p><a name="419396"> </a>
+The arrows in <a href="thesis_b.htm#418342">Figure 6</a> denote the flow of data.  The data handler only updates the shared state; the control handler both updates the shared state and accesses it to generate the application's RTCP packets.  
+</p><a name="418411"> </a>
+<h2 align="center">III.2   DPSS Constraints</h2>
+<p><a name="418415"> </a>
+In truth, the DPSS is a somewhat awkward match as a storage device for current MBone data because the average rates of data produced and consumed by current MBone tools are so small.  The DPSS was designed for optimal behavior in an environment where significantly greater average bandwidth usage is the norm: as a result, DPSS blocks are on the order of 64 KB.  RTP packets vary in size according to the type of data they carry, but the largest packets at present are only on the order of 1-2 KB.  
+</p><p><a name="418541"> </a>
+The disjunction between the granularity of current typical MBone data and DPSS data reduces to the concrete problem of corresponding small RTP and RTCP packets with much larger DPSS data blocks.  The solution is fortunately quite straightforward: a DPSS data block should contain dozens or hundreds of RTP packets.  During recording, the DMRP buffers packets until they constitute a contiguous block that is large enough for efficient storage on the DPSS; during playback, the DMRP obtains data from the DPSS in blocks, but emits the data packet by packet.
+</p><p><a name="418464"> </a>
+The client interface to the DPSS-specifically, the client-side API-permits the client to issue a request for data, and separately to read the data.  By always requesting the next data block needed before processing the most recently received block, the DMRP ensures that as much as possible of the latency introduced by the DPSS is subsumed within the time spent processing the prior data block.  In the best case, the DPSS can completely process the request and transfer the block over the network while the DMRP is processing the prior block, limiting the client-side delay to the time needed to transfer the data block from kernel memory to user memory.  
+</p><a name="418331"> </a>
+<h2 align="center">III.3   Other Design Considerations</h2>
+<p><a name="419356"> </a>
+The ability to save entire RTP sessions naturally raises the issue of how the sessions are organized for retrieval.  The DMRP does not extensively address this question, but it has a rudimentary built-in naming facility that uses the limited data set management functionality provided by the DPSS itself.  
+</p><p><a name="419357"> </a>
+The DPSS development team has been working with the developers of a WWW-based data object manager, WALDO <a href="thesis_b.htm#443014">[19]</a>, to enable WALDO to catalog all types of data that can be stored on the DPSS.  In this way, WALDO will provide DPSS users with a consistent interface by which they can access their data.  
+</p><p><a name="419358"> </a>
+WALDO's designers envision allowing the user to browse a collection of data sets (called <em>large data objects</em>) via a display of associated information (metadata) pertaining to each; such information could include the data type, owner, size, and a thumbnail image if available.  Each entry would also include a hyperlink; by following the hyperlink, the user would cause WALDO to launch an application appropriate for accessing that type of data.  In the case of MBone data stored on the DPSS, WALDO would actually launch a DMRP plus whatever other applications were appropriate.  For recording it is conceivable that the DMRP would be the only necessary software, but for playback, WALDO would have to launch end-user tools as well, e.g., vic and vat.  
+</p><p><a name="440209"> </a>
+Thus envisioned as &quot;middleware,&quot; the DMRP was not given a GUI, and its current model of interaction with the user is quite primitive.  Whether simpler and more intuitive means of controlling the DMRP should be built into WALDO or into the DMRP itself is under discussion.  
+</p><a name="440210"> </a>
+<h2 align="center">III.4   Design</h2>
+<p><a name="419360"> </a>
+The DMRP consists of two modules, the <em>recorder</em> and the <em>player</em>.  The recorder and player are each composed of one or more <em>session manager</em> modules.  Each session manager controls the application's participation in a single RTP session; recording a conference consisting of an audio session and a video session would require two session managers.  
+</p><p><a name="419363"> </a>
+Each session manager is comprised of a <em>packet manager</em> module and a <em>DPSS I/O</em> module.  The two modules interact via a shared data buffer under the control of the session manager.  In the recorder, the packet manager fills the data buffer and the DPSS I/O module &quot;drains&quot; it by dispatching the buffer's contents to the DPSS as a data block.  In the player, the roles are reversed: the DPSS I/O module &quot;produces&quot; and the packet manager &quot;consumes.&quot;  
+</p><p>The conceptual design of the DMRP is illustrated in <a href="thesis_b.htm#419718">Figure 7</a>:
+<a name="419718"> <img alt="image of DMRP design modules" src="thesisa3.gif"></a><p>
+</p><p><a name="419722"> </a>
+As in <a href="thesis_b.htm#418342">Figure 6</a>, arrows indicate the possible directions of data flow; the thicker arrows denote the flow of data to or from the network, with the particular source or sink below the arrow in italics.  Note that in the player, the data packet handler still updates the shared state database, even though the data come from the DPSS via the shared data buffer.  This is necessary to ensure that the control packet handler generates RTCP packets that reflect the DMRP's playout rate so that receivers obtain a true picture of the DMRP's performance.  
+</p><a name="418332"> </a>
+<h1 align="center">CHAPTER IV </h1>
+<a name="433941"> </a>
+<h1 align="center"> IMPLEMENTATION AND ARCHITECTURE OF THE DMRP</h1>
+<a name="418009"> </a>
+<h2 align="center">IV.1   Introduction</h2>
+<p><a name="425490"> </a>
+The DMRP's design decomposed its functionality into relatively independent modules, some of which further decomposed into smaller functional modules.  Such modules could have been implemented in many ways and in many languages, but the encapsulation of functionality and state implicit in, e.g., the packet handler, made it natural to view the project in terms of interacting objects.  At the same time, it made sense to leverage the functionality offered by the existing DPSS client library (actually a set of several libraries) that offered C language functions to facilitate client interaction with the DPSS.  Hence from the beginning, C++ was a logical choice for the language in which to implement the DMRP.  An unexpected benefit of coding in C++ was the availability of the C++ Standard Template Library to address the issue of how best to store data that had to be accessed by SSRC ID.  
+</p><p><a name="425491"> </a>
+As indicated in <a href="thesis_b.htm#419718">Figure 7</a>, both the recorder and player were designed to handle multiple RTP sessions simultaneously, as will usually be necessary for video conferences (recall that each medium usually constitutes its own RTP session).  Each session can largely be handled independently of any other session, since there is no need for session managers to exchange information with one another.  Because the session managers' activities are parallel, concurrent, and non-interacting, the session managers were ideal candidates for implementation via threads.  
+</p><a name="425492"> </a>
+<h3 align="center">IV.1.1   C++ Terminology and Notation</h3>
+<p><a name="425056"> </a>
+The description of the DMRP's implementation will occasionally resort to C++-specific notation or terminology, some of which will be reviewed here.  A C++ <em>class</em> is a type that defines an aggregate of &quot;objects of various types . . . , a set of functions for manipulating these objects . . . , and a set of restrictions on the access to these objects and functions&quot; (<a href="thesis_b.htm#443050">[37]</a>, 487).  The objects and functions within a class are its <em>members;</em> member functions are frequently termed <em>methods.</em>  The C++ :: operator particularizes the scope of a member; subsequent sections of this document will frequently refer to a function <em>func</em> that is a member of class <em>Cl</em> as Cl::func(), especially if <em>func</em> is referenced in the discussion of a class other than <em>Cl.</em>  
+</p><p><a name="425083"> </a>
+An instance of a class is called an <em>object.</em>  During object instantiation, C++ implicitly invokes a special method of the class called a <em>constructor;</em> the constructor allows a class' implementor to ensure that the object is initialized to a known state.  Object instantiation is frequently termed <em>construction.</em>  A <em>destructor</em> is a method that performs any required actions to ensure that the object is in a known state prior to the deallocation of its memory.  Not all classes require constructors and destructors, and some classes may have more than one constructor method.  
+</p><p><a name="426814"> </a>
+C++ objects control access to their members using the keywords <em>private,</em> <em>protected,</em> and <em>public</em> in the class definitions.  These keywords define quite specific conditions under which members are visible or not visible outside the scope of the object.  For the purposes of this discussion, however, a private member of object <em>O</em> can be considered visible only to, and usable only by, members of <em>O,</em> whereas a public member of <em>O</em> is visible to and usable by any object or function that can access <em>O.</em>  In this paper, all methods discussed are public unless stated otherwise.  
+</p><a name="419932"> </a>
+<h3 align="center">IV.1.2   C++ Standard Template Library</h3>
+<p><a name="419933"> </a>
+From the outset, it was clear that the packet manager would need an efficient mechanism to look up per-source data in the RTP/RTCP shared database using a source's (randomly chosen) SSRC ID as a key.  Because the DMRP was being implemented in C++, it was possible to take advantage of the recently standardized <em>Standard Template Library</em> (STL) <a href="thesis_b.htm#443048">[36]</a> to manage the key/data correspondence.  STL provides a framework for the use of generalized algorithms and data types.  
+</p><p><a name="425096"> </a>
+A C++ <em>template,</em> or <em>class template,</em> &quot;specifies how individual classes can be constructed much as a class declaration specifies how individual objects can be constructed&quot; (<a href="thesis_b.htm#443050">[37]</a>, 595).  STL uses templates to parameterize its built-in functions during compilation.  The library also relies on the ability of C++ objects to define their behavior when operators such as less-than (&lt;) are applied to them.  Thus STL's sorting algorithms, for example, may generically apply &lt; to objects being sorted without regard to the objects' complexity, relying on the objects' implementor to supply a meaningful definition of &lt; as applied to the objects.  
+</p><a name="425502"> </a>
+<h3 align="center">IV.1.3   Threads</h3>
+<p><a name="425503"> </a>
+For code portability, the DMRP adheres to the threads API defined by the formal standard POSIX 1003.1c-1995 <a href="thesis_b.htm#442986">[3]</a>, approved by the IEEE in June 1995 and hereinafter referred to as &quot;the POSIX threads standard&quot; or simply &quot;POSIX.&quot;  
+</p><p><a name="425509"> </a>
+Under the POSIX threads standard, a process consists of a single thread executing the main body of the program; this thread is referred to as the <em>initial thread.</em>  The initial thread differs from all other threads in the process in that if the initial thread is destroyed, all other running threads in the process are also terminated: the entire process is destroyed.  The initial thread is also the only one not explicitly created by the process.  
+</p><p><a name="425532"> </a>
+A POSIX thread is created via the pthread_create() function, which assigns the new thread an identifier and causes it to execute a function defined by the caller, the <em>start function.</em>  The newly created thread returns when it has finished executing the start function, but unless specifically allowed to do so, it does not give up its resources until another thread has explicitly joined with it using pthread_join().  pthread_join() acts as a thread synchronizer by allowing the creating thread to obtain the created thread's return status before the latter is destroyed.  
+</p><p><a name="432595"> </a>
+In the DMRP, the initial thread creates a thread to control each of the session managers.  The initial thread can control the execution of each of the session managers within the process by setting a status flag in the session manager.  Because the flag is accessed by more than one thread-in fact, by two, the initial thread and the session manager thread-inconsistent results are possible if the threads' access is not controlled via mutex locks.  POSIX provides mutexes and defines the functions pthread_mutex_lock() and pthread_mutex_unlock() to acquire and to release mutexes, respectively.  The status flag and associated mutex are encapsulated in the AppStatus class; see <a href="thesis_b.htm#420105">Section IV.2.7</a> for more details.  
+</p><a name="419928"> </a>
+<h2 align="center">IV.2   DMRP Classes</h2>
+<p><a name="425129"> </a>
+The DMRP recorder and player are implemented as distinct applications.  This is a result of the project's development history: it was necessary to develop the recorder first in order to understand the structure of the data the player would be manipulating.  However, the two applications must perform some of the same tasks, such as joining RTP/RTCP sessions and both sending and receiving RTCP packets.  
+</p><p><a name="425130"> </a>
+The actual implementation of the DMRP has resulted in the two applications sharing most of the same code base in the form of classes which operate one way during recording and the opposite way during playback.  The shared code base reflects the two applications' opposite yet highly correlated activities.  
+</p><p><a name="420007"> </a>
+The DMRP's class hierarchy, whether recording or playing, can best be understood by considering the following functional areas: generic networking, RTP/RTCP state management, RTP/RTCP packet handling (i.e., filtering), DPSS input and output, per-session management (comprising the interactions between RTP/RTCP packet management and DPSS I/O), and application control.  Each functional area is represented by a class hierarchy.  In addition, a separate class governs the interaction between the protocol state and protocol packet-handling classes.  
+</p><a name="420014"> </a>
+<h3 align="center">IV.2.1   Generic Networking Classes</h3>
+<a name="420038"> </a>
+<h4>IV.2.1.1	 IPNetAP</h4>
+<p><a name="420016"> </a>
+At heart, the DMRP's networking needs are quite basic, comprising open(), read(), write(), and close(), to use the Unix I/O model.<a href="#420018"><sup>11</sup></a>  The <em>IPNetAP</em> class encapsulates the required functionality and hides the specifics of the operating system network programming interface.  
+</p><p><a name="420020"> </a>
+The IPNetAP class is oriented to the needs of multicast communication.  It contains both a local address (i.e., the local interface through which the session's traffic will be sent and received) and a remote address, usually an IP multicast address and port.  After object construction, the application can join a multicast session by invoking the IPNetAP mcast_connect() method.  mcast_connect() requests the operating system to allocate the necessary resources for IP multicast communication and to register the application's desire to join the designated multicast session with the multicast router.  (mcast_connect() also supports unreliable unicast communication, in which case the remote address is that of a single host rather than a multicast group, and the &quot;connect&quot; behavior is slightly different.)  
+</p><p><a name="420029"> </a>
+Following a successful call to mcast_connect(), the application can read from or write to the network.  IPNetAP::recv() and IPNetAP::recvfrom() are modeled on the Berkeley sockets routines of the same name that read data from the network-recvfrom(), like its sockets namesake, also returns the address of the host whence the data originated.  Similarly, the send() and sendto() methods transmit data to the networks, sendto() allowing the application to specify the address to which the data are to be sent (send() uses the remote address specified either during object construction or in the call to mcast_connect()).  
+</p><p><a name="420030"> </a>
+The disconnect() method advises the operating system that the application is finished communicating, allowing the system to recover local resources, and partially resets the IPNetAP to indicate that the application may no longer read or write via the object.  However, this method does not change either the local or remote address previously set.<a href="#420032"><sup>12</sup></a>  
+</p><p><a name="420034"> </a>
+The IPNetAP class is implemented using Berkeley sockets; several class methods are simply wrappers for sockets interfaces, as evidenced above.  One unfortunate implementation flaw is the lack of any method analogous to select(): this results in a few instances of other classes having to operate directly at the socket level, violating the encapsulation of the implementation that the IPNetAP class otherwise provides.  This flaw could be repaired by providing a new class that allows operations across multiple IPNetAP objects.  
+</p><a name="420035"> </a>
+<h4>IV.2.1.2	 IPAddr</h4>
+<p><a name="420039"> </a>
+The Berkeley sockets API uses the sockaddr_in structure to pass IP addresses and transport-level port numbers between many of its routines.  The DMRP hides the complications of manipulating sockaddr_in structures within the <em>IPAddr</em> class.  This class provides a number of ways to initialize its value, including methods that translate an ASCII string (representing an IP address in dotted-decimal format) and a 16-bit integer (the port number) to an appropriate sockaddr_in for use within the DMRP.  The class also provides methods for assigning the value of one IPAddr to another and for testing two IPAddrs for equality (defined as the same IP address and port number).  
+</p><p><a name="420048"> </a>
+The IPNetAP class represents its local and remote addresses as IPAddr objects.  Other classes use IPAddr objects whenever address information must be exchanged or manipulated; in particular, the RTPSourceList method get_source() tests two IPAddr objects for equality in order to detect SSRC ID collision.  
+</p><a name="420049"> </a>
+<h3 align="center">IV.2.2   RTP/RTCP State Management Classes</h3>
+<a name="420050"> </a>
+<h4>IV.2.2.1	 RTPSource</h4>
+<p><a name="420051"> </a>
+RTP requires that each participant use RTP and RTCP packets to monitor and to cache some of the state of every other participant, including each source's SSRC ID, host address, and last sequence number seen.  Most of the cached items are required for RTCP sender and receiver reports, but the SSRC ID and host address are required to detect SSRC ID collisions (two or more session participants accidentally selecting the same ID).  
+</p><p><a name="420052"> </a>
+The DMRP encapsulates each session participant's state information, including its own, in the <em>RTPSource</em> class.  The RTPSource is at the heart of the DMRP's shared-state database, and as such is nothing more than a repository: it performs no processing of the data it stores, leaving that activity to other classes.  Its primary roles are to eliminate duplication of data in the packet handler modules and to provide minimal access control to the data.  The latter is accomplished via C++ class-based scope control and results in only a limited number of other classes' objects having the ability to modify an RTPSource's contents.  
+</p><p><a name="420053"> </a>
+In addition to the SSRC ID, source address, and last sequence number, an RTPSource includes the number of complete cycles through the sequence number space (i.e., how often the source has wrapped sequence numbers), the transit time of the most recent packet, an estimate of the current network jitter, a flag indicating whether the DMRP has received data from the source recently, a flag to indicate whether the DMRP itself has sent data (set only in the RTPSource corresponding to the DMRP itself), the total number of packets and octets sent by the source to date, and several fields used for timing synchronization.  There are also class members used to validate a source from which the DMRP has not previously heard; see the description of the RTPDataHandler, below, for more information on this activity.  
+</p><p><a name="420064"> </a>
+The RTPSource was based on a sample data structure provided by RFC 1889, extended to accommodate the DMRP's specific needs (e.g., for timing and synchronization data).  
+</p><a name="420065"> </a>
+<h4>IV.2.2.2	 RTPSourceList</h4>
+<p><a name="420113"> </a>
+Each RTP and RTCP packet's header must be parsed for information either to update or to compare against the data in the appropriate RTPSource, so every packet's arrival requires locating the RTPSource corresponding to the SSRC ID in the packet's header.  The <em>RTPSourceList</em> encapsulates a group of RTPSource objects and the functionality required to access them.  
+</p><p><a name="420114"> </a>
+The most important member function is get_source(), which requires an SSRC ID and, optionally, the source's address (if provided, it allows the routine to check for SSRC ID collisions) and returns an RTPSource object.  Internally, get_source() first attempts to find an RTPSource for the given SSRC ID, and returns the object if it exists (and if there is no SSRC ID collision, if the caller provided a source address); otherwise, get_source() builds a new RTPSource object, adds it to the RTPSourceList's set of RTPSource objects, and returns the newly constructed object.  Access, therefore, implies creation.  
+</p><p><a name="420115"> </a>
+The RTPSourceList's internal database of RTPSource objects is implemented using an STL associative container called a <em>map.</em>  An STL map corresponds key values and data values; each unique key is associated with one and only one datum.  In this case, each 32-bit SSRC ID is the key that recovers the associated RTPSource object.  
+</p><a name="420066"> </a>
+<h4>IV.2.2.3	 RTPSession</h4>
+<p><a name="420130"> </a>
+The <em>RTPSession</em> class is little more than a wrapper for an RTPSourceList and a repository for two per-session attributes, the session's requested bandwidth, and a seed value for a random number generator.  The bandwidth (in bytes per second) is needed to calculate the correct interval between RTCP packets generated by the DMRP; a correct packet interval helps to ensure that RTCP does not exceed the fraction of the session's total bandwidth assigned under the application's profile.  (The DMRP operates under the general A/V profile described in RFC 1890.)<a href="#420135"><sup>13</sup></a>  The seed value is used to prime the random number generator that chooses the DMRP's SSRC ID for the session.  
+</p><p><a name="420143"> </a>
+The RTPSession class is a remnant of an earlier stage of the DMRP's implementation.  Originally, the class directly implemented RTPSource lookup.  However, as the DMRP became more sophisticated, it became necessary to isolate the lookup functionality for use by other classes.  The RTPSession will probably be merged with the only class that derives from it, the RTPComm (see <a href="thesis_b.htm#420079">Section IV.2.4</a>), in a future version of the DMRP.  
+</p><a name="420131"> </a>
+<h3 align="center">IV.2.3   RTP Packet-Handling Classes</h3>
+<p><a name="420176"> </a>
+The bulk of the code implementing packet-handling-i.e., parsing of headers (and in the case of RTCP packets, the contents as well), calculating statistics like network jitter, and updating RTPSources with current packet information-is contained in the RTPDataHandler and RTPCtrlHandler classes.  However, some common functionality was abstracted into separate classes for clarity and ease of maintenance.  
+</p><a name="420070"> </a>
+<h4>IV.2.3.1	 RTPFormat</h4>
+<p><a name="422730"> </a>
+The <em>RTPFormat</em> class contains payload format-specific data.  The interpretation of the RTP timestamp's value-or, more to the point, the interpretation of the RTP clock rate-is dependent upon the characteristics of the data being transported.  As an example, RFC 1890 mandates that the RTP clock rate for audio encodings &quot;equals the number of sampling periods per second,&quot; so that for a typical audio encoding like vat's default, PCM, the RTP timestamp value is incremented by 8000 RTP timestamp units, or <em>ticks,</em> per second.  
+</p><p><a name="422735"> </a>
+The two most important methods for this class are ticks2ms() and ms2ticks().  ticks2ms() calculates the number of milliseconds corresponding to a given number of RTP ticks for a particular payload format.  ms2ticks() calculates the number of RTP ticks corresponding to a given number of milliseconds for a particular data format; this method is important for generating the RTP timestamp for RTCP SR packets.  
+</p><p><a name="422736"> </a>
+The RTPFormat class isolates media-dependent information in a single module so that the rest of the packet-handling classes can be as general and flexible as possible.  The RTPDataHandler and RTPCtrlHandler classes inherit from RTPFormat so that they automatically include the functionality needed to interpret RTP timestamp values for both RTCP reporting and RTP data playback.  
+</p><a name="422669"> </a>
+<h4>IV.2.3.2	 Timer</h4>
+<p><a name="420185"> </a>
+The <em>Timer</em> class provides routines that monitor inter-packet intervals.  Its functionality is important for both the recorder's and player's RTCP packet emissions as well as the player's transmission of data.  Each Timer object keeps track of the wallclock time the prior packet was sent, the wallclock time at which the next packet is to be dispatched, and the time remaining until next-packet dispatch.  
+</p><p><a name="420186"> </a>
+Four methods are at the heart of the Timer class.  set_send_timer() takes an amount of time, in milliseconds, and sets the next-packet dispatch time to the session's start time plus that number of milliseconds.  time_to_next_send() returns the difference between the current time and next-packet dispatch time.  ready_to_send() returns a nonzero value if the next-packet dispatch time has been reached or passed, and zero otherwise.  Finally, send_wait() is used by the RTPDataHandler and RTPCtrlHandler objects to wait the (usually short) interval until the next packet is to be sent on playback.  
+</p><p><a name="420187"> </a>
+The Timer class is implemented using the Unix timeval structure and relies heavily on the C library's gettimeofday() function.  It does not, however, rely on traditional Unix timing mechanisms such as those used by alarm() or setitimer(): these calls rely on SIGALRM, which is reserved for use at the application level (see <a href="thesis_b.htm#425601">Section IV.3</a>).  
+</p><a name="420069"> </a>
+<h4>IV.2.3.3	 RTPHandler</h4>
+<p><a name="420202"> </a>
+Both the RTP and RTCP packet handlers need to connect to multicast sessions and to disconnect from those sessions; they also need to keep track of the state associated with their presence in the session(s), which may actually represent several different points of contact to the network.  The <em>RTPHandler</em> class embodies the foregoing functionality.  
+</p><p><a name="420203"> </a>
+The RTPHandler sets the TTL of the application's packets, governing the packets' effective scope.  The RTPHandler otherwise consists mostly of wrapper methods for the IPNetAP class, with one important distinction: the RTPHandler is designed to manage multiple IPNetAP objects.  This capability is critical for the player, allowing it to simulate the presence of multiple data sources, as may have existed in the original session.  
+</p><p><a name="422743"> </a>
+However, many MBone sessions include many receivers but only one or a few senders.  The recorder stores all the RTCP packets that it receives (except as noted in <a href="thesis_b.htm#420096">Section IV.2.6</a>), so it would be possible to recreate all receivers' presence on playback; however, doing so would have little practical benefit, for passive receivers contribute nothing to the substance of the playback.  More importantly, each recreated session member would require finite system resources such as UDP ports and Unix file/socket descriptors which would be tied up to no good purpose, even if there were enough such resources to do so.  
+</p><p><a name="422768"> </a>
+Therefore, the RTPHandler maintains a list of IPNetAP objects, indexed by SSRC ID, corresponding to original session members that actually sent data.  An IPNetAP object for a source is created and added to the list only after at least one data packet from that source is encountered in the playback data stream.  Thus each member of the original session appears during playback only if it sent data, and only from the moment it first sent data.  
+</p><a name="420071"> </a>
+<h4>IV.2.3.4	 RTPDataHandler</h4>
+<p><a name="422769"> </a>
+The <em>RTPDataHandler</em> class encapsulates all the functionality needed for the DMRP to receive and retransmit RTP data packets.  Because the DMRP was not intended to modify the data in any way, the RTPDataHandler actually performs all of its limited work upon the RTP fixed header.  It inherits from RTPHandler for packet transmission and receipt functionality, from Timer for inter-packet timing facilities, and from RTPFormat to aid in RTP timestamp interpretation.  
+</p><p><a name="422775"> </a>
+The class' main routine for parsing incoming packets is parse_pkt(), which is invoked whenever a new RTP packet arrives during recording.  The method finds or creates an RTPSource object in the RTPSession based on the RTP fixed packet header's SSRC ID field, then checks the packet header's sequence number and modifies the running estimate of the interarrival jitter.  The sequence number check is performed by the private method update_seq(), which compares the current packet's sequence number against the last sequence number seen from the source, if any.  update_seq() requires that a source be considered &quot;on probation&quot; until the RTPDataHandler has received at least two packets with adjacent, in-order sequence numbers.  The method also checks both for sequence number wrap, maintaining a counter of such sequence number wraps, as well as for source restart, indicated by a break in sequence number continuity followed by the establishment of a new run of contiguous sequence numbers.  update_seq() is based on the algorithm provided in Appendix A.1 of <a href="thesis_b.htm#443044">[34]</a>.  
+</p><p><a name="422790"> </a>
+Following sequence number evaluation, parse_pkt() updates the current estimate of interarrival jitter, defined as &quot;the statistical variance of the data [packet] interarrival time&quot; (<a href="thesis_b.htm#443044">[34]</a>, 71), using the private method update_jitter().  update_jitter() first calculates the raw difference between the current packet's arrival time and its sample time as given in the RTP timestamp field of the fixed packet header; this difference is the packet's transit time.  Then the difference between the current and previous packets' transit times is calculated.  The current jitter estimate is subtracted from the difference in transit times, a gain factor of 1/16 is applied, and the result added to the current jitter estimate.  (The gain factor is for noise reduction in the calculations.)  update_jitter() is based on an algorithm provided in <a href="thesis_b.htm#443044">[34]</a>, Appendix A.8.  
+</p><p><a name="422803"> </a>
+On playback, the method make_pkt() is invoked to refashion each saved packet's RTP fixed header as necessary.  As noted in <a href="thesis_b.htm#420267">Section II.1.2.2</a>, for additional security the RTP timestamp and sequence number should be randomly initialized to new values at the start of playback, with all subsequent replayed packets incrementing from the new values; the SSRC ID should also be randomly initialized to avoid collisions (although collisions are unlikely unless playback occurs in the same session recorded earlier).  However, for ease of implementation, the current implementation of make_pkt() does not change the original values.  
+</p><p><a name="422806"> </a>
+make_pkt() updates, or creates, the RTPSource associated with the saved packet's SSRC ID, calling update_seq() in the process.  It also establishes the correct transmission time by calculating the packet's offset from the first data packet received in terms of RTP ticks.  This tick interval is then converted to milliseconds by calling RTPFormat::ticks2ms() and this millisecond offset is passed to Timer::set_send_timer().  The first data packet received in the original session, in other words, is treated as the start of that session for timing purposes.  
+</p><p><a name="422811"> </a>
+Note that an RTPDataHandler object does not independently receive or send packets, that is, the object is not associated with an independent thread of control during recording or playback.  Rather, the object is invoked as needed by the thread associated with each SessionManager.  See the discussion of the SessionManager for a more detailed explanation.  
+</p><a name="420078"> </a>
+<h4>IV.2.3.5	 RTPCtrlHandler</h4>
+<p><a name="422812"> </a>
+The <em>RTPCtrlHandler</em> class encapsulates all the functionality needed for the DMRP to send and to receive RTCP packets.  It parses RTCP packets from other session members, modifying the RTPSession database as new members join and as existing members report their current state (e.g., the amount of data they have received from each source, their estimate of the interarrival jitter, etc.).  It constructs and transmits the DMRP's own RTCP packets and calculates the interval between each such packet.  (Like the RTPDataHandler, however, the RTPCtrlHandler does not execute within its own thread of control.)  The RTPCtrlHandler inherits from the RTPHandler class for packet transport functionality, from the Timer class for inter-packet timing facilities, and from the RTPFormat class to aid in RTP timestamp interpretation and generation.  
+</p><p><a name="422824"> </a>
+The RTPCtrlHandler can be understood by examining five functional areas: construction, parsing of received packets, calculating the pause between transmitted packets, building packets, and use of stored RTCP packets during playback.  
+</p><p><a name="422813"> </a>
+An RTPCtrlHandler object's constructor attempts to initialize the application's RTCP SDES fields as fully as possible based on the user invoking the application, making use of GCOS information in the system's password database or, if available, the .RTPdefaults file created by vic or vat in the user's home directory.  The constructor also seeds the random number generator used to create the application's SSRC ID.  The constructor requires the name of the program being run (for the SDES TOOL value) and the session's TTL.  
+</p><p><a name="422829"> </a>
+After reading an RTCP packet from the network, control passes to the method parse_pkt().  parse_pkt() first checks the packet's gross structure to verify that some of the fixed fields-e.g., the protocol version and length-are correct, then updates the running average of RTCP packet size and applies packet type-specific methods to process the packet's contents.  Only four type-specific methods are currently defined: parse_sr(), parse_rr(), parse_sdes(), and parse_bye(), corresponding to the four most common RTCP packet types (see <a href="thesis_b.htm#417959">Section II.1.2.3</a>).  parse_sr() and parse_sdes() update the appropriate RTPSource according to the packet's contents.  parse_rr() only registers a session member's presence in the RTPSession database; further processing is unnecessary since RTCP RR statistics are not currently of interest to the DMRP.  Similarly, because the departure of session members is not relevant to the DMRP, parse_bye() does nothing.  parse_rr() and parse_bye() exist as placeholders in case they are needed in future.  
+</p><p><a name="422838"> </a>
+parse_pkt() &quot;walks&quot; through RTCP compound packets, parsing each constituent packet using the appropriate type-specific method.  A successfully processed packet's contents are not altered.  An error in any constituent packet invalidates the entire compound packet: there is no provision for continued processing.  Because RTPv2 is intended to replace older versions of RTP/RTCP, parse_pkt() has not been designed to parse non-RTPv2 control packets and treats them as invalid.  
+</p><p><a name="422856"> </a>
+As previously mentioned, RTCP is designed to be self-limiting in its bandwidth consumption, taking no more than a small, fixed percentage of an RTP session's total agreed-upon bandwidth.  The RTCP traffic rate is controlled largely by the frequency at which packets are transmitted.  set_rtcp_interval() calculates the time at which the next RTCP packet should be sent, taking into account both the current number of session members and the estimated average RTCP packet size.  
+</p><p><a name="422883"> </a>
+set_rtcp_interval() first determines whether a partitioning of the available RTCP bandwidth between senders and receivers is required.  All sources that have sent data in the last two reporting intervals are collectively allocated a minimum of 25% of the total RTCP bandwidth; if senders were not given a minimum amount, a small number of senders in a large session would be unable to send reports frequently enough to be useful to the rest of the session participants.  A partitioning of the bandwidth would not be necessary if, for example, the session contained a large number of senders relative to the total number of session members.  If it is necessary, set_rtcp_interval() determines whether the DMRP has sent any data in order to determine whether it will share the senders' bandwidth or that remaining to the other session participants.  Then the average packet size is updated with the size of the last RTCP packet sent by the RTPCtrlHandler.  Finally, the average packet size is multiplied by the number of members sharing the available bandwidth (giving an estimate of the total amount of data these members would send if they all transmitted one RTCP packet of the average size) and this total is divided by the available bandwidth to produce the interval until the caller should send its next RTCP report.  set_rtcp_interval() is based on the algorithm provided in Appendix A.7 of <a href="thesis_b.htm#443044">[34]</a>.  
+</p><p><a name="422908"> </a>
+Whenever an RTCP packet (other than an RTCP BYE<a href="#422966"><sup>14</sup></a>) should be sent, the application invokes the send_rpt() method.  send_rpt() is misleadingly named, for its primary task is to create the RTCP compound packet that will be sent.  It builds the packet in a static buffer created during construction of the RTPCtrlHandler object.  
+</p><p><a name="424804"> </a>
+send_rpt() first checks whether the application has sent data: this will never be true for the recorder and will usually be true for the player.  If data has been sent, send_rpt() first creates an SR using the private method make_sr(); otherwise, it creates an RR for each source that has sent data during the last two RTCP reporting intervals.  RFC 1889 requires that an RTCP compound packet always contain an SR or RR as its first component.  If no source has sent data, the packet will begin with an empty RR whose reception report count is zero.  
+</p><p><a name="424808"> </a>
+Following the initial SR or RR, send_rpt() constructs a two-chunk RTCP SDES using the private method make_sdes().  make_sdes() invokes another private method, choose_sdes_items(), to ensure that the first chunk is a CNAME item and the second chunk either a NAME, EMAIL, or TOOL item.  This selection of SDES items is suggested by RFC 1889 to allow rapid distribution to the entire multicast group of the most important information, the CNAME, while also allowing eventual delivery of less important but still useful identifying data.  
+</p><p><a name="422957"> </a>
+After building the compound packet, send_rpt() transmits it and calls set_rtcp_interval() to calculate the time at which the next RTCP packet should be constructed and sent.  
+</p><p><a name="422976"> </a>
+Note that send_rpt() and most of the methods it invokes require an RTPSource that embodies the current state of the reporter.  Only one RTPSource represents the recorder, but the player's state may be represented by several RTPSources, each corresponding to a separate data source in the original session.  RTCP packets must be generated for each RTPSource for which the player is responsible.  
+</p><p><a name="422990"> </a>
+Although the DMRP stores RTCP packets along with RTP data packets, the RTCP packets cannot blindly be replayed.  Many RTCP data items pertain only to the transient state of the original session, such as the number of lost packets reported by a given receiver, and would be at best meaningless (and more likely misleading) in the context of a retransmission.  Indeed, the reasons for which RTCP exists mandate that RTCP packets, and the information they contain, be created <em>ab initio</em> during a session.  
+</p><p><a name="422991"> </a>
+However, it is useful to identify the original members of a session on playback if they appear, and RTCP SDES packets contain precisely the identifying information needed.  Therefore, stored RTCP packets are scanned during playback by the parse_saved_pkt() method.  parse_saved_pkt() traverses the RTCP packet, ignoring all SR and RR components, deleting from the RTPSession any source for which a BYE is read, and passing any SDES components to the routine update_sdes().  update_sdes() uses the original SSRC ID in the SDES packet to perform a table lookup of the source's SDES information as maintained in a structure called an <em>sdesinfo.</em>  As with other SSRC ID-based lookups in the packet-handling classes, if such a table entry does not exist, one is created.  
+</p><p><a name="422992"> </a>
+At present, update_sdes() is only concerned with the source's original SDES CNAME and SDES NAME.  The DMRP uses the original CNAME without modification, under the assumption that if the original CNAME was unique in the original session, it will likely be unique in a replay of the session.  However, because most MBone end-user tools use the SDES NAME to identify session members in a human-readable fashion, it seemed appropriate to avoid confusion as to the recorded nature of a playback session by appending &quot; (DMRP replay)&quot; to the original SDES NAME during playback.  
+</p><p><a name="422996"> </a>
+As noted in the discussion of the RTPHandler, a member of the original session does not appear as part of the playback session unless and until it sends data.  It is helpful, however, that as much identifying data as possible be available for such a sender soon after it appears as part of the playback session.  The sdesinfo allows the RTPCtrlHandler to accumulate such identifying data from the source's stored RTCP packets even before it is &quot;known&quot; to have sent data.  
+</p><a name="420079"> </a>
+<h3 align="center">IV.2.4   RTP/RTCP Protocol Management Class: RTPComm</h3>
+<p><a name="422989"> </a>
+The <em>RTPComm</em> class attempts to encapsulate all of the data and functionality associated with RTP/RTCP packet handling in the DMRP.  It represents the DMRP's interface to a single RTP session, coordinating the functioning of the packet-handling classes (in fact, it contains an RTPCtrlHandler object and an RTPDataHandler object) and the state management classes and hiding much of the complexity associated with both.  The RTPComm class thus allows a caller to control the RTP/RTCP classes as a single module using relatively simple and straightforward semantics such as &quot;join,&quot; &quot;read data,&quot; and &quot;send control.&quot;  It embodies the conceptual design of <a href="thesis_b.htm#418342">Figure 6</a>.  The RTPComm class inherits from RTPSession.  
+</p><p><a name="424008"> </a>
+Construction and initialization consists of constructing the member RTPCtrlHandler and RTPDataHandler objects and calling RTPCtrlHandler::set_rtcp_interval() to choose a time to send the application's first RTCP packet (thereby registering the application's presence in the session).  
+</p><p><a name="423005"> </a>
+Semantically, the class restricts the DMRP in its interaction with the session to joining, receiving a data or control packet, sending a data or control packet, and disconnecting.  The class also includes an encapsulation of the packet handlers' timing facilities to provide hints to the DMRP as to when a packet, either data or control, should be sent.  
+</p><p><a name="423006"> </a>
+The join functionality is provided by join()<a href="#423028"><sup>15</sup></a>, which &quot;connects&quot; the DMRP to the RTP session by triggering mcast_connect() for the RTPComm's RTPDataHandler and RTPCtrlHandler (recall that the required IPNetAP object is encapsulated in one of the objects' base classes, RTPHandler; see <a href="thesis_b.htm#420069">Section IV.2.3.3</a> and <a href="thesis_b.htm#420038">Section IV.2.1.1</a> for more details).  
+</p><p><a name="423047"> </a>
+Once the application has determined that either an RTP or RTCP packet is waiting to be read, it invokes the RTPComm methods read_data() or read_ctrl(), respectively.  read_data() in turn invokes the RTPDataHandler to read and to parse the RTP packet.  If in parsing the packet the RTPDataHandler indicates that an SSRC ID collision has taken place and the RTPComm determines that the collision involves the DMRP's own SSRC ID, read_data() chooses a new SSRC ID before returning.  read_ctrl() similarly invokes the RTPCtrlHandler to read and to parse the RTCP packet.  Both methods return the number of bytes of data read, or -1 on error (e.g., upon encountering an unrecognized or malformed packet header).  
+</p><p><a name="423048"> </a>
+Both read_data() and read_ctrl() also prepend a header structure, dubbed a <em>PktInfo,</em> to the raw RTP or RTCP packet.  The PktInfo contains the packet's size in bytes, its type (RTP or RTCP), and its time offset (currently unused)<em>,</em> in milliseconds, from the start of the session.<a href="#439187"><sup>16</sup></a>  The packet size must be saved because it is part of neither the RTP nor RTCP fixed header: it is provided by the underlying transport protocol (UDP or something equivalent).  The size that read_data() and read_ctrl() return includes the size of the prepended PktInfo structure.  
+</p><p><a name="423049"> </a>
+Sending RTCP packets while recording is straightforward: whenever the application needs to send a control packet, it invokes the RTPComm method send_ctrl(), which in turn calls RTPCtrlHandler::send_rpt().  Sending RTCP packets during playback is slightly more complex.  Unlike the recorder, which has only one RTCP endpoint, the player may be responsible for multiple RTCP endpoints, each of which represents a different member of the original session.  Moreover, the player must send RTCP packets from each endpoint often enough for receivers to consider the source associated with the endpoint to be alive (i.e., its host has neither crashed nor been severed from the network).  
+</p><p><a name="437511"> </a>
+For RTCP timing purposes, the player should calculate an RTCP inter-packet interval for each endpoint as if it were associated with an independent session member.  At present, this is not possible because neither the RTPCtrlHandler nor RTPComm maintains a separate timer for each endpoint: only one timer is available to determine the RTCP interval for the entire application.  Consequently, send_ctrl() uses a round-robin algorithm to cycle through all the endpoints the RTPCtrlHandler has created, calling RTPCtrlHandler::send_rpt() on only one of them per RTCP interval.  This method will not scale to a large number of playback sources, since receivers will perceive an excessively long RTCP interpacket interval for each source.  
+</p><p><a name="437948"> </a>
+send_ctrl() requires a flag to indicate whether it is being called within the recorder or the player.  
+</p><p><a name="423057"> </a>
+Sending data packets (which occurs only during playback) is complex for a different reason.  It is a two-step process because until the saved packet and its PktInfo have been parsed, the player cannot know when the packet should be sent in the playback session.  The RTPComm method make_pkt() first checks the type as indicated in the PktInfo, then invokes RTPDataHandler::make_pkt() if the packet is RTP data.  RTPDataHandler::make_pkt() automatically registers the sending time for the packet, so assuming there were no processing errors, the player actually transmits the packet at the correct time using the RTPComm method send_data_pkt().  If RTPComm::make_pkt() determines that it is processing a saved RTCP packet, it calls RTPCtrlHandler::parse_saved_pkt().  parse_saved_pkt() does not register a time for the saved RTCP packet to be sent since the packet will not be replayed.  
+</p><p><a name="424070"> </a>
+The RTPComm method wait_send_next() compares the times at which the next RTP and RTCP packets are to be sent, and only waits until the earlier time, while RTPComm::send_next() checks what kind of packet is being sent, and invokes the appropriate packet handler object to send it.  send_next() also triggers the construction of an IPNetAP object in both the RTPDataHandler and RTPCtrlHandler if a data packet is being sent for the first time from a source, as explained in <a href="thesis_b.htm#420069">Section IV.2.3.3</a>.  wait_send_next() and send_next() are necessary to avoid the suspension of the thread controlling the session if it encounters long periods of time during which no session member sends data (pauses) during a recorded session.  (The first implementation of the player simply paused until the next data packet was ready for dispatch.  This mechanism worked until the player attempted to play back a lecture containing an unusually long pause.  While the player waited until the correct time to send the data packet, it failed to send RTCP packets.  The failure to indicate its continuing presence in the session by transmitting RTCP packets caused the other session participants' tools to drop the player from their membership lists, and in a widely distributed session might have caused routers to prune the player's subnet from the multicast distribution tree.)  
+</p><p><a name="424745"> </a>
+To disconnect from the RTP session, the RTPComm class provides the method closecomm().  closecomm() ensures that RTPCtrlHandler::send_bye() is invoked prior to the actual disconnect of the relevant IPNetAP objects in the RTPCtrlHandler and RTPDataHandler.  
+</p><a name="424744"> </a>
+<h3 align="center">IV.2.5   DPSS Interface Class: DPSSPOC</h3>
+<p><a name="424746"> </a>
+The <em>DPSSPOC</em> class manages I/O to and from the DPSS.  It attempts to isolate the rest of the DMRP from the complexities of the current low-level DPSS client API.  It frees the DMRP from explicitly having to monitor some of the state associated with the DPSS session and provides a programming interface that somewhat resembles the Unix filesystem interface.  
+</p><p><a name="424747"> </a>
+Before commencing a DPSS session, a client must specify the DPSS master host and the <em>Data Set Manager</em> (DSM) host; the DSM provides a simple naming service for the DPSS and its clients.  The DPSSPOC constructor allows the DMRP to specify these hosts.  If they are not passed as arguments to the constructor, it searches for appropriate environmental variables for the host names or IP addresses.  If either the DPSS master or DSM cannot be ascertained, construction fails.  
+</p><p><a name="424748"> </a>
+A DPSS session begins with a call to open_dpss().  open_dpss() contacts the DPSS master, establishing a connection and a context within which all subsequent transactions during this session will take place.  The state reflecting this context is embodied in the <em>IssHandle,</em> a data structure provided by the low-level DPSS client API.  Clients treat the IssHandle in the same way applications treat the Unix FILE structure for buffered I/O, i.e., as an opaque handle required by the interface routines.  
+</p><p><a name="424749"> </a>
+To write data to the DPSS, an application must reserve as much space as is needed.  Space reservation allows greater control of data layout by client applications, which can take expected data access patterns into account when distributing their data during a DPSS writing session.  Reserving space on the DPSS in principle requires that the client application choose individual DPSS disks; in practice, clients need only specify server hosts and by default all disks on those hosts are used.  The DPSSPOC method prep_new_set() reserves space on the DPSS for the recorder.  It also registers the set with the DSM, as clients are expected to do to facilitate monitoring of the DPSS' contents.  
+</p><p><a name="424752"> </a>
+prep_new_set() relies on the DPSSPOC method get_scribe_addrs(), which takes a string consisting of the desired server names separated by commas or spaces and caches the server names for subsequent use by both prep_new_set() and connect_to_scribes().  connect_to_scribes(), called after a successful return from prep_new_set(), sets up a connection between the recorder and the scribe processes on the DPSS server hosts that will be writing the data to disk.  Following a successful return from connect_to_scribes(), the recorder is ready to store data on the DPSS.  
+</p><p><a name="424753"> </a>
+The actual storage of data occurs on a block-by-block basis.  When the recorder is ready to commit a block to storage, it invokes the method send_block().<a href="#424755"><sup>17</sup></a>  send_block() uses a counter to construct the block's logical name (see <a href="thesis_b.htm#417988">Section II.2.2</a>), calls a low-level DPSS API routine that actually transfers the data, and increments the block counter.  
+</p><p><a name="424815"> </a>
+The DPSSPOC is constrained to write one block at a time because the underlying DPSS API routine, issSendBlock(), is also so constrained.  issSendBlock() updates a block lookup table used by the DPSS, the <em>BlockMap,</em> with several pieces of information that cannot be determined until the block is actually written.  The per-block information includes the block's size in bytes and a checksum.  Blocks may be of any size, i.e., may contain any number of bytes of data, up to a maximum of 64 KB.  The application includes the exact number of bytes of valid data in the block in the call to issSendBlock().  
+</p><p><a name="424842"> </a>
+To read data from the DPSS, the DPSSPOC provides the method open_dpss_r().  open_dpss_r() connects to the DSM to obtain information about the data set,<a href="#424844"><sup>18</sup></a> including the number of blocks comprising it, then connects to the DPSS.  Connecting to the DPSS to read data is a four-stage process.  The client first contacts the DPSS as in open_dpss() to create the DPSS session context, then requests that one or more data sets be prepared for reading.  The set preparation request causes the DPSS master to verify that the server hosts on which the data set is loaded are all available; if they are, the master sends the client the information needed to establish the data-requesting and data-receiving streams.  The third step is for the client actually to establish these connections to the DPSS, and the final step is to synchronize the client and DPSS by exchanging a &quot;ready&quot; message.  
+</p><p><a name="424849"> </a>
+The data-request stream is the communications channel through which the client sends its block requests to the master, while the data-receiving streams are the connections by which the client receives the requested data directly from the DPSS servers.  As mentioned in <a href="thesis_b.htm#417993">Section II.2.3</a>, the client sends block requests to the master, which translates each request to a physical location (using the BlockMap) and forwards the location and number of bytes to read to the disk server.  The server reads the data from disk, or possibly finds the data already resident in its memory cache as the result of a prior request, then dispatches the data directly to the client.  The DPSSPOC provides the method request_blocks() to issue block requests; the method requires only the number of blocks to be requested as a parameter.  The DPSSPOC method receive_blocks() reads blocks from the DPSS servers into a buffer; both the buffer and the number of blocks to be read are provided as parameters to the method.  
+</p><p><a name="424856"> </a>
+By requiring that data reading take place on block boundaries, as opposed to allowing Unix-style read() calls of arbitrarily large or small numbers of bytes, the DPSSPOC avoids the delays of memory-to-memory copying between an internal buffer and the user-provided buffer.  receive_blocks() can read data directly from the network into the user-provided buffer.  
+</p><p><a name="424857"> </a>
+At the end of a DPSS session, the DPSSPOC method close_dpss() is invoked.  If data were being loaded, close_dpss() carries out final bookkeeping tasks, including updating the set's DSM entry to reflect the total number of blocks written, and sending a message to the DPSS master to save the set's BlockMap.  close_dpss() then ends the DPSS session, using low-level DPSS API routines to close connections and clean up state as necessary.  
+</p><p><a name="424858"> </a>
+If a partially filled block is pending when the recorder is shut down, the recorder calls send_block() to write the partial block prior to calling close_dpss().  Otherwise the pending data would be lost, as the DPSSPOC does not manage the data buffer: it is a resource that must be shared between the DPSSPOC and the RTP/RTCP packet handlers, as is discussed in <a href="thesis_b.htm#420096">Section IV.2.6</a>.  
+</p><a name="420096"> </a>
+<h3 align="center">IV.2.6   DMRP Session Management Class: SessionManager</h3>
+<p><a name="424872"> </a>
+The <em>SessionManager</em> class orchestrates the interaction between the RTP/RTCP packet-handling classes and the DPSS I/O class.  A <em>DMRP session</em> consists of an RTPComm participating in a single RTP session (see <a href="thesis_b.htm#420267">Section II.1.2.2</a>) with an associated DPSSPOC; the two classes exchange data via a shared buffer.  Both classes, together with the shared buffer and some session-wide state data, constitute a SessionManager.  
+</p><a name="424877"> </a>
+<h4>IV.2.6.1	 Construction and Initialization</h4>
+<p><a name="424878"> </a>
+Constructing and initializing the SessionManager largely consists of constructing and initializing the RTPComm object, and initializing the DMRP session state.  Much of this state is encapsulated in a data structure called the <em>DMRPSessionInfo.</em>  The DMRPSessionInfo includes the session's multicast or unicast address, port, and TTL, as well as the name by which the set will be (or in the case of playback, is) registered with the DSM.  For the most part, the DMRPSessionInfo's data can be obtained automatically from sdr session announcements; see <a href="thesis_b.htm#425601">Section IV.3</a>.  
+</p><a name="424891"> </a>
+<h4>IV.2.6.2	 Recording</h4>
+<p><a name="424892"> </a>
+To record a session, the recorder first sets up to write to the DPSS, then joins the session, and finally enters a packet-reading and block-writing cycle.  The SessionManager method open_dpss() performs the steps required to write data to the DPSS, i.e., establishing a DPSS session context, reserving space, connecting to the DPSS scribes, and registering the set with the DSM, all as described in <a href="thesis_b.htm#424744">Section IV.2.5</a>.  The parameters to open_dpss() include the filename to be stored on the DSM, the DPSS master host, DSM host (which need not be the same as the DPSS master host, though it frequently is), the set's estimated size, and a string consisting of the names of the DPSS server hosts on which to store the data.  
+</p><p><a name="424901"> </a>
+join_session() is a SessionManager wrapper for RPTComm::join(), with the SessionManager providing the session's address in standard dotted-decimal string form and the port as a host byte-ordered short integer.  join_session() thus creates a pair of communications endpoints explicitly associated with the application, resulting in the recorder appearing as a full-fledged member of the RTP session, i.e., as one that identifies itself and its current state (packet statistics) via RTCP.  
+</p><p><a name="424914"> </a>
+The SessionManager method mcast_receive() reads both data and control packets sent to the session, accumulates them in a buffer, saves the data, and triggers the sending of the recorder's own control packets.  The implementation uses the Berkeley sockets call select() to poll the RTP data socket and RTCP control socket, using as a timeout the time at which the recorder must build and dispatch the next RTCP packet of its own.  The select() controls the while() loop within which mcast_receive() does its work: each iteration of the loop occurs because either an RTP data packet arrived, or an RTCP packet arrived, or the time has come to send an RTCP packet.  (However, see <a href="thesis_b.htm#420105">Section IV.2.7</a> for another condition governing the loop's execution.)  
+</p><p><a name="424927"> </a>
+If a packet has arrived, mcast_receive() calls either RTPComm::read_data() or RTPComm::read_ctrl(), as appropriate.  mcast_receive() accumulates packets in the SessionManager's built-in buffer simply by maintaining a pointer into the buffer; this <em>end-of-buffer</em> (EOB) pointer is incremented by the number of bytes reported as read by the RTPComm reading routines.  In case of error, the EOB pointer is not incremented, so that a malformed or unrecognized packet is obliterated by subsequent valid packets.  
+</p><p><a name="424937"> </a>
+After each packet has been read, the number of accumulated bytes in the buffer-equivalent to the offset of the EOB pointer-is checked against a &quot;high-water mark.&quot;  The high-water mark, 64 KB, simply reflects the limitation on the maximum size of a DPSS block.  If the high-water mark has not been reached, mcast_receive() increments the EOB pointer by the number of bytes read; otherwise, it calls the SessionManager method save_block().  save_block() ensures that no more than 64 KB are written to the DPSS using DPSSPOC::send_block().  If the amount of data accumulated exceeds 64 KB, save_block() first writes all of the data up to the last complete packet within the 64 KB limit, then copies the excess data from the end of the buffer to the beginning and increments mcast_receive()'s EOB pointer so new packets will be stored after the remaining unsent packet.  save_block() thus ensures that each block begins and ends on the boundary of a packet; this makes playback more efficient because it eliminates the need to copy parts of packets that straddle blocks and guarantees that no packet in one block is delayed in its dispatch because part of it is in the subsequent block.  
+</p><p><a name="424956"> </a>
+Whether or not a packet was read, mcast_receive() checks whether an RTCP packet should be generated using RTPComm::ctrl_ready(), which is a wrapper method for Timer::ready_to_send().  If an RTCP packet should be generated, mcast_receive() calls RTPComm::send_ctrl().  
+</p><a name="424960"> </a>
+<h4>IV.2.6.3	 Automatic Suspension of Recording</h4>
+<p><a name="424961"> </a>
+Occasionally, relatively long intervals pass during which no RTP session member sends data.  It is common, for example, that a lecture source will test its equipment by sending small amounts of data before the actual start of the session, then cease transmitting until the formal start time.  Multicast sessions from conferences that span several days often do not transmit data continuously, but only at specified times, e.g., to present keynote speeches.  
+</p><p><a name="424964"> </a>
+The DMRP recorder does not permit interactive use as, e.g., the MBone VCR does, so even if a human operator is present, he cannot manually &quot;pause&quot; the recording; the recorder either runs forever or is interrupted.  Moreover, it is sometimes impractical for a human being to be present.  A major reason to record a session, after all, is likely to be one's inability to watch it live.  
+</p><p><a name="424969"> </a>
+Since the recorder continues to run during periods of inactivity, i.e., when no data are being transmitted, it automatically detects the absence of data and ceases recording.  Such behavior saves space on the storage device, since the recorder would otherwise continue to store RTCP packets, which are transmitted irrespective of whether data are transmitted.  mcast_receive() uses a counter, cycles_sans_data, to count the number of sequential loop iterations without receiving data.  By default, if cycles_sans_data exceeds a threshold value, the recorder stops saving RTCP packets.  Receipt of a data packet decrements cycles_sans_data if it is greater than zero.  The reason for decrementing the counter, rather than resetting it directly to zero, is that short bursts of data-e.g., white noise that exceeds the silence suppression threshold on vat-occasionally are sent to the session by accident.  These bursts of data are generally meaningless, but if they reset cycles_sans_data to zero, they would increase the amount of time the recorder captured unnecessary RTCP packets.  Decrementing the counter requires data sources to transmit a continuous sequence of packets to keep the counter well below the cutoff threshold, i.e., to &quot;buy&quot; time for pauses between data.  
+</p><p><a name="424974"> </a>
+The current threshold value, 10, was chosen at random for testing purposes.  Tests with the recorder suggest that this value is too low for real sessions, but further testing will be necessary to determine a more appropriate value.  It should also be noted that the recording cutoff can be disabled at runtime if desired.  
+</p><a name="424990"> </a>
+<h4>IV.2.6.4	 Playback</h4>
+<p><a name="424991"> </a>
+Playback first requires connecting to the DPSS and DSM.  The player can use the same open_dpss() method as described above, using the default file size and DPSS server list parameters (the defaults cause the method to assume that the data set already exists); it may also call open_dpss() with a DPSS set ID instead of a filename.  In either case, the SessionManager invokes DPSSPOC::open_dpss_r() to set up for retrieving the data from the DPSS.  
+</p><p><a name="425000"> </a>
+The player does not &quot;join&quot; the playback session as the recorder joined the original session.  The recorder joins the original session as a full participant, explicitly identifying itself as a recording process.  However, the player has no such distinct identity: the replayed data packets, as well as newly generated RTCP packets, must be attributed to the original data sender(s) rather than to the player process.  As such, although the player could join the playback session using join_session(), it would be meaningless to do so, for the player will never transmit data via the communications endpoints thus created.  Instead, the player calls SessionManager::register_session() to record the playback session's address and port in the RTPComm.  The RTPHandler object creates the necessary communications endpoints (IPNetAPs) automatically during playback, as noted in <a href="thesis_b.htm#420069">Section IV.2.3.3</a>.  
+</p><p><a name="425006"> </a>
+mcast_send() is the playback analogue to mcast_receive().  mcast_send() reads data from the DPSS and transmits the data, packet by packet (recall that the original RTP and RTCP packets are saved without alteration), until there are no more to send.  
+</p><p><a name="425007"> </a>
+mcast_send() implements the scheme described in <a href="thesis_b.htm#418411">Section III.2</a>, whereby the request for the next DPSS block is issued just before the current block is parsed.  The time required by the DPSS to satisfy the request is thus at least partially subsumed within the time needed to process the current block's data.  The cycle is primed by an initial call to DPSSPOC::read_blocks(), which is a wrapper for DPSSPOC::request_blocks and DPSSPOC::receive_blocks(), followed by a call to DPSSPOC::request_blocks().  DPSSPOC::read_blocks() obtains the first block of the data for immediate processing, while DPSSPOC::request_blocks() begins the request-next/process-current/read-next cycle.  At present, only one block at a time is requested and processed, although there is no reason why more could not be handled.  
+</p><p><a name="425018"> </a>
+Each DPSS block is parsed packet by packet.  mcast_send() performs a crude check for data corruption by examining the prepended PktInfo, then passes the packet to RTPComm::make_pkt() for further handling.  Assuming no error occurs, make_pkt() returns the packet's size, not including the size of the PktInfo.  If the saved packet was RTCP, mcast_send() updates its pointer into the block buffer (the EOB pointer, analogous to the pointer in mcast_receive()) and begins processing the next packet in the block.  Otherwise, mcast_send() sets a &quot;data pending&quot; flag to indicate that a data packet is awaiting transmission and calls RTPComm::wait_send_next() to wait until the next packet (saved RTP or newly generated RTCP) should be sent.  
+</p><p><a name="425027"> </a>
+Upon return from wait_send_next(), mcast_send() knows only that at least one packet is ready to be sent, but not which type.  mcast_send() therefore checks both whether a data packet should be sent and whether an RTCP packet should be built and sent; it is even possible that both conditions will be true.  If the most recently processed data packet is dispatched, the EOB pointer is updated and the &quot;data pending&quot; flag is cleared.  
+</p><p><a name="425034"> </a>
+Following packet dispatch, mcast_send() loops back to parse the next packet from the DPSS block.  If, however, the currently pending data packet was not sent, mcast_send() skips the parsing step and proceeds to call wait_send_next().  In this way, a long pause in data transmission during the original session is preserved on playback, but the player is still able to dispatch its required periodic RTCP packets.  
+</p><a name="425040"> </a>
+<h4>IV.2.6.5	 Shutdown</h4>
+<p><a name="426402"> </a>
+The SessionManager contains an AppStatus object (see <a href="thesis_b.htm#420105">Section IV.2.7</a>) that acts as a status flag for the loop in mcast_receive().  mcast_receive() runs until either an error occurs or the AppStatus object indicates that mcast_receive() should return.  Usually the recorder triggers such a return as a result of some event external to mcast_receive(), e.g., a user-requested interrupt.  However, mcast_receive() may return on its own it if discovers that no more space is available on the DPSS.  See <a href="thesis_b.htm#420105">Section IV.2.7</a> and <a href="thesis_b.htm#425601">Section IV.3</a> for more details.  
+</p><p><a name="426433"> </a>
+mcast_send() reads through blocks packet by packet until it encounters an error or until it determines there are no more blocks to read (or until the user interrupts the process, whichever occurs first; see <a href="thesis_b.htm#425626">Section IV.4</a> for more detail).  Like mcast_receive(), mcast_send()'s main packet-processing loop checks the SessionManager's AppStatus object to see if it should break out of the loop and return.  mcast_send() itself will change the AppStatus object to indicate it is done if it finishes processing all available blocks; this is the normal means by which the routine quits.  
+</p><p><a name="425041"> </a>
+Returning from mcast_receive() or mcast_send() does not end the DMRP session.  The recorder or player must still explicitly exit the session, which means it must call the SessionManager methods close_dpss() and leave_session().  close_dpss() first flushes any pending data to the DPSS if the SessionManager was recording (the data constitute the last block of the data set), then calls DPSSPOC::close_dpss() to shut down all connections to the DPSS and DSM.  leave_session() is a wrapper method for RTPComm::closecomm().  
+</p><a name="420105"> </a>
+<h3 align="center">IV.2.7   Application Status Class: AppStatus</h3>
+<p><a name="425553"> </a>
+In the original implementation of the recorder and player, the SessionManager's functionality resided within the application itself.  Because all of the required state was declared global to the application, it was possible for a Unix signal handler to ensure that on receipt of a signal-e.g., SIGINT-the application would shut down gracefully.  
+</p><p><a name="425560"> </a>
+The SessionManager class was developed because the recorder and player had to be able to accommodate multiple concurrent RTP sessions.  Each SessionManager, operating independently of other SessionManagers, clearly was suitable for implementation as a single thread, particularly when executing mcast_receive() or mcast_send().  However, the semantics of Unix signal handling in a multithreaded application made it necessary to modify the original signal handling mechanism.  
+</p><p><a name="425569"> </a>
+By default, most signals can be delivered to any thread in the process.  In theory, every thread could be allowed to handle the signals by installing appropriate handlers.  However, for simplicity the DMRP allows only the initial thread to receive signals for the entire process; the initial thread then takes whatever steps are necessary to communicate with all other threads.  
+</p><p><a name="425598"> </a>
+In the original non-threaded implementation, mcast_receive() could only be exited by the process' receipt of an asynchronous event, i.e., a signal.  (mcast_send() returned, in the absence of error, when it ran out of data.)  To allow controlled, synchronous communication between the initial thread and the SessionManager threads, it was necessary to modify mcast_receive() so that it checked for external events, e.g., the request by the initial thread for mcast_receive() to quit.  
+</p><p><a name="425599"> </a>
+Thus on each loop iteration, mcast_request() now checks the condition of the SessionManager's <em>AppStatus</em> object.  The AppStatus at heart is merely a flag and a small set of accessor methods to simplify the flag's use.  However, the class also includes a mutex to ensure that the flag can be accessed and modified consistently by multiple threads.  The methods lock() and unlock(), used by all the other AppStatus methods to guarantee that only a single thread at a time can read or modify the flag, are merely wrappers for pthread_mutex_lock() and pthread_mutex_unlock().  
+</p><p><a name="425604"> </a>
+At present, the only AppStatus methods used by other DMRP objects are done() and doneq().  done() sets the AppStatus' flag to indicate that the application is ready to shut down.  doneq() checks whether the flag indicates &quot;done,&quot; returning 1 if so and 0 otherwise.  In addition to checking both for packets to read and for a timeout, mcast_receive() calls doneq() on each loop iteration, breaking out of the loop if doneq() returns 1.  
+</p><p><a name="425607"> </a>
+Although the AppStatus class is currently only used to allow the application to indicate that it wishes to shut down, the class can in principle be used to convey other asynchronous events in a synchronous fashion.  In addition to responding to data from the network and to timeouts, the packet-processing loop could also implement user-requested actions like &quot;pause,&quot; &quot;fast forward,&quot; &quot;rewind,&quot; and so on, increasing the DMRP's range of functionality.  The means of posting the asynchronous event are irrelevant to the responses implemented by the SessionManager or other classes, so it would be possible to replace the current terminal-based interface, in which signals are the events, with a GUI in which user-requested window events trigger the actions.  Alternatively, the recorder and player could monitor the LBL <em>Conference Bus</em> (discussed briefly in <a href="thesis_b.htm#443028">[26]</a>) for messages from applications like LBL's <em>confcntlr</em> <a href="thesis_b.htm#443036">[30]</a>.  The AppStatus class includes the methods get(), set(), and add() to retrieve, to (over)write, and to add to the status flag, respectively, in the expectation that these capabilities will be useful in future for generalized event posting and monitoring.  
+</p><p><a name="425612"> </a>
+Because the AppStatus proved so useful in controlling mcast_receive(), mcast_send() was also modified to incorporate an AppStatus check in its main loop.  
+</p><a name="425601"> </a>
+<h2 align="center">IV.3   Recorder</h2>
+<p><a name="425623"> </a>
+The recorder controls one or more SessionManagers saving RTP/RTCP data to the DPSS.  It allows the user to specify certain DMRP session elements (e.g., the amount of space to reserve on the DPSS for each session) via command-line flags and/or a configuration file.  It spawns all necessary threads and coordinates their shutdown.  
+</p><p><a name="figure8"><img alt="image of screen dump showing DMRP recorder and other MBone tools" src="thesisa7.gif"></a><p>
+<a href="thesis_b.htm#figure8">Figure 8</a> shows the recorder operating alongside vic, vat, and sdr.  The recorder is capturing the session currently being displayed by vic and vat; however, vic and vat are operating independently and are not required for the recorder to function.  <a href="thesis_b.htm#443274">Figure 9</a>
+
+shows the recorder's terminal window from <a href="thesis_b.htm#figure8">Figure 8</a> in greater detail.  (The recorder was invoked as &quot;listener.test&quot; in the figure.)  
+</p><p><a name="443274"><img alt="detail of Figure 8 showing DMRP recorder command line output" src="thesisa8.gif"></a><p>
+Recorder initialization, which occurs in the function init(), largely consists of argument parsing, followed by SessionManager construction and DPSS/DSM connection via SessionManager::open_dpss().  Of the fourteen command-line options currently available, four are most often used.  The -F option allows the user to provide most of the RTP session parameters via an MBone VCR conference configuration file; in <a href="thesis_b.htm#443274">Figure 9</a>, the file is called &quot;cspan.vcr.&quot; <a href="#427255"><sup>19</sup></a>  The parameters include the address, port, and TTL to be used for each session (the file can specify more than one).  The configuration file's contents are used to initialize DMRPSessionInfo structures, each of which is in turn used to construct a SessionManager object.  <a href="thesis_b.htm#425624">Figure 10</a><a name="425624"><img alt="image of DMRPSessionInfo structure" src="thesisa4.gif"></a><p> shows the DMRPSessionInfo structure.  &quot;addr&quot; is the unicast or multicast address (expressed as a dotted-decimal IP number string) and &quot;port&quot; is the 16-bit port identifier on which the recorder should listen for data.  &quot;ttl&quot; denotes the TTL to be associated with the session's packets.  &quot;filename&quot; is intended as an aid to human auditors of the DPSS/DSM.  &quot;filesz&quot; is the number of bytes to reserve for a session's data, not including RTCP (the recorder automatically allocates a greater number to allow for RTCP).  &quot;duration&quot; is the amount of time, in minutes, that the recorder should run.  &quot;set_id&quot; is useful only to the player and is discussed in <a href="thesis_b.htm#425626">Section IV.4</a>; &quot;bandwidth&quot; is currently unused.  
+</p><p><a name="425631"> </a>
+The -S flag is required to list the DPSS server hosts on which the data should be stored.  The server list must be parsed as a single argument by the Unix shell, so it must consist either of a comma-separated list without spaces, or a list, possibly space-separated, enclosed by quotation marks.  (DPSS clients use the DPSSHOST environmental variable to set the DSM / DPSS master host.)  
+</p><p><a name="425632"> </a>
+The -s flag allows the user to specify how many bytes to allocate for each data set (corresponding to an RTP session); the default is 1,073,741,824 bytes, or 1 GB.<a href="#425634"><sup>20</sup></a>  (In <a href="thesis_b.htm#443274">Figure 9</a>, the recorder is shown requesting 10,485,760 bytes, or 10 MB.)  
+</p><p><a name="425636"> </a>
+In an attempt to automate recording, the recorder allows the user to set a recording length via the -l option; the length is specified in minutes.  This eliminates the need for a human user to monitor a session or sessions whose duration is announced in advance, and facilitates automated recording via a tool like WALDO (see <a href="thesis_b.htm#418331">Section III.3</a>), which can launch a recorder process without requiring a mechanism to deliver it a signal or otherwise to micromanage its activities.  
+</p><p><a name="425641"> </a>
+Following initialization, the recorder calls the function join_sessions(), which in turn invokes SessionManager::join_session() for each SessionManager object.  join_sessions() also ensures that each RTPComm has the same &quot;session start&quot; time, so that packet time offsets are measured from the same starting time across all DMRP sessions.  join_sessions() returns the number of sessions for which SessionManager::join_session() did not return an error.  In theory, the recorder could operate as long as at least one SessionManager successfully joined its session; at present, however, the recorder quits if any SessionManager failed to do so.  
+</p><p><a name="425664"> </a>
+After a successful return from join_sessions(), the initial thread creates a thread for each SessionManager; each such <em>session thread</em> immediately begins executing SessionManager::mcast_receive().  If the user requested a timeout via the recorder's -l option, the initial thread spawns a <em>timer thread</em> that issues a call to alarm(), which will result in a SIGALRM being sent to the process when it has run for the requested amount of time.  Finally, the initial thread waits for signals.  
+</p><p><a name="425677"> </a>
+Prior to creating other threads, the initial thread blocks the signals it wishes to catch using the POSIX function pthread_sigmask(); in the recorder's case, the signals of interest are SIGINT and SIGALRM.  pthread_sigmask() changes the default action taken in response to the specified signals, modifying the thread's signal mask.  In the case of the recorder, the signals are blocked, or queued for delivery (as opposed to being delivered asynchronously as is normal).  Any new thread inherits its creator's signal mask, so that all threads block these signals, enabling the initial thread to use the system call sigwait() to catch the blocked signals synchronously.  sigwait() waits for one of a set of signals to be posted to the process; the set of signals is passed as a parameter to the call.  
+</p><p><a name="425696"> </a>
+A SIGINT or SIGALRM received by sigwait() causes a controlled shutdown.  The initial thread calls AppStatus::done() for each SessionManager via the SessionManager wrapper routine quit().  Then the initial thread joins each session thread, releasing the resources associated with the thread, like memory.  Note that the SessionManager objects are not deallocated with the session threads since the initial thread allocated their memory.  Finally, the initial thread calls the recorder function close_session() for each SessionManager.  close_session() first calls SessionManager::close_dpss(), then SessionManager::leave_session().  
+</p><a name="425626"> </a>
+<h2 align="center">IV.4   Player</h2>
+<p><a name="427635"> </a>
+The player controls one or more SessionManagers playing RTP/RTCP data from the DPSS.  It allows the user to specify DMRP session elements via command-line flags and/or a configuration file, spawns all necessary threads, and coordinates their shutdown, like the recorder.  
+</p><p><a name="443187"><img alt="image of DMRP player and client applications" src="thesisa6.gif"></a><p>
+The player's operation is shown in <a href="thesis_b.htm#443187">Figure 11</a>.  The player is running in the terminal window on the left of the figure.  The session being replayed consists of a single video session with two senders, as indicated by the two vic windows at the bottom center, but no corresponding audio; thus the vat client at the top right corner of <a href="thesis_b.htm#443187">Figure 11</a> shows no other session participants and no audio output.  (The original senders had muted their audio devices due to the noisiness of the environment in which the original conference had been recorded.)   
+</p><p><a name="443217"> </a>
+The player's command-line interface is shown in more detail in <a href="thesis_b.htm#443217">Figure 12</a>. <img alt="detail of Figure 11 showing player command line output" src="thesisa5.gif"><p>
+(The player was invoked as &quot;player.test.&quot;)  Note that the only command-line option provided was a configuration file via the -F option.  Also, by default, each session thread prints the number of each DPSS block as it is being processed; this verboseness helps to diagnose errors such as the player sending to a different destination address than the client expected.  Finally, the title bar of the client vic window visible in <a href="thesis_b.htm#443217">Figure 12</a> indicates that the sender &quot;SC97 DOE2000 (LBL)&quot; is not live, but is rather being replayed by the DMRP.  
+</p><p><a name="427640"> </a>
+Player initialization is similar to recorder initialization: the function init() parses arguments, constructs SessionManager objects (one per session to be replayed), and connects them to the DPSS and DSM via open_dpss().  The most important command-line option flag is -F for the configuration file, which must be in MBone VCR format.  Note that the configuration file must include an address, port, and TTL for each medium to be replayed, and it is the user's responsibility to ensure these do not conflict with existing sessions.  sdr can be used to choose these parameters by creating a new presentation to be advertised; sdr can also generate the configuration file containing these parameters for the player.  
+</p><p><a name="427641"> </a>
+The configuration file must also specify what DPSS set(s) contain the data to be replayed.  Although the recorder generates a name for each set (the DMRPSessionInfo &quot;filename&quot; field mentioned in <a href="thesis_b.htm#425601">Section IV.3</a>), that name is not guaranteed to be unique on the DPSS; in fact, it is guaranteed to be the same for multiple recordings (in parallel or in sequence) that use the same configuration file.  Moreover, the player requires the original configuration file to reconstruct the names chosen by the recorder.  For these reasons, the DMRP extends the MBone VCR configuration file format to allow a DPSS set ID to be designated for each medium: this is used to fill in the DMRPSessionInfo &quot;set_id&quot; field.  Because the set ID is guaranteed to be unique on a given DPSS, users are encouraged to identify sets for playback in this way rather than by name.  
+</p><p><a name="427645"> </a>
+Following a successful return from init(), the player calls register_sessions(), which calls register_session() for each SessionManager and, like the recorder function join_sessions(), ensures a uniform &quot;session start&quot; time across all RTPComm objects.  Then the player creates a session thread for each SessionManager.  Each session thread executes SessionManager::mcast_send().  
+</p><p><a name="427646"> </a>
+Shutdown is handled somewhat differently from the recorder.  Each session thread runs to completion, i.e., until there are no more blocks to read from the DPSS.  Following a successful return from mcast_send(), the session thread calls the player function dec_thread_count(), which decrements a global counter of the number of active session threads.  The last thread to complete detects that the counter is zero after it calls dec_thread_count() and sends the player process a SIGINT.  Because the player, like the recorder, created its session threads with SIGINT blocked, the signal is delivered to the initial thread, which is blocked in sigwait().  Following return from sigwait() (as a result of signal delivery), the player joins each session thread and invokes close_session() for each SessionManager.  
+</p><a name="418017"> </a>
+<h1 align="center">CHAPTER V </h1>
+<a name="433961"> </a>
+<h1 align="center"> PERFORMANCE AND SCALABILITY</h1>
+<p><a name="438381"> </a>
+The following discussion considers the performance and scalability of the DPSS and DMRP.  
+</p><p><a name="438600"> </a>
+Because the DPSS consists of multiple disks, it inherently has greater total storage capacity than any single disk.  Moreover, the DPSS can parallelize disk accesses and network sends across its multiple disks in a way that is impossible to duplicate on any single host with a single disk.  This means that the DPSS can take full advantage of network bandwidths that exceed the maximum throughput of any single disk.  
+</p><p><a name="439215"> </a>
+For example, a DPSS in current use for testing consists of three server hosts, each of which is a Sun Microsystems UltraSPARC I workstation with an OC-3 ATM interface capable of a raw throughput of 155 Mb/s.  Cavanaugh <a href="thesis_b.htm#442988">[4]</a> suggests that 135 Mb/s is the maximum data rate in practice after taking link-layer and ATM protocol overhead into account (this does not include TCP and IP protocol overhead, but these can be considered minimal for sufficiently large TCP packets and assuming no fragmentation at the IP level).  Attached to each host are two disks, each of which has a storage capacity of 4501 MB (4.4 GB) and a raw throughput measured at approximately 14 MB/s, or 112 Mb/s; note that neither of these disks is sufficient to saturate a server's ATM network interface by itself.  In toto, this 3-server configuration is theoretically capable of a sustained transmission rate of approximately 405 Mb/s.  Measurements of DPSS throughput capability have demonstrated 80 Mb/s throughput rates per disk server for an aggregate of 240 Mb/s for this configuration.  (It is worth noting that this throughput measurement was made with a DPSS client that ignored the data; this figure can therefore be considered an upper limit for what &quot;real&quot; clients can expect to achieve.)  Details of this testing are provided in <a href="thesis_a.htm#1003618">Appendix A.1</a>.  
+</p><p><a name="438496"> </a>
+It is useful to compare the DPSS' data rate with currently achievable MBone data rates.  For pulse code modulation (PCM)-encoded data <a href="thesis_b.htm#443042">[33]</a>-the default audio encoding used by vat-320-byte packets of data are transmitted every 40 ms.  The RTP header adds 12 bytes, UDP adds 8, and IP adds 20 for a protocol overhead of 40 bytes (12.5%) per packet, resulting in a raw data rate of 9000 bytes/s, or a useful data rate of 8000 bytes/s (64 Kb/s).  vic's default encoding, H.261 <a href="thesis_b.htm#443056">[40]</a>, can generate up to 30 frames/s, but the frame size varies.  For a high-bandwidth video session, an average frame is 2700 bytes (according to observation of typical high-bandwidth video sessions).  Because vic typically breaks up frames into three or four RTP packets, 120-160 bytes of each frame are required for network protocol headers.  Thus a high-bandwidth video session has a raw data rate of between 84,600 bytes/s (660 Kb/s) and 85,800 bytes/s (670 Kb/s), and a useful data rate of approximately 81,000 bytes/s (632 Kb/s).  
+</p><p><a name="438505"> </a>
+Thus the combined audio and video from a single participant can be expected to require approximately 700 Kb/s of bandwidth.  The DPSS described above can in theory sustain approximately 350 such combined audio and video sessions simultaneously (either recording or playing), assuming that the underlying network is capable of providing the bandwidth.  Unfortunately it is not currently feasible to undertake such a test in the current LBL environment due to insufficient hosts on which to run the recorders or players.  
+</p><p><a name="438613"> </a>
+Tests (described in <a href="thesis_a.htm#1003809">Appendix A.2</a>) have demonstrated that a single DMRP player can support twelve conferences of combined audio and video, each conference averaging 700 Kb/s in throughput, for a total of 8.2 Mb/s throughput for the application.  Furthermore, a DMRP recorder can record twelve such conferences with minimal loss beyond that caused by congestion.  
+</p><p><a name="438652"> </a>
+In these tests, a player on a Sun Microsystems Ultra Enterprise Server (with ~1 GB of memory and a 620 Mb/s OC-12 ATM interface) was used to play back three separately recorded presentations (each consisting of one audio and one associated video session with one data source per session) in parallel: that is, the three presentations-or six RTP sessions-were replayed simultaneously.  Furthermore, the simultaneous replay was repeated to four new conferences, where each new conference consisted of an audio session and a video session.  Each RTP session corresponds to a DPSS data set and each data set to a client, so the player simulated 24 separate DPSS reading clients at the same time.  The recorder (running on a second, similarly configured Ultra Enterprise Server) was used to record the four new conferences.  Because each conference consisted of an audio and a video session, the recorder simulated eight separate DPSS writing clients simultaneously.  Thus the DPSS was able to serve 32 clients, receiving data at approximately 8 Mb/s while transmitting at the same rate.  Playback of the four newly recorded presentations showed that little data had been lost.  
+</p><a name="418018"> </a>
+<h1 align="center">CHAPTER VI </h1>
+<a name="439013"> </a>
+<h1 align="center"> FUTURE WORK</h1>
+<p><a name="439023"> </a>
+The DMRP has much room for improvement.  Perhaps its most obvious flaw is its lack of interactivity: there is no way for a user to change its behavior once it has started running.  Although originally envisioned as middleware that would not require extensive user control, in practice it has turned out to be similar enough to a hardware audio or video recorder that a GUI should be added to allow pausing, stopping, rewinding, fast-forwarding, and so on.  Some modification to the SessionManager and AppStatus classes will be necessary to support this new functionality.  Also, as noted in <a href="thesis_b.htm#420105">Section IV.2.7</a>, the AppStatus class should be modified to allow remote control, perhaps via RTSP (see <a href="thesis_b.htm#417972">Section II.1.3</a>).  Also, in order to minimize the difficulty of compiling and installing the GUI-based application, the recorder and player should be combined into a single program.  
+</p><p><a name="439047"> </a>
+One of the DMRP's most troublesome shortcomings is its inability to request additional space dynamically from the DPSS.  Because the DPSS was originally designed to accommodate read-mostly data sets whose size was known in advance, the API does not provide a simple way to request more space after the initial allocation.  However, the code to do so has been written for other applications and the DPSSPOC class should be modified accordingly.  
+</p><p><a name="439032"> </a>
+The DMRP's interaction with the DPSS should be made more efficient by adding a double-buffering system.  At present, when the recorder needs to save a block, mcast_receive() pauses in its packet processing in order to send the block to the DPSS.  Depending on the data rate, several data packets may be lost in this interval.  A more efficient mechanism would employ an additional buffer and an additional thread: when one buffer is full (i.e., ready to be stored on the DPSS), the thread executing mcast_receive() would begin saving into the other buffer with virtually no delay; meanwhile, the new thread would save the full buffer to the DPSS.  A similar problem exists in the player and a similar mechanism should be introduced for reading blocks from the DPSS during playback.  
+</p><p><a name="439035"> </a>
+The thread-unsafe nature of the DPSS client library requires that each session thread in the recorder and player establish its own connection to the DPSS and maintain its own state in the form of a distinct IssHandle (see <a href="thesis_b.htm#424744">Section IV.2.5</a>).  Much of this state is redundant: for example, all the session threads will store data to the same DPSS disks or read data from the same server hosts.  If the DMRP could eliminate the redundant state, it could reduce its memory footprint.  Whether it is actually possible to synchronize access to shared DPSS client library state without corrupting that state is unclear, however.  
+</p><p><a name="439040"> </a>
+The DMRP violates RTCP's requirements in a few minor respects.  Although the specification calls for an SSRC's CNAME to be consistent throughout a session, the player may not be able to assign the source's correct CNAME when data playback begins because the player has to wait until it reads a saved RTCP packet from the source in the saved data stream.  Hence the CNAME for a source may change, particularly if it sends data at or near the beginning of playback.  The violation could be corrected by creating a cache of SSRC identifying information.  The cache could be created either during recording, off-line between recording and playback, or just before playback commenced; it could be stored with the data set or off-line as part of WALDO.  
+</p><p><a name="439090"> </a>
+Once the RTPCtrlHandler has filled in an SDES NAME for an SSRC on playback, it ignores any changes that may have occurred in the original session (e.g., a user may not have set his NAME correctly in his tool prior to sending data, but may have done so subsequently).  Again, caching the SSRC identifying information would correct this playback error, as would modifying the RTPCtrlHandler to notice when such information changes for an SSRC.  (Note that showing an incorrect NAME does not violate RTCP, nor does the protocol prohibit modifying the NAME.)  
+</p><p><a name="439254"> </a>
+For security, the player should generate new RTP timestamps, sequence numbers, and SSRC IDs for all data packets, as noted in <a href="thesis_b.htm#420071">Section IV.2.3.4</a>.  
+</p><p><a name="439059"> </a>
+Playback as currently implemented makes the generation of RTCP packets at correct intervals for each playback source difficult, as noted in <a href="thesis_b.htm#420078">Section IV.2.3.5</a>.  The RTPCtrlHandler should be modified to support multiple interval timers so that each advertised SSRC appears to send its own RTCP packets at the proper times.  
+</p><p><a name="439050"> </a>
+At present, the DMRP recorder does not reorder out-of-order packets before storing them, nor does the player reorder out-of-order packets before (re)transmitting them.  Although misordering has not been a significant problem in tests to date, some kind of reordering-perhaps performed off-line between recording and playback-would prevent the player from reproducing the original session's errors and could be important in an environment where misordering occurs more frequently, e.g., on an Ethernet.  
+</p><p><a name="439194"> </a>
+As noted in <a href="thesis_b.htm#424960">Section IV.2.6.3</a>, automatic recording suspension has not been adequately tested to find the proper number of non-data cycles that should elapse before shutting off packet  saving.  
+</p><p><a name="439241"> </a>
+During testing with real MBone sessions, the DMRP recorder showed a lack of robustness: it crashed unexpectedly when an advertised but initially inactive video session suddenly became active, i.e., a participant began sending low-rate video.  More testing is needed to determine the cause of the problem.  
+</p><p><a name="439251"> </a>
+The RTPFormat class needs to know about more payload formats; at present only H.261 (for video) and PCM (for audio) have been tested extensively, although several other audio formats have been tested for short times.  Attempts to test JPEG video were unsuccessful because of problems generating a sustained, high-bandwidth source stream using vic.  
+</p><a name="439008"> </a>
+<h1 align="center">CHAPTER VII </h1>
+<a name="433974"> </a>
+<h1 align="center"> CONCLUSIONS</h1>
+<p><a name="436477"> </a>
+ The DMRP mediates between multicast multimedia traffic on the Internet and a distributed server, the DPSS.  The DMRP captures RTPv2 and RTCP traffic from one or more RTP sessions, accumulating data into large blocks and saving these blocks onto the DPSS.  On playback, the DMRP reproduces the original sessions' flow of data by reading blocks and parsing them, packet by packet, according to their original timing.  During playback, the DMRP also retransmits appropriate identifying information so that data can be attributed to the original sources rather than to the player process.  
+</p><p><a name="439003"> </a>
+Whether recording or playing, the DMRP attempts to comply fully with the requirements of RTP and RTCP so that it is a full participant in an RTP session: in particular, the DMRP transmits RTCP packets at appropriate intervals.  Protocol compliance is important to allow data sources to monitor and, if necessary, to modify their behavior based on current conditions.  
+</p><p><a name="442980"> </a>
+The DMRP's implementation strives to make modifications relatively easy while taking advantage of existing technology.  The use of object technology provides a clean organization of, and division between, code modules that resembles the original design; it also permits the extension of the existing class hierarchy to allow new, unanticipated behavior if it is desirable or necessary.  Moreover, the choice of C++ as the implementation language permits the DMRP to take advantage of the C++ Standard Template Library as well as the substantial existing C language DPSS API.  Implementing much of the functionality via concurrently running threads allows a modest degree of scalability.  
+</p><a name="443073"> </a>
+<h1 align="center"> REFERENCES</h1>
+<ol>
+<a name="442982"> </a>
+<li>Berc, L., W. Fenner, R. Frederick and S. McCanne. 1996. <em>RTP Payload Format for JPEG-compressed Video.</em> IETF Request for Comments 2035. 
+<a name="442984"> </a>
+<li>Braden, R., L. Zhang, S. Berson, S. Herzog and S. Jamin. 1997. <em>Resource ReSerVation Protocol (RSVP) -- Version 1 Functional Specification.</em> IETF Request for Comments 2205. 
+<a name="442986"> </a>
+<li>Butenhof, D. R. 1997. <em>Programming with POSIX(R) Threads.</em> Addison-Wesley professional computing series. Reading, Mass: Addison-Wesley. 
+<a name="442988"> </a>
+<li>Cavanaugh, J.  1994.  &quot;Protocol Overhead in IP/ATM Networks.&quot;  Available from http://www.msci.magic.net/Papers.html.  
+<a name="442990"> </a>
+<li>Chen, L. T. and D. Rotem. 1993. &quot;Declustering Objects for Visualization,&quot; <em>Proc. of the 19th VLDB (Very Large Database) Conference</em>. 
+<a name="442992"> </a>
+<li>Deering, Steve. 1989. <em>Host Extensions for IP Multicasting.</em> IETF Request for Comments 1112. 
+<a name="443567"> </a>
+<li>Eriksson, Hans. 1994.  &quot;MBONE: The Multicast Backbone,&quot; <em>Communications of the ACM</em> (August 1994/Vol 37, No. 8): 54-60.  
+<a name="442994"> </a>
+<li>Fenner, W. 1997. <em>Internet Group Management Protocol, Version 2.</em> IETF Internet Draft draft-ietf-idmr-igmp-v2-06.txt (January 1997; work in progress). 
+<a name="442996"> </a>
+<li>Fielding, R., J. Gettys, J. Mogul, H. Frystyk and T. Berners-Lee. 1997. <em>Hypertext Transfer Protocol -- HTTP/1.1.</em> IETF Request for Comments 2068. 
+<a name="442998"> </a>
+<li>Floyd, S., V. Jacobson, C. Liu, S. McCanne and L. Zhang. 1995. &quot;A Reliable Multicast Framework for Light-weight Sessions and Application Level Framing,&quot; <em>ACM SIGCOMM 95</em> (August 1995): 342-356. 
+<a name="443000"> </a>
+<li>Greiman, W., W. E. Johnston, C. McParland, D. Olson, B. Tierney, C. Tull. 1997. &quot;High-Speed Distributed Data Handling for HENP,&quot; International Conference on Computing in High Energy Physics (April 1997), available from http://www-itg.lbl.gov/STAR/. 
+<a name="443002"> </a>
+<li>Handley, M. 1996. <em>SAP: Session Announcement Protocol.</em> IETF Internet Draft draft-ietf-mmusic-sap-00.ps (November 1996; work in progress). 
+<a name="443004"> </a>
+<li>Handley, M., J. Crowcroft, C. Bormann and J. Ott. 1997. <em>The Internet Multimedia Conferencing Architecture.</em> IETF Internet Draft draft-ietf-mmusic-confarch-00.txt (July 1997; work in progress). 
+<a name="443006"> </a>
+<li>Handley, M. and V. Jacobson. 1997. <em>SDP: Session Description Protocol.</em> IETF Internet Draft draft-ietf-mmusic-sdp-04.ps (September 1997; work in progress). 
+<a name="443008"> </a>
+<li>Handley, M., H. Schulzrinne and E. Schooler. 1997. <em>SIP: Session Initiation Protocol.</em> IETF Internet Draft draft-ietf-mmusic-sip-03.txt (July 1997; work in progress). 
+<a name="443010"> </a>
+<li>Hoffman, D., G. Fernando and V. Goyal. 1996. <em>RTP Payload Format for MPEG1/MPEG2 Video.</em> IETF Request for Comments 2038. 
+<a name="443012"> </a>
+<li>Holfelder, W. 1995. &quot;Mbone VCR - Video Conference Recording on the MBone,&quot; <em>ACM Multimedia 95</em> (November 1995). 
+<a name="443675"> </a>
+<li>Hoo, G. 1996. <em>tv_sim home page</em>.  Available at http://www-itg.lbl.gov/ISS/userguide/tv_sim.html.  
+<a name="443014"> </a>
+<li>Johnston, W., G. Jin, C. Larsen, J. Lee, G. Hoo, M. Thompson and B. Tierney. 1997. &quot;Real-Time Digital Libraries based on Widely Distributed, High Performance Management of Large-Data-Objects&quot; (draft submitted to <em>International Journal of Digital Libraries</em>, special issue on &quot;Digital Libraries in Medicine,&quot; available at http://www-itg.lbl.gov/WALDO/DigLib/LargeDataObj-Arch.fm.html). 
+<a name="443016"> </a>
+<li>Johnston, W. E., B. L. Tierney, H. M. Herzog, G. Hoo, G. Jin and J. R. Lee. 1994. &quot;Distributed Parallel Data Storage Systems: A Scalable Approach to High Speed Image Servers,&quot; <em>ACM Multimedia 1994</em>. 
+<a name="443018"> </a>
+<li>Johnston, W. E., B. L. Tierney, H. M. Herzog, G. Hoo, G. Jin and J. R. Lee. 1994. &quot;Using High Speed Networks to Enable Distributed Parallel Image Server Systems,&quot; <em>Supercomputing '94.</em> 
+<a name="443020"> </a>
+<li>Johnston, W., B. Tierney, J. Lee, G. Hoo and M. Thompson. 1996. &quot;Distributed Large Data-Object Environments: End-to-End Performance Analysis of High Speed Distributed Storage Systems in Wide Area ATM Networks,&quot; <em>Fifth NASA/Goddard Conference on Mass Storage Systems and Technologies</em> (available at http://www-itg.lbl.gov/%7Ejohnston/DPSS.NASA.MSS.Symp96.9.fm.html). 
+<a name="443022"> </a>
+<li>Kouvelas, I. and V. Hardman. 1997. &quot;Overcoming Workstation Scheduling Problems in a Real-Time Audio Tool,&quot; <em>Proceedings of Usenix Annual Technical Conference</em> (January 1997): 235-242. 
+<a name="443024"> </a>
+<li>Leclerc, Y. and S. Q. Lau. 1994. &quot;TerraVision: A Terrain Visualization System,&quot; Technical Note 540, SRI International, available from http://www.ai.sri.com/~magic/terravision.html. 
+<a name="443026"> </a>
+<li>McCanne, S. 1992. &quot;A Distributed Whiteboard for Network Conferencing&quot; (unpublished term project report, University of California, Berkeley, May 25, 1992; available from http://www.cs.berkeley.edu/~mccanne/unpublished.html#wb-work). 
+<a name="443028"> </a>
+<li>McCanne, S. and V. Jacobson. 1995. &quot;em>vic</em>: A Flexible Framework for Packet Video,&quot; <em>ACM Multimedia</em> (November 1995): 511-522. 
+<a name="443030"> </a>
+<li>Mills, D. 1992. <em>Network Time Protocol (Version 3) Specification, Implementation and Analysis.</em> IETF Request for Comments 1305. 
+<a name="443032"> </a>
+<li>Network Research Group, Lawrence Berkeley National Laboratory. <em>LBNL Audio Conferencing Tool (vat) home page.</em> Available at http://www-nrg.ee.lbl.gov/vat/. 
+<a name="443034"> </a>
+<li>Perkins, C., I. Kouvelas, O. Hodson, V. Hardman, M. Handley, J.C. Bolot, A. Vega-Garcia and S. Fosse-Parisis. 1997. RTP Payload for Redundant Audio Data. IETF Request for Comments 2198. 
+<a name="443036"> </a>
+<li>Perry, M. 1997. <em>Confcntlr home page.</em>  Available at http://www-itg.lbl.gov/mbone/confcntlr. 
+<a name="443038"> </a>
+<li>Postel, Jon. 1981. <em>Internet Protocol.</em> IETF Request for Comments 791. 
+<a name="443040"> </a>
+<li>Postel, Jon. 1982. <em>Simple Mail Transfer Protocol.</em> IETF Request for Comments 821. 
+<a name="443042"> </a>
+<li>Schulzrinne, H. 1996. <em>RTP Profile for Audio and Video Conferences with Minimal Control.</em> IETF Request for Comments1890. 
+<a name="443044"> </a>
+<li>Schulzrinne, H., S. Casner, R. Frederick and V. Jacobson. 1996. <em>RTP: A Transport Protocol for Real-Time Applications.</em> IETF Request for Comments 1889. 
+<a name="443046"> </a>
+<li>Schulzrinne, H., A. Rao and R. Lanphier. 1997. <em>Real Time Streaming Protocol (RTSP).</em> IETF Internet Draft draft-ietf-mmusic-rtsp-04.txt (September 1997; work in progress). 
+<a name="443048"> </a>
+<li>Stepanov, A. and M. Lee. 1995. <em>The Standard Template Library.</em> Hewlett-Packard. Available from http://www.cs.rpi.edu/projects/STL/htdocs/stl.html. 
+<a name="443050"> </a>
+<li>Stroustrup, B. 1991. <em>The C++ Programming Language.</em> Reprinted with corrections 1995. Reading, Mass: Addison-Wesley. 
+<a name="443052"> </a>
+<li>Thompson, M., W. Johnston, G. Jin, J. Lee, B. Tierney and J. F. Terdiman. 1996. &quot;Distributed Health Care Imaging Information Systems.&quot; Available from http://www-itg.lbl.gov/DPSS/Kaiser/. 
+<a name="443054"> </a>
+<li>Tierney, B., W. Johnston, H. Herzog, G. Hoo, G. Jin and J. Lee. 1994. &quot;System Issues in Implementing High Speed Distributed Parallel Storage Systems,&quot; <em>Proceedings of the USENIX Symposium on High Speed Networking</em>. 
+<a name="443056"> </a>
+<li>Turletti, T. and C. Huitema. 1996. <em>RTP Payload Format for H.261 Video Streams.</em> IETF Request for Comments 2032. 
+<a name="443058"> </a>
+<li>Wiltzius, D., L. Berc and S. Devadhar. 1996. &quot;BAGNet: Experiences with an ATM metropolitan-area network,&quot; <em>ConneXions 10</em>, no. 3 (March 1996). 
+<p><a name="439269"> </a>
+
+</p></ol>
+
+<hr><br>
+ 
+<a href="thesis.html">[Top]</a> <a href="thesis.html">[Prev]</a> <a href="thesis_appendices.html">[Next]</a> <a href="thesis_appendices.html">[Bottom]</a>
+<hr><br>
+ 
+<sup>1</sup><p><a name="418721"> </a>
+References to &quot;routers&quot; in the following discussion should be understood to mean &quot;multicast routers&quot; unless stated otherwise.
+</p><sup>2</sup><p><a name="437978"> </a>
+Multicast routers do not use IGMP to direct multicast traffic between one another: they use one of several multicast routing protocols which will not be discussed in this document.  
+</p><sup>3</sup><p><a name="418735"> </a>
+&quot;RTP&quot; is often used to denote both the data transport protocol and the combination of RTP and RTCP, with the meaning being clear from context.  In this paper, where ambiguity may exist, both protocols are explicitly mentioned.
+</p><sup>4</sup><p><a name="420661"> </a>
+The term has a slightly different meaning if RTP and RTCP are used for unicast.  
+</p><sup>5</sup><p><a name="420439"> </a>
+RTP version 0 (RTPv0) was used by one of the earliest MBone applications, vat.  RTPv1 was an experimental version that was not widely deployed.  
+</p><sup>6</sup><p><a name="431846"> </a>
+A profile is one set of RTP parameters typically agreed upon for transport of a particular medium or media, e.g., CD quality audio.  
+</p><sup>7</sup><p><a name="418755"> </a>
+RTCP can also &quot;convey minimal session control information.&quot;  However, it is more common to convey this information via the protocols discussed in <a href="thesis_b.htm#417972">Section II.1.3</a>.  
+</p><sup>8</sup><p><a name="427073"> </a>
+The IETF protocol documents use &quot;session&quot; inconsistently.  The conference control protocols such as SDP, SAP and SIP use &quot;session&quot; to denote what was defined as a &quot;presentation&quot; above, while RTP/RTCP defines a &quot;session&quot; in terms of an address and port number pair associated with a single medium.  In this discussion, &quot;session&quot; will always have the RTP/RTCP meaning, and &quot;presentation&quot; will be used to describe a set of multiple sessions.  Following this usage, SDP, for example, would more properly be called the &quot;Presentation Description Protocol.&quot;  
+</p><sup>9</sup><p><a name="418789"> </a>
+TerraVision cannot absorb data at that rate due to limitations in the rendering hardware on the SGI Onyx computer on which it has been run.  To date, TerraVision has been able to absorb a maximum of 80 Mb/s.  
+</p><sup>10</sup><p><a name="418799"> </a>
+The master may also enforce security policies, authenticating client requests and verifying access authorizations.
+</p><sup>11</sup><p><a name="420018"> </a>
+In fact, IP multicast does not require the functionality of close() as such, although both RTP/RTCP and Unix sockets do.  
+</p><sup>12</sup><p><a name="420032"> </a>
+By default, an IPNetAP object chooses an address to serve as the local communication endpoint.  The application may override this default, as may be desirable for a multihomed host.  
+</p><sup>13</sup><p><a name="420135"> </a>
+What the bandwidth for a session should be is not addressed by RTP/RTCP.  Some MBone tools, e.g., sdr, allow the user to set the bandwidth and recommend defaults for certain types of sessions.  
+</p><sup>14</sup><p><a name="422966"> </a>
+To send an RTCP BYE packet, the special method send_bye() is used.  
+</p><sup>15</sup><p><a name="423028"> </a>
+There are actually three join() methods, each allowing the caller to describe the session's multicast address in a different format but otherwise providing the same services.  
+</p><sup>16</sup><p><a name="439187"> </a>
+Formerly, the <em>time offset</em> was needed for the player to determine the correct time at which to replay each data packet, relative to a canonical starting time for the session which is maintained by the RTPComm.  (This mechanism for timing packet playback was borrowed from the MBone VCR, which uses a similar per-packet header structure.)  As described in <a href="thesis_b.htm#420071">Section IV.2.3.4</a>, however, the current packet-dispatch timing mechanism is format-dependent and uses the RTP timestamp, as is correct.  
+</p><sup>17</sup><p><a name="424755"> </a>
+The recorder actually invokes a wrapper routine, write_dpss(); this makes the DPSSPOC programming interface more similar to the standard Unix write() system call.  
+</p><sup>18</sup><p><a name="424844"> </a>
+There are actually two open_dpss_r() methods, one of which allows the caller to specify the a set's name and the other of which allows the set to be specified by its DPSS set ID.  
+</p><sup>19</sup><p><a name="427255"> </a>
+The MBone VCR file format was chosen for compatibility: Bill Fenner of Xerox PARC wrote a widely available script that can be invoked by sdr to generate such a configuration file for an advertised conference.  
+</p><sup>20</sup><p><a name="425634"> </a>
+This has proven to be somewhat more than is usually necessary for current MBone data rates and session duration.  
+</p>
+
+<em>Copyright &#169; 1997, Gary Hoo.   All rights reserved.</em>
+
+<!-- This file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- -->
+<!-- For more information on how this document, and how the rest of -->
+<!-- this server was created, email gjhoo@lbl.gov -->
+<!-- -->
+<!-- Last updated: Thu Jul 16 19:59:22 1998 -->
+
+</body>
+</html>

@@ -1,0 +1,206 @@
+TO:  All GCN email sites
+RE:  Two Changes in the format of some of the Swift Notices
+DT:  29 Oct 05
+
+INTRO:
+This documents two changes to the GCN/Swift XRT & UVOT Notices: (a) the DATE & TIME
+labels, and (b) the addition of the time-since-trigger field.
+(a) The original implementation of these DATE & TIME labels was not quite right.
+I got the "GRB" prefixes incorporated in some of the NFI Notices, when, in fact,
+they are not strictly GRB-ish, but rather afterglow/image-related.
+(b) The delta time since trigger is being added as a convenience.
+These effect only the full email format notices;  nothing is changing
+in the 4 pager/cell formats,  nor the socket packet contents.
+
+
+WHICH NOTICES ARE CHANGING LABELS:
+There are 6 Notice types that have the label changes.  See the table below.
+
+
+TABLE OF CHANGES:
+   NOTICE TYPE                    LABEL  DELTA_T
+   ==========================     =====  =======
+   XRT Position                    Y       Y
+   XRT Pos Nack                    Y       Y
+   XRT Image [Processed]                   Y
+   XRT Spectrum [Processed]                Y
+   XRT Lightcurve [Processed]              Y
+   UVOT Source List [Processed]    Y       Y
+   UVOT Image [Processed]          Y       Y
+   UVOT Position                           Y
+
+
+WHICH LABELS ARE CHANGING:
+Below are pairs of extractions from the Notices in question.  For clarity,
+only the NOTICE_TYPE and the *_DATE/*_TIME lines are listed for clarity
+(I didn't list the whole notice because that would clutter things).
+Each pair is separated by a "//////////" divider.  The current way
+is listed first, then comes the new way (separated by a "========" divider).
+The basic change is that the "GRB_" prefix is changed to "IMG_START_"
+(or "SPEC_START_" or "LC_START_", as appropriate).
+
+
+ADDITION TO THE 'TIME' LINE:
+In addition to the label changes, there is also an addition to each
+of the IMG_START_TIME lines.  Appended onto each line is the field:
+"NN.N [sec] since BAT Trigger Time".  (This field is just the difference
+between the respective start-of-image-accumulation time and
+the BAT Trigger Time.)
+All the XRT and UVOT notice types are getting this change.  See the table above.
+
+
+SCHEDULE FOR IMPLEMENTATION:
+a) The label changes will start 03 Nov 05.
+b) The delta-time fields have already been added as of 26 Oct 05.
+
+
+APOLOGIES:
+I apologize for those of you who have written scripts to parse these incoming
+email notices.  These changes (particularly the label changes) will cause you
+some extra work.  However, I feel that the current set of "GRB_"-based labels
+is too confusing to people, and the long-term benifits will outweigh
+the short-term efforts of a few.
+
+
+Sincerely,
+Scott
+
+Scott Barthelmy                      NASA-GSFC, Code 661, Greenbelt, MD   20771
+PHONE:  301-286-3106                 (office)
+FAX:    301-286-1684                 (1st choice,  -1682 2nd choice)
+EMAIL:  scott@lheamail.gsfc.nasa.gov
+PAGER:  3013463733@mmode.com
+WEB:    http://gcn.gsfc.nasa.gov/gcn
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+NOTICE_TYPE:     Swift-XRT Position
+GRB_DATE:        13414 TJD;    44 DOY;   05/02/13
+GRB_TIME:        79992.27 SOD {22:13:12.27} UT     [Start of CCD integration]
+======================================================================================
+NOTICE_TYPE:     Swift-XRT Position
+IMG_START_DATE:  13414 TJD;    44 DOY;   05/02/13
+IMG_START_TIME:  79992.27 SOD {22:13:12.27} UT,  91.8 [sec] since BAT Trigger Time
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+NOTICE_TYPE:     Swift-XRT Nack-Position
+GRB_DATE:        13414 TJD;    44 DOY;   05/02/13
+GRB_TIME:        79992.27 SOD {22:13:12.27} UT     [Start of CCD integration]
+======================================================================================
+NOTICE_TYPE:     Swift-XRT Nack-Position
+IMG_START_DATE:  13414 TJD;    44 DOY;   05/02/13
+IMG_START_TIME:  79992.27 SOD {22:13:12.27} UT,  91.8 [sec] since BAT Trigger Time
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+NOTICE_TYPE:     Swift-XRT Image
+IMG_START_DATE:  13414 TJD;    44 DOY;   05/02/13
+IMG_START_TIME:  79992.27 SOD {22:13:12.27} UT
+======================================================================================
+NOTICE_TYPE:     Swift-XRT Image
+IMG_START_DATE:  13414 TJD;    44 DOY;   05/02/13
+IMG_START_TIME:  79992.27 SOD {22:13:12.27} UT,   91.8 [sec] since BAT Trigger Time
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+NOTICE_TYPE:     Swift-XRT Processed Image
+IMG_START_DATE:  13414 TJD;    44 DOY;   05/02/13
+IMG_START_TIME:  79992.27 SOD {22:13:12.27} UT
+======================================================================================
+NOTICE_TYPE:     Swift-XRT Processed Image
+IMG_START_DATE:  13414 TJD;    44 DOY;   05/02/13
+IMG_START_TIME:  79992.27 SOD {22:13:12.27} UT,   91.8 [sec] since BAT Trigger Time
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+NOTICE_TYPE:     Swift-XRT Spectrum
+SPEC_START_DATE: 13414 TJD;    44 DOY;   05/02/13
+SPEC_START_TIME: 80005.60 SOD {22:13:25.60} UT
+======================================================================================
+NOTICE_TYPE:     Swift-XRT Spectrum
+SPEC_START_DATE: 13414 TJD;    44 DOY;   05/02/13
+SPEC_START_TIME: 80005.60 SOD {22:13:25.60} UT,     105.1 [sec] since BAT Trigger Time
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+NOTICE_TYPE:     Swift-XRT Processed Spectrum
+SPEC_START_DATE: 13414 TJD;    44 DOY;   05/02/13
+SPEC_START_TIME: 80013.60 SOD {22:13:33.60} UT
+======================================================================================
+NOTICE_TYPE:     Swift-XRT Processed Spectrum
+SPEC_START_DATE: 13414 TJD;    44 DOY;   05/02/13
+SPEC_START_TIME: 80013.60 SOD {22:13:33.60} UT,     113.1 [sec] since BAT Trigger Time
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+NOTICE_TYPE:     Swift-XRT Processed Spectrum
+SPEC_START_DATE: 13414 TJD;    44 DOY;   05/02/13
+SPEC_START_TIME: 80013.60 SOD {22:13:33.60} UT
+======================================================================================
+NOTICE_TYPE:     Swift-XRT Processed Spectrum
+SPEC_START_DATE: 13414 TJD;    44 DOY;   05/02/13
+SPEC_START_TIME: 80013.60 SOD {22:13:33.60} UT,     113.1 [sec] since BAT Trigger Time
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+NOTICE_TYPE:     Swift-XRT Lightcurve
+LC_START_DATE:   13414 TJD;    44 DOY;   05/02/13
+LC_START_TIME:   79997.61 SOD {22:13:17.61} UT
+======================================================================================
+NOTICE_TYPE:     Swift-XRT Lightcurve
+LC_START_DATE:   13414 TJD;    44 DOY;   05/02/13
+LC_START_TIME:   79997.61 SOD {22:13:17.61} UT,   97.1 [sec] since BAT Trigger Time
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+NOTICE_TYPE:     Swift-UVOT Source List
+GRB_DATE:        13414 TJD;    44 DOY;   05/02/13
+GRB_TIME:        79998.98 SOD {22:13:18.98} UT
+======================================================================================
+NOTICE_TYPE:     Swift-UVOT Source List
+IMG_START_DATE:  13414 TJD;    44 DOY;   05/02/13
+IMG_START_TIME:  79998.98 SOD {22:13:18.98} UT,   98.5 [sec] since BAT Trigger Time
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+NOTICE_TYPE:     Swift-UVOT Processed Source List
+GRB_DATE:        13414 TJD;    44 DOY;   05/02/13
+GRB_TIME:        79998.98 SOD {22:13:18.98} UT
+======================================================================================
+NOTICE_TYPE:     Swift-UVOT Processed Source List
+IMG_START_DATE:  13414 TJD;    44 DOY;   05/02/13
+IMG_START_TIME:  79998.98 SOD {22:13:18.98} UT,   98.5 [sec] since BAT Trigger Time
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+NOTICE_TYPE:     Swift-UVOT Image
+GRB_DATE:        13414 TJD;    44 DOY;   05/02/13
+GRB_TIME:        79998.98 SOD {22:13:18.98} UT
+======================================================================================
+NOTICE_TYPE:     Swift-UVOT Image
+IMG_START_DATE:  13414 TJD;    44 DOY;   05/02/13
+IMG_START_TIME:  79998.98 SOD {22:13:18.98} UT,   98.5 [sec] since BAT Trigger Time
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+NOTICE_TYPE:     Swift-UVOT Processed Image
+GRB_DATE:        13414 TJD;    44 DOY;   05/02/13
+GRB_TIME:        79998.98 SOD {22:13:18.98} UT
+======================================================================================
+NOTICE_TYPE:     Swift-UVOT Processed Image
+IMG_START_DATE:  13414 TJD;    44 DOY;   05/02/13
+IMG_START_TIME:  79998.98 SOD {22:13:18.98} UT,   98.5 [sec] since BAT Trigger Time
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+NOTICE_TYPE:     Swift-UVOT Position
+IMG_START_DATE:  13414 TJD;    44 DOY;   05/02/13
+IMG_START_TIME:  79998.98 SOD {22:13:18.98} UT
+======================================================================================
+NOTICE_TYPE:     Swift-UVOT Position
+IMG_START_DATE:  13414 TJD;    44 DOY;   05/02/13
+IMG_START_TIME:  79998.98 SOD {22:13:18.98} UT,   98.5 [sec] since BAT Trigger Time

@@ -1,0 +1,815 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ILL XML Schema v4 by Leif Andresen - lea@bs.dk - and Anders Mortensen 2003-12-05 / www.bs.dk -->
+<!-- Based on: ILL XML Schema v3 by Poul Henrik Jorgensen 2002-10-10 / www.portia.dk  -->
+<!-- V3: Includes ILL-REQUEST, ILL-ANSWER, STATUS-QUERY and STATUS-OR-ERROR-REPORT -->
+<!-- V4: Added fields: Cancel-6, Cancel-Reply-7, Recall-9, Overdue-12, Renew-13, Renew-Answer-14 -->
+<!-- V5: namespace changed from ill4 to ill5
+	reason-unfilled added in Unfilled-ResultsType 
+	typo in "transactions-results" corrected, 
+	Shipped-3 added
+	cancel-extension names corrected, e.g. to overdue-extension in Overdue-12
+	supplemental-item-description type changed in ILL-Request-1
+	date-due-field in Date-DueType changed from xsd:string to xsd:date
+	date-due element added to Renew-Answer-14 and Overdue-12
+	answer-due-date attribute changed to answer attribute in Renew-Answer-14
+	Supplemental-ItemDescription definition changed
+-->
+
+<xsd:schema targetNamespace="http://www.loc.gov/z3950/agency/defns/ill5" xmlns:ill5="http://www.loc.gov/z3950/agency/defns/ill5" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+	<xsd:element name="ILL-APDU">
+		<xsd:complexType>
+			<xsd:choice>
+				<xsd:element ref="ill5:ILL-Request-1"/>
+				<xsd:element ref="ill5:Shipped-3"/>
+				<xsd:element ref="ill5:ILL-Answer-4"/>
+				<xsd:element ref="ill5:Cancel-6"/>
+				<xsd:element ref="ill5:Cancel-Reply-7"/>
+				<xsd:element ref="ill5:Recall-9"/>
+				<xsd:element ref="ill5:Overdue-12"/>
+				<xsd:element ref="ill5:Renew-13"/>
+				<xsd:element ref="ill5:Renew-Answer-14"/>
+				<xsd:element ref="ill5:Status-Query-18"/>
+				<xsd:element ref="ill5:Status-Or-Error-Report-19"/>
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ILL-Request-1">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="transaction-id" type="ill5:Transaction-IdType"/>
+				<xsd:element name="service-date-time" type="ill5:Service-Date-TimeType"/>
+				<xsd:element name="requester-id" type="ill5:System-IdType" minOccurs="0"/>
+				<xsd:element name="responder-id" type="ill5:System-IdType" minOccurs="0"/>
+				<xsd:element name="delivery-address" type="ill5:Delivery-AddressType" minOccurs="0"/>
+				<xsd:element name="delivery-service" type="ill5:Delivery-ServiceType" minOccurs="0"/>
+				<xsd:element name="billing-address" type="ill5:Delivery-AddressType" minOccurs="0"/>
+				<xsd:element name="iLL-service-type" type="ill5:ILL-Service-TypeType" maxOccurs="5"/>
+				<xsd:element name="responder-specific-service" type="ill5:ExternalType" minOccurs="0"/>
+				<xsd:element name="requester-optional-messages" type="ill5:Requester-Optional-Messages-TypeType" minOccurs="0"/>
+				<xsd:element name="search-type" type="ill5:Search-TypeType" minOccurs="0"/>
+				<xsd:element name="supply-medium-info-type" type="ill5:Supply-Medium-Info-TypeType" minOccurs="0" maxOccurs="7"/>
+				<xsd:element name="client-id" type="ill5:Client-IdType" minOccurs="0"/>
+				<xsd:element name="item-id" type="ill5:Item-IdType"/>
+				<xsd:element name="supplemental-item-description" type="ill5:Supplemental-Item-DescriptionType" minOccurs="0"/>
+				<xsd:element name="cost-info-type" type="ill5:Cost-Info-TypeType" minOccurs="0"/>
+				<xsd:element name="third-party-info-type" type="ill5:Third-Party-Info-TypeType" minOccurs="0"/>
+				<xsd:element name="iLL-request-extensions" type="ill5:ExtensionType" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="protocol-version-num" type="xsd:positiveInteger" use="required" fixed="2"/>
+			<xsd:attribute name="copyright-compliance" type="xsd:string" use="optional"/>
+			<xsd:attribute name="retry-flag" type="xsd:boolean" fixed="false"/>
+			<xsd:attribute name="forward-flag" type="xsd:boolean" fixed="false"/>
+			<xsd:attribute name="requester-note" type="xsd:string"/>
+			<xsd:attribute name="forward-note" type="xsd:string"/>
+			<xsd:attribute name="transaction-type" default="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:positiveInteger">
+						<xsd:minInclusive value="1"/>
+						<xsd:maxInclusive value="3"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="place-on-hold" default="3">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:positiveInteger">
+						<xsd:minInclusive value="1"/>
+						<xsd:maxInclusive value="3"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Shipped-3">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="transaction-id" type="ill5:Transaction-IdType"/>
+				<xsd:element name="service-date-time" type="ill5:Service-Date-TimeType"/>
+				<xsd:element name="requester-id" type="ill5:System-IdType" minOccurs="0"/>
+				<xsd:element name="responder-id" type="ill5:System-IdType" minOccurs="0"/>
+				<xsd:element name="responder-address" type="ill5:System-AddressType" minOccurs="0"/>
+				<xsd:element name="intermediary-id" type="ill5:System-IdType" minOccurs="0"/>
+				<xsd:element name="supplier-id" type="ill5:System-IdType" minOccurs="0"/>
+				<xsd:element name="client-id" type="ill5:Client-IdType" minOccurs="0"/>
+				<xsd:element name="supplemental-item-description" type="ill5:Supplemental-Item-DescriptionType" minOccurs="0"/>
+				<xsd:element name="shipped-service-type" type="ill5:Shipped-Service-TypeType" minOccurs="0"/>
+				<xsd:element name="responder-optional-messages" type="ill5:Responder-Optional-MessagesType" minOccurs="0"/>
+				<xsd:element name="supply-details" type="ill5:Supply-DetailsType" minOccurs="0"/>
+				<xsd:element name="return-to-address" type="ill5:Postal-AddressType" minOccurs="0"/>
+				<xsd:element name="shipped-extensions" type="ill5:ExtensionType" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="protocol-version-num" type="xsd:positiveInteger" use="required" fixed="2"/>
+			<xsd:attribute name="responder-note" type="xsd:string"/>
+			<xsd:attribute name="transaction-type" default="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:positiveInteger">
+						<xsd:minInclusive value="1"/>
+						<xsd:maxInclusive value="3"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ILL-Answer-4">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="transaction-id" type="ill5:Transaction-IdType"/>
+				<xsd:element name="service-date-time" type="ill5:Service-Date-TimeType"/>
+				<xsd:element name="requester-id" type="ill5:System-IdType" minOccurs="0"/>
+				<xsd:element name="responder-id" type="ill5:System-IdType" minOccurs="0"/>
+				<xsd:element name="results-explanation" minOccurs="0">
+					<xsd:complexType>
+						<xsd:choice>
+							<xsd:element name="conditional-results" type="ill5:Conditional-ResultsType"/>
+							<xsd:element name="retry-results" type="ill5:Retry-ResultsType"/>
+							<xsd:element name="unfilled-results" type="ill5:Unfilled-ResultsType"/>
+							<xsd:element name="locations-results" type="ill5:Locations-ResultsType"/>
+							<xsd:element name="will-supply-results" type="ill5:Will-Supply-ResultsType"/>
+							<xsd:element name="hold-placed-results" type="ill5:Hold-Placed-ResultsType"/>
+							<xsd:element name="estimate-results" type="ill5:Estimate-ResultsType"/>
+						</xsd:choice>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="responder-specific-results" type="ill5:ExternalType" minOccurs="0"/>
+				<xsd:element name="supplemental-item-description" type="ill5:Supplemental-Item-DescriptionType" minOccurs="0"/>
+				<xsd:element name="send-to-list" type="ill5:Send-To-List-TypeType" minOccurs="0"/>
+				<xsd:element name="already-tried-list" type="ill5:System-IdType" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="responder-optional-messages" type="ill5:Responder-Optional-MessagesType" minOccurs="0"/>
+				<xsd:element name="iLL-answer-extensions" type="ill5:ExtensionType" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="protocol-version-num" type="xsd:positiveInteger" fixed="2"/>
+			<xsd:attribute name="responder-note" type="xsd:string" use="optional"/>
+			<xsd:attribute name="transaction-results" type="ill5:Transaction-ResultsType" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Cancel-6">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="transaction-id" type="ill5:Transaction-IdType"/>
+				<xsd:element name="service-date-time" type="ill5:Service-Date-TimeType"/>
+				<xsd:element name="requester-id" type="ill5:System-IdType"/>
+				<xsd:element name="responder-id" type="ill5:System-IdType"/>
+				<xsd:element name="cancel-extensions" type="ill5:ExtensionType" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="protocol-version-num" type="xsd:positiveInteger" fixed="2"/>
+			<xsd:attribute name="requester-note" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Cancel-Reply-7">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="transaction-id" type="ill5:Transaction-IdType"/>
+				<xsd:element name="service-date-time" type="ill5:Service-Date-TimeType"/>
+				<xsd:element name="requester-id" type="ill5:System-IdType"/>
+				<xsd:element name="responder-id" type="ill5:System-IdType"/>
+				<xsd:element name="cancel-reply-extensions" type="ill5:ExtensionType" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="protocol-version-num" type="xsd:positiveInteger" fixed="2"/>
+			<xsd:attribute name="answer" type="xsd:boolean" use="required"/>
+			<xsd:attribute name="responder-note" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Recall-9">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="transaction-id" type="ill5:Transaction-IdType"/>
+				<xsd:element name="service-date-time" type="ill5:Service-Date-TimeType"/>
+				<xsd:element name="requester-id" type="ill5:System-IdType"/>
+				<xsd:element name="responder-id" type="ill5:System-IdType"/>
+				<xsd:element name="recall-extensions" type="ill5:ExtensionType" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="protocol-version-num" type="xsd:positiveInteger" fixed="2"/>
+			<xsd:attribute name="responder-note" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Overdue-12">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="transaction-id" type="ill5:Transaction-IdType"/>
+				<xsd:element name="service-date-time" type="ill5:Service-Date-TimeType"/>
+				<xsd:element name="requester-id" type="ill5:System-IdType"/>
+				<xsd:element name="responder-id" type="ill5:System-IdType"/>
+				<xsd:element name="date-due" type="ill5:Date-DueType"/>
+				<xsd:element name="overdue-extensions" type="ill5:ExtensionType" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="protocol-version-num" type="xsd:positiveInteger" fixed="2"/>
+			<xsd:attribute name="responder-note" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Renew-13">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="transaction-id" type="ill5:Transaction-IdType"/>
+				<xsd:element name="service-date-time" type="ill5:Service-Date-TimeType"/>
+				<xsd:element name="requester-id" type="ill5:System-IdType"/>
+				<xsd:element name="responder-id" type="ill5:System-IdType"/>
+				<xsd:element name="renew-extensions" type="ill5:ExtensionType" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="protocol-version-num" type="xsd:positiveInteger" fixed="2"/>
+			<xsd:attribute name="desired-due-date" type="xsd:date"/>
+			<xsd:attribute name="requester-note" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Renew-Answer-14">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="transaction-id" type="ill5:Transaction-IdType"/>
+				<xsd:element name="service-date-time" type="ill5:Service-Date-TimeType"/>
+				<xsd:element name="requester-id" type="ill5:System-IdType"/>
+				<xsd:element name="responder-id" type="ill5:System-IdType"/>
+				<xsd:element name="date-due" type="ill5:Date-DueType"/>
+				<xsd:element name="renew-answer-extensions" type="ill5:ExtensionType" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="protocol-version-num" type="xsd:positiveInteger" fixed="2"/>
+			<xsd:attribute name="answer" type="xsd:boolean" use="required"/>
+			<xsd:attribute name="responder-note" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Status-Query-18">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="transaction-id" type="ill5:Transaction-IdType"/>
+				<xsd:element name="service-date-time" type="ill5:Service-Date-TimeType"/>
+				<xsd:element name="requester-id" type="ill5:System-IdType" minOccurs="0"/>
+				<xsd:element name="responder-id" type="ill5:System-IdType" minOccurs="0"/>
+				<xsd:element name="status-query-extensions" type="ill5:ExtensionType" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="protocol-version-num" type="xsd:integer" use="required" fixed="2"/>
+			<xsd:attribute name="note" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Status-Or-Error-Report-19">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="transaction-id" type="ill5:Transaction-IdType"/>
+				<xsd:element name="service-date-time" type="ill5:Service-Date-TimeType"/>
+				<xsd:element name="requester-id" type="ill5:System-IdType" minOccurs="0"/>
+				<xsd:element name="responder-id" type="ill5:System-IdType" minOccurs="0"/>
+				<xsd:element name="status-report" minOccurs="0"/>
+				<xsd:element name="error-report" minOccurs="0"/>
+				<xsd:element name="status-or-error-report-extensions" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="protocol-version-num" type="xsd:integer" use="required" fixed="2"/>
+			<xsd:attribute name="note" type="xsd:string" use="optional"/>
+			<xsd:attribute name="reason-no-report" use="optional">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:positiveInteger">
+						<xsd:minInclusive value="1"/>
+						<xsd:maxInclusive value="2"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Transaction-IdType">
+		<xsd:sequence>
+			<xsd:element name="initial-requester-id" type="ill5:System-IdType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="transaction-group-qualifier" type="xsd:string" use="required"/>
+		<xsd:attribute name="transaction-qualifier" type="xsd:string" use="required"/>
+		<xsd:attribute name="sub-transaction-qualifier" type="xsd:string" use="optional"/>
+	</xsd:complexType>
+	<xsd:complexType name="Service-Date-TimeType">
+		<xsd:sequence>
+			<xsd:element name="date-time-of-this-service">
+				<xsd:complexType>
+					<xsd:attribute name="date" type="xsd:date" use="required"/>
+					<xsd:attribute name="time" type="xsd:time" use="optional"/>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="date-time-of-original-service" minOccurs="0">
+				<xsd:complexType>
+					<xsd:attribute name="date" type="xsd:date" use="required"/>
+					<xsd:attribute name="time" type="xsd:time" use="optional"/>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="System-IdType">
+		<xsd:choice>
+			<xsd:element name="person-or-institution-symbol" type="ill5:Person-Or-Institution-SymbolType" minOccurs="0"/>
+			<xsd:element name="name-of-person-or-institution" type="ill5:Name-Of-Person-Or-InstitutionType" minOccurs="0"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="Delivery-AddressType">
+		<xsd:sequence>
+			<xsd:element name="postal-address" type="ill5:Postal-AddressType" minOccurs="0"/>
+			<xsd:element name="electronic-address" type="ill5:System-AddressType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="Delivery-ServiceType">
+		<xsd:choice>
+			<xsd:element name="physical-delivery" type="ill5:Transportation-ModeType" minOccurs="0"/>
+			<xsd:element name="electronic-delivery" type="ill5:Electronic-Delivery-ServiceType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="Requester-Optional-Messages-TypeType">
+		<xsd:attribute name="can-send-RECEIVED" type="xsd:boolean"/>
+		<xsd:attribute name="can-send-RETURNED" type="xsd:boolean"/>
+		<xsd:attribute name="requester-SHIPPED">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:integer">
+					<xsd:enumeration value="1"/>
+					<xsd:enumeration value="2"/>
+					<xsd:enumeration value="3"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="requester-CHECKED-IN">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:integer">
+					<xsd:enumeration value="1"/>
+					<xsd:enumeration value="2"/>
+					<xsd:enumeration value="3"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="Search-TypeType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="level-of-service" type="xsd:string"/>
+				<xsd:attribute name="need-before-date" type="xsd:date"/>
+				<xsd:attribute name="expiry-date" type="xsd:date"/>
+				<xsd:attribute name="expiry-flag">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:integer">
+							<xsd:enumeration value="1"/>
+							<xsd:enumeration value="2"/>
+							<xsd:enumeration value="3"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="Client-IdType">
+		<xsd:attribute name="client-name" type="xsd:string" use="optional"/>
+		<xsd:attribute name="client-status" type="xsd:string" use="optional"/>
+		<xsd:attribute name="client-identifier" type="xsd:string" use="optional"/>
+	</xsd:complexType>
+	<xsd:complexType name="Item-IdType">
+		<xsd:sequence>
+			<xsd:element name="held-medium-type"/>
+			<xsd:element name="national-bibliography-no" minOccurs="0"/>
+			<xsd:element name="system-no" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="item-type" type="xsd:integer"/>
+		<xsd:attribute name="call-number" type="xsd:string"/>
+		<xsd:attribute name="author" type="xsd:string"/>
+		<xsd:attribute name="title" type="xsd:string"/>
+		<xsd:attribute name="sub-title" type="xsd:string"/>
+		<xsd:attribute name="sponsoring-body" type="xsd:string"/>
+		<xsd:attribute name="place-of-publication" type="xsd:string"/>
+		<xsd:attribute name="publisher" type="xsd:string"/>
+		<xsd:attribute name="series-title-number" type="xsd:string"/>
+		<xsd:attribute name="volume-issue" type="xsd:string"/>
+		<xsd:attribute name="edition" type="xsd:string"/>
+		<xsd:attribute name="publication-date" type="xsd:string"/>
+		<xsd:attribute name="publication-date-of-component" type="xsd:string"/>
+		<xsd:attribute name="author-of-article" type="xsd:string"/>
+		<xsd:attribute name="title-of-article" type="xsd:string"/>
+		<xsd:attribute name="pagination" type="xsd:string"/>
+		<xsd:attribute name="iSBN" type="xsd:string"/>
+		<xsd:attribute name="iSSN" type="xsd:string"/>
+		<xsd:attribute name="additional-no-letters" type="xsd:string"/>
+		<xsd:attribute name="verification-reference-source" type="xsd:string"/>
+	</xsd:complexType>
+	<xsd:complexType name="Supplemental-Item-DescriptionType">
+		<xsd:sequence>
+			<xsd:element name="barcode" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="Cost-Info-TypeType">
+		<xsd:sequence>
+			<xsd:element name="maximum-cost" minOccurs="0">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="ill5:AmountType">
+							<xsd:attribute name="reciprocal-agreement" type="xsd:boolean" default="false"/>
+							<xsd:attribute name="will-pay-fee" type="xsd:boolean" default="false"/>
+							<xsd:attribute name="payment-provided" type="xsd:boolean" default="false"/>
+						</xsd:extension>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="reciprocal-agreement" type="xsd:boolean" default="false"/>
+		<xsd:attribute name="will-pay-fee" type="xsd:boolean" default="false"/>
+		<xsd:attribute name="payment-provided" type="xsd:string" default="false"/>
+	</xsd:complexType>
+	<xsd:complexType name="Third-Party-Info-TypeType">
+		<xsd:sequence>
+			<xsd:element name="initial-requester-address" type="ill5:System-AddressType" minOccurs="0"/>
+			<xsd:element name="send-to-list" type="ill5:Send-To-List-TypeType" minOccurs="0"/>
+			<xsd:element name="already-tried-list" type="ill5:System-IdType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="permission-to-forward" type="xsd:boolean" default="false"/>
+		<xsd:attribute name="permission-to-chain" type="xsd:boolean" default="false"/>
+		<xsd:attribute name="permission-to-partition" type="xsd:boolean" default="false"/>
+		<xsd:attribute name="permission-to-change-send-to-list" type="xsd:boolean" default="false"/>
+		<xsd:attribute name="preference" default="2">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:positiveInteger">
+					<xsd:minInclusive value="1"/>
+					<xsd:maxInclusive value="2"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="Supply-DetailsType">
+		<xsd:sequence>
+			<xsd:element name="date-due" minOccurs="0"/>
+			<xsd:element name="cost" minOccurs="0"/>
+			<xsd:element name="shipped-via" minOccurs="0"/>
+			<xsd:element name="insured-for" minOccurs="0"/>
+			<xsd:element name="return-insurance-require" minOccurs="0"/>
+			<xsd:element name="no-of-units-per-medium" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="date-shipped" type="xsd:date"/>
+		<xsd:attribute name="chargeable-units">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:integer">
+					<xsd:maxInclusive value="9999"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="shipped-conditions" type="xsd:string"/>
+	</xsd:complexType>
+	<xsd:complexType name="Postal-AddressType">
+		<xsd:sequence>
+			<xsd:element name="name-of-person-or-institution" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="extended-postal-delivery-address" type="xsd:string" use="optional"/>
+		<xsd:attribute name="street-and-number" type="xsd:string" use="optional"/>
+		<xsd:attribute name="post-office-box" type="xsd:string" use="optional"/>
+		<xsd:attribute name="city" type="xsd:string" use="optional"/>
+		<xsd:attribute name="region" type="xsd:string" use="optional"/>
+		<xsd:attribute name="country" type="xsd:string" use="optional"/>
+		<xsd:attribute name="postal-code" type="xsd:string" use="optional"/>
+	</xsd:complexType>
+	<xsd:complexType name="Send-To-List-TypeType">
+		<xsd:sequence maxOccurs="unbounded">
+			<xsd:element name="system-id" type="ill5:System-IdType"/>
+			<xsd:element name="system-address" type="ill5:System-AddressType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="Already-Tried-List-TypeType">
+		<xsd:sequence>
+			<xsd:element name="System-Id" type="ill5:System-IdType" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AmountType">
+		<xsd:attribute name="currency-code" type="xsd:string" use="optional"/>
+		<xsd:attribute name="monetary-value" type="xsd:string" use="optional"/>
+	</xsd:complexType>
+	<xsd:complexType name="Date-DueType">
+		<xsd:sequence>
+			<xsd:element name="date-due-field" type="xsd:date"/>
+		</xsd:sequence>
+		<xsd:attribute name="renewable" type="xsd:boolean" default="false"/>
+	</xsd:complexType>
+	<xsd:complexType name="Damaged-DetailsType">
+		<xsd:sequence>
+			<xsd:element name="damaged-portion"/>
+		</xsd:sequence>
+		<xsd:attribute name="document-type-id" type="xsd:string"/>
+	</xsd:complexType>
+	<xsd:complexType name="Status-ReportType">
+		<xsd:sequence>
+			<xsd:element name="user-status-report"/>
+			<xsd:element name="provider-status-report"/>
+		</xsd:sequence>
+		<xsd:attribute name="provider-status-report" type="ill5:Curent-StateType" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="Error-ReportType">
+		<xsd:sequence>
+			<xsd:element name="report-source"/>
+			<xsd:element name="user-error-report" minOccurs="0"/>
+			<xsd:element name="provider-error-report" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="correlation-information" type="xsd:string"/>
+	</xsd:complexType>
+	<xsd:complexType name="Person-Or-Institution-SymbolType">
+		<xsd:choice>
+			<xsd:element name="person-symbol" type="xsd:string"/>
+			<xsd:element name="institution-symbol" type="xsd:string"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="Name-Of-Person-Or-InstitutionType">
+		<xsd:choice>
+			<xsd:element name="name-of-person" type="xsd:string"/>
+			<xsd:element name="name-of-institution" type="xsd:string"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="Electronic-Delivery-ServiceType">
+		<xsd:sequence>
+			<xsd:element name="e-delivery-service" type="ill5:E-Delivery-ServiceType" minOccurs="0"/>
+			<xsd:element name="document-type" type="ill5:Document-TypeType" minOccurs="0"/>
+			<xsd:element name="e-delivery-details" type="ill5:E-Delivery-DetailsType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="e-delivery-description" type="xsd:string"/>
+		<xsd:attribute name="name-or-code" type="xsd:string"/>
+		<xsd:attribute name="delivery-time" type="xsd:time"/>
+	</xsd:complexType>
+	<xsd:complexType name="Shipped-ViaType">
+		<xsd:choice>
+			<xsd:element name="physical-delivery"/>
+			<xsd:element name="electronic-delivery"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="Units-Per-Medium-TypeType">
+		<xsd:sequence>
+			<xsd:element name="medium"/>
+		</xsd:sequence>
+		<xsd:attribute name="no-of-units">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:integer">
+					<xsd:maxInclusive value="9999"/>
+					<xsd:minInclusive value="1"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="Conditional-ResultsType">
+		<xsd:sequence>
+			<xsd:element name="locations" type="ill5:Location-InfoType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="proposed-delivery-service" type="ill5:Delivery-ServiceType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="conditions" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:positiveInteger">
+					<xsd:enumeration value="13"/>
+					<xsd:enumeration value="14"/>
+					<xsd:enumeration value="15"/>
+					<xsd:enumeration value="16"/>
+					<xsd:enumeration value="22"/>
+					<xsd:enumeration value="23"/>
+					<xsd:enumeration value="24"/>
+					<xsd:enumeration value="25"/>
+					<xsd:enumeration value="27"/>
+					<xsd:enumeration value="28"/>
+					<xsd:enumeration value="30"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="date-for-reply" type="xsd:date" use="optional"/>
+	</xsd:complexType>
+	<xsd:complexType name="Retry-ResultsType">
+		<xsd:sequence>
+			<xsd:element name="locations" type="ill5:Location-InfoType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="reason-not-available" use="optional">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:positiveInteger">
+					<xsd:enumeration value="1"/>
+					<xsd:enumeration value="2"/>
+					<xsd:enumeration value="6"/>
+					<xsd:enumeration value="7"/>
+					<xsd:enumeration value="8"/>
+					<xsd:enumeration value="13"/>
+					<xsd:enumeration value="14"/>
+					<xsd:enumeration value="15"/>
+					<xsd:enumeration value="16"/>
+					<xsd:enumeration value="17"/>
+					<xsd:enumeration value="19"/>
+					<xsd:enumeration value="27"/>
+					<xsd:enumeration value="28"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="retry-date" type="xsd:date" use="optional"/>
+	</xsd:complexType>
+	<xsd:complexType name="Unfilled-ResultsType">
+		<xsd:sequence>
+			<xsd:element name="locations" type="ill5:Location-InfoType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="reason-unfilled" use="optional">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:positiveInteger">
+					<xsd:enumeration value="1"/>
+					<xsd:enumeration value="2"/>
+					<xsd:enumeration value="3"/>
+					<xsd:enumeration value="4"/>
+					<xsd:enumeration value="5"/>
+					<xsd:enumeration value="6"/>
+					<xsd:enumeration value="7"/>
+					<xsd:enumeration value="8"/>
+					<xsd:enumeration value="9"/>
+					<xsd:enumeration value="10"/>
+					<xsd:enumeration value="11"/>
+					<xsd:enumeration value="12"/>
+					<xsd:enumeration value="13"/>
+					<xsd:enumeration value="14"/>
+					<xsd:enumeration value="15"/>
+					<xsd:enumeration value="16"/>
+					<xsd:enumeration value="17"/>
+					<xsd:enumeration value="18"/>
+					<xsd:enumeration value="19"/>
+					<xsd:enumeration value="20"/>
+					<xsd:enumeration value="21"/>
+					<xsd:enumeration value="22"/>
+					<xsd:enumeration value="23"/>
+					<xsd:enumeration value="24"/>
+					<xsd:enumeration value="27"/>
+					<xsd:enumeration value="28"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="Locations-ResultsType">
+		<xsd:sequence>
+			<xsd:element name="locations" type="ill5:Location-InfoType" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="Will-Supply-ResultsType">
+		<xsd:sequence>
+			<xsd:element name="return-to-address" type="ill5:Postal-AddressType" minOccurs="0"/>
+			<xsd:element name="locations" type="ill5:Location-InfoType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="electronic-delivery-service" type="ill5:Electronic-Delivery-ServiceType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="reason-will-supply" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:positiveInteger">
+					<xsd:enumeration value="1"/>
+					<xsd:enumeration value="2"/>
+					<xsd:enumeration value="6"/>
+					<xsd:enumeration value="8"/>
+					<xsd:enumeration value="19"/>
+					<xsd:enumeration value="26"/>
+					<xsd:enumeration value="27"/>
+					<xsd:enumeration value="28"/>
+					<xsd:enumeration value="30"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="supply-date" type="xsd:date" use="optional"/>
+	</xsd:complexType>
+	<xsd:complexType name="Hold-Placed-ResultsType">
+		<xsd:sequence>
+			<xsd:element name="locations" type="ill5:Location-InfoType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="hold-placed-medium-type" type="ill5:Medium-TypeType" use="optional"/>
+		<xsd:attribute name="estimated-date-available" type="xsd:date" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="Estimate-ResultsType">
+		<xsd:sequence>
+			<xsd:element name="locations" type="ill5:Location-InfoType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="cost-estimate" type="xsd:string" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="History-ReportType">
+		<xsd:sequence>
+			<xsd:element name="initiator-of-most-recent-service" type="ill5:System-IdType"/>
+		</xsd:sequence>
+		<xsd:attribute name="date-requested" type="xsd:string" use="optional"/>
+		<xsd:attribute name="author" type="xsd:string" use="optional"/>
+		<xsd:attribute name="title" type="xsd:string" use="optional"/>
+		<xsd:attribute name="author-of-article" type="xsd:string" use="optional"/>
+		<xsd:attribute name="title-of-article" type="xsd:string" use="optional"/>
+		<xsd:attribute name="date-of-last-transition" type="xsd:date" use="required"/>
+		<xsd:attribute name="most-recent-service" type="ill5:Most-recent-ServiceType" use="required"/>
+		<xsd:attribute name="date-of-most-recent-service" type="xsd:date" use="required"/>
+		<xsd:attribute name="most-recent-service-note" type="xsd:string" use="optional"/>
+		<xsd:attribute name="shipped-service-type" use="optional">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:positiveInteger">
+					<xsd:enumeration value="1"/>
+					<xsd:enumeration value="2"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="transaction-results" type="ill5:Transaction-ResultsType" use="optional"/>
+	</xsd:complexType>
+	<xsd:complexType name="User-Error-ReportType">
+		<xsd:choice>
+			<xsd:element name="already-forwarded"/>
+			<xsd:element name="intermediary-problem"/>
+			<xsd:element name="security-problem"/>
+			<xsd:element name="unable-to-perform"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="Provider-Error-ReportType">
+		<xsd:sequence>
+			<xsd:element name="general-problem"/>
+			<xsd:element name="transaction-id-problem"/>
+			<xsd:element name="state-transition-prohibited"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="Person-SymbolType">
+		<xsd:choice>
+			<xsd:element name="person-symbol" type="xsd:string"/>
+			<xsd:element name="institution-symbol" type="xsd:string"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="E-Delivery-ServiceType">
+		<xsd:attribute name="e-delivery-mode" type="xsd:string"/>
+		<xsd:attribute name="e-delivery-parameters" type="xsd:string"/>
+	</xsd:complexType>
+	<xsd:complexType name="Document-TypeType">
+		<xsd:attribute name="document-type-id" type="xsd:string"/>
+		<xsd:attribute name="document-type-parameters" type="xsd:string"/>
+	</xsd:complexType>
+	<xsd:complexType name="E-Delivery-DetailsType">
+		<xsd:choice>
+			<xsd:element name="e-delivery-address" type="ill5:System-AddressType"/>
+			<xsd:element name="e-delivery-id" type="ill5:System-IdType"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="Location-InfoType">
+		<xsd:sequence>
+			<xsd:element name="location-id" type="ill5:System-IdType"/>
+			<xsd:element name="location-address" type="ill5:System-AddressType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="location-note" type="xsd:string" use="optional"/>
+	</xsd:complexType>
+	<xsd:complexType name="Already-ForwardedType">
+		<xsd:sequence>
+			<xsd:element name="responder-id"/>
+			<xsd:element name="responder-address" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="State-Transition-ProhibitedType">
+		<xsd:sequence>
+			<xsd:element name="aPDU-type"/>
+			<xsd:element name="current-state"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="System-AddressType">
+		<xsd:attribute name="telecom-service-identifier" type="xsd:string" use="optional"/>
+		<xsd:attribute name="telecom-service-address" type="xsd:string" use="optional"/>
+	</xsd:complexType>
+	<xsd:complexType name="Transportation-ModeType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="ILL-Service-TypeType">
+		<xsd:restriction base="xsd:positiveInteger">
+			<xsd:minInclusive value="1"/>
+			<xsd:maxInclusive value="5"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Shipped-Service-TypeType">
+		<xsd:restriction base="xsd:positiveInteger">
+			<xsd:minInclusive value="1"/>
+			<xsd:maxInclusive value="2"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ExternalType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:complexType name="Supply-Medium-Info-TypeType">
+		<xsd:attribute name="supply-medium-type" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:positiveInteger">
+					<xsd:minInclusive value="1"/>
+					<xsd:maxInclusive value="7"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="medium-characteristics" type="xsd:string" use="optional"/>
+	</xsd:complexType>
+	<xsd:simpleType name="Transaction-ResultsType">
+		<xsd:restriction base="xsd:positiveInteger">
+			<xsd:minInclusive value="1"/>
+			<xsd:maxInclusive value="7"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Medium-TypeType">
+		<xsd:restriction base="xsd:positiveInteger">
+			<xsd:minInclusive value="1"/>
+			<xsd:maxInclusive value="7"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="Responder-Optional-MessagesType">
+		<xsd:attribute name="can-send-SHIPPED" type="xsd:boolean" use="required"/>
+		<xsd:attribute name="can-send-CHECKED-IN" type="xsd:boolean" use="required"/>
+		<xsd:attribute name="responder-RECEIVED">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:positiveInteger">
+					<xsd:minInclusive value="1"/>
+					<xsd:maxInclusive value="3"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="ExtensionType">
+		<xsd:sequence>
+			<xsd:element name="item" type="xsd:anyType"/>
+		</xsd:sequence>
+		<xsd:attribute name="Identifier" type="xsd:integer" use="required"/>
+		<xsd:attribute name="critical" type="xsd:boolean" default="false"/>
+	</xsd:complexType>
+	<xsd:simpleType name="Curent-StateType">
+		<xsd:restriction base="xsd:positiveInteger">
+			<xsd:minInclusive value="1"/>
+			<xsd:maxInclusive value="18"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Most-recent-ServiceType">
+		<xsd:restriction base="xsd:positiveInteger">
+			<xsd:minInclusive value="1"/>
+			<xsd:maxInclusive value="20"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

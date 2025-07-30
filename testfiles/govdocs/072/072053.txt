@@ -1,0 +1,1571 @@
+NDP-055
+
+TROPICAL AFRICA:  LAND USE, BIOMASS, AND CARBON ESTIMATES FOR 1980
+
+Contributed by:
+Sandra Brown*
+Greg Gaston**
+
+Work on this project was initiated while at the Department of Natural 
+Resources and Environmental Sciences, University of Illinois, Urbana, Illinois,
+61801, U.S.A.
+
+*Sandra Brown is currently affiliated with Winrock International, Arlington, VA.
+(http://www.winrock.org)
+
+**Greg Gaston is currently affiliated with the Department of Geosciences,  
+Oregon State University, 244 Wilkinson Hall, Corvalis, OR  97331.
+
+Prepared by T.W. Beaty, and  L.M. Olsen.
+Carbon Dioxide Information Analysis Center
+Environmental Sciences Division
+Date Published: June, 1996 (Revised 2001)
+
+Prepared by the Carbon Dioxide Information Analysis Center, OAK RIDGE NATIONAL 
+LABORATORY, Oak Ridge, Tennessee 37831-6335.  Managed by the  University of 
+Tennessee-Battelle, LLC for the U.S. DEPARTMENT OF ENERGY under contract 
+DE-AC05-00OR22725.
+
+CONTENTS
+--------
+
+LIST OF TABLES
+ABBREVIATIONS
+ABSTRACT
+1. BACKGROUND INFORMATION
+2. SOURCE AND SCOPE OF THE DATA
+3. DATA MANIPULATION AND INTERPOLATION
+4. MODELING BIOMASS
+5. DESCRIPTION OF DATA PROCESSING ROUTINE
+6. REFERENCES
+7. HOW TO OBTAIN THE DATA AND DOCUMENTATION
+8. LISTING OF FILES PROVIDED
+9. DESCRIPTION OF THE DOCUMENTATION FILE
+10.DESCRIPTION, FORMAT, AND PARTIAL LISTINGS OF THE DATA FILES
+11.SAS AND FORTRAN CODES TO ACCESS THE DATA
+APPENDIX A: A BREAKDOWN BY COUNTRY OF THE AMOUNT OF LAND AND BIOMASS IN OPEN AND
+CLOSED FOREST IN 1980 
+APPENDIX B: REPRINT OF PERTINENT LITERATURE
+APPENDIX C: RECLASSIFICATION SCHEME USED TO OBTAIN THE FOUR LAND USE 
+            CATEGORIES USED IN THIS NDP
+
+LIST OF TABLES
+--------------
+1.  Files in this numeric data package
+2.  Assignment of the biomass indices to potential biomass densities based on
+    forest inventories
+3.  Emission of CO2, CO, and CH4 that would have occurred
+    if the measured reduction in dry biomass (from potential to actual in 1980) 
+    were burned as fuelwood.
+4.  Variable formats for biomax.asc (biomax grid), lakes.asc (lakes grid) and 
+    land.asc (land grid)
+5.  Variable formats for pd80.asc (pd80 grid) and bio1980.asc (bio1980 grid)
+6.  Variable formats of t_afr.asc and t_afr.pat
+7.  Variable formats of africa.asc and africa.patsum1980
+
+ABBREVIATIONS
+-------------
+CDIAC = Carbon Dioxide Information Analysis Center
+FTP = file transfer protocol
+NDP = numeric data package
+QA = quality assurance
+GCM = General Circulation Model
+UNEP = United Nations' Environmental Program
+FAO = United Nations' Food And Agriculture Organization
+GIS = geographic information system
+PBD = potential biomass density
+ARC/INFO is a registered trademark of the Environmental Systems Research
+Institute, Inc., Redlands, CA 92372.
+SAS is a registered trademark of the SAS Institute, Inc., Cary, NC 27511-8000.
+
+
+ABSTRACT
+--------
+Brown, S, and Greg Gaston.  1996. Tropical Africa:  Land Use, Biomass, and 
+Carbon Estimates for 1980.  NDP-055, Carbon Dioxide Information Center, Oak 
+Ridge National Laboratory, Oak Ridge, Tennessee.
+
+This document describes the contents of a digital database containing 
+maximum potential aboveground biomass, land use, and estimated biomass and 
+carbon data for 1980.  The biomass data and carbon estimates are associated 
+with woody vegetation in Tropical Africa. These data were collected to reduce 
+the uncertainty associated with estimating historical releases of carbon from 
+land use change. Tropical Africa is defined here as encompassing 22.7 x 10E6 
+km2 of the earth's land surface and is comprised of countries that are located 
+in tropical Africa (Angola, Botswana, Burundi, Cameroon, Cape Verde, Central 
+African Republic, Chad, Congo, Benin, Equatorial Guinea, Ethiopia, Djibouti, 
+Gabon, Gambia, Ghana, Guinea, Ivory Coast, Kenya, Liberia, Madagascar, Malawi, 
+Mali, Mauritania, Mozambique, Namibia, Niger, Nigeria, Guinea-Bissau, Zimbabwe 
+(Rhodesia), Rwanda, Senegal, Sierra Leone, Somalia, Sudan, Tanzania, Togo,
+Uganda, Burkina Faso (Upper Volta), Zaire, and Zambia).
+
+The database was developed using the GRID module in the ARC/INFO (TM
+geographic information system. Source data were obtained from the Food and 
+Agriculture Organization (FAO), the U.S. National Geophysical Data Center, and 
+a limited number of biomass-carbon density case studies. These data were used 
+to derive the maximum potential and actual (ca. 1980) aboveground biomass 
+values at regional and country levels. The land-use data provided were derived 
+from a vegetation map originally produced for the FAO by the International 
+Institute of Vegetation Mapping, Toulouse, France.
+
+Analyses conducted with this database found that 18% of Tropical Africa was 
+classified as closed forest and 36% was classified as open forest in 1980. 
+Forested lands contained over 138E+09 Mg of aboveground live 
+biomass, which is equivalent to 69E+09 Mg of carbon. Closed forests and open 
+forests had mean aboveground biomass values of 209 Mg/ha and 67 Mg/ha, 
+respectively, in 1980. These values are down from maximum potential 
+aboveground live biomass values of 296 Mg/ha for closed forest and 108 Mg/ha 
+for open forest.
+
+Keywords:  Carbon release, climate change, deforestation, forestry, population.
+
+NDP-055 includes the following data and documentation files:
+
+1.  Descriptive text file (ndp055.txt)
+2.  ARC/INFO projection file (trop_africa.prj) with parameters for the 
+    ARC/INFO grids and coverages included in this NDP. 
+3.  ARC/INFO exported integer grid (biomax.e00) containing maximum potential 
+    biomass density data in Mg/ha.
+4.  ASCII format of BIOMAX grid (biomax.asc) 
+5.  ARC/INFO exported integer grid (lakes.e00) containing the location of all 
+    nonseasonal lakes.
+6.  ASCII format of LAKES grid(lakes.asc)
+7.  ARC/INFO exported integer grid (land.e00) containing land-use information.
+8.  ASCII format of LAND grid (land.asc) 
+9.  FORTRAN code (intgrid.for) to read and print the ASCII data files 
+    (biomax.asc, lakes.asc, and land.asc)
+10. SAS retrieval program (intgrid.sas) to read and print the ASCII data files 
+    biomax.asc, lakes.asc, and land.asc.
+11. ARC/INFO exported floating point grid (bio1980.e00) containing the 
+    calculated actual aboveground live biomass in open and closed forests 
+    for 1980 in Mg/ha.
+12. ASCII format of BIO1980 grid (bio1980.asc)
+13. ARC/INFO exported floating point grid (pd80.e00) containing population 
+    density data for 1980.
+14. ASCII format of PD80 grid (pd80.asc)
+15. FORTRAN code (realgrid.for) to read and print the ASCII files pd80.asc and 
+    bio1980.asc.
+16. SAS retrieval program (realgrid.sas) to read and print the ASCII 
+    datafiles pd80.asc and bio1980.asc.
+17. ARC/INFO exported coverage (africa.e00) containing the amount and biomass 
+    in open and closed forest by country.
+18. ARC/INFO exported coverage (t_afr.e00) containing population data for 1960,
+    1970, 1980 and 1990 for the subnational political units used in this NDP.
+19. ASCII file (africa.asc) containing the attribute information associated 
+    with africa.e00.
+20. FORTRAN code (africa.for) to read and print africa.asc.
+21. SAS retreival program (africa.sas) to read and print africa.asc.
+22. ASCII file (t_afr.asc) containing the attribute information associated 
+    with t_afr.e00.
+23. FORTRAN code (t_afr.for) to read and print t_afr.asc.
+24. SAS retrieval program (t_afr.sas) to read and print t_afr.asc.
+25. Graphic Map, "Maximum Potential Biomass Density" (africa_biomax.gif)
+26. Graphic Map, "Land use" (africa_lc.gif)
+27. Graphic Map, "Area of Closed Forests (By Country)" (areaclsdforest.gif)
+28. Graphic Map, "Area of Open Forests (By Country)" (areaopnforest.gif)
+29. Graphic Map, "Mean Biomass of Closed Forests (By Country)" (csldforestbio.gif)
+30. Graphic Map, "Mean Biomass of Open Forests (By Country)" (opnforestbio.gif)
+31. Graphic Map, "Percent Forest Cover (By Country)" (pctforest.gif)
+32. Graphic Map, "Total Forest Biomass (By Country)" (totforestbio.gif)
+33. Graphic Map, "Population Density - 1990" (pop1990.gif)
+34. Graphic Map, "Population Density - 1980" (pop1980.gif)
+35. Graphic Map, "Population Density - 1970" (pop1970.gif)
+36. Graphic Map, "Population Density - 1960" (pop1960.gif)
+
+1. BACKGROUND INFORMATION
+-------------------------
+
+This database was developed by Sandra Brown, Louis Iverson, Ariel
+Lugo, Anantha Prasad, Greg Gaston, and others between 1990 and 1994.
+The primary contract that supported the collection of the data was the U.S. 
+Department of Energy, Office of Health and Environmental Research, contract 
+DEFG02-90ER61081. Additional support was obtained from the U.S. Environmental 
+Protection Agency through its post doctoral fellowship program, which is 
+administered by the National Research Council.
+
+Human-induced changes in the Earth's land cover may influence ecological and
+climatic systems.  The potential for these changes to have regional or global
+implications makes the task of developing an all-inclusive general circulation
+model (GCM) with predictive capabilities essential.  However, to accurately
+predict the effects of long-term increases in the number and concentration of
+greenhouse gases on climate, GCMs require information on the timing and 
+magnitude of past releases of CO2, methane, nitrous oxide, water 
+vapor, and a host of other anthropogenic gases. An understanding of all of the
+major processes leading to the release (sources) and storage (sinks) of these 
+gases over time is also essential.
+
+The prediction of regional trends in climate will be problematic until a 
+well- documented understanding of the past, present, and possible future usage 
+of fossil fuels and land is reached.  Such an understanding is possible only 
+with the concerted effort of many investigators from a diverse set of 
+disciplines.  The perspectives of ecologists, biologists, historians, 
+geographers, foresters, mathematicians, physicists, and others are needed if 
+a multifaceted examination of the causes and consequences of land-cover change 
+and human population growth on the world's climate is to be conducted.
+
+Reductions in the amount of carbon stored in terrestrial ecosystems are 
+partially responsible for the increase in the concentration of atmospheric 
+CO2 that has occurred since 1850 (Houghton 1993).  For example, live
+vegetation in terrestrial ecosystems is estimated to have contained over 900 Pg
+of carbon, with 90% of this being in forests, prior to any intentional land 
+clearing on Earth (Olson et al. 1985, Dale et al. 1991).
+
+A decline in the amount of carbon sequestered in vegetation has been 
+associated with the rapid increase of human population that began during the 
+industrial revolution.  This population growth created demands for food and 
+forest products that were fulfilled through the clearing and conversion of 
+large tracts of forest to agriculture and other uses.  This land-cover change 
+has direct impacts on the concentration of atmospheric CO2.  For example, a 1% 
+change in the total amount of carbon stored in living vegetation would release 
+about 21 Pg of carbon to the atmosphere, almost four times the present annual 
+emission from fossil fuels (Houghton 1993).
+
+2. SOURCE AND SCOPE OF THE DATA
+-------------------------------
+
+This numeric data package (NDP-055) describes a land-use and biomass
+database for Tropical Africa that contains 1980 land cover, maximum potential
+aboveground biomass, and biomass estimates for woody vegetation in 1980. In
+addition, the database includes information on human populations in each
+nation and sub-national political unit in Tropical Africa for the years 1960,
+1970, 1980, and 1990. These data were collected to reduce the uncertainty
+associated with the possible magnitude and time course of historical releases
+of carbon from land-cover change and may be used by demographers, historians,
+geographers, and other researchers interested in the relationship between land
+cover change, land degradation, climate, and anthropogenic activities.
+
+For purposes of this NDP, Tropical Africa is defined as encompassing
+nearly 22.7 x 1E6 km2 of the world's surface and includes the following 
+countries: Angola, Botswana, Burundi, Cameroon, Cape Verde, Central African 
+Republic, Chad, Congo, Benin, Equatorial Guinea, Ethiopia, Djibouti, Gabon, 
+Gambia, Ghana, Guinea, Ivory Coast, Kenya, Liberia, Madagascar, Malawi, Mali, 
+Mauritania, Mozambique, Namibia, Niger, Nigeria, Guinea-Bissau, Zimbabwe 
+(Rhodesia), Rwanda, Senegal, Sierra Leone, Somalia, Sudan, Tanzania, Togo, 
+Uganda, Burkina Faso (Upper Volta), Zaire, and Zambia. As defined here 
+Tropical Africa does not include countries in Mediterranean and southern 
+Africa (i.e., Egypt, Libya, Tunisia, Algeria, Morocco, Western Sahara, South 
+Africa, Lesotho, and Swaziland).
+
+The major effort in the compilation of this database involved the acquisition
+and processing of the source data sets.  Most of these data sets were acquired 
+from the United Nations Environmental Program's (UNEP) Global Resources 
+Information Database (Jaakkola 1990) or from the United Nation's Food and 
+Agriculture Organization (FAO 1993).  These data, in turn, were input, 
+georeferenced, and converted into a raster format as needed using an 
+ARC/INFO (TM) geographic information system (GIS).  The spatial data sets used 
+in the development of this NDP are as follows:
+
+1.  National boundaries were derived from the U.S. Defense Mapping Agency's
+    Digital Chart of the World at a scale of 1:1,000,000.  Boundaries for
+    subnational political units were derived from The New International 
+    Atlas, the Encyclopedia of the Nations, and the FAO's Tropical Forest 
+    Resources Assessment Program 1990 population data (Worldmark Press 1984,
+    Rand McNally 1980).  Boundaries for large water bodies (e.g. Lake Victoria) 
+    were copied from the Digital Chart of the World; moderate-size dlakes 
+    (>20 km in length in any direction) were digitized from the UNESCO 
+    Vegetation Map of Africa, scale 1:5,000,000 (UNESCO/AETFAT/UNSO 1981, 
+    White 1983).
+
+2.  Population density data for 1960, 1970, 1980, and 1990 for national and
+    subnational political units were provided by M. Lorenzini and K.D. Singh,
+    FAO, Tropical Forest Resources Assessment Program 1990 (FAO 1993).
+
+3.  Elevation data were derived from a global digital elevation database
+    originally developed by the U.S. Defense Mapping Agency (ETOPO5).  The 
+    elevation data were reclassified into 15-m increments, and all bathymetry
+    data were set to zero.
+
+4.  Soils data were derived from the FAO Soils Map of the World (FAO 1971-81).      The soils data were reclassified into five soil texture classes, five 
+    slope classes, and two soil depth classes and were used in calculating 
+    the maximum potential biomass values included with this database.  These 
+    soil data are not included with this NDP.
+
+5.  Climatic data were obtained from the FAO agro-meteorology database and two
+    maps were developed using the spatial coordinates for each station and the 
+    mean monthly precipitation, maximum temperature, minimum temperature, 
+    day-night temperature differential, evapotranspiration rate, and vapor 
+    pressure.  The first map is a isopleth map of annual precipitation and the 
+    second is of an integrated climate index that provides a measure of the 
+    growing season length based on five climatic variables (Weck 1970).
+
+6.  Vegetation data represent conditions in 1980 (approximate date) from the 
+    FAO Vegetation Map of Africa (Lavenu 1987).
+
+
+3. DATA MANIPULATION AND INTERPOLATION
+--------------------------------------
+
+The methodology described in Iverson et al. (1994) and Brown and Gaston 
+(1995) (reprinted in Appendix B) was used to compute degradation ratios.  
+These degradation ratios were applied to a map of maximum potential 
+aboveground biomass density to develop a map of current (ca. 1980) aboveground 
+biomass. Since the linear regression models used to estimate the degradation 
+ratios were calibrated for woody vegetation only, this map was masked using 
+a land cover map (1980).  All areas not in a forested or wooded class were 
+deleted.  This process resulted in a map showing the amount of aboveground 
+biomass in woody vegetation for 1980.  The change (emission) of carbon 
+resulting from land use change and land degradation between the 1880s and 1980 
+can be estimated for closed and open forests by comparing the aboveground 
+biomass map with the maximum potential aboveground biomass density map.
+
+Two of the data sources used in calculating the maximum potential aboveground 
+biomass values needed additional processing before they could be used in the 
+biomass estimation model.  First, the meteorology data were used to calculate 
+a climatological index for each station based on a modified version of Weck's 
+(1970) methodology.  Second, these climatological indices (point data) were 
+interpolated into a thematic map using a thin-plate spline technique (Iverson 
+et al. 1994).  Lastly, the FAO vegetation map used (Lavenu 1987) was 
+reclassified from over 64 ecosystem types into a map showing closed forest, 
+open forest, grassland savanna, and other non forested lands.  See Appendix C
+for a description of the reclassification scheme used.
+
+The source data were then projected into a cylindrical equal-area projection
+using a central meridian of 15 degrees east and a standard parallel of 
+0 degrees.  This equal-area versions of the source data were then converted 
+into grids (cellsize 5km)  using the ARC/INFO (TM) POLYGRID command.
+
+
+4. MODELING BIOMASS
+-------------------
+The maximum potential biomass density of woody vegetation is assumed to be 
+the product of a combination of the prevailing climatic and geomorphic 
+conditions in an area.  To estimate the maximum potential biomass for each grid
+cell, each input layer (i.e., mean annual precipitation, climate index, 
+elevation/slope, and soil quality/texture) was recoded and assigned values
+ranging from 1 to 25 based on the perceived importance of the layer to the 
+growth of woody vegetation.  A weighted overlay of the four layers was then 
+performed to create a biomass index with a minimum possible value of 4 and a 
+maximum value of 100 (in Tropical Africa the values ranged from 40 to 100).
+
+The climate-related layers (mean annual precipitation and climate index) 
+account for 50% of the possible index value.  The soil layer accounts for 25% 
+and the elevation and slope layer [formed by combining the elevation data 
+(maximum value 13) with the slope data (maximum value 12)] accounts for the 
+remaining 25%.  Iverson et al. (1994) used the same weighting scheme for 
+Tropical Asia.  This scheme was found to give satisfactory results for Africa 
+when compared to available literature for the region (Graham et al. 1990, 
+Martin 1991, Lavenu 1987).
+
+Potential biomass density (PBD) indices for forests, woodlands, and woody 
+savannas were calibrated by assigning aboveground biomass density estimates 
+(obtained from the literature) to the range of index values.  This task posed a 
+challenge because few measurements of mature forest biomass have been taken in 
+this region (Brown and Lugo 1982).  The highest reported biomass densities 
+were about 500 Mg/ha (Huttel and Bernhard-Reversat 1975, Huttel 1975) for 
+tropical moist forests in western Africa.  Western Africa is also associated
+with the highest range of PBD indices (>96).  A PBD index value of 51 
+was assumed to represent the lower limit for tree or shrub savannas and was 
+assigned a biomass density of 15 Mg/ha based on data in Lamotte (1975), 
+Lamotte and Bourliere (1983), and Menaut et al. (1991).  It was then assumed 
+that biomass density exhibited a logistic-shaped function between the PBD 
+index and biomass.  Biomass values (in Mg/ha) were assigned to the PBD values 
+as shown in Table 2.  The lower index value (i.e., ~40) and upper index value 
+(i.e., 100) for Tropical Africa were equated with 1Mg/ha and with 500 Mg/ha, 
+respectively.  Between these two bounds the potential biomass index was divided
+into twelve ranges.  Intermediate values of biomass density were obtained or 
+estimated from Greenland and Kowal (1960), Pierlot (1966), Feson et al. (1974),
+and Brown et al. (1994).
+
+The remainder of this methodology is designed for woody vegetation only.  
+Thus, the next step in determining the actual biomass in forests for 1980 was 
+to remove non-woody vegetation associations from the map of maximum potential 
+biomass density that is distributed with this database.  This was done by 
+taking the reclassified FAO vegetation map for 1980 (Lavenu 1987) [i.e., with 
+four classes:  closed forest, open forest (woodland/wooded savanna), grassland 
+savanna, and other] and setting those grid cells with closed forest or open 
+forest to a value of 1.  All other cells were set to NODATA.  This temporary 
+map was multiplied by the potential biomass density map.  This process set or
+masked most grid cells that were not classified as woody vegetation (as of 1980)
+to NODATA.  The resulting maximum potential biomass density map, therefore, is
+of forested areas only.  The only non-wooded areas remaining in this map are 
+grid cells located within lakes.
+
+To estimate the actual biomass remaining in live woody vegetation in 1980,
+researchers developed degradation ratios based on population data and applied 
+them to the maximum potential biomass density map for forested lands.  The 
+degradation ratios were based on the assumption that the degree to which 
+forests are reduced from their potential biomass is a function of the 
+population density and forest type or ecofloristic zone.  For example, high 
+population densities will result in low degradation ratios (i.e., highly 
+degraded forests), and drier regions will be degraded more severely than 
+moist regions because of the ability of moist forests to replace biomass faster
+(Brown and Lugo 1982).
+
+Other socioeconomic factors such as the ratio of rural to urban population, 
+the importance of subsistence versus export-oriented agriculture, and the state
+of industrialization affects the rate of biomass reduction.  In developed 
+countries a population density and a stage of industrial development 
+have been reached at which no further biomass loss occurs and other factors 
+come into play, which may actually lead to increases in biomass (Flint 
+and Richards 1994).
+
+In most of Tropical Africa this threshold has not been reached, as 
+exemplified by the fact that 90% of the population in Africa still uses wood 
+for cooking.  The average amount of wood used for cooking per family is 
+equivalent to about 1.5 tons of fuel oil per year.  It has been estimated that 
+the annual addition to the fuelwood supply through the growth of biomass was 
+less than consumption in 1980 and that the half-life of tree stocks (the time 
+it would take for stocks to decline by 50%) averaged about 25 years in 1980.  
+Furthermore, tree stocks are declining at accelerating rates because 
+consumption is increasing exponentially with population growth (Anderson and 
+Fishwick 1984).
+
+Degradation equations have been estimated for two forest types (closed 
+forest and woodland/wooded savanna) by comparing the potential biomass 
+density in 1980 with biomass densities obtained from forest inventories for 
+the same location.  This process produced unitless factors that indicate the 
+reduction from potential biomass to actual biomass as a function of population 
+density.  Eight reliable forest inventories for Tropical Africa were used to 
+develop the degradation equations (Clement and Nouvellet 1978, Development 
+and Resources Corporation 1967, Republique de Cote d'Ivoire 1975, United 
+Nations 1972, FAO 1989). Due to the limited number of suitable forest 
+inventories of tropical Africa, 27 additional inventories from tropical South 
+and Southeast Asia were also included in the analysis (Iverson et al. 1994).
+
+The data for the closed forest zone of Tropical Africa were combined with 
+the moist forest data from South and Southeast Asia, while data for the 
+woodland/wooded savanna zone were combined with the dry forest data from South 
+and Southeast Asia.  A least-squares regression was conducted for each zone, 
+and the following degradation equations were produced.
+
+The equations, sample sizes, and correlation results for closed forest are:
+
+PD >  12:   DR = 0.847 - 0.091 ln (PD), (n = 25, r2 = 0.72),   (1a)
+PD <= 12:   DR = 1 - 0.032 PD,                                 (1b)
+
+where DR is the degradation ratio and PD is the population density in people 
+per km2. 
+
+The equations, sample sizes, and correlation results for open forest 
+(woodland/wooded savanna) are:
+
+PD >  7:    DR = 0.866 - 0.118 ln (PD), (n = 10, r2 = 0.54),      (2a)
+PD <= 7:    DR = 1 - 0.050 PD,                                    (2b)
+
+where DR is the degradation ratio and PD is the population density in people 
+per km2.
+
+Equation 1a and 2a for each forest type is based on the range of available 
+data, and the minimum PD for which it is applicable.  For PDs less than these 
+minimums, simple linear equations (Eq. 1b and 2b) were developed between the DR
+at zero PD (assumed to be one), and the value of DR from equation 1a and 2a at 
+the minimum PD.  A linear function of PD was then calculated for each land 
+cover class between these DR values.
+
+Use of the natural logarithm in equations 1a and 2a allows negative DR 
+values to occur for PDs greater than 11,022 for closed forest and 1,539 for 
+the open forest (woodland/wooded savanna) land cover classes.  This was not a 
+problem in most cases, however, since forest lands tend to have lower 
+population densities.  For this reason,  calculated DR values less than 0.1 
+were reset to 0.1.
+
+The actual-biomass-density map for 1980 is the product of the 
+potential-biomass- density map for woody vegetation, the population density map
+for 1980 stratified by land cover type (closed forest and open forest), and 
+the calculated degradation ratios.  The map of actual biomass densities for 
+1980 was calculated on a cell-by-cell basis.  All cells within a political 
+unit were assigned the same population density value.  The forest strata, 
+however, may vary within a political unit causing the degradation equation 
+used to vary.  Thus, the map of actual biomass density for woody vegetation 
+in 1980 reflects the predicted maximum potential biomass, the forest type 
+stratification, and the population density in 1980.
+
+Due to the coarse scale of the input data used in generating the potential 
+biomass density map, some large water bodies within Africa were not 
+represented.  Boundaries for large water bodies (e.g., Lake Victoria) and 
+moderate-sized lakes (>20 km in length in any direction) were digitized and 
+entered into a lake coverage (map).  Following a process similar to that used 
+for the land cover data, those grid cells within a lake (i.e., > 50%) were 
+given a value of NODATA, and the remainder were set to one.  This coverage was 
+multiplied by the grid cells in the map of actual biomass density for 1980
+to set all "wet" grid cells to NODATA.
+
+This final map of actual live aboveground biomass density only contains 
+lands that were in closed forest (moist forest and seasonal forest) or open 
+forest (woodland/wooded savanna) in 1980 (per Lavenu 1987).  The final map 
+contains 4,025,275 km2 of closed forest land with a mean biomass 
+density of 208.7 Mg/ha and 8,156,575 km2 of open forest land (woodland/ wooded 
+savanna) with a mean biomass density of 67.1 Mg/ha.  As expected, the minimum 
+biomass densities were located in lowland dry zones to the north and south, 
+maximum values were located in the humid lowlands in southwest and south
+central Africa (i.e., Congo, Gabon, Zaire), and highland areas had slightly 
+less biomass than their lowland counterparts.  The presence of these known 
+patterns increased our confidence in this methodology and its ability to 
+generate reasonable estimates of biomass density for Tropical Africa.
+
+The primary product of this GIS methodology is the actual biomass density
+information for woody vegetation in 1980. Actual biomass density in year X 
+may be determined (as described for 1980) using a land-cover map and population
+data for year X (e.g., 1990). The results may then be compared to determine 
+the change in biomass (carbon) of woody vegetation in the intervening years.  
+
+The biomass for 1980 may also be compared to the maximum potential aboveground 
+biomass for the region.  The difference between the mean maximum potential 
+biomass density for closed forest lands and the mean actual biomass density 
+in 1980 is 86.9 Mg/ha (40.5 Mg/ha for open forest).  On the basis of the 
+average biomass to carbon conversion factor of 1 kg of wood to 0.5 kg of 
+carbon (Smith 1991), and the assumption that the removed wood was eventually 
+burned, the amount of CO2, CO, CH4, and other gases emitted from this per ha 
+reduction in biomass may be estimated for closed and open forests.  Table 3
+shows the estimated emission of CO2, CO, and CH4 that would have occurred if 
+86.9  (40.5) Mg of dry biomass were burned using traditional West African 
+stoves, based on emission factors calculated by Brocard et al. (1995).  (If 
+forest fire based emission factors were used the emission of CO2 and CO would 
+increase while the amount of CH4 and carbon in the "other" category 
+would decrease.)
+
+Africa had an estimated total population of 100 million people in 1650 (density
+of 0.03 people per km2).  Two hundred years later (1850) the population
+was still around 100 million (Udo 1982).  Thus, it may be assumed that prior to 
+the colonial period, which began in the mid to late 1800s, the amount of land 
+in forests had remained relatively stable for over two hundred years.  Since 
+the land in the closed forest and open forest (woodland/wooded savanna) 
+land-cover classes in 1980 were located in the interior of larger forests in 
+1880, it can be assumed that they were at or near their maximum potential 
+biomass density at the beginning of the colonial period.  If this was the case,
+the emission of CO2 due to the degradation of these forested lands (i.e., 
+reduction of biomass from the maximum potential to the "actual" biomass in 
+1980) would total 27.21E+12 kg/C.  If this CO2 had been emitted at a 
+constant rate since 1880, 272.1E+06 Mg C per year would have been released 
+into the atmosphere.  To put this figure into perspective, Houghton and Hackler
+(1995) calculated that the regional net flux of carbon in Tropical Africa from 
+all land-use changes was 238.69E+06 Mg C in 1980 and had increased to 
+341.5E+06 Mg C by 1990.
+
+
+5. LIMITATIONS AND RESTRICTIONS OF THE DATA
+-------------------------------------------
+
+The following paragraphs list the limitations and caveats that should be
+considered when using this database.  Failure to consider these limitations 
+could result in erroneous interpretations of the data.
+
+1.  All data coverages (maps) in this database have been resampled into 5 x 5 km
+    grid cells.  This cell size and the small cartographic scale of most of the
+    input data used preclude the use of these data for site-specific studies.
+
+2.  The soil texture, slope, and elevation data used in the development of the
+    map of maximum potential aboveground biomass densities were based on 
+    small-scale data sources (1:1,000,000 to 1:5,000,000).
+
+3.  The climate data were extrapolated into areas with little or no data.  
+    Consequently, effects of local topography on precipitation and temperature 
+    patterns are not considered in the map of maximum potential aboveground 
+    biomass.
+
+4.  The population data used to calculate the degradation ratios are based on
+    national internal political subdivisions as of 1980.  The population data 
+    provided with this database (i.e., for 1960, 1970, 1980, and 1990) are 
+    keyed to these 1980 divisions.
+
+5.  The limited number of forest inventories in Tropical Africa makes 
+    verification of the final map of actual biomass density for woody 
+    vegetation in 1980 difficult.  However, average biomass densities were 
+    obtained for Guinea, Gambia, Mozambique, and Burkina Faso from national 
+    level forest inventories and compared to those calculated here.  The 
+    values for Guinea, Gambia, Mozambique, and Burkina Faso were within 3%, 
+    19%, 3%, and 38%, respectively, of the inventory values (Brown and Gaston 
+    1995).
+
+
+6. DATA CHECKS PERFORMED BY CDIAC
+---------------------------------
+
+An important part of the data packaging process at the Carbon Dioxide 
+Information Analysis Center (CDIAC) is the quality assurance (QA) of the data 
+before its distribution.  The QA process is an important component of the 
+value-added concept of ensuring accurate, usable information.  The complete QA 
+of a data set can be a time- consuming process, since data received by CDIAC 
+are rarely in condition for immediate distribution, regardless of source.  The 
+following summarizes the QA checks performed on the various data groups 
+presented in this document.
+
+1.  The map of maximum potential aboveground biomass density is derived from an 
+index calculated from six climatic and geomorphic variables.  The index values 
+were associated with the known upper and lower limits of biomass density in 
+Africa, and the range was divided into 12 density groupings (See Table 2).  
+The maximum potential aboveground biomass density map (5x5 km grid cells) was 
+correlated with a 1x1 degree map of carbon in live vegetation (Olson et al. 
+1983).  The analysis obtained an r<sup>2</sup> value of 0.4, n = 1195611, 
+and alpha  =  0.0001.  Because of cell size differences, a higher correlation 
+value should not be expected;  however, the significance of the correlation 
+(>99%) implies that the two independently derived data sources are measures of 
+the same variable.
+
+2.  The map of maximum potential aboveground biomass (5x5 km grid cells) and 
+the Olson et al. (1983) 1 x 1 degree map of carbon in live vegetation were 
+printed and visually compared to ensure that the location of low and high 
+carbon/biomass densities matched.
+
+3.  The land-use map for 1980 derived from Lavenu (1987) was printed and 
+compared to a similar map prepared by the United Nations (White 1983).
+
+4.  On the basis of QA steps 2 and 3, it was determined that neither the land 
+cover nor potential-biomass-density map had accounted for internal water bodies
+in Tropical Africa.  A new map was created for use with this database that 
+contains all permanent (versus seasonal) lakes larger than 20 km in length in 
+any direction.
+
+5.  The population data for 1960, 1970, 1980, and 1990, were aggregated by 
+country and compared to secondary data sources (e.g., WorldMark Press 1984, Udo 
+1982, and Goode 1992).
+
+6.  The final actual-biomass-density map for 1980 was aggregated on a 
+cell-by-cell basis to obtain the mean biomass density by country (see 
+Appendix A).  These mean values were compared with national level forest 
+inventories available for Guinea, Gambia, Mozambique, and Burkina Faso to 
+ensure that the calculated values were within accepted ranges for tropical 
+regions of the world.
+
+
+5. DESCRIPTION OF DATA PROCESSING ROUTINE 
+-----------------------------------------
+
+The data distributed with this NDP were initially received as ARC/INFO GRIDs 
+and the base map used was derived from the 1:1,000,000- scale Digital Chart of 
+the World developed by the U.S. Defense Mapping Agency with additional 
+information digitized from a 1:5,000,000 scale land use map of Africa 
+(White 1983).  The data contained in this NDP are available as flat ASCII 
+files and as ARC/INFO export files (*.e00).
+
+The ARC/INFO GRID data is provided in two formats. This data was exported
+using both the ARC/INFO EXPORT command and the ARC/INFO GRIDASCII command.
+The ARC/INFO coverages were exported using the ARC/INFO EXPORT command and the
+attribute information is provided in ASCII format. The biomass density values
+are expressed in Mg per ha (i.e., 2 Mg of dry biomass = 1 Mg/C or 1 metric ton
+of carbon).
+
+The degradation ratio equations used in calculating BIO1980.ASC are described 
+below. For a detailed description of these equations see Part 1, Section 8.2, 
+of the documentation. (The documentation for NDP-055 is available free-of-charge
+from the Carbon Dioxide Information Analysis Center, Oak Ridge, Tennessee).
+
+Degradation equations were estimated for two ecofloristic zones [closed
+forest and open forest (woodland/wooded savanna)] by comparing the potential
+biomass density with current biomass and population densities obtained for the
+same location. This process produced unitless factors that indicate the
+reduction from potential biomass to "current" biomass as a function of
+population density. A least-squares regression was then conducted for each
+zone and the following degradation equations were produced. The equations,
+sample size (n), and correlation coefficient for closed forest are:
+
+PD  > 12:  DR = 0.847   0.091 ln (PD), (n = 25, r^2 = 0.72),   (1a)
+PD <= 12:  DR = 1 - 0.032 PD .                                 (1b)
+
+The equations, sample size, and correlation coefficient for open forest
+(woodland/wooded savanna) are:
+
+PD  > 7:    DR = 0.866   0.118 ln (PD), (n = 10, r^2 = 0.54),  (2a)
+PD <= 7:    DR = 1 - 0.050 PD .                                (2b)
+
+Where DR is the degradation ratio and PD is the population density in people
+per km2.        
+
+
+6. REFERENCES
+-------------
+
+Anderson, D. and R. Fishwick. 1984.  Fuelwood consumption and Deforestation
+in African Countries.  World Bank Staff Working Papers No. 704.  The World
+Bank, Washington, D.C.
+
+Brocard, D., C. Lacaux, J.P. Lacaux, G. Kouadio, V. Yoboue, M. Assa Achy, 
+B. Ahoua, and M. Koffi.  1995.  Emissions from the combustion of biofuels in
+the African tropics.  In Biomass Burning and Global Change, J.S. Levine (ed.).
+MIT Press, Cambridge, MA.
+
+Brown, S., Gaston G., and R. Daniels. 1996.  Tropical Africa:  Land Use, 
+Biomass, and Carbon Estimates for 1980.  ORNL/CDIAC-92, NDP-055.  
+Carbon Dioxide Information Analysis Center, Oak Ridge National 
+Laboratory, Oak Ridge, Tennessee.
+
+Brown, S. and G. Gaston.  1995.  Use of forest inventories and geographic 
+information systems to estimate biomass density of tropical forests:  
+Application to Tropical Africa.  Environmental Monitoring  38: 157-168.
+
+Brown, S. and A.E. Lugo.  1982.  The storage and production of organic matter 
+in tropical forests and their role in the global carbon cycle.  Biotropica 14: 
+161-187.  
+
+Brown, S., L.R. Iverson, A. Prasad, and D. Liu.  1993.  Geographical 
+distributions of carbon in biomass and soils of tropical Asian forests.  
+Geocarto International 4: 45-59.
+
+Clement, J. and Y. Nouvellet.  1978.  Inventaire Forestier dans la Zone 
+d'Edenzork.  Republique du Gabon, Soceite Gabonaise de cellulose, Centre
+Technique Forestier Tropical, Nogent-sur-Marne, France.
+
+Dale, V.H., R.A. Houghton, and C.A.S. Hall. 1991.  Estimating the effects of
+land-use change on global atmospheric CO2 concentrations.  Canadian Journal of 
+Forest Research  21: 87-90.
+
+Development and Resources Corporation.  1967.  Forestry Resources of the 
+Southwest Region.  Government of the Republic of the Ivory Coast, New York.
+
+Food and Agriculture Organization (FAO).  1993.  Forest Resources Assessment
+1990: Tropical Countries.  Forestry Paper 112, FAO, Rome, Italy.
+
+FAO.  1989.  Studies on the Volume and Yield of Tropical Forest Stands:  1. 
+Dry forest Formations.  Forestry Paper 51/1, FAO, Rome, Italy.  
+
+FAO.  1971-81.  Soils Map of the World 1:5,000,000.  FAO/UNESCO, Rome, 
+Italy.
+
+Flint, E.P. and J.F. Richards.  1994.  Trends in carbon content of vegetation in
+South and Southeast Asia associated with changes in land use, pp. 201-300.  In 
+Effects of Land-Use Change on Atmospheric CO2 Concentrations: South and 
+Southeast Asia as a Case Study, V.H. Dale (ed.). Springer-Verlag Inc., New York.
+
+Freson, R., G. Goffinet, and F. Malaisse.  1974.  Ecological effects of the 
+regressive succession mhulu-miombo-savannah in Upper-Shaba (Zaire), pp. 
+365-371.In Proceedings 1st International Congress of Ecology.  The Hauge, 
+The Netherlands.
+
+Goode, J.P.   1992.  Goode's World Atlas.  18th Edition, Rand McNally,
+Chicago, Illinois.
+
+Graham, R.L., R.D. Perlack, A. Prasad, J.W. Ranney, and D.B. Waddle.  1990.  
+Greenhouse Gas Emissions in Sub-Saharan Africa.  ORNL-6640.  Oak Ridge 
+National Laboratory, Oak Ridge, Tennessee.
+
+Greenland, D.J. and J.M.L. Kowal.  1960.  Nutrient content of the moist tropical
+forest of Ghana.  Plant and Soil  12: 154-173.
+
+Houghton, R.A. and J.L. Hackler.  1995.  Continental Scale Estimates of the
+Biotic Carbon Flux from Land Cover Change:  1850 to 1980.  ORNL/CDIAC-79, 
+NDP-050.  Carbon Dioxide Information Analysis Center, Oak Ridge National 
+Laboratory, Oak Ridge, Tennessee.
+
+Houghton, R.A. 1993.  Changes in terrestrial carbon over the last 135 years, pp.
+139-157.  In The Global Carbon Cycle, M. Heimann (ed.).  NATO ASI Series, Vol. 
+I 15.  Springer-Verlag Inc., New York.
+
+Houghton, T.A., W.H. Schlesinger, S. Brown, and J.F. Richards.  1985.  Carbon 
+dioxide exchange between the atmosphere and terrestrial ecosystems, pp. 
+113-140.  In Atmospheric Carbon Dioxide and the Global Carbon Cycle, 
+J.R. Trabalka (ed.).  DOE/ER-0239.  U.S. Department of Energy, Office of 
+Energy Research, Washington, D.C.
+
+Huttel, C.H.  1975.  Root distribution and biomass in three Ivory Coast rain 
+forest plots, pp. 123-130.  In Tropical Ecological Systems, F.B. Golley 
+and E. Medina (eds).  Springer Verlag Inc., New York.
+
+Huttel, C.H., and F. Bernhard-Reversat.  1975.  Recherches sur l'ecosysteme de 
+la foret subequatoriale de base Cote D'Ivoire.  Cycle de las matiere 
+oranique.  Terre et Vie 29: 203-228.
+
+Iverson, L.R., S. Brown, A. Prasad, H. Mitasova, A.J.R. Gillespie, and A.E. 
+Lugo.  1994.  Use of GIS for estimating potential and actual forest biomass 
+for continental South and Southeast Asia, pp. 67-115.  In Effects of Land-
+Use Change on Atmospheric CO2 Concentrations:  South and Southeast 
+Asia as a Case Study, V.H. Dale (ed.).  Springer-Verlag Inc., New York.
+
+Jaakkola, S.  1990.  Managing data for the monitoring of tropical forest cover:
+The Global Resources Information Database approach.  Photogrammetric 
+Engineering and Remote Sensing 56: 1355-1358.
+
+Lamotte, M.  1975.  The structure and function of a tropical savanna ecosystem, 
+pp. 179-222.  In Tropical Ecosystems:  Trends in Terrestrial and Aquatic
+Research, F.B. Golley and E. Medina (eds). Springer-Verlag Inc., New York.  
+
+Lamotte, M. and F. Bourliere.  1983.  Energy flow and nutrient cycling in 
+tropical savannas, pp. 583-603.  In Ecosystems of the World 13:Tropical
+Savannas, F. Bourliere (ed.).  Elsevier, Amsterdam, The Netherlands.
+
+Lavenu, F.  1987.  Vegetation Map of Africa 1:5,000,000.  Institue de la
+Carte Internationale de la Vegetation, Universitie Paul Sabatier, Toulouse, 
+France.  Distributed by FAO Forest Resources Assessment Project-1990, Rome, 
+Italy.
+
+Martin, C.  1991.  The Rainforests of West Africa.  Birkhauser Verlag,
+Basel, Switzerland.
+
+Menaut, J.C., L. Abbadie, F. Lavenu, P. Loudjami, and A. Podaire.  1991.  
+Biomass burning in west African Savannas, pp. 133-142.  In Global Biomass 
+Burning:  Atmospheric, Climatic and Biospheric Implications, J.S. 
+Levine (ed).  MIT Press, Cambridge, Massachusetts.
+
+Olson, J.S., J.A. Watts, and L.J. Allison.  1983.  Carbon in Live Vegetation 
+of Major World Ecosystems.  TR004, U.S. Department of Energy, Office of 
+Energy Research, Washington, D.C.
+
+Olson, J.S., R.M. Garrles, R.A. Berner, T.V. Armentano, M.I. Dyer, and D.H. 
+Yaalon.  1985.  The natural carbon cycle, pp. 175-214.  In Atmospheric 
+Carbon Dioxide and the Global Carbon Cycle, J.R. Trabalka (ed.).  
+DOE/ER-0239.  U.S. Department of Energy, Office of Energy Research, 
+Washington, D.C. 
+
+Pierlot, R.  1966.  Structure et composition de forets denses d'Afrique, 
+especialement celles du Kivu.  Academie Royale des Sciences d'Outre-mer, 
+Classes des Sciences naturelles et Medicales N.S.-XVI-4, Bruxelles, Belgium.
+
+Rand McNally Co.  1980.  The new International Atlas.  Rand McNally, 
+Chicago, Illinois.
+
+Republique de Cote d'Ivoire.  1975.  Analyse et Commentaires des Resultats
+de l'Inventaire Forestier de la Region Nord-Ouest:  Resultats de la Region du
+Nord-Ouest.  Inventaire Forestier National, Direction des Inventaire et
+Amenagement, Abidjan, Ivory Coast.
+
+Smith, K.R.  1991.  Biomass cook stoves in global perspectives:  Energy, health,
+and global warming.  In The Earth as System Central.  EWC/ESMAP/UNDP 
+Report 3, The World Bank, Washington, D.C.
+
+Udo, R.K.  1982.  The Human Geography of Tropical Africa.  Heinemann
+Educational Books, London, United Kingdom.
+
+United Nations.  1972.  Forestry Inventory of the Gola Forest Reserves:  
+Report to the Government of Sierra Leone.  FAO, Rome, Italy.
+
+UNESCO/AETFAT/UNSO.  1981.  Vegetation Map of Africa 1:5,000,000.  Oxford
+University Press, Hammond and Kell Ltd., Mitcham, Surrey, United Kingdom.
+
+Weck, J.  1970.  An improved CVP-index for the delimitation of the potential
+productivity zones of forest lands of India.  Indian Forester 96: 565-572.
+
+White, F.  1983.  The vegetation of Africa:  A descriptive memoir to accompany
+the Unesco/AETFAT/UNSO vegetation map of Africa.  UNESCO, United Nations,
+New York.
+
+Worldmark Press, Ltd.  1984.  Encyclopedia of the Nations, vol. 2 
+(Africa).  John Wiley and Sons Inc., New York.
+
+
+
+7. HOW TO OBTAIN THE DATA AND DOCUMENTATION
+-------------------------------------------
+
+These data may be used with a vector or raster geographic information system
+(GIS) or non-GIS database systems.  This database (NDP-055) is available free 
+of charge from CDIAC. The files are available, via the Internet, from CDIAC's 
+World-Wide-Web site (http://cdiac.esd.ornl.gov), or from CDIAC's anonymous 
+file transfer protocol (FTP) area (cdiac.esd.ornl.gov) as follows:
+
+  1.  FTP to cdiac.esd.ornl.gov (128.219.24.36).
+  2.  Enter "ftp" as the user id.
+  3.  Enter your electronic mail address as the password (e.g., fred@zulu.org).
+  4.  Change to the directory "pub/ndp055" (i.e., use the command "cd
+      pub/ndp055").
+  5.  Set ftp to get ASCII files by using the ftp "ascii" command.
+  6.  Retrieve the ASCII database documentation file by using the ftp "get
+      ndp055.txt" command.
+  7.  Retrieve the ASCII data files by using the ftp "mget *.asc" command.
+  8.  Retrieve the ASCII FORTRAN files by using the ftp "mget *.for" command.
+  9.  Retrieve the ASCII SAS (TM) files by using the ftp "mget *.sas" 
+      command.
+  10. Set ftp to get BINARY files by using the ftp "binary" command. 
+  11. Retrieve the binary ARC/INFO (TM) export files by using the ftp 
+      "mget *.e00" command.
+  12. Exit the system by using the ftp "quit" command.
+
+For non-Internet data acquisitions (e.g., floppy diskette or CD-ROM) or for 
+additional information, contact:
+
+Carbon Dioxide Information Analysis Center
+Oak Ridge National Laboratory
+P.O. Box 2008
+Oak Ridge, Tennessee 37831-6335, U.S.A.
+
+Telephone: 1-865-574-3645
+Telefax: 1-865-574-2232
+E-mail: cdiac@ornl.gov
+
+
+8. LISTING OF FILES PROVIDED
+----------------------------
+
+This database consists of 36 files: two *.txt files seven *.e00 GIS data 
+files,  one *prj projection file, seven *.asc data files, four FORTRAN input 
+statement files, and four SAS input statement files, and 13 *.gif graphics 
+files.  See Table 1 (table.txt) for a complete listing and description of 
+these files.
+
+
+9. DESCRIPTION OF THE DOCUMENTATION FILE
+----------------------------------------
+
+The ndp055.txt (File 1) file is an ASCII text file (this document).
+
+
+10. DESCRIPTION, FORMAT, AND PARTIAL LISTINGS OF THE DATA FILES
+---------------------------------------------------------------
+
+Table 1 lists and describes the files included in this numeric data package.
+
+FLAT ASCII DATA FILES:
+
+Eight flat ASCII data files are provided with this data package. These files
+contain the same information as the ARC INFO grids and coverages included in 
+this NDP.  The ASCII files were either created directly from the ARC/INFO grids
+of the same name using the GRIDASCII command or are ASCII versions of ARC/INFO 
+attribute tables associated with polygon coverages included in this NDP.  SAS 
+and FORTRAN programs designed to read and print the contents of each ASCII 
+data file are also provided. The information within these files will allow the 
+user to ascertain population densities, the amount of land remaining in forests
+in 1980, the maximum potential aboveground biomass densities within Africa, and
+the biomass in aboveground woody vegetation in Tropical Africa in 1980. What 
+follows is a description of the contents and formats (e.g., variable names, 
+widths) of the eight flat ASCII data files distributed with this data package.
+
+The flat ASCII files BIOMAX.ASC (File 4), LAKES.ASC (File 6), and LAND.ASC 
+(File 8) are formatted as shown in the following FORTRAN code and may 
+be read using the input/output programs INTGRID.FOR (File 9) or INTGRID.SAS 
+(File 10).
+
+        READ (5,100) NCOLS
+        READ (5,100) NROWS
+        READ (5,110) XLLCORNR
+        READ (5,110) YLLCORNR
+        READ (5,100) CSIZE
+        READ (5,100) NODATA
+        DO 10 ROWS = 1, NROWS
+             READ (5,120)  (VALUE(ROWS,COLS), COLS=1, NCOLS)
+ 10     CONTINUE 
+C                
+ 100    FORMAT(14X,I5)
+ 110    FORMAT(14X,F15.5)
+ 120    FORMAT(1534(1X,I5))
+
+
+BIOMAX.ASC contains maximum potential biomass density data in Mg/ha; LAND.ASC 
+contains land-use information classified into four land-use categories; and 
+LAKES.ASC contains the location of all non-seasonal lakes >20 km in any 
+direction in Tropical Africa.  Each file of these three files contains header 
+information containing a set of key words followed by cell (i.e., data) values 
+in row-major order.  The first six lines of BIOMAX.ASC, LAKES.ASC, and LAND.ASC
+(header information) are:
+
+ncols 1534
+nrows 1502
+xllcorner -3616156.5
+yllcorner -3644063.04465
+cellsize 5000
+NODATA_value -9999
+
+The data are in a normal (type 1) cylindrical equal-area projection with
+a central meridian of 15 degrees East longitude and a standard parallel of 0
+degrees latitude. Data are provided for 1,502 rows and 1,534 columns, with the
+first cell being located in the upper-left corner. Each data cell covers a 25
+km2 square area, 5,000 m per side. The area covered by the data is bounded by 
+a box with the following coordinates: lower-left -3616156.500, -3644063.04465; 
+upper-right 4053843.500, 3865936.955.
+
+The variables in BIOMAX.ASC (File 4), LAKES.ASC (File 6), and LAND.ASC (File 8)
+are formatted as listed in Table 4 and are shown in the same order as they 
+would appear in the files.
+
+The flat ASCII files PD80.ASC (File 14) and BIO1980.ASC (File 12) are formatted
+as shown in the following FORTRAN code and may be read using the input/output 
+programs REALGRID.FOR (File 15) or REALGRID.SAS (File 16).
+
+        READ (5,100) NCOLS
+        READ (5,100) NROWS
+        READ (5,110) XLLCORNR
+        READ (5,110) YLLCORNR
+        READ (5,100) CSIZE
+        READ (5,120) NODATA
+        DO 10 ROWS = 1, NROWS
+             READ (5,130)  (VALUE(ROWS,COLS), COLS=1, NCOLS)
+ 10     CONTINUE 
+C                
+ 100    FORMAT(14X,I5)
+ 110    FORMAT(14X,F15.5)
+ 120    FORMAT(14X,F8.2)
+ 130    FORMAT(1534(1X,F8.2))
+
+
+PD80.ASC contains population-density data for 1980 in people/km2 and 
+BIO1980.ASC contains the calculated "actual" aboveground live biomass in open
+and closed forest for 1980 in Mg/ha.  Each of these two files contains header
+information with a set of key words followed by cell values in row-major order.
+The first six lines of PD80.ASC, and BIO1980.ASC (header information) are :
+
+ncols 1534
+nrows 1502
+xllcorner -3616156.5
+yllcorner -3644063.04465
+cellsize 5000
+NODATA_value -9999
+
+The data are in a normal (type 1) cylindrical equal-area projection with
+a central meridian of 15 degrees East longitude and a standard parallel of 0
+degrees latitude. Data are provided for 1,502 rows and 1,534 columns with the
+first cell located in the upper-left corner. Each data cell covers a square
+area, 5,000 m per side. The area covered by the data is bounded by a box with
+the following coordinates: lower-left -3616156.500, -3644063.04465; upper-right
+4053843.500, 3865936.955.
+
+The variables in PD80.ASC (File 14) and BIO1980.ASC (File 12) are formatted as 
+listed in Table 5 and are shown in the same order as they would appear in the 
+files.
+
+The flat ASCII file T_AFR.ASC (File 22) contains population density data for 
+1960, 1970, 1980, and 1990 for the subnational political units used in this 
+database. The data were provided by M. Lorenzini and K. D. Singh (FAO, 
+Tropical Forest Resources Assessment Program 1990). The file is formatted as 
+shown in the following FORTRAN code and may be read using the input/output 
+programs T_AFR.FOR (File 23) or T_AFR.SAS (File 24).
+
+ 10     READ (5,100,END=999) COUNTRY, COUNTRY_NO, ADMP, ADMP_NM,
+     1                      PD60, PD70, PD80, PD90, LANDAREA
+        GOTO 10  
+C                
+ 100    FORMAT(A30,I5,I4,A40,4F8.3,I10)
+
+
+The variables in T_AFR.ASC (File 22) are formatted as listed in Table 6 and are
+shown in the same order as they appear in the file.
+
+The first ten data records of t_afr.asc are:
+
+Water        0    0                 0      0      0      0        0            
+Mauritania 136  287  TIRIS_ZEMOUR   0.058  0.077  0.106  0.148    252900       
+Mali       133  275  TOMBOUCTOU    -1     -1      1.215  1.236    408977       
+Water        0    0                 0      0      0      0        0            
+Niger      158  306  AGADEZ        -1      0.111  0.196  0.334    714790       
+Chad        39   74  BET            0.119  0.138  0.147  0.17     600350       
+Mauritania 136  283  ADRAR          0.326  0.301  0.253  0.161    215300       
+Mauritania 136  278  HODH_CHARKI    0.986  0.953  0.877  0.71     182700       
+Sudan      206  387  NORTH_REGION  -1      1.942  2.176  2.339    477405       
+Sudan      206  388  EAST_REGION   -1      4.28   5.952  8.273    334331       
+
+
+The last ten data records of t_afr.asc are:
+
+Mozambique 144  296  INHAMBANE               9.594 12.542 14.517 17.591   68615
+Botswana    20   18  KGALAGADI               0.142  0.157  0.217  0.286  106940
+Botswana    20   20  KWENENG                 1.9    2.027  3.096  4.419   35890
+Botswana    20   19  KGATLENG                3.57   4.295  5.445  6.757    7960
+Botswana    20   23  NGWAKETSE               2.246  2.812  3.863  5.237   27370
+Mozambique 144  298  CID_MAPUTO_MAPUTO_PROV 18.545 34.664 47.177 69.288   26358
+Botswana    20   24  BAROLONG_SOUTH_EAST    10.397 21.905 40.573 71.489    2880
+Mozambique 144  298  CID_MAPUTO_MAPUTO_PROV 18.545 34.664 47.177 69.288   26358
+Zimbabwe   181  337  MATABELELAND_NORTH     -1      8.159 11.329 15.806   73537
+Zimbabwe   181  339  MIDLANDS               -1     13.191 17.577 23.54    58967
+
+
+The flat ASCII file AFRICA.ASC (File 19) contains the amount of land and 
+biomass in open and closed forest by country for 1980. The file is formatted 
+as shown in the following FORTRAN code and may be read by using the 
+input/output programs AFRICA.FOR (File 20) or AFRICA.SAS (File 21).
+
+ 10     READ (5,100,END=999) COUNTRY, CNTRY_NO, TOTCELL,
+     1        TOTAREA, CFAREA, OFAREA, CFBIO, OFBIO,
+     1        TOTBIO, FOREST
+        GOTO 10  
+C                
+ 100    FORMAT(A30,I5,I11,I10,2I9,2F12.1,F12.4,F12.1)
+
+The variables in AFRICA.ASC (File 19) are formatted as listed in Table 7 and 
+are shown in the same order as they appear in the file.
+
+The first ten data records of africa.asc are:
+
+Angola              7 50127 1253175  66750  1063775  109.4  69.7  8144.76   90.2
+Botswana           20 23195  579875      0   101800    0    13.1   133.36   17.6
+Burundi            29  1021   25525   2575     6900   57.1  40.3    42.51   37.1
+Cameroon           32 18529  463225 221750   182500  297.5 120    8787.06   87.3
+C African Republic 37 24856  621400 105425   515850  262.9 185.7 12350.96  100
+Chad               39 50635 1265875      0   316825    0    38    1203.94   25 
+Congo              46 13841  346025 247675      375  344.9  36.4  8543.68   71.7
+Benin              53  4664  116600   4325   103675   75.6  56.4   617.42   92.6
+Equatorial Guinea  61  1072   26800  24725        0  318     0     786.26   92.3
+Ethiopia           62 49920 1248000 375450   325400   65.3  35.6  3610.11   56.2
+
+The last ten data records of africa.asc are:
+
+Senegal       195   7916  197900   13500    63975   52.8   25.8   236.34   39.1
+Sierra Leone  197   2899   72475   30875    28400  220.6  174.9  1177.82   81.8
+Somalia       201  25573  639325     350   165675   11.4   12.4   205.84   26 
+Sudan         206  99743 2493575    5425   737150  134     63    4716.74   29.8
+Tanzania      215  35629  890725    5550   529800   73.5   48.6  2615.62   60.1
+Togo          217   2297   57425     725    49575   40.9   71.7   358.42   87.6
+Uganda        226   8204  205100   12075   131825  124    101.7  1490.39   70.2
+Burkina Faso  233  10957  273925       0    97375    0     34     331.08   35.5
+Zaire         250  92433 2310825 1860300   378175  223.9  118.2 46122.15   96.9
+Zambia        251  29846  746150   47250   579650   45.9   52.3  3248.45   84 
+
+
+ARC/INFO (Version 7.2.1) EXPORT FILES
+Seven ARC/INFO export files (*.e00) are provided with this NDP. These files 
+contain the same data as the flat ASCII data files described previously. The 
+ARC/INFO export (*.e00) files were produced using the EXPORT command with the 
+NONE option in ARC/INFO Version 7.2.1.  These files are in an uncompressed, 
+fixed-block format that may be moved across computer systems. The coverages 
+are in a normal (type 1) cylindrical equal-area projection with a central 
+meridian of 15 degrees East longitude and a standard parallel of 0 degrees 
+latitude. All units are in meters and the spheroid is a sphere with a radius 
+of 6,370,997 meters (vs. the Clark 1866 spheroid).
+
+The following files (BIOMAX.E00, LAND.E00, PD80.E00, LAKES.E00 and BIO1980.E00)
+should be imported with the GRID option and contain 1,502 rows and 1,534 
+columns, with each data cell covering a square area with 5,000m per side. The 
+remaining files (T_AFR.E00 and  AFRICA.E00) are ARC/INFO polygon coverages and 
+should be imported using the COVER option.  The polygon coverage AFRICA 
+contains regions.  The region subclass within AFRICA is named SUM1980.  These 
+regions were built using countries within Tropical Africa as unique 
+identifiers.  The AFRICA.PAT.SUM1980 INFO file contains summary information by 
+country for the amount of land and biomass in open and closed forests in 1980. 
+The area covered by the data is bounded by a box with the following 
+coordinates: lower-left -3616156.500, -3644063.04465; upper-right 4053843.500, 
+3865936.955. A listing of the variable names and data formats for these last 
+two export (E00) files are shown in Tables 6, and 7.
+
+The first ten data records of BIOMAX.E00 are:
+
+EXP  0 /DATA4/OZ1/CDIAC/NDP-055/NEW_E00/BIOMAX.E00                              
+GRD  2
+      1534      1502 1-0.21474836470000E+10
+ 0.50000000000000E+04 0.50000000000000E+04
+-0.36161565000000E+07-0.36440630446500E+07
+ 0.40538435000000E+07 0.38659369553500E+07
+         -9999         -9999         -9999         -9999         -9999
+         -9999         -9999         -9999         -9999         -9999
+         -9999         -9999         -9999         -9999         -9999
+         -9999         -9999         -9999         -9999         -9999
+
+
+The last ten data records of BIOMAX.E00 are:
+
+         42      90055
+         75      91074
+        150      99339
+        250      81883
+        350      64032
+        425      37550
+        475      17970
+        500       2264
+EOI
+EOS
+
+The first ten data records of LAND.E00 are:
+
+EXP  0 /DATA4/OZ1/CDIAC/NDP-055/NEW_E00/LAND.E00                                
+GRD  2
+      1534      1502 1-0.21474836470000E+10
+ 0.50000000000000E+04 0.50000000000000E+04
+-0.36161565000000E+07-0.36440630446500E+07
+ 0.40538435000000E+07 0.38659369553500E+07
+         -9999         -9999         -9999         -9999         -9999
+         -9999         -9999         -9999         -9999         -9999
+         -9999         -9999         -9999         -9999         -9999
+         -9999         -9999         -9999         -9999         -9999
+
+The last ten data records of LAND.E00 are:
+
+LAND.VAT                        XX   2   2   8         5
+VALUE             4-1   14-1  10-1 50-1  -1  -1-1                   1I
+COUNT             4-1   54-1  10-1 50-1  -1  -1-1                   2-
+      -9999    1105588
+          1     175811
+          2     346001
+          3     157539
+          4     519129
+EOI
+EOS
+
+The first ten data records of PD80.E00 are:
+
+EXP  0 /DATA4/OZ1/CDIAC/NDP-055/NEW_E00/PD80.E00                                
+GRD  2
+      1534      1502 2-0.34028234663853E+39
+ 0.50000000000000E+04 0.50000000000000E+04
+-0.36161565000000E+07-0.36440630446500E+07
+ 0.40538435000000E+07 0.38659369553500E+07
+-0.9999000E+04-0.9999000E+04-0.9999000E+04-0.9999000E+04-0.9999000E+04
+-0.9999000E+04-0.9999000E+04-0.9999000E+04-0.9999000E+04-0.9999000E+04
+-0.9999000E+04-0.9999000E+04-0.9999000E+04-0.9999000E+04-0.9999000E+04
+-0.9999000E+04-0.9999000E+04-0.9999000E+04-0.9999000E+04-0.9999000E+04
+
+The last ten data records of PD80.E00 are:
+
+IFO  2
+PD80.STA                        XX   4   4  32         1
+MIN               8-1   14-1  15 3 60-1  -1  -1-1                   1-
+MAX               8-1   94-1  15 3 60-1  -1  -1-1                   2-
+MEAN              8-1  174-1  15 3 60-1  -1  -1-1                   3-
+STDV              8-1  254-1  15 3 60-1  -1  -1-1                   4-
+-9.99900000000000000E+03 2.19550610351562500E+03-4.78676211358813089E+03 5.00127
+655918892469E+03
+EOI
+EOS
+
+The first ten data records of LAKES.E00 are:
+
+EXP  0 /DATA4/OZ1/CDIAC/NDP-055/NEW_E00/LAKES.E00                               
+GRD  2
+      1534      1502 1-0.21474836470000E+10
+ 0.50000000000000E+04 0.50000000000000E+04
+-0.36161565000000E+07-0.36440630446500E+07
+ 0.40538435000000E+07 0.38659369553500E+07
+         -9999         -9999         -9999         -9999         -9999
+         -9999         -9999         -9999         -9999         -9999
+         -9999         -9999         -9999         -9999         -9999
+         -9999         -9999         -9999         -9999         -9999
+
+The last ten data records of LAKES.E00 are:
+
+STDV              8-1  254-1  15 3 60-1  -1  -1-1                   4-
+-9.99900000000000000E+03 4.00000000000000000E+00-9.95541616610273741E+03 6.58839
+540326123597E+02
+LAKES.VAT                       XX   2   2   8         2
+VALUE             4-1   14-1  10-1 50-1  -1  -1-1                   1I
+COUNT             4-1   54-1  10-1 50-1  -1  -1-1                   2-
+      -9999    2294029
+          4      10039
+EOI
+EOS
+
+The first ten data records of BIO1980.E00 are:
+
+EXP  0 /DATA4/OZ1/CDIAC/NDP-055/NEW_E00/BIO1980.E00                             
+GRD  2
+      1534      1502 2-0.34028234663853E+39
+ 0.50000000000000E+04 0.50000000000000E+04
+-0.36161565000000E+07-0.36440630446500E+07
+ 0.40538435000000E+07 0.38659369553500E+07
+-0.9999000E+04-0.9999000E+04-0.9999000E+04-0.9999000E+04-0.9999000E+04
+-0.9999000E+04-0.9999000E+04-0.9999000E+04-0.9999000E+04-0.9999000E+04
+-0.9999000E+04-0.9999000E+04-0.9999000E+04-0.9999000E+04-0.9999000E+04
+-0.9999000E+04-0.9999000E+04-0.9999000E+04-0.9999000E+04-0.9999000E+04
+
+The last ten data records of BIO1980.E00 are:
+
+IFO  2
+BIO1980.STA                     XX   4   4  32         1
+MIN               8-1   14-1  15 3 60-1  -1  -1-1                   1-
+MAX               8-1   94-1  15 3 60-1  -1  -1-1                   2-
+MEAN              8-1  174-1  15 3 60-1  -1  -1-1                   3-
+STDV              8-1  254-1  15 3 60-1  -1  -1-1                   4-
+-9.99900000000000000E+03 4.66339996337890625E+02-7.86027052510779868E+03 4.13001
+816239345681E+03
+EOI
+EOS
+
+
+11. SAS AND FORTRAN CODES TO ACCESS THE DATA
+--------------------------------------------
+
+BIOMAX.ASC (File 4), LAKES.ASC (File 6), and LAND.ASC (File 8) may be read 
+using the input/output programs INTGRID.FOR (File 9) or INTGRID.SAS (File 10). 
+
+INTGRID.FOR (File 9):
+
+  real xllcornr, yllcornr
+       integer ka
+       integer ncols, nrows, csize, nodata
+       dimension ka(2304068)
+       open(unit=5,file='biomax.asc',status='old',access='sequential')
+       open(unit=6,file='biomax.out',status='new',access='sequential')
+       read (5,100) ncols
+       read (5,100) nrows
+       read (5,110) xllcornr
+       read (5,110) yllcornr
+       read (5,100) csize
+       read (5,120) nodata
+       write (6,200) ncols, nrows, xllcornr, yllcornr,
+     1               csize, nodata
+       do k=1,1502
+       read (5,*) (ka(j),j=1,1534)
+       write(6,*) (ka(j),j=1,1534)
+       enddo
+       continue
+100    format (14x,i5)
+105    format (14x,f10.1)
+110    format (14x,f14.5)
+120    format (14x,i5)
+200    format (1x,i5,/,1x,i5,/,1x,f10.1,/,1x,f15.5,/,1x,i5,/,1x,i5)
+999    close(unit=5)
+       close(unit=6)
+       stop
+       end
+
+
+INTGRID.SAS (File 10):
+
+data in;
+infile 'path and file name' firstobs=7 linesize=9203;
+input varname@@;
+run;
+
+
+The flat ASCII files PD80.ASC (File 14) and BIO1980.ASC (File 12) may be read 
+using the input/output programs REALGRID.FOR (File 15) or REALGRID.SAS 
+(File 16).
+
+REALGRID.FOR (File 15):
+
+ real xllcornr, yllcornr, xa
+       integer ncols, nrows, csize, nodata
+       dimension xa(2304068)
+       open(unit=5,file='bio1980.asc',status='old',access='sequential')
+       open(unit=6,file='bio1980.out',status='new',access='sequential')
+       read (5,100) ncols
+       read (5,100) nrows
+       read (5,110) xllcornr
+       read (5,110) yllcornr
+       read (5,100) csize
+       read (5,120) nodata
+       write (6,200) ncols, nrows, xllcornr, yllcornr,
+     1               csize, nodata
+       do x=1,1502
+       read (5,*) (xa(j),j=1,1534)
+       write(6,*) (xa(j),j=1,1534)
+       enddo
+       continue
+100    format (14x,i5)
+105    format (14x,f10.1)
+110    format (14x,f14.5)
+120    format (14x,i5)
+200    format (1x,i5,/,1x,i5,/,1x,f10.1,/,1x,f15.5,/,1x,i5,/,1x,i5)
+999    close(unit=5)
+       close(unit=6)
+       stop
+       end
+
+REALGRID.SAS (File 16):
+
+data in;
+infile 'path and file name' firstobs=7 linesize=13805;
+input varname@@;
+run;
+
+The flat ASCII file T_AFR.ASC (File 22) may be read using the input/output 
+programs T_AFR.FOR (File 23) or T_AFR.SAS (File 24).
+
+T_AFR.FOR (File 23):
+
+   character cntry*30, aname*40
+       integer cntryn, admp, larea
+       real pd60, pd70, pd80, pd90
+       open(unit=5,file='t_afr.asc',status='old',access='sequential')
+       open(unit=6,file='t_afr.out',status='new',access='sequential')
+5      read (5,100, end=999) cntry, cntryn, admp, aname, pd60, pd70,
+     1 pd80, pd90, larea
+10     write (6,100) cntry, cntryn, admp, aname, pd60, pd70,
+     1 pd80, pd90, larea
+       goto 5
+100    format (a30,1x,i5,1x,i4,1x,a39,1x,f8.3,1x,f8.3,
+     1         1x,f8.3,1x,f8.3,1x,i8)
+999    close(unit=5)
+       close(unit=6)
+       stop
+       end
+
+T_AFR.SAS (File 24):
+
+data in;
+infile 't_afr.asc';
+input country $ 1-30 cntry_no 32-36 admp 38-41
+      admp_nm 43-82 pd60 84-91 pd70 93-100
+      pd80 102-109 pd90 111-118 landarea 120-129;
+proc print;
+run;
+
+The flat ASCII file AFRICA.ASC (File 19) may be read by using the input/output 
+programs AFRICA.FOR (File 20) or AFRICA.SAS (File 21).
+
+AFRICA.FOR (File 20):
+
+  character cntry*30
+       integer cntryn, tcell, tarea, carea, oarea
+       real cbio, obio, tbio, forest
+       open(unit=5,file='africa.asc',status='old',access='sequential')
+       open(unit=6,file='africa.out',status='new',access='sequential')
+5      read (5,100, end=999) cntry, cntryn, tcell, tarea, carea,
+     1 oarea, cbio, obio, tbio, forest
+10     write (6,100) cntry, cntryn, tcell, tarea, carea,
+     1 oarea, cbio, obio, tbio, forest
+       goto 5
+100    format (a30,1x,i5,1x,i11,1x,i10,1x,i9,1x,i9,
+     1         1x,f12.1,1x,f12.1,1x,f12.2,1x,f12.1)
+999    close(unit=5)
+       close(unit=6)
+       stop
+       end
+
+AFRICA.SAS (File 21):
+<pre>
+data in;
+infile 'africa.asc';
+input country $ 1-30 cntry_no 32-36 tcell 38-48
+      tarea 50-60 carea 62-70 oarea 72-80
+      cbio 82-95 obio 97-110 tbio 112-126
+      forest 128-41;
+proc print;
+run;
+</pre>
+
+
+------------------------------------------------------------------------------
+APPENDICES
+------------------------------------------------------------------------------
+
+APPENDIX A - BREAKDOWN BY COUNTRY OF THE AMOUNT OF LAND AND BIOMASS IN OPEN
+             AND CLOSED FOREST IN 1980  (see ndp055appA.pdf)
+
+------------------------------------------------------------------------------
+APPENDIX B - REPRINT OF PERTINENT LITERATURE 
+
+Use of Forest Inventories and Geographic Information Systems To Estimate
+Biomass Density of Tropical Forests:  Application to Tropical Africa
+
+S. Brown and G. Gaston
+
+U.S. Environmental Protection Agency,
+200 SW 35th St.,
+Corvalis, OR  97333, USA
+
+ABSTRACT
+--------
+
+One of the most important databases needed for estimating emissions of carbon
+dioxide resulting from changes in the cover, use, and management of tropical
+forests is the total quantity of biomass per unit area, referred to as biomass
+density.  Forest inventories have been shown to be valuable sources of data for
+estimating biomass density, but inventories for the tropics are few in number
+and their quality is poor.  This lack of reliable data has been overcome by use
+of a promising approach that produces geographically referenced estimates by
+modeling in a geographic information system (GIS).  This approach has been
+used to produce geographically referenced, spatial distributions of potential
+and actual (circa 1980) aboveground biomass density of all forest types in
+tropical Africa.  Potential and actual biomass density estimates ranged from
+33 to 412 Mg/ha (10E06 g/ha) and 20 to 299 Mg/ha, respectively, for
+very dry lowland to moist lowland forests and from 78 to 197 Mg/ha and 37
+to 105 Mg/ha, respectively,  for montane-seasonal to montane-moist forests.
+Of the 37 countries included in this study, more than half (51%) contained
+forest that had less than 60% of their potential biomass.  Actual biomass
+density for forest vegetation was lowest in Botswana, Niger, Somalia, and
+Zimbabwe (about 10 to 15 Mg/ha).  Highest estimates for actual biomass
+density were found in Congo, Equatorial Guinea, Gabon, and Liberia (305 to
+344 Mg/ha).  Results from this research effort can contribute to reducing
+uncertainty in the inventory of country-level emission by providing consistent
+estimates of biomass density at subnational scales that can be used with other
+similarly scaled databases on change in land cover and use.
+
+Complete citation:
+
+Brown, S. and G. Gaston.  1995.  Use of Forest Inventories and Geographic
+Information Systems to Estimate Biomass Density of Tropical Forests:
+Applications to Tropical Africa.  Environmental Monitoring and Assessment
+38:157-168.
+
+Copyright 1995 Kluwer Academic Publishers, Printed in the Netherlands
+
+This abstract is provided with permission of Kluwer Academic Publishers.
+Visit them online at http://www.kluweronline.com
+
+-----------------------------------------------------------------------------
+APPENDIX C - RECLASSIFICATION SCHEME USED TO OBTAIN THE FOUR LAND USE
+             CATEGORIES USED IN THIS NUMERIC DATA PACKAGE.
+
+	The 64 land cover classes in the original FAO land cover map
+(Lavenu 1987) were combined using the reclassification scheme shown here to
+obtain the 4 land use categories used in this numeric data package.
+
+Land use         FAO class number and land cover description
+Category
+
+Closed Forest    Dense Forest
+                 1. Dense Forest (1a)  	
+                 2. Dense Forest-Dense Tree Thicket (1a-1b)  	
+                 3. Dense Forest-Dense Tree Thicket-Forest Fallow (1a-1b/6)
+                 4. Dense Forest-Miombo Woodland (1a-2a)
+                 5. Dense Forest-Miombo Woodland-Forest Fallow (1a-2a/6)
+                 6. Dense Forest-Discontinuous Tree/Shrub Thicket (1a-2b)
+                 7. Dense Forest-Discontinuous Tree/Shrub Thicket-
+                    Forest Fallow (1a-2b/6)
+                 8. Dense Forest-Discontinuous Tree/Shrub Thicket-
+                    Savanna Fallow (1a-2b/7)
+                 9. Dense Forest-Tree/Woodland Savanna (1a-2c)
+                10. Dense Forest-Tree/Woodland Savanna-Cropland/
+                    Plantation (1a-2c)
+                11. Dense Forest-Grass Savanna (1a-3a)
+                13. Dense Forest-Forest Fallow (1a/6)
+                14. Dense Forest-Forest Fallow-Miombo Woodland (1a/6-2a)
+                15. Dense Forest-Forest Fallow-Tree/Woodland Savanna (1a/6-2c)
+
+                Dense Tree Thicket
+                16. Dense Tree Thicket (1b)
+                17. Dense Tree Thicket-Discontinuous Tree/Shrub Thicket (1b-2b)
+
+Open Forest     Woodland
+                19. Miombo Woodland (2a)
+                20. Miombo Woodland-Tree/Woodland Savanna (2a-2c)
+                21. Miombo Woodland-Tree/Woodland Savanna-Forest 
+                    Fallow (2a-2c/b)
+                22. Miombo Woodland-Shrub Savanna/Steppe (2a-2d) 
+                23. Miombo Woodland-Grass Savanna (2a-3a)
+                24. Miombo Woodland-Grass Steppe (2a-3b)
+                26. Miombo Woodland-Forest Fallow (2a/6)
+
+                Discontinuous Trees
+                27. Discontinuous Tree/Shrub Thicket (2b)
+                28. Discontinuous Tree/Shrub Thicket Tree/Woodland 
+                    Savanna (2b-2c)
+                29. Discontinuous Tree/Shrub Thicket Tree/Woodland 
+                    Savanna Forest Fallow (2b-2c/6)
+                30. Discontinuous Tree/Shrub Thicket Tree/Woodland 
+                    Savanna Savanna Fallow (2b-2c/7)
+                31. Discontinuous Tree/Shrub Thicket Shrub 
+                    Savanna/Steppe (2b-2d) 
+                32. Discontinuous Tree/Shrub Thicket Shrub 
+                    Savanna/Steppe Savanna Fallow (2b-2d/7) 
+                33. Discontinuous Tree/Shrub Thicket Grass Savanna (2b-3a)
+                34. Discontinuous Tree/Shrub Thicket Grass Steppe (2b-3b)
+                35. Discontinuous Tree/Shrub Thicket Cropland/Plantation (2b/5)
+                36. Discontinuous Tree/Shrub Thicket Forest Fallow (2b/6)
+		
+		Woodland Savanna
+                37. Tree/Woodland Savanna (2c)
+                38. Tree/Woodland Savanna Discontinuous Tree/Shrub 
+                    Thicket (2c-2b)
+                39. Tree/Woodland Savanna Shrub Savanna/Steppe (2c-2d) 
+                40. Tree/Woodland Savanna Grass Savanna (2c-3a) 
+                41. Tree/Woodland Savanna Grass Steppe (2c-3b) 
+                42. Tree/Woodland Savanna Cropland/Plantation (2c/5) 
+                43. Tree/Woodland Savanna Forest Fallow (2c/6) 
+                44. Tree/Woodland Savanna Savanna Fallow (2c/7) 
+
+		Shrub Savanna
+                45. Shrub Savanna/Steppe (2d)
+                46. Shrub Savanna/Steppe Grass Savanna (2d-3a)
+                47. Shrub Savanna/Steppe Grass Steppe (2d-3b)
+                48. Shrub Savanna/Steppe Pseudodesertic Steppe (2d-4a)
+                50. Shrub Savanna/Steppe Cropland/Plantation Grass
+                    Savanna (2d/5-3a)
+                51. Shrub Savanna/Steppe Savanna Fallow (2d/7) 
+
+
+Grassland       Grass Savanna
+Savanna         52. Grass Savanna (3a)
+		53. Grass Savanna Shrub Savanna/Steppe (3a-2d)
+		55. Grass Savanna Savanna Fallow (3a/7)
+
+                Grass Steppe
+		56. Grass Steppe (3b)
+		57. Grass Steppe Pseudodesertic Steppe (3b-4a)
+		58. Grass Steppe Cropland/Plantation (3b/5)
+		58. Grass Steppe Cropland/Plantation (3b/5)
+
+Other           Agriculture/Plantation
+		12. Dense Forest-Cropland/Plantation (1a/5)
+		18. Dense Tree Thicket-Forest Fallow (1b/6)
+		25. Miombo Woodland-Cropland/Plantation (2a/5)
+		49. Shrub Savanna/Steppe-Cropland/Plantation (2a/5)
+		54. Grass Savanna-Cropland/Plantation (3a/5)
+		62. Cropland/Plantation (5)
+		63. Cropland/Plantation-Forest Fallow (5/6)
+		64. Cropland/Plantation-Savanna Fallow (5/7)
+
+                Desert
+		59. Pseudodesertic Steppe (4a)
+		60. Desert (4b)
+		61. Halophytic Soil (4c)
+
+Source map:  Lavenu, F. 1987.  Vegetation map of Africa 1:5,000,000.  
+Institute de la Carte Internationale de la Vegetation, Universitie Paul 
+Sabatier, Toulouse, France.  Distributed by FAO Forest Resources Assessment 
+Project-1990, Rome, Italy.
+
+

@@ -1,0 +1,527 @@
+ 
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html lang="en">
+
+
+
+<head>
+<title>American FactFinder</title>
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<script type="text/javascript" src="/javascript/common/browser_ver.js"></script>
+<script type="text/javascript" src="/javascript/common/layer_util.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/global_r6.css" />
+<link rel="stylesheet" type="text/css" href="/css/saff/global_banner.css" media="all" />
+<link rel="stylesheet" type="text/css" href="/css/saff/global_tabs.css" media="all" />
+<script type="text/javascript">
+<!--
+if (is_mac && !ie5 && !ns5) {
+document.write('<'+'link rel="stylesheet" href="/css/global_r6_mac.css" />');
+}
+-->
+</script>
+<script type="text/javascript" src="/javascript/openFeedback.js"></script>
+<script type="text/javascript" src="/javascript/panel_id.js"></script>
+<script type="text/javascript" src="/javascript/epss_open.js"></script>
+<script language="JavaScript" src="/javascript/timestamp.js" ></script>
+<script language="JavaScript" src="/javascript/breadcrumb.js" ></script>
+<script language="JavaScript">
+function gotoPage(servlet, datasetName) {
+document.gotoPageForm.action = servlet;
+document.gotoPageForm.ds_name.value = datasetName;
+document.gotoPageForm.submit();
+}
+</script>
+<style type="text/css" media="all">
+form { display: inline; }
+.breadcrumbs { font-size: 8pt; margin: 1px 0 1px 6px; }
+h1 { font-size: 9pt; font-weight: bold; border-bottom: 1px solid #888; color: #184173; background-color: #fff; margin: 14px 0 0 0; padding-left: 6px; }
+.cbox { margin-left: 14px; }
+.searchresults h2 { font-size: 110%; color: #184173; margin: 12px 0 4px 4px; padding: 2px 0 0px 30px; background-color: #eeeeee; border-bottom: 1px solid #cccccc;  }
+.searchresults h3 { font-size: 100%; margin: 8px 0 4px 50px; }
+.searchresults ul { margin: 4px 4px 4px 74px; }
+.searchresults li { margin: 0; list-style-image : url("/img/bullet_blue_box.gif"); }
+.searchresults p { margin: 4px 4px 10px 50px;  } 
+.searchresults p.moreresults { margin: 0 4px 12px 74px;  } 
+.pdfnote { margin: 28px 0 10px 32px; width: 600px; font-size: 90%; }
+</style>
+<script language="JavaScript1.2" src="/javascript/loading.js" TYPE="text/javascript">
+</script> 
+<script language="JavaScript">
+function selectListOfOneResult() {
+var form = document.forms["form1"];
+var size = -1;
+var geoCount = 0;
+var list;
+for(i = 0; i < form.elements.length; i++) {
+if(form.elements[i].name == "geos")
+geoCount++;
+}
+if (geoCount == 1) {
+list = form.geos; 
+size = form.geos.size;
+} else if (geoCount > 1) {
+list = form.geos[geoCount-1]; 
+size = form.geos[geoCount-1].size;
+}
+if (size == 8) {            
+selectInList(list);
+} 
+//Places selection list
+list2 = document.form1.places;
+selectInList(list2);
+}
+function selectInList(_list) {
+if (_list != null) {
+tempLength = _list.length;
+if (tempLength == 1) {
+if (_list.options[0].value != "" && _list.options[0].value != "NBSP" && _list.options[0].value != "?undefined?") {
+_list.options[0].selected = true;
+_list.onchange();	
+} 
+} else if (tempLength == 2)  {
+if ( _list.options[0].value == "NBSP" || _list.options[0].value == "?undefined?" || _list.options[0].value == "") {
+if (_list.options[1].value != "") {
+_list.options[1].selected = true;
+_list.onchange();
+}
+}	
+}   
+}
+}
+</script>
+</head>
+<body bgcolor="#ffffff" marginheight="0" topmargin="0" marginwidth="6" leftmargin="6" onUnLoad="monitorLoadingWindow()" onLoad="closeLoadingWindow();selectListOfOneResult()">
+<input type="hidden" name="_lang" value="en" />
+
+
+<script type="text/javascript">
+<!--
+function gotoServlet(url) {
+if (self.opener) { // I'm a popup.
+opener.top.document.location.href = url;
+self.close();
+}
+else { // business as usual
+top.document.location.href = url;
+}
+}
+-->
+</script>
+<script type="text/javascript">
+<!--
+if (is_ie50) {
+document.write('<'+'link rel="stylesheet" href="/css/saff/global_ie50.css" />');
+}
+-->
+</script>
+<script type="text/javascript" src="/javascript/gotoMainPage.js"></script>
+
+<map name="smb" id="smb">
+<area alt="Skip Navigation Bar" coords="0,0,1,1" href="#startcontent" />
+</map>
+<div class="smb-img">
+<img src="/img/saff/smb_1.jpg" width="71" height="50"  border="0" usemap="#smb" alt="" />
+</div>
+<div class="smb-uscb">
+<a href="http://www.census.gov"><img src="/img/cb_head.gif" width="639" height="25" alt="US Census Bureau" /></a><br />
+<img src="/img/aff.gif" width="203" height="25" alt="American FactFinder"  />
+</div>
+<div class="smb-menu">
+<img src="/img/saff/global_menu_bkg_sm.gif" width="480" height="25" alt="" />
+</div>
+<div class="smb-bkg"><img src="/img/1px.gif" width="1" height="1" alt="" /></div>
+<div class="globalnav"><a href="javascript:gotoMainPage('?_lang=en','')">Main</a><br /><span>Search</span><a href="javascript:openFeedback('en/')" title="Open Feedback in new window">Feedback</a><br /><a href="javascript:openFAQ()" title="Open FAQs in new window">FAQs</a><br /><a href="javascript:openEPSS('en','glossary_a')" title="Open Glossary in new window">Glossary</a><br /><a href="javascript:gotoServlet('/jsp/saff/SAFFInfo.jsp?_content=gt1_site_map.html?_gnId=0&amp;_gtId=6')">Site&nbsp;Map</a><br /><a href="javascript:openEPSS('en')" title="Open Help in new window">Help</a>
+</div>
+<a name="startcontent"></a>
+<img src="/img/1px.gif" width="1" height="56" alt="" /><br />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- function name -->
+<table border="0" cellspacing="0" cellpadding="0" width="748" summary="">
+<tr><td height="20" class="functionname"><img src="/img/1px.gif" width="4" height="1" alt="" />Search</td></tr>
+<tr><td bgcolor="#9FB1C9"><img src="/img/1px.gif" width="660" height="1" alt="" /></td></tr>
+</table>
+<!-- end function name -->
+<!-- breadcrumbs -->
+<table border="0" cellspacing="0" cellpadding="0" width="748" summary="">
+<tr><td width="6"><img src="/img/1px.gif" width="6" height="1" alt="" /><form name="breadcrumbHref" method="get" action="" style="display: inline"><input type="hidden" name="_lang" value="en" /><input type="hidden" name="_ts" value="" /></form><form name="breadcrumbDataSetsHref" method="get" action="" style="display: inline"><input type="hidden" name="_lang" value="en" /><input type="hidden" name="_ts" value="" /><input type="hidden" name="_ds_name" /><input type="hidden" name="_program" /></form></td><td nowrap="nowrap" class="tip" height="16"><b>You are here: &nbsp;</b><a href="javascript:gotoBreadcrumbMain()">Main</a> <img src="/img/bc_arrow.gif" width="8" height="9" alt="-&gt;" /> <b>Search</b></td></tr>
+</table>
+<!-- end breadcrumbs -->
+
+<!-- begin tab support -->
+<!-- begin tab pane # 1  -->
+<br />
+
+<!-- begin tabs -->
+<table border="0" cellspacing="0" cellpadding="0" width="100%"  bgcolor="#f4f4f4" summary="">
+<tr>
+<td bgcolor="#ffffff">
+		<table class="methodtabs" cellspacing="0" cellpadding="0" summary="">
+<tr valign="bottom">
+			<td><a href="AFFAdvSearchGeneralServlet?_lang=en">general search</a></td>
+			<td><a href="AdvSearchByKeywordServlet?_lang=en">keyword</a></td>
+			<td><span>geography</span></td>
+		</tr>
+</table>
+	</td>
+</tr>
+<tr>
+<td height="3" bgcolor="#366ea7"><img src="/img/1px.gif" width="1" height="3" alt="" /></td>
+</tr>
+<tbody>
+<!-- start tab pane content -->
+<tr>
+<td>
+<form name="form1" onSubmit="submitKeyword('_lang=en', 'Enter a geographic name. Click Search.', 'Enter at least a word or a partial word. Click Go.', 'Search terms must contain at least 2 alphabetic characters.', 'Search terms must contain at least 2 alphanumeric characters.'); return false" method="get" style="display: inline">
+<input type="hidden" name="chosenProgramYear" value="" />
+<input type="hidden" name="chosenState" value="" />
+<input type="hidden" name="chosenKeyword" value="Savanna" />
+<input type="hidden" name="chosenPlacename" value="" />
+<input type="hidden" name="chosenGeoBucketId" value="" />
+<input type="hidden" name="chosenTreeId" value="" />
+
+<script language="JavaScript" src="/javascript/string_util.js"></script>
+<script language="JavaScript" src="/javascript/adv_search_placename.js"></script>
+<script language="JavaScript" src="/javascript/adv_search_jump.js"></script>
+<script language="JavaScript" src="/javascript/adv_search_mapit.js"></script>
+<table border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr valign="bottom">
+<td nowrap="nowrap"><img src="/img/1px.gif" width="32" height="1" alt="" /></td>
+<td nowrap="nowrap" class="listboxnn">
+<br />
+<a href="AdvGeoSearchByListServlet?_lang=en&_command=getPlacenames">Show more selection methods and more geographic types</a>
+</td>
+</tr>
+</tbody>
+</table>
+
+
+
+<br />
+<table border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr valign="top">
+<td nowrap="nowrap"><img src="/img/1px.gif" width="10" height="1" alt="" /><img src="/img/ibullet.gif" width="25" height="11" alt="" border="0" /></td>
+<td nowrap="nowrap">
+<label for="lb_yearprog">Select a year and program</label>
+</td>
+</tr>
+</tbody>
+</table>
+
+<table border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr valign="bottom">
+<td nowrap="nowrap"><img src="/img/1px.gif" width="32" height="1" alt="" /></td>
+<td nowrap="nowrap" class="listboxnn">
+<select name="fields" id="lb_yearprog" size="1" class="listboxie" onChange="selectYearProgram(this)">
+
+<option value="restrictDataset.mostRecent" selected>Most recent data from all programs</option>
+
+
+<option value="88">2008 Population Estimates</option>
+<option value="50">Census 2000</option>
+<option value="87">2007 Population Estimates</option>
+<option value="86">2006 Population Estimates</option>
+<option value="47">2007 American Community Survey</option>
+<option value="46">2006 American Community Survey</option>
+<option value="45">2005 American Community Survey</option>
+<option value="41">2004 American Community Survey</option>
+<option value="63">2003-6 Annual Economic Surveys</option>
+<option value="39">2003 American Community Survey</option>
+<option value="67">2007 Economic Census and Surveys</option>
+<option value="62">2002 Economic Census and Surveys</option>
+<option value="38">2002 American Community Survey</option>
+<option value="71">2001 Supplementary Survey</option>
+<option value="37">2001 American Community Survey</option>
+<option value="70">2000 Supplementary Survey</option>
+<option value="36">2000 American Community Survey</option>
+<option value="61">1997 Economic Census</option>
+<option value="40">1990 Decennial Census</option>
+<option value="undefined" >All years and programs
+</select>
+</td>
+<td><img src="/img/1px.gif" width="10" height="1" alt="" /></td>
+<td valign="bottom"></td>
+</tr>
+</tbody>
+</table> 
+
+<br />
+<table border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr valign="top">
+<td nowrap="nowrap"><img src="/img/1px.gif" width="10" height="1" alt="" /><img src="/img/ibullet.gif" width="25" height="11" alt="" border="0" /></td>
+<td nowrap="nowrap">
+<label for="lb_states">Restrict search to</label>
+</td>
+</tr>
+</tbody>
+</table>
+
+<table border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr valign="bottom">
+<td nowrap="nowrap"><img src="/img/1px.gif" width="32" height="1" alt="" /></td>
+<td nowrap="nowrap" class="listboxnn">
+<select name="fields" id="lb_states" size="1" class="listboxie" onChange="selectState(this)">
+<option value="undefined">All</option>
+<option value="01">Alabama</option>
+<option value="02">Alaska</option>
+<option value="04">Arizona</option>
+<option value="05">Arkansas</option>
+<option value="06">California</option>
+<option value="08">Colorado</option>
+<option value="09">Connecticut</option>
+<option value="10">Delaware</option>
+<option value="11">District of Columbia</option>
+<option value="12">Florida</option>
+<option value="13">Georgia</option>
+<option value="15">Hawaii</option>
+<option value="16">Idaho</option>
+<option value="17">Illinois</option>
+<option value="18">Indiana</option>
+<option value="19">Iowa</option>
+<option value="20">Kansas</option>
+<option value="21">Kentucky</option>
+<option value="22">Louisiana</option>
+<option value="23">Maine</option>
+<option value="24">Maryland</option>
+<option value="25">Massachusetts</option>
+<option value="26">Michigan</option>
+<option value="27">Minnesota</option>
+<option value="28">Mississippi</option>
+<option value="29">Missouri</option>
+<option value="30">Montana</option>
+<option value="31">Nebraska</option>
+<option value="32">Nevada</option>
+<option value="33">New Hampshire</option>
+<option value="34">New Jersey</option>
+<option value="35">New Mexico</option>
+<option value="36">New York</option>
+<option value="37">North Carolina</option>
+<option value="38">North Dakota</option>
+<option value="39">Ohio</option>
+<option value="40">Oklahoma</option>
+<option value="41">Oregon</option>
+<option value="42">Pennsylvania</option>
+<option value="44">Rhode Island</option>
+<option value="45">South Carolina</option>
+<option value="46">South Dakota</option>
+<option value="47">Tennessee</option>
+<option value="48">Texas</option>
+<option value="49">Utah</option>
+<option value="50">Vermont</option>
+<option value="51">Virginia</option>
+<option value="53">Washington</option>
+<option value="54">West Virginia</option>
+<option value="55">Wisconsin</option>
+<option value="56">Wyoming</option>
+</select>
+</td>
+<td><img src="/img/1px.gif" width="10" height="1" alt="" /></td>
+<td valign="bottom"></td>
+</tr>
+</tbody>
+</table>
+<br />
+<table border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr valign="top">
+<td nowrap="nowrap"><img src="/img/1px.gif" width="10" height="1" alt="" /><img src="/img/ibullet.gif" width="25" height="11" alt="" border="0" /></td>
+<td nowrap="nowrap">
+<label for="tb_name">Enter name to search for</label>
+</td>
+</tr>
+</tbody>
+</table>
+
+<table border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr valign="bottom">
+<td nowrap="nowrap"><img src="/img/1px.gif" width="32" height="1" alt="" /></td>
+<td nowrap="nowrap" class="listboxnn">
+<input type="text" name="keyword" id="tb_name" size="40" maxlength="255" value="Savanna" onChange="setKeyword(this)" />
+
+</td>
+<td><img src="/img/1px.gif" width="10" height="1" alt="" /></td>
+<td valign="bottom"><a href="javascript:makeHREF('getPlacenames','_lang=en','Select a geography. Click OK.','Enter a geographic name. Click Search.','Enter at least a word or a partial word. Click Go.','Search terms must contain at least 2 alphabetic characters.','Search terms must contain at least 2 alphanumeric characters.')"><img src="/img/en/search.gif" width="64" height="22" alt="Search" border="0" align="top" /></a><img src="/img/1px.gif" width="30" height="1" alt="" /><span class="tip"><img src="/img/infoicon.gif" width="13" height="13" alt="" align="absmiddle">&nbsp;<a href="javascript:openEPSS('en', 'search_tips_geo')">Search Tips</a></span></td>
+</tr>
+</tbody>
+</table>
+
+
+
+<br />
+<table border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr valign="top">
+<td nowrap="nowrap"><img src="/img/1px.gif" width="10" height="1" alt="" /><img src="/img/ibullet.gif" width="25" height="11" alt="" border="0" /></td>
+<td nowrap="nowrap">
+<label for="lb_results">Select a geography and click 'OK'</label>
+</td>
+</tr>
+</tbody>
+</table>
+
+
+
+<table border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr valign="bottom">
+<td nowrap="nowrap"><img src="/img/1px.gif" width="32" height="1" alt="" /></td>
+<td nowrap="nowrap" class="listboxnn">
+<br />Search results for '<b>Savanna</b>' :<br />
+<select name="places" id="lb_results" size="8" class="listboxie"  onChange="selectPlacename()">
+<option value="?undefined?">===== County Subdivision - 2008 Population Estimates =====</option>
+<option value="06000US1701567834|88|808">Savanna township, Carroll County, Illinois</option>
+<option value="?undefined?">===== Place - 2008 Population Estimates =====</option>
+<option value="16000US1767821|88|808">Savanna city, Illinois</option>
+<option value="16000US4065600|88|808">Savanna town, Oklahoma</option>
+<option value="?undefined?">===== County Subdivision - 2007 Population Estimates =====</option>
+<option value="06000US1701567834|87|807">Savanna township, Carroll County, Illinois</option>
+<option value="?undefined?">===== County Subdivision - Census 2000 =====</option>
+<option value="06000US1701567834|50|4001">Savanna township, Carroll County, Illinois</option>
+<option value="?undefined?">===== Place - 2007 Population Estimates =====</option>
+<option value="16000US4065600|87|807">Savanna town, Oklahoma</option>
+<option value="16000US1767821|87|807">Savanna city, Illinois</option>
+<option value="?undefined?">===== Place - Census 2000 =====</option>
+<option value="16000US4065600|50|4001">Savanna town, Oklahoma</option>
+<option value="16000US1767821|50|4001">Savanna city, Illinois</option>
+<option value="?undefined?">===== Urban Area - Census 2000 =====</option>
+<option value="40000US79741|50|4001">Savanna, IL--IA Urban Cluster</option>
+<option value="?undefined?">===== County Subdivision - 2006 Population Estimates =====</option>
+<option value="06000US1701567834|86|806">Savanna township, Carroll County, Illinois</option>
+<option value="?undefined?">===== Place - 2006 Population Estimates =====</option>
+<option value="16000US4065600|86|806">Savanna town, Oklahoma</option>
+<option value="16000US1767821|86|806">Savanna city, Illinois</option>
+<option value="?undefined?">===== School District, Elementary - 2007 American Community Survey =====</option>
+<option value="95000US0636030|47|3307">SAVANNA ELEMENTARY , California</option>
+<option value="?undefined?">===== Economic Place - 2002 Economic Census =====</option>
+<option value="E6000US1701567821|62|1600">Savanna city, Illinois</option>
+<option value="?undefined?">===== 5-digit ZIP Code - 2002 Economic Census =====</option>
+<option value="86000US74565|62|NOMAP">ZIP 74565 (Savanna, OK)</option>
+<option value="86000US61074|62|NOMAP">ZIP 61074 (Savanna, IL)</option>
+<option value="?undefined?">===== County Subdivision - 2001 Decennial Supplementary Survey =====</option>
+<option value="06000US1701567834|71|NOMAP">Savanna township, Carroll County, Illinois</option>
+<option value="?undefined?">===== Place - 2001 Decennial Supplementary Survey =====</option>
+<option value="16000US4065600|71|NOMAP">Savanna town, Oklahoma</option>
+<option value="16000US1767821|71|NOMAP">Savanna city, Illinois</option>
+<option value="?undefined?">===== Economic Place - 1997 Economic Census =====</option>
+<option value="E6000US170156782199999999|61|500">Savanna, IL</option>
+<option value="?undefined?">===== County Subdivision - 1990 Decennial =====</option>
+<option value="06000US17015045|40|101">Savanna township, Carroll County, Illinois</option>
+<option value="?undefined?">===== Place - 1990 Decennial =====</option>
+<option value="16000US402145|40|101">Savanna town, Oklahoma</option>
+<option value="16000US175190|40|101">Savanna city, Illinois</option>
+</select>
+</td>
+<td><img src="/img/1px.gif" width="10" height="1" alt="" /></td>
+<td valign="bottom"><span class="tip"><a href="javascript:openEPSS('en', 'census_geography')">Explain Census Geography</a></span><br /><img src="/img/1px.gif" width="1" height="10" alt="" /><br />
+<script>
+var selectGeoMsg = "Select one geography and click 'Map It'.";
+</script>
+<a href="javascript:mapIt('/servlet/MapItDrawServlet','_lang=en', selectGeoMsg, 'No map is available for the selected geography.')"><img src="/img/en/mapit.gif" width="62" height="22" alt="Map It - See Geography Location" border="0" /></a><br /><img src="/img/1px.gif" width="1" height="10" alt="" /><br /><a href="javascript:makeHREF('getResults', '_lang=en', 'Select a geography. Click OK.', 'Enter a geographic name. Click Search.', 'Enter at least a word or a partial word. Click Go.','Search terms must contain at least 2 alphabetic characters.','Search terms must contain at least 2 alphanumeric characters.')"><img src="/img/en/ok.gif" width="40" height="22" alt="OK" border="0" /></a></td>
+</tr>
+</tbody>
+</table>
+
+<br />
+<!-- end of custom tab pane content -->
+
+</td>
+</tr>
+</tbody>
+<!-- begin tab pane bottom border -->
+<tr><td valign="bottom" style="background: url(/img/tab_bottom.gif)"><img src="/img/1px.gif" width="40" height="22" alt="" /></td></tr>
+<!-- end tab pane bottom border -->
+</table>
+<!-- end tab pane # 1 -->
+
+<!-- end tab support -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br />
+
+
+
+
+
+
+</nobr>
+</span>
+</form>
+<form name="panelForm" style="display: inline">
+<input type="hidden" name ="PANEL_ID" value="search_placename" />
+</form>
+<form name="gotoPageForm" method="get" style="display: inline">
+<input type="hidden" name="ds_name" value="" />
+<input type="hidden" name="_lang" value="en" />
+<input type="hidden" name="_ts" value="" />
+</form>
+
+
+</body>
+</html>

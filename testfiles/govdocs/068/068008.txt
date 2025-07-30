@@ -1,0 +1,244 @@
+// Text_t.cxx
+
+#include "dataset_util/Text.h"
+#include "dataset_util/getcwd.h"
+#include "dataset_util/XmlElement.h"
+#include <iostream>
+#include <cassert>
+
+using std::cout;
+using std::endl;
+
+void msg(const char* msg) {
+  cout << "----- ";
+  cout << msg;
+  cout << " -----" << endl;
+}
+
+int Text_t() {
+
+  msg("Empty text");
+  {
+    Text txt;
+    cout << txt << endl;
+    assert( txt.is_valid() );
+    assert( txt.name() == "" );
+    assert( txt.size() == 0 );
+    msg("Write file");
+    system("rm -rf empty.txt");
+    txt.write("empty.txt");
+    msg("Read file");
+    Text txt2("empty.txt");
+    cout << txt2 << endl;
+    assert( txt2.size() == txt.size() );
+  }
+
+  msg("Single line");
+  {
+    Text txt;
+    txt.append("Line 1");
+    cout << txt << endl;
+    assert( txt.line(0) == "Line 1");
+    assert( txt.size() == 1 );
+    msg("Write file");
+    system("rm -rf single.txt");
+    txt.write("single.txt");
+    msg("Read file");
+    Text txt2("single.txt");
+    cout << txt2 << endl;
+    assert( txt2.size() == txt.size() );
+  }
+
+  msg("Multi line");
+  {
+    Text txt;
+    txt.append("Line 1");
+    txt.append("Line two");
+    txt.append("Line threeeeee");
+    cout << txt << endl;
+    assert( txt.line(0) == "Line 1");
+    assert( txt.size() == 3 );
+    msg("Write file");
+    system("rm -rf multi.txt");
+    txt.write("multi.txt");
+    msg("Read file");
+    Text txt2("multi.txt");
+    cout << txt2 << endl;
+    assert( txt2.size() == txt.size() );
+    msg("To XML");
+    XmlElement* pele = txt.xml();
+    cout << *pele << endl;
+    msg("From XML");
+    Text txt3(*pele);
+    cout << txt3 << endl;
+    assert( txt3.size() == txt.size() );
+    assert( txt3.line(0) == "Line 1");
+    assert( txt3.line(1) == "Line two");
+    assert( txt3.line(2) == "Line threeeeee");
+  }
+
+  msg("With blanks");
+  {
+    Text txt;
+    txt.append("Line 1");
+    txt.append("");
+    txt.append("Line threeeeee");
+    txt.append("");
+    cout << txt << endl;
+    assert( txt.line(0) == "Line 1");
+    assert( txt.size() == 4 );
+    msg("Write file");
+    system("rm -rf blanks.txt");
+    txt.write("blanks.txt");
+    msg("Read file");
+    Text txt2("blanks.txt");
+    cout << txt2 << endl;
+    assert( txt2.size() == txt.size() );
+    assert( txt2 == txt );
+  }
+
+  msg("Append");
+  {
+    msg(".. first text");
+    Text txt1;
+    txt1.append("Line 1");
+    txt1.append("Line two");
+    txt1.append("Line threeeeee");
+    cout << txt1 << endl;
+    msg(".. second text");
+    Text txt2;
+    txt2.append("Line 4");
+    txt2.append("Line 5");
+    cout << txt2 << endl;
+    msg(".. appended");
+    Text txt3 = txt1;
+    assert( txt3.size() == 3 );
+    txt3.append(txt2);
+    cout << txt3 << endl;
+    assert( txt3.size() == 5 );
+    assert( txt3.line(1) == txt1.line(1) );
+    assert( txt3.line(4) == txt2.line(1) );
+  }
+
+  msg("With special characters");
+  Text txt1;
+  txt1.append("<Tag example> <>");
+  txt1.append("Ampersand&& &&&");
+  txt1.append("literals&lt;&amp;&gt;");
+  cout << txt1 << endl;
+  msg("To XML");
+  XmlElement* pele = txt1.xml();
+  assert( pele != 0 );
+  cout << *pele << endl;
+  msg("From XML");
+  Text txt2(*pele);
+  cout << txt2 << endl;
+  assert( txt2.size() == txt1.size() );
+  assert( txt2 == txt1 );
+
+  msg("With unprintable characters");
+  system("rm -f unprintable.txt");
+  Text txtu("unprintable.txt");
+  txtu.append("Unprintable character at 2-3");
+  Text::Line lineu = "12\20445";
+  txtu.append(lineu);
+  txtu.append("End of text");
+  assert( txtu.size() == 3 );
+  cout << txtu << endl;
+  txtu.write();
+  Text::set_warn();
+
+  msg("Check unprintable.");
+  Text txtu1("unprintable.txt", true, true);
+  assert( ! txtu1.is_valid() );
+  assert( txtu1.size() == 0 );
+
+  msg("Do not check unprintable.");
+  Text txtu2("unprintable.txt", true, false);
+  assert( txtu2.is_valid() );
+  assert( txtu2.size() == 0 );
+
+  msg("Split a line.");
+  Text::Line line("This is@a@ line ");
+  cout << line << endl;
+  Text::WordList words = Text::split(line, " @");
+  for ( Text::WordList::const_iterator iwrd=words.begin();
+        iwrd!=words.end(); ++iwrd ) {
+    cout << "---" << *iwrd << "---" << endl;
+  }
+  assert( words.size() == 4 );
+  assert( words[0] == "This" );
+  assert( words[1] == "is" );
+  assert( words[2] == "a" );
+  assert( words[3] == "line" );
+
+  msg("Split a line w/o skipping blanks.");
+  Text::Line line2("This is@a@ line ");
+  cout << line2 << endl;
+  Text::WordList words2 = Text::split(line, " @", false);
+  for ( Text::WordList::const_iterator iwrd=words2.begin();
+        iwrd!=words2.end(); ++iwrd ) {
+    cout << "-->" << *iwrd << "<--" << endl;
+  }
+  assert( words2.size() == 6 );
+  assert( words2[0] == "This" );
+  assert( words2[1] == "is" );
+  assert( words2[2] == "a" );
+  assert( words2[3] == "" );
+  assert( words2[4] == "line" );
+  assert( words2[5] == "" );
+  
+  msg("Create an empty named text object");
+  Text::Name name0 = "named0.txt";
+  Text tnam0(name0);
+  assert( tnam0.name() == name0 );
+  assert( tnam0.size() == 0 );
+
+  msg("Create a text object from a file");
+  Text::Name name1 = "named1.txt";
+  txt1.write(name1);
+  Text tnam1(name1);
+  assert( tnam1.name() == name1 );
+  assert( tnam1.size() != 0 );
+  assert( tnam1 == txt1 );
+
+  msg("Write text to internal name");
+  system("rm named1.txt");
+  assert( Text(name1).size() == 0 );
+  assert( tnam1.write() == 0 );
+  assert( Text(name1).size() != 0 );
+  assert( Text(name1) == txt1 );
+
+  msg("New name");
+  Text trename("name1");
+  assert( trename.name() != "newname" );
+  assert( trename.set_name("newname") == 0 );
+  assert( trename.name() == "newname" );
+
+  msg("Write to XML");
+  XmlElement* pxtnam1 = tnam1.xml();
+  assert( pxtnam1 != 0 );
+  cout << *pxtnam1 << endl;
+  assert( pxtnam1->name() == Text::xml_name() );
+
+  msg("Read from XML");
+  Text tnam2(*pxtnam1);
+  cout << tnam2 << endl;
+  assert( tnam2.name() == tnam1.name() );
+  assert( tnam2 == tnam1 );
+
+  msg("Invalid for missing file");
+  assert( ! Text("no_such_file", true, true).is_valid() );
+
+  msg("Invalid for directory");
+  assert( ! Text(getcwd(), true, true).is_valid() );
+
+  msg("All tests passed.");
+  return 0;
+}
+
+#ifdef CTEST_MAIN
+int main() {
+  return Text_t();
+}
+#endif

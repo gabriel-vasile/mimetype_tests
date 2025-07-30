@@ -1,0 +1,18 @@
+/^CONSTRAINT:/ {
+: RENEW
+  # Lines ending with a backslash get rolled into the next one
+  /[ ,]\$/ {
+    s/\$.*$//g
+    N
+    b RENEW
+  }
+  s/^CONSTRAINT://g
+  s/\n//g
+  s/  */ /g
+
+  # Convenience routines
+  s/source(/(source NE /g
+  s/time(/bulgeprep_tbound(tt,/g
+  p
+}
+d

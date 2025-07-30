@@ -1,0 +1,492 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Generator" CONTENT="Microsoft Word 97/98">
+   <META NAME="Template" CONTENT="Macintosh HD:Desktop Folder:Applications:MS Word:Microsoft Office 98:Templates:Web Pages:Blank Web Page">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.07C-SGI [en] (X11; I; IRIX 6.5 IP32) [Netscape]">
+   <TITLE>Final Report: Earth's Core and Mantle Dynamics</TITLE>
+</HEAD>
+<BODY LINK="#0000FF" VLINK="#800080" bgcolor="white">		<b><font color="#000099"><font size=+4>NASA HPCC</font></font></b><BR>		<b><font color="#000099"><font size=+4>Earth and Space</font></font></b><BR>		<b><font color="#000099"><font size=+4>Sciences Project</font></font></b>		<P><B><font color="#000099"><font size=+3>Final Report</font></font></B>
+<P><b><font color="#000099"><font size=+3>Simulations of the Earth's Core and Mantle Dynamics</font></font></b><BR>			<b><font color="#000099"><font size=+2>(NCCS5-147)</font></font></b>
+		<P><I><font color="#000099"><font size=+1>Peter Olson, Johns Hopkins University, Principal Investigator</font></font></I>		<hr width="100%">		<p><b><font size="+2">Contents</font></b></p>		<p><b>Mantle</b></p>		<p><a href="#terra">A Brief History of TERRA Code Improvements during Round Two</a></p>		<p><a href="#stag">Self-Consistent Generation of Plate Tectonics</a></p>		<p><a href="#plate">Models of Plate Boundary Formation</a></p>		<p><b>Core</b></p>		<p><a href="#dynamo">Report on Dynamo</a></p>		<p><a href="#geodynamo">Geodynamo Models<br>				<br>			</a></p>		<HR WIDTH="100%">		<P><a name="terra"></a><b><font color="#3333FF"><font size=+2>A Brief History of TERRA Code Improvements during Round Two</font></font></b>
+<P><i>John Baumgardner, Los Alamos National Laboratory</i><BR>			&nbsp;
+
+<P>Following the Round Two site visit held at UCLA in April 1996, an effort
+was launched to improve the performance of TERRA on the expected Round
+Two initial hardware, the Cray T3D. TERRA had been originally developed
+on and highly optimized for the Cray vector XMP and YMP machines. This
+effort focused on optimizing instead for the cache-based superscalar architecture
+of the T3D Dec Alpha processors. It involved primarily increasing the reuse
+of data in the very small cache on these processors. A large fraction of
+the arithmetic operations in TERRA involve application of 21-point stencils
+on a logically regular mesh. This character of the numerical algorithms
+provides the potential of significant data reuse, since field values at
+a given grid point are used several times as a stencil operator is applied
+at neighboring grid points.
+<P>The main strategy for achieving improved data reuse involved breaking
+single loops that swept over two spatial dimensions into two shorter loops
+that each sweep over a single spatial dimension. Whereas the T3D processor
+cache generally was too small to hold the two-dimensional arrays required
+for high reuse, it was found to be large enough for the smaller one-dimensional
+arrays. This strategy improved the per processor performance on the main
+kernels in TERRA from about 12 Mflops to the range of 35-40 Mflops -- approximately
+a three-fold increase. It required, however, a rewrite of all the important
+kernels in the code.
+<P>John Baumgardner at Los Alamos accomplished this work mostly during
+the month of May 1996 in collaboration with Mark Dalton of Cray Research
+at Los Alamos and Maynard Brandt in the Benchmark Services group at Cray
+Research in Eagan, Minnesota. In addition, Maynard Brandt rewrote the communication
+module to use T3D shmem routines in place of PVM library routines. The
+latter resulted in a two-fold reduction in the time spent in inter-process
+communication, such that it constituted only about six percent of the total.
+<P>Maynard Brandt at Cray Research made a quantitative measure of TERRA
+performance after these improvements. The test problem was a non-trivial
+one involving a fully 3-D temperature-dependent viscosity model using 16
+T3D processors and a grid subdomain size identical to that planned for
+the 512 processor benchmark. From the CPU time and the number of floating
+point operations as determined by Apprentice, Brandt in early June 1996
+obtained a TERRA performance of 22.0 Mflops/processor. This performance
+projected to a total of 11.24 Gflops on 512 T3D processors and indicated
+that TERRA's raw performance was now sufficient to achieve the first performance
+milestone of 10 Gflops.
+<P>The next hurdle was to remove a limitation in TERRA that restricted
+the number of processes to a power of four (i.e., 1, 4, 16, 64, 256, ...)
+such that, instead, any power of two (in particular, 9, corresponding to
+512 processors) was possible. This involved modifying the manner in which
+domain decomposition was done and therefore also many of the details of
+the interprocess communication. It required generalization of all the communications
+routines to accommodate a variable number (either five or ten) of blocks
+of grid points per processor. (There are ten logically square blocks of
+grid points that fit together to cover the spherical surface in the icosahedral
+grid used in TERRA.)
+<P>A second similar hurdle was to eliminate a piece of serial coding at
+the lowest levels of the multigrid solver. This task involved mapping the
+multigrid calculations at the lowest grid levels, rather than to a single
+processor as had been done previously, instead, to one-fourth of the remaining
+active processors. This strategy allows the work at these lowest grid levels
+to be done in parallel instead of serially. But it required writing new
+communication routines to handle the new communication patterns as well
+as major modification of the data structures at these lower grid levels.
+<P>Both these tasks were completed by mid-January, 1997. Shortly thereafter
+TERRA met the 10 Gflops milestone with a performance of 11.6 Gflops on
+the NASA Goddard 512 processor Cray T3D. Speed per processor was found
+to be constant within about one percent for configurations of 16 to 512
+processors when the total problem size was scaled to give roughly the same
+per processor work. This implied excellent parallel scaling.
+<P>With the arrival of the Cray T3E at NASA Goddard in the spring of 1997,
+effort was focused on optimizing the code for that platform. The most significant
+issue was making use of the new T3E hardware stream buffers that allowed
+more efficient transfer of data from main memory to secondary cache. Unfortunately,
+there was a design error in the boards that used the 300 MHz EV5 Alpha
+chip that could cause a system crash when the stream buffers were utilized.
+To work around this problem it was necessary initially to use versions
+of the communication routines based on MPI rather than shmem. Spencer Swift
+of Cray Research/SGI at NASA Goddard provided considerable help working
+through these difficulties as well as in modifying the kernel routines
+to achieve improved utilization of the stream buffers. With stream buffers
+activated, TERRA performance exceeded what was required to meet the 50
+Gflops milestone by a comfortable margin.
+<P>In early August 1997 a performance of 38.0 Gflops was measured on the
+512 PE 300 MHz T3E (T3E-600) at NASA Goddard (considered by NASA to represent
+half the resources required for the 50 Gflops milestone). At about the
+same time a performance of 86.8 Gflops was measured on a 1024 PE 450 MHz
+T3E (T3E-900) at Eagan, Minnesota (considered by NASA to represent 1.5
+times the resources required for the 50 Gflops milestone). In the first
+case the performance was 38.0/25.0 = 1.52 times the milestone requirement,
+and in the second it was 86.8/75.0 = 1.16 times the requirement. In regard
+to the latter case, it is to be noted that although the peak processor
+speed of the T3D-900 exceeded that of the T3E-600 by 50%, the bandwidth
+to main memory was identical for both systems. Since the TERRA performance
+is limited mostly by memory bandwidth, it is understandable why its performance
+did not scale simply with peak processor speed. In any case, these performance
+numbers were readily satisfied the requirements of the second performance
+milestone.
+<P>The final performance milestone required that the TERRA calculation
+include its particle-based treatment of lithospheric plates. Lithospheric
+plates in TERRA are modeled as perfectly rigid patches in the topmost layer
+of nodes in the spherical grid. The spatial identity of the plates is carried
+by sets of particles, one set for each plate, that are moved in a Lagrangian
+manner across the surface. A single Euler rotation vector describes the
+motion of each plate. In a dynamical calculation the set of plate rotation
+vectors is obtained via a Newton iteration procedure that minimizes the
+net torque on each plate. The resulting piecewise uniform surface velocity
+field is then applied as a velocity boundary condition in solving the momentum
+equation for the velocity field in the interior of the spherical shell
+domain. A set of rules is applied at plate boundaries to treat the removal
+of particles at zones of convergence and addition of particles and creation
+of new plate in zones of divergence.
+<P>The particles in this treatment are always stored in memory in locations
+corresponding to the nearest grid point. This permits the basic particle
+data structure to be identical to that of the other grid based variables
+and allows identical domain decomposition and parallelization. It therefore
+allows relatively high parallel performance for the particle algorithms.
+Indeed we found that adding the particle treatment reduced the overall
+performance by only a few percent compared with runs without this treatment.
+<P>We achieved the third performance milestone, that of 100 Gflops, in
+November 1998 during a window of opportunity when a large Cray T3E-1200
+was available at Eagan, Minnesota. TERRA achieved 121.8 Gflops on 1024
+processors with the plate treatment included. Table 1 below summarizes
+the TERRA performance on three versions of the Cray T3E hardware with processor
+clock rates respectively of 300, 450, and 600 Mhz.
+<P><b>Table 1</b> <i>TERRA Performance in billions of floating point operations per second (gigaflops) on parallel Cray T3E systems as measured in 1998. Work per processing element (PE) is approximately equal in all cases.</i><BR>			&nbsp;
+		<CENTER>			<TABLE BORDER COLS=4 WIDTH="100%" NOSAVE >				<TR>					<TD><B>PEs</B></TD>					<TD><B>T3E-600</B></TD>					<TD><B>T3E-900</B></TD>					<TD><B>T3E-1200</B></TD>				</TR>				<TR>					<TD><B>64</B></TD>					<TD>5.49</TD>					<TD>6.62</TD>					<TD>8.44</TD>				</TR>				<TR>					<TD><B>128</B></TD>					<TD>10.4</TD>					<TD>12.7</TD>					<TD>16.4</TD>				</TR>				<TR>					<TD><B>256</B></TD>					<TD>22.1</TD>					<TD>26.2</TD>					<TD>32.3</TD>				</TR>				<TR>					<TD><B>512</B></TD>					<TD>42.5</TD>					<TD>49.1</TD>					<TD></TD>				</TR>				<TR>					<TD><B>1024</B></TD>					<TD></TD>					<TD></TD>					<TD>121.8 (w/plates)</TD>				</TR>			</TABLE>			&nbsp;
+</CENTER>		<P><B>Illustrative TERRA Calculation</B>		<P>To illustrate TERRA's present capabilities, we present a model calculation
+for the Earth's mantle that exploits TERRA's ability to treat strong local
+variations in the strength of silicate rock that arise from variations
+in temperature and stress. Including this realism in the silicate deformation
+law leads to a remarkably Earth-like solution, with plate-like surface
+velocities, an internal density structure with strong harmonic degree two
+components, and an amount of toroidal energy in the surface velocity field
+similar to that actually observed. This solution varies only slowly with
+time after a transient response from an initial state involving high spatial
+frequency random temperature perturbations.
+<P>Our computational mesh, as displayed in Fig. 1, has 65 layers, with
+163,842 grid points each, for a total of 10,649,730 grid points. The horizontal
+resolution at the surface is about 60 km. For simplicity in the interpretation
+of our results we make the Boussinesq approximation. We assume the spherical
+shell is heated only from within. We use Earth-like values for all the
+primary physical parameters except for the specific heat, which we lower
+by a factor of ten to reduce the Rayleigh number so as to match the resolution
+constraints imposed by the available computer resources. We also reduce
+by about a factor of five the activation energy in the Newtonian viscosity
+because of limitations on the viscosity gradients imposed by our algorithms.
+The depth dependence of viscosity, as shown in Fig. 2, is relatively simple.
+The upper mantle has a reference value of 2 x 1020 Pa-s, and the top 65
+km and depths below 1000 km have reference values 1000 times larger, with
+smooth variation in the depth regions 65-250 km and 450-1000 km. We apply
+a viscous yield stress of 140 MPa in the top 250 km. The resulting total
+viscosity variation is approximately a factor of 200,000.
+<P>The calculation is initialized with random temperature variations imposed
+on a radial temperature profile that is uniformly 2000 K in the interior
+and drops to 300 K through a boundary layer at the surface. The temperature
+field initially displays a large number of point like downwellings, but
+these tend to coalesce into linear downwelling features which in turn coalesce
+to form a single linear network as displayed in Fig. 3(a). The time scale
+for this development is about 109 years. Thereafter the pattern retains
+its topological character and changes only slowly with time as indicated
+in Fig. 3(b). Figures 4 and 5 show the viscosity field with large high
+viscosity patches at the surface characterized by low internal rates of
+strain. Weak zones that display high rates of deformation and represent
+zones of localized downwelling and upwelling surround these platelike patches.
+Numerous instances of oblique motion at downwelling zones lead to a toroidal
+component of velocity that is 30-35% of the poloidal component in magnitude
+at the surface. The geoid is dominated by its harmonic degree two components.
+<P>From a scientific standpoint, this solution which displays such remarkable
+similarity to the Earth leads us to conclude much of the mantle's unique
+behavior and history can be traced directly to a few crucial but simple
+aspects of its rheology.
+<P>This case was run on 128 processors of the Cray T3E-600 `jsimpson' at
+NASA's Goddard Space Flight Center. A typical time step of length 40,000
+years required 6.5 seconds of CPU time on 128 processors. This corresponds
+to 163 CPU seconds per Myr of problem time or 45 CPU hours per Gyr. Each
+time step typically involves four multigrid cycles to solve for 42.6 million
+unknowns (three velocity components plus pressure at each grid point) plus
+an update of the energy equation. The total execution rate for this case
+on the 128 processors of the T3E-600 is approximately 11 Gflops. TERRA
+also displays a similar level of performance on current Beowulf clusters
+of similar size.
+<BR>			&nbsp;
+<P><IMG SRC="nasafig1.gif" NOSAVE HEIGHT=612 WIDTH=792>
+<P><b>Figure 1</b> <i>Cutout view of a portion of the TERRA computational grid. Horizontal grid is constructed by successive refinements of the projection of the regular icosahedron onto the sphere. Replicating this horizontal grid at appropriate radial locations generates the 3D grid. The grid pictured here has 65 radial layers, each with 163,842 points, for a total of 10,649,730 grid points.</i>		<P>			<HR WIDTH="100%">			<BR>			&nbsp;
+						<P><IMG SRC="nasafig2.gif" HEIGHT=306 WIDTH=396>		<P><b>Figure 2</b> <i>Reference radial viscosity profile. Lateral viscosity variation, arising from lateral temperature variations and yield stress weakening, multiplies this radial variation to yield the 3D viscosity field.</i>
+<P>		<HR WIDTH="100%">		<P><b>Figure 3a</b><BR>			<IMG SRC="nasafig3a.gif" HEIGHT=612 WIDTH=792><BR>			&nbsp;
+
+
+<P><b>Figure 3b</b><BR>			<IMG SRC="nasafig3b.gif" HEIGHT=612 WIDTH=792>		<P><b>Figure 3 </b><i>Temperature and velocity fields at 367 km depth and problem times of 1.0 Gyr (a) and 2.0 Gyr (b). Note the linear pattern of downwelling flow that resembles, at least in spatial frequency content, the pattern of subduction observed today for the Earth. Arrows denote horizontal velocity, triangles upward radial velocity, and squares downward radial velocity. Velocity magnitude is proportional to symbol size.</i>		<p></p>		<P><b>Figure 4a</b><BR>			<IMG SRC="nasafig4a.gif" HEIGHT=612 WIDTH=792>		<P><b>Figure 4b</b><BR>			<IMG SRC="nasafig4b.gif" HEIGHT=612 WIDTH=792>
+
+<P><b>Figure 4</b> <i>Viscosity and velocity fields at problem time of 2.0 Gyr. (a) Fields at surface. (b) Fields at 367 km depth. In (a) note regions of reduced viscosity at zones of flow convergence and divergence with regions of high viscosity elsewhere. In (b) the high viscosity in the narrow zones of downwelling flow is a consequence of the temperature dependence of the viscosity law.</i>		<P>		<P><IMG SRC="nasafig5.gif" HEIGHT=447 WIDTH=453>		<P><b>Figure 5</b> <i>Cutout view of 3D viscosity field with a high viscosity isosurface exposed in the cutout region. Top corner of cutout is at the north pole, and central longitude of cutout is approximately 115 degrees east relative to the central meridian of Figs. 3 and 4. Note the high viscosity platelike patches (in orange) at the outer surface, the low viscosity zone (in blue) corresponding to the Earth's upper mantle, and the contorted extensions of the high viscosity downwelling flow in the lower portion of the spherical shell corresponding to the Earth's lower mantle.</i><BR>			<font face="Times New Roman,Times"></font>&nbsp;
+
+		<p><b><font size=+1>Related Publications</font></b><b><font size=+1><br>				</font></b><b><font size=+1><br>				</font></b>W.-S. Yang and J.R. Baumgardner, &quot;Matrix-dependent transfer multigrid method for strongly variable viscosity infinite Prandtl number thermal convection,&quot; Geophys. and Astrophys. Fluid Dyn., in press, 2000.&nbsp;<br>			<br>			H. R. Wenk, J. R. Baumgardner, C. N. Tome, and R. Lebensohn, &quot;A deformation model to explain anisotropy of the inner core,&quot; J. Geophys. Res., in press, 2000.&nbsp;<br>			<br>			M. A. Richards, H.-P. Bunge, Y. Ricard, and J.R. Baumgardner, &quot;Polar wandering and inertial interchange events in mantle convection models,&quot; Geophys. Res. Lett., 26, 1777-1780, 1999.&nbsp;<br>			<br>			M.A. Richards, H.-P. Bunge, C. Lithgow-Bertelloni, and J.R. Baumgardner, &quot;Mantle convection and plate motion history: Toward general circulation models,&quot; History and Dynamics of Global Plate Motions, AGU Monograph Series, 1999.&nbsp;<br>			<br>			C.C. Reese, V. S. Solomatov, J. Baumgardner and W. Yang, Stagnant lid convection&nbsp; in a spherical shell, Phys. Earth Planet. Int., 116, 1-7, 1999.<br>			<br>			H.P. Bunge, M.A. Richards, C. Lithgow-Bertelloni, J.R. Baumgardner, S.P. Grand, and B.A. Romanowicz, Time scales and heterogeneous structure in geodynamic Earth models,&nbsp; Science, 280, 91-95, 1998.<br>			<br>			H.P. Bunge, M.A. Richards, and J.R. Baumgardner, A sensitivity study of 3-D spherical mantle convection at 10^8 Rayleigh number, J. Geophys. Res., 102 (B6), 11991-12007, 1997.&nbsp;<br>			<br>			H.P. Bunge, M.A. Richards, The origin of large scale structure in mantle gonvection, Geophys. Res. Lett., 23, 2987-2990, 1996.&nbsp;<br>			<br>			H.P. Bunge, M.A. Richards, and J.R. Baumgardner, The effect of depth-dependent viscosity on the planform of mantle convection, Nature, 379, 436-438, 1996.&nbsp;<br>			<br>		</p>		<hr width="100%">		<P><a name="stag"></a><b><font color="#3333FF"><font size=+2>Self-Consistent Generation of Plate Tectonics</font></font></b>		<P><I>Paul Tackley, UCLA</I>
+<P>One of the fundamental goals of this project, and of mantle convection
+research in general, is to identify&nbsp; a material description which
+will allow tectonic plates to form naturally in mantle convection simulations,
+rather than being imposed by the modeler as has been necessary in the past.
+This should help to answer fundamental&nbsp; questions such as "Why does
+the Earth have plate tectonics, whereas Venus and Mars do not". This problem
+is particularly challenging in three-dimensional geometry due to the presence
+of transform plate boundaries, which do no arise naturally in a convecting
+system.
+<P>In summer 1997, Tackley obtained for the first time, self-consistently
+generated plates&nbsp; in a three-dimensional mantle flow&nbsp; calculation,&nbsp;
+work which was subsequently published in Earth and Planetary Science Letters.
+They key component of the material properties&nbsp; was strain-rate weakening,&nbsp;
+i.e., decreasing stress with increasing strain rate. Strain-rate weakening
+had previously been investigated in a two-dimensional sheet by co-PI Bercovici.
+The material and numerical model used for these initial results was quite
+simple, and as a result the plates were not fully realistic. In particular,
+the calculations considered only the instantaneous flow for a given distribution
+of buoyancy&nbsp; forces, rather than being time-dependent, and assumed
+a fixed-thickness lithosphere, rather than one which arose due to the temperature-dependence
+of viscosity in the cold upper boundar layer .
+<P>To overcome these limitations, Tackley developed a rheological parameterization
+which combines temperature- depth- stress- and history- dependence. The
+history-dependence is described through the time-dependent evolution of
+'damage', which weakens the material. Damage arises where material is deformed
+at high stress, and heals with time at a rate which is temperature-dependent,
+allowing long-term memory at cold, lithospheric temperatures but rapid
+healing at hot mantle temperatures. Under steady-state conditions, the
+damage evolution reduces to the previously-used strain-rate weaking. This
+description was shown to lead to the generation of weak transform margins,
+suduction zones and spreading centers in steady-state models in a paper
+in press in an AGUGeophysical Monograph volume.
+<P>Fully time-dependent, self-consistent models followed in fall 1998,
+when Tackley developed the first fully time-dependent, self-consistent
+3-D models which develop plate-like behavior evolving continuously in space
+and in time. These results were presented at several meetings, and will
+be submitted for publication shortly. An illustrative result shown in the
+Figure below shows passive rifting, passive oceanic spreading centers,
+single-sided subduction, and back-arc spreading , all characteristic features
+of Earth's plate tectonics.&nbsp; In these results, the plateness is, to
+first order, caused by a pseudo-plastic yield stress rather than strain-weakening
+or strain-rate weakening. Having a low-viscosity asthenosphere under the
+lithosphere results in sharper plate boundaries but is not necessary for
+plates to exist. A systematic investigation of these models is under way.
+<P><IMG SRC="PTfig.jpg" HEIGHT=352 WIDTH=764>
+<P><b>Figure 6</b>&nbsp; <i>Self-consistent plate generation, including continental plates (single-sided subduction)</i>
+<P>		<HR WIDTH="100%">		<P>An important component of Earth's plate tectonics are the compositionally-distinct
+continental plate regions. The interaction between buoyant continental
+material and mantle flowhas been studied by Tackley and student Li Ma using
+three-dimensional simulations with buoyant continental material at the
+top. The simulations are distinguished from previous works not only by
+dimensionality but also by treating the continents using a self-consistent
+rheological description allowing them to deform, break up etc., as opposed
+to the traditional 'rigid block' approach. Buoyant continental material
+has also been included in the fully self-consistent plate generation models,
+as shown above.
+<P>Elasticity and related brittle failure are undoubtedly important in
+the shallow lithosphere and may be responsible for some of the characteristic
+features of plate tectonics and instrumental in the formation of new plate
+boundaries. Progress was made by project postoc Moritz Heimpel on the inclusion
+of elasticity and brittle failure in the STAG convection code and it is
+expected that this will be completed in the near future.
+<BR>			&nbsp;
+<P><B>Mantle-Core Coupling</B>
+<P><b>a)</b> Coupled mantle and core dynamics on Io. Jupiter's moon Io
+is a prime example of a body for which mantle-core coupling may play an
+important&nbsp; role. Recent measurements by the Galileo spacecraft indicate
+that Io has an active component to its magnetic field. Circulation in the
+core is probably driven by differential heating and cooling from the mantle.
+Io's mantle is particularly interesting, being unique amonst planetary
+mantles so far considered because convection is driven by non-uniform tidal
+dissipation rather than uniform radiogenic heating or an isothermal hot
+lower boundary. Thus, Tackley in collaboration with Schubert and Glatzmaier
+have been simulating mantle convection in Io, using the spectral MAN code.
+Results to date indicate that the style of convection consistens of a mean
+flow driven by the distribution of tidal heating, with small-scale instabilities
+superimposed on the mean flow. As Rayleigh number is increased these small-scale
+instabilities increasingly distribute the heat, so that the surface distribution
+of heat flow is much more uniform than the tidal dissipation distribution
+would suggest. Patterns of heat flux across the core-mantle boundary are
+being used as a boundary condition for core dyamo simulations by Glatzmaier
+and Roberts.
+<BR>			&nbsp;
+<P><b>b)</b> The core-mantle-boundary region: thermo-chemical convection
+calculations with a dense D" layer. The D" region, lying at the base of
+the mantle directly above the core, has received a lot of interest and
+attention in recent years and is a key area for core-mantle interactions.
+One possibility for D" is that it consists of a layer of chemically dense
+material. Tackley has performed the first three-dimensional calculations
+of mantle convection with a dense layer at the base, in order to characterize
+the basic planforms and dynamics. Dense material is swept up into 'piles'
+underlying the upwellings, and slowly entrained. Entrainment is always
+in cylindrical forms, even in completely internally-heated convection.
+If depth-dependent properties (such as viscosity) result in very sluggish
+convection in the deep mantle (as indicated by a low 'local' Rayleigh number)
+then these piles can be very large, even if the chemical density contrast
+is small. These large thermo-chemical piles or 'megaplumes' may provide
+an explanation for features seen in seismic tomographic models under Africa
+and the Pacific.
+<P><B>Publications</B>
+<P>Tackley, P. J., Self-consistent generation of tectonic plates in three-dimensional
+mantle convection,&nbsp; Earth Planet. Sci. Lett., 157, 9-22, 1998.
+<P>Tackley, P. J., Three-dimensional simulations of mantle convection with
+a thermo-chemical basal boudary layer: D"?, in The Core-Mantle Boundary
+Region, AGU Geodynamics Series 28, Ed. Gurnis et al., pp231-253, 1998.
+<P>Tackley, P. J., Baumgardner, J. R., Glatzmaier, G. A., Olson, P., Clune,
+T., Three-dimensional spherical simulations of convection in Earth's mantle
+and core using massively-parallel computers, Proceedings of High Performance
+Computing 1999, pp. 95-100, Ed. A. Tentner, 1999.
+<P>Tackley, P.J., The quest for self-consistent generation of plate tectonics
+in mantle convection, in The History and Dynamics of Global Plate Motions,
+AGU Geodynamics Series, Ed. M.A. Richards et al., in press, 1999.
+<P>Tackley, P.J., Three-dimensional, time-dependent&nbsp; models of mantle
+convection with self-consistent plate tectonics, in preparation for Geochemisty,
+Geophysics, Geosystems, 1999.
+<P>Tackley, P.J., G. Schubert, G.A. Glatzmaier, and J.T. Ratcliff, Three-dimensional
+simulations of mantle convection in Io, in&nbsp; preparation for Icarus,
+1999.
+<BR>			&nbsp;
+					<P><B>Meeting Presentations (reverse chronological order)</B>
+<P>"The coupled system of mantle convection and lithospheric plate tectonics:
+towards a self-consistent model", P.J. Tackley, IUGG meeting, Birmingham,
+1999
+<P>"Three-dimensional spherical simulations of mantle convection in Io",
+P.J. Tackley, G. Schubert, G.A. Glatzmaier, J.T. Ratcliff, IUGG meeting,
+Birmingham, 1999
+<P>"Dynamical constraints on the thermo-chemical megaplumes in the deep
+mantle beneath Africa and Hawaii", P.J. Tackley, Spring AGU 1999.
+<P>"Self-consistent generation of plate tectonics in time-dependent three-dimensional
+mantle convection", P.J. Tackley, Spring AGU 1999.
+<P>"Three-dimensional spherical simulations of convection in Earth's mantle
+and core using massively-parallel computers", P.J. Tackley, J. R. Baumgardner,
+G. A. Glatzmaier, P. Olson, T. Clune, At the High Performance Computing
+ASTC conference, San Diego 1999.
+<P>"Large-scale thermo-chemical structures in the deep mantle: Constraints
+from 3-D numerical simulations of mantle convection and seismology", P.J.
+Tackley, Fall AGU 1998.
+<P>"Self-consistent generation of plate tectonics from mantle convection,
+Part II: Memory and time-dependent evolution", P.J. Tackley, Fall AGU 1998.
+<P>"Three-dimensional numerical simulations of mantle convection in Io",
+G. Schubert, P.J. Tackley, J.-P. Matas, G.A. Glatzmaier, J.T. Ratcliff,
+Fall AGU 1998.
+					<P>&nbsp;"Towards self-consistent generation of plate tectonics in 3D mantle
+convection", P.J. Tackley, Gordon conference NH 6/98
+<P>&nbsp;"Advances in three-dimensional mantle convection modeling: variable
+viscosity, plates, and geochemistry", P.J. Tackley, SEDI Tours, France
+7/98
+<P>&nbsp;"Three-dimensional simulations of mantle and core convection on
+Io", SEDI Tours, France 7/98
+<P>"Continental Drift, Aggregation, Breakup and Dispersal in a 3-D Mantle
+Convection Model", P.J. Tackley and L. Ma, AGU Chapman conference on The
+History and Dynamics of Global Plate Motions, 9/97.=20
+<P>&nbsp;"Self-consistent Generation of Plate Tectonics in 3-D Mantle Convection",&nbsp;
+Tackley, P.J., AGU Fall Meeting, 1997.
+		<P>"Continental Drift, Aggregation, Breakup and Dispersal in a 3-D mantle
+convection model", Tackley, P.J., EOS Trans. AGU Fall Meeting, 1997.
+<br>			<br>		<HR WIDTH="100%">		<P><a name="plate"></a><b><font color="#3333FF"><font size=+2>Models of Plate Boundary Formation</font></font></b>
+<P><i>David Bercovici, University of Hawaii</i><BR>			&nbsp;
+
+<P><IMG SRC="DBfig1.jpg" HEIGHT=570 WIDTH=468>		<P><b>Figure 7 </b><i>Approximate horizontal divergence (top) and vertical vorticity (middle) fields of the Earth (plate and continental outlines are shown for reference in the bottom frame).Horizontal divergence is a fine-scaled representation of poloidal flow at the Earth's surface and represents the so-called rate of creation (divergence) and destruction (convergence or negati e divergence) of the plates at ridges and subduction zones, respectively. Vertical vorticity is&nbsp; a fine-scaled representation of toroidal flow and represents the rate of strike-slip shear between plates as well as plate spin (vorticity is essentially a measure of the local angular velocity, i.e., angular velocity of a point in the fluid). The divergence and vorticity fields shown are estimated directly from a model that uses finite-width plate margins based on seismicity distributions; for the standard plate model with infinitesimall thin margins, these fields are singularities and thus cannot be reliably estimated.</i>		<p></p>		<P><IMG SRC="DBfig2.jpg" HEIGHT=471 WIDTH=682>		<P><b>Figure 8 </b><i>Generation of the Earth's toroidal motion via a source-sink model.
+The Earth's horizontal divergence <b>(Fig. a -- top)</b> (a simpler and
+smoother version of that shown in the previous figure)&nbsp; is used as&nbsp;
+a source-sink field to drive flow in a non-Newtonian thin (lithospheric)
+fluid shell.&nbsp; The divergent zones (yellow and red) are used as sources
+of material, while the convergent zones (blue) are used as sinks. Ideally,
+the interaction of the source-sink&nbsp; field and non-Newtonian rheology
+in the lithospheric fluid shell would recover the Earth's vertical vorticity
+field (Fig. (a) -- bottom) (again, simpler and smoother than that shown
+in \plateref{divvor}). Flow in the models with power-law rheologies do
+not generate Earth-like vorticity (<b>Fig. (b) -- top and middle frames</b>)
+for power-law indices that are mantle-like, n=3, and extreme, n=21.&nbsp;
+Flow with the continuous stick-slip or self-lubricating rheologies (labelled
+as n=-1) (<b>Fig. (b</b>) <b>-- bottom</b>) generates a more Earth-like vorticity field.&nbsp; See Bercovici [1995a] for further discussion.</i>		<P>		<P><IMG SRC="DBfig3.jpg" HEIGHT=569 WIDTH=540>		<P><b>Figure 9 </b><i>A simple model of a thin lithospheric-type layer of fluid driven by a basic source-sink field S (top row; yellow and red represent a source of material, blues represent sinks). The viscosity of the fluid layer is variable. In one model the viscosity is a function of temperature Theta and heat is generated by viscous dissipation (middle row showing, left to right, dimensionless horizontal velocity v_h, vertical vorticity or strike-slip shear omega_z [see also Figs 7 and 8], and temperature Theta). In the second model viscosity is a function of volatile (e.g., water) content measured in terms of volume&nbsp; raction of voids or porosity Phi; the voids are generated according to the amount that the fluid is stressed and damaged (bottom row, showing left to right, velocity, vorticity and porosity). The fields S, omega_z, Theta and Phi as shown are multiplied by a factor of 1000. The interaction of the source-sink field and the variable viscosity leads to toroidal flow. Toroidal motion (represented with vertical vorticity) and plate strength&nbsp; or&nbsp; plateness (measured by temperature or porosity distribution, where hot or porous is weak, cold and unporous is strong) remains diffuse and unplate-like in the viscous-heating based mechanism even with very temperature-dependent viscosity. However, toroidal motion in the void-volatile model can allow extremely focussed, nearly fault-like concentrations of strike-slip shear or toroidal motion (bottom middle frame) and plate- ike strength distributions (bottom right frame). (After Bercovici [1998].)</i>		<P><b>Relevant Publications</b>		<P>Bercovici, D., Y. Ricard and G. Schubert, A two-phase model for compaction and damage, Part 1: General theory, submitted to&nbsp; J. Geophys. Res. 1999.<P>Ricard, Y. Bercovici, D., and G. Schubert, A two-phase model for compaction and damage,&nbsp; Part 2: Applications to compaction, deformation and and the role of interfacial surface tension, submitted to&nbsp; J. Geophys. Res. 1999.<P>Bercovici, D., Y. Ricard and G. Schubert, A two-phase model for compaction and damage,&nbsp; Part 3: Applications to shear localization and plate boundary formation, submitted to&nbsp; J. Geophys. Res. 1999.<P>Bercovici, D., Y. Ricard, and M.A. Richards, The relation between mantle dynamics and plate tectonics: A primer, in press AGU Monograph Series ``History and Dynamics of Global Plate Motions&quot;, M.A. Richards, R. Gordon and R. Van der Hilst, editors, 1999.<P>Bercovici, D., Generation of plate tectonics from&nbsp; lithosphere-mantle flow and void-volatile self-lubrication,&nbsp; Earth Planet. Sci. Lett., 154, 139-151, 1998.<P>Dumoulin, C., D. Bercovici,&nbsp; and P. Wessel, A continuous&nbsp; plate-tectonic model using geophysical data to estimate plate margin widths, with a seismicity based example, Geophys. J. Int., 133, 379--389, 1998.<P>Bercovici, D., Plate generation in&nbsp; a simple model of lithosphere-mantle flow with dynamic self-lubrication, Earth Planet. Sci. Lett., 144, 41--51, 1996.<P>Bercovici, D., On the purpose of toroidal flow in a convecting mantle,&nbsp; Geophys. Res. Lett.,&nbsp; 22, 3107--3110, 1995b.<P>Bercovici, D., A source-sink model of the generation of plate tectonics from non-Newtonian mantle flow,&nbsp; J. Geophys. Res., 100, 2013--2030,&nbsp; 1995a.<P>Bercovici, D. and P. Wessel, A continuous kinematic model of plate tectonic motions, Geophys. J. Int.,&nbsp; 119, 595--610, 1994.		<P>Bercovici, D., A simple model of plate generation from mantle flow,&nbsp; Geophys. J. Int., 114, 635--650, 1993.<BR>			<br>		<hr width="100%">		<font size="+2"><a name="dynamo"></a><b><font color="#3333FF">Report on DYNAMO</font></b></font>		<P><I>Gary A. Glatzmaier, Earth Sciences Department, University of California,
+Santa Cruz</I>		<P><I>Thomas T. Clune, Silicon Graphics Inc.</I>
+<P><I>Paul H. Roberts, Institute of Geophysics and Planetary Physics, University
+of California, Los Angeles</I>
+<P>A computer simulation of magnetic field generation by convection in
+the Earth's fluid outer core produces a time dependent field that, like
+the Earth's, is strongly dipole dominated outside the core and occasionally
+undergoes spontaneous dipole reversals.
+<P>The 3D spherical model solves the magnetohydrodynamic equations within
+the anelastic approximation. Because of limited spatial resolution, the
+viscous and thermal diffusivities crudely represent the transport of momentum
+and heat by unresolved eddies. An Earth-like heat flux imposed over the
+core-mantle boundary (CMB) controls the cooling rate of the core, which
+determines the vigor of the convection and intensity of the generated magnetic
+field. The Earth's rotation rate is essential for producing the sheared
+and helical fluid flows for the dynamo; it is also what makes the numerical
+method, which treats the Coriolis force implicitly, so challenging.
+<P>The DYNAMO code uses a spectral transform formulation based upon expansion
+in&nbsp; spherical harmonics and Chebyshev polynomials.&nbsp; The equations
+are integrated forward in time using a third-order Runge-Kutta scheme;
+nonlinear terms are treated explicitly and linear terms are treated implicitly.
+<P>The high-performance parallel code is based on a message passing paradigm.
+In the broadest terms, the parallelization strategy has been to perform
+the spectral transforms on data that is ``in processor'' while distributing
+the orthogonal directions among the processors in a load-balanced manner.
+Global memory transposes are then used to rearrange the data as necessary
+for each type of operation. The spectral transforms themselves are highly
+efficient operations (in terms of hardware utilization) on virtually all
+processors, but particularly so on cache-based hierarchical memory systems
+typical of modern parallel computers.
+<P>As part of NASA's Earth and Space Science High Performance Computing
+Cooperative Agreement, DYNAMO has been highly optimized for the Cray T3E.
+The T3E possesses an extremely low-latency, high-bandwidth network which
+is ideal for the global memory transposes used in spectral transform methods.
+Every effort has been made to maximize cache-reuse, reduce the number of
+communication packets, and to exploit the specialized&nbsp; E-registers
+for local and remote memory transfers. Because the computational load of
+the Legendre transforms is dominant for all but very low resolution cases,
+the time spent in transforms also dominates the time spent communicating,
+thereby enabling excellent scalability. DYNAMO has run on as many as 1490
+processors and attained performance in excess of 600 billion floating point
+operations per second (GFLOPS). For moderate grid resolutions suitable
+for our current research, DYNAMO&nbsp; typically achieves between 100 and
+200 GFLOPS on 512 processors of the T3E.
+<P>Several numerical simulations have been obtained with the Glatzmaier-Roberts
+model; they span over a million years using a numerical time step of 15
+days or less.&nbsp; Here we describe a medium resolution case with 49 radial
+levels (plus 17 in the inner core), 144 latitudinal levels, and 144 longitudinal
+levels. The magnetic energy, integrated through the core, is more than
+three orders of magnitude greater than the kinetic energy of the convection
+that maintains it.&nbsp; Maximum magnetic field intensity, in the deep
+interior of the core, can be 20 mT and maximum fluid velocity is typically
+about a millimeter per second.&nbsp; Although this is much less than, for
+example, atmospheric wind speeds, it is a million times greater than mantle
+convection.&nbsp; Convection of the dense metallic core fluid is so efficient
+that the maximum temperature variation (on a sphere of constant radius)
+is only about 0.001K.
+<P>Figure 10 shows a typical magnetic energy spectrum (in spherical harmonic degrees) for the field at the CMB for the Earth (out to degree 12) and for the Glatzmaier-Roberts simulation (to degree 95).&nbsp; (The Earth's core field is known only out to degree 12 because the crustal magnetic field significantly interferes for larger degrees.)&nbsp; Both spectra show the dipole (l=1) component dominating.&nbsp; Since the dipole part of the field decreases the least rapidly with distance from the core, the structure appears even more dipole dominated at the Earth's surface as i lustrated in Figure 2 where the radial component of the field is plotted in equal area projections.&nbsp; One can also see in Figure 2 that although including degrees 13 to 95 produces no detectable difference in the surface field, it makes a significant difference in the structure of the field at the CMB.&nbsp; This argues for much more small scale structure in the geomagnetic field at the CMB than is seen in the current degree 12 spectrum of the geomagnetic field. The intense concentrations of magnetic flux (core spots) seen in the simulated field at the CMB are somewhat similar to sun spots on the solar surface.<P><IMG SRC="fig1.gif" HEIGHT=560 WIDTH=552>		<P><b>Figure 10</b> <i>A snapshot of the magnetic energy density at the core-mantle boundary for today's Earth (solid circles, up to degree 12) and for the Glatzmaier-Roberts geodynamo simulation (open circles, up to degree 95).</i>		<P><IMG SRC="fig2.gif" HEIGHT=552 WIDTH=516>		<P><b>Figure 11</b> <i>The radial component of the magnetic field at the surface and at the core-mantle boundary for the Earth (up to degree 12) and for the Glatzmaier-Roberts simulation (up to degree 12 and up to degree 95). The surface field has been multiplied by 10 to give comparable color contrast.</i>		<P><B>Recent Publications</B>		<P>Glatzmaier, G.A., Coe, R.S., Hongre, L. and Roberts, P.H. The role of
+the Earth's mantle in controlling the frequency of geomagnetic reversals.
+Nature 401, 885-890 (1999).
+<P>Clune, T.C., Elliott, J.R., Miesch, M.S., Toomre, J. and Glatzmaier,
+G.A. Computational aspects of a code to study rotating turbulent convection
+in spherical shells.&nbsp; Parallel Computing 25, 361-380 (1999).
+<P>Roberts, P.H. and Glatzmaier, G.A. Theory and simulations of the geodynamo.
+Rev. Mod. Phys., submitted (1999).
+<P>Roberts, P.H. and Glatzmaier, G.A. A test of the frozen flux approximation
+using geodynamo simulations. Phil. Trans. Roy. Soc., submitted (1999).
+		<P>Glatzmaier, G.A. and Clune, T. Computational aspects of geodynamo simulations.
+Computing in Science and Engineering, submitted (1999).
+<BR>			<br>		<HR WIDTH="100%">		<a name="geodynamo"></a><b><font color="#3333FF"><font size=+2>Geodynamo Models</font></font></b>		<P><i>Peter Olson, Johns Hopkins University</i><BR>		<P><B>I. Technical Accomplishments:</B>		<P>In year 3 of the project we created and used a new workstation version
+of the DYNAMO code, along with user documentation and a graphical interface.
+The workstation version is based on the Boussinesq (incompressible fluid
+limit) version of the full code. It uses an improved explicit time step
+procedure, in which the Alfven waves in the boundary layers are numerically
+damped. This permits longer time steps, and allows for longer simulation
+times.&nbsp; The code is readily portable to any workstation or PC running
+UNIX or LINUX.&nbsp; The graphical interface is written in IDL (Interactive
+Data Language) and can be used on UNIX, Windows, or Mac platforms.
+<P><B>II. Scientific Accomplishments: A Systematic Parameter Study of Numerical
+Dynamos</B>
+<P>We have analyzed about 50 3D numerical dynamos driven by thermal convection
+in a rotating spherical shell with the geometry of the Earth's core (Olson,
+Christensen and Glatzmaier, 1999; Christensen, Olson and Glatzmaier, 1999).
+We examined the influence of rigid versus stress-free boundaries and, by
+varying the Ekman, Rayleigh, and Prandtl numbers, different combination
+of magnetic, thermal and viscous diffusivities. We find mostly dipole-dominated
+dynamo solutions, except at the highest Rayleigh numbers, where the dynamos
+are sometimes octupole&nbsp; dominated (see Figure 12 below).&nbsp; When
+low-pass filtered to mimic the filtering effect of the mantle on the magnetic
+field, several of the models exhibit magnetic field strucutures that resemble
+the geomagnetic field at the core-mantle boundary.
+<BR>			&nbsp;
+		<P><IMG SRC="POfig.gif" HEIGHT=419 WIDTH=525>		<p>			&nbsp;
+<b>Figure 12</b> <i>A comparison of numerical dynamos driven by thermal
+convection in rotating, electrically conducting fluid spheres. The left
+image in each panel shows contours of the radial component of the magnetic
+field on the outer boundary&nbsp; (radius R). The right image in each panel
+shows contours of the radial component of the fluid velocity at radius
+0.8R. Red colors indicate positive values and blue colors indicate negative
+values.&nbsp; <b>a:</b> quasi-stationary dipolar dynamo with azimuthally
+periodic convection at Ekman number E=0.001 and Rayleigh number 1.8 times
+critical. <b>b</b>: nondipolar dynamo at E=0.001 and Rayleigh number 14
+times critical. <b>c</b>: dipolar dynamo at E=0.0001 and Rayleigh number
+3.5 times critical. <b>d:</b> dipolar dynamo at E=0.0001 and Rayleigh number
+15 times critical. <b>e:</b> dipolar dynamo at E=0.0001, Rayleigh number
+11 times critical and&nbsp; magnetic Prandtl number 2. <b>f:</b> dipolar dynamo at E=0.0001, Rayleigh number 11 times critical and&nbsp; magnetic Prandtl number 0.5. Among these, d and f are most similar to the geodynamo.</i></p>		<P><b>Publications Supported by NASA HPCC (Year 3 - 1999)</b>		<p>Olson, P., U. Christensen, and G.A. Glatzmaier, Numerical modeling of
+the geodynamo:&nbsp; Mechanisms of field generation and equilibration,
+J. Geophys. Res., 104, 10.383-10,404, 1999.
+</p>		<P>Christensen, U., P. Olson and G.A. Glatzmaier, Numerical modelling of
+the geodynamo:&nbsp; a systematic parameter study, Geophys. J. Int., 138,
+393-409, 1999.
+		<P>Tackely, P., J.R. Baumgardner, G.A. Glatzmaier, P. Olson and T. Clume,
+Three-dimensional spherical simulations of convection in Earth's mantle
+and core using massively-parallel&nbsp; computers, Proc. High. Performance
+Computing Symposium-HPC'99 95-100, 1999.
+		<P>Olson, P. and J. Aurnou, A polar vortex in the Earth's core, Nature,
+402, 170-173, 1999.
+&nbsp;
+	</BODY>
+</HTML>

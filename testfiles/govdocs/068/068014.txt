@@ -1,0 +1,3656 @@
+diff -Nrc2 bash-1.14.4/.patchlevel bash-1.14.5/.patchlevel
+*** bash-1.14.4/.patchlevel	Wed Feb  1 11:29:20 1995
+--- bash-1.14.5/.patchlevel	Sat May 20 15:24:57 1995
+***************
+*** 1 ****
+! 4
+--- 1 ----
+! 5
+diff -Nrc2 bash-1.14.4/CWRU/sh-redir-hack bash-1.14.5/CWRU/sh-redir-hack
+*** bash-1.14.4/CWRU/sh-redir-hack	Wed Dec 31 19:00:00 1969
+--- bash-1.14.5/CWRU/sh-redir-hack	Thu May 12 10:43:50 1994
+***************
+*** 0 ****
+--- 1,15 ----
++ Add to `subshell' production in parse.y and recompile -DREDIRECTION_HACK to
++ get `< xx (command)' sh compatibility.
++ 
++ 	|	redirections '(' list ')'
++ 			{
++ #if defined (REDIRECTION_HACK)
++ 			  /* XXX - C News sh compatibility hack - XXX */
++ 			  $3->redirects = $1;
++ 			  $3->flags |= CMD_WANT_SUBSHELL;
++ 			  $$ = $3;
++ #else
++ 			  yyerror ();
++ 			  YYABORT;
++ #endif
++ 			}
+diff -Nrc2 bash-1.14.4/CWRU/sh-redirection-hack bash-1.14.5/CWRU/sh-redirection-hack
+*** bash-1.14.4/CWRU/sh-redirection-hack	Thu May 12 10:43:50 1994
+--- bash-1.14.5/CWRU/sh-redirection-hack	Wed Dec 31 19:00:00 1969
+***************
+*** 1,15 ****
+- Add to `subshell' production in parse.y and recompile -DREDIRECTION_HACK to
+- get `< xx (command)' sh compatibility.
+- 
+- 	|	redirections '(' list ')'
+- 			{
+- #if defined (REDIRECTION_HACK)
+- 			  /* XXX - C News sh compatibility hack - XXX */
+- 			  $3->redirects = $1;
+- 			  $3->flags |= CMD_WANT_SUBSHELL;
+- 			  $$ = $3;
+- #else
+- 			  yyerror ();
+- 			  YYABORT;
+- #endif
+- 			}
+--- 0 ----
+diff -Nrc2 bash-1.14.4/INSTALL bash-1.14.5/INSTALL
+*** bash-1.14.4/INSTALL	Fri Jul  8 09:21:22 1994
+--- bash-1.14.5/INSTALL	Thu May 18 17:05:09 1995
+***************
+*** 24,29 ****
+    3. Type `./bash' to see if the compile worked.
+  
+!   4. Type `make install bindir=/usr/gnu/bin' (or wherever you
+!      keep GNU binaries) to copy bash to your binaries directory.
+  
+  * Menu:
+--- 24,32 ----
+    3. Type `./bash' to see if the compile worked.
+  
+!   4. Type `make install prefix=/usr/gnu/' (or the appropriate root
+!      of your local GNU software installation tree) to copy bash to
+!      your binaries directory, assumed to be ${prefix}/bin.  This will
+!      also attempt to install the manual pages under ${prefix}/man
+!      and the info file under ${prefix}/info.
+  
+  * Menu:
+diff -Nrc2 bash-1.14.4/Makefile bash-1.14.5/Makefile
+*** bash-1.14.4/Makefile	Fri Jul  8 09:25:33 1994
+--- bash-1.14.5/Makefile	Sun Jun 11 14:41:48 1995
+***************
+*** 27,31 ****
+  # If all else fails, set CPPNAME=$(CC) -E
+  CPPNAME =
+! CPP     = `/bin/sh $(CPPMAGIC) $(GETCPPSYMS) "$(CPPNAME)"` -P
+  
+  CPP_MAKEFILE = $(srcdir)/cpp-Makefile
+--- 27,31 ----
+  # If all else fails, set CPPNAME=$(CC) -E
+  CPPNAME =
+! CPP     = `$(SHELL) $(CPPMAGIC) $(GETCPPSYMS) "$(CPPNAME)"` -P
+  
+  CPP_MAKEFILE = $(srcdir)/cpp-Makefile
+***************
+*** 91,99 ****
+  
+  tests DEFINES tags documentation: bash-Makefile directory-frob
+! 	$(MAKE) -f bash-Makefile $(MFLAGS) $(MAKEARGS) bindir=$(bindir) $@
+  
+! clean distclean realclean: bash-Makefile directory-frob
+  	rm -f .notified
+! 	$(MAKE) -f bash-Makefile $(MFLAGS) $(MAKEARGS) bindir=$(bindir) $@
+  
+  directory-frob:
+--- 91,99 ----
+  
+  tests DEFINES tags documentation: bash-Makefile directory-frob
+! 	$(MAKE) -f bash-Makefile $(MFLAGS) $(MAKEARGS) $@
+  
+! clean distclean realclean mostlyclean maintainer-clean: bash-Makefile directory-frob
+  	rm -f .notified
+! 	$(MAKE) -f bash-Makefile $(MFLAGS) $(MAKEARGS) $@
+  
+  directory-frob:
+diff -Nrc2 bash-1.14.4/NEWS bash-1.14.5/NEWS
+*** bash-1.14.4/NEWS	Tue Apr 11 15:47:53 1995
+--- bash-1.14.5/NEWS	Wed Jul 12 10:08:44 1995
+***************
+*** 1,97 ****
+! This file documents the bugs fixed between this release, bash-1.14.4,
+! and the last public bash release, 1.14.3.
+  
+  1.  Bugs fixed in Bash
+  
+! a.  The command history is now saved whenever an interactive shell exits,
+!     even if on hangup or error.
+  
+! b.  Newline is no longer escaped with a backslash by the filename completion
+!     quoting functions.
+  
+! c.  When building, `ranlib' is now searched for in the user's search path
+!     before attempting to find it in the file system.
+  
+! d.  `getopts' now saves state across calls to fix core dumps when parsing
+!     arguments other than the positional parameters.
+  
+! e.  The builtin getopt() has been greatly simplified, renamed sh_getopt()
+!     and is now compiled in on all machines.
+  
+! f.  The default PATH has been changed to remove the leading `.'.
+  
+! g.  The default MAILPATH needed to be changed for a few 4.4BSD-based systems.
+  
+! h.  User-changable CFLAGS can now modify all of the build parameters.
+  
+! i.  Fixed a typo that caused AFS to incorrectly report some files as
+!     executable.
+  
+! j.  Fixed a bug in pathname canonicalization that could cause core dumps.
+  
+! k.  Changes to the job control code to work around SCO kernel bugs
+!     (waitpid()).
+  
+! l.  Fixed compilation problems on machines that defined `const' in a system
+!     header file without defining `inline'.
+  
+! m.  New/changed machine descriptions:  BSD/OS 2.0, Irix 6.x, Amdahl UTS, SCO,
+!     Linux, Stratus FTX.
+  
+! n.  Fixes to make empty PS1 and PS2 work correctly.
+  
+! o.  The \[ and \] prompt escapes are not recognized unless readline has been
+!     compiled into the shell.
+  
+! p.  Fixed bad variable initialization that could cause core dumps on systems
+!     without varargs.
+  
+! q.  Fixed bug that caused `bash -c exit' to return incorrect exit status.
+! 
+! r.  Fixed bug that did not allow `PS4=' to suppress the execution trace
+!     display of `+'.
+! 
+! s.  Fixed bug so that quoting inside "${param[:][-?=+]word}" is honored.
+! 
+! t.  References without braces to unset positional parameters (`$5') now
+!     cause errors if set -u is on.
+! 
+! u.  Fixed bug so that the rhs of assignment statements is no longer word
+!     split.
+! 
+! v.  Changed calls to signal() to set_signal_handler() for Posix.1 semantics
+!     where available.
+! 
+! w.  Fixed bug that caused the exit trap to be passed to (...) subshells.
+! 
+! x.  $BASH is no longer auto-exported.
+! 
+! y.  Instances of globbing characters in completed filenames (`*', `?', `[')
+!     now cause the filename to be quoted.
+! 
+! z.  Fixed bug that caused an infinite loop if $PROMPT_COMMAND contained a
+!     syntax error.
+! 
+! aa. Bash no longer provides a default value for MAILPATH, but will search a
+!     default file for mail if MAILCHECK is set and MAIL and MAILPATH are not.
+  
+  2.  Bugs fixed in Readline
+  
+! a.  When listing filename completions, unprintable characters in filenames
+!     are now translated to ASCII
+! 
+! b.  Fixes to make empty prompt strings work correctly, instead of reusing
+!     the previously-displayed prompt.
+! 
+! c.  Use _SVR4_DISABLE if it is available and _POSIX_VDISABLE is not defined
+!     to turn off meanings of special characters like ^C
+! 
+! d.  Fixed up some functions called with incorrect arguments.
+  
+! e.  Fixed bug with `:%' history modifier so that it now inserts the
+!     string matched by the most recent !?string? search, not the string
+!     searched for.
+  
+! f.  Fixed a bug in the line updating functions that caused stray characters
+!     to be left on lines after the first if characters are removed from a
+!     wrapped line so that the line is exactly as long as the screen width.
+--- 1,64 ----
+! This file documents the bugs fixed between this release, bash-1.14.5,
+! and the last public bash release, 1.14.4.
+  
+  1.  Bugs fixed in Bash
+  
+! a.  Fix to `fc' so that `fc -l' works when fewer than 16 commands are in
+!     the history list.
+  
+! b.  Fixes to the builtin getopt(3) and `getopts' to complete conversion
+!     from GNU glibc getopt() to internal bash getopt.
+  
+! c.  Changes to `make install' to bring it closer to GNU guidelines.
+  
+! d.  Fixes to the expansion code so that double quotes on the rhs of
+!     ${variableOPword} are handled better.
+  
+! e.  New/changed machines.h entries: Fujitsu UXP/M, Tandem
+  
+! f.  Changes to cpp-Makefile and the rest of the Makefiles to more closely
+!     adhere to the GNU coding standards.  In particular, all recommended
+!     targets should now exist.
+  
+! g.  `read' now correctly strips trailing IFS whitespace from the input line.
+  
+! h.  Reworked the documentation Makefile so that it does not use `texindex'
+!     and `tex', but rather `texi2dvi', as per the GNU coding standards
+  
+! i.  If SIGINT is not trapped, a process dying of SIGINT will cause the shell
+!     to act as if it had received SIGINT and break out of for, while, and
+!     until loops.
+  
+! j.  Fixed a bug that caused the `select' prompt to be garbled under
+!     certain conditions.
+  
+! k.  Fixed a bug that made `declare +r variable' turn off the readonly
+!     attribute for a variable.
+  
+! l.  Fixed a bug that prevented `declare -f -r function' (or other attributes)
+!     from changing the function's attributes.
+  
+! m.  Fixed a job control bug that allowed `fg' and `bg' to restart jobs
+!     that had terminated.
+  
+! n.  The pathname canonicalization code now handles filenames with backslashes
+!     embedded in them more reasonably.
+  
+! o.  Fixed a bug that caused the expression evaluator to occasionally core
+!     dump when printing an error message.
+  
+! p.  Fixed a bug that caused "$*" to sometimes leave a stray ^B in the
+!     expansion when there were no positional parameters.
+  
+! q.  Fixed a bug that caused pre-3.2v4.x SCO machines to hang waiting for
+!     waitpid(2) to return.
+  
+  2.  Bugs fixed in Readline
+  
+! a.  Fix to the display code so that null prompts don't cause core dumps.
+  
+! b.  Readline now recognizes that an $LC_CTYPE value of `ISO-8859-1' means
+!     that it should go into eight-bit mode.
+  
+! c.  Fixed a completion bug that removed user-supplied opening quotes in
+!     filenames under some circumstances.
+diff -Nrc2 bash-1.14.4/builtins/Makefile bash-1.14.5/builtins/Makefile
+*** bash-1.14.4/builtins/Makefile	Mon Jan 30 12:36:03 1995
+--- bash-1.14.5/builtins/Makefile	Sun Jun 11 14:59:20 1995
+***************
+*** 19,23 ****
+  	$(RM) $@
+  	./$(MKBUILTINS) $(DIRECTDEFINE) $<
+! 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $*.c
+  	$(RM) $*.c
+  
+--- 19,23 ----
+  	$(RM) $@
+  	./$(MKBUILTINS) $(DIRECTDEFINE) $<
+! 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $*.c || ( $(RM) $*.c ; exit 1 )
+  	$(RM) $*.c
+  
+***************
+*** 92,96 ****
+  
+  clean:
+! 	$(RM) $(OFILES) $(CREATED_FILES) $(MKBUILTINS) libbuiltins.a
+  
+  alias.o: alias.def
+--- 92,102 ----
+  
+  clean:
+! 	$(RM) $(OFILES) $(CREATED_FILES) $(MKBUILTINS)
+! 
+! mostlyclean:
+! 	$(RM) $(OFILES) libbuiltins.a
+! 
+! distclean realclean maintainer-clean: clean
+! 	$(RM) libbuiltins.a
+  
+  alias.o: alias.def
+diff -Nrc2 bash-1.14.4/builtins/declare.def bash-1.14.5/builtins/declare.def
+*** bash-1.14.4/builtins/declare.def	Tue May 31 15:59:25 1994
+--- bash-1.14.5/builtins/declare.def	Mon Jun  5 17:37:10 1995
+***************
+*** 219,229 ****
+  	    {
+  	      SHELL_VAR *find_function (), *funvar;
+  	      funvar = find_function (name);
+  
+  	      if (funvar)
+  		{
+! 		  char *result = named_function_string
+! 		    (name, (COMMAND *)function_cell (funvar), 1);
+! 		  printf ("%s\n", result);
+  		}
+  	      else
+--- 219,245 ----
+  	    {
+  	      SHELL_VAR *find_function (), *funvar;
++ 
+  	      funvar = find_function (name);
+  
+  	      if (funvar)
+  		{
+! 		  if (readonly_p (funvar) && (flags_off & att_readonly))
+! 		    {
+! 		      builtin_error ("%s: readonly function", name);
+! 		      any_failed++;
+! 		      NEXT_VARIABLE ();
+! 		    }
+! 
+! 		  if (flags_on == att_function && flags_off == 0)
+! 		    {
+! 		      char *result = named_function_string
+! 				(name, (COMMAND *)function_cell (funvar), 1);
+! 		      printf ("%s\n", result);
+! 		    }
+! 		  else
+! 		    {
+! 		      funvar->attributes |= flags_on;
+! 		      funvar->attributes &= ~flags_off;
+! 		    }
+  		}
+  	      else
+***************
+*** 241,251 ****
+  	    var = bind_variable (name, "");
+  
+! 	  /* We are not allowed to rebind readonly variables that
+! 	     already are readonly unless we are turning off the
+! 	     readonly bit. */
+! 	  if (flags_off & att_readonly)
+! 	    flags_on &= ~att_readonly;
+! 
+! 	  if (value && readonly_p (var) && (!(flags_off & att_readonly)))
+  	    {
+  	      builtin_error ("%s: readonly variable", name);
+--- 257,261 ----
+  	    var = bind_variable (name, "");
+  
+! 	  if (readonly_p (var) && (flags_off & att_readonly))
+  	    {
+  	      builtin_error ("%s: readonly variable", name);
+diff -Nrc2 bash-1.14.4/builtins/fc.def bash-1.14.5/builtins/fc.def
+*** bash-1.14.4/builtins/fc.def	Sun Jun 26 20:56:49 1994
+--- bash-1.14.5/builtins/fc.def	Tue Apr 25 11:19:57 1995
+***************
+*** 296,299 ****
+--- 296,301 ----
+  	  histend = last_hist;
+  	  histbeg = histend - 16;
++ 	  if (histbeg < 0)
++ 	    histbeg = 0;
+  	}
+        else
+diff -Nrc2 bash-1.14.4/builtins/getopt.c bash-1.14.5/builtins/getopt.c
+*** bash-1.14.4/builtins/getopt.c	Sat Feb 25 19:00:16 1995
+--- bash-1.14.5/builtins/getopt.c	Thu Apr 27 10:58:24 1995
+***************
+*** 203,207 ****
+  }
+  
+! int
+  sh_getopt_restore_state (argv)
+       char **argv;
+--- 203,207 ----
+  }
+  
+! void
+  sh_getopt_restore_state (argv)
+       char **argv;
+diff -Nrc2 bash-1.14.4/builtins/getopt.h bash-1.14.5/builtins/getopt.h
+*** bash-1.14.4/builtins/getopt.h	Thu Jun 10 09:49:41 1993
+--- bash-1.14.5/builtins/getopt.h	Mon Apr 24 11:05:20 1995
+***************
+*** 16,26 ****
+     Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
+  
+  #ifndef _GETOPT_H
+  #define _GETOPT_H 1
+  
+- #ifdef	__cplusplus
+- extern "C" {
+- #endif
+- 
+  /* For communication from `getopt' to the caller.
+     When `getopt' finds an option that takes an argument,
+--- 16,24 ----
+     Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
+  
++ /* XXX THIS HAS BEEN MODIFIED FOR INCORPORATION INTO BASH XXX */
++ 
+  #ifndef _GETOPT_H
+  #define _GETOPT_H 1
+  
+  /* For communication from `getopt' to the caller.
+     When `getopt' finds an option that takes an argument,
+***************
+*** 29,33 ****
+     each non-option ARGV-element is returned here.  */
+  
+! extern char *optarg;
+  
+  /* Index in ARGV of the next element to be scanned.
+--- 27,31 ----
+     each non-option ARGV-element is returned here.  */
+  
+! extern char *sh_optarg;
+  
+  /* Index in ARGV of the next element to be scanned.
+***************
+*** 40,129 ****
+     non-option elements that the caller should itself scan.
+  
+!    Otherwise, `optind' communicates from one call to the next
+     how much of ARGV has been scanned so far.  */
+  
+! extern int optind;
+  
+  /* Callers store zero here to inhibit the error message `getopt' prints
+     for unrecognized options.  */
+  
+! extern int opterr;
+  
+  /* Set to an option character which was unrecognized.  */
+  
+! extern int optopt;
+  
+! /* Describe the long-named options requested by the application.
+!    The LONG_OPTIONS argument to getopt_long or getopt_long_only is a vector
+!    of `struct option' terminated by an element containing a name which is
+!    zero.
+! 
+!    The field `has_arg' is:
+!    no_argument		(or 0) if the option does not take an argument,
+!    required_argument	(or 1) if the option requires an argument,
+!    optional_argument 	(or 2) if the option takes an optional argument.
+! 
+!    If the field `flag' is not NULL, it points to a variable that is set
+!    to the value given in the field `val' when the option is found, but
+!    left unchanged if the option is not found.
+! 
+!    To have a long-named option do something other than set an `int' to
+!    a compiled-in constant, such as set a value from `optarg', set the
+!    option's `flag' field to zero and its `val' field to a nonzero
+!    value (the equivalent single-letter option character, if there is
+!    one).  For long options that have a zero `flag' field, `getopt'
+!    returns the contents of the `val' field.  */
+! 
+! struct option
+! {
+! #if	__STDC__
+!   const char *name;
+! #else
+!   char *name;
+! #endif
+!   /* has_arg can't be an enum because some compilers complain about
+!      type mismatches in all the code that assumes it is an int.  */
+!   int has_arg;
+!   int *flag;
+!   int val;
+! };
+! 
+! /* Names for the values of the `has_arg' field of `struct option'.  */
+! 
+! #define	no_argument		0
+! #define required_argument	1
+! #define optional_argument	2
+! 
+! #if __STDC__
+! #if defined(__GNU_LIBRARY__)
+! /* Many other libraries have conflicting prototypes for getopt, with
+!    differences in the consts, in stdlib.h.  To avoid compilation
+!    errors, only prototype getopt for the GNU C library.  */
+! extern int getopt (int argc, char *const *argv, const char *shortopts);
+! #else /* not __GNU_LIBRARY__ */
+! extern int getopt ();
+! #endif /* not __GNU_LIBRARY__ */
+! extern int getopt_long (int argc, char *const *argv, const char *shortopts,
+! 		        const struct option *longopts, int *longind);
+! extern int getopt_long_only (int argc, char *const *argv,
+! 			     const char *shortopts,
+! 		             const struct option *longopts, int *longind);
+! 
+! /* Internal only.  Users should not call this directly.  */
+! extern int _getopt_internal (int argc, char *const *argv,
+! 			     const char *shortopts,
+! 		             const struct option *longopts, int *longind,
+! 			     int long_only);
+! #else /* not __STDC__ */
+! extern int getopt ();
+! extern int getopt_long ();
+! extern int getopt_long_only ();
+! 
+! extern int _getopt_internal ();
+! #endif /* not __STDC__ */
+! 
+! #ifdef	__cplusplus
+! }
+! #endif
+  
+  #endif /* _GETOPT_H */
+--- 38,57 ----
+     non-option elements that the caller should itself scan.
+  
+!    Otherwise, `sh_optind' communicates from one call to the next
+     how much of ARGV has been scanned so far.  */
+  
+! extern int sh_optind;
+  
+  /* Callers store zero here to inhibit the error message `getopt' prints
+     for unrecognized options.  */
+  
+! extern int sh_opterr;
+  
+  /* Set to an option character which was unrecognized.  */
+  
+! extern int sh_optopt;
+  
+! extern int sh_getopt ();
+! extern void sh_getopt_restore_state ();
+  
+  #endif /* _GETOPT_H */
+diff -Nrc2 bash-1.14.4/builtins/getopts.def bash-1.14.5/builtins/getopts.def
+*** bash-1.14.4/builtins/getopts.def	Sat Feb 25 20:49:46 1995
+--- bash-1.14.5/builtins/getopts.def	Mon Apr 24 11:12:41 1995
+***************
+*** 84,88 ****
+       int newind;
+  {
+!   optind = newind;
+  }
+  
+--- 84,88 ----
+       int newind;
+  {
+!   sh_optind = newind;
+  }
+  
+***************
+*** 142,148 ****
+    if (special_error)
+      {
+!       old_opterr = opterr;
+        optstr++;
+!       opterr = 0;		/* suppress diagnostic messages */
+      }
+  
+--- 142,148 ----
+    if (special_error)
+      {
+!       old_opterr = sh_opterr;
+        optstr++;
+!       sh_opterr = 0;		/* suppress diagnostic messages */
+      }
+  
+***************
+*** 152,156 ****
+        t = argv[0];
+        argv[0] = dollar_vars[0];
+!       ret = getopt (argc, argv, optstr);
+        argv[0] = t;
+      }
+--- 152,156 ----
+        t = argv[0];
+        argv[0] = dollar_vars[0];
+!       ret = sh_getopt (argc, argv, optstr);
+        argv[0] = t;
+      }
+***************
+*** 160,164 ****
+  
+        for (i = 0; dollar_vars[i]; i++);
+!       ret = getopt (i, dollar_vars, optstr);
+      }
+    else
+--- 160,164 ----
+  
+        for (i = 0; dollar_vars[i]; i++);
+!       ret = sh_getopt (i, dollar_vars, optstr);
+      }
+    else
+***************
+*** 176,190 ****
+          v[i] = words->word->word;
+        v[i] = (char *)NULL;
+!       ret = getopt (i, v, optstr);
+        free (v);
+      }
+  
+    if (special_error)
+!     opterr = old_opterr;
+  
+    /* Set the OPTIND variable in any case, to handle "--" skipping. */
+!   if (optind < 10)
+      {
+!       numval[14] = optind + '0';
+        numval[15] = '\0';
+        i = 14;
+--- 176,190 ----
+          v[i] = words->word->word;
+        v[i] = (char *)NULL;
+!       ret = sh_getopt (i, v, optstr);
+        free (v);
+      }
+  
+    if (special_error)
+!     sh_opterr = old_opterr;
+  
+    /* Set the OPTIND variable in any case, to handle "--" skipping. */
+!   if (sh_optind < 10)
+      {
+!       numval[14] = sh_optind + '0';
+        numval[15] = '\0';
+        i = 14;
+***************
+*** 193,197 ****
+      {
+        numval[i = 15] = '\0';
+!       n = optind;
+        do
+  	{
+--- 193,197 ----
+      {
+        numval[i = 15] = '\0';
+!       n = sh_optind;
+        do
+  	{
+***************
+*** 204,215 ****
+    /* If an error occurred, decide which one it is and set the return
+       code appropriately.  In all cases, the option character in error
+!      is in OPTOPT.  If an illegal option was encountered, OPTARG is
+       NULL.  If a required option argument was missing, OPTARG points
+       to a NULL string (that is, optarg[0] == 0). */
+    if (ret == '?')
+      {
+!       if (optarg == NULL)
+  	ret = G_ILLEGAL_OPT;
+!       else if (optarg[0] == '\0')
+  	ret = G_ARG_MISSING;
+      }
+--- 204,215 ----
+    /* If an error occurred, decide which one it is and set the return
+       code appropriately.  In all cases, the option character in error
+!      is in SH_OPTOPT.  If an illegal option was encountered, OPTARG is
+       NULL.  If a required option argument was missing, OPTARG points
+       to a NULL string (that is, optarg[0] == 0). */
+    if (ret == '?')
+      {
+!       if (sh_optarg == NULL)
+  	ret = G_ILLEGAL_OPT;
+!       else if (sh_optarg[0] == '\0')
+  	ret = G_ARG_MISSING;
+      }
+***************
+*** 230,234 ****
+        if (special_error)
+  	{
+! 	  strval[0] = (char) optopt;
+  	  strval[1] = '\0';
+  	  bind_variable ("OPTARG", strval);
+--- 230,234 ----
+        if (special_error)
+  	{
+! 	  strval[0] = (char) sh_optopt;
+  	  strval[1] = '\0';
+  	  bind_variable ("OPTARG", strval);
+***************
+*** 248,252 ****
+  	  bind_variable (name, strval);
+  
+! 	  strval[0] = (char) optopt;
+  	  strval[1] = '\0';
+  	  bind_variable ("OPTARG", strval);
+--- 248,252 ----
+  	  bind_variable (name, strval);
+  
+! 	  strval[0] = (char) sh_optopt;
+  	  strval[1] = '\0';
+  	  bind_variable ("OPTARG", strval);
+***************
+*** 262,266 ****
+      }			
+  
+!   bind_variable ("OPTARG", optarg);
+  
+    strval[0] = (char) ret;
+--- 262,266 ----
+      }			
+  
+!   bind_variable ("OPTARG", sh_optarg);
+  
+    strval[0] = (char) ret;
+diff -Nrc2 bash-1.14.4/builtins/kill.def bash-1.14.5/builtins/kill.def
+*** bash-1.14.4/builtins/kill.def	Thu Apr 14 09:23:24 1994
+--- bash-1.14.5/builtins/kill.def	Wed Jun  7 10:13:59 1995
+***************
+*** 40,43 ****
+--- 40,44 ----
+  #endif /* !errno */
+  
++ #include "../bashtypes.h"
+  #include "../shell.h"
+  #include "../trap.h"
+diff -Nrc2 bash-1.14.4/builtins/read.def bash-1.14.5/builtins/read.def
+*** bash-1.14.4/builtins/read.def	Mon Jan 30 12:31:14 1995
+--- bash-1.14.5/builtins/read.def	Thu May  4 15:50:50 1995
+***************
+*** 244,247 ****
+--- 244,254 ----
+  	  return (EXECUTION_FAILURE);
+  	}
++ 
++       /* This has to be done this way rather than using string_list
++ 	 and list_string because Posix.2 says that the last variable gets the
++ 	 remaining words and their intervening separators. */
++       input_string = strip_trailing_ifs_whitespace (input_string, ifs_chars,
++ 						      saw_escape);
++ 
+        if (saw_escape)
+  	{
+diff -Nrc2 bash-1.14.4/cpp-Makefile bash-1.14.5/cpp-Makefile
+*** bash-1.14.4/cpp-Makefile	Thu Apr  6 16:44:43 1995
+--- bash-1.14.5/cpp-Makefile	Sun Jun 11 14:44:05 1995
+***************
+*** 67,72 ****
+  prefix = /usr/local
+  
+- /**/#prefix = @prefix@
+- 
+  exec_prefix = $(prefix)
+  bindir = $(exec_prefix)/bin
+--- 67,70 ----
+***************
+*** 85,94 ****
+  
+  srcdir = .
+- /**/#srcdir = @srcdir@
+  
+  VPATH = .:$(srcdir)
+  
+- /**/#incdir = @incdir@
+- 
+  /* If you have purify, and want to use it, uncomment this definition or
+     run the make as `make -f bash-Makefile bash PURIFY=purify'. */
+--- 83,89 ----
+***************
+*** 156,161 ****
+  AR = ar
+  
+! INSTALL_PROGRAM = install -c
+! INSTALL_DATA = install -c -m 644
+  
+  COMPRESS = gzip
+--- 151,157 ----
+  AR = ar
+  
+! INSTALL = $(SUPPORT_SRC)install.sh
+! INSTALL_PROGRAM = $(INSTALL) -c
+! INSTALL_DATA = $(INSTALL) -c -m 644
+  
+  COMPRESS = gzip
+***************
+*** 722,726 ****
+  /**/# Rules for cleaning the readline and termcap sources.
+  #if defined (HAVE_READLINE_SOURCE)
+! CLEAN_READLINE = (cd $(RL_LIBDIR); $(MAKE) $(MFLAGS) clean)
+  #else
+  CLEAN_READLINE = :
+--- 718,722 ----
+  /**/# Rules for cleaning the readline and termcap sources.
+  #if defined (HAVE_READLINE_SOURCE)
+! CLEAN_READLINE = (cd $(RL_LIBDIR); $(MAKE) $(MFLAGS) $@)
+  #else
+  CLEAN_READLINE = :
+***************
+*** 729,733 ****
+  #if defined (HAVE_HISTORY_SOURCE)
+  #  if !defined (READLINE)
+! CLEAN_HISTORY = (cd $(HIST_LIBDIR); $(MAKE) $(MFLAGS) clean)
+  #  else
+  CLEAN_HISTORY = :
+--- 725,729 ----
+  #if defined (HAVE_HISTORY_SOURCE)
+  #  if !defined (READLINE)
+! CLEAN_HISTORY = (cd $(HIST_LIBDIR); $(MAKE) $(MFLAGS) $@)
+  #  else
+  CLEAN_HISTORY = :
+***************
+*** 736,740 ****
+  
+  #if defined (HAVE_TERMCAP_SOURCE)
+! CLEAN_TERMCAP = (cd $(TERM_LIBDIR); $(MAKE) $(MFLAGS) clean)
+  #else
+  CLEAN_TERMCAP = :
+--- 732,736 ----
+  
+  #if defined (HAVE_TERMCAP_SOURCE)
+! CLEAN_TERMCAP = (cd $(TERM_LIBDIR); $(MAKE) $(MFLAGS) $@)
+  #else
+  CLEAN_TERMCAP = :
+***************
+*** 742,746 ****
+  
+  #if defined (USE_GLOB_LIBRARY)
+! CLEAN_GLOB = (cd $(GLOB_LIBDIR); $(MAKE) $(MFLAGS) clean)
+  #else
+  CLEAN_GLOB = :
+--- 738,742 ----
+  
+  #if defined (USE_GLOB_LIBRARY)
+! CLEAN_GLOB = (cd $(GLOB_LIBDIR); $(MAKE) $(MFLAGS) $@)
+  #else
+  CLEAN_GLOB = :
+***************
+*** 748,752 ****
+  
+  #if defined (HAVE_TILDE_SOURCE)
+! CLEAN_TILDE = (cd $(TILDE_LIBDIR); $(MAKE) $(MFLAGS) clean)
+  #else
+  CLEAN_TILDE = :
+--- 744,748 ----
+  
+  #if defined (HAVE_TILDE_SOURCE)
+! CLEAN_TILDE = (cd $(TILDE_LIBDIR); $(MAKE) $(MFLAGS) $@)
+  #else
+  CLEAN_TILDE = :
+***************
+*** 754,758 ****
+  
+  #if defined (USE_GNU_MALLOC_LIBRARY)
+! CLEAN_MALLOC = (cd $(MALLOC_LIBDIR); $(MAKE) $(MFLAGS) clean)
+  #else
+  CLEAN_MALLOC = :
+--- 750,754 ----
+  
+  #if defined (USE_GNU_MALLOC_LIBRARY)
+! CLEAN_MALLOC = (cd $(MALLOC_LIBDIR); $(MAKE) $(MFLAGS) $@)
+  #else
+  CLEAN_MALLOC = :
+***************
+*** 919,927 ****
+  	   $(SIGLIST) $(GETCWD) version.o $(RL_SUPPORT_OBJ) $(BUILTINS_LIB)
+  
+- #if defined (LOAD_BUILTIN)
+- LOAD_DEF = $(DEFDIR)load.def
+- LOAD_OBJ = $(DEFDIR)load.o
+- #endif /* LOAD_BUILTIN */
+- 
+  /**/# Where the source code of the shell builtins resides.
+  BUILTIN_SRCDIR=$(srcdir)/builtins/
+--- 915,918 ----
+***************
+*** 1003,1007 ****
+  
+  CREATED_SUPPORT = $(ENDIAN_OUTPUT) $(SIGNAMES_OUTPUT) sysdefs.h \
+! 		  $(SDIR)getcppsyms recho tests/recho
+  
+  SUPPORT = configure $(ENDIAN_SUPPORT) $(SIGNAMES_SUPPORT) $(SCRIPTS_SUPPORT) \
+--- 994,998 ----
+  
+  CREATED_SUPPORT = $(ENDIAN_OUTPUT) $(SIGNAMES_OUTPUT) sysdefs.h \
+! 		  $(SDIR)getcppsyms recho tests/recho tests/printenv
+  
+  SUPPORT = configure $(ENDIAN_SUPPORT) $(SIGNAMES_SUPPORT) $(SCRIPTS_SUPPORT) \
+***************
+*** 1439,1445 ****
+  		@$(MKTARFILE) +notar $(Machine) $(OS) $(THINGS_TO_TAR)
+  
+! install:	.made
+! 		-if [ -f $(bindir)/$(Program) ]; \
+! 		  then mv $(bindir)/$(Program) $(bindir)/$(Program).old; \
+  		fi
+  		$(INSTALL_PROGRAM) $(Program) $(bindir)/$(Program)
+--- 1430,1442 ----
+  		@$(MKTARFILE) +notar $(Machine) $(OS) $(THINGS_TO_TAR)
+  
+! installdirs:
+! 		@${SHELL} $(SUPPORT_SRC)mkdirs $(bindir)
+! 		@${SHELL} $(SUPPORT_SRC)mkdirs $(mandir) $(man3dir)
+! 		@${SHELL} $(SUPPORT_SRC)mkdirs $(infodir)
+! 
+! install:	.made installdirs documentation
+! 		-if [ -f $(bindir)/$(Program) ]; then \
+! 		  rm -f $(bindir)/$(Program).old ;\
+! 		  ln $(bindir)/$(Program) $(bindir)/$(Program).old; \
+  		fi
+  		$(INSTALL_PROGRAM) $(Program) $(bindir)/$(Program)
+***************
+*** 1448,1457 ****
+  		fi
+  		$(INSTALL_PROGRAM) bashbug $(bindir)/bashbug
+- 		$(RM) installed-$(Program)
+- 		-ln -s $(bindir)/$(Program) installed-$(Program)
+  		( cd $(DOCDIR) ; $(MAKE) $(MFLAGS) mandir=$(mandir) \
+! 			man3dir=$(man3dir) infodir=$(infodir) \
+! 			INSTALL_PROGRAM="${INSTALL_PROGRAM}" \
+! 			INSTALL_DATA="${INSTALL_DATA}" $@ )
+  
+  uninstall:	.made
+--- 1445,1450 ----
+  		fi
+  		$(INSTALL_PROGRAM) bashbug $(bindir)/bashbug
+  		( cd $(DOCDIR) ; $(MAKE) $(MFLAGS) mandir=$(mandir) \
+! 			man3dir=$(man3dir) infodir=$(infodir) $@ )
+  
+  uninstall:	.made
+***************
+*** 1482,1490 ****
+  		$(MAKE) -f $(srcdir)/Makefile $(MFLAGS) srcdir=$(srcdir)
+  
+! texindex:	force
+! 		build_lib_in_dir($(LIBPATH)doc-support, texindex, $${topdir}/lib/doc-support, $${topdir}/lib/doc-support/Makefile)
+! 
+! documentation:  force texindex
+! 		(cd $(DOCDIR); $(MAKE) $(MFLAGS) CFLAGS='$(CCFLAGS)')
+  
+  force:
+--- 1475,1480 ----
+  		$(MAKE) -f $(srcdir)/Makefile $(MFLAGS) srcdir=$(srcdir)
+  
+! documentation:  force
+! 		(cd $(DOCDIR); $(MAKE) $(MFLAGS))
+  
+  force:
+***************
+*** 1496,1506 ****
+  		ctags -x $(SOURCES) $(BUILTIN_C_SRC) $(LIBRARY_SOURCE) > $@
+  
+! clean:
+  		$(RM) $(OBJECTS) $(Program) bashbug ansi-Makefile *.aux
+  		$(RM) .build .made .machine version.h
+! 		$(RM) $(CREATED_SUPPORT) bash-Makefile
+  		$(RM) tags TAGS
+! 		(cd $(DOCDIR); $(MAKE) $(MFLAGS) clean)
+! 		(cd builtins; $(MAKE) $(MFLAGS) clean)
+  		$(CLEAN_READLINE) ;
+  		$(CLEAN_HISTORY) ;
+--- 1486,1501 ----
+  		ctags -x $(SOURCES) $(BUILTIN_C_SRC) $(LIBRARY_SOURCE) > $@
+  
+! basic-clean:
+  		$(RM) $(OBJECTS) $(Program) bashbug ansi-Makefile *.aux
+  		$(RM) .build .made .machine version.h
+! 		$(RM) $(CREATED_SUPPORT)
+! 		$(RM) tags TAGS
+! 
+! mostlyclean:
+! 		$(RM) $(OBJECTS) $(Program) bashbug
+! 		$(RM) .build .made .machine version.h
+  		$(RM) tags TAGS
+! 		(cd $(DOCDIR) && $(MAKE) $(MFLAGS) $@ )
+! 		(cd builtins && $(MAKE) $(MFLAGS) $@ )
+  		$(CLEAN_READLINE) ;
+  		$(CLEAN_HISTORY) ;
+***************
+*** 1510,1523 ****
+  		$(CLEAN_MALLOC) ;
+  
+! distclean:	clean
+! 		$(RM) installed-bash
+  
+! realclean:	clean
+! 		$(RM) y.tab.c y.tab.h parser-built installed-bash
+  
+  recho:		$(SUPPORT_SRC)recho.c
+  	@$(CC) -o $@ $(SUPPORT_SRC)recho.c
+  
+! tests:		force $(Program) recho
+  	@cp recho $(SUPPORT_SRC)printenv tests
+  	( cd tests ; sh run-all )
+--- 1505,1535 ----
+  		$(CLEAN_MALLOC) ;
+  
+! distclean clean:	basic-clean
+! 		(cd $(DOCDIR) && $(MAKE) $(MFLAGS) $@ )
+! 		(cd builtins && $(MAKE) $(MFLAGS) $@ )
+! 		$(CLEAN_READLINE) ;
+! 		$(CLEAN_HISTORY) ;
+! 		$(CLEAN_TERMCAP) ;
+! 		$(CLEAN_GLOB) ;
+! 		$(CLEAN_TILDE) ;
+! 		$(CLEAN_MALLOC) ;
+! 		$(RM) bash-Makefile
+  
+! realclean maintainer-clean:	basic-clean
+! 		$(RM) y.tab.c y.tab.h parser-built
+! 		(cd $(DOCDIR) && $(MAKE) $(MFLAGS) $@ )
+! 		(cd builtins && $(MAKE) $(MFLAGS) $@ )
+! 		$(CLEAN_READLINE) ;
+! 		$(CLEAN_HISTORY) ;
+! 		$(CLEAN_TERMCAP) ;
+! 		$(CLEAN_GLOB) ;
+! 		$(CLEAN_TILDE) ;
+! 		$(CLEAN_MALLOC) ;
+! 		$(RM) bash-Makefile
+  
+  recho:		$(SUPPORT_SRC)recho.c
+  	@$(CC) -o $@ $(SUPPORT_SRC)recho.c
+  
+! tests check:		force $(Program) recho
+  	@cp recho $(SUPPORT_SRC)printenv tests
+  	( cd tests ; sh run-all )
+diff -Nrc2 bash-1.14.4/documentation/FAQ bash-1.14.5/documentation/FAQ
+*** bash-1.14.4/documentation/FAQ	Wed Dec 31 19:00:00 1969
+--- bash-1.14.5/documentation/FAQ	Mon May 15 14:46:47 1995
+***************
+*** 0 ****
+--- 1,756 ----
++ This document contains a set of frequently-asked questions concerning
++ Bash, the GNU Bourne-Again Shell.  Bash is a freely-available command
++ interpreter with advanced features for both interactive use and shell
++ programming.
++ 
++ Another good source of basic information about shells is the collection
++ of FAQ articles periodically posted to comp.unix.shell.
++ 
++ Questions and comments concerning the document should be set to
++ chet@po.cwru.edu.
++ 
++ Contents:
++ 1)  What is it?
++ 2)  What's the latest version?
++ 3)  Where can I get it?
++ 4)  What's the `Posix 1003.2 standard'?
++ 5)  On what machines will bash run?
++ 6)  How does bash differ from sh, the Bourne shell?
++ 7)  How does bash differ from the Korn shell?
++ 8)  What is the bash `posix mode'?
++ 9)  How can I build bash with gcc?
++ 10) Why does bash run a different version of `command' than
++     `which command' says it will?
++ 11) How can I make my csh aliases work when I convert to bash?
++ 12) Now that I've converted from ksh to bash, are there equivalents to
++     ksh features like autoloaded functions and the `whence' command?
++ 13) Why is the bash builtin `test' slightly different from /bin/test?
++ 14) Why does bash sometimes say `Broken pipe'?
++ 15) How can I get bash to read and display eight-bit characters?
++ 16) Why can't I use command line editing in my `cmdtool'?
++ 17) How do I write a function `x' to replace builtin command `x', but
++     still invoke the command from within the function?
++ 18) When I have terminal escape sequences in my prompt, why does bash
++     wrap lines at the wrong column?
++ 19) I built bash on Solaris 2.  Why do globbing expansions chop off the
++     first few characters of each filename?
++ 20) Why doesn't bash treat brace expansions exactly like csh?
++ 21) Why does bash dump core after I interrupt username completion?
++ 22) I'm running SVR4.2.  Why is the line erased every time I type `@'?
++ 23) How can I find the value of a shell variable whose name is the value
++     of another shell variable?
++ 24) If I pipe the output of a command into `read variable', why doesn't
++     the output show up in $variable when the read command finishes?
++ 25) I just changed my shell to bash, and now I can't FTP into my machine.
++     Why not?
++ 26) I have a bunch of shell scripts that use backslash-escaped characters
++     in arguments to `echo'.  Bash doesn't interpret these characters.  Why
++     not, and how can I make it understand them?
++ 27) Why doesn't bash have csh variable modifiers?
++ 28) How do I report bugs in bash, and where should I look for fixes and
++     advice?
++ 29) What kind of bash documentation is there?
++ 30) What's coming in future versions?
++ 31) What's on the bash `wish list'?
++ 32) When will the next release appear?
++ 
++ 1)  What is it?
++ 
++ Bash is a Unix command interpreter (shell).  It is an implementation of
++ the Posix 1003.2 shell standard, and resembles the Korn and System V
++ shells.
++ 
++ Bash contains a number of enhancements over those shells, both
++ for interactive use and shell programming.  Features geared
++ toward interactive use include command line editing, command
++ history, job control, aliases, and prompt expansion.  Programming
++ features include additional variable expansions, shell
++ arithmetic, and a number of variables and options to control
++ shell behavior. 
++ 
++ 2)  What's the latest version?
++ 
++ The latest version is 1.14.4, first made available on April 21, 1995.
++ 
++ 3)  Where can I get it?
++ 
++ Bash is the GNU project's shell, and so is available from the
++ master GNU archive site, prep.ai.mit.edu, and its mirrors.  The
++ latest version is also available for FTP from slc2.ins.cwru.edu,
++ the maintainer's machine.  The following URLs tell how to get
++ version 1.14.4:
++ 
++ ftp://prep.ai.mit.edu/pub/gnu/bash-1.14.4.tar.gz
++ ftp://slc2.ins.cwru.edu/pub/dist/bash-1.14.4.tar.gz
++ 
++ 4)  What's the `Posix 1003.2 standard'?
++ 
++ POSIX is a name originally coined by Richard Stallman for a
++ family of open system standards based on UNIX.  There are a
++ number of aspects of UNIX under consideration for
++ standardization, from the basic system services at the system
++ call and C library level to applications and tools to system
++ administration and management.  Each area of standardization is
++ assigned to a working group in the 1003 series. 
++ 
++ The POSIX Shell and Utilities standard has been developed by IEEE
++ Working Group 1003.2 (POSIX.2).  It concentrates on the command
++ interpreter interface and utility programs commonly executed from
++ the command line or by other programs.  An initial version of the
++ standard has been approved and published by the IEEE, and work is
++ currently underway to update it. 
++ 
++ Bash is concerned with the aspects of the shell's behavior
++ defined by POSIX.2.  The shell command language has of course
++ been standardized, including the basic flow control and program
++ execution constructs, I/O redirection and pipelining, argument
++ handling, variable expansion, and quoting. 
++ 
++ The `special' builtins, which must be implemented as part of the
++ shell to provide the desired functionality, are specified as
++ being part of the shell; examples of these are `eval' and
++ `export'.  Other utilities appear in the sections of POSIX.2 not
++ devoted to the shell which are commonly (and in some cases must
++ be) implemented as builtin commands, such as `read' and `test'. 
++ POSIX.2 also specifies aspects of the shell's interactive
++ behavior as part of the UPE, including job control and command
++ line editing.  Only vi-style line editing commands have been
++ standardized; emacs editing commands were left out due to
++ objections.
++ 
++ 5)  On what machines will bash run?
++ 
++ Bash has been ported to nearly every version of UNIX.  All you
++ should have to do to build it on a machine for which a port
++ exists is to type `make'.  The build process will attempt to
++ discover the version of UNIX you have and tailor itself
++ accordingly, using a combination of saved definitions in the file
++ `machines.h' and a file `sysdefs.h' created by inspecting the
++ environment for various things. 
++ 
++ More information appears in the file `INSTALL' in the distribution.
++ 
++ 6)  How does bash differ from sh, the Bourne shell?
++ 
++ This is a non-comprehensive list of features that differentiate bash
++ from the SVR4 shell.  The bash manual page explains these completely.
++ 
++ Things bash has that sh does not:
++ 	long invocation options
++ 	`!' reserved word to invert pipeline return value
++ 	the select compound command
++ 	the $(...) form of command substitution
++ 	the ${#param} parameter value length operator
++ 	expansions to perform substring removal (${p%[%]w}, ${p#[#]w})
++ 	variables: BASH, BASH_VERSION, UID, EUID, REPLY, PPID, PWD,
++ 		   OLDPWD, SHLVL, RANDOM, SECONDS, LINENO, HISTCMD,
++ 		   HOSTTYPE, OSTYPE, ENV, MAIL_WARNING, PS3, PS4,
++ 		   HISTSIZE, HISTFILE, HISTFILESIZE, PROMPT_COMMAND,
++ 		   FCEDIT, FIGNORE, IGNOREEOF, INPUTRC, HISTCONTROL,
++ 		   command_oriented_history, allow_null_glob_expansion,
++ 		   glob_dot_filenames, histchars, nolinks, auto_resume,
++ 		   HOSTFILE, noclobber, TMOUT, no_exit_on_failed_exec,
++ 		   cdable_vars
++ 	redirections: <>, &>, >|
++ 	prompt string special char translation and variable expansion
++ 	auto-export of modified values of variables in initial environment
++ 	command search finds functions before builtins
++ 	bash return builtin will exit a file sourced with `.'
++ 	builtins: cd -, exec -, echo -e/-E, export -n/-f/-p/name=value,
++ 		  pwd -P, read -r, readonly -f, trap -l, ulimit -n/-p/-u,
++ 		  set -b/-m/-o option/-p/-l/-d/-C/-H/-P, unset -f/-v,
++ 		  umask -S, type -all/-path/-type, suspend -f, kill -s
++ 	bash reads ~/.bashrc for interactive shells, $ENV for non-interactive
++ 	bash restricted shell mode is more extensive
++ 	bash allows functions and variables with the same name
++ 	brace expansion
++ 	tilde expansion
++ 	arithmetic expansion and `let' builtin
++ 	process substitution
++ 	aliases and alias/unalias builtins
++ 	local variables in functions and `local' builtin
++ 	readline and command-line editing
++ 	history and history/fc builtins
++ 	csh-like history expansion
++ 	other new bash builtins: bind, command, builtin, declare/typeset,
++ 				 dirs, enable, fc, help, history, logout,
++ 				 popd, pushd
++ 	exported functions
++ 	filename generation when using output redirection (command >a*)
++ 
++ Things sh has that bash does not:
++ 	uses variable SHACCT to do shell accounting
++ 	includes `stop' builtin (bash can use alias stop='kill -s STOP')
++ 	`newgrp' builtin
++ 	turns on job control if called as `jsh'
++ 	ulimit attempts to set both soft & hard limits if -S/-H not given
++ 
++ New things in the SVR4.2 sh:
++ 	internationalization: $LANG, $LC_CTYPE, $LC_MESSAGES, setlocale, etc.
++ 	$TIMEOUT (like bash $TMOUT)
++ 	new builtins: mldmode, priv
++ 	`read' builtin has -r
++ 	cannot trap SIGALRM or SIGCHLD
++ 	kill -s is present
++ 
++ Implementation differences:
++ 	redirection to/from compound commands causes sh to create a subshell
++ 	bash does not allow unbalanced quotes; sh silently inserts them at EOF
++ 	bash does not mess with signal 11
++ 	sh sets (euid, egid) to (uid, gid) if -p not supplied and uid < 100
++ 	bash splits only the results of expansions on IFS
++ 	sh does not allow MAILCHECK to be unset (?)
++ 
++ 7)  How does bash differ from the Korn shell?
++ 
++ Things bash has or uses that ksh does not:
++ 	long invocation options
++ 	`!' reserved word
++ 	posix mode and posix conformance
++ 	command hashing
++ 	tilde expansion for assignment statements that look like $PATH
++ 	process substitution with named pipes if /dev/fd is not available
++ 	variables: BASH, BASH_VERSION, UID, EUID, SHLVL, HISTCMD, HOSTTYPE,
++ 		   OSTYPE, MAIL_WARNING, HISTFILESIZE, OPTERR,
++ 		   PROMPT_COMMAND, IGNOREEOF, FIGNORE, INPUTRC, HISTCONTROL,
++ 		   notify, command_oriented_history, glob_dot_filenames,
++ 		   allow_null_glob_expansion, histchars, nolinks, HOSTFILE,
++ 		   noclobber, auto_resume, no_exit_on_failed_exec, cdable_vars
++ 	prompt expansion with backslash escapes and command substitution
++ 	redirection: &> (stdout and stderr)
++ 	more extensive and extensible editing and completion
++ 	builtins: bind, builtin, command, declare, dirs, echo -e/-E, enable,
++ 		  exec -, fc -s, export -n/-f/-p, hash, help, history,
++ 		  jobs -x, kill -s, local, logout, popd, pushd,
++ 		  readonly -n/-f/-p, set -o braceexpand/-o histexpand/
++ 		  -o interactive-comments/-o notify/-o physical/-o posix/
++ 		  -l/-d/-C/-b/-H/-P, suspend, trap -l, type, ulimit -u,
++ 		  umask -S
++ 	$[...] synonym for $((...))
++ 	`!' csh-style history expansion
++ 
++ Things ksh has or uses that bash does not:
++ 	new version of test: [[...]]
++ 	((...)) equivalent to let "..."
++ 	time keyword to let pipelines be timed
++ 	tracked aliases
++ 	$(<file)	
++ 	one-dimensional arrays and appropriate expansions
++ 	variables: ERRNO, FPATH, COLUMNS, LINES, EDITOR, VISUAL
++ 	extended pattern matching with egrep-style pattern lists
++ 	co-processes (|&, >&p, <&p)
++ 	weirdly-scoped functions
++ 	typeset +f to list all function names without definitions
++ 	text of command history kept in a file, not memory
++ 	builtins: alias -x, cd old new, fc -e -, newgrp, print,
++ 		  read -p/-s/u/var?prompt, set -A/-o gmacs/-o keyword/
++ 		  -o bgnice/-o markdirs/-o nolog/-o trackall/-o viraw/-s,
++ 		  typeset -H/-L/-R/-A/-ft/-fu/-fx/-l/-u/-t, whence
++ 
++ Implementation differences:
++ 	ksh runs last command of a pipeline in parent shell context
++ 	ksh ulimit sets hard and soft limits by default
++ 	bash has brace expansion by default
++ 	bash has fixed startup file for all interactive shells; ksh reads $ENV
++ 	bash has exported functions
++ 	bash command search finds functions before builtins
++ 
++ 8)  What is the bash `posix mode'?
++ 
++ Although bash is an implementation of the Posix.2 shell
++ specification, there are areas where the bash default behavior
++ differs from that spec.  The bash `posix mode' changes the bash
++ behavior in these areas so that it obeys the spec more closely. 
++ 
++ Posix mode is entered by starting bash with the -posix option or
++ executing `set -o posix' after bash is running.
++ 
++ The specific aspects of bash which change when posix mode is
++ active are listed in the file CWRU/POSIX.NOTES in the bash
++ distribution. 
++ 
++ 9) How can I build bash with gcc? 
++ 
++ Type
++ 	make CC=gcc CPPNAME='$(CC) -E'
++ 
++ 10) Why does bash run a different version of `command' than
++     `which command' says it will?
++ 
++ `which' is actually a csh script that assumes you're running csh. 
++ It reads the csh startup files from your home directory and uses
++ those to determine which `command' will be invoked.  Since bash
++ doesn't use any of those startup files, there's a good chance
++ that your bash environment differs from your csh environment. 
++ 
++ 11) How can I make my csh aliases work when I convert to bash?
++ 
++ Bash uses a different syntax to support aliases than csh does. 
++ The details can be found in the documentation.  We have provided
++ a shell script which does most of the work of conversion for you;
++ this script can be found in ./examples/alias-conv.sh.  Here is
++ how you use it:
++   
++ Start csh in the normal way for you.  (e.g., `csh')
++   
++ Pipe the output of `alias' through `alias-conv.sh', saving the
++ results into `bash_aliases':
++   
++ 	alias | alias-conv.sh >bash_aliases
++   
++ Edit `bash_aliases', carefully reading through any created
++ functions.  You will need to change the names of csh specific
++ variables (like $cwd) to the bash equivalents (like $PWD).  You
++ will also need to remove recursive references to commands which
++ are defined as functions.  For example, the csh alias:
++   
++ 	alias cd 'cd \!*;echo $cwd'
++   
++ is converted to the bash function:
++ 
++ 	cd () 
++ 	{ 
++ 		cd $*;
++ 		echo $cwd
++ 	}
++   
++ This function contains a self-pointing reference to `cd', which
++ should be changed to use the `builtin' version.  It also uses
++ the csh variable `$cwd' which has an equivalent in bash.
++ Precede the recursive reference with the word `builtin', and
++ change the name of the variable:
++   
++         cd () { builtin cd $*; echo $PWD; }
++   
++ Merge the edited file into your ~/.bashrc.
++ 
++ 12) Now that I've converted from ksh to bash, are there equivalents to
++     ksh features like autoloaded functions and the `whence' command?
++ 
++ There are features in ksh-88 that do not have direct bash equivalents.
++ Most, however, can be emulated with very little trouble.
++ 
++ ksh-88 feature		Bash equivalent
++ --------------		---------------
++ [[...]]			can usually use [...]; minor differences
++ compiled-in aliases	set up aliases in .bashrc; some ksh aliases are
++ 			bash builtins (hash, history, type)
++ $(<file)		$(cat file)
++ arrays			no good subsitute yet
++ ((...))			let "..."
++ time			use external command; GNU time is particularly useful
++ 			use time bash -c '...' for complicated constructs
++ extended patterns	no good substitute
++ coprocesses		named pipe pairs (one for read, one for write)
++ typeset +f		declare -f |
++ 			     sed -n 's:^declare -[a-z]* \([^ ]*\).*$:\1:p'
++ cd, print, whence	function subsitutes in examples/functions/kshenv
++ autoloaded functions	examples/functions/autoload is the same as typeset -fu
++ read var?prompt		[ -t 0 ] && echo -n prompt; read var
++ 
++ 13) Why is the bash builtin `test' slightly different from /bin/test?
++ 
++ The specific example used here is [ ! x -o x ], which is false.
++ 
++ Bash's builtin `test' implements the Posix.2 spec, which can be
++ summarized as follows (the wording is due to David Korn):
++    
++ Here is the set of rules for processing test arguments.
++   
++     0 Args: False
++     1 Arg:  True iff argument is not null.
++     2 Args: If first arg is !, True iff second argument is null.
++ 	    If first argument is unary, then true if unary test is true
++ 	    Otherwise error.
++     3 Args: If second argument is a binary operator, do binary test of $1 $3
++ 	    If first argument is !, negate two argument test of $2 $3
++ 	    Otherwise error.
++     4 Args: If first argument is !, negate three argument test of $2 $3 $4.
++ 	    Otherwise unspecified
++     5 or more Args: unspecified.  (Historical shells would use their
++     current algorithm).
++    
++ The operators -a and -o are considered binary operators for the purpose
++ of the 3 Arg case.
++    
++ As you can see, the test becomes (not (x or x)), which is false.
++ 
++ 14) Why does bash sometimes say `Broken pipe'?
++ 
++ If a sequence of commands appear in a pipeline, and one of the
++ reading commands finishes before the writer has finished, the
++ writer receives a SIGPIPE signal.  Many other shells special-case
++ SIGPIPE as an exit status in the pipeline and do not report it. 
++ For example, in:
++   
++       ps -aux | head
++   
++ `head' can finish before `ps' writes all of its output, and ps
++ will try to write on a pipe without a reader.  In that case, bash
++ will print `Broken pipe' to stderr when ps is killed by a
++ SIGPIPE. 
++ 
++ 15) How can I get bash to read and display eight-bit characters?
++ 
++ This is a process requiring several steps.
++ 
++ First, you must ensure that the `physical' data path is a full eight
++ bits.  For xterms, for example, the `vt100' resources `eightBitInput'
++ and `eightBitOutput' should be set to `true'.
++ 
++ Once you have set up an eight-bit path, you must tell the kernel and
++ tty driver to leave the eigth bit of characters alone when processing
++ keyboard input.  Use `stty' to do this:
++ 
++ 	stty cs8 -istrip -parenb
++ 
++ For old BSD-style systems, you can use
++ 
++ 	stty pass8
++ 
++ you may also need
++ 
++ 	stty even odd
++ 
++ Finally, you need to tell readline that you will be inputting and
++ displaying eight-bit characters.  You use readline variables to do
++ this.  These variables can be set in your .inputrc or using the bash
++ `bind' builtin.  Here's an example using `bind':
++ 
++ 	bash$ bind 'set convert-meta off'
++ 	bash$ bind 'set meta-flag on'
++ 	bash$ bind 'set output-meta on'
++ 
++ The `set' commands between the single quotes may also be placed
++ in ~/.inputrc.
++ 
++ 16) Why can't I use command line editing in my `cmdtool'?
++ 
++ The problem is `cmdtool' and bash fighting over the input.  When
++ scrolling is enabled in a cmdtool window, cmdtool puts the tty in
++ `raw mode' to permit command-line editing using the mouse for
++ applications that cannot do it themselves.  As a result, bash and
++ cmdtool each try to read keyboard input immediately, with neither
++ getting enough of it to be useful.
++ 
++ This mode also causes cmdtool to not implement many of the
++ terminal functions and control sequences appearing in the
++ `sun-cmd' termcap entry.  For a more complete explanation, see
++ that file examples/suncmd.termcap in the bash distribution. 
++ 
++ `xterm' is a better choice, and gets along with bash much more
++ smoothly.
++ 
++ 17) How do I write a function `x' to replace builtin command `x', but
++     still invoke the command from within the function?
++ 
++ This is what the `command' and `builtin' builtins are for.  The
++ `command' builtin executes the command supplied as its first
++ argument, skipping over any function defined with that name.  The
++ `builtin' builtin executes the builtin command given as its first
++ argument directly. 
++ 
++ For example, to write a function to replace `cd' that writes the
++ hostname and current directory to an xterm title bar, use
++ something like the following:
++ 
++ 	cd()
++ 	{
++ 		builtin cd "$@" && xtitle $HOST: $PWD
++ 	}
++ 
++ This could also be written using `command' instead of `builtin';
++ the version above is marginally more efficient. 
++ 
++ 18) When I have terminal escape sequences in my prompt, why does bash
++     wrap lines at the wrong column?
++ 
++ Bash does not know that the terminal escape sequences do not take
++ up space on the screen.  The redisplay code assumes, unless told
++ otherwise, that each character in the prompt is a `printable'
++ character that takes up one character position on the screen. 
++ 
++ You can use the bash prompt expansion facility (see the PROMPTING
++ section in the manual page) to tell readline that sequences of
++ characters in the prompt strings take up no screen space. 
++ 
++ Use the \[ escape to begin a sequence of non-printing characters,
++ and the \] escape to signal the end of such a sequence. 
++ 
++ 19) I built bash on Solaris 2.  Why do globbing expansions chop off the
++     first few characters of each filename?
++ 
++ This is the consequence of building bash on SunOS 5 and linking
++ with the libraries in /usr/ucblib, but using the definitions
++ and strutures from files in /usr/include. 
++ 
++ The actual conflict is between the dirent structure in
++ /usr/include/dirent.h and the struct returned by the version of
++ `readdir' in libucb.a (a 4.3-BSD style `struct direct'). 
++ 
++ Make sure you've got /bin ahead of /usr/ucb in your $PATH when
++ building bash.  This will ensure that you use /bin/cc or acc
++ instead of /usr/ucb/cc and that you link with libc before libucb. 
++ 
++ 20) Why doesn't bash treat brace expansions exactly like csh?
++ 
++ The only difference between bash and csh brace expansion is that
++ bash requires a brace expression to contain at least on unquoted
++ comma if it is to be expanded.  Any brace-surrounded word not
++ containing an unquoted comma is left unchanged by the brace
++ expansion code.  This affords the greatest degree of sh
++ compatibility. 
++ 
++ Bash, ksh, zsh, and pd-ksh all implement brace expansion this way. 
++ 
++ 21) Why does bash dump core after I interrupt username completion on a
++     machine running NIS?
++ 
++ This is a famous and long-standing bug in the SunOS YP (sorry, NIS)
++ client library, which is part of libc.
++ 
++ The YP library code keeps static state -- a pointer into the data
++ returned from the server.  When YP initializes itself (setpwent),
++ it looks at this pointer and calls free on it if it's non-null. 
++ So far, so good. 
++ 
++ If one of the YP functions is interrupted during getpwent (the
++ exact function is interpretwithsave()), and returns NULL, the
++ pointer is freed without being reset to NULL, and the function
++ returns.  The next time getpwent is called, it sees that this
++ pointer is non-null, calls free, and the bash free() blows up
++ because it's being asked to free freed memory. 
++ 
++ The traditional Unix mallocs allow memory to be freed multiple
++ times; that's probably why this has never been fixed.  You can
++ probably stop it by adding an #undef USE_GNU_MALLOC to the
++ appropriate machine description in machines.h. 
++ 
++ 22) I'm running SVR4.2.  Why is the line erased every time I type `@'?
++ 
++ The `@' character is the default `line kill' character in most
++ versions of System V, including SVR4.2.  You can change this
++ character to whatever you want using `stty'.  For example, to
++ change the line kill character to control-u, type
++ 
++ 	stty kill ^U
++ 
++ where the `^' and `U' can be two separate characters.
++ 
++ 23) How can I find the value of a shell variable whose name is the value
++     of another shell variable?
++ 
++ Use the `eval' builtin.  The important thing to remember is that
++ `eval' expands the arguments you give it again, so you need to
++ quote the parts of the arguments that you want `eval' to act on. 
++ 
++ For example, this expression prints the value of the last positional
++ parameter:
++ 
++ 	eval echo \$\{$#\}
++ 
++ The expansion of the quoted portions of this expression will be
++ deferred until `eval' runs, while the `$#' will be expanded
++ before `eval' is executed. 
++ 
++ 24) If I pipe the output of a command into `read variable', why doesn't
++     the output show up in $variable when the read command finishes?
++ 
++ This has to do with the parent-child relationship between Unix
++ processes. 
++ 
++ Each element of a pipeline runs in a separate process, a child of
++ the shell running the pipeline.  A subprocess cannot affect its
++ parent's environment.  When the `read' command sets the variable
++ to the input, that variable is set only in the subshell, not the
++ parent shell.  When the subshell exits, the value of the variable
++ is lost. 
++ 
++ Many pipelines that end with `read variable' can be converted
++ into command substitutions, which will capture the output into a
++ variable:
++ 
++ 	grep ^gnu /usr/lib/news/active | wc -l | read ngroup
++ 
++ can be converted into
++ 
++ 	ngroup=$(grep ^gnu /usr/lib/news/active | wc -l)
++ 
++ This does not, unfortunately, work to split the text among
++ multiple variables, as read does when given multiple variable
++ arguments.
++ 
++ 25) I just changed my shell to bash, and now I can't FTP into my machine.
++     Why not?
++ 
++ You must add the full pathname to bash to the file /etc/shells. 
++ Many versions of ftpd use this file to prohibit `special' users
++ such as `uucp' and `news' from using FTP. 
++ 
++ 26) I have a bunch of shell scripts that use backslash-escaped characters
++     in arguments to `echo'.  Bash doesn't interpret these characters.  Why
++     not, and how can I make it understand them?
++ 
++ This is the behavior of echo on most Unix System V machines.
++ 
++ The bash builtin `echo' is modelled after the 9th Edition
++ Research Unix version of `echo'.  It does not interpret
++ backslash-escaped characters in its argument strings by default,
++ but requires the use of the -e option to enable the
++ interpretation.  The System V echo provides no way to disable the
++ special characters; the bash echo has a -E option to disable
++ them. 
++ 
++ There is a compile-time option that will make bash behave like
++ the System V echo and interpret things like \t by default. 
++ Change config.h so that DEFAULT_ECHO_TO_USG is defined, remove
++ builtins/libbuiltins.a and builtins/echo.o, and rebuild.
++ 
++ 27) Why doesn't bash have csh variable modifiers?
++ 
++ Posix has specified a more powerful, albeit somewhat more confusing,
++ mechanism cribbed from ksh, and bash implements it.
++ 
++ ${parameter%word}
++         Remove smallest suffix pattern.  The WORD is expanded to produce
++         a pattern.  It then expands to the value of PARAMETER, with the
++         smallest portion of the suffix matched by the pattern deleted.
++ 
++         x=file.c
++         echo ${x%.c}.o
++         -->file.o
++ 
++ ${parameter%%word}
++ 
++         Remove largest suffix pattern.  The WORD is expanded to produce
++         a pattern.  It then expands to the value of PARAMETER, with the
++         largest portion of the suffix matched by the pattern deleted.
++ 
++         x=posix/src/std
++         echo ${x%%/*}
++         -->posix
++ 
++ ${parameter#word}
++         Remove smallest prefix pattern.  The WORD is expanded to produce
++         a pattern.  It then expands to the value of PARAMETER, with the
++         smallest portion of the prefix matched by the pattern deleted.
++ 
++         x=$HOME/src/cmd
++         echo ${x#$HOME}
++         -->/src/cmd
++ 
++ ${parameter##word}
++         Remove largest prefix pattern.  The WORD is expanded to produce
++         a pattern.  It then expands to the value of PARAMETER, with the
++         largest portion of the prefix matched by the pattern deleted.
++ 
++         x=/one/two/three
++         echo ${x##*/}
++         -->three
++ 
++ 
++ Given
++ 	a=/a/b/c/d
++ 	b=b.xxx
++ 
++ 	csh			bash		result
++ 	---			----		------
++ 	$a:h			${a%/*}		   /a/b/c
++ 	$a:t			${a##*/}	   d
++ 	$b:r			${b%.*}		   b
++ 	$b:e			${b##*.}	   xxx
++ 
++ 
++ 28) How do I report bugs in bash, and where should I look for fixes and
++     advice?
++ 
++ Use the `bashbug' script to report bugs.  It is built and
++ installed at the same time as bash.  It provides a standard
++ template for reporting a problem and automatically includes
++ information about your configuration and build environment. 
++ 
++ `bashbug' sends its reports to bug-bash@prep.ai.mit.edu, which
++ is a large mailing list gatewayed to the usenet newsgroup gnu.bash.bug. 
++ 
++ Bug fixes, answers to questions, and announcements of new releases
++ are all posted to gnu.bash.bug.  Discussions concerning bash features
++ and problems also take place there.
++ 
++ To reach the bash maintainers directly, send mail to
++ bash-maintainers@prep.ai.mit.edu.
++ 
++ 29) What kind of bash documentation is there?
++ 
++ First, look in the documentation directory in the bash distribution.
++ It should contain the following files:
++ 
++ bash.1		an extensive, thorough Unix-style manual page
++ builtins.1	a manual page covering just bash builtin commands
++ features.texi	a Gnu-style info file overview
++ FAQ		this file
++ article.ms	text of an article written for The Linux Journal
++ readline.3	a man page describing readline
++ 
++ Postscript files created from the above source are also present in
++ the distribution.
++ 
++ There is additional documentation available for anonymous FTP from host
++ slc2.ins.cwru.edu in the `pub/bash' directory.
++ 
++ Cameron Newham is in the midst of writing a book on bash, to be
++ published by O'Reilly and Associates.  Look for it sometime this
++ year.
++ 
++ 30) What's coming in future versions?
++ 
++ There will be no new features in future releases of version 1.14.
++ 
++ The next major release, bash-2.0, will contain extensive changes and new
++ features.  Here's a short list:
++ 
++ one-dimensional arrays with a new compound assignment statement,
++         appropriate expansion constructs and modifications to some
++ 	of the builtins (read, declare, etc.) to use them
++ new expansions to do ANSI-C string expansion, substring extraction,
++ 	pattern replacement, and indirect variable expansion
++ new builtins: `disown' and `shopt'
++ new variables: HISTIGNORE, SHELLOPTS, PIPESTATUS, DIRSTACK
++ special handling of many unused or redundant variables removed
++ dynamic loading of new builtin commands; many loadable examples provided
++ new prompt expansions: \e, \n, \H, \T
++ new readline variables: enable-keypad, mark-directories, input-meta
++ new readline commands to manipulate the mark and operate on the region
++ new readline emacs mode commands and bindings for ksh-88 compatibility
++ updated and extended builtins
++ new DEBUG trap
++ expanded (and now documented) restricted shell mode
++ 
++ implementation stuff:	
++ autoconf-based configuration
++ nearly all of the bugs reported since version 1.14 have been fixed
++ most builtins converted to use builtin `getopt' for consistency
++ most builtins use -p option to display output in a reusable form
++ 	(for consistency)
++ grammar tighter and smaller (66 reduce-reduce conflicts gone)
++ lots of code now smaller and faster
++ test suite greatly expanded
++ 
++ 31) What's on the bash `wish list'?
++ 
++ internationalization with a variable expansion to translate a string
++ 	according to a particular message catalog
++ Programmable completion a la zsh
++ menu completion a la tcsh
++ the ksh egrep-style extended pattern matching operators
++ associative arrays (not really all that hard)
++ breaking some of the shell functionality into embeddable libraries
++ a bash debugger
++ 
++ Much of this will not be in bash-2.0.
++ 
++ 32) When will the next release appear?
++ 
++ There will probably be a 1.14.5 release to coincide with the next GNU
++ source CD.  That will be the last release for version 1.14.
++ 
++ The next version will appear sometime in 1995.  Never make predictions.
+diff -Nrc2 bash-1.14.4/documentation/Makefile bash-1.14.5/documentation/Makefile
+*** bash-1.14.4/documentation/Makefile	Sat Dec 31 16:23:27 1994
+--- bash-1.14.5/documentation/Makefile	Sun Jun 11 14:45:55 1995
+***************
+*** 1,17 ****
+  # This Makefile is for the Bash/documentation directory -*- text -*-.
+  #
+- CP	    = cp
+  RM	    = rm -f
+  
+! INSTALL_DATA = install -c -m 644
+  
+! DOC_SUPPORT = ../lib/doc-support/
+! TEXINDEX    = $(DOC_SUPPORT)texindex
+! TEXINDSRC   = $(DOC_SUPPORT)texindex.c
+  TEX	    = tex
+  QUIETPS	    = #set this to -q to shut up dvips
+  DVIPS	    = dvips -D 300 $(QUIETPS) -o $@	# tricky
+  TEXINPUTS   = ./../lib/readline/doc
+- MAKEINFO    = makeinfo
+  
+  # Change to groff -Tascii if you don't have nroff
+--- 1,17 ----
+  # This Makefile is for the Bash/documentation directory -*- text -*-.
+  #
+  RM	    = rm -f
+  
+! INSTALL_DATA = ../support/install.sh -c -m 644
+  
+! # unused
+! TEXINDEX    = texindex
+  TEX	    = tex
++ 
++ MAKEINFO    = makeinfo
++ TEXI2DVI    = ../support/texi2dvi
+  QUIETPS	    = #set this to -q to shut up dvips
+  DVIPS	    = dvips -D 300 $(QUIETPS) -o $@	# tricky
+  TEXINPUTS   = ./../lib/readline/doc
+  
+  # Change to groff -Tascii if you don't have nroff
+***************
+*** 52,56 ****
+  all: ps info dvi text
+  
+! ps: bash.ps builtins.ps readline.ps article.ps
+  dvi: features.dvi features.ps 
+  info: features.info
+--- 52,56 ----
+  all: ps info dvi text
+  
+! ps: bash.ps readline.ps article.ps
+  dvi: features.dvi features.ps 
+  info: features.info
+***************
+*** 58,64 ****
+  
+  features.dvi: features.texi $(HSUSER) $(RLUSER)
+! 	TEXINPUTS=.:$(TEXINPUTS):$$TEXINPUTS $(TEX) features.texi
+! 	$(TEXINDEX) features.??
+! 	TEXINPUTS=.:$(TEXINPUTS):$$TEXINPUTS $(TEX) features.texi
+  
+  features.ps: features.dvi
+--- 58,62 ----
+  
+  features.dvi: features.texi $(HSUSER) $(RLUSER)
+! 	TEXINPUTS=.:$(TEXINPUTS):$$TEXINPUTS $(TEXI2DVI) features.texi
+  
+  features.ps: features.dvi
+***************
+*** 69,84 ****
+  	$(MAKEINFO) --no-split -I$(TEXINPUTS) features.texi
+  
+- bash.dvi: $(TEXINDEX) bash.texinfo $(HSUSER) $(RLUSER)
+- 	TEXINPUTS=.:$(TEXINPUTS):$$TEXINPUTS $(TEX) bash.texinfo
+- 	$(TEXINDEX) bash.??
+- 	TEXINPUTS=.:$(TEXINPUTS):$$TEXINPUTS $(TEX) bash.texinfo
+- 
+- bashman.ps: bash.dvi
+- 	rm -f $@
+- 	$(DVIPS) bash.dvi
+- 
+  bash.txt: bash.1
+  bash.ps: bash.1
+- builtins.ps: builtins.1 bash.1
+  builtins.txt: builtins.1 bash.1
+  readline.txt: readline.3
+--- 67,72 ----
+***************
+*** 86,92 ****
+  article.ps: article.ms
+  
+- $(TEXINDEX): $(TEXINDSRC)
+- 	(cd $(DOC_SUPPORT); $(MAKE) $(MFLAGS) texindex)
+- 
+  hsuser.texinfo: ../lib/readline/doc/hsuser.texinfo
+  	ln -s ../lib/readline/doc/hsuser.texinfo .
+--- 74,77 ----
+***************
+*** 96,119 ****
+  
+  clean:
+! 	rm -f *.aux *.cp *.fn *.ky *.log *.pg *.toc *.tp *.vr *.cps *.pgs \
+! 	*.fns *.kys *.tps *.vrs *.o core texindex rluser.texinfo hsuser.texinfo
+  
+! distclean:
+! 	rm -f *.aux *.cp *.fn *.ky *.log *.pg *.toc *.tp *.vr *.cps *.pgs \
+! 	*.dvi *.info *.info-* *.fns *.kys *.tps *.vrs *.o core texindex \
+! 	rluser.texinfo hsuser.texinfo
+  
+! realclean:	clean
+  
+! install: all
+  	-[ -d $(mandir) ] || mkdir $(mandir)
+- 	$(INSTALL_DATA) bash.1 $(mandir)
+- 	sed 's:so bash.1:so man1/bash.1:' < builtins.1 > $(mandir)/bash_builtins.1
+  	-[ -d $(man3dir) ] || mkdir $(man3dir)
+- 	$(INSTALL_DATA) readline.3 $(man3dir)
+  	-[ -d $(infodir) ] || mkdir $(infodir)
+  	$(INSTALL_DATA) features.info $(infodir)/bash.info
+  
+  uninstall:
+! 	$(RM) $(mandir)/bash.1 $(mandir)/bash_builtins.1
+  	$(RM) $(man3dir)/readline.3 $(infodir)/bash.info
+--- 81,103 ----
+  
+  clean:
+! 	$(RM) *.aux *.cp *.fn *.ky *.log *.pg *.toc *.tp *.vr *.cps *.pgs \
+! 	*.fns *.kys *.tps *.vrs *.o core rluser.texinfo hsuser.texinfo
+  
+! distclean mostlyclean:	clean
+  
+! realclean maintainer-clean:	clean
+! 	rm -f *.dvi *.info *.ps *.txt
+  
+! installdirs:
+  	-[ -d $(mandir) ] || mkdir $(mandir)
+  	-[ -d $(man3dir) ] || mkdir $(man3dir)
+  	-[ -d $(infodir) ] || mkdir $(infodir)
++ 
++ install: all installdirs
++ 	$(INSTALL_DATA) bash.1 $(mandir)
++ 	$(INSTALL_DATA) readline.3 $(man3dir)
+  	$(INSTALL_DATA) features.info $(infodir)/bash.info
+  
+  uninstall:
+! 	$(RM) $(mandir)/bash.1
+  	$(RM) $(man3dir)/readline.3 $(infodir)/bash.info
+diff -Nrc2 bash-1.14.4/documentation/README bash-1.14.5/documentation/README
+*** bash-1.14.4/documentation/README	Thu Mar 17 10:22:54 1994
+--- bash-1.14.5/documentation/README	Mon May 15 14:47:14 1995
+***************
+*** 1,4 ****
+--- 1,5 ----
+  This directory contains the bash documentation.
+  
++ FAQ		- a set of frequently-asked questions about Bash with answers
+  article.ms	- an article I wrote about bash for The Linux Journal
+  bash.1		- the bash man page
+diff -Nrc2 bash-1.14.4/documentation/bash.1 bash-1.14.5/documentation/bash.1
+*** bash-1.14.4/documentation/bash.1	Thu Mar  9 18:41:06 1995
+--- bash-1.14.5/documentation/bash.1	Wed May 17 15:44:05 1995
+***************
+*** 7,15 ****
+  .\"	chet@ins.CWRU.Edu
+  .\"
+! .\"	Last Change: Thu Mar  9 18:40:22 EST 1995
+  .\"
+  .\" bash_builtins, strip all but Built-Ins section
+  .if \n(zZ=1 .ig zZ
+! .TH BASH 1 "1995 Mar 9" GNU
+  .\"
+  .\" There's some problem with having a `@'
+--- 7,15 ----
+  .\"	chet@ins.CWRU.Edu
+  .\"
+! .\"	Last Change: Fri May  5 10:44:39 EDT 1995
+  .\"
+  .\" bash_builtins, strip all but Built-Ins section
+  .if \n(zZ=1 .ig zZ
+! .TH BASH 1 "1995 May 5" GNU
+  .\"
+  .\" There's some problem with having a `@'
+***************
+*** 1938,1942 ****
+  execution.
+  .PP
+! Function names may be listed with the
+  .B \-f
+  option to the
+--- 1938,1942 ----
+  execution.
+  .PP
+! Function names and definitions may be listed with the
+  .B \-f
+  option to the
+***************
+*** 3141,3151 ****
+  Display version information about the current instance of
+  .BR bash .
+- .TP
+- .B emacs\-editing\-mode (C\-e)
+- When in
+- .B vi
+- editing mode, this causes a switch to
+- .B emacs
+- editing mode.
+  .PD
+  .SH HISTORY
+--- 3141,3144 ----
+***************
+*** 5330,5337 ****
+  that you have.
+  .PP
+! Once you have determined that a bug actually exists, mail a
+! bug report to \fIbash\-maintainers\fP@\fIprep.ai.MIT.Edu\fP.
+  If you have a fix, you are welcome to mail that
+! as well!  Suggestions and `philosophical' bug reports may be mailed
+  to \fPbug-bash\fP@\fIprep.ai.MIT.Edu\fP or posted to the Usenet
+  newsgroup
+--- 5323,5332 ----
+  that you have.
+  .PP
+! Once you have determined that a bug actually exists, use the
+! .I bashbug
+! command to submit a bug report.
+  If you have a fix, you are welcome to mail that
+! as well!
+! Suggestions and `philosophical' bug reports may be mailed
+  to \fPbug-bash\fP@\fIprep.ai.MIT.Edu\fP or posted to the Usenet
+  newsgroup
+***************
+*** 5352,5355 ****
+--- 5347,5354 ----
+  A short script or `recipe' which exercises the bug
+  .PD
++ .PP
++ .I bashbug
++ inserts the first three items automatically into the template
++ it provides for filing a bug report.
+  .PP
+  Comments and bug reports concerning
+*** bash-1.14.4/documentation/readline.3	Tue Jul 26 14:48:09 1994
+--- bash-1.14.5/documentation/readline.3	Wed May 24 10:38:36 1995
+***************
+*** 96,101 ****
+  .LP
+  .nf
+- .LP
+- .nf
+  .ft B
+  int rl_parse_and_bind (line)
+--- 96,99 ----
+***************
+*** 745,749 ****
+  Insert the last argument to the previous command (the last word on
+  the previous line).  With an argument,
+! behave exactly like @code{yank-nth-arg}.
+  .PD
+  .SS Commands for Changing Text
+--- 743,747 ----
+  Insert the last argument to the previous command (the last word on
+  the previous line).  With an argument,
+! behave exactly like \fByank-nth-arg\fP.
+  .PD
+  .SS Commands for Changing Text
+diff -Nrc2 bash-1.14.4/execute_cmd.c bash-1.14.5/execute_cmd.c
+*** bash-1.14.4/execute_cmd.c	Wed Feb  1 10:30:37 1995
+--- bash-1.14.5/execute_cmd.c	Thu Jun  8 11:29:00 1995
+***************
+*** 1305,1312 ****
+      select_command->action->flags |= CMD_IGNORE_RETURN;
+  
+-   ps3_prompt = get_string_value ("PS3");
+-   if (!ps3_prompt)
+-     ps3_prompt = "#? ";
+- 
+    unwind_protect_int (return_catch_flag);
+    unwind_protect_jmp_buf (return_catch);
+--- 1305,1308 ----
+***************
+*** 1315,1318 ****
+--- 1311,1318 ----
+    while (1)
+      {
++       ps3_prompt = get_string_value ("PS3");
++       if (!ps3_prompt)
++ 	ps3_prompt = "#? ";
++ 
+        QUIT;
+        selection = select_query (list, list_len, ps3_prompt);
+***************
+*** 1871,1876 ****
+--- 1871,1878 ----
+  	  dispose_used_env_vars ();
+  	}
++ #if 0
+        else
+  	builtin_env = (char **)NULL;
++ #endif
+      }
+  
+***************
+*** 1935,1940 ****
+--- 1937,1944 ----
+        dispose_used_env_vars ();
+      }
++ #if 0
+    else
+      function_env = (char **)NULL;
++ #endif
+  
+    /* Note the second argument of "1", meaning that we discard
+diff -Nrc2 bash-1.14.4/expr.c bash-1.14.5/expr.c
+*** bash-1.14.4/expr.c	Mon Dec 12 16:10:13 1994
+--- bash-1.14.5/expr.c	Fri Jun  9 17:17:23 1995
+***************
+*** 769,773 ****
+    for (t = expression; whitespace (*t); t++)
+      ;
+!   fprintf (stderr, "%s: %s%s: %s (remainder of expression is \"%s\")",
+    		 name, t,
+  		 msg, (lasttp && *lasttp) ? lasttp : "");
+--- 769,773 ----
+    for (t = expression; whitespace (*t); t++)
+      ;
+!   fprintf (stderr, "%s: %s: %s (remainder of expression is \"%s\")\n",
+    		 name, t,
+  		 msg, (lasttp && *lasttp) ? lasttp : "");
+diff -Nrc2 bash-1.14.4/general.c bash-1.14.5/general.c
+*** bash-1.14.4/general.c	Mon Jan 30 12:23:30 1995
+--- bash-1.14.5/general.c	Thu Jun  8 11:59:24 1995
+***************
+*** 621,627 ****
+  	}
+  
+!       /* Handle backquoted `/'. */
+        if (start > 0 && result[start - 1] == '\\')
+  	continue;
+  
+        /* Check for trailing `/'. */
+--- 621,629 ----
+  	}
+  
+! #if 0
+!       /* Handle backslash-quoted `/'. */
+        if (start > 0 && result[start - 1] == '\\')
+  	continue;
++ #endif
+  
+        /* Check for trailing `/'. */
+diff -Nrc2 bash-1.14.4/jobs.c bash-1.14.5/jobs.c
+*** bash-1.14.4/jobs.c	Wed Mar 29 16:40:49 1995
+--- bash-1.14.5/jobs.c	Wed Jul 12 09:37:18 1995
+***************
+*** 1495,1499 ****
+  #else /* !WAITPID_BROKEN */
+  #  if defined (MUST_UNBLOCK_CHILD)	/* SCO */
+!       UNBLOCK_CHILD (oset);
+  #  endif
+        waiting_for_job = 1;
+--- 1495,1509 ----
+  #else /* !WAITPID_BROKEN */
+  #  if defined (MUST_UNBLOCK_CHILD)	/* SCO */
+!       struct sigaction act, oact;
+!       sigset_t nullset, chldset;
+! 
+!       sigemptyset (&nullset);
+!       sigemptyset (&chldset);
+!       sigprocmask (SIG_SETMASK, &nullset, &chldset);
+!       act.sa_handler = SIG_DFL;
+!       sigemptyset (&act.sa_mask);
+!       sigemptyset (&oact.sa_mask);
+!       act.sa_flags = 0;
+!       sigaction (SIGCHLD, &act, &oact);
+  #  endif
+        waiting_for_job = 1;
+***************
+*** 1501,1505 ****
+        waiting_for_job = 0;
+  #  if defined (MUST_UNBLOCK_CHILD)
+!       BLOCK_CHILD (set, oset);
+  #  endif
+  #endif /* !WAITPID_BROKEN */
+--- 1511,1516 ----
+        waiting_for_job = 0;
+  #  if defined (MUST_UNBLOCK_CHILD)
+!       sigaction (SIGCHLD, &oact, (struct sigaction *)NULL);
+!       sigprocmask (SIG_SETMASK, &chldset, (sigset_t *)NULL);
+  #  endif
+  #endif /* !WAITPID_BROKEN */
+***************
+*** 1548,1553 ****
+  		WTERMSIG (child->status) == SIGINT)
+  	    {
+! 	      putchar ('\n');
+! 	      fflush (stdout);
+  	    }
+  
+--- 1559,1575 ----
+  		WTERMSIG (child->status) == SIGINT)
+  	    {
+! 	      /* If SIGINT is not trapped, set the interrupt state if in a
+! 	         loop so the loop will be broken.  If not in a loop, print
+! 	         the newline that the kernel does not. */
+! 	      if (signal_is_trapped (SIGINT) == 0)
+! 		{
+! 		  if (loop_level)
+! 		    interrupt_state++;
+! 		  else
+! 		    {
+! 		      putchar ('\n');
+! 		      fflush (stdout);
+! 		    }
+! 		}
+  	    }
+  
+***************
+*** 1782,1785 ****
+--- 1804,1814 ----
+    already_running = (JOBSTATE (job) == JRUNNING);
+  
++   if (JOBSTATE (job) == JDEAD)
++     {
++       report_error ("%s: job has terminated", this_command_name);
++       UNBLOCK_CHILD (oset);
++       return (-1);
++     }
++ 
+    if (!foreground && already_running)
+      {
+***************
+*** 2114,2118 ****
+  				  temp_handler = old_sigint_handler;
+  				  restore_sigint_handler ();
+! 				  (*temp_handler) (SIGINT);
+  				}
+  			    }
+--- 2143,2148 ----
+  				  temp_handler = old_sigint_handler;
+  				  restore_sigint_handler ();
+! 				  if (temp_handler != SIG_IGN)
+! 				    (*temp_handler) (SIGINT);
+  				}
+  			    }
+diff -Nrc2 bash-1.14.4/lib/doc-support/Makefile bash-1.14.5/lib/doc-support/Makefile
+*** bash-1.14.4/lib/doc-support/Makefile	Mon May 23 11:49:00 1994
+--- bash-1.14.5/lib/doc-support/Makefile	Fri May  5 15:10:48 1995
+***************
+*** 16,17 ****
+--- 16,23 ----
+  texindex: texindex.o
+  	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
++ 
++ clean:
++ 	rm -f texindex.o
++ 
++ realclean distclean maintainer-clean:	clean
++ 	rm -f texindex
+diff -Nrc2 bash-1.14.4/lib/glob/Makefile bash-1.14.5/lib/glob/Makefile
+*** bash-1.14.4/lib/glob/Makefile	Mon Jan 30 12:38:51 1995
+--- bash-1.14.5/lib/glob/Makefile	Wed Jun  7 14:22:25 1995
+***************
+*** 68,72 ****
+  
+  documentation: force
+! 	-(cd doc; $(MAKE) $(MFLAGS))
+  force:
+  
+--- 68,73 ----
+  
+  documentation: force
+! 	-(cd doc && $(MAKE) $(MFLAGS))
+! 
+  force:
+  
+***************
+*** 81,86 ****
+  clean:
+  	rm -f $(OBJECTS) $(LIBRARY_NAME)
+! 	-(cd doc; $(MAKE) $(MFLAGS) clean)
+  
+  
+  ######################################################################
+--- 82,89 ----
+  clean:
+  	rm -f $(OBJECTS) $(LIBRARY_NAME)
+! 	-(cd doc && $(MAKE) $(MFLAGS) $@)
+  
++ maintainer-clean realclean mostlyclean distclean: clean
++ 	-(cd doc && $(MAKE) $(MFLAGS) $@)
+  
+  ######################################################################
+diff -Nrc2 bash-1.14.4/lib/glob/doc/Makefile bash-1.14.5/lib/glob/doc/Makefile
+*** bash-1.14.4/lib/glob/doc/Makefile	Wed Nov  4 14:14:40 1992
+--- bash-1.14.5/lib/glob/doc/Makefile	Fri May  5 15:19:01 1995
+***************
+*** 1,5 ****
+- 
+- clean:
+- 	rm -f glob.??
+  all:
+  	cp glob.texi glob.info
+--- 1,5 ----
+  all:
+  	cp glob.texi glob.info
++ 
++ maintainer-clean realclean distclean clean:
++ 	rm -f glob.?? glob.info
+diff -Nrc2 bash-1.14.4/lib/readline/Makefile bash-1.14.5/lib/readline/Makefile
+*** bash-1.14.4/lib/readline/Makefile	Mon Jan 30 12:37:44 1995
+--- bash-1.14.5/lib/readline/Makefile	Wed Jun  7 14:17:29 1995
+***************
+*** 99,106 ****
+  	cd $(libdir) && ${RM} -f libreadline.a libreadline.old
+  
+- clean:
+- 	rm -f $(OBJECTS) *.a
+- 	(if [ -d doc ]; then cd doc; $(MAKE) $(MFLAGS) $@; fi)
+- 
+  tags:	force
+  	etags $(CSOURCES) $(HSOURCES)
+--- 99,102 ----
+***************
+*** 115,119 ****
+  	  keymaps.o -ltermcap
+  
+! realclean distclean mostlyclean: clean
+  
+  # Dependencies
+--- 111,120 ----
+  	  keymaps.o -ltermcap
+  
+! clean:
+! 	$(RM) -f $(OBJECTS) libreadline.a libhistory.a
+! 	(if [ -d doc ]; then cd doc; $(MAKE) $(MFLAGS) $@; fi)
+! 
+! maintainer-clean realclean distclean mostlyclean: clean
+! 	(if [ -d doc ]; then cd doc; $(MAKE) $(MFLAGS) $@; fi)
+  
+  # Dependencies
+diff -Nrc2 bash-1.14.4/lib/readline/complete.c bash-1.14.5/lib/readline/complete.c
+*** bash-1.14.4/lib/readline/complete.c	Mon Mar  6 16:20:52 1995
+--- bash-1.14.5/lib/readline/complete.c	Thu Jun  8 12:22:57 1995
+***************
+*** 469,473 ****
+  	}
+  
+!       if (rl_point == end)
+  	{
+  	  int quoted = 0;
+--- 469,473 ----
+  	}
+  
+!       if (rl_point == end && found_quote == 0)
+  	{
+  	  int quoted = 0;
+***************
+*** 669,673 ****
+  	      should_quote = rl_strpbrk (matches[0], rl_completer_word_break_characters) != 0;
+  #if defined (SHELL)
+! 	      should_quote = should_quote || rl_strpbrk (matches[0], "#$`?*[") != 0;
+  #endif
+  
+--- 669,673 ----
+  	      should_quote = rl_strpbrk (matches[0], rl_completer_word_break_characters) != 0;
+  #if defined (SHELL)
+! 	      should_quote = should_quote || rl_strpbrk (matches[0], "#$`?*[!") != 0;
+  #endif
+  
+diff -Nrc2 bash-1.14.4/lib/readline/display.c bash-1.14.5/lib/readline/display.c
+*** bash-1.14.4/lib/readline/display.c	Thu Mar 16 13:11:09 1995
+--- bash-1.14.5/lib/readline/display.c	Mon May  1 10:18:02 1995
+***************
+*** 186,190 ****
+      }
+  
+!   l = strlen (pmt);
+    r = ret = xmalloc (l + 1);
+    
+--- 186,190 ----
+      }
+  
+!   l = pmt ? strlen (pmt) : 0;
+    r = ret = xmalloc (l + 1);
+    
+***************
+*** 747,751 ****
+       corresponding `bold') that manifests itself on certain terminals. */
+  
+!   lendiff = strlen (local_prompt);
+    if (current_line == 0 && !_rl_horizontal_scroll_mode &&
+        lendiff > visible_length &&
+--- 747,751 ----
+       corresponding `bold') that manifests itself on certain terminals. */
+  
+!   lendiff = local_prompt ? strlen (local_prompt) : 0;
+    if (current_line == 0 && !_rl_horizontal_scroll_mode &&
+        lendiff > visible_length &&
+diff -Nrc2 bash-1.14.4/lib/readline/doc/Makefile bash-1.14.5/lib/readline/doc/Makefile
+*** bash-1.14.4/lib/readline/doc/Makefile	Sun Aug  7 01:21:21 1994
+--- bash-1.14.5/lib/readline/doc/Makefile	Sun Jun 11 14:55:57 1995
+***************
+*** 48,56 ****
+  	(cd $(DOC_SUPPORT); $(MAKE) $(MFLAGS) CFLAGS='$(CFLAGS)' texindex)
+  
+! clean:
+  	rm -f *.aux *.cp *.fn *.ky *.log *.pg *.toc *.tp *.vr *.cps *.pgs \
+! 	      *.fns *.kys *.tps *.vrs *.o core texinfo.tex
+  
+! squeaky-clean:
+! 	rm -f *.aux *.cp *.fn *.ky *.log *.pg *.toc *.tp *.vr *.cps *.pgs \
+! 	      *.dvi *.info *.info-* *.fns *.kys *.tps *.vrs *.o core
+--- 48,55 ----
+  	(cd $(DOC_SUPPORT); $(MAKE) $(MFLAGS) CFLAGS='$(CFLAGS)' texindex)
+  
+! distclean mostlyclean clean:
+  	rm -f *.aux *.cp *.fn *.ky *.log *.pg *.toc *.tp *.vr *.cps *.pgs \
+! 	      *.fns *.kys *.tps *.vrs *.o core
+  
+! maintainer-clean realclean:	clean
+! 	rm -f *.dvi *.info *.info-*  *.ps
+diff -Nrc2 bash-1.14.4/lib/readline/readline.c bash-1.14.5/lib/readline/readline.c
+*** bash-1.14.4/lib/readline/readline.c	Mon Feb 27 11:08:40 1995
+--- bash-1.14.5/lib/readline/readline.c	Wed May 24 10:43:28 1995
+***************
+*** 994,998 ****
+       8-bit character input and output. */
+    t = getenv ("LC_CTYPE");
+!   if (t && (strcmp (t, "iso-8859-1") == 0 || strcmp (t, "iso_8859_1") == 0))
+      {
+        _rl_meta_flag = 1;
+--- 994,999 ----
+       8-bit character input and output. */
+    t = getenv ("LC_CTYPE");
+!   if (t && (strcmp (t, "iso-8859-1") == 0 || strcmp (t, "iso_8859_1") == 0 ||
+!   	    strcmp (t, "ISO-8859-1") == 0))
+      {
+        _rl_meta_flag = 1;
+***************
+*** 3119,3123 ****
+    else
+      {
+!       rl_end_of_line ();
+        if (orig_point != rl_point)
+  	rl_kill_text (orig_point, rl_point);
+--- 3120,3124 ----
+    else
+      {
+!       rl_end_of_line (1, ignore);
+        if (orig_point != rl_point)
+  	rl_kill_text (orig_point, rl_point);
+***************
+*** 3142,3146 ****
+        else
+  	{
+! 	  rl_beg_of_line ();
+  	  rl_kill_text (orig_point, rl_point);
+  	}
+--- 3143,3147 ----
+        else
+  	{
+! 	  rl_beg_of_line (1, ignore);
+  	  rl_kill_text (orig_point, rl_point);
+  	}
+***************
+*** 3166,3170 ****
+    if (!rl_kill_ring)
+      {
+!       rl_abort ();
+        return -1;
+      }
+--- 3167,3171 ----
+    if (!rl_kill_ring)
+      {
+!       rl_abort (count, ignore);
+        return -1;
+      }
+***************
+*** 3187,3191 ****
+        !rl_kill_ring)
+      {
+!       rl_abort ();
+        return -1;
+      }
+--- 3188,3192 ----
+        !rl_kill_ring)
+      {
+!       rl_abort (1, key);
+        return -1;
+      }
+***************
+*** 3206,3210 ****
+    else
+      {
+!       rl_abort ();
+        return -1;
+      }
+--- 3207,3211 ----
+    else
+      {
+!       rl_abort (1, key);
+        return -1;
+      }
+diff -Nrc2 bash-1.14.4/lib/readline/vi_mode.c bash-1.14.5/lib/readline/vi_mode.c
+*** bash-1.14.4/lib/readline/vi_mode.c	Mon Dec  5 17:50:57 1994
+--- bash-1.14.5/lib/readline/vi_mode.c	Sun May 21 13:18:50 1995
+***************
+*** 276,280 ****
+      {
+        _rl_vi_set_last (key, 1, rl_arg_sign);
+!       rl_vi_insertion_mode ();
+      }
+    return (0);
+--- 276,280 ----
+      {
+        _rl_vi_set_last (key, 1, rl_arg_sign);
+!       rl_vi_insertion_mode (1, key);
+      }
+    return (0);
+***************
+*** 287,291 ****
+    rl_tilde_expand (0, key);
+    _rl_vi_set_last (key, 1, rl_arg_sign);	/* XXX */
+!   rl_vi_insertion_mode ();
+    return (0);
+  }
+--- 287,291 ----
+    rl_tilde_expand (0, key);
+    _rl_vi_set_last (key, 1, rl_arg_sign);	/* XXX */
+!   rl_vi_insertion_mode (1, key);
+    return (0);
+  }
+***************
+*** 508,513 ****
+       int count, key;
+  {
+!   rl_beg_of_line ();
+!   rl_vi_insertion_mode ();
+    return (0);
+  }
+--- 508,513 ----
+       int count, key;
+  {
+!   rl_beg_of_line (1, key);
+!   rl_vi_insertion_mode (1, key);
+    return (0);
+  }
+***************
+*** 518,522 ****
+    if (rl_point < rl_end)
+      rl_point++;
+!   rl_vi_insertion_mode ();
+    return (0);
+  }
+--- 518,522 ----
+    if (rl_point < rl_end)
+      rl_point++;
+!   rl_vi_insertion_mode (1, key);
+    return (0);
+  }
+***************
+*** 525,530 ****
+       int count, key;
+  {
+!   rl_end_of_line ();
+!   rl_vi_append_mode ();
+    return (0);
+  }
+--- 525,530 ----
+       int count, key;
+  {
+!   rl_end_of_line (1, key);
+!   rl_vi_append_mode (1, key);
+    return (0);
+  }
+***************
+*** 837,841 ****
+    _rl_vi_doing_insert = 1;
+    _rl_vi_set_last (key, count, rl_arg_sign);
+!   rl_vi_insertion_mode ();
+  
+    return (0);
+--- 837,841 ----
+    _rl_vi_doing_insert = 1;
+    _rl_vi_set_last (key, count, rl_arg_sign);
+!   rl_vi_insertion_mode (1, key);
+  
+    return (0);
+***************
+*** 1158,1162 ****
+    rl_begin_undo_group ();
+    _rl_vi_doing_insert = 1;
+!   rl_vi_insertion_mode ();
+  
+    return (0);
+--- 1158,1162 ----
+    rl_begin_undo_group ();
+    _rl_vi_doing_insert = 1;
+!   rl_vi_insertion_mode (1, key);
+  
+    return (0);
+diff -Nrc2 bash-1.14.4/lib/termcap/Makefile bash-1.14.5/lib/termcap/Makefile
+*** bash-1.14.4/lib/termcap/Makefile	Mon Jan 30 12:39:48 1995
+--- bash-1.14.5/lib/termcap/Makefile	Wed Jun  7 14:21:43 1995
+***************
+*** 59,62 ****
+--- 59,65 ----
+  		rm -f *.o *.a *.log *.cp *.tp *.vr *.fn *.aux *.pg *.toc
+  
++ maintainer-clean realclean mostlyclean distclean: clean
++ 
++ 
+  $(DESTDIR)/libtermcap.a: libtermcap.a
+  		-mv $(DESTDIR)/libtermcap.a $(DESTDIR)/libtermcap.old
+diff -Nrc2 bash-1.14.4/lib/tilde/Makefile bash-1.14.5/lib/tilde/Makefile
+*** bash-1.14.4/lib/tilde/Makefile	Mon Jan 30 12:38:30 1995
+--- bash-1.14.5/lib/tilde/Makefile	Wed Jun  7 14:22:01 1995
+***************
+*** 15,19 ****
+  # RANLIB, and selfdir are passed in from ../Makefile, and do
+  # not need to be defined here.
+! RM = rm
+  
+  srcdir = .
+--- 15,21 ----
+  # RANLIB, and selfdir are passed in from ../Makefile, and do
+  # not need to be defined here.
+! RM = rm -f
+! MV = mv
+! CP = cp
+  
+  srcdir = .
+***************
+*** 60,64 ****
+  
+  $(LIBRARY_NAME): $(OBJECTS)
+! 	$(RM) -f $@
+  	$(AR) cq $@ $(OBJECTS)
+  	-[ -n "$(RANLIB)" ] && $(RANLIB) $@
+--- 62,66 ----
+  
+  $(LIBRARY_NAME): $(OBJECTS)
+! 	$(RM) $@
+  	$(AR) cq $@ $(OBJECTS)
+  	-[ -n "$(RANLIB)" ] && $(RANLIB) $@
+***************
+*** 82,87 ****
+  
+  clean:
+! 	$(RM) -f $(OBJECTS) $(LIBRARY_NAME)
+! 	-(cd doc; $(MAKE) $(MFLAGS) clean)
+  
+  
+--- 84,91 ----
+  
+  clean:
+! 	$(RM) $(OBJECTS) $(LIBRARY_NAME)
+! 	-(cd doc && $(MAKE) $(MFLAGS) $@)
+! 
+! maintainer-clean realclean mostlyclean distclean: clean
+  
+  
+diff -Nrc2 bash-1.14.4/lib/tilde/doc/Makefile bash-1.14.5/lib/tilde/doc/Makefile
+*** bash-1.14.4/lib/tilde/doc/Makefile	Tue Aug 31 16:47:59 1993
+--- bash-1.14.5/lib/tilde/doc/Makefile	Fri May  5 15:17:50 1995
+***************
+*** 1,5 ****
+- 
+- clean:
+- 	rm -f glob.??
+  all:
+  	cp tilde.texi tilde.info
+--- 1,5 ----
+  all:
+  	cp tilde.texi tilde.info
++ 
++ clean realclean maintainer-clean:
++ 	rm -f tilde.?? tilde.info
+diff -Nrc2 bash-1.14.4/machines.h bash-1.14.5/machines.h
+*** bash-1.14.4/machines.h	Tue Apr 11 15:47:09 1995
+--- bash-1.14.5/machines.h	Wed May 31 11:05:02 1995
+***************
+*** 472,476 ****
+     * Use `$(CC) -E' instead of `/lib/cpp' in Makefile.
+  */
+! #if defined (mips) && (!defined (M_MACHINE) || defined (RiscOS))
+  
+  #  if defined (MIPSEB)
+--- 472,476 ----
+     * Use `$(CC) -E' instead of `/lib/cpp' in Makefile.
+  */
+! #if defined (mips) && ((!defined (M_MACHINE) && !defined (__nonstopux)) || defined (RiscOS))
+  
+  #  if defined (MIPSEB)
+***************
+*** 2018,2024 ****
+  /* ************************ */
+  /*			    */
+! /*    Tandem running SVR3   */
+  /*			    */
+  /* ************************ */
+  #if defined (tandem) && !defined (M_MACHINE)
+  #  define M_MACHINE "tandem"
+--- 2018,2032 ----
+  /* ************************ */
+  /*			    */
+! /*          Tandem          */
+  /*			    */
+  /* ************************ */
++ /* I don't know what this is supposed to be (Greg Lehey, LEMIS, 29 May 1995).
++  * Tandem had two very different machines which ran SVR3: the LXN, based on
++  * a Motorola 68000, and the S2, based on a MIPS R3000.  Both are obsolete
++  * (well, S2s should now be running NonStop UX version B, which is a flavour
++  * of SVR4).  I'm leaving this here and will test for NonStop UX B with the
++  * preprocessor variable __nonstopux, which is set by the native compiler and
++  * should also be set by any other compiler, such as gcc (caveat portor: you'$
++  * need to fix gcc config to to get this). */
+  #if defined (tandem) && !defined (M_MACHINE)
+  #  define M_MACHINE "tandem"
+***************
+*** 2034,2037 ****
+--- 2042,2090 ----
+  #endif /* Tandem running SVR3 */
+  
++ /* This is for NonStop UX Bxx, which is SVR4, but there's a very good
++  * chance it will trigger on NonStop UX Axx (SVR3).  If this happens,
++  * fix it or upgrade your OS. */
++ #if defined (mips) && defined (__nonstopux)               /* Integrity, NonStop UX */
++ #  define M_MACHINE "Integrity"
++ #  define M_OS "NonStop_UX"
++ #  undef HAVE_GETWD
++ #  define HAVE_DIRENT
++ #  define HAVE_STRERROR
++ #  define HAVE_VFPRINTF
++ #  define VOID_SIGHANDLER
++ #  define HAVE_SYS_SIGLIST
++ #  define HAVE_SETLINEBUF
++ #  define HAVE_GETGROUPS
++ #  undef HAVE_ALLOCA
++ #endif
++ 
++ /* ****************** */ 
++ /*                    */
++ /*  Fujitsu UXP/M     */
++ /*                    */
++ /* ****************** */ 
++ 
++ #if defined (__uxpm__)
++ #  define M_MACHINE "VP"
++ #  define M_OS "USG"
++ #  define VOID_SIGHANDLER
++ #  define HAVE_POSIX_SIGNALS
++ #  define HAVE_VFPRINTF
++ #  define HAVE_DIRENT
++ #  define HAVE_SETVBUF
++ #  define HAVE_STRCHR
++ #  define HAVE_STRERROR
++ #  define HAVE_GETGROUPS
++ #  define HAVE_DUP2
++ #  undef HAVE_ALLOCA
++ #  undef HAVE_GETWD
++ #  define HAVE_GETCWD
++ #  define HAVE_SYS_SIGLIST
++ #  define NO_SBRK_DECL
++ #  define SYSDEP_CFLAGS  -DHAVE_UID_T -Dsys_siglist=_sys_siglist  -DUSGr4 
++ #  define EXTRA_LIB_SEARCH_PATH /usr/ucblib
++ #  define REQUIRED_LIBRARIES -lc -lucb
++ #endif
++ 
+  /* ****************** */ 
+  /*                    */
+***************
+*** 2040,2044 ****
+  /* ****************** */
+  
+! #if defined (UTS)
+  #  define M_MACHINE "uts"
+  #  define M_OS "systemV"
+--- 2093,2097 ----
+  /* ****************** */
+  
+! #if defined (UTS) && !defined (M_MACHINE)
+  #  define M_MACHINE "uts"
+  #  define M_OS "systemV"
+diff -Nrc2 bash-1.14.4/subst.c bash-1.14.5/subst.c
+*** bash-1.14.4/subst.c	Sat Feb 25 22:59:35 1995
+--- bash-1.14.5/subst.c	Tue Jun 27 15:13:26 1995
+***************
+*** 51,54 ****
+--- 51,55 ----
+  
+  #include <glob/fnmatch.h>
++ #include "builtins/getopt.h"
+  
+  /* The size that strings change by. */
+***************
+*** 67,71 ****
+  extern int dollar_dollar_pid, no_brace_expansion;
+  extern int posixly_correct;
+- extern int opterr, optind;
+  extern int eof_encountered, eof_encountered_limit, ignoreeof;
+  extern char *this_command_name;
+--- 68,71 ----
+***************
+*** 1094,1097 ****
+--- 1094,1117 ----
+  }
+  
++ /* Remove IFS white space at the end of STRING.  Start at the end
++    of the string and walk backwards until the beginning of the string
++    or we find a character that's not IFS white space and not CTLESC.
++    Only let CTLESC escape a white space character if SAW_ESCAPE is
++    non-zero.  */
++ char *
++ strip_trailing_ifs_whitespace (string, separators, saw_escape)
++      char *string, *separators;
++      int saw_escape;
++ {
++   char *s;
++   
++   s = string + STRLEN (string) - 1;
++   while (s > string && ((spctabnl (*s) && issep (*s)) ||
++ 			(saw_escape && *s == CTLESC && spctabnl (s[1]))))
++     s--;
++   *++s = '\0';
++   return string;
++ }
++ 
+  #if defined (PROCESS_SUBSTITUTION)
+  #define EXP_CHAR(s) (s == '$' || s == '`' || s == '<' || s == '>' || s == CTLESC)
+***************
+*** 1366,1369 ****
+--- 1386,1408 ----
+  }
+  
++ /* This does not perform word splitting or dequote the WORD_LIST
++    it returns. */
++ static WORD_LIST *
++ expand_string_for_rhs (string, quoted, dollar_at_p, has_dollar_at)
++      char *string;
++      int quoted, *dollar_at_p, *has_dollar_at;
++ {
++   WORD_DESC td;
++   WORD_LIST *tresult;
++ 
++   if (string == 0 || *string == '\0')
++     return (WORD_LIST *)NULL;
++      
++   bzero (&td, sizeof (td));
++   td.word = string; 
++   tresult = call_expand_word_internal (&td, quoted, dollar_at_p, has_dollar_at);
++   return (tresult);
++ }
++ 
+  /* Expand STRING just as if you were expanding a word, but do not dequote
+     the resultant WORD_LIST.  This is called only from within this file,
+***************
+*** 1445,1451 ****
+  
+    temp = xmalloc (3);
+!   temp[0] = CTLESC;
+!   temp[1] = c;
+!   temp[2] = '\0';
+    return (temp);
+  }
+--- 1484,1498 ----
+  
+    temp = xmalloc (3);
+!   if (c == 0)
+!     {
+!       temp[0] = CTLNUL;
+!       temp[1] = '\0';
+!     }
+!   else
+!     {
+!       temp[0] = CTLESC;
+!       temp[1] = c;
+!       temp[2] = '\0';
+!     }
+    return (temp);
+  }
+***************
+*** 2371,2375 ****
+  
+        if (var && !invisible_p (var) && (temp = value_cell (var)))
+! 	temp = quote_escapes (temp);
+      }
+    return (temp);
+--- 2418,2423 ----
+  
+        if (var && !invisible_p (var) && (temp = value_cell (var)))
+! 	temp = quoted && temp && *temp ? quote_string (temp)
+! 				       : quote_escapes (temp);
+      }
+    return (temp);
+***************
+*** 2386,2390 ****
+    WORD_LIST *l;
+    char *t, *t1, *temp;
+!   int i;
+  
+    if (value[0] == '~' ||
+--- 2434,2438 ----
+    WORD_LIST *l;
+    char *t, *t1, *temp;
+!   int i, lquote, hasdol;
+  
+    if (value[0] == '~' ||
+***************
+*** 2395,2399 ****
+  
+    /* This is a hack.  A better fix is coming later. */
+!   if (*temp == '"')
+      {
+        i = 1;
+--- 2443,2448 ----
+  
+    /* This is a hack.  A better fix is coming later. */
+!   lquote = 0;
+!   if (*temp == '"' && temp[strlen (temp) - 1] == '"')
+      {
+        i = 1;
+***************
+*** 2401,2407 ****
+        free (temp);
+        temp = t;
+      }
+!   l = *temp ? expand_string_internal (temp, quoted) : (WORD_LIST *)NULL;
+    free (temp);
+  
+    if (l)
+--- 2450,2464 ----
+        free (temp);
+        temp = t;
++       lquote = 1;	/* XXX */
+      }
+!   hasdol = 0;
+!   /* XXX was quoted not lquote */
+!   l = *temp ? expand_string_for_rhs (temp, quoted||lquote, &hasdol, (int *)NULL)
+! 	    : (WORD_LIST *)NULL;
+    free (temp);
++   /* expand_string_for_rhs does not dequote the word list it returns, but
++      there are a few cases in which we need to add quotes. */
++   if (lquote && quoted == 0 && hasdol == 0 && l && l->word->quoted == 0)
++     quote_list (l);
+  
+    if (l)
+***************
+*** 2750,2753 ****
+--- 2807,2816 ----
+  	      temp = string_rest_of_args (quoted);
+  
++ 	      if (quoted && temp && *temp == '\0' /* && istring_index > 0 */)
++ 		{
++ 		  free (temp);
++ 		  temp = (char *)NULL;
++ 		}
++ 
+  	      /* In the case of a quoted string, quote the entire arg-list.
+  		 "$1 $2 $3". */
+***************
+*** 2977,2980 ****
+--- 3040,3049 ----
+  		      if (!value || !*value || !temp || !*temp)
+  			break;
++ 		      if (quoted)
++ 			{
++ 			  t = dequote_string (temp);
++ 			  free (temp);
++ 			  temp = t;
++ 			}
+  		      t = parameter_brace_remove_pattern (value, temp, c);
+  		      free (temp);
+***************
+*** 2999,3002 ****
+--- 3068,3081 ----
+  				temp = parameter_brace_expand_rhs
+  				  (name, value, c, quoted);
++ 				/* XXX - this is a hack.  A better fix is
++ 					 coming later. */
++ 				if ((value[0] == '$' && value[1] == '@') ||
++ 				    (value[0] == '"' && value[1] == '$' && value[2] == '@'))
++ 				  {
++ 				    if (quoted)
++ 				      quoted_dollar_at++;
++ 				    if (contains_dollar_at)
++ 				      *contains_dollar_at = 1;
++ 				  }
+  				free (value);
+  			      }
+***************
+*** 3125,3129 ****
+  	      {
+  		/* Find the variable in VARIABLE_LIST. */
+! 		int old_index = sindex;
+  		char *name;
+  		SHELL_VAR *var;
+--- 3204,3208 ----
+  	      {
+  		/* Find the variable in VARIABLE_LIST. */
+! 		int old_index;
+  		char *name;
+  		SHELL_VAR *var;
+***************
+*** 3131,3135 ****
+  		temp = (char *)NULL;
+  
+! 		for (;
+  		     (c = string[sindex]) &&
+  		     (isletter (c) || digit (c) || c == '_');
+--- 3210,3214 ----
+  		temp = (char *)NULL;
+  
+! 		for (old_index = sindex;
+  		     (c = string[sindex]) &&
+  		     (isletter (c) || digit (c) || c == '_');
+***************
+*** 3152,3156 ****
+  		if (var && !invisible_p (var) && value_cell (var))
+  		  {
+! 		    temp = quote_escapes (value_cell (var));
+  		    free (name);
+  		    goto add_string;
+--- 3231,3237 ----
+  		if (var && !invisible_p (var) && value_cell (var))
+  		  {
+! 		    temp = value_cell (var);
+! 		    temp = quoted && temp && *temp ? quote_string (temp)
+! 						   : quote_escapes (temp);
+  		    free (name);
+  		    goto add_string;
+***************
+*** 3491,3495 ****
+  	     IFS="" and the positional parameters are not empty. */
+  	  if (quoted_dollar_at && ifs_chars && *ifs_chars)
+! 	    temp_list = list_string (istring, " ", 1);
+  	  else
+  	    {
+--- 3572,3583 ----
+  	     IFS="" and the positional parameters are not empty. */
+  	  if (quoted_dollar_at && ifs_chars && *ifs_chars)
+! 	    {
+! 	      temp_list = list_string (istring, " ", 1);
+! #if 0
+! 	      /* This turns quoted null strings back into CTLNULs */
+! 	      dequote_list (temp_list);
+! 	      quote_list (temp_list);
+! #endif
+! 	    }
+  	  else
+  	    {
+***************
+*** 4724,4728 ****
+    if (tt && *tt)
+      s = atoi (tt);
+!   opterr = s;
+  }
+  #endif /* GETOPTS_BUILTIN */
+--- 4812,4816 ----
+    if (tt && *tt)
+      s = atoi (tt);
+!   sh_opterr = s;
+  }
+  #endif /* GETOPTS_BUILTIN */
+diff -Nrc2 bash-1.14.4/subst.h bash-1.14.5/subst.h
+*** bash-1.14.4/subst.h	Sun Dec 19 15:19:02 1993
+--- bash-1.14.5/subst.h	Thu May  4 15:49:06 1995
+***************
+*** 75,78 ****
+--- 75,79 ----
+  
+  extern char *get_word_from_string __P((char **, char *, char **));
++ extern char *strip_trailing_ifs_whitespace __P((char *, char *, int));
+  
+  /* Given STRING, an assignment string, get the value of the right side
+diff -Nrc2 bash-1.14.4/support/FAQ bash-1.14.5/support/FAQ
+*** bash-1.14.4/support/FAQ	Tue Mar 23 13:16:09 1993
+--- bash-1.14.5/support/FAQ	Wed Dec 31 19:00:00 1969
+***************
+*** 1,202 ****
+- This Frequently Asked Questions file is edited in -*- indented-text -*- mode.
+- 
+- If you are viewing this text in a GNU Emacs Buffer, you can type "M-2 C-x $" to
+- get an overview of just the questions.  Then, when you want to look at the text
+- of the answers, just type "C-x $".
+- 
+- To search for a question numbered XXX, type "M-C-s ^XXX:", followed by a C-r if
+- that doesn't work, then type ESC to end the search.
+- 
+- 1: How do I convert all of my Csh aliases over to Bash aliases?
+-   Bash uses a different syntax to support aliases than Csh does.  The
+-   details can be found in the documentation.  We have provided a shell
+-   script which does most of the work of conversion for you; this
+-   script can be found in ./examples/alias-conv.sh.  Here is how you
+-   use it:
+-   
+-       Start Csh in the normal way for you.  (e.g., "csh")
+-   
+-       Pipe the output of "alias" through "alias-conv.sh", saving the
+-       results into "bash_aliases":
+-   
+-         alias | alias-conv.sh >.bash_aliases
+-   
+-       Edit "bash_aliases" carefully reading through any created
+-       functions.  You will need to change the names of Csh specific
+-       variables (like $cwd) to the Bash equivalents (like $PWD).  You
+-       will also need to remove recursive references to commands which
+-       are defined as functions.  For example, the Csh alias:
+-   
+- 	alias cd 'cd \!*;echo $cwd'
+-   
+-       is converted to the Bash function:
+-   
+- 	cd () 
+- 	{ 
+- 	  cd $*;
+- 	  echo $cwd
+- 	}
+-   
+-       This function contains a self-pointing reference to "cd", which
+-       should be changed to use the "builtin" version.  It also uses
+-       the Csh variable `$cwd' which has an equivalent in Bash.
+-       Precede the recursive reference with the word "builtin", and
+-       change the name of the variable:
+-   
+-         cd () { builtin cd $*; echo $PWD }
+-   
+-       Merge the edited file into your ~/.bashrc.
+-   
+- 2: Background jobs have staggered output, as if there was no CR before the LF.
+-   This is a result of bash using the BSD-style tty driver on Ultrix.  The BSD
+-   driver ties input and output carriage return translation together with the
+-   CRMOD bit.  (The CRMOD bit causes CR->LF translation on input and LF->CRLF
+-   translation on output.)  Unless the CRMOD bit is cleared, it is impossible
+-   to get a literal ^M in an input line.  Unfortunately, one of the effects of
+-   clearing it is the loss of output processing you've observed. 
+-   
+-   The Ultrix Posix-style tty driver can't be used because it has serious
+-   problems with losing typeahead when ICANON is switched on and off.  These
+-   characters seem to reappear later without warning, usually when a
+-   program that uses the BSD-style ioctls turns on CBREAK (e.g., `more').
+-   
+- 3: Bash's "test" different from "/bin/test"? ([ ! x -o x ] -> false)
+-    Bash's builtin "test" implements the Posix.2 spec, which can be
+-    summarized as follows (the wording is due to David Korn):
+-    
+-     Here is the set of rules for processing test arguments.
+-   
+-     0 Args: False
+-     1 Arg:  True iff argument is not null.
+-     2 Args: If first arg is !, True iff second argument is null.
+- 	    If first argument is unary, then true if unary test is true
+- 	    Otherwise error.
+-     3 Args: If second argument is a binary operator, do binary test of $1 $3
+- 	    If first argument is !, negate two argument test of $2 $3
+- 	    Otherwise error.
+-     4 Args: If first argument is !, negate three argument test of $2 $3 $4.
+- 	    Otherwise unspecified
+-     5 or more Args: unspecified.  (Historical shells would used their
+-     current algorithm).
+-    
+-     The operators -a and -o are considered binary operators for the purpose
+-     of the 3 Arg case.
+-    
+-    As you can see, the test becomes (not (x or x)), which is false.
+-    
+- 4: Completion listings can differ from `ls' in the number of columns output.
+-   This can happen because `ls' calls stat () on every file before
+-   listing the output, while GNU Readline only calls stat () on the
+-   files when they are being printed.  This means that `ls' knows how
+-   many characters will be added to each filename in advance, and can
+-   accurately calculate the maximum length, while Bash must assume that
+-   each filename will have characters added to it.
+-   
+- 5: Bash crashes when I do "cd".
+-   If you have `cd' defined as a function, it is likely that the
+-   function is recursively calling itself.  See the answer to question
+-   1 above.
+-   
+- 6: Why does Bash sometimes say "Broken pipe"?
+-   If a sequence of commands appear in a pipeline, and one of the
+-   reading commands finishes before the writer has finished, the writer
+-   receives a SIGPIPE signal.  Many other shells special-case SIGPIPE as
+-   an exit status in the pipeline and do not report it.  For example,
+-   in:
+-   
+-       ps -aux | head
+-   
+-   `head' can finish before `ps' writes all of its output.  In that case,
+-   Bash will print `Broken pipe' to stderr on behalf of the `ps'
+-   command.
+-   
+- 7: How can I use `!' to reinvoke a command starting with a digit?
+-   If you had issued a command such as `8086engine foo', and then at a
+-   later time wished to reinvoke the command, typing `!80' would probably
+-   not work since Bash would think you meant the 80'th command in the
+-   history, not the command starting with `80'.  You can type `!?80',
+-   which says to re-execute the most recent command containing `80'.
+- 
+- Questions About Input Line Editing:
+- 
+- 1: What do things like this mean: C-h, M-C-a, RET, etc.?
+-   
+-   C-a means press the "a" key while holding down the "Control" key.  The
+-   ASCII code this sends will generally be the value that would be sent by
+-   pressing just "a" minus 96 or 64.  Either way it will be a number from 0
+-   to 31.
+-   
+-   M-a means press the "a" key while holding down the "Meta" key.  The
+-   ASCII code this sends is the sum of the ASCII code that would be sent by
+-   pressing just "a" and 128.
+-   
+-   M-C-a means press the "a" key while holding down both the "Control" key
+-   and the "Meta" key.  C-M-a is a synonym for M-C-a.
+-   
+-   * RET means press the "Return" key.  RET is the same as C-m.  This sends
+-     ASCII code 13.
+-   
+-   * LFD means press the "Linefeed" key.  LFD is also the same as C-j.  This
+-     sends ASCII code 10.  Under Unix, ASCII code 10 is more often called
+-     "Newline".
+-   
+-   * DEL means press the "Delete" key.  DEL is the same as C-?.  This sends
+-     ASCII code 127.  (WARNING: It is a misnomer to call C-? a "control" key,
+-     since 127 has both bits 6 and 7 turned ON, and the rule for control keys
+-     is that they have 6 and 7 turned OFF.  Also, on very few keyboards does
+-     Control-? generate ASCII code 127.  In fact, Control-? (which is
+-     actually Control-Shift-/) is more likely to generate C-_, ASCII code
+-     31!)
+-   
+-   * ESC means press the "Escape" key.  ESC is the same as C-[.  This sends
+-     ASCII code 27.
+-   
+-   * SPC means press the "Space" key.  This send ASCII code 32.
+-   
+-   * TAB means press the "Tab" key.  TAB is the same as C-i.  This send ASCII
+-     code 9.
+-   
+-   For C-@ and C-^, usually you don't have to hold down the shift key and you
+-   can type Control-2 or Control-6 instead.  For C-_, you may have to hold
+-   down the shift key, typing Control-Shift-Hyphen.  C-@ can often be
+-   generated by typing Control-Space.  C-@ is often called the NUL character,
+-   and has ASCII value 0.  C-_ can often be generated by typing Control-7 or 
+-   Control-/.  Try Control with all of the digits on your keyboard to see
+-   what gets generated.
+-   
+-   To read more about this online, type "C-h i m emacs RET m characters
+-   RET", and also "C-h i m emacs RET m keys RET".
+-   
+- 2: What do you mean when you write things like this: type "ESC a"?
+-   
+-   I will enclose key sequences that are longer than one key inside double
+-   quotes.  These notations refer to single key strokes (some with
+-   modifiers):
+-   
+-     C-x, M-x, M-C-x
+-     RET, LFD, DEL, ESC, SPC, TAB
+-   
+-   I separate these from other keys within double quotes by spaces.  Any
+-   real spaces that I write inside double quotes can be ignored, only SPC
+-   means press the space key.  All other characters within double quotes
+-   represent single keys (some shifted).
+-   
+- 3: What if I don't have a Meta key?
+-   
+-   Instead of typing M-a, you can type "ESC a" instead.  In fact, Emacs
+-   converts M-a internally into "ESC a" anyway (depending on the value of
+-   meta-prefix-char).
+-   
+- 4: What if I don't have an Escape key?
+-   
+-   Type C-[ instead.  This should send ASCII code 27 just like an Escape
+-   key would.
+-   
+- 5: What does "M-x command" mean?
+-   
+-   "M-x command" means type M-x, then type the name of the command, then
+- 
+- 
+- Local Variables:
+- eval: (set-selective-display 2)
+- End:
+--- 0 ----
+diff -Nrc2 bash-1.14.4/support/bashbug.sh bash-1.14.5/support/bashbug.sh
+*** bash-1.14.4/support/bashbug.sh	Tue Mar  7 10:13:05 1995
+--- bash-1.14.5/support/bashbug.sh	Wed May 31 14:21:26 1995
+***************
+*** 76,80 ****
+  	fi
+  
+! 	${RMAIL} $BUGADDR < $TEMP || cat $TEMP >> $HOME/dead.bashbug
+  fi
+  
+--- 76,83 ----
+  	fi
+  
+! 	${RMAIL} $BUGADDR < $TEMP || {
+! 		cat $TEMP >> $HOME/dead.bashbug
+! 		echo "$0: mail failed: report saved in $HOME/dead.bashbug" >&2
+! 	}
+  fi
+  
+diff -Nrc2 bash-1.14.4/support/getcppsyms.c bash-1.14.5/support/getcppsyms.c
+*** bash-1.14.4/support/getcppsyms.c	Sun Aug  7 00:01:58 1994
+--- bash-1.14.5/support/getcppsyms.c	Wed May 31 11:02:14 1995
+***************
+*** 333,336 ****
+--- 333,339 ----
+    printf (" -Dn16");
+  #endif /* n16 */
++ #if defined __nonstopux
++   printf (" -D__nonstopux");
++ #endif
+  #if defined (ns32000)
+    printf (" -Dns32000");
+diff -Nrc2 bash-1.14.4/support/mksysdefs bash-1.14.5/support/mksysdefs
+*** bash-1.14.4/support/mksysdefs	Fri Mar 17 17:01:58 1995
+--- bash-1.14.5/support/mksysdefs	Mon May 22 10:52:29 1995
+***************
+*** 81,84 ****
+--- 81,89 ----
+  fi
+  
++ # (sound of teeth grinding...)
++ if [ "$UNAME" = "UNIX_SV" ] && [ "$UNAME_R" != "4.2" ] && [ "$RELEASE"."$LEVEL" = "4.2" ]; then
++ 	UNAME_R="4.2"
++ fi
++ 
+  # another check for SVR4 on 386 or 486 machines
+  case "${UNAME_M}:${UNAME}:${UNAME_R}" in
+***************
+*** 240,243 ****
+--- 245,254 ----
+  	XD88*) SYSDEF=XD88 ;;
+  	M88100) SYSDEF=M88100 ;;	# Motorola Delta 88K
++ 	esac
++ fi
++ 
++ if [ "$SYSDEF" = "" ]; then
++ 	case "$UNAME_V" in
++ 	V[0-9]*L[0-9]*) SYSDEF=UXP ;;	# Fujitsu DS/90
+  	esac
+  fi
+diff -Nrc2 bash-1.14.4/support/texi2dvi bash-1.14.5/support/texi2dvi
+*** bash-1.14.4/support/texi2dvi	Wed Dec 31 19:00:00 1969
+--- bash-1.14.5/support/texi2dvi	Mon May  8 15:54:34 1995
+***************
+*** 0 ****
+--- 1,263 ----
++ #!/bin/sh
++ # texi2dvi -- smartly produce DVI files from texinfo sources
++ #
++ # Copyright (C) 1992, 1993 Free Software Foundation.
++ #
++ # This program is free software; you can redistribute it and/or modify
++ # it under the terms of the GNU General Public License as published by
++ # the Free Software Foundation; either version 2, or (at your option)
++ # any later version.
++ #
++ # This program is distributed in the hope that it will be useful,
++ # but WITHOUT ANY WARRANTY; without even the implied warranty of
++ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ # GNU General Public License for more details.
++ #
++ # You should have received a copy of the GNU General Public License
++ # along with this program; if not, you can either send email to this
++ # program's author (see below) or write to:
++ #
++ #              Free Software Foundation, Inc.
++ #              675 Mass Ave.
++ #              Cambridge, MA 02139, USA. 
++ #
++ # Please send bug reports, etc. to bug-texinfo@prep.ai.mit.edu
++ # If possible, please send a copy of the output of the script called with
++ # the `--debug' option when making a bug report. 
++ #
++ # Version 0.4
++ # Last modified 26-Mar-93
++ #
++ 
++ # Please note that in the interest of general portability, some common
++ # bourne shell constructs were avoided because they weren't guaranteed to
++ # be available in some earlier implementations.  I've tried to make this as
++ # portable as possible. 
++ #
++ # Among the more interesting lossages I noticed with some bourne shells
++ # are:
++ #       1) Some don't have an `unset' builtin 
++ #       2) In some implementations the `shift' builtin can't take a
++ #          numerical argument. 
++ 
++ progname=`basename $0`
++ 
++ usage="Usage: ${progname} {-D} {-h} [file1] {file2} {...}
++        {--debug} {--help}
++ 
++    Options in braces are optional.  Those in brackets are required. 
++ "
++ 
++ if test $# -eq 0 ; then
++    echo "${usage}" 1>&2;
++    exit 1
++ fi
++ 
++ backup_extension=".bak"
++ texindex="texindex"
++ tex="tex"
++ bq="\`"  # To prevent hairy quoting and escaping later.
++ eq="'"
++ orig_pwd="`pwd`"
++ 
++ if test "z${TEXINDEX}" != "z" ; then
++    texindex="${TEXINDEX}"
++ fi
++ 
++ if test "z${TEX}" != "z" ; then
++    tex="${TEX}"
++ fi
++ 
++ # Save this so we can construct a new TEXINPUTS path for each file to be
++ # processed.
++ TEXINPUTS_orig="${TEXINPUTS}"
++ export TEXINPUTS
++ 
++ # Parse command line options
++ 
++ # "unset" option variables to make sure they weren't accidentally
++ # exported
++ debug=""
++ 
++ # If you add new commands be sure to change the wildcards below to make
++ # sure they are unambiguous (i.e. only match one possible long option)
++ # Be sure to show at least one instance of the full long option name to
++ # document what the long option is canonically called. 
++ while test $# -gt 0 ; do
++    case z$1 in
++       z-D | z--debug | z--d* )
++          debug="t"
++          shift
++         ;;
++       z-h | z--help | z--h* )
++          echo "${usage}" 1>&2
++          exit 1
++         ;;
++       z-- )
++          shift
++          break 
++         ;;
++       z-* )
++          echo "${progname}: ${bq}${1}${eq} is not a valid option." 1>&2
++          echo "" 1>&2
++          echo "${usage}" 1>&2
++          exit 1
++         ;;
++       * )
++          break 
++         ;;
++    esac
++ done
++ 
++ # See if there are any command line args left (which will be interpreted as
++ # filename arguments)
++ if test $# -eq 0 ; then
++    echo "${progname}: at least one file name is required as an argument." 1>&2
++    echo "" 1>&2
++    echo "${usage}" 1>&2
++    exit 1
++ fi
++ 
++ test "z${debug}" = "zt" && set -x
++ 
++ # Texify files
++ for command_line_filename in ${1+"$@"} ; do
++    # Roughly equivalent to `dirname ...`, but more portable
++    directory="`echo ${command_line_filename} | sed 's/\/[^\/]*$//'`"
++    filename_texi="`basename ${command_line_filename}`"
++    # Strip off the last extension part (probably .texinfo or .texi)
++    filename_noext="`echo ${filename_texi} | sed 's/\.[^.]*$//'`"
++ 
++    # If directory and file are the same, then it's probably because there's
++    # no pathname component.  Set dirname to `.', the current directory.
++    if test "z${directory}" = "z${command_line_filename}" ; then
++       directory="."
++    fi
++ 
++    # Source file might @include additional texinfo sources.  Put `.' and
++    # directory where source file(s) reside in TEXINPUTS before anything
++    # else.  `.' goes first to ensure that any old .aux, .cps, etc. files in
++    # ${directory} don't get used in preference to fresher files in `.'. 
++    TEXINPUTS=".:${directory}:${TEXINPUTS_orig}"
++ 
++    # "Unset" variables that might have values from previous iterations and
++    # which won't be completely reset later.
++    definite_index_files=""
++ 
++    # See if file exists here.  If it doesn't we're in trouble since, even
++    # though the user may be able to reenter a valid filename at the tex
++    # prompt (assuming they're attending the terminal), this script won't be
++    # able to find the right index files and so forth.
++    if test ! -r "${command_line_filename}" ; then
++       echo "${progname}: ${command_line_filename}: No such file or permission denied." 1>&2
++       continue; 
++    fi
++ 
++    # Find all files having root filename with a two-letter extension,
++    # determine whether they're really index files, and save them.  Foo.aux
++    # is actually the cross-references file, but we need to keep track of
++    # that too.
++    possible_index_files="`eval echo ${filename_noext}.?? ${filename_noext}.aux`"
++    for this_file in ${possible_index_files} ; do
++       # If file is empty, forget it.  
++       if test ! -s "${this_file}" ; then
++          continue;
++       fi
++ 
++       # Examine first character of file.  If it's not a backslash or
++       # single quote, then it's definitely not an index or xref file.
++       first_character="`sed -n '1s/^\(.\).*$/\1/p;q' ${this_file}`"
++       if test "${first_character}" = "\\" -o "${first_character}" = "'" ; then
++          definite_index_files="${definite_index_files} ${this_file}"
++       fi
++    done
++    orig_index_files="${definite_index_files}"
++    orig_index_files_sans_aux="`echo ${definite_index_files} \
++                                 | sed 's/'${filename_noext}'\.aux//;
++                                        s/^[ ]*//;s/[ ]*$//;'`"
++ 
++    # Now save copies of original index files so we have some means of
++    # comparison later. 
++    for index_file_to_save in ${orig_index_files} ; do
++        cp "${index_file_to_save}" "${index_file_to_save}${backup_extension}"
++    done
++ 
++    # Run texindex on current index files.  If they already exist, and
++    # after running TeX a first time the index files don't change, then
++    # there's no reason to run TeX again.  But we won't know that if the
++    # index files are out of date or nonexistent.
++    if test "${orig_index_files_sans_aux}" ; then
++       ${texindex} ${orig_index_files_sans_aux}
++    fi
++ 
++    if ${tex} ${command_line_filename} ; then		# TeX run first time
++       definite_index_files=""
++       # Get list of new index files
++       possible_index_files="`eval echo ${filename_noext}.?? ${filename_noext}.aux`"
++       for this_file in ${possible_index_files} ; do
++          # If file is empty, forget it.
++          if test ! -s ${this_file} ; then
++             continue;
++          fi
++ 
++          # Examine first character of file.  If it's not a backslash or
++          # single quote, then it's definitely not an index or xref file.
++          first_character="`sed -n '1s/^\(.\).*$/\1/p;q' ${this_file}`"
++          if test "${first_character}" = "\\" -o "${first_character}" = "'" ; then
++             definite_index_files="${definite_index_files} ${this_file}"
++          fi
++       done
++       new_index_files="${definite_index_files}"
++       new_index_files_sans_aux="`echo ${definite_index_files} \
++                                   | sed 's/'${filename_noext}'\.aux//;
++                                          s/^[ ]*//;s/[ ]*$//;'`"
++ 
++       # If old and new list don't at least have the same file list, then one
++       # file or another has definitely changed.  
++       if test "${orig_index_files}" != "${new_index_files}" ; then
++          index_files_changed_p=t
++       else
++          # File list is the same.  We must compare each file until we find a
++          # difference.  
++          index_files_changed_p=""
++          for this_file in ${new_index_files} ; do
++             # cmp -s will return nonzero exit status if files differ. 
++             cmp -s "${this_file}" "${this_file}${backup_extension}"
++             if test $? -ne 0  ; then
++                # We only need to keep comparing until we find *one* that
++                # differs, because we'll have to run texindex & tex no
++                # matter what. 
++                index_files_changed_p=t
++                break
++             fi
++          done
++       fi
++ 
++       # If index files have changed since TeX has been run, or if the aux
++       # file wasn't present originally, run texindex and TeX again.
++       if test "${index_files_changed_p}"  ; then
++          retval=0
++          if test "${new_index_files_sans_aux}" ; then
++             ${texindex} ${new_index_files_sans_aux} 
++             retval=$?
++          fi
++          if test ${retval} -eq 0 ; then
++             ${tex} "${command_line_filename}"
++          fi
++       fi
++    fi
++ 
++    # Generate list of files to delete, then call rm once with the entire
++    # list.  This is significantly faster than multiple executions of rm. 
++    file_list=""
++    for file in ${orig_index_files} ; do
++        file_list="${file_list} ${file}${backup_extension}"
++    done
++    if test "${file_list}" ; then
++       rm -f ${file_list}
++    fi
++ done
++ 
++ #
++ # eof
++ #
+diff -Nrc2 bash-1.14.4/tests/glob-test bash-1.14.5/tests/glob-test
+*** bash-1.14.4/tests/glob-test	Tue Dec  6 14:40:17 1994
+--- bash-1.14.5/tests/glob-test	Wed May 17 15:47:46 1995
+***************
+*** 10,14 ****
+  rm -rf $TESTDIR
+  mkdir $TESTDIR
+! cd $TESTDIR
+  
+  touch a b c d abc abd abe bb bcd ca cb dd de
+--- 10,14 ----
+  rm -rf $TESTDIR
+  mkdir $TESTDIR
+! builtin cd $TESTDIR
+  
+  touch a b c d abc abd abe bb bcd ca cb dd de
+***************
+*** 175,179 ****
+  esac
+  
+! cd /
+! /bin/rm -rf $TESTDIR
+  exit 0
+--- 175,179 ----
+  esac
+  
+! builtin cd /
+! rm -rf $TESTDIR
+  exit 0
+diff -Nrc2 bash-1.14.4/tests/run-all bash-1.14.5/tests/run-all
+*** bash-1.14.4/tests/run-all	Fri Jul  8 09:23:30 1994
+--- bash-1.14.5/tests/run-all	Wed May 31 11:07:54 1995
+***************
+*** 1,6 ****
+  #! /bin/sh
+  
+! PATH=$PATH:.
+  export PATH
+  
+  echo Any output from any test indicates an anomaly worth investigating
+--- 1,7 ----
+  #! /bin/sh
+  
+! PATH=.:$PATH			# just to get the right version of printenv
+  export PATH
++ unset ENV
+  
+  echo Any output from any test indicates an anomaly worth investigating

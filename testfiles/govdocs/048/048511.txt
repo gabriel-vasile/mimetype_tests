@@ -1,0 +1,18 @@
+/^TEMPLATE:/ {
+: RENEW
+  # Lines ending with a backslash get rolled into the next one
+  /[ ,]\$/ {
+    s/\$.*$//g
+    N
+    b RENEW
+  }
+  s/^TEMPLATE://g
+  s/\n//g
+  s/  */ /g
+
+  # Convenience routines
+  s/source(/(source EQ /g
+  s/time(/bulgeprep_tbound(tt,/g
+  p
+}
+d

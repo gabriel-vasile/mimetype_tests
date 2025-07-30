@@ -1,0 +1,234 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <link rel="stylesheet" href="/Run2Physics/cs/css/cs.css" type="text/css">
+   <link rel="shortcut icon" href="/Run2Physics/cs/favicon.ico" >
+  <title>CSG: Fixed p17 Data</title>
+</head>
+
+<body>
+
+ <a href="/Run2Physics/cs/"><img id="logo" src="/Run2Physics/cs/csg.gif" alt="Back to the CSG main page"></a>
+
+<h1>Fixed p17 Data, p17.09.00 Data And Monte Carlo</h1>
+
+<div class="clear"></div>
+
+<p>
+
+<hr>
+
+<strong>Please switch to the <a href="fixPass2p170903.html">new data sets</a>  for summer.</strong>
+
+<hr>
+
+Here you can find information on how to access 
+<ul>
+<li><a href="#DATA">unskimmed data</a></li> 
+<li><a href="#TMB">skimmed thumbnails</a> (including <a href="#TMBp1709">p17.09.00 data</a>) </li>
+<li> <a href="#CAF">skimmed CAF trees</a> and </li>
+<li><a href="#MC">Monte Carlo CAF trees</a>.</li>
+</ul>
+
+<hr>
+
+<h3><a name="DATA">Unskimmed Data</a></h3>
+
+<p>
+All data reconstructed with p17.03.03 and p17.05.01 needs fixing.
+You can use the following SAM constraints to find <em>unskimmed</em> fixed data (warning: this takes a long time):
+
+<b>
+<pre>
+sam translate constraints --dim="(((APPL_NAME  p17tmbfixer and (VERSION  p17.07.00 or VERSION p17.07.01)) and DATA_TIER  thumbnail) and FILE_NAME  TMBfix-recoT_all_%)"
+</pre>
+</b>
+
+<p>
+All data reconstructed with p17.09.00 already includes the fixing. You can find the <em>unskimmed</em> data with these constraints:
+<b>
+<pre>
+sam translate constraints --dim="(((APPL_NAME  recon_root and VERSION  p17.09.00) and DATA_TIER  thumbnail) and FILE_NAME  recoT_all_%)"
+</pre>
+</b>
+
+
+<p>
+To learn how to process inclusive skims efficiently, see this <a href="http://www-d0.fnal.gov/Run2Physics/cs/howto/filter/EventFlags.html">HOWTO</a> on filtering based on event flags.
+<hr>
+
+
+<h3><a name="TMB">Skimmed Thumbnails</a></h3>
+
+<p>
+
+Please use the following predefined dataset definitions in SAM to find <em>skimmed</em> thumbnails
+<ul>
+<li><b>CSskim-<font color="red">SKIM</font>-PASS2-p17fix</b> (Fixed data)</li>
+<li><b>CSskim-<font color="red">SKIM</font>-PASS2-p17.09.01</b> (p17.09 data)</li>
+</ul>
+
+<p>
+or use a command like this from the shell:
+<b>
+<ul>
+<li><pre>sam translate constraints --dims="(((APPL_NAME tmbskim and VERSION csskim-pass2-p17) and DATA_TIER thumbnail) and FILE_NAME CSskim-XXXXXX-%)"</pre>(Fixed data)</li>
+<li><pre>sam translate constraints --dims="(((APPL_NAME tmbskim and VERSION csskim-pass2-p17.09.01) and DATA_TIER thumbnail) and FILE_NAME CSskim-XXXXXX-%)"</pre> (p17.09 data)</li>
+</ul>
+</b>
+
+where XXXXX stands for the skim name (see below).
+
+<hr>
+
+<h3><a name="CAF">Skimmed CAF Trees</a></h3>
+
+<p>
+To find CAF trees use one of the predefined dataset definitions 
+
+<ul>
+<li><b>CSG_CAF_<font color="red">SKIM</font>_v3</b></li>
+<li><b>CSG_CAF_<font color="red">SKIM</font>_v3_p17.09.01</b> for p17.09 data</li>
+</ul>
+
+or a command like this:
+
+<b>
+<pre>
+sam translate constraints --dims="(((DATA_TIER  root-tree-bygroup and APPL_NAME  tmb_analyze) and VERSION  csgcaf_01.01.00) and FILE_NAME  CAF-CSGv1-CSskim-XXXXXX-%)"
+</pre> 
+</b>
+
+where again XXXXXX stands for the skim name. For p17.09 data replace the version with <code>csgcaf_01.03.00</code>
+
+<hr>
+
+<h3><a name="MC">Smeared Monte Carlo</a></h3>
+
+To find CAF trees for Monte Carlo, use the dataset definition
+
+<ul>
+<li><b>CSG_CAF-MCv2-<font color="red">XXXXX</font></b>
+</ul>
+
+or the following sam command
+
+<b>
+<pre>
+sam translate constraints --dims="((((RUN_TYPE 'monte carlo') and DATA_TIER  root-tree-bygroup and APPL_NAME  tmb_analyze) and VERSION  csgcaf_01.02.00) and GLOBAL.REQUESTID XXXXX)"
+</pre> 
+</b>
+
+where XXXXX is the <a href="http://d0-france.in2p3.fr/WORKING_GROUPS/MONTECARLO/Catalog/current/">official Monte Carlo request ID.</a>
+
+<p>
+These CAF trees are produced with p18.04.00.
+
+
+<h4>Unsmeared Monte Carlo</h4>
+
+If you really want the older unsmeared Monte Carlo (where trees are not available for all requests) use this constraints:
+
+<b>
+<pre>
+sam translate constraints --dims="((((RUN_TYPE 'monte carlo') and DATA_TIER  root-tree-bygroup and APPL_NAME  tmb_analyze) and VERSION  csgcaf_01.01.00) and FILE_NAME CAF-MCv1-XXXXX-%)"
+</pre> 
+</b>
+
+or the dataset definitions:
+
+<ul>
+<li><b>CSG_CAF-MCv1-<font color="red">XXXXX</font></b>
+</ul>
+
+<p>
+These CAF trees are produced with p18.03.00.
+
+
+<hr>
+
+<h3>Dataset Definitions for Thumbnails and CAF Trees for fixed p17 Data</h3>
+
+<p>
+Note: For some skims the CAF tree production will not be finished due to the calorimeter calibration bug. See 
+<a href="p17data.html">this page</a> for possible replacements.
+
+<p>
+These CAF trees are produced with p18.03.00.
+
+<p>
+
+<table align="center" width="90%">
+<thead>
+<tr>
+<th>Skim</th>
+<th>Thumbnail Dataset Definition</th> 
+<th>CAF p18.03.00 Dataset Definition</th>
+</thead>
+<tbody>
+<tr><th>EMinclusive</th><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=291262">CSskim-EMinclusive-PASS2-p17fix</a></td><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=301082">CSG_CAF_EMinclusive_v3</a></td></tr>
+<tr><th>MUinclusive</th><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=291266">CSskim-MUinclusive-PASS2-p17fix</a></td><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=301086">CSG_CAF_MUinclusive_v3</a></td></tr>
+<tr><th>ZBMB</th><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=291271">CSskim-ZBMB-PASS2-p17fix</a></td><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=301091">CSG_CAF_ZBMB_v3</a></td></tr>
+<tr><th>NP</th><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=291267">CSskim-NP-PASS2-p17fix</a></td><td align="center"><del><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=301087">CSG_CAF_NP_v3</a></del></td></tr>
+<tr><th>TAUTRIG</th><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=291269">CSskim-TAUTRIG-PASS2-p17fix</a></td><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=301089">CSG_CAF_TAUTRIG_v3</a></td></tr>
+<tr><th>2EMhighpt</th><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=291258">CSskim-2EMhighpt-PASS2-p17fix</a></td><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=301077">CSG_CAF_2EMhighpt_v3</a></td></tr>
+<tr><th>2MUhighpt</th><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=291259">CSskim-2MUhighpt-PASS2-p17fix</a></td><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=301078">CSG_CAF_2MUhighpt_v3</a></td></tr>
+<tr><th>JPSI</th><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=291265">CSskim-JPSI-PASS2-p17fix</a></td><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=301085">CSG_CAF_JPSI_v3</a></td></tr>
+<tr><th>3JET</th><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=291260">CSskim-3JET-PASS2-p17fix</a></td><td align="center"><del><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=301080">CSG_CAF_3JET_v3</a></del></td></tr>
+<tr><th>DIFF</th><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=291261">CSskim-DIFF-PASS2-p17fix</a></td><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=301081">CSG_CAF_DIFF_v3</a></td></tr>
+<tr><th>QCD</th><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=291268">CSskim-QCD-PASS2-p17fix</a></td><td align="center"><del><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=301088">CSG_CAF_QCD_v3</a></del></td></tr>
+<tr><th>Higgs</th><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=291264">CSskim-Higgs-PASS2-p17fix</a></td><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=301084">CSG_CAF_Higgs_v3</a></td></tr>
+<tr><th>TOPJETTRIG</th><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=291270">CSskim-TOPJETTRIG-PASS2-p17fix</a></td><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=301090">CSG_CAF_TOPJETTRIG_v3</a></td></tr>
+<tr><th>EMMU</th><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=291263">CSskim-EMMU-PASS2-p17fix</a></td><td align="center"><a href="http://d0db-prd.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=301083">CSG_CAF_EMMU_v3</a></td></tr>
+
+</tbody>
+</table>
+
+<hr>
+
+<h3><a name="TMBp1709">Dataset Definitions for Thumbnails and CAF Trees for p17.09 Data</a></h3>
+
+<table align="center"  width="90%">
+<thead>
+<tr>
+<th>Skim</th>
+<th>Thumbnail Dataset Definition</th> 
+<th>CAF Tree Dataset Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr><th>EMinclusive</th><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=317708">CSskim-EMinclusive-PASS2-p17.09.01</a></td>
+<td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=322190">CSG_CAF_EMinclusive_v3_p17.09.01</a></td></tr>
+<tr><th>MUinclusive</th><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=317712">CSskim-MUinclusive-PASS2-p17.09.01</a></td><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=322194">CSG_CAF_MUinclusive_v3_p17.09.01</a></td></tr>
+<tr><th>ZBMB</th><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=317716">CSskim-ZBMB-PASS2-p17.09.01</a></td><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=322199">CSG_CAF_ZBMB_v3_p17.09.01</a></td></tr>
+<tr><th>NP</th><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=317721">CSskim-NP-PASS2-p17.09.01</a></td><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=322195">CSG_CAF_NP_v3_p17.09.01</a></td></tr>
+<tr><th>TAUTRIG</th><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=317725">CSskim-TAUTRIG-PASS2-p17.09.01</a></td><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=322197">CSG_CAF_TAUTRIG_v3_p17.09.01</a></td></tr>
+<tr><th>2EMhighpt</th><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=317699">CSskim-2EMhighpt-PASS2-p17.09.01</a></td><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=322186">CSG_CAF_2EMhighpt_v3_p17.09.01</a></td></tr>
+<tr><th>2MUhighpt</th><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=317704">CSskim-2MUhighpt-PASS2-p17.09.01</a></td><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=322187">CSG_CAF_2MUhighpt_v3_p17.09.01</a></td></tr>
+<tr><th>JPSI</th><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=317728">CSskim-JPSI-PASS2-p17.09.01</a></td><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=322193">CSG_CAF_JPSI_v3_p17.09.01</a></td></tr>
+<tr><th>3JET</th><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=317732">CSskim-3JET-PASS2-p17.09.01</a></td><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=322188">CSG_CAF_3JET_v3_p17.09.01</a></td></tr>
+<tr><th>DIFF</th><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=317737">CSskim-DIFF-PASS2-p17.09.01</a></td><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=322189">CSG_CAF_DIFF_v3_p17.09.01</a></td></tr>
+<tr><th>QCD</th><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=317741">CSskim-QCD-PASS2-p17.09.01</a></td><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=322196">CSG_CAF_QCD_v3_p17.09.01</a></td></tr>
+<tr><th>Higgs</th><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=317747">CSskim-Higgs-PASS2-p17.09.01</a></td><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=322192">CSG_CAF_Higgs_v3_p17.09.01</a></td></tr>
+<tr><th>TOPJETTRIG</th><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=317751">CSskim-TOPJETTRIG-PASS2-p17.09.01</a></td><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=322198">CSG_CAF_TOPJETTRIG_v3_p17.09.01</a></td></tr>
+<tr><th>EMMU</th><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=317757">CSskim-EMMU-PASS2-p17.09.01</a></td><td align="center"><a href="http://d0db.fnal.gov/sam_dataset_editor/cgi/find_dataset_definition.py?defId=322191">CSG_CAF_EMMU_v3_p17.09.01</a></td></tr>
+
+</tbody>
+</table>
+
+<hr>
+
+To see which logical skim is contained in which files, consult <a href="skim_p17.07.01/doc_write.html">this page</a>
+
+<p>
+To see a list of all tags, consult <a href="skim_p17.07.01/doc_tag.html">this page</a>
+
+<hr>
+
+<address>
+<center><b><a href="mailto:shary@fnal.gov,rhauser@fnal.gov">Comments to CSG Conveners</a>, 24 January 2006</b></center>
+</address>
+</body>
+</html>

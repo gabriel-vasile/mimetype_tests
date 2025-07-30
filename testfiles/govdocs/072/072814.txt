@@ -1,0 +1,654 @@
+;file processmovies.ana, ras
+; /3/93 second generation movie processer adapted from alignmovies
+ ;user interface to generate parameters
+ ;
+ ;9/23/90	rotation upgraded and reference angle allowed, if r_ref
+ ;		is defined in command file, it is used rather than computing
+ ;		a mid range, also lt 0 forces compute -- in a series the
+ ;		first movie will define r_ref and the other will use the same
+ ;5/23/90	some changes to handle 1024 images, these involve assuming
+ ;that images are 512 until the first is read in, then we change the
+;subarea (for CC) and the rotation center (if a rotation is done)
+ ;
+ ;an intermediate step to a better system, this file contains routines to
+ ;rigidly align a series of images (stored as disk files in FZ format) and
+ ;to destretch them
+ ;the routines are run via command files which define the file names,
+ ;length of sequence, and operation performed
+ ;
+ ;both the alignment and the destretch use a double pass method, the first
+ ;pass determines the image by image offsets and the second does some trend
+ ;processing on these before applying them and producing output images
+ ;file name conventions are assumed to comply with the following rules:
+ ;	last 5 characters of file name are n#### were the #'s represent the
+ ;	number of the image in the sequence; i.e., the first file name
+ ;	might be LB113w5576N0001. The first part of the file name is
+ ;	called name_set within the software. The files must progress from
+ ;	0001 up to the number of files in steps of 1.
+ ;	The file extensions are .COR for the initial images. The software
+ ;	then creates .RIG files and .STRT files for the rigidly aligned and
+ ;	destretched results.
+@/umbra/people/shine/auto/series_align_new
+@/umbra/people/shine/auto/automodules
+@/umbra/people/shine/auto/rigplot
+@/umbra/people/zoe/look92
+ ;==============================================================================
+block getstarted
+ close,1,2
+ #diskout1='/data2/soup/'
+ #diskout2='/data0/soup/'
+ #diskout3='/data1/soup/'
+ #diskout4='/pore2/people/shine/lp92/'
+ #diskout5='/data5/soup/'
+ #diskout6='/pore2data/soup/'
+ #diskout7='/data/soup/'
+ #ndisksout=7		;number to use
+ ;get id for this data set
+ tapeid=''
+ read,'enter catalog tape id (e.g., le132f18)',tapeid
+ catload,tapeid
+ type,'nimage =',nimage,', nexp =',nexp,'
+ if nexp gt 0 then { nrepeats=nimage/nexp
+	  type,'nrepeats (complete ones) =',nrepeats }
+ ;check for duplicates that should be combined
+ waveindx=lonarr(nexp)
+ nc=1
+ ;loop through and assign a number for each image, images with the same state
+ ;get the same number
+ for k=0,nexp-1 do {
+ ;gen the name, assume unique and then check
+ ss='namew'+istring(nc,3,2)
+ wname,seq_wave(k),seq_off(k),seq_pol(*,k),eval(ss),tapeid
+ ;now check against all previous names
+ waveindx(k)=nc	nc=nc+1
+ if k gt 0 then { for i=0,k-1 do { s2='namew'+istring(waveindx(i),3,2)
+   if eval(s2) eq eval(ss) then { nc=nc-1  waveindx(k)=waveindx(i)  break }}}
+ }
+ nwave=nc-1
+ ty,'number of unique wavelengths is',nwave
+ ;get subcycles for each wavelength
+ subcycle=zero(intarr(nwave))
+ for k=0,nexp-1 do {
+ subcycle(waveindx(k)-1) += 1
+ }
+ endblock
+ ;==============================================================================
+block autotwist
+ ty,'please select an option'
+ ty,'0: compute alignments and produce output files'
+ ty,'1: only compute alignments, defer output'
+ ty,'2: only produce output files (assumes alignments on disk)'
+ ty,'3: rotate but don''t align, produces output files'
+ read,#twist_option
+ if #twist_option eq 0 then ty,'if things get dicey, output might be deferred'
+ run getstarted		;load the catalog info and such
+ 
+ wavesave=zero(intarr(nwave))+1
+ mess=''
+ read,'are we processing all the wavelengths ? [Y/N]',mess
+ if upcase(mess) ne 'Y' then {
+ type,'for each wavelength set, type Y to untwist, N to skip, Q to skip all remaining'
+ zero,wavesave		;a flag array
+ for iw=1,nwave do {
+ type,eval('namew'+ist(iw,3,2))
+ read,mess
+ if upcase(mess) eq 'Y' then wavesave(iw-1)=1
+ if upcase(mess) eq 'Q' then break
+ }
+ }
+ kfirstrep=1
+ kreps=nrepeats
+ while 1 eq 1 do {
+ mess=''
+ read,'Are we processing all the repeats ? [Y/N]',mess
+ if upcase(mess) eq 'Y' then break
+ read,'enter first and last rep (of the complete cycles) to use',kfirstrep,kreps
+ type,'you have first and last rep =', kfirstrep,kreps
+ read,'is this OK [Y/N]?',mess
+ if upcase(mess) eq 'Y' then break
+ type,'let''s try again then'
+ }
+ repeats_used=kreps-kfirstrep+1
+	 ;set up some parameters
+ #rotate=1		;we are rotating by default (chance to change later)
+ r_ref=-1.0		;use mean rotation by default
+	 ;determine drift parameters, first get duration of run
+ dt=3600.*fix(#t(39:40))+60.*fix(#t(42:43))+fix(#t(45:46)
+ dt=dt-3600.*fix(#t(27:28))-60.*fix(#t(30:31))-fix(#t(33:34)
+ if dt lt 0 then dt=dt+24.*3600.
+ dt_rep=dt/nrepeats
+	 ;if only a partial run, adjust dt
+ dt=dt_rep*(repeats_used)
+   ;our scheme - if the duration < 30m, don't use superdrift, just rigid align
+   ;if > 30 but < 90, smooth with about a 10 minute window, for longer
+   ;runs use 15 m, these may need adjusting as experience improves
+   ;also use rigid (no drift) if repeats_used is 10 or less
+ if dt le 1800 or repeats_used le 10 then { driftbase=0 } else {
+ if dt le 5400 then { driftbase=600./dt_rep } else { driftbase=900./dt_rep }
+ }
+ ty,'computed driftbase =', driftbase
+	 ;choose an output disk
+ disk=zero(lonarr(nwave))	;provide for different disks later
+ 
+ if #twist_option ne 1 then {
+ iq=-1
+ while (iq le 0 or iq gt #ndisksout) do {
+ ty,'enter a number to choose output disk'
+ for i=1,#ndisksout do { ty,i,'  ',eval('#diskout'+ist(i,2,2)) }
+ read,iq
+ }
+ disk=disk+iq-1
+ 
+ read,'enter 1 to turn on delete flag', #dflag
+ if #dflag ne 1 then #dflag=0
+ }
+ 
+ name_in_ext='.cor'
+ name_out_ext='.rig'
+ mess=''
+ ty,'anything special ?'
+ ty,'(turn off rotation, override drift factor, non-standard name extensions,'
+ ty,'special subarea)'
+ read,'[Y/N]',mess
+ if upcase(mess) eq 'Y' then {
+ read,'enter 1 for La Palma rotation or 0 for none', #rotate
+ #rotate=fix(#rotate)
+ mess=''
+ if #rotate ne 0 then {
+ read,'enter rotation reference angle or -1 to use mean orientation',r_ref
+ }
+ read,'want to change driftbase ? [Y/N]',mess
+	 if upcase(mess) eq 'Y' then {
+	 ty,'enter new driftbase (0 for completely rigid)', driftbase }
+ read,'want to change input name extension ? [Y/N]',mess
+	 if upcase(mess) eq 'Y' then {
+	 read,'enter it with the "." (e.g., ".cor")', name_in_ext }
+ read,'need to specify the CC subarea ? [Y/N]',mess
+	 if upcase(mess) eq 'Y' then {
+	 ty,'please be very careful !'
+	 read,'enter first and last x index',#i1,#i2
+	 read,'enter first and last y index',#j1,#j2
+	 #usersubarea=1
+	 }
+ if #twist_option ne 1 then {
+ read,'want to change output name extension ? [Y/N]',mess
+	 if upcase(mess) eq 'Y' then {
+	 read,'enter it with the "." (e.g., ".rig")', name_out_ext }
+ }
+ 
+ }
+ 
+ ;log our beginning
+ mess=istring(fix(!systime),10,2)	;a unique part of the file name
+ close,1	openw,1,lowcase(tapeid)+'.'+mess+'.history'
+ printf,1,tapeid,' de-rotation and de-jitter processing begun ',!date,' ',!time
+ ;also print info block on plot file
+ pdev,1
+ run infoblock
+ 
+ count=0
+ ;main untwist loop
+ 
+ for iw=0,nwave-1 do {
+ if wavesave(iw) ne 0 {
+ 
+   if driftbase gt 0 then {
+   #drift=fix(driftbase*subcycle(iw))
+   #drift=#drift-(#drift%2 eq 0)			;make odd
+   #drift=#drift>3
+   } else #drift=0
+ 
+   count = count + 1
+   ;get the file counts
+   kstart=1+ (kfirstrep-1)*subcycle(iw)
+   kend=kreps*subcycle(iw)
+   name_set=lowcase(eval('namew'+ist(iw+1,3,2)))
+   name_in=name_set+'n####'+name_in_ext
+   printf,1,!time
+   printf,1,'iw =', iw,' kstart and kend =', kstart,kend
+   printf,1,'name_in =', name_in
+   ty,'iw =', iw,' kstart and kend =', kstart,kend
+   ty,'name_in =', name_in
+
+ ;need angles for all cases but 2 (which reads in old values)
+ if #twist_option ne 2 then {
+   getangles,kstart,kend,name_in,r_ref,r
+ }
+ 
+ ;options, getrigid, saves, and plots done only for 0 and 1
+ if #twist_option eq 0 or #twist_option eq 1 then {
+ 
+   getrigid,kstart,kend,name_in,r_ref,r,d,seeing,meanint,sample_a,sample_b
+ 
+	 ;getrigid computes the angles and the pair offsets
+	 ;saved in r and d
+	 ;note that #twist_option can be changed to 1 by getrigid
+ 
+   s='angles from autoprocess, first value is ref, remainder has it subtracted'
+   fzwrite,[r_ref,r],name_set+'.angles',s
+   s='offsets from getrigid in autoprocess'
+   fzwrite,d,name_set+'.offsets',s
+   s='seeing measure from getrigid in autoprocess'
+   fzwrite,seeing,name_set+'.seeing',s
+   ;plot some results
+   if count eq 1 then  { rotplot,r_ref,r,name_set,kstart }
+   ;also postage stamps of first and last images
+   stamps,sample_a,sample_b,count,1,name_in_ext,kstart,kend
+   ;before plotting, process the raw offsets
+   dhipass,d,dxs,dys
+   rigplot,count,name_set,dxs,dys,seeing,meanint,kstart
+ } 
+ ;for option 2, the offsets and angles are restored
+ if #twist_option eq 2 then {
+   fzread,r,name_set+'.angles'
+   r_ref=r(0)		r=r(1:*)
+   fzread,d,name_set+'.offsets'
+   ;process the raw offsets
+   dhipass,d,dxs,dys
+ }
+
+ ;for option 3, we make a zero delta array
+ if #twist_option eq 3 then {
+ nf=kend-kstart+1
+ dxs=zero(fltarr(nf))		dys=dxs
+ }
+ 
+   sdisk=eval('#diskout'+ist(disk(iw)+1,2,2))
+ ;this info printed even if we aren't writing files
+   name_out=sdisk+name_set+'n####'+name_out_ext
+   printf,1,'#twist_option =', #twist_option
+   printf,1,'name_out =', name_out
+   printf,1,'drift factor =',#drift
+   ty,'#twist_option =', #twist_option
+   ty,'name_out =', name_out
+ 
+ ;note that untwist produces the samples for #twist_option = 1
+ ;these are not printed for #twist_option = 2 or 3
+ 
+ untwist,kstart,kend,name_in,name_out,r_ref,r,dxs,dys,sample_a,sample_b
+ 
+ if #twist_option eq 0 or #twist_option eq 1 then {
+   stamps,sample_a,sample_b,count,0,name_out_ext,kstart,kend
+   ;need to eject?
+   if count%3 eq 2 then erase
+ }
+ }}	;end of iw loop
+ ;change name of plot file
+ spawn,'mv junk.eps '+lowcase(tapeid)+'.twist.eps'
+ printf,1,'untwist processing completed ',!date,' ',!time
+ close,1
+ endblock
+ ;==============================================================================
+block customtwist
+ name_set=''	name_in_ext=''	name_out_ext=''
+ ty,'please select an option'
+ ty,'0: compute alignments and produce output files'
+ ty,'1: only compute alignments, defer output'
+ ty,'2: only produce output files (assumes alignments on disk)'
+ ty,'3: rotate but don''t align, produces output files'
+ read,#twist_option
+ read,'enter set name (without extension, e.g., le132f18w6302m350n####)',name_set
+ read,'enter input extension (with the "." please)',name_in_ext
+ if #twist_option ne 1 then {
+  read,'enter output extension (with the "." please)',name_out_ext }
+ read,'enter first and last file numbers', kstart,kend
+ nk=kend-kstart+1	kstartoffsets = 1
+ if nk le 0 then {ty,'last must be ge than first' retall }
+ if #twist_option eq 2 and kstart ne 1 then {
+  read,'enter first image used in offset calculation',kstartoffsets }
+ nk = kend - kstartoffsets + 1
+ read,'enter drift smoothing factor', #drift
+ read,'enter 1 for La Palma rotation or 0 for none', #rotate
+ #rotate=fix(#rotate)
+ mess=''
+ if #rotate ne 0 then {
+ read,'enter rotation reference angle or -1 to use mean orientation',r_ref
+ }
+ 
+ read,'enter 1 to turn on delete flag', #dflag
+ if #dflag ne 1 then #dflag=0
+ if #twist_option eq 0 then ty,'if things get dicey, output might be deferred'
+ if #twist_option ne 1 then {
+ 	 ;choose an output disk
+ #diskout1='/data2/soup/'
+ #diskout2='/data0/soup/'
+ #diskout3='/data1/soup/'
+ #diskout4='/pore2/people/shine/lp92/'
+ #diskout5='/data5/soup/'
+ #diskout6='/pore2data/soup/'
+ #diskout7='/data/soup/'
+ #diskout8='/pore2data/'
+ #diskout9='/pore2data2/'
+ #ndisksout=9		;number to use
+ iq=-1
+ while (iq le 0 or iq gt #ndisksout) do {
+ ty,'enter a number to choose output disk'
+ for i=1,#ndisksout do { ty,i,'  ',eval('#diskout'+ist(i,2,2)) }
+ read,iq
+ }
+ disk=iq
+ } 
+ ;log our beginning
+ mess=istring(fix(!systime),10,2)	;a unique part of the file name
+ close,1
+ sq='custom'
+ openw,1,lowcase(sq)+'.'+mess+'.history'
+ printf,1,sq,' de-rotation and de-jitter processing begun ',!date,' ',!time
+ 
+    name_in=name_set+name_in_ext
+   printf,1,!time
+   printf,1,' kstart and kend =', kstart,kend
+   printf,1,'name_in =', name_in
+   ty,' kstart and kend =', kstart,kend
+   ty,'name_in =', name_in
+
+ ;need angles for all cases but 2 (which reads in old values)
+ ;unless no rotation of course
+ if #rotate ne 0 then {
+ if #twist_option ne 2 then {
+   getangles,kstart,kend,name_in,r_ref,r
+ } } else {r=zero(fltarr(nk)) r_ref=0.0}
+ 
+ ;options, getrigid, saves, and plots done only for 0 and 1
+ if #twist_option eq 0 or #twist_option eq 1 then {
+ 
+   getrigid,kstart,kend,name_in,r_ref,r,d,seeing,meanint,sample_a,sample_b
+ 
+	 ;getrigid computes the angles and the pair offsets
+	 ;saved in r and d
+	 ;note that #twist_option can be changed to 1 by getrigid
+ 
+   s='angles from autoprocess, first value is ref, remainder has it subtracted'
+   if #rotate ne 0 then {
+    fzwrite,[r_ref,r],lowcase(strr(name_set,'#',''))+'.angles',s }
+   s='offsets from getrigid in autoprocess'
+   fzwrite,d,lowcase(strr(name_set,'#',''))+'.offsets',s
+   s='seeing measure from getrigid in autoprocess'
+   fzwrite,seeing,lowcase(strr(name_set,'#',''))+'.seeing',s
+   ;before plotting, process the raw offsets
+   dhipass,d,dxs,dys
+ } 
+ ;for option 2, the offsets and angles are restored
+ if #twist_option eq 2 then {
+   if #rotate ne 0 then {
+    fzread,r,lowcase(strr(name_set,'#',''))+'.angles' } else r=zero(fltarr(nk+1))
+   r_ref=r(0)		r=r(1:*)
+   fzread,d,lowcase(strr(name_set,'#',''))+'.offsets'
+   ;process the raw offsets
+   dhipass,d,dxs,dys
+ }
+
+ ;for option 3, we make a zero delta array
+ if #twist_option eq 3 then {
+ nf=kend-kstart+1
+ dxs=zero(fltarr(nf))		dys=dxs
+ }
+ 
+ if #twist_option ne 1 then {
+   sdisk=eval('#diskout'+ist(disk,2,2))
+   name_out=sdisk+name_set+name_out_ext
+   printf,1,'#twist_option =', #twist_option
+   printf,1,'name_out =', name_out
+   printf,1,'drift factor =',#drift
+   ty,'#twist_option =', #twist_option
+   ty,'name_out =', name_out
+   }
+ 
+ ;note that untwist produces the samples for #twist_option = 1
+ ;these are not printed for #twist_option = 2 or 3
+ 
+ untwist,kstart,kend,name_in,name_out,r_ref,r,dxs,dys,sample_a,sample_b,kstartoffsets
+ 
+ printf,1,'untwist processing completed ',!date,' ',!time
+ close,1
+ endblock
+ ;=============================================================================
+block autostretch
+ ty,'please select an option'
+ ty,'0: compute distortion grids and produce output files'
+ ty,'1: only compute distortion grids, defer output'
+ ty,'2: only produce output files (assumes distortion grids on disk)'
+ read,#stretch_option
+ run getstarted		;load the catalog info and such
+ 
+ wavesave=zero(intarr(nwave))
+ 
+ ;for destretching, always query for which wavelengths since we rarely
+ ;do all of them
+ 
+ type,'for each wavelength set, type Y to destretch, N to skip, Q to skip all remaining'
+ for iw=1,nwave do {
+ type,eval('namew'+ist(iw,3,2))
+ mess=''
+ read,mess
+ if upcase(mess) eq 'Y' then wavesave(iw-1)=1
+ if upcase(mess) eq 'Q' then break
+ }
+ 
+ kfirstrep=1
+ kreps=nrepeats
+ while 1 eq 1 do {
+ mess=''
+ read,'Are we processing all the repeats ? [Y/N]',mess
+ if upcase(mess) eq 'Y' then break
+ read,'enter first and last rep (of the complete cycles) to use',kfirstrep,kreps
+ type,'you have first and last rep =', kfirstrep,kreps
+ read,'is this OK [Y/N]?',mess
+ if upcase(mess) eq 'Y' then break
+ type,'let''s try again then'
+ }
+ repeats_used=kreps-kfirstrep+1
+ 
+	 ;set up some parameters
+	 ;determine drift parameters, first get duration of run
+ 
+ dt=3600.*fix(#t(39:40))+60.*fix(#t(42:43))+fix(#t(45:46)
+ dt=dt-3600.*fix(#t(27:28))-60.*fix(#t(30:31))-fix(#t(33:34)
+ if dt lt 0 then dt=dt+24.*3600.
+ dt_rep=dt/nrepeats
+	 ;if only a partial run, adjust dt
+ dt=dt_rep*(repeats_used)
+   ;computed differently for stretching than for aligning
+   ;since we may want to preserve flows even in short runs
+   ;smoothing is done with a gaussian kernel, upgrade from boxcar
+   ;our scheme - if the duration < 20m, use half the duration
+   ;if > 20 but < 90, smooth with about a 10 minute window, for longer
+   ;runs use 15 m, these may need adjusting as experience improves
+   ;also use rigid (no drift) if repeats_used is 10 or less
+ if dt le 1200 or repeats_used le 10 then { driftbase=repeats_used/2 } else {
+ if dt le 5400 then { driftbase=600./dt_rep } else { driftbase=900./dt_rep }
+ }
+ ty,'computed driftbase =', driftbase
+	 ;choose an output disk
+ disk=zero(lonarr(nwave))	;provide for different disks later
+ if #stretch_option eq 0 or #stretch_option eq 2 then {
+ iq=-1
+ while (iq le 0 or iq gt #ndisksout) do {
+ ty,'enter a number to choose output disk'
+ for i=1,#ndisksout do { ty,i,'  ',eval('#diskout'+ist(i,2,2)) }
+ read,iq
+ }
+ disk=disk+iq-1
+ read,'enter 1 to turn on delete flag', #dflag
+ if #dflag ne 1 then #dflag=0
+ }
+ 
+ if #stretch_option eq 0 or #stretch_option eq 1 then {
+ nest = 3
+ grid_set=[8,16,32]
+ grid_clips=[5,4,3]
+ ty,'the default destretching is:  nest=',nest
+ ty,'grid_set =',grid_set
+ ty,'grid_clips =',grid_clips
+ mess=''
+ read,'enter 1 to change any of these',mess
+ if mess eq '1' then {
+  read,'enter number of nested destretches', nest
+  grid_set=fltarr(nest)
+  grid_clips=fltarr(nest)
+  read,'enter grid sizes', grid_set
+  read,'enter grid clips', grid_clips
+ }
+ } 
+
+ read,'enter 1 to trim edges, 0 to keep the whole image', #trim_edge
+ if #trim_edge ne 1 then #trim_edge=0
+ 
+ name_in_ext='.rig'
+ name_out_ext='.strt'
+ mess=''
+ ty,'anything special ?'
+ ty,'(override drift factor, non-standard name extensions)'
+ read,'[Y/N]',mess
+ if upcase(mess) eq 'Y' then {
+ mess=''
+ read,'want to change driftbase ? [Y/N]',mess
+	 if upcase(mess) eq 'Y' then {
+	 read,'enter new driftbase (0 for completely rigid)', driftbase }
+ read,'want to change input name extension ? [Y/N]',mess
+	 if upcase(mess) eq 'Y' then {
+	 read,'enter it with the "." (e.g., ".rig")', name_in_ext }
+ read,'want to change output name extension ? [Y/N]',mess
+	 if upcase(mess) eq 'Y' then {
+	 read,'enter it with the "." (e.g., ".strt")', name_out_ext }
+ }
+ ;log our beginning
+ mess=istring(fix(!systime),10,2)	;a unique part of the file name
+ close,1	openw,1,lowcase(tapeid)+'.'+mess+'.history'
+ printf,1,tapeid,' de-stretch processing begun ',!date,' ',!time
+ !match_messages=0
+ 
+ ;main loop
+ for iw=0,nwave-1 do {
+ if wavesave(iw) ne 0 {
+   ;get the file counts
+   kstart=1+ (kfirstrep-1)*subcycle(iw)
+   kend=kreps*subcycle(iw)
+   name_in=eval('namew'+ist(iw+1,3,2))+'n####'+name_in_ext
+   printf,1,!time
+   printf,1,'iw =', iw,' kstart and kend =', kstart,kend
+   printf,1,'name_in =', name_in
+   ty,'iw =', iw,' kstart and kend =', kstart,kend
+   ty,'name_in =', name_in
+  if #stretch_option eq 0 or #stretch_option eq 1 then {
+   getstretch,kstart,kend,name_in,delta,grid_set,grid_clips,seeing
+ 
+   ;save some results
+   s='grid from getstretch in autoprocess'
+   name_out=eval('namew'+ist(iw+1,3,2))
+   fzwrite,delta,lowcase(name_out)+'.grid',s
+  }
+
+  if #stretch_option eq 2 then {
+   ;read the grids back in
+   name_out=eval('namew'+ist(iw+1,3,2))
+   fzread,delta,lowcase(name_out)+'.grid',s
+  }
+
+   if driftbase gt 0 then {
+   #drift=fix(driftbase*subcycle(iw))
+   #drift=#drift-(#drift%2 eq 0)		;make odd
+   #drift=#drift>3
+   } else #drift=0
+
+  if #stretch_option eq 0 or #stretch_option eq 2 then {
+   sdisk=eval('#diskout'+ist(disk(iw)+1,2,2))
+   name_out=sdisk+eval('namew'+ist(iw+1,3,2))+'n####'+name_out_ext
+   printf,1,'name_out =', name_out
+   printf,1,'drift factor =',#drift
+   ty,'name_out =', name_out
+   destretch,kstart,kend,name_in,name_out,delta
+  }
+ 
+ }}	;end of iw loop
+ spawn,'mv junk.eps '+tapeid+'.stretch.eps'
+ printf,1,'destretch processing completed ',!date,' ',!time
+ close,1
+ endblock
+ ;==============================================================================
+block customstretch
+ close,1,2
+ ty,'please select an option'
+ ty,'0: compute distortion grids and produce output files'
+ ty,'1: only compute distortion grids, defer output'
+ ty,'2: only produce output files (assumes distortion grids on disk)'
+ read,#stretch_option
+ name_set=''	name_in_ext=''	name_out_ext=''
+ read,'enter set name (without extension, e.g., le132f18w6302m350n####)',name_set
+ read,'enter input extension (with the "." please)',name_in_ext
+ read,'enter output extension (with the "." please)',name_out_ext
+ read,'enter first and last file numbers', kstart,kend
+ kstartgrid = kstart
+ if #stretch_option eq 2 and kstart ne 1 then {
+  read,'enter first image used in distortion grid calculation',kstartgrid }
+ if #stretch_option eq 0 or #stretch_option eq 2 then {
+ read,'enter smoothing factor', #drift
+ }
+ if #stretch_option eq 0 or #stretch_option eq 1 then {
+ read,'enter number of nested destretches', nest
+ grid_set=fltarr(nest)
+ grid_clips=fltarr(nest)
+ read,'enter grid sizes', grid_set
+ read,'enter grid clips', grid_clips
+ read,'enter maximum total shift', #max_stretch_shift
+ }
+ read,'enter 1 to trim edges, 0 to keep the whole image', #trim_edge
+ if #trim_edge ne 1 then #trim_edge=0
+ if #stretch_option eq 0 or #stretch_option eq 2 then {
+	 ;choose an output disk
+ #diskout1='/data2/soup/'
+ #diskout2='/data0/soup/'
+ #diskout3='/data1/soup/'
+ #diskout4='/pore2/people/shine/lp92/'
+ #diskout5='/data5/soup/'
+ #diskout6='/pore2data/soup/'
+ #diskout7='/data/soup/'
+ #diskout8='/pore2data/'
+ #diskout9='/pore2data2/'
+ #ndisksout=9		;number to use
+ iq=-1
+ while (iq le 0 or iq gt #ndisksout) do {
+ ty,'enter a number to choose output disk'
+ for i=1,#ndisksout do { ty,i,'  ',eval('#diskout'+ist(i,2,2)) }
+ read,iq
+ }
+ disk=iq
+ read,'enter 1 to turn on delete flag', #dflag
+ if #dflag ne 1 then #dflag=0
+ }
+ ;log our beginning
+ mess=istring(fix(!systime),10,2)	;a unique part of the file name
+ close,1
+ openw,1,lowcase(strr(name_set,'#',''))+'.'+mess+'.history'
+ printf,1,name_set,' de-stretch processing begun ',!date,' ',!time
+ name_in=name_set+name_in_ext
+  if #stretch_option ne 2 then {
+  printf,1,'nest factor =',nest
+  printf,1,'grid sizes =', grid_set
+  printf,1,'grid clips =', grid_clips }
+  if #stretch_option eq 0 or #stretch_option eq 1 then {
+   ty,'name_in =', name_in, ' looping from',kstart,' to', kend
+   printf,1,'name_in =', name_in
+   getstretch,kstart,kend,name_in,delta,grid_set,grid_clips,seeing
+ 
+   ;save some results
+   s='grid from getstretch in autoprocess'
+   fzwrite,delta,lowcase(strr(name_set,'#',''))+'.grid',s
+ }
+  if #stretch_option eq 2 then {
+   ;read the grids back in
+   fzread,delta,lowcase(strr(name_set,'#',''))+'.grid',s
+  }
+  if #stretch_option eq 0 or #stretch_option eq 2 then {
+   sdisk=eval('#diskout'+ist(disk,2,2))
+   name_out=sdisk+name_set+name_out_ext
+   printf,1,'name_out =', name_out
+   printf,1,'drift factor =',#drift
+   ty,'name_out =', name_out
+ 
+   destretch,kstart,kend,name_in,name_out,delta,kstartgrid
+ } 
+ printf,1,'destretch processing completed ',!date,' ',!time
+ close,1
+ endblock
+ ;=============================================================================

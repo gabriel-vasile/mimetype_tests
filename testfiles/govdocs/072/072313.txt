@@ -1,0 +1,5904 @@
+From tei@adv.sbc.sony.co.jp  Mon Sep  1 11:05:26 1997
+From: Tom Isaacson <tei@adv.sbc.sony.co.jp>
+Date: Mon Sep  1 11:05:29 PDT 1997
+Subject: Zilog z85230 Driver
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+
+Does anyone have a working version of a Zilog z85230 ESCC serial device
+driver? I have an old version (1993) of one from Wind River, but it was
+given to us untested, and I am having a lot of trouble getting it working.
+
+Any help would be greatly appreciated.
+
+Tom Isaacson
+--MimeMultipartBoundary--
+
+
+From daemon@csg.lbl.gov  Tue Sep  2 04:02:37 1997
+From: daemon@csg.lbl.gov
+Date: Tue Sep  2 04:02:40 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Tue Sep  2 04:02:34 PDT 1997
+
+        Subject: Re: struct variables memory alignment
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: struct variables memory alignment
+Date: 1 Sep 97 18:35:24 GMT
+From: glennt@ibm.net
+Organization: die.spam.die
+Message-ID: <340b0aec.0@news1.ibm.net>
+References: <5u64fp$3pu$1@news02.btx.dtag.de>
+Reply-To: glenntT@ibm.net
+
+In <5u64fp$3pu$1@news02.btx.dtag.de>, schuehle@t-online.de (Martin Sauter) writes:
+>Hello,
+>
+>I have a problem with the alignment of struct variables with the GNU x86
+>compiler for VxWorks. Take the following case
+>
+>typedef struct mystruct
+>{
+>  short test;
+>  float ftest;
+>} mystruct;
+>
+>sizeof(mystruct); returns 8 instead of 6 as I guess there are two bytes
+>added after the short variable to align the float variable in some way.
+>No big deal until you write that struct to a file and expect another
+>program to read the stuff. My question therefore is how it is possible
+>to disable that memory alignment for this struct or in general? 
+>
+>Thanks in advance for your help
+>Martin
+
+Martin -
+
+You may be SOL. I suspect that the best you can do is order the items
+in your struct from largest to smallest and hope that the compiler will
+order them the same way. The struct itself will probably be the same
+size, but the padding might be at the end rather than in the middle.
+
+To see exactly what the compiler DID do, compile the source file that
+defines the struct to assembly language instead of object and see what
+the compiler really did give you. See your gnu manual for the switch,
+I think it's "-s".
+
+Good Luck! - Glenn
+
+************************************************************
+*                                                           *
+*  Two wrongs don't make a right, BUT                       *
+*       Three lefts do!                                     *
+*                                                           *
+* (remove upper case characters to de-spamproof my address) *
+************************************************************
+
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From currie@ghg.net  Tue Sep  2 06:41:43 1997
+From: currie@ghg.net (Alan Currie)
+Date: Tue Sep  2 06:41:46 PDT 1997
+Subject: Re: Memory alignment
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+the vxWorks Users Group Exploder wrote:
+> 
+> Submitted-by daemon@csg.lbl.gov  Tue Sep  2 04:02:37 1997
+> Submitted-by: daemon@csg.lbl.gov
+> 
+> Comp.Os.Vxworks Daily Digest    Tue Sep  2 04:02:34 PDT 1997
+> 
+>         Subject: Re: struct variables memory alignment
+> 
+> -------------------------------------------------------
+> 
+> Newsgroups: comp.os.vxworks
+> Subject: Re: struct variables memory alignment
+> Date: 1 Sep 97 18:35:24 GMT
+> From: glennt@ibm.net
+> Organization: die.spam.die
+> Message-ID: <340b0aec.0@news1.ibm.net>
+> References: <5u64fp$3pu$1@news02.btx.dtag.de>
+> Reply-To: glenntT@ibm.net
+> 
+> In <5u64fp$3pu$1@news02.btx.dtag.de>, schuehle@t-online.de (Martin Sauter) writes:
+> >Hello,
+> >
+> >I have a problem with the alignment of struct variables with the GNU x86
+> >compiler for VxWorks. Take the following case
+> >
+> >typedef struct mystruct
+> >{
+> >  short test;
+> >  float ftest;
+> >} mystruct;
+> >
+> >sizeof(mystruct); returns 8 instead of 6 as I guess there are two bytes
+> >added after the short variable to align the float variable in some way.
+> >No big deal until you write that struct to a file and expect another
+> >program to read the stuff. My question therefore is how it is possible
+> >to disable that memory alignment for this struct or in general?
+> >
+> >Thanks in advance for your help
+
+We padded our structures out to 32 bits because we are passing data 
+through sockets to a labview application on a Win '95 PC.  Just group 
+your short ints together, bits, etc. and add the appropriate pad to make 
+it a full word boundary.  This way the structure definitions on both 
+machines is identical, you don't have to figure out what the compiler is 
+doing.  In your example you would have:
+
+> >typedef struct mystruct
+> >{
+> >  short test;     short pad1;
+> >  float ftest;
+> >} mystruct;
+--MimeMultipartBoundary--
+
+
+From R.Kirnum@dialogic.com  Tue Sep  2 10:54:04 1997
+From: "Kirnum, Robert" <R.Kirnum@dialogic.com>
+Date: Tue Sep  2 10:54:07 PDT 1997
+Subject: Re: struct variables memory alignment
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+What about using bit fields?  You will still have padding, but it will
+be at the end.  You will have to play games with type conversions
+though.
+
+typedef struct {
+   unsigned
+      shortVal : 16,
+      longVal : 32;
+} myStruct;
+
+myStruct
+   aStruct;
+
+short
+   aShort;
+
+float
+   aFloat;
+
+   aStruct.shortVal = aShort;
+   aStruct.longVal = *((unsigned *) &aFloat);
+
+This should work.  You can then write the necessary number of bytes
+starting at the beginning of the structure.
+(I could not get it to work under Visual C++, but I am sure it is due to
+some MS setting.  Check your compiler for specifics on bit fields.)
+
+Bob
+________________________________________________________________________
+D I A L	Bob Kirnum
+_|_|_|O	Software Engineer
+_|_|_|G	973-993-3000 Ext. 6589
+_|_|_|I	973-993-5916 Fax
+_|_|_|C	mailto:R.Kirnum@dialogic.com
+Get the Dialogic Edge at http://www.dialogic.com
+Dialogic Corp.  /  1515 Rt. 10  /  Parsippany, NJ 07054
+________________________________________________________________________
+             Did you know . . . that FireWire was developed by Apple?
+        . . . that Apple is 150 in the Fortune 500 and Microsoft is 172?
+Believe in Macintosh? Check out http://www.evangelist.macaddict.com/
+                   Join by emailing mailto:evangelist@macway.com
+
+--MimeMultipartBoundary--
+
+
+From cgrames@mdc.com  Tue Sep  2 11:10:53 1997
+From: Charlie Grames <cgrames@mdc.com>
+Date: Tue Sep  2 11:10:56 PDT 1997
+Subject: comp.os.vxworks newsdigest -Reply
+--MimeMultipartBoundary
+Content-Type: text/plain
+Content-Disposition: inline
+
+Newsgroups: comp.os.vxworks
+Subject: Network Load of Symbol Table using FTP
+Troy,
+
+Are you using Windows NT?  We were having similar problems when using the wftpd32 FTP
+server that comes bundled with Tornado.  We switched to the FTP server included with the
+Microsoft Peer Web Services (bundled with NT Workstation), and the problems went away.
+
+Charlie Grames
+The Boeing Company
+(314) 233-1956
+Charles.R.Grames@boeing.com
+
+Date: Fri, 29 Aug 1997 18:12:05 GMT
+From: "Troy A. Moon" <tamoon@most.fw.hac.com>
+Organization: Hughes Defense Communications
+Message-ID: <340710F5.3AC9@most.fw.hac.com>
+Reply-To: tamoon@most.fw.hac.com
+Sender: usenet@most.fw.hac.com (News Administration)
+
+We've been experiencing problems downloading the Symbol Table
+(vxWorks.sum) from a host using FTP.  If several boards try to load the
+Symbol Table all at once, one of them will get the file successfully,
+but very slowly.  All the other boards will fail to load the file.  Has
+anyone experienced this problem?
+
+- -- 
+Troy A. Moon
+Software Engineer
+Hughes Defense Communications
+tamoon@most.fw.hac.com
+
+--MimeMultipartBoundary--
+
+
+From dje@dmc10.com  Tue Sep  2 17:14:22 1997
+From: dje@dmc10.com
+Date: Tue Sep  2 17:14:25 PDT 1997
+Subject: Real Time Software Engineer Needed
+Please excuse the intrusion.  Your name was linked to a software engineering web site related to real time product development and I was hoping you could help me out.
+
+I'm looking to hire a Software Engineer experienced with real time embedded systems to be applied to the full life cycle development of medical devices such as patient monitors and surgical equipment.  Experience with C and C++ is required.  Position involves developing specs with marketing, defining system requirements, development of the systems, and overseeing the creation of documentation and test procedures. We can provide salary to $110,000.00 and great benefits.
+
+If you know anyone that might be interested, I can be reached at:
+Voice:  (609) 586-9000 ext 273
+Fax: (609)584-9575
+E-mail: dje@dmc10.com
+
+Thanks, Dave Eide
+
+
+From daemon@csg.lbl.gov  Thu Sep  4 04:01:46 1997
+From: daemon@csg.lbl.gov
+Date: Thu Sep  4 04:01:50 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Thu Sep  4 04:01:43 PDT 1997
+
+        Subject: Re: struct variables memory alignment
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: struct variables memory alignment
+Date: 3 Sep 97 17:27:24 GMT
+From: "Keith Kingsley" <kingsley@lintek.com>
+Message-ID: <01bcb88d$b72f6f50$fd35afce@hopscotch>
+References: <5u64fp$3pu$1@news02.btx.dtag.de>
+
+The GNU compiler has an extension which allows you to specify that a
+certain structure field should be byte-aligned.  Define your structure like
+this:
+
+typedef struct mystruct
+{
+  short test;
+  float ftest __attribute__ ((packed));
+} mystruct;
+
+You should find that sizeof(mystruct) returns 6 in this case.  Of course,
+__attribute__ ((packed)) is not ANSI-compliant-- you might want to do
+#define PACKED __attribute__ ((packed)) in a .h file and define your
+structure this way:
+
+typedef struct mystruct
+{
+  short test;
+  float ftest PACKED;
+} mystruct;
+
+That way if you change compilers you could redefine PACKED.
+
+- --Keith Kingsley
+Aeroflex Lintek
+
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From daemon@csg.lbl.gov  Fri Sep  5 04:01:17 1997
+From: daemon@csg.lbl.gov
+Date: Fri Sep  5 04:01:20 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Fri Sep  5 04:01:14 PDT 1997
+
+        Subject: Re: X25 comms card to VME
+        Subject: Exceptions in Tornado 1.0.1/gnu 2.7.2?
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: X25 comms card to VME
+Date: Mon, 01 Sep 1997 12:08:25 +0100
+From: Thomas Liszka <thomas_liszka@coweseng.demon.co.uk>
+Organization: Siemens Plessey Systems
+Message-ID: <340AA229.3A3D@coweseng.demon.co.uk>
+References: <3406C5D3.7643@coweseng.demon.co.uk>
+
+Thomas Liszka wrote:
+> 
+> I am trying to interface an X25 comms card to VME.
+> Can anyone tell me where I might be able to purchase such a card?.
+
+The required card must be X25 and HDLC.
+
+---------------------------
+
+Newsgroups: comp.os.vxworks,gnu.g++.help
+Subject: Exceptions in Tornado 1.0.1/gnu 2.7.2?
+Date: 1 Sep 1997 11:21:03 GMT
+From: "Fredrik Jonsson" <fredrik.jonsson@sea.ericsson.se>
+Organization: Ericsson Austria AG
+Message-ID: <01bcb6c8$de2df700$8bcbbac1@stpc139.sea.ericsson.se>
+
+
+When Tornado 1.0.1 came with the gnu 2.7.2 compiler I was
+hoping to be able to do some tests of the exception support.
+
+(Unfortunately the exception support was rejected by WindRiver
+so any user wanting to try it has to do it on his own.)
+
+We are using the cpu32 (68k) compiler for VxWorks 5.3.
+
+The shipped compiler includes the support for exception
+compilation using "-fhandle-exceptions" and "-frtti", and, it
+compiles c++ code with exception handling without any
+complaints.
+
+But, when loading binaries compiled with exceptions I get
+warnings on the following:
+
+   warning: object module contains undefined symbols:
+   ___register_exceptions, ___find_first_exception_table_match,
+   ___unwind_function, _terminate__Fv
+
+Anyone who knows how to get around this? What should/can
+I rebuild in order resolve those symbols?
+
+/FJ
+
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From johill@lanl.gov  Fri Sep  5 09:13:06 1997
+From: Jeff Hill <johill@lanl.gov>
+Date: Fri Sep  5 09:13:09 PDT 1997
+Subject: RE: Exceptions in Tornado 1.0.1/gnu 2.7.2?
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+
+
+
+> 
+> When Tornado 1.0.1 came with the gnu 2.7.2 compiler I was
+> hoping to be able to do some tests of the exception support.
+> 
+> (Unfortunately the exception support was rejected by WindRiver
+> so any user wanting to try it has to do it on his own.)
+> 
+> We are using the cpu32 (68k) compiler for VxWorks 5.3.
+> 
+> The shipped compiler includes the support for exception
+> compilation using "-fhandle-exceptions" and "-frtti", and, it
+> compiles c++ code with exception handling without any
+> complaints.
+> 
+> But, when loading binaries compiled with exceptions I get
+> warnings on the following:
+> 
+>    warning: object module contains undefined symbols:
+>    ___register_exceptions, ___find_first_exception_table_match,
+>    ___unwind_function, _terminate__Fv
+> 
+> Anyone who knows how to get around this? What should/can
+> I rebuild in order resolve those symbols?
+> 
+
+As I understand it use of exceptions under g++ 2.7.2
+also precludes use of the -O option. Does anyone know
+if there is any work underway at GNU to resolve this
+problem? Does anyone know of any good articles on the
+performance cost of placing C++ code inside a catch block?
+I am interested only in the impact on the normal(no 
+exception present) path through the C++ source code.
+
+Jeff
+
+______________________________________________________
+Jeffrey O. Hill           Internet     johill@lanl.gov
+LANL MS H820              Voice        505 665 1831
+Los Alamos NM 87545 USA   FAX          505 665 5107
+
+--MimeMultipartBoundary--
+
+
+From SJohnson@SYSTRAN.com  Fri Sep  5 09:51:59 1997
+From: Steve Johnson <SJohnson@SYSTRAN.com>
+Date: Fri Sep  5 09:52:02 PDT 1997
+Subject: Uninitialized Interrupt 2
+--MimeMultipartBoundary
+Content-Type: text/plain
+
+"Does anyone happen to know ....?"
+
+We have written a driver for an mv2603 and mv3604 that uses a PMC card
+generating PMC interrupts . The driver runs fine, but occasionally we
+get the message "uninitialized interrupt 2" while the driver is running.
+The driver never hangs and appears to be working correctly otherwise.
+Is this a similar situation which occurred in the BSP back when the 1603
+boards printed out "uninitialized interrupt 7" back in the earlier days?
+If I remember, this was due to noisy interrupt lines.  The fix was to
+simply add in a handler which simply returned.
+
+Or is this a different type of problem?
+
+Thanx for any Help.
+
+Steve Johnson
+Systran Corp.
+Dayton, Ohio
+
+sjohnson@systran.com
+--MimeMultipartBoundary--
+
+
+From daemon@csg.lbl.gov  Sat Sep  6 04:00:48 1997
+From: daemon@csg.lbl.gov
+Date: Sat Sep  6 04:00:54 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Sat Sep  6 04:00:45 PDT 1997
+
+        Subject: VxWorks TIMEZONE environment variable
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: VxWorks TIMEZONE environment variable
+Date: Mon, 25 Aug 1997 13:23:02 -0700
+From: Curtis Bray <cbray@best.com>
+Message-ID: <3401E9A6.DB08A97@best.com>
+Reply-To: cbray@best.com
+
+I've a bit confused by the documentation in the ansiTime library. 
+
+>If the environment variable TIMEZONE is set, the information is
+>retrieved from this variable, otherwise from the locale information. 
+> TIMEZONE is of the form:
+>
+>    name_of_zone:(unused): time_in_minutes_from_UTC:daylight_start:daylight_end
+>
+> To calculate local time, the value of time_in_minutes_from_UTC is subtracted
+> from UTC; time_in_minutes_from_UTC must be positive.
+
+  I saw nothing in the locale.h that support timezone, so I used the
+environment variable method described above.
+
+  I followed these examples and always set time_in_minutes_from_UTC to
+be positive. 
+
+For example:
+GMT-1 means time_in_minutes_from_UTC = 60
+GMT+1 means time_in_minutes_from_UTC = 12*60+1*60 = 780 (this keeps it
+positive)
+
+  This didn't respond like I thought it would and once I set
+time_in_minutes_from_UTC to -60 for the GMT+1 Timezone everything worked
+correctly. 
+ Any ideas what my the manual states that time_in_minutes_from_UTC must
+be positive?
+
+ Thank you!
+   Curtis Bray
+   cbray@best.com
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From daemon@csg.lbl.gov  Sun Sep  7 04:00:21 1997
+From: daemon@csg.lbl.gov
+Date: Sun Sep  7 04:00:24 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Sun Sep  7 04:00:17 PDT 1997
+
+        Subject: GET THE CASH YOU NEED ////////////
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: GET THE CASH YOU NEED ////////////
+Date: Sat, 6 Sep 1997 18:14:55
+From: CASH4U@dream.com
+Organization: Bell Atlantic Internet Solutions
+Message-ID: <5usknp$d3n@world1.bawave.com>
+
+CASH GRANTS   CASH GRANTS   CASH GRANTS
+
+Foundations all over the United States GIVE CASH GRANTS.
+
+ANYONE can apply for a Grant from 18 years and up...
+
+This money HAS to be given away, WHY not to YOU?
+
+Grants from $500.00 to $50,000.00 possible, in some instances.
+
+Grants don't have to be paid back.
+
+Grants can be ideal for people who are or were bankrupt 
+or just have bad credit.
+
+Get the money you need to start that business, you have always wanted.
+
+To get your  list of  FOUNDATIONS that give grants, AND instructions 
+on how to apply.
+
+Send a check or money order for ONLY $7.00 to:
+
+TO RECEIVE BY US MAIL ENCLOSE A STAMPED, SELF ADDRESSED, #10 ENVELOPE.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+B.C.S.
+39 GURLEY ROAD  #201
+EDISON, NJ  08817
+Att: GRANT INFO
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Include your E-MAIL ADDRESS for faster service.
+
+
+
+
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From ENG.Gordon.Manning@megadrive.cchub.com  Mon Sep  8 08:24:40 1997
+From: ENG.Gordon.Manning@megadrive.cchub.com (ENG Gordon Manning)
+Date: Mon Sep  8 08:24:43 PDT 1997
+Subject: Galileo 4 BSP
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+
+     Has anyone tried to get the Galileo 4 BSP to work?  I have been 
+     unsuccessful and would appreciate any advice.
+     
+     Thank you,
+     
+     J. Gordon Manning
+     MegaDrive Systems
+     
+     jmanning@megadrive.com
+--MimeMultipartBoundary--
+
+
+From RadaJA@corning.com  Mon Sep  8 12:05:20 1997
+From: "Rada, Jeff A" <RadaJA@corning.com>
+Date: Mon Sep  8 12:05:24 PDT 1997
+Subject: Second Ethernet controller for MVME177
+--MimeMultipartBoundary
+Content-Type: text/plain
+Content-Transfer-Encoding: 7BIT
+
+
+	All,
+
+	Does any one know if there are ethernet controllers for the VME
+BUS that will work as a second controller for a MVME177 (68060)
+processor. We wish to create a secondary lan that Communicates to host
+processes and a primary using the on board controller. I know there are
+ethernet controllers out there but will they work with my board and
+vxWorks? Thanks in advance.
+	 
+--MimeMultipartBoundary--
+
+
+From owner-vxwexplo-process  Wed Sep 10 07:29:46 1997
+From: "Mabrouk Aboughanaima" <mabrouka@nortel.ca>
+Date: Wed Sep 10 07:29:49 PDT 1997
+Subject: C++ Makefile for PowerPC860
+Hi,
+
+Does anyone have any  C++ Makefile that comiples a multi file project
+for PowerPC860.
+
+My CPU is PPC860
+VxWorks 5.3.1 
+TOOL is gnu (GNU Make version 3.74+wrs-2)
+
+Please if anyone has a file or an idea e_mail me at
+
+mabrouka@nortel.ca
+
+or phone <613>763-6000
+
+
+Thanks a lot.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++  Mabrouk Aboughanaima            + Tel: (613) 763-6000         +
++  CDMA Software                   +      ESN:  393-6000         +
++  Nortel Wireless Networks        + FAX: (613) 763-2686         +
++  P.O. Box 3511, Station 'C'      + Internet: mabrouka@nortel.ca+
++  Ottawa K1Y 4H7 Canada           +                             +
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                                                  
+
+
+From owner-vxwexplo-process  Wed Sep 10 11:43:35 1997
+From: Mark Muri <mmuri@qualcomm.com>
+Date: Wed Sep 10 11:43:38 PDT 1997
+Subject: SM_MAX_TRIES set to 100, yet smObjShow reports 5001
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+
+All,
+
+  We're in the popular cycle of evaluating the current VME PowerPC offerings.
+
+  The current problem is affecting multiple vendor's cards, so I'm
+wondering if I am running into a more general VxWorks SM_NET and/or vxMP
+issue.
+
+  The smObjShow output (below) shows a bizarre number for the Maximum Tries
+to Take Lock field, even though the various config.h files set this upper
+limit to 100.  Similarly, the smNetShow output is showing a large number of
+packet errors that may be attributed to this.
+
+  I've been able to trace this number down to a consecutive number of
+'false' return values from each vendor's sysBusTas routines.  That is, at
+some point, the sysBusTas routine said it could not TAS the backplane 5001
+times in a row.
+
+  I'm discussing with the vendors what the BSP issues may or may not be.  I
+thought I'd open it up and see if any general users may have already
+seen/fixed this issue.  I have a hard time believing that my bus is *that*
+heavily loaded when this condition occurs (although I have 6 to 8 CPUs on
+the backplane at the time).
+
+  We're on Tornado 1.0.1 with the Jumbo Patch 3.  We have many, many
+INCLUDE_ options set, but I'm not convinced they relate to this problem
+(i.e. INCLUDE_SCSI, INCLUDE_POSIX, etc).
+
+  Comments?
+
+
+-> smObjShow
+
+Shared Mem Anchor Local Addr : 0x4100
+Shared Mem Hdr Local Addr    : 0x2002c
+Attached CPU                 : 8
+Max Tries to Take Lock       : 5001
+
+Shared Object Type     Current   Maximum  Available
+-------------------- ---------- --------- ----------
+Tasks                         0       200        200
+Binary Semaphores             0        50         50
+Counting Semaphores           0        50         50
+Messages Queues               0       100        100
+Memory Partitions             0        20         20
+Names in Database             0       200        200
+
+value = 0 = 0x0
+->
+
+-> smNetShow
+Anchor Local Addr: 0x4100
+Sequential addressing enabled.  Master address: 129.46.153.101
+
+heartbeat = 67953, header at 0x101ec, free pkts = 19.
+
+cpu int type    arg1       arg2       arg3    queued pkts
+--- -------- ---------- ---------- ---------- -----------
+ 0  mbox-1         0x2d     0xcc00          0       0
+ 1  mbox-1         0x2d     0xcc08          0       0
+ 2  mbox-1         0x2d     0xcc10          0       0
+ 3  mbox-1         0x2d     0xcc18          0       0
+ 4  mbox-1         0x2d     0xcc20          0       0
+ 5  mbox-1         0x2d     0xcc28          0       0
+ 6  mbox-1         0x2d     0xcc30          0       0
+ 7  mbox-1         0x2d     0xcc38          0       0
+
+input packets = 3442  output packets = 6033
+input errors  =   6  output errors =  15
+collisions    =   0
+value = 0 = 0x0
+->
+
+Mark
+
+
+<==========================o============================================>
+| Mark E. Muri              | E-Mail: mailto:mmuri@qualcomm.com         |
+|  Sr. Staff Engineer/Mgr   | Alpha:  mailto:mmuri@pager.qualcomm.com   |
+|  R-241H                   | Work:   (619) 658-3303                    |
+| QUALCOMM, Inc             | Fax:    (619) 651-1987                    |
+|  10185 McKellar Ct.       | Pager:  (619) 636-0446                    |
+|  San Diego, CA 92121-2779 | PCS:    (619) 207-3139                    |
+| Go Gulls!                 | VME/C++/CCP/GSS/680x0/PowerPC/VxWorks/Ada |
+<==========================o============================================>
+
+
+--MimeMultipartBoundary--
+
+
+From daemon@csg.lbl.gov  Thu Sep 11 04:00:41 1997
+From: daemon@csg.lbl.gov
+Date: Thu Sep 11 04:00:44 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Thu Sep 11 04:00:36 PDT 1997
+
+        Subject: problem with transparent FTP file access
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: problem with transparent FTP file access
+Date: 9 Sep 1997 06:25:22 GMT
+From: schuehle@t-online.de (Martin Sauter)
+Organization: Schuehle Measurement and Control Systems
+Message-ID: <5v2q4i$br6$1@news02.btx.dtag.de>
+Reply-To: ms@schuehle.com
+
+Hi all,
+
+I am using transparent file access with FTP to transfer files generated
+on my x86 BSP embedded system (Tornado 1.0, VxWorks 5.3) to another
+computer. This works fine most of the time but sooner or later there
+seems to be a problem during data transmission to the FTP server and the
+whole embedded system hangs. The task that is using the transparent FTP
+file access has one of the lowest priorities in the system so something
+strange is going on. This is an excerpt from the FTP server log:
+
+16:01:02 Connection accepted from 147.11.72.100
+16:01:02 Command "USER target" received
+16:01:02 PASSword accepted
+16:01:02 User target logged in
+16:01:02 Command "TYPE I" received
+16:01:02 TYPE set to I N
+16:01:02 Command "CWD c:/pr/mm5" received
+16:01:02 Command "PORT 147,11,72,100,4,69" received
+16:01:02 Port set to 147.11.72.100 - 1093 (4,69)
+16:01:02 Command "STOR as05_05.dat" received
+16:01:02 STORe started on file as05_05.dat
+
+- -> so far this is o.k. but here comes the error :
+
+16:02:38 Transfer aborted                             -> (usually only
+takes about a second)
+16:02:38 Put file c:/pr/mm5/as05_05.dat unsuccessfully
+16:02:38 QUIT or close. User target logged out
+
+Any idea what the problem could be?
+
+thanks in advance 
+Martin
+
+P.S.: Just had a couple of other errors during ftp transfer to the
+embedded systems. The first time I got the following error message:
+"Socket error 10054" and the second time the ftp server said "Received
+data signal FD_Write on socket 6 which I can't find". Both times the
+embedded system hung afterwards...
+
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From dsunnarb@wavetech.net  Thu Sep 11 09:40:58 1997
+From: Dan Sunnarborg <dsunnarb@wavetech.net>
+Date: Thu Sep 11 09:41:02 PDT 1997
+Subject: Bootable VxWorks application
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Anyone who can help,
+
+I am tying to make a bootable application by using your
+taskSpawn command.  The problem is, I don't wish to build it
+into the vxworks image due to its large size.  Is it possible
+to spawn a task that is outside the vxworks image, even though
+it is being loaded PRIOR to the taskSpawn call as follows in
+usrRoot():
+
+usrRoot()
+{
+        .
+        .
+        .
+
+#ifdef INCLUDE_USER_APPL
+    /* Startup the user's application */
+
+    USER_APPL_INIT;     /* must be a valid C statement or block */
+#endif
+
+    /* Load module containing hostinit() 
+     */
+    env_id = loadModule(fd_env, LOAD_ALL_SYMBOLS);
+
+    taskSpawn ("HostInit", 100, 0, 20000, (FUNCPTR)
+hostinit,                                                                                             
+0,0,0,0,0,0,0,0,0,0);
+
+}
+
+I can declare the task as external, so the "C" file builds, but
+the link fails with:
+
+ld386 -X -N -e _sysInit -Ttext 00108000  \
+    -o vxWorks dataSegPad.o vxWorks.tmp ctdt.o
+vxWorks.tmp(.text+0x5a87): undefined reference to `hostinit'
+
+
+I also tried to add the -r option to the vxworks makefile, but upon
+loading the image, I received an error and nothing loaded.
+
+Is there a solution to this problem, or do I have to build an
+incredibly large vxworks image with everything linked ahead of
+time?
+
+Thanks in advance!
+
+Dan Sunnarborg
+Applied Biometrics Inc.
+Burnsville, MN
+(612) 890-1123
+dsunnarb@wavetech.net
+--MimeMultipartBoundary--
+
+
+From pbanta@adc.com  Thu Sep 11 13:20:14 1997
+From: pbanta@adc.com (Paul Banta)
+Date: Thu Sep 11 13:20:17 PDT 1997
+Subject: gdbm port
+Before I reinvent the wheel, has anyone ported gdbm to VxWorks?  If
+so, would you mind sharing your work?
+
+-Paul 
+
+--
+Paul Banta                                 voice 972-680-7666
+ADC Telecommunications                       fax 972-680-7672
+Network Services Division                  email pbanta@adc.com
+
+
+From daemon@csg.lbl.gov  Fri Sep 12 04:01:53 1997
+From: daemon@csg.lbl.gov
+Date: Fri Sep 12 04:01:56 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Fri Sep 12 04:01:48 PDT 1997
+
+        Subject: Re: VxWorks won't close old socket
+        Subject: How do I read the keyboard?
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: VxWorks won't close old socket
+Date: Thu, 11 Sep 1997 06:47:16 -0700
+From: Chet Kackman <kackman@GDEsystems.com>
+Organization: GDE Systems Inc.
+Message-ID: <3417F664.7F3@GDEsystems.com>
+References: <873835177.263688@wagasa.cts.com>
+
+Mathue Moyer wrote:
+> 
+> Here's the story.  I'm evaluating VxWorks (5.3.1) networking performance on
+> an i486 platform.  I have an application put together that accepts telnet
+> connections on a well-known port, copies text amongst the various
+> connections, and when instructed to do so, shuts itself down.  On various
+> other platforms, all connections are cleanly terminated when the application
+> shuts down, and I can immediately reuse the port that was being used.
+> For those familiar with using sockets, I use setsockopt to set SO_REUSEADDR
+> to ON and SO_LINGER to OFF (I've also tried ON with a linger time of 0).
+> Problem is, it _doesn't_ work that way on the VxWorks platform.  The
+> existing connections are not closed cleanly (remote client is just left
+> sitting instead of getting the "Connection closed by foreign host" message)
+> and no matter how long I wait (up to several hours) I can't reuse the same
+> port number (it complains about being in use when I try to bind() to it).
+> I figured maybe it was a problem with counting on the implicit "close()"
+> performed when this app runs as a process rather than a VxWorks task, but
+> explicitly closing all sockets (all connections and the host socket) didn't
+> fix the problem.  I tried using shutdown(fd, 2) on all of the sockets as
+> well, but that didn't do it either.
+> 
+> So the question is... has anybody else experienced problems with VxWorks
+> failing to properly terminate network connections?
+> 
+> --
+>        Mathue Moyer                           | Anyone who says they have only
+> Email: mathue@cts.com                         | one life to live must not know
+> URL:   http://www.users.cts.com/king/m/mathue | how to read a book.
+Matt
+  Try using the select function to test for read/write or exception for
+each FD in use, It may help you detect when your socket is closed.
+
+                      Regards
+
+                         Chet
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: How do I read the keyboard?
+Date: 11 Sep 1997 15:25:09 GMT
+From: jim@geigerpc.gsfc.nasa.gov (Jim Geiger)
+Organization: NASA Goddard Space Flight Center -- Greenbelt, Maryland USA
+Message-ID: <5v92gl$f7r@post.gsfc.nasa.gov>
+
+Hello,
+
+   I am running Tornado 1.0.1 on a Win95 host with a PPC 603e target
+(a MVME 2600-2 board in a VME chassie).  I would like to be able to 
+read/capture keyboard input.  In a DOS environment, I would use the functions
+in <conio.h>, and, in a unix environment, I would use functions in <termios.h>
+to set up the console so I could read the keyboard.  Does anyone know how I do
+this in the VxWorks environment?
+
+Thanks,
+Jim
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From nmehrotra@yurie.com  Fri Sep 12 08:21:54 1997
+From: nmehrotra@yurie.com
+Date: Fri Sep 12 09:04:30 PDT 1997
+Subject: Bootable VxWorks application
+--MimeMultipartBoundary
+Content-type: text/plain; charset=US-ASCII
+
+
+
+From: Nitin Mehrotra on 09/12/97 11:19 AM
+Hi Dan,
+
+What you're trying to do is interesting but tricky; you have to
+do a little more than what you're doing now. Starting a task involves
+optionally loading the code in memory and then creating a task with
+one function from that code. You can keep the code external and load it
+into memory as you're doing but how do you know the function to start
+the task with? Specifically, in your taskSpawn call:
+
+    taskSpawn ("HostInit", 100, 0, 20000, (FUNCPTR)hostinit,
+0,0,0,0,0,0,0,0,0,0);
+
+Where is the function hostinit()? It is in the code you load, so vxWorks
+will know it's address at load time but does not know its address at
+compile/link time. So the compiler flags it as an external function and
+the linker barfs because it doesn't find it.
+
+What you have to do is to find the address of the hostinit function
+at runtime and then call taskSpawn with that address. The only way I can
+think of is using the symLib to find the address.
+Try this piece of code:
+
+{
+     FUNCTPTR	pFunc;
+
+    env_id = loadModule(fd_env, LOAD_ALL_SYMBOLS);
+
+    if (ERROR == (symFindByName(sysSymTbl, "hostinit",
+                    &pFunc, &symbolType))) {
+          /* handle function not found error */
+    }
+
+     taskSpawn ("HostInit", 100, 0, 20000, pFunc,
+0,0,0,0,0,0,0,0,0,0);
+}
+
+That should do the work for you. I haven't tested it out so I'd be
+interested in knowing your results.
+
+Oh, btw, check all errors. I will save you a lot of grief one day.
+
+HTH
+
+nitin
+
+
+From dsunnarb@wavetech.net  Thu Sep 11 09:40:58 1997
+From: Dan Sunnarborg <dsunnarb@wavetech.net>
+Date: Thu Sep 11 09:41:02 PDT 1997
+Subject: Bootable VxWorks application
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Anyone who can help,
+
+I am tying to make a bootable application by using your
+taskSpawn command.  The problem is, I don't wish to build it
+into the vxworks image due to its large size.  Is it possible
+to spawn a task that is outside the vxworks image, even though
+it is being loaded PRIOR to the taskSpawn call as follows in
+usrRoot():
+
+usrRoot()
+{
+        .
+        .
+        .
+
+#ifdef INCLUDE_USER_APPL
+    /* Startup the user's application */
+
+    USER_APPL_INIT;     /* must be a valid C statement or block */
+#endif
+
+    /* Load module containing hostinit()
+     */
+    env_id = loadModule(fd_env, LOAD_ALL_SYMBOLS);
+
+    taskSpawn ("HostInit", 100, 0, 20000, (FUNCPTR)
+hostinit,
+0,0,0,0,0,0,0,0,0,0);
+
+}
+
+I can declare the task as external, so the "C" file builds, but
+the link fails with:
+
+ld386 -X -N -e _sysInit -Ttext 00108000  \
+    -o vxWorks dataSegPad.o vxWorks.tmp ctdt.o
+vxWorks.tmp(.text+0x5a87): undefined reference to `hostinit'
+
+
+I also tried to add the -r option to the vxworks makefile, but upon
+loading the image, I received an error and nothing loaded.
+
+Is there a solution to this problem, or do I have to build an
+incredibly large vxworks image with everything linked ahead of
+time?
+
+Thanks in advance!
+
+Dan Sunnarborg
+Applied Biometrics Inc.
+Burnsville, MN
+(612) 890-1123
+dsunnarb@wavetech.net
+--MimeMultipartBoundary--
+
+
+
+
+--MimeMultipartBoundary--
+
+
+From rodmelby@csys.win-uk.net  Sat Sep 13 04:23:54 1997
+From: rodmelby@csys.win-uk.net (Rodney W Melby)
+Date: Sat Sep 13 04:24:01 PDT 1997
+Subject: No mail since Sept 8th.
+I haven't had any mail since Sept 8th. To my knowledge I have not
+cancelled my subscription. Any idea?
+
+Regards
+
+Rod
+
+
+
+From daemon@csg.lbl.gov  Sun Sep 14 04:00:42 1997
+From: daemon@csg.lbl.gov
+Date: Sun Sep 14 04:00:46 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Sun Sep 14 04:00:39 PDT 1997
+
+        Subject: executing MMX code
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: executing MMX code
+Date: 12 Sep 1997 01:55:33 GMT
+From: dixon@ra.crd.ge.com (walt dixon)
+Organization: GE Corp. Research & Development, Schenectady, NY
+Keywords: x86 mmx coff a.out
+Message-ID: <5va7el$7pv$1@rdsunx.crd.ge.com>
+
+I have a need to execute a fairly sizeable chunk of mmx code on a
+vxworks hosted system.  My target is x86 and my host is windows nt.
+I currently have compiled and tested this code using visual c++.
+Is there a relatively straight-forward way to convert this code to
+run on vxWorks.  The basic problem seems to be that there is no
+coff support in the x86 tool set.  I have considered the following
+alternatives:
+	(1) create a custom version of objcopy that supports both a.out
+	    and coff.  Any thoughts on how difficult this task would be?
+            (BFD supports both formats).
+	(2) Generate an assembly language file and assemble it with
+	    NASM.
+	(3) Rewriting the code in gas and using intel mmx macros.
+Am I missing something obvious?  Any suggestions would be appreciated.
+The simpler the solution, the better. TIA
+
+Walt Dixon	email:		dixon@crd.ge.com
+		us mail:	Walt Dixon
+				GE Corp. R&D
+				PO Box 8
+				Schenectady, NY 12301
+		voice:		518-387-5798
+		fax:		518-387-5164
+
+
+
+- -- 
+Walt Dixon	email:		dixon@crd.ge.com
+		us mail:	Walt Dixon
+				GE Corp. R&D
+				PO Box 8
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From daemon@csg.lbl.gov  Mon Sep 15 04:01:25 1997
+From: daemon@csg.lbl.gov
+Date: Mon Sep 15 04:01:29 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Mon Sep 15 04:01:22 PDT 1997
+
+        Subject: Re: Big endian and Little endian( PC to PPC)
+        Subject: Re: VxWorks won't close old socket
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: Big endian and Little endian( PC to PPC)
+Date: Sun, 14 Sep 1997 08:08:40 GMT
+From: valentin@netcom.com (Valentin Pepelea)
+Organization: Netcom Communications, Santa Clara, CA
+Message-ID: <valentinEGHnyH.M1v@netcom.com>
+References: <19970913215400.RAA10530@ladder02.news.aol.com>
+Sender: valentin@netcom11.netcom.com
+
+In article <19970913215400.RAA10530@ladder02.news.aol.com> caoy@aol.com (Caoy) writes:
+>
+>We need send a data structure down to the target through TCP/IP from the
+>PC host. On the PC side data format is little endian while big endian on
+>the target 
+>side.
+>
+>My question:
+>
+>1) If we send the data structure as normal from PC side,  what does the
+>byte order of the structures look like? For instances, there are four
+>integers in the structure. Are the four integers in the same order as they
+>are on the PC side but the byte order of the each integer is reversed OR
+>the byte order of the whole structure is reversed ?
+
+Yup, correct analysis.
+
+>2) Has anyone had this similiar situation?
+
+Oh yeah, very often.
+
+>How to get the correct data structure on the target side? What is the better
+>way to take care of this problem??
+
+On the target side, we simply use a macro to convert the integers:
+
+#define ConvertEndian(x) ((x&0xFF)<<24 | (x&0xFF00)<<8 | (x&0xFF000000)>>8 | (x&0xFF00000000)>>24)
+
+I wrote this from memory, so double check my coding.
+
+Valentin
+- -- 
+"An operating system without virtual memory      Valentin Pepelea
+ is an operating system without virtue."         Embedded Systems Consultant
+                                                 (415) 516-7293
+                     - Ancient Inca Proverb      valentin@netcom.com
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: VxWorks won't close old socket
+Date: Fri, 12 Sep 1997 11:16:52 GMT
+From: fudath@ct.essd.northgrum.com (Thomas Fuda)
+Organization: Northrop Grumman Corporation, Baltimore, MD
+Message-ID: <3419217f.948714@155.104.79.99>
+References: <873835177.263688@wagasa.cts.com>
+Sender: news%mother@mdnews.md.essd.northgrum.com
+
+On 9 Sep 1997 19:59:37 GMT, mathue@king.cts.com (Mathue Moyer) wrote:
+
+
+>So the question is... has anybody else experienced problems with VxWorks
+>failing to properly terminate network connections?
+>
+
+Yes, I have has some problems with TCP sockets under VxWorks. Overcame
+our problems by enabling the TCP_KEEPALIVE option on our sockets and
+messing with the timers that control the keepalive function. The
+timers are initialized with the default values specified in
+tcp_timer.h (TCPTV_KEEP_INIT, TCPTV_KEEP_IDLE, TCPTV_KEEPINTVL, and
+TCPTV_KEEPCNT determine the defaults). These default values are
+extremely long in duration. Rather than changing the values in
+tcp_timer.h and recompiling the socket libraries I changed the global
+variables tcp_keepinit, tcp_keepidle, tcp_keepintvl and tcp_keepcnt
+(which are initialized with the values specified in tcp_timer.h).
+Maybe this would help you.
+
+
+				Thomas Fuda
+				Sr. Software Engineer
+				Northrop Grumman Norden Systems
+
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From cruz_nojunk@xyplex.com  Mon Sep 15 09:02:21 1997
+From: Roger Cruz <cruz_nojunk@xyplex.com>
+Date: Mon Sep 15 09:02:24 PDT 1997
+Subject: Relocating the bootrom file in a PC 486
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Has anyone been successful in relocating the starting address of the
+bootrom code in a PC?  The documentation says I should changed
+RAM_HIGH_ADRS in the VxWorks makefile and config.h.  I changed mine from
+the default of 0x8000 to 0x10000 and I can't make it work.  The system
+reboots.  I'm using vxload.com and I have verified that the bootrom
+image fits in the free space.
+
+  Thanks.
+
+PS. Remove "_nojunk" from email address to contact me.
+-- 
+Roger Cruz                           cruz_nojunk@xyplex.com
+Xyplex Networks                      w: 508-952-4783
+295 Foster Street                    f: 508-952-4887
+Littleton, MA 01460
+--MimeMultipartBoundary--
+
+
+From goldappl@services.aminvestnet.com  Mon Sep 15 21:03:15 1997
+From: "Golden Apples LP" <sales@goldenapples.com>
+Date: Mon Sep 15 21:03:22 PDT 1997
+Subject: ANIMATION -- Cels -- Giveaway
+
+Dear Art Enthusiast:
+
+The Golden Apples Group of Los Angeles is proud to offer original art 
+"cels" (value $100.00*) at no cost to you in exchange for completing an 
+industry survey at the Golden Apples web site. 
+
+These hand-painted, one-of-a-kind cels were used used in the hit TV series 
+Teenage Mutant Ninja Turtles. These cels are the last of an art form soon to 
+be extinct, because most of today's animation is computer generated. This is 
+an excellent gift or art investment and includes a Certificate of 
+Authenticity.
+
+We are giving away this special piece of art because we hope this 
+limited-time promotion will attract art enthusiasts, such as you, as well as 
+your friends and family. In addition we want to create awareness of Golden 
+Apples' new web sites. The principals of our company have been in the art 
+business for many years and are one of the larger galleries buying and 
+selling decorative, fine and collectible art.
+
+To see our cel samples and take the survey, click here:
+http://www.goldenapples.com
+
+
+Thank you.
+
+* Only one per person.
+       Each cel measures 7 1/2 x 9 1/2 inches
+       Shipping and handling are not included
+       Note this is a one time mailing
+
+To be deleted from our mailing list, please click here:
+http://www.goldenapples.com/remove_me.html
+
+
+
+From daemon@csg.lbl.gov  Tue Sep 16 04:00:37 1997
+From: daemon@csg.lbl.gov
+Date: Tue Sep 16 04:00:40 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Tue Sep 16 04:00:33 PDT 1997
+
+        Subject: http://home.fia.net/~crespom
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: http://home.fia.net/~crespom
+Date: 10 Sep 1997 12:03:13 GMT
+From: merlito<crespom@fia.net>
+Organization: paper air machines
+Message-ID: <5v62a1$aqc$11164@usenet88.supernews.com>
+
+http://home.fia.net/~crespom
+
+
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From wbrown@csg.lbl.gov  Tue Sep 16 07:30:55 1997
+From: wbrown@csg.lbl.gov (Bill Brown)
+Date: Tue Sep 16 07:30:58 PDT 1997
+Subject: This is a test
+
+of the vxWorks exploder and broad-scattering system.  This message was
+sent to the exploder via email.  You do not need to adjust your set
+at this time.
+
+Disclaimer:  Any opinions are my own and have	    |  -bill
+    nothing to do with the official policy or the   |   wlbrown@lbl.gov
+    management of L.B.N.L, who probably couldn't    |   Berkeley, CA
+    care less about employees who play with trains. |   aka wlbrown@netcom.com
+
+
+From jlao@yurie.com  Tue Sep 16 09:56:45 1997
+From: jlao@yurie.com
+Date: Tue Sep 16 09:57:01 PDT 1997
+Subject: VxWorks Needed
+--MimeMultipartBoundary
+Content-type: text/plain; charset=US-ASCII
+
+
+
+
+James Lao
+09/16/97 12:54 PM
+
+We are looking for experience VxWorks with an excellent background
+in telecommunications in area of SS7 and ISDN. If you are
+interested, please contact me.
+
+James Lao
+Yurie Systems, Inc.
+ 8301 Professional Place
+Landover,  MD 20785-2237
+jlao@yurie.com
+tel.(301)-352-4606
+fax.(301)-352-4680
+
+
+--MimeMultipartBoundary--
+
+
+From R.Kirnum@dialogic.com  Tue Sep 16 11:37:02 1997
+From: "Kirnum, Robert" <R.Kirnum@dialogic.com>
+Date: Tue Sep 16 11:37:06 PDT 1997
+Subject: Startup Script
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Is there some way to have a startup script (as in VxWorks 5.2) using
+Tornado?
+
+________________________________________________________________________
+D I A L	Bob Kirnum
+_|_|_|O	Software Engineer
+_|_|_|G	973-993-3000 Ext. 6589
+_|_|_|I	973-993-5916 Fax
+_|_|_|C	mailto:R.Kirnum@dialogic.com
+Get the Dialogic Edge at http://www.dialogic.com
+Dialogic Corp.  /  1515 Rt. 10  /  Parsippany, NJ 07054
+________________________________________________________________________
+             Did you know . . . that FireWire was developed by Apple?
+        . . . that Apple is 150 in the Fortune 500 and Microsoft is 172?
+Believe in Macintosh? Check out http://www.evangelist.macaddict.com/
+                   Join by emailing mailto:evangelist@macway.com
+
+--MimeMultipartBoundary--
+
+
+From 82162060@msn.com  Tue Sep 16 19:17:38 1997
+From: 82162060@msn.com
+Date: Tue Sep 16 19:17:41 PDT 1997
+Subject: WARNING - Major Investigation May Involve You
+
+
+
+ARE YOU BEING INVESTIGATED????
+
+
+
+Learn the Internet tools that are used to investigate you, your 
+
+friends, neighbors, enemies, Employees or anyone else!  My huge 
+
+report "SNOOPING THE INTERNET" of Internet sites will give you...
+
+
+* Thousands of Internet locations to look up people, credit, 
+
+Social security, current or past employment, Driving records, 
+
+medical information, addresses, phone numbers, Maps to city 
+
+locations...
+
+
+
+Every day the media (television, radio, and newspapers) are full 
+
+of stories about PERSONAL INFORMATION being used, traded, and sold 
+
+over the Internet... usually without your permission or knowledge. 
+
+With my report I show you HOW IT'S DONE!!!
+	
+
+It's amazing..
+
+	
+
+Locate a debtor that is hiding, or get help in finding hidden assets.
+
+
+
+*   Find that old romantic interest.
+
+
+*   Find e-mail, telephone or address information on just about 
+
+     anyone! Unlisted phone numbers can often be found through 
+
+     some of these sites!!
+
+
+
+Perhaps you're working on a family "tree" or history. The Internet 
+
+turns what once was years of work into hours of DISCOVERY & 
+
+INFORMATION.
+
+
+
+
+      Check birth, death, adoption or social security records.
+
+
+MILITARY
+
+      Check service records of Army, Navy, Air Force or Marine 
+
+      Corps. Find out who's been telling the truth and who's been 
+
+      lying. Perhaps you can uncover the next lying politician!!!
+ 
+
+
+FELLOW EMPLOYEES;
+
+
+* Find out if your fellow employee was jailed on sex charges, or   
+
+  has other "skeletons" in the closet!!
+
+
+
+PERFORM BACKGROUD CHECKS;
+  
+   Check credit, driving or criminal records, Verify income or 
+
+   educational claims, Find out Military history and discipline, 
+
+   previous political affiliations, etc.
+
+
+YOUR KID'S FRIENDS;
+
+
+   Find out the background of your children's friends & dates.
+
+
+WHATS THE LAW? STOP GUESSING!!
+
+
+* Look up laws, direct from law libraries around the world. Is 
+
+  that new business plan legal?? 
+
+
+
+
+NEW JOB?  NEW TOWN?  NEW LIFE?
+
+   Employment ads from around the world can be found on the 
+
+   Internet. Get a new job and disappear!
+
+
+
+The Internet can tell you just about ANYTHING, if you know WHERE 
+
+to look. 
+
+
+
+BONUS REPORT!!!!
+
+
+Check your credit report and use the Internet to force credit 
+
+bureaus to remove derogatory information. My special BONUS REPORT 
+
+included as part of the "SNOOPING THE INTERNET" collection reveals 
+
+all sorts of credit tricks, legal and for "information purposes 
+
+only" some of the ILLEGAL tricks.
+
+
+Research YOURSELF first!
+
+
+What you find will scare you.
+
+
+If you believe that the information that is compiled on you should 
+
+be as easily available to you as it is to those who compile it, 
+
+then. . .
+
+You want to order the SNOOPING THE INTERNET report I've put 
+
+together.
+
+
+This huge report is WHERE YOU START! Once you locate these FREE 
+
+private, college and government web sites, you'll find even MORE 
+
+links to information search engines!
+
+YOU CAN FIND OUT ANYTHING ABOUT ANYBODY ANY TIME using the Internet!!!!
+
+  1) WE TAKE: AMERICAN EXPRESS <> VISA <> MASTERCARD
+ 
+        TYPE OF CARD  AMX/VISA/MC??____________________
+ 
+        NAME ON CREDIT CARD___________________________
+ 
+       CREDIT CARD #___________________________________
+ 
+        BILLING ADDRESS ________________________________
+ 
+        CITY_____________________________________________
+ 
+        STATE________________ZIP________________________
+ 
+        PHONE INCLUDE AREA CODE______________________
+ 
+        WE WILL BILL 39.95 to your account
+ 
+        SALES TAX (2.90) added to CA residents 
+ 
+  >>> Send $39.95 ($42.85 in CA) cash, check or money order to:
+  >>> CASINO CHICO
+  >>> Background Investigations Division
+  >>> 305 Nord Ave.
+  >>> P.O. Box 4191
+  >>> Chico, CA 95927-4191
+
+
+  2) Send the same above requested credit card information to above address. 
+
+
+   3) Fax the same above credit card information to 916-895-8470
+
+   4) Call phone # 916-876-4285.  This is a 24 hour phone number to          
+
+      place a CREDIT CARD order.
+
+ I will RUSH back to you SAME DAY my "SNOOPING THE INTERNET" report!
+
+Log on to the Internet and in moments you will fully understand...
+
+ What information is available -- and exact Internet site to get there!
+
+2nd BONUS!!!!
+
+
+Along with the report we will send a 3 1/2" disk with sites 
+
+already "HOT LINKED". No need to type in those addresses. Simply 
+
+click on the URL address and "PRESTO" you are at the web site!!! 
+
+
+Personal ads, logs of personal e-mail, mention of individuals
+
+anywhere on the Internet are "your for the taking" with this 
+
+report.
+
+
+Lists of resources to find even more information (private
+
+Investigation companies, etc..) 
+
+
+   Order surveillance equipment (if legal in your state)
+  
+
+Send anonymous e-mail
+   
+Research companies 
+
+Research technology
+
+Locate military records
+
+ 
+FIND INFORMATION ON CRIMINALS 
+
+   Find Wanted fugitives - perhaps even a close associate!
+
+ABSOLUTE SATISIFACTION GUARANTEED:
+
+Your satisfaction is 100% guaranteed, just return the material
+For a full refund within 30 days if you aren't 100% satisfied.
+
+
+Copyright 1997 All Rights Reserved
+
+R Jon Scott Hall Publications. 
+
+
+
+  THIS IS NOT A  FRANK MULLEN / CYBER PRODUCTS / SPYMASTER  PUBLICATION
+
+
+
+
+
+
+
+
+
+
+
+
+From wbrown@csg.lbl.gov  Wed Sep 17 07:10:58 1997
+From: wbrown@csg.lbl.gov (Bill Brown)
+Date: Wed Sep 17 07:11:01 PDT 1997
+Subject: This is a test of the vxworks exploder.
+
+-bill
+
+
+From mwbrown@dragon  Wed Sep 17 08:45:36 1997
+From: mwbrown@dragon.sandia.gov (Matthew W. K. Brown)
+Date: Wed Sep 17 08:45:38 PDT 1997
+Subject: Problems upgrading to Tornado
+--MimeMultipartBoundary
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+
+vxWorkers:
+
+I am upgrading some S/W from 5.2 to Tornado and I have run into some 
+problems.  
+
+The code seems to work fine under 5.2.  I took this same code and 
+recompiled it with the compilers shipped with 5.3.1.  It compiles fine, 
+loads fine, and seems to run fine--except, it doesn't handle interrupts 
+anymore.  The device that generates the interrupts is a non-vxWorks device 
+and shouldn't be effected by the upgrade.  I did stick a VMETRO bus 
+analyser board in to verify this and sure enough, interrupts are being 
+generated (as expected) ... my code just isn't handling them under Tornado.
+This *exact* same code did handle them under 5.2!  Just to make sure, I 
+switched back to my 5.2 PROMs, recompiled the code again ... and it still 
+works under 5.2.
+
+The only thing unusual that I am doing is that I built my 5.3 vxWorks with 
+5.2 support using the following includes:
+
+#define INCLUDE_LOADER          /* object module loading */ 
+#define INCLUDE_NET_SYM_TBL     /* load symbol table from network */ 
+#define INCLUDE_RLOGIN          /* remote login */ 
+#define INCLUDE_SHELL           /* interactive c-expression interpreter */ 
+#define INCLUDE_SHOW_ROUTINES   /* show routines for system facilities*/ 
+#define INCLUDE_SPY             /* spyLib for task monitoring */ 
+#define INCLUDE_STARTUP_SCRIPT  /* execute start-up script */ 
+#define INCLUDE_STAT_SYM_TBL    /* create user-readable error status */ 
+#define INCLUDE_SYM_TBL         /* symbol table package */ 
+#define INCLUDE_TELNET          /* telnet-style remote login */ 
+#define INCLUDE_UNLOADER        /* object module unloading */ 
+#define INCLUDE_DEBUG           /* native debugging */ 
+
+
+Any ideas or suggestions?
+
+Thanks,
+
+Matthew
+
+
+-------------------------------------------------------------------------
+Matthew Brown, SMTS                             Voice: (505) 844-1160
+Sandia National Laboratories                    Fax:   (505) 844-7059
+P. O. Box 5800    M/S 0965                      email: mwbrown@sandia.gov
+Albuquerque, NM  87185-0965
+--MimeMultipartBoundary--
+
+
+From page@rocko.mit.edu  Wed Sep 17 09:02:57 1997
+From: "Russell J. Page, Sr." <page@rocko.mit.edu>
+Date: Wed Sep 17 09:03:00 PDT 1997
+Subject: Joerger VDACM software
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Hi Folks:
+
+I am looking for anyone in the EPICS community that may have the
+appropriate record and device support software for the Joerger VDACM
+8-channel, 16-bit waveform generator.
+
+Thanks in advance
+Russ
+-- 
+-----------------------------------------------------------------
+|Russell J. Page, Sr.		    Phone (617) 253-9585	|
+|MIT Bates Linear Accelerator Ctr.  FAX   (617) 253-9799	|
+|PO Box 846			    email :page@rocko.mit.edu	|
+|Middleton, MA  01949		    http://mitbates.mit.edu/	|
+-----------------------------------------------------------------
+
+--MimeMultipartBoundary--
+
+
+From budh@venus.gvg.tek.com  Wed Sep 17 10:01:27 1997
+From: budh@venus.gvg.tek.com (Bud Hensley)
+Date: Wed Sep 17 10:01:31 PDT 1997
+
+Please unsubscribed.
+
+
+From chenyc@fnal.gov  Wed Sep 17 16:35:43 1997
+From: Yenchu Chen <chenyc@fnal.gov>
+Date: Wed Sep 17 16:35:46 PDT 1997
+Subject: platform supported by VxWorks 5.3
+--MimeMultipartBoundary
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+
+To whom it may concern,
+
+   I learned that the new version, VxWorks 5.3, doesn't support IRIX 6.
+Could someone tell me what kinds of platform are supported by the
+VxWorks 5.3?
+
+   By the way I could not find VxWorks 5.3 in Wind River's web pages!?
+
+   Best regards,         Yen-Chu Chen
+                         chenyc@fnal.gov
+                         (630) 840-8871 (experiment)
+                         (886)-(2) 789-9681 (Inst. of Phys., Academia Sinica)
+
+--MimeMultipartBoundary--
+
+
+From daemon@csg.lbl.gov  Thu Sep 18 04:00:40 1997
+From: daemon@csg.lbl.gov
+Date: Thu Sep 18 04:00:44 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Thu Sep 18 04:00:37 PDT 1997
+
+        Subject: VxWorks Timing
+        Subject: Power Off function ?
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: VxWorks Timing
+Date: Wed, 17 Sep 1997 13:29:07 +0200
+From: Sam Michiels <samm@cs.kuleuven.ac.be>
+Organization: Department of Computer Science, K.U.Leuven
+Message-ID: <341FBF03.3912@cs.kuleuven.ac.be>
+
+Hello,
+
+I did some basic timing performance tests on our VxWorks target
+(Motorola 68360 25 Mhz).
+These tests included semaphorecreate, delete, take, give and the
+spawning of tasks...
+
+In the VxW FAQ, I found figures in the order of a few, to a few hundred
+MICROseconds... 
+My tests resulted in much much faster performance figures (In the order
+of picoseconds :-/
+(e.g. to create 1000 Mutual Exclusion Semaphores : 15 nanoseconds...)
+
+What am I doing wrong, or are the FAQ performance figures outdated (FAQ
+tests were done on a mv167 25Mhz)?
+I'm using POSIX 'clock_gettime()' method to do the timing...
+
+Can anyone help me with this? I've put part of the program below.
+
+Thnx,
+Sam.
+
+- ------------------------------------------------------------------
+Here is part of the test program:
+
+#include <vxWorks.h>
+#include <timers.h>
+#include <semLib.h>
+
+SEM_ID SemPrio[1000];
+
+void semTakeTiming( void )
+{
+    int s;
+    struct timespec start, end;
+
+    printf("** Timing of Semaphore TAKE **\n\n");
+
+    clock_gettime(CLOCK_REALTIME, &start);
+    for(s=0 ; s<1000 ; s++){
+      semTake( SemPrio[s], WAIT_FOREVER);
+    }
+    clock_gettime(CLOCK_REALTIME, &end);
+    printf("Delay to TAKE 1000 Mutual Exclusion Semaphores (Priority 		
+Queueing) : %ld nsecs\n", end.tv_nsec - start.tv_nsec);
+}
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Power Off function ?
+Date: 17 Sep 1997 10:48:13 GMT
+From: Thomas.Eriksson@lu.erisoft.se (Thomas Eriksson)
+Organization: Erisoft AB, Sweden
+Message-ID: <5vochd$pui$1@antares.lu.erisoft.se>
+Reply-To: Thomas.Eriksson@lu.erisoft.se
+
+Need a "Power Off" function on a
+SPARC CPU-5V  ( in a Teraforce/Target-32 rack ) 
+with Tornado 1.0.1 and
+BSP CPU-5V/-5VT/-7V/-8VT Rel. 1.1/3   
+
+Got this information:
+- ---------------------------------------------------------------------
+The software controlled down logic works as follows:
+
+The power down program starts a write access to the VME
+address $FCFFFFFE Hex. The specially designed decoding
+logic on the MOTH-32 responds with the DTACK signal on
+the VMEbus and this signal remains low. After this
+action, the logic generates the shutdown signal to the
+power supply. After detecting the shutdown signal, the
+power supply powers off the DC voltage.
+- ----------------------------------------------------------------------
+
+Need an example for it, or more information.
+
+Have anyone done this or seen it somewhere ?
+
+Thanks   /  TE
+!~~~~~~~~~~~~~~~~~~~!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~!~~~~~~~~~~~~~~~~~~~~~~~~~~~~!
+! Thomas Eriksson   ! E-mail:                       ! Home adress:               !
+!Ericsson Erisoft AB! Thomas.Eriksson@lu.erisoft.se ! Norra Pitholmsvagen 129    !
+!  Box 920          ! Tel.company +46 920 202000    ! 941 46 Pitea, SWEDEN       !
+!  971 28 LULEA     ! Tel.direct  +46 920 202773    ! Tel.home    +46 911 69164  ! 
+!  SWEDEN           ! Tel.ECN      857 2773         ! Tel.GSM     +46 70 5958170 !
+!  Apt.LU/EPL/L/M   ! Telefax     +46 920 202099    ! Telefax	+46 911 69164    !
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From info@triada.si  Thu Sep 18 07:26:23 1997
+From: info@triada.si
+Date: Thu Sep 18 07:26:27 PDT 1997
+Subject: Re: VxWorks Timing
+>My tests resulted in much much faster performance figures (In the order
+>of picoseconds :-/
+>(e.g. to create 1000 Mutual Exclusion Semaphores : 15 nanoseconds...)
+
+Sam,
+
+I do not see semCreate in your source. If this is really missing all your
+semaphores are uninitialised.
+
+Jure
+
+-----------------------------------------------------------
+info@triada.si
+
+Triada d.o.o.
+Rozna dolina 9/3
+1000 Ljubljana
+Slovenia
+Europe
+
+fax: +386-61-1234-166
+tel: +386-61-1234-891
+-----------------------------------------------------------
+
+
+
+From mea@mclean.sparta.com  Thu Sep 18 07:44:28 1997
+From: Mike Anderson <mea@mclean.sparta.com>
+Date: Thu Sep 18 07:44:31 PDT 1997
+Subject: RE: Problems upgrading to Tornado
+--MimeMultipartBoundary
+Content-Type: text/plain
+
+> Submitted-by mwbrown@dragon  Wed Sep 17 08:45:36 1997
+> Submitted-by: mwbrown@dragon.sandia.gov (Matthew W. K. Brown)
+> 
+> vxWorkers:
+> 
+> I am upgrading some S/W from 5.2 to Tornado and I have run into some 
+> problems.  
+> 
+> The code seems to work fine under 5.2.  I took this same code and 
+> recompiled it with the compilers shipped with 5.3.1.  It compiles
+> fine, 
+> loads fine, and seems to run fine--except, it doesn't handle
+> interrupts 
+> anymore.  The device that generates the interrupts is a non-vxWorks
+> device 
+> and shouldn't be effected by the upgrade.  I did stick a VMETRO bus 
+> analyser board in to verify this and sure enough, interrupts are being
+> 
+> generated (as expected) ... my code just isn't handling them under
+> Tornado.
+> This *exact* same code did handle them under 5.2!  Just to make sure,
+> I 
+> switched back to my 5.2 PROMs, recompiled the code again ... and it
+> still 
+> works under 5.2.
+> 
+> [snip]
+> 
+> Hi Matt,
+> 
+>   I suspect that your problem may be your 5.3.1 BSP.  You don't
+> mention which architecture you're using, so I assume that it's
+> a 68K flavor of some sort.  Check out the sysLib.c and verify 
+> that sysIntEnable still works.  Just to make sure that the BSP 
+> is still working, try the following:
+> 
+> -> intConnect(0xa0 << 2, logMsg, "this is an interrupt\n")
+> -> sysIntEnable(5)
+> -> sysBusIntGen(5, 0xa0)
+> 
+> This hooks logMsg up to vector 0xA0 (160 decimal) and should print
+> the message when you issue the sysBusIntGen (using level 5 in this
+> example).  If you don't get anything with this, then it's 
+> probably a bug in the 5.3.1 BSP.  
+> 
+> It's not that you have the 5.2 code enabled.  In fact, I've
+> found Tornado particularly troublesome WRT local file systems
+> (just try to do a "cd yourBootHostName:/" from the Wind Shell
+> and watch the error message occur).  Ram disks don't work, NFS
+> drives with local drive names that aren't visible to the boot
+> host (e.g., you've mounted them from another VxWorks client)
+> don't work, etc.  Tornado is fine for developing code for that
+> deeply embedded gizmo that barely has enough RAM for the O/S,
+> but it really bites for complex, multiprocessor development
+> projects.  Let's all hope that WRS *NEVER* eliminates the 
+> ability to shut Tornado off and get back to good ol' VxWorks.
+> 
+> Regards,
+>  
+--MimeMultipartBoundary--
+
+
+From mmcquade@pop.aa.net  Thu Sep 18 11:02:04 1997
+From: Mike McQuade <mmcquade@pop.aa.net>
+Date: Thu Sep 18 11:02:07 PDT 1997
+Subject: PMC / PCI Bandwidth
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+
+
+Hello,
+
+We are using an mv-2603 board and Tornado 1.01.
+
+Does anyone have any experience writing to a PMC card ?
+
+Im curious what kind of data rates you have seen writing
+from CPU DRAM to PMC space.
+
+How does one achieve the 132Mbyte / second figure ?
+
+
+Thanks.
+
+
+
+ 
+
+--MimeMultipartBoundary--
+
+
+From mmcquade@pop.aa.net  Thu Sep 18 13:16:37 1997
+From: Mike McQuade <mmcquade@pop.aa.net>
+Date: Thu Sep 18 13:16:40 PDT 1997
+Subject: RamDisks, was-> RE: Problems upgrading to Tornado
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+
+At 07:44 AM 9/18/97 PDT, you wrote:
+>Submitted-by mea@mclean.sparta.com  Thu Sep 18 07:44:28 1997
+>Submitted-by: Mike Anderson <mea@mclean.sparta.com>
+>
+
+snip...
+
+>> Ram disks don't work, NFS
+>> drives with local drive names that aren't visible to the boot
+>> host ....
+
+
+
+Mike,
+
+
+What do you mean by "Ram Disks Don't work", we have been using a 2meg
+ram disk in our system for quite some time, we use it as a place to
+FTP a file when we update the FLASH memory.
+
+We have not had problems with the Ram Disk, yet...
+
+
+So, Id like to hear what problems you have had, to
+know what to look for.
+
+
+Thanks.
+
+
+
+
+Mike.
+
+
+
+--MimeMultipartBoundary--
+
+
+From cgrames@mdc.com  Thu Sep 18 13:47:05 1997
+From: Charlie Grames <cgrames@mdc.com>
+Date: Thu Sep 18 13:47:09 PDT 1997
+Subject: Re:  VxWorks Timing
+Sam,
+
+I'm not sure what your clock source on a 68360 is, but, typically, the POSIX timing routines use the
+resolution of the system clock, which is, by default, 16.67 ms (60 Hz).  That being the case, it
+would be impossible to get a smaller delta time than 16.67 ms.
+
+If you want to get finer resolution with your timings, you will need to use the timestamp clock.  I
+don't know whether this is available by default with the BSP for your board.  If it is, and assuming
+your timestamp clock runs as fast as the processor clock (which is doubtful), your tick resolution
+will be 40 ns.
+
+I don't see anything wrong with your code, assuming you are initializing your semaphores
+elsewhere.  You might want to make a call to clock_getres() to determine the resolution of the
+POSIX clock.  I think I can say with great certainty, however, that Wind River currently supports no
+processor that can complete 1000 calls to semTake in 15 ns.
+
+Charlie Grames
+The Boeing Company
+(314) 233-1956
+Charles.R.Grames@boeing.com
+
+
+From mea@mclean.sparta.com  Thu Sep 18 14:55:10 1997
+From: Mike Anderson <mea@mclean.sparta.com>
+Date: Thu Sep 18 14:55:17 PDT 1997
+Subject: RE: RamDisks, was-> RE: Problems upgrading to Tornado
+--MimeMultipartBoundary
+Content-Type: text/plain
+
+	[snip]
+
+
+> What do you mean by "Ram Disks Don't work", we have been using a 2meg
+> ram disk in our system for quite some time, we use it as a place to
+> FTP a file when we update the FLASH memory.
+> 
+> We have not had problems with the Ram Disk, yet...
+> 
+> 
+> So, Id like to hear what problems you have had, to
+> know what to look for.
+> 
+> 
+> So sorry for the confusion.  Ram Disks *do* work.  You just
+> can't "cd" to them and then "ls" from the WindShell.  That's 
+> what I meant when I said that.  The whole issue stems from the
+> WindShell running locally on the host and the "ls" command on
+> WindShell executing locally.  For instance, connect to the 
+> target via WindShell and do an "ls".  That works.  Now,
+> shut your target off and do an "ls".  It *still* works!  The
+> only time the WindShell will detect that the target has gone
+> away is if you execute a command that *forces* the WindShell to
+> talk to the target.  Also, the WindShell only has a subset of
+> the commands from usrLib.c.  E.g., printErrno runs from the
+> WindShell, but try to load a piece of code that calls printErrno
+> and you'll get an invalid symbol error for printErrno!  Again,
+> this is probably not a problem for the "skinny" client.  But,
+> for porting code from older version of VxWorks, these problems
+> are just the tip of the iceberg.
+> 
+> Regards,
+> 
+--MimeMultipartBoundary--
+
+
+From mea@mclean.sparta.com  Thu Sep 18 14:59:29 1997
+From: Mike Anderson <mea@mclean.sparta.com>
+Date: Thu Sep 18 14:59:32 PDT 1997
+Subject: RE: PMC / PCI Bandwidth
+--MimeMultipartBoundary
+Content-Type: text/plain
+
+
+
+> -----Original Message-----
+> From:	the vxWorks Users Group Exploder [SMTP:vxwexplo@lbl.gov]
+> Sent:	Thursday, September 18, 1997 5:44 PM
+> To:	vxworks_users@csg.lbl.gov
+> Subject:	PMC / PCI Bandwidth
+> 
+> Submitted-by mmcquade@pop.aa.net  Thu Sep 18 11:02:04 1997
+> Submitted-by: Mike McQuade <mmcquade@pop.aa.net>
+> 
+> --MimeMultipartBoundary
+> Content-Type: text/plain; charset="us-ascii"
+> 
+> 
+> Hello,
+> 
+> We are using an mv-2603 board and Tornado 1.01.
+> 
+> Does anyone have any experience writing to a PMC card ?
+> 
+> Im curious what kind of data rates you have seen writing
+> from CPU DRAM to PMC space.
+> 
+> How does one achieve the 132Mbyte / second figure ?
+> 
+> 
+> One uses a *lot* of really powerful drugs and then
+> washes it down with a fifth of bourbon, then you
+> squint your eyes and turn your head sideways ;-).  
+> 
+> 132MBs/sec is a myth of the PCI consortium.  You'll 
+> maybe see half of that in practice for long transfers and
+> maybe 75% for 1-2 word bursts.
+> 
+> Regards,
+> 
+--MimeMultipartBoundary--
+
+
+From nrd1jrb@nrd.ups.com  Fri Sep 19 05:34:57 1997
+From: Jim Bucciferro <nrd1jrb@nrd.ups.com>
+Date: Fri Sep 19 05:35:00 PDT 1997
+Subject: 486 RAM disk
+
+--------------17BDB2E9551636B996C8994B
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Hi.
+  I am starting a new project using a I486 system.  I need to use a RAM
+disk.
+I was able to set up the RAM disk but I am not sure how to access it.
+
+Here is the code I used to create the RAM disk:
+STATUS setramdrive(int size)
+{
+ BLK_DEV   *pBlkDev;
+ DOS_VOL_DESC *pVolDesc;
+
+ if(size == 0)
+  size = 512;
+
+ pBlkDev = ramDevCreate(0,size,400,400,0) ;
+
+ if( pBlkDev == NULL )
+ {
+  printf("Creation of RAM Drive failed\n");
+  return(ERROR);
+ }
+
+ pVolDesc = dosFsMkfs("DEV1:", pBlkDev );
+ if( pVolDesc == NULL )
+ {
+  printf("Creation of RAM Drive File System failed\n");
+  return(ERROR);
+ }
+
+ printf("Creation of RAM disk complete!\n");
+ return (OK);
+}
+
+This works fine because I can see the device when I issue the "devs"
+command from the shell.
+
+However, I cannot access it.
+How do I access this drive?
+
+Thanks.
+Jim Bucciferro
+
+--------------17BDB2E9551636B996C8994B
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+<HTML>
+<FONT FACE="Courier New,Courier"><FONT SIZE=-1>Hi.</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp; I am starting
+a new project using a I486 system.&nbsp; I need to use a RAM disk.</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>I was able to set up
+the RAM disk but I am not sure how to access it.</FONT></FONT><FONT FACE="Courier New,Courier"><FONT SIZE=-1></FONT></FONT>
+
+<P><FONT FACE="Courier New,Courier"><FONT SIZE=-1>Here is the code I used
+to create the RAM disk:</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>STATUS setramdrive(int
+size)</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>{</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp;BLK_DEV&nbsp;&nbsp;
+*pBlkDev;</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp;DOS_VOL_DESC *pVolDesc;</FONT></FONT><FONT FACE="Courier New,Courier"><FONT SIZE=-1></FONT></FONT>
+
+<P><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp;if(size == 0)</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp; size = 512;</FONT></FONT><FONT FACE="Courier New,Courier"><FONT SIZE=-1></FONT></FONT>
+
+<P><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp;pBlkDev = ramDevCreate(0,size,400,400,0)
+;</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp;</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp;if( pBlkDev ==
+NULL )</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp;{</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp; printf("Creation
+of RAM Drive failed\n");</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp; return(ERROR);</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp;}</FONT></FONT><FONT FACE="Courier New,Courier"><FONT SIZE=-1></FONT></FONT>
+
+<P><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp;pVolDesc = dosFsMkfs("DEV1:",
+pBlkDev );</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp;if( pVolDesc ==
+NULL )</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp;{</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp; printf("Creation
+of RAM Drive File System failed\n");</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp; return(ERROR);</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp;}</FONT></FONT><FONT FACE="Courier New,Courier"><FONT SIZE=-1></FONT></FONT>
+
+<P><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp;printf("Creation
+of RAM disk complete!\n");</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>&nbsp;return (OK);</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>}</FONT></FONT><FONT FACE="Courier New,Courier"><FONT SIZE=-1></FONT></FONT>
+
+<P><FONT FACE="Courier New,Courier"><FONT SIZE=-1>This works fine because
+I can see the device when I issue the "devs" command from the shell.</FONT></FONT><FONT FACE="Courier New,Courier"><FONT SIZE=-1></FONT></FONT>
+
+<P><FONT FACE="Courier New,Courier"><FONT SIZE=-1>However, I cannot access
+it.</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>How do I access this
+drive?</FONT></FONT><FONT FACE="Courier New,Courier"><FONT SIZE=-1></FONT></FONT>
+
+<P><FONT FACE="Courier New,Courier"><FONT SIZE=-1>Thanks.</FONT></FONT>
+<BR><FONT FACE="Courier New,Courier"><FONT SIZE=-1>Jim Bucciferro</FONT></FONT></HTML>
+
+--------------17BDB2E9551636B996C8994B--
+
+
+
+From blohm@vs.dasa.de  Fri Sep 19 07:04:30 1997
+From: "Gundula Blohm" <blohm@vs.dasa.de>
+Date: Fri Sep 19 07:04:33 PDT 1997
+Subject: RE: windShell, was-> RE: Problems upgrading to Tornado
+On 18 Sep 97 at 14:55, the vxWorks Users Group Explo wrote:
+
+
+> > What do you mean by "Ram Disks Don't work", we have been using a 2meg
+> > ram disk in our system for quite some time, we use it as a place to
+> > FTP a file when we update the FLASH memory.
+> > 
+> > So sorry for the confusion.  Ram Disks *do* work.  You just
+> > can't "cd" to them and then "ls" from the WindShell.  That's 
+> > what I meant when I said that.  The whole issue stems from the
+> > WindShell running locally on the host and the "ls" command on
+> > WindShell executing locally.  For instance, connect to the 
+> > target via WindShell and do an "ls".  That works.  Now,
+> > shut your target off and do an "ls".  It *still* works!  The
+> > only time the WindShell will detect that the target has gone
+> > away is if you execute a command that *forces* the WindShell to
+> > talk to the target. 
+
+You can force the shell to give the command to the target by typing 
+@command e.g. @ls
+
+> > Also, the WindShell only has a subset of
+> > the commands from usrLib.c.  E.g., printErrno runs from the
+> > WindShell, but try to load a piece of code that calls printErrno
+> > and you'll get an invalid symbol error for printErrno!
+
+It just depends on how you configured your BSP. I think it s 
+INCLUDE_SHOW_ROUTINES.
+
+regards, dula
+===================================================
+Gundula Blohm
+Tel. +49 (731) 392-4731
+Fax  +49 (731) 392-4958
+mailto:blohm@vs.dasa.de
+===================================================
+
+
+From dleviner@HiWAAY.net  Fri Sep 19 07:06:28 1997
+From: David Leviner <dleviner@HiWAAY.net>
+Date: Fri Sep 19 07:06:31 PDT 1997
+Subject: scsiLib interface for scsi adapter driver???
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+VxWorks Gurus,
+
+I'm writing a driver for a scsi host bus vme adapter card. This scsi
+initiator board has some board specific functionality for acquiring
+status/identification data. It also has scsi command "pass through"
+capability for interfacing to disk arrays. I'm trying to find out how to
+interface to the scsi library in order to do scsi transactions under the
+"pass through" functionality of the adapter board. I need some help with
+the scsiLib's data structures in order to use them correctly in my
+xxScsiTransact() function. I've talked to Tech Support (Vinh Du - TSR
+#47581) at Wind River and they sent me some top level info from the
+device driver training notes. This info was somewhat vague and
+generalized. I asked Vinh Du if there were any source code templates or
+example code for writing this type of driver. He responded that there is
+but it is not available to me - WindRiver proprietary. Does anyone have
+any sample code or even template code for this type of driver? If not,
+does anyone know the details of the scsiLib data structure interface.
+
+Thanks,
+David
+
+-- 
+  
+        ____________________________
+       |			    |
+       | David Leviner		    |
+       | Real-Time Systems Engineer |
+       | Chandler/May, Inc. (CMI)   |
+       | 125 West Park Loop	    |
+       | Huntsville, AL  35806	    |
+       | phone: (205)722-0175	    |
+      /) fax:   (205)722-0144       (\      
+     / ) email: dleviner@HiWAAY.net ( \    
+   _( (|____________________________) )  />  
+  (((\ \)  / )                / )  / //))/  
+  (\\\\ \_/ /                 \ \_/ /////    
+   \       /                   \       /      
+    \    _/                     \_    /          
+----/   /-------------------------\   \----
+   /   /                           \   \
+--MimeMultipartBoundary--
+
+
+From tkb@mclean.sparta.com  Fri Sep 19 07:15:58 1997
+From: "Thomas K. Buchanan" <tkb@mclean.sparta.com>
+Date: Fri Sep 19 07:16:00 PDT 1997
+Subject: Re: 486 RAM disk
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+
+>  I am starting a new project using a I486 system.  I need to use a RAM
+>disk.
+>I was able to set up the RAM disk but I am not sure how to access it.
+>
+
+You will be able to access it programatically.  You cannot access it from
+the WindShell command line.  Tornado intercepts all file system related
+commands and executes some of them on the development host.  The last time
+I tried it, Tornado could not tell that RAM disk commands had to be
+executed on the target.
+
+adios
+--------------------------------------------  
+       /\       Thomas Keith Buchanan 
+      /##\      Principal Engineer
+     /####\     
+    /####/--    
+   /####/----   SPARTA, Inc.                 
+  -\####\__---  Computer Products Division 
+ ---\##\  /---- 7926 Jones Branch Drive      
+ ----\##\/\---- Suite 900                    
+  ----\####\--  McLean, VA 22102             
+   ----\####/                                
+    ---/###/    Voice: 703 448 0210          
+     -/###/     FAX:   703 893 5494          
+      \##/      WWW:   www.mclean.sparta.com
+       \/       
+--MimeMultipartBoundary--
+
+
+From karstens@wg.com  Fri Sep 19 09:59:35 1997
+From: Alexander Karstens <karstens@wg.com>
+Date: Fri Sep 19 09:59:38 PDT 1997
+Subject: Re: 486 RAM disk
+Hi,
+
+I am guessing, that you can't read or write files.
+
+I ran into the same problem and I had to start the dos filesystem.
+
+Hope that helps.
+
+
+
+
+From mmcquade@pop.aa.net  Fri Sep 19 10:04:33 1997
+From: Mike McQuade <mmcquade@pop.aa.net>
+Date: Fri Sep 19 10:04:37 PDT 1997
+Subject: Re: 486 RAM disk >> here is how you do it.
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+
+At 05:35 AM 9/19/97 PDT, Jim Bucciferro <nrd1jrb@nrd.ups.com> wrote:
+
+>I was able to set up the RAM disk but I am not sure how to access it.
+>
+
+
+We use a Ram disk on a PowerPC (mv2603) and we access it from the Windshell
+as follows.
+
+@cd "/ramdisk/"
+
+@ls
+
+
+Here is how you do it, this comes from a TSR that I had with WRS,
+this is a "workaround" that we have found to work very well in our
+application.
+
+
+Include the following at the end of usrConfig.c
+
+#ifdef INCLUDE_USRLIB
+
+#include "usrLib.h"
+
+/***************************************************************************
+****
+*
+* usrLibInit - pull in usrLib.o finctions
+*
+* This dummy routine references cd () in usrLib.c so that all usrLib
+* functions can be pulled into vxWorks.
+*/
+
+void usrLibInit (void)
+
+{
+cd (""); /* never actually called */
+}
+
+#endif /* INCLUDE_USRLIB */
+
+
+Now define INCLUDE_USRLIB in config.h
+
+This will allow you to do the following from windsh:
+
+-> @ls "DISKA:"
+-> @cd "DISKA:
+-> @pwd
+etc
+
+The "@" sign is important, as it passes the command to the target instead
+of interpreting it on the host side.
+
+
+
+--MimeMultipartBoundary--
+
+
+From blohm@vs.dasa.de  Fri Sep 19 10:30:55 1997
+From: "Gundula Blohm" <blohm@vs.dasa.de>
+Date: Fri Sep 19 10:30:59 PDT 1997
+Subject: Re: 486 RAM disk
+> >  I am starting a new project using a I486 system.  I need to use a RAM
+> >disk.
+> >I was able to set up the RAM disk but I am not sure how to access it.
+> >
+> 
+> You will be able to access it programatically.  You cannot access it from the
+> WindShell command line.  Tornado intercepts all file system related commands
+> and executes some of them on the development host.  The last time I tried it,
+> Tornado could not tell that RAM disk commands had to be executed on the
+> target.
+
+You can access it from WindShell, see my last message :-)
+(@command)
+
+Dula
+===================================================
+Gundula Blohm
+Tel. +49 (731) 392-4731
+Fax  +49 (731) 392-4958
+mailto:blohm@vs.dasa.de
+===================================================
+
+
+From rtp.co.uk!ihw@rtp.co.uk  Fri Sep 19 10:31:34 1997
+From: Ian Willats <ihw@rtp.co.uk>
+Date: Fri Sep 19 10:31:37 PDT 1997
+Subject: scsiLib interface for scsi adapter driver???
+David Leviner <dleviner@HiWAAY.net> asked:
+
+> Does anyone have
+> any sample code or even template code for this type of driver? If not,
+> does anyone know the details of the scsiLib data structure interface.
+
+I have written several drivers for both the `old' (pre-Tornado) and current 
+scsiLib interfaces, and I'm very familiar with what goes on in and around 
+the data structures used by scsiLib and the drivers underneath it.
+
+I can't supply any source code unless you purchase a source licence for 
+scsiLib and/or a SCSI driver from WRS.  However, if you'd like to call or 
+e-mail me with your queries I'd be happy to help.
+
+BTW I will be out of the office Tuesday and Wednesday next week.
+
+Regards,
+
+Ian
+----------------------------------------------------------------
+Ian Willats                          E-mail:       ihw@rtp.co.uk
+Real-Time Products Ltd.
+Unit 8, Holt Court,                  Telephone: +44 121 333 6955
+Aston Science Park,                  Fax:       +44 121 333 5433
+Jennens Road,
+Birmingham B7 4EJ. England.          Web:          www.rtp.co.uk
+----------------------------------------------------------------
+
+
+
+
+From nrd1jrb@nrd.ups.com  Fri Sep 19 10:51:33 1997
+From: Jim Bucciferro <nrd1jrb@nrd.ups.com>
+Date: Fri Sep 19 10:51:36 PDT 1997
+Subject: Re: 486 RAM disk
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+the vxWorks Users Group Exploder wrote:
+
+> >  I am starting a new project using a I486 system.  I need to use a
+> RAM
+> >disk.
+> >I was able to set up the RAM disk but I am not sure how to access it.
+>
+> >
+>
+> You will be able to access it programatically.  You cannot access it
+> from
+> the WindShell command line.  Tornado intercepts all file system
+> related
+> commands and executes some of them on the development host.  The last
+> time
+> I tried it, Tornado could not tell that RAM disk commands had to be
+> executed on the target.
+>
+> adios
+
+Is it better to use the raw I/O, open(),creat(),read(),write() for a RAM
+disk or can I use the stdio
+functions - fopen(), fread(), fwrite()?
+
+Thanks.
+JB
+
+--MimeMultipartBoundary--
+
+
+From sbatchu@holontech.com  Fri Sep 19 13:12:19 1997
+From: Suresh Batchu <sbatchu@holontech.com>
+Date: Fri Sep 19 13:12:22 PDT 1997
+Subject: Serial Driver for PC87334 I/O 
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+I am looking for a serial driver for the PC87334 Super I/O chip ( which
+is software compatible with PC16550A and PC16450) to work under vxWorks
+5.3. Does anyone know where I can find them? I heard that these kind of
+drivers are available for free. Any help or advice is appreciated.
+
+Thanks in advance,
+
+Suresh Batchu
+HolonTech Corporation
+sbatchu@holontech.com
+
+--MimeMultipartBoundary--
+
+
+From RHOWELLS@racalrec.co.uk  Sat Sep 20 01:59:59 1997
+From: RICHARD HOWELLS <RHOWELLS@racalrec.co.uk>
+Date: Sat Sep 20 02:00:02 PDT 1997
+Subject: C++ class libraries
+--MimeMultipartBoundary
+Content-Type: text/plain
+Content-Disposition: inline
+
+Hi,
+
+Is anybody out there using third party (commercial) class
+libraries (other than tools.h) in their application with
+VxWorks??  Which ones are you using?  What about the
+STL? Is anybody using it in a embedded application & where
+can you get a version for use with VxWorks from?
+Any other comments on the use of C++, class libraries, STL
+welcome.
+
+Many thanks,
+Richard
+--MimeMultipartBoundary--
+
+
+From daemon@csg.lbl.gov  Sat Sep 20 04:00:33 1997
+From: daemon@csg.lbl.gov
+Date: Sat Sep 20 04:00:39 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Sat Sep 20 04:00:30 PDT 1997
+
+        Subject: i2o OSM Support?
+        Subject: Multicast support in VxWorks
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: i2o OSM Support?
+Date: Thu, 18 Sep 1997 18:46:37 -0600
+From: kevin.russell@tek.com
+Organization: Tektronix, Inc.
+Message-ID: <874621491.28862@dejanews.com>
+Reply-To: kevin.russell@tek.com
+
+Has anyone implemented the host side of i2o under vxWorks?
+
+Does anyone know of any third party companies that sell libraries etc. for
+the host side of i2o.
+
+Thanks,
+
+Kevin Russell
+kevin.russell@tek.com
+503-627-3548
+
+- -------------------==== Posted via Deja News ====-----------------------
+      http://www.dejanews.com/     Search, Read, Post to Usenet
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Multicast support in VxWorks
+Date: Fri, 19 Sep 1997 10:18:07 GMT
+From: jmorris@netcom.com (Jeffrey L. Morris)
+Organization: Netcom On-Line Services
+Message-ID: <jmorrisEGr3A8.4H2@netcom.com>
+Sender: jmorris@netcom19.netcom.com
+
+
+
+Hello all:
+
+I'm using VxWorks with a PC386 target, NE2000 NIC.  
+
+Does anyone know if the 'ene' driver supports multicast?  
+
+If so, how do we activate it?  How do we set the multicast 
+address(es)?  
+
+Thanks in advance for any information you can provide!
+
+JLM
+
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From mailhost@aol.com  Sat Sep 20 10:30:42 1997
+From: mailhost@aol.com
+Date: Sat Sep 20 10:30:46 PDT 1997
+Subject: Your Credit Report
+<HTML><PRE><BODY BGCOLOR="#000000"><FONT COLOR="#00FFFF" SIZE=3>
+///////////////////////////////////////////////////////////////////////
+                     STOP COLLECTION AGENCIES COLD!
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+If you have received this electronic mailing by mistake, please pardon our intrusion.
+
+Greetings,
+
+Have you or somebody that you know experienced the humiliation of a collection agency calling at work or at home? They always seem to know when somebody is sitting at your desk or visiting your home when they call.
+
+Millions of collection telephone calls and letters are made or sent each week to people who owe money. Those of us who owe money will pay our debts and do not need the help of a collection agency hounding us at our homes or place of business. Consumers have been helpless to stop the harassment of these predators, UNTIL NOW!
+
+Our hard-hitting report 'Stop Collection Agencies Cold (C 1996)' will show you how to put an end to those telephone calls and letters, INSTANTLY! At the same time, the collectors will be forbidden to EVER call or write you again!!
+
+'Stop Collectors Cold (C 1996)' is a brief, concise report that will tell you everything you need to know to stop the harrassment forever and comes to you with a 100% money-back guarantee! This report is normally $49.95, but if you act WITHIN THE NEXT 24 HOURS, you will pay only $18.00 plus $1.95 S&H.
+-----------------------------------------------------------------------
+
+ORDER INFORMATION
+
+IMS
+5201 Kingston Pike, Suite 6-216
+Knoxville, Tennessee 37919
+
+YES, please rush me the special report 'Stop Collectors Cold (C 1996)' to:
+
+Name:___________________________________________________
+
+Address:________________________________________________
+
+City:___________________________________________________
+
+State:____________________  Zip:________________________
+
+Your E-Mail address (Needed for confirmation):__________
+///////////////////////////////////////////////////////////////////////
+
+I have enclosed $18.00 + $1.95 shipping and handling ($19.95 TOTAL).
+
+___Personal Check  ___Money Order  ___Cashiers Check
+
+___I am faxing my order NOW! Please send as a bonus the collector letter package (A $9.95 value).
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+			Fax Your Order NOW!
+
+Please tape your signed personal check in the space below and fax to IMS. The 24 hour facsimile number is 1-423-681-6520.
+
+*****************************************************************
+
+FAX: 1-423-681-6520
+
+PLEASE TAPE YOUR CHECK HERE
+
+PLEASE SIGN YOUR CHECK
+
+*****************************************************************
+
+Thank You for your order!
+
+
+</FONT><FONT  COLOR="#000000" SIZE=3>
+
+
+
+From 04470848@14923.com  Sat Sep 20 17:22:23 1997
+From: 04470848@14923.com
+Date: Sat Sep 20 17:22:26 PDT 1997
+Subject: Your Web Page
+Now you can submit your Web Page to over 620 Internet indexes in a few 
+short minutes and watch your traffic soar!
+
+The Central Registry has helped thousands of sites like yours greatly
+improve the performance of their Web Page.  The more indexes you are
+registered in, the more traffic your Web Page is going to receive.
+Being registered in "the top" indexes is not enough.  Why not have your
+Web Page registered in every index throughout the world that will 
+generate extra traffic for you?
+
+The Central Registry is the leader in Web Page registration and promotion.
+We are the oldest and most well established service of this type on the
+Internet.  We process more Web Page registrations than all of our
+competitors combined.  The Central Registry is the only service that
+dynamically asks you for the exact same information each index requests,
+assuring accurate and thorough registration.  Unlike most services, we do
+not exclude indexes with larger input forms and various detailed 
+categories.  No other registration service can compare to our value,
+professionalism and performance.
+
+Please come visit our web page today at: http://www.CentralRegistry.com
+and see what some of our customers have had to say about the overwhelming 
+traffic increases they have seen as a result of being registered 
+everywhere.  Thank you.
+
+
+Sincerely,
+
+
+The Central Registry
+http://www.CentralRegistry.com
+
+
+
+From daemon@csg.lbl.gov  Mon Sep 22 04:00:24 1997
+From: daemon@csg.lbl.gov
+Date: Mon Sep 22 04:00:39 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Mon Sep 22 04:00:20 PDT 1997
+
+        Subject: Re: VxWorks Timing
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: VxWorks Timing
+Date: Fri, 19 Sep 1997 09:45:30 +0200
+From: Sam Michiels <samm@cs.kuleuven.ac.be>
+Organization: Department of Computer Science, K.U.Leuven
+Message-ID: <34222D9A.3C1F@cs.kuleuven.ac.be>
+References: <s4214ce3.080@mdc.com>
+
+This is a multi-part message in MIME format.
+
+- --------------7A6E8742254
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Charlie Grames wrote:
+> 
+> Sam,
+> 
+> I'm not sure what your clock source on a 68360 is, but, typically, the POSIX timing routines use the
+> resolution of the system clock, which is, by default, 16.67 ms (60 Hz).  That being the case, it
+> would be impossible to get a smaller delta time than 16.67 ms.
+> 
+> If you want to get finer resolution with your timings, you will need to use the timestamp clock.  I
+> don't know whether this is available by default with the BSP for your board.  If it is, and assuming
+> your timestamp clock runs as fast as the processor clock (which is doubtful), your tick resolution
+> will be 40 ns.
+> 
+> I don't see anything wrong with your code, assuming you are initializing your semaphores
+> elsewhere.  You might want to make a call to clock_getres() to determine the resolution of the
+> POSIX clock.  I think I can say with great certainty, however, that Wind River currently supports no
+> processor that can complete 1000 calls to semTake in 15 ns.
+> 
+> Charlie Grames
+> The Boeing Company
+> (314) 233-1956
+> Charles.R.Grames@boeing.com
+
+I don't think so either...
+I attached the complete file with this mail... I did initialize the
+semaphores, and I read the clock resolution too :
+  (Clock resolution = 0 seconds  16666666 nanoseconds)
+
+Is it ok to say then that the result I got was the number of
+clock ticks...so when I multiply this by 16.67 msec
+(= time/tick), I get the time it took (approximately of course)?
+
+Thanks again for your help!
+
+Sam.
+
+- -- 
+
+
+- -----------------------------------------------------------------------
+ Sam Michiels                                Tel : +32 (0) 16 32.70.68	
+ Kuleuven, Dept. Computer Science            Fax : +32 (0) 16 32.79.96
+ Celestijnenlaan 200A 03.40
+ B-3001 Heverlee			
+ e-mail : Sam.Michiels@cs.kuleuven.ac.be
+- -----------------------------------------------------------------------
+
+- --------------7A6E8742254
+Content-Type: text/plain; charset=us-ascii; name="semtim~1.c"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline; filename="semtim~1.c"
+
+/* Timing program....
+
+	 Creation of Mutual Exclusion Semaphores
+		Esp. (Non)Inversion Safe, Deletion Safe, Fifo/Priority Queued
+
+	 Taking/Giving of Mutual Exclusion Semaphores
+
+	 Deletion of Semaphores
+
+*/
+  
+/* includes */
+#include <stdio.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <vxWorks.h>
+#include <timers.h>
+#include <semLib.h>
+#include <taskLib.h>
+
+/****************************************************************************/
+
+const N=1000;
+		
+SEM_ID SemPrio[ 1000], SemFifo[ 1000], SemInvSafe[ 1000], SemNonInvSafe[ 1000];
+/*					 SemDelSafe[ N];*/
+
+/****************************************************************************/
+
+void semCreateTiming( void )
+{
+		int s;
+		struct timespec start, end;
+
+		printf("** Timing of Creation of Mutual Exclusion Semaphores **\n");
+
+		if( clock_gettime(CLOCK_REALTIME, &start) == -1){
+		 printf("Error...%d\n", errno);
+		 exit(-1);
+		}
+
+		for(s=0 ; s< N ; s++){
+			SemPrio[s] = semMCreate (SEM_Q_PRIORITY);
+		}
+
+		if( clock_gettime(CLOCK_REALTIME, &end) == -1){
+		 printf("Error...%d\n", errno);
+		 exit(-1);
+		}
+
+		printf("Delay to create 1000 Default Mut Excl Semaphore with Priority Queueing: %ld nsecs\n", end.tv_nsec - start.tv_nsec);
+
+
+/******************************************************************************/
+
+		clock_gettime(CLOCK_REALTIME, &start);
+		for(s=0 ; s<N ; s++){
+			SemFifo[s] = semMCreate (SEM_Q_FIFO);
+		}
+		clock_gettime(CLOCK_REALTIME, &end);
+		printf("Delay to create 1000 Default Mut Excl Semaphore with FIFO Queueing: %ld nsecs\n", end.tv_nsec - start.tv_nsec);
+
+
+/******************************************************************************/
+
+		clock_gettime(CLOCK_REALTIME, &start);
+		for(s=0 ; s<N ; s++){
+			SemInvSafe[s] = semMCreate (SEM_Q_PRIORITY | SEM_INVERSION_SAFE);
+		}
+		clock_gettime(CLOCK_REALTIME, &end);
+		printf("Delay to create 1000 Mut Excl Inversion Safe Semaphore : %ld nsecs\n", end.tv_nsec - start.tv_nsec);
+
+
+/******************************************************************************/
+
+		clock_gettime(CLOCK_REALTIME, &start);
+		for(s=0 ; s<N ; s++){
+			SemNonInvSafe[s] = semMCreate (SEM_Q_PRIORITY );
+		}
+		clock_gettime(CLOCK_REALTIME, &end);
+		printf("Delay to create 1000 Mutual Exclusion Non-Inversion Safe Semaphore : %ld nsecs\n", end.tv_nsec - start.tv_nsec);
+
+}
+/******************************************************************************/
+/******************************************************************************/
+void semTakeTiming( void )
+{
+		int s;
+		struct timespec start, end;
+
+		printf("** Timing of Semaphore TAKE **\n\n");
+
+		clock_gettime(CLOCK_REALTIME, &start);
+		for(s=0 ; s<N ; s++){
+			semTake( SemPrio[s], WAIT_FOREVER);
+		}
+		clock_gettime(CLOCK_REALTIME, &end);
+		printf("Delay to TAKE 1000 Mutual Exclusion Semaphores (Priority Queueing) : %ld nsecs\n", end.tv_nsec - start.tv_nsec);
+
+/******************************************************************************/
+
+		clock_gettime(CLOCK_REALTIME, &start);
+		for(s=0 ; s< N ; s++){
+			semTake( SemFifo[s], WAIT_FOREVER);
+		}
+		clock_gettime(CLOCK_REALTIME, &end);
+		printf("Delay to TAKE 1000 Mutual Exclusion Semaphores (Fifo Queueing) : %ld nsecs\n", end.tv_nsec - start.tv_nsec);
+}
+/******************************************************************************/
+/******************************************************************************/
+void semGiveTiming( void )
+{
+		int s;
+		struct timespec start, end;
+
+		printf("** Timing of Semaphore GIVE **\n\n");
+
+		clock_gettime(CLOCK_REALTIME, &start);
+		for(s=0 ; s< N ; s++){
+			semGive( SemPrio[s] );
+		}
+		clock_gettime(CLOCK_REALTIME, &end);
+		printf("Delay to GIVE 1000 Mut Excl Semaphores (Priority Queueing) : %ld nsecs\n", end.tv_nsec - start.tv_nsec);
+
+/******************************************************************************/
+
+		clock_gettime(CLOCK_REALTIME, &start);
+		for(s=0 ; s< N ; s++){
+			semGive( SemFifo[s] );
+		}
+		clock_gettime(CLOCK_REALTIME, &end);
+		printf("Delay to GIVE 1000 Mut Excl Semaphores (Fifo Queueing) : %ld nsecs\n", end.tv_nsec - start.tv_nsec);
+}
+/******************************************************************************/
+/******************************************************************************/
+void semDeleteTiming( void )
+{
+		int s;
+		struct timespec start, end;
+
+		printf("** Timing of Semaphore DELETE **\n\n");
+
+		clock_gettime(CLOCK_REALTIME, &start);
+		for(s=0 ; s< N ; s++){
+			semDelete( SemPrio[s] );
+		}
+		clock_gettime(CLOCK_REALTIME, &end);
+		printf("Delay to DELETE 1000 Default Mut Excl Semaphore with Priority Queueing: %ld nsecs\n", end.tv_nsec - start.tv_nsec);
+
+/******************************************************************************/
+
+		clock_gettime(CLOCK_REALTIME, &start);
+		for(s=0 ; s< N ; s++){
+			semDelete( SemFifo[s] );
+		}
+		clock_gettime(CLOCK_REALTIME, &end);
+		printf("Delay to DELETE 1000 Default Mut Excl Semaphore with Fifo Queueing: %ld nsecs\n", end.tv_nsec - start.tv_nsec);
+
+/******************************************************************************/
+
+		clock_gettime(CLOCK_REALTIME, &start);
+		for(s=0 ; s< N ; s++){
+			semDelete( SemNonInvSafe[s] );
+		}
+		clock_gettime(CLOCK_REALTIME, &end);
+		printf("Delay to DELETE 1000 Mutual Exclusion Non-Inversion Safe Semaphore : %ld nsecs\n", end.tv_nsec - start.tv_nsec);
+
+/******************************************************************************/
+
+		clock_gettime(CLOCK_REALTIME, &start);
+		for(s=0 ; s< N ; s++){
+			semDelete( SemInvSafe[s] );
+		}
+		clock_gettime(CLOCK_REALTIME, &end);
+		printf("Delay to DELETE 1000 Mutual Exclusion Inversion Safe Semaphore : %ld nsecs\n", end.tv_nsec - start.tv_nsec);
+}
+/******************************************************************************/
+/******************************************************************************/
+void SemTiming ( void )
+{
+		struct timespec resolution;
+
+		printf("***************** START TIMING PROGRAM ***********************\n\n");
+
+		resolution.tv_sec = 0;
+		resolution.tv_nsec = 1;
+		if( clock_setres(CLOCK_REALTIME, &resolution) == -1 ){
+			printf("Error... %d\n",errno);
+		}
+
+		clock_getres(CLOCK_REALTIME, &resolution);
+		printf("Clock resolution = %ld seconds  %ld nanoseconds\n",resolution.tv_sec, resolution.tv_nsec);
+
+		semCreateTiming();
+		semTakeTiming();
+		semGiveTiming();
+		semDeleteTiming();
+
+		printf("***************** END PROGRAM *******************************\n");
+}
+
+- --------------7A6E8742254--
+
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From ptp@mclean.sparta.com  Mon Sep 22 05:16:55 1997
+From: "Patrick T. Pinkowski" <ptp@mclean.sparta.com>
+Date: Mon Sep 22 05:16:58 PDT 1997
+Subject: PPP on a Synchronous HDLC Serial Device
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+I am attempting to get PPP to work on a Synchronous HDLC Serial
+interface.  Does anyone have any experience doing this?  Any help would
+be greatly appreciated.
+
+I am using vxWorks 5.3.1 on a CPU32 CPU.
+
+Regards
+
+Pat
+
+--------------------------------------------------
+      /\   Patrick T. Pinkowski, Senior Engineer
+     /##\        ptp@mclean.sparta.com
+    /####\         703.448.1683 x228
+   /####/--
+  /####/----    SPARTA, Inc.
+ -\####\__---   7926 Jones Branch Drive, Suite 900
+---\##\  /----  McLean, Virginia  22102
+----\##\/\----  (703)448-0210 (Main)
+ ----\####\--   (703)893-5494 (Facsimile)
+  ----\####/    http://www.mclean.sparta.com
+   ---/###/
+    -/###/ SPARTA
+     \##/  ~~~~~~
+      \/   Pride In Performance
+
+
+--MimeMultipartBoundary--
+
+
+From Richard_W_Mattox@ccmail.orl.lmco.com  Mon Sep 22 07:04:59 1997
+From: Richard_W_Mattox@ccmail.orl.lmco.com
+Date: Mon Sep 22 07:07:45 PDT 1997
+Subject: Rational C++ and VxWorks
+--MimeMultipartBoundary
+Content-type: TEXT/PLAIN
+Content-transfer-encoding: 7BIT
+
+Hello fellow VxWorkers,
+
+The new application I am working on is to be written in C++ hosted on an HP 
+workstation targeted for the 604e PowerPC.  I am currently evaluating Rational 
+Rose/C++ and Apex.  Has anyone developed under this environment with Rational?  
+If so, then can you address the pros and cons of using their tools.  If Rational
+was not used, then can anyone recommend a set of tools that they did use.  I do 
+not want to use the gnu tools that are supplied with VxWorks.
+
+
+TIA,
+Rick Mattox
+richard.w.mattox@lmco.com
+--MimeMultipartBoundary--
+
+
+From t_wmoles@qualcomm.com  Mon Sep 22 09:59:22 1997
+From: Hugh Molesworth <t_wmoles@qualcomm.com>
+Date: Mon Sep 22 09:59:26 PDT 1997
+Subject: ld68k -M; List of error numbers
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Anyone kindly point me to a list of the linker error numbers?
+
+We are using a 68060 target from a Sun host VxWorks 5.3. and I can't
+find any reference to the error numbers in the WindRiver documentation
+set and didn't particularly want to search the GNU sources (our
+installation of info does not have the numbers).
+
+My specific problem is that when I enable the -M map option I get a core
+dump (about 15Mbytes) with a numeric error message part way through the
+link. The output binary is something over 4Mbyte and compiles ok without
+the -M option.
+
+Maybe it's just too big ...
+
+Hugh
+--MimeMultipartBoundary--
+
+
+From t_wmoles@qualcomm.com  Mon Sep 22 11:00:37 1997
+From: Hugh Molesworth <t_wmoles@qualcomm.com>
+Date: Mon Sep 22 11:00:40 PDT 1997
+Subject: ld68k -M; List of error numbers
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+
+Anyone kindly point me to a list of the linker error numbers?
+
+We are using a 68060 target from a Sun host VxWorks 5.3. and I can't
+find any reference to the error numbers in the WindRiver documentation
+set and didn't particularly want to search the GNU sources (our
+installation of info does not have the numbers).
+
+My specific problem is that when I enable the -M map option I get a core
+dump (about 15Mbytes) with a numeric error message part way through the
+link. The output binary is something over 4Mbyte and compiles ok without
+the -M option.
+
+Maybe it's just too big ...
+
+Hugh
+
+--MimeMultipartBoundary--
+
+
+From jonggonl@lgis.lg.co.kr  Mon Sep 22 16:33:11 1997
+From: =?EUC-KR?B?wMzBvrDv?= <jonggonl@lgis.lg.co.kr>
+Date: Mon Sep 22 16:33:15 PDT 1997
+Subject: explosion
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+
+explosion
+>
+--MimeMultipartBoundary--
+
+
+From daemon@csg.lbl.gov  Tue Sep 23 04:01:23 1997
+From: daemon@csg.lbl.gov
+Date: Tue Sep 23 04:01:27 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Tue Sep 23 04:01:19 PDT 1997
+
+        Subject: What if . . .
+        Subject: Re: C++ class libraries
+        Subject: FS: MVME167 and MVME177
+        Subject: Re: Download vxWorks with 162BUG
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: What if . . .
+Date: 16 Sep 1997 04:17:41 GMT
+From: goforit@savetrees.com
+Organization: The Alliance
+Message-ID: <5vl195$nn9$315@news.insnet.com>
+
+Ten years ago, you could have bought 36 shares of Microsoft for 28.01 
+per share. That $1,008.36 would be $198,126.00 now. What if you had 
+another chance to invest in a company with that much potential?  If you 
+leave your email at "http://theprofitcenter.net/stock" you could get 
+the chance to consider an Internet investment with tremendous potential. 
+
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: C++ class libraries
+Date: Mon, 22 Sep 1997 23:02:30 -0400
+From: wotsizname@somethingorother.com
+Organization: None
+Message-ID: <342830b1.3338470@news.tiac.net>
+References: <s4238e83.065@racalrec.co.uk>
+
+> Any other comments on the use of C++, class libraries, STL
+> welcome.
+
+Am I the only one who cannot get CrossWind to find the right source line(s)
+when debugging C++ code under VxSim for Solaris?
+
+
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: FS: MVME167 and MVME177
+Date: Mon, 22 Sep 1997 21:48:58 -0500
+From: Innovative Research Technologies <Marty@innovative-research.com>
+Organization: Netcom
+Message-ID: <34272E1A.5418@innovative-research.com>
+Reply-To: Marty@innovative-research.com
+
+We currently have the following boards available.  
+
+MFG: MOTOROLA                                                 QTY
+- -----------------------------------------------------------------
+
+MVME167   68040 CPU, 33Mhz, 64MB Memory mezz card             02
+          4 SIO, 1PIO, Ethernet, SCSI
+          DMA and A32/D32/BLT64 VMEbus I/F
+          167bug
+
+MVME177   68060 CPU, 50Mhz, 32MB Memory mezz card             02
+          4 SIO, 1PIO, Ethernet, SCSI
+          DMA and A32/D32/BLT64 VMEbus I/F
+          177bug
+
+MVME952   3-slot desktop VME chassis                          01
+
+
+
+Still under warranty.  E-mail if interested or for more
+information.
+
+
+Marty Norton
+E-mail: Marty@innovative-research.com
+INNOVATIVE RESEARCH TECH.
+
+
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: Download vxWorks with 162BUG
+Date: 23 Sep 97 02:21:30 GMT
+From: steved@pacifier.com (Steve Doiel)
+Message-ID: <342727aa.0@news.pacifier.com>
+References: <01bcc71a$e95e9be0$6ae42299@raymondy>
+
+In article <01bcc71a$e95e9be0$6ae42299@raymondy>, ryeung@earthlink.net says...
+>
+>I'm trying to download vxWorks to DRAM on our MVME162LC board
+>from PC (with Windows NT).  NIOP in 162 Bug is used.  On PC side, I have
+>TFTP Daemon running and security disabled (so that authentication is not
+>performed).  NIOT is used to set up some of the parameters.
+>I'm getting error code of 0500, meaning "TFTP retry count exceeded".
+>Turning on tracing, I got the following decoded results (messages not in
+>order):
+>Unsupported ETHERNET Type
+>Unsupported UDP Type
+>ARP Request
+>ARP Reply
+>Unsupported ICMP Type
+>
+>Can anyone shed some light here?  Am I using the right command here?
+>
+A couple of things:
+  Did you do the NIOT command first in order to set up the server and
+client IP addresses?  These do not come from the same place as the ones
+used by VxWorks (apparently).
+  Did you start up the system clock?  162's are shipped with the clock turned
+off in order to save the battery, but you must start them in order for the
+ethernet communication to work under 162bug.
+
+I hope this helps,
+SteveD
+
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From nrd1jrb@nrd.ups.com  Tue Sep 23 06:44:21 1997
+From: Jim Bucciferro <nrd1jrb@nrd.ups.com>
+Date: Tue Sep 23 06:44:24 PDT 1997
+Subject: Low level FTP
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+I need to use FTP.  However, ftpXfer doesn't work for some remote
+servers so I have to resort to using the lower level FTP commands.  I
+got the current chain of commands from the VxWorks Manual but I'm not
+sure if I need all of them.
+Here is my code:
+
+ int ctrlSock;
+ int dataSock;
+ int status = OK;
+...
+
+if( (ctrlSock = ftpHookup( server )) == ERROR )  {...}
+
+ if( ftpLogin( ctrlSock, username, password,"") == ERROR ) {...}
+
+ if( ftpCommand(ctrlSock, "TYPE I", 0,0,0,0,0,0 ) != FTP_COMPLETE )
+{...}
+
+ if( ( dataSock = ftpDataConnInit( ctrlSock )) == ERROR ) {...}
+
+ if( ftpCommand( ctrlSock, "RETR %s/%s",serverpath, serverfile,0,0,0,0 )
+!= FTP_PRELIM ) {...}
+
+ if( (dataSock = ftpDataConnGet( dataSock )) == ERROR ) {...}
+....
+If all of these commands pass, then I retrieve the file and copy it to a
+ram disk, which works fine.
+
+The question is whether I need all of these commands, and is the order
+correct.
+
+Thanks.
+Jim Bucciferro
+UPS Research & Development
+
+
+
+--MimeMultipartBoundary--
+
+
+From Thomas.Arand@vs.siemens.de  Tue Sep 23 06:57:42 1997
+From: "Arand, Thomas OEN BN EF3" <Thomas.Arand@vs.siemens.de>
+Date: Tue Sep 23 06:57:45 PDT 1997
+Subject: AW: comp.os.vxworks newsdigest
+
+
+> ----------
+> Von: 	vxwexplo@lbl.gov[SMTP:vxwexplo@lbl.gov]
+> Gesendet: 	Dienstag, 23. September 1997 13:01
+> An: 	vxworks_users@csg.lbl.gov
+> Betreff: 	comp.os.vxworks newsdigest
+> 
+> Submitted-by daemon@csg.lbl.gov  Tue Sep 23 04:01:23 1997
+> Submitted-by: daemon@csg.lbl.gov
+> 
+> Comp.Os.Vxworks Daily Digest    Tue Sep 23 04:01:19 PDT 1997
+> 
+>         Subject: What if . . .
+>         Subject: Re: C++ class libraries
+>         Subject: FS: MVME167 and MVME177
+>         Subject: Re: Download vxWorks with 162BUG
+> 
+> -------------------------------------------------------
+> 
+> Newsgroups: comp.os.vxworks
+> Subject: What if . . .
+> Date: 16 Sep 1997 04:17:41 GMT
+> From: goforit@savetrees.com
+> Organization: The Alliance
+> Message-ID: <5vl195$nn9$315@news.insnet.com>
+> 
+> Ten years ago, you could have bought 36 shares of Microsoft for 28.01 
+> per share. That $1,008.36 would be $198,126.00 now. What if you had 
+> another chance to invest in a company with that much potential?  If
+> you 
+> leave your email at "http://theprofitcenter.net/stock" you could get 
+> the chance to consider an Internet investment with tremendous
+> potential. 
+> 
+> 
+> ---------------------------
+> 
+> Newsgroups: comp.os.vxworks
+> Subject: Re: C++ class libraries
+> Date: Mon, 22 Sep 1997 23:02:30 -0400
+> From: wotsizname@somethingorother.com
+> Organization: None
+> Message-ID: <342830b1.3338470@news.tiac.net>
+> References: <s4238e83.065@racalrec.co.uk>
+> 
+> > Any other comments on the use of C++, class libraries, STL
+> > welcome.
+> 
+> Am I the only one who cannot get CrossWind to find the right source
+> line(s)
+> when debugging C++ code under VxSim for Solaris?
+> 
+> 
+No, You aren't. However, as You did not include very much information
+(which versions do You use, how do You see the error), I only can guess
+that it is the same error as occured here.
+
+I had this problem with Tornado 1.0. In the meantime, I changed to
+1.0.1, and everything is allright.
+
+Ciao,
+	Thomas Arand
+
+
+> ---------------------------
+> 
+> Newsgroups: comp.os.vxworks
+> Subject: FS: MVME167 and MVME177
+> Date: Mon, 22 Sep 1997 21:48:58 -0500
+> From: Innovative Research Technologies <Marty@innovative-research.com>
+> Organization: Netcom
+> Message-ID: <34272E1A.5418@innovative-research.com>
+> Reply-To: Marty@innovative-research.com
+> 
+> We currently have the following boards available.  
+> 
+> MFG: MOTOROLA                                                 QTY
+> - -----------------------------------------------------------------
+> 
+> MVME167   68040 CPU, 33Mhz, 64MB Memory mezz card             02
+>           4 SIO, 1PIO, Ethernet, SCSI
+>           DMA and A32/D32/BLT64 VMEbus I/F
+>           167bug
+> 
+> MVME177   68060 CPU, 50Mhz, 32MB Memory mezz card             02
+>           4 SIO, 1PIO, Ethernet, SCSI
+>           DMA and A32/D32/BLT64 VMEbus I/F
+>           177bug
+> 
+> MVME952   3-slot desktop VME chassis                          01
+> 
+> 
+> 
+> Still under warranty.  E-mail if interested or for more
+> information.
+> 
+> 
+> Marty Norton
+> E-mail: Marty@innovative-research.com
+> INNOVATIVE RESEARCH TECH.
+> 
+> 
+> 
+> ---------------------------
+> 
+> Newsgroups: comp.os.vxworks
+> Subject: Re: Download vxWorks with 162BUG
+> Date: 23 Sep 97 02:21:30 GMT
+> From: steved@pacifier.com (Steve Doiel)
+> Message-ID: <342727aa.0@news.pacifier.com>
+> References: <01bcc71a$e95e9be0$6ae42299@raymondy>
+> 
+> In article <01bcc71a$e95e9be0$6ae42299@raymondy>, ryeung@earthlink.net
+> says...
+> >
+> >I'm trying to download vxWorks to DRAM on our MVME162LC board
+> >from PC (with Windows NT).  NIOP in 162 Bug is used.  On PC side, I
+> have
+> >TFTP Daemon running and security disabled (so that authentication is
+> not
+> >performed).  NIOT is used to set up some of the parameters.
+> >I'm getting error code of 0500, meaning "TFTP retry count exceeded".
+> >Turning on tracing, I got the following decoded results (messages not
+> in
+> >order):
+> >Unsupported ETHERNET Type
+> >Unsupported UDP Type
+> >ARP Request
+> >ARP Reply
+> >Unsupported ICMP Type
+> >
+> >Can anyone shed some light here?  Am I using the right command here?
+> >
+> A couple of things:
+>   Did you do the NIOT command first in order to set up the server and
+> client IP addresses?  These do not come from the same place as the
+> ones
+> used by VxWorks (apparently).
+>   Did you start up the system clock?  162's are shipped with the clock
+> turned
+> off in order to save the battery, but you must start them in order for
+> the
+> ethernet communication to work under 162bug.
+> 
+> I hope this helps,
+> SteveD
+> 
+> 
+> ---------------------------
+> 
+> End of New-News digest
+> **********************
+> 
+> 
+
+
+From ugema10@bonsai.de  Tue Sep 23 07:42:41 1997
+From: Dirk Hilger <ugema10@bonsai.de>
+Date: Tue Sep 23 07:42:48 PDT 1997
+Subject: starting target from flash
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+
+Hallo,
+
+I am using a PEP vsbc32 board (CPU32) with 1MB flash.
+How can I write my object code into flash and start the target from there?
+How can I write variables into flash and read these variables out of the flash?
+
+--MimeMultipartBoundary--
+
+
+From tony.mayes@tecra.it  Tue Sep 23 08:12:43 1997
+From: tony.mayes@tecra.it
+Date: Tue Sep 23 08:12:47 PDT 1997
+Subject: Tornado 1.0.1 Crosswind Debugger
+--MimeMultipartBoundary
+Content-type: text/plain; charset=US-ASCII
+Content-transfer-encoding: 7BIT
+
+What experiences have people had with the 1.0,1.0.1 releases of 
+Tornado on Win95 or NT hosts?
+
+I am particularly interested in the host debugger, crosswind, which 
+is giving us a lot of problems which WRS seem not to be able to give 
+us solutions on at this time.
+
+We run on NT 4.0 hosts to PC based targets, using ethernet connection 
+between host and target. So far we have removed all of the anti virus 
+software, rebuilt NT 4.0 from scratch and reinstalled from scratch 
+the Tornado tools, oh and we got rid of all the NT 4.0 service packs 
+as well. Still however we see lots of lock ups in the debugger.
+
+I am interested to know if we are alone in this problem or not and 
+solutions if anyone has been here and overcome it.
+
+Thanks in advance
+
+Tony
+
+
+
+
+
+
+
+
+Tony Mayes
+
+Email address          tony.mayes@epid.eurotherm.co.uk
+
+Phone 031 975243
+Fax   031 977512
+
+Eurotherm SpA, 
+Via XXIV Maggio, 22070 Guanzate (CO), Italy
+
+(NOTE: The opinions expressed within are my 
+       own and are not necessarily  those 
+       of my employer)
+
+--MimeMultipartBoundary--
+
+
+From jwc@ssd.ray.com  Tue Sep 23 09:25:05 1997
+From: Cosgrove <jwc@ssd.ray.com>
+Date: Tue Sep 23 09:25:08 PDT 1997
+Subject: VME Interrupts on a 2604
+Hi, fellow "VxWorkers"
+
+I am having trouble connecting the VME interrupts to a 2604 based handler.
+I have done this in both the 68k and 1604 PPC families (but both use the VMEchip2)
+but in the Universe/Raven chipset, I am having a little trouble.
+
+Could someone offer a code fragment to connect a VME generated interrupt to a 
+handler on a 2604(3)??? (including any needed enabling)
+
+I must be missing some crucial because the VMEbus analyser shows the IACK occurred,
+but I never get the interrupt...
+
+Thanks
+
+John Cosgrove
+Raytheon
+(401)842-4167 (desk)
+(401)842-3511 (lab)
+jwc@ssd.ray.com
+
+
+
+From wbrown@csg.lbl.gov  Tue Sep 23 10:05:41 1997
+From: wbrown@csg.lbl.gov (Bill Brown)
+Date: Tue Sep 23 10:05:44 PDT 1997
+Subject: Re: explosion
+
+KAA-BOOM???????
+
+F.Y.I.
+
+As it happens, the vxWorks exploder is manually maintained by a (sub?)human.
+
+There are three ways to read postings to the exploder and news group:
+
+    1) Subscribe to the immediate mailing list.  This will get the messages
+       mailed to you "as they happen."  New subscribers are placed on this
+       list by default.
+
+    2) Subscribe to the digest.  This will get all of the messages that were
+       posted to the list within the last 24 hours mailed to you each morning
+       as one message.
+
+    3) Read the news group "comp.os.vxworks".  This contains all of the
+       messages that are sent to the mailing list as well as messages posted
+       to the news group.  In addition, all messages posted to the news group
+       are automagically mailed to the immediate mailing list subscribers once
+       each day, and are included in the next edition of the digest.
+
+Messages to the list should be either emailed to vxwexplo@lbl.gov or posted
+to the "comp.os.vxworks" news group.  When responding to messages, please
+minimize the quoted section of the original message.  Messages which contain
+the "trailer" added by the exploder are deleted in an attempt to avoid
+"storms" of bounce messages.
+
+Requests for subscriptions, removal from the list, address changes, etc.
+should be sent to "vxwexplo-request@lbl.gov".  While requests can be sent
+to me directly, sending them to "vxwexplo-request@lbl.gov" insures that
+someone will receive and deal with them when I am not available.  Please
+be sure to include the address that you used when you subscribed and note
+which list (immediate list or digest) you receive when requesting service.
+
+DO NOT SEND ADMINISTRATIVE REQUESTS TO "vxwexplo@lbl.gov."  Since these
+request are of little interest to the rest of the world, filters in the
+exploder will send these messages to some file that we'll probably forget
+to check.  The correct addresses for posting and for administrative matters
+are appended to each message mailed by the exploder.
+
+Also - PLEASE - when "bounce" messages start to appear on the list, DON'T
+SEND COMPLAINTS TO THE WHOLE LIST!!!  That just makes things worse!  If you
+must complain, send a message to me at "vxwexplo-request@lbl.gov".  While
+it may not result in my fixing the problem any sooner, at least it will
+not make things worse.
+
+Several sites maintain their own "sub-exploders" which redistribute postings
+within the supporting orginization.  We do not maintain these lists.
+
+The WRS web-site URL is www.wrs.com
+
+Information on the vxWorks archive is available by sending e-mail to
+	netlib@thor.atd.ucar.edu
+with the text
+	send index
+as the body of the message.
+
+The VxWorks exploder archive is located at 'csg.lbl.gov' in '/pub/vxwexplo'.
+Anonymous login is permitted.
+
+-bill
+"duty mailing-list-grunt of the day"
+
+
+From campiglia@ocegr.fr  Tue Sep 23 10:46:56 1997
+From: Jean-Marie Campiglia <campiglia@ocegr.fr>
+Date: Tue Sep 23 10:46:59 PDT 1997
+Subject: PCI boards experiences on mv26xx series
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+I'm about to migrate my application (including PCI boards) from an
+ultra604 to mtx604 board.
+My software drives PCI boards which controller is an AMCC S5933 used
+both in master R/W mode.
+Has anybody got an experience of using this PCI controller with a mv260X
+board since Host/Pci bridge (Raven asic) is also used on Mtx series.
+
+Thanks,
+JM Campiglia
+
+OCE Industries SA
+--MimeMultipartBoundary--
+
+
+From mmcquade@pop.aa.net  Tue Sep 23 12:51:05 1997
+From: Mike McQuade <mmcquade@pop.aa.net>
+Date: Tue Sep 23 12:51:09 PDT 1997
+Subject: Re: VME Interrupts on a 2604
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+
+At 09:25 AM 9/23/97 PDT, jwc@ssd.ray.com  wrote:
+
+>Hi, fellow "VxWorkers"
+>
+>I am having trouble connecting the VME interrupts to a 2604 based handler.
+>I have done this in both the 68k and 1604 PPC families (but both use the
+VMEchip2)
+>but in the Universe/Raven chipset, I am having a little trouble.
+>
+>Could someone offer a code fragment to connect a VME generated interrupt
+to a 
+>handler on a 2604(3)??? (including any needed enabling)
+>
+>I must be missing some crucial because the VMEbus analyser shows the IACK
+occurred,
+>but I never get the interrupt...
+>
+
+here is an example used on a 2603, the hardware doc for the board tells us
+the vector 
+put on the VME bus is 0xe3.
+
+
+
+Mike.
+
+
+void my_isr()
+{
+   *(UINT *)UNIVERSE_LINT_STAT = 
+      LONGSWAP (LINT_STAT_MASK | LINT_STAT_VIRQ3);          /*reset
+interrupt*/
+   
+   logMsg("VME Level 3 Interrupt happened...\n");
+}
+
+
+void setup_rup()
+{
+   if( sysIntEnable(3) == ERROR)                            /* enable VME
+level 3 */
+      logMsg( "intEnable Failed\n");
+   
+   if( intConnect(INUM_TO_IVEC (0xe3), my_isr, 0) == ERROR)  	/* connect
+ISR to VME Vector */
+      logMsg ( "intConnect Failed\n");                          
+}
+
+
+
+
+
+
+
+--MimeMultipartBoundary--
+
+
+From rd1@idm-associates.com  Wed Sep 24 00:39:20 1997
+From: rd1@idm-associates.com
+Date: Wed Sep 24 00:39:23 PDT 1997
+Subject: You'll Never Get Ahead Unless...
+Let's face it:  you'll never get ahead financially just working a job for  someone else.  You need to own your own business if you expect to make any  financial headway.  I've been in business for a long time.  While many businesses have good earnings potential, they are laden down with high costs of inventory, shrinking margins, risk factors, employees, overhead and marketing burdens...not to mention the owner's ball and chain..  I went on a search for two years to find the perfect HOME based business.  I finally found it!
+
+ We represent an income opportunity that is unparalleled with anything else  in the USA.  We GIVE AWAY a wireless, two way state-of-the-art voice  technology home security system to homeowners and businesses.  The system is portable so it can be moved with the customer.  It is even available to renters.  NO other security company offers this option.  The customer signs a mandatory monitoring contract with a UL listed company at a competitive rate.  My compensation works similar to the cellular phone industry.  Each time I give away a system, I make at least $300.  Combine this with the ability to do network marketing, no risk, no employees, no overhead.... I've got a gold mine.
+ Please take a moment to view our website at
+ http://www.idm-associates.com/rd1/freedom.htm
+ I promise it will be worth your while.  You, too, can be in business for a very minor investment.. You'll make at least $696 on your first four sales.  I made $1500 in my first two weeks. Your road to financial freedom is only a mouse click away.
+
+ You will be only contact once with this proposal.  If you wish, you may reply this message with "remove" in the subject line.  We will respectfully honor your request.
+
+
+
+
+
+From rtp.co.uk!jfd@rtp.co.uk  Wed Sep 24 03:25:37 1997
+From: Julian Day <jfd@rtp.co.uk>
+Date: Wed Sep 24 03:25:44 PDT 1997
+Subject: Re: VxWorks 5.3.1 FTP Server
+
+
+-----Original Message-----
+Subject:      VxWorks 5.3.1 FTP Server
+From:         "Engineering group (1)" <mwright@cct.co.uk>
+Date:         1997/09/23
+Message-Id:   <875005830.12726.0.nnrp-04.c30b1810@news.demon.co.uk>
+Newsgroups:   comp.os.vxworks
+
+ We have code running under VxWorks 5.3 (x86) and I have just rebuilt
+evrything for version 5.3.1. All is OK apart from the fact that the FTP
+server will not let me log in. The documentation states that there is no
+username or password checking but the error I get from the FTP client on the
+host indicates that my password is invalid. Any ideas?
+
+[Julian Day]  
+
+FROM SPR 8602:
+
+The reason is that Tornado 1.0.1 (VxWorks 5.3.1) is deliverd with an
+ftpdLib.o compiled with INCLUDE_SECURITY enabled. Therefore the ftp deamon
+always asks for a valid username and password.
+
+
+RESOLUTION:
+
+1. In target/config/all/configAll.h
+
+   Place the following defines in the 'Included Software Facilities':
+
+#define INCLUDE_SYM_TBL (or INCLUDE_CONFIGURATION_5_2)
+#define INCLUDE_SECURITY
+
+   You can see the default user name ("target") and password ("password")
+   under
+ 
+#define LOGIN_USER_NAME ...
+#define LOGIN_PASSWORD ...
+
+2. The option INCLUDE_CONFIGURATION_5_2 will give a target shell, plus
+   target-based tools, whereas INCLUDE_SYM_TBL simply includes the symbol
+   table facilities.
+
+   If you use the INCLUDE_SYM_TBL option, then you will need to make an
+   additional change. In the file target/config/all/usrConfig.c, there is
+   the following block of code:
+
+    /* initialize interactive shell */
+
+#ifdef  INCLUDE_SHELL
+#ifdef  INCLUDE_SECURITY                      /* include shell security */
+   if ((sysFlags & SYSFLG_NO_SECURITY) == 0)
+      {
+      loginInit ();                           /* initialize login table */
+      shellLoginInstall (loginPrompt, NULL);  /* install security program */
+
+      /* add additional users here as required */
+
+      loginUserAdd (LOGIN_USER_NAME, LOGIN_PASSWORD);
+   }
+#endif  /* INCLUDE_SECURITY */
+...
+
+You need to copy the code bracketed by INCLUDE_SECURITY to a position
+outside the INCLUDE_SHELL brackets.
+
+
+SPR / PATCH: 8602
+
+KEYWORDS: FTPD, FTP, SECURITY, PASSWORD
+
+
+
+From daemon@csg.lbl.gov  Wed Sep 24 04:01:32 1997
+From: daemon@csg.lbl.gov
+Date: Wed Sep 24 04:01:35 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Wed Sep 24 04:01:29 PDT 1997
+
+        Subject: How to make symbols available to Wind Shell
+        Subject: Re: Changing interrupt priorities on mv2604 PowerPC?
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: How to make symbols available to Wind Shell
+Date: 23 Sep 1997 03:12:59 GMT
+From: "Raymond K.S. Yeung" <ryeung@adicomw.com>
+Organization: AdiCom Wireless
+Message-ID: <01bcc7ce$e8ffcd40$df60a9ce@host.hooked.net>
+
+I used the startup-script feature to have the 
+target-resident shell to load in our applications.
+How do I make the symbols accessible to
+Windsh (the serial link won't be available to
+us after the system comes up)?
+
+Thanks,
+Raymond
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: Changing interrupt priorities on mv2604 PowerPC?
+Date: Wed, 24 Sep 1997 00:28:12 GMT
+From: georg@sgl.ists.ca (Georg Feil)
+Organization: Institute for Space and Terrestrial Science
+Message-ID: <georg.875060892@s2.sgl.ists.ca>
+References: <georg.874978644@s2.sgl.ists.ca>
+Sender: news@newshub.ists.ca
+
+...After a bit more looking around and suggestions from people here
+is what I have come up with on my problem:
+
+I figured out the hanging part can be corrected by also adjusting
+the PCI to ISA interrupt routing as I suspected. These are hard-coded(!)
+in the sysPciExtIbcInit() routine in sl82565IntrCtl.c:
+
+    pciConfigOutWord (pciBusNo, pciDevNo, pciFuncNo, PCI_CFG_IBC_INTR_ROUTE,
+                      0xabef);
+
+I generalized this to the following and everything works:
+
+    pciConfigOutWord (pciBusNo, pciDevNo, pciFuncNo, PCI_CFG_IBC_INTR_ROUTE,
+                      (LN_INT_LVL << 12) |
+                      (UNIV_INT_LVL <<  8) |
+                      (SCSI_INT_LVL <<  4) |
+                      0x000f );
+
+The ISA interrupt lines do have an implicit priority, although what I'm after
+is priorities along with actual interrupt nesting, and I'm not sure how/if
+that's possible. Unfortuntately I was wrong about the priority order, as 
+shipped the VxWorks assignments do make the Universe higher priority than
+SCSI, although lower than the LAN. I have switched the universe to be higher
+priority than the LAN, but with no obvious effect. I think the priority may
+simply apply to simultaneous interrupts, not nested ones.
+
+I've realized just what a hack the VxWorks mv2604 BSP is. Simple stuff like
+the above should not need to be patched by users. The following comment 
+says it all:
+
+sl82565IntrCtl.c:
+   INTERNAL
+   ** HELP **
+   The sysPciExtIbcInit function does not belong in this driver module.
+   The excIntConnect function in sysIbcInit does not belong in this module.
+   These should be removed and the change in initialization sequence should
+   be updated.
+
+
+No wonder there are so many problems...
+
+Georg
+- --
+Georg Feil
+                                             |  http://www.sgl.ists.ca/~georg
+Space Geodynamics Laboratory                 | Email: georg@sgl.ists.ca
+Institute for Space and Terrestrial Science  | Phone: (416) 665-5458
+4850 Keele St./North York/Ont/Canada/M3J 3K1 |   Fax: (416) 665-1815
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From pcrescio@dsrnet.com  Wed Sep 24 11:28:05 1997
+From: "Crescioli, Phil" <pcrescio@Dsrnet.Com>
+Date: Wed Sep 24 11:28:09 PDT 1997
+Subject: RE: comp.os.vxworks newsdigest
+>Subject: How to make symbols available to Wind Shell
+>Date: 23 Sep 1997 03:12:59 GMT
+>From: "Raymond K.S. Yeung" <ryeung@adicomw.com>
+>Organization: AdiCom Wireless
+
+>I used the startup-script feature to have the 
+>target-resident shell to load in our applications.
+>How do I make the symbols accessible to
+>Windsh (the serial link won't be available to
+>us after the system comes up)?
+
+>Thanks,
+>Raymond
+
+You can redirect stdio to a windsh by placing the following in a windsh.tcl
+file in your .wind dir:
+                   if{[shParse {tstz = open ("/vio/0",2,0)}] !=-1} {
+                       shParse {vf0 = tstz};
+                       shParse {ioGlobalStdSet (0,vf0)};
+                       shParse {ioGlobalStdSet (1,vf0)};
+                       shParse {ioGlobalStdSet (2,vf0)};
+                       shParse {logFdAdd (vf0) ;
+                      }
+PAC
+          
+
+
+From fenj@symmetrycomm.com  Wed Sep 24 12:38:13 1997
+From: Fen Jain <fenj@symmetrycomm.com>
+Date: Wed Sep 24 12:38:16 PDT 1997
+Subject: experience on PPP and TCP/IP  
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+I would like to get comments from anyone who has used TCP/IP from Wind
+River and PPP from CoSystem or TeleNetwork (WindRiver partners) on your
+experience in using the packages for Internet access.  We are interested
+in kowning if you are able to use it successfully in real product and
+how these two compared with PSOS.
+
+Thank you in advance for your help.
+
+Fen Jain
+Symmetry Communications Systems
+
+--MimeMultipartBoundary--
+
+
+From daemon@csg.lbl.gov  Thu Sep 25 04:01:49 1997
+From: daemon@csg.lbl.gov
+Date: Thu Sep 25 04:01:52 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Thu Sep 25 04:01:45 PDT 1997
+
+        Subject: VxWorks RPC
+        Subject: IP broadcast to 255.255.255.255
+        Subject: Re: flash memory programming: linker problem
+        Subject: Re: How to make symbols available to Wind Shell
+        Subject: VxWorks SE contract
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: VxWorks RPC
+Date: 24 Sep 1997 17:04:25 GMT
+From: wendy@sw.stratus.com (Wendy McNaughton)
+Organization: Stratus Computer, Inc.
+Message-ID: <60bh6p$f0h@transfer.stratus.com>
+
+Does anyone have any experiences that they can share with regards to using
+RPC on VxWorks?  Has anyone attempted to use RPC on VxWorks to talk to an
+NT-based RPC client/server?  Is it possible to use the VxWorks NT-based
+portmapper as a general purpose portmapper?
+
+- ------------------------------------------------------------------
+Wendy McNaughton		| wendy@seussnt.stratus.com              
+Stratus Computer		| Wendy_McNaughton@vos.stratus.com
+55 Fairbanks Blvd.
+Marlboro, MA  01752
+(508) 460-2930
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: IP broadcast to 255.255.255.255
+Date: Wed, 24 Sep 1997 10:31:27 -0700
+From: Sudhakar Ravi <sudhakar@sonicsys.com>
+Organization: Sonic Systems
+Message-ID: <34294E6E.86A29613@sonicsys.com>
+
+Does anyone know why VxWorks is unable to send an ip packet to
+255.255.255.255?
+
+The broadcast address on my ethernet port (using ifShow) comes up as
+net.255 where net is the network part of my class C address.  If I call
+ifBroadcastSet() with 255.255.255.255, I get a -1 error.
+
+I have an application (DHCP Server) that needs to send to the all 255
+address and not the subnet broadcast.  I'm using VxWorks 5.3.
+
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: flash memory programming: linker problem
+Date: Wed, 24 Sep 1997 10:41:55 -0700
+From: John Fabiani <johnx@wrs.com>
+Organization: Wind River Systems, Inc.
+Message-ID: <342950E3.FE2E77CE@wrs.com>
+References: <MPG.e90675d544d4ce7989691@SanMateo01.news.internex.net>
+
+At runtime, dynamically download the object containing the flash code.
+This will place the flash code in ram.  This assumes you have at least
+a serial port.
+
+George Pontis wrote:
+> 
+> I am in need of a solution to controlling the link process more finely
+> than is usually done with vxWorks.
+> 
+> In this very small system, there is 512K of flash, and 256K RAM. The
+> application runs nicely from ROM, and I normally build the ROMable image
+> using the vxWorks.res_rom_nosym target. There is plenty of spare ROM and
+> RAM in this configuration. However, the top 64K sector of flash ROM is
+> supposed to hold specific calibration data for the product. I have
+> written and tested the routines that erase and reprogram this area, but
+> cannot execute them from the normal mode of operation.
+> 
+> The problem is that one cannot be fetching instructions from flash ROM
+> while simultaneously programming the same part. A simple solution would
+> be to locate the flash routines in RAM, then block interrupts while they
+> execute. However, it does not appear to be possible to locate only some
+> of the code in RAM. The vxWorks options seem to provide only for 100% in
+> RAM, or 100% in ROM. (What a contrast this is to other embedded
+> development tools, that provide fine grain control of the compiler-
+> generated sections and the linker segment grouping/ordering)
+> 
+> I talked with tech support this morning, and they could only suggest that
+> I check the archives maintained by the user group at csg.lbl.gov, which I
+> have done without benefit.
+> 
+> Does anyone out there in netland have a semi-clean workaround to this
+> problem ?
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: How to make symbols available to Wind Shell
+Date: 24 Sep 1997 18:14:20 GMT
+From: "Raymond K.S. Yeung" <ryeung@adicomw.com>
+Organization: AdiCom Wireless
+Message-ID: <01bcc915$fc4667e0$df60a9ce@host.hooked.net>
+References: <01bcc7ce$e8ffcd40$df60a9ce@host.hooked.net> <34286ad7.234186@news.clark.net>
+
+I've figured out a way to resolve this.  Target symbol table
+seems to be available to telnet (Windsh uses a symbol
+table maintained by target server on the host.  So if
+application image is loaded without going through tgt
+svr, this host symbol table would not have the symbols).
+
+
+M. Hayman <hayman@clark.net> wrote in article
+<34286ad7.234186@news.clark.net>...
+> 1) Use Tornado 1.0.1
+> 
+> OR
+> 
+> 2) Rather than load your applications from the startup script,
+> statically link them to the kernel when you build it.  You can do this
+> by either adding them to your Vx Makefile (ADDED_MODULES = ), or by
+> defining "added modules" from WindCFG prior to building the kernel.
+> By doing this, their symbol information will be built into
+> vxWorks.sym, which is available to both the target shell AND a Tornado
+> target server (e.g. WindSh).
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: VxWorks SE contract
+Date: 24 Sep 1997 18:56:21 GMT
+From: tadp0le@aol.com (Tadp0le)
+Organization: AOL http://www.aol.com
+Message-ID: <19970924185601.OAA12740@ladder02.news.aol.com>
+
+Hi. My name is Peter Fuller.I have a HOT contract (possibly to perm) position
+available in the West Chicago burbs for a premier company. If you are
+interested/available please email tadp0le@aol.com/fax(630-505-0983)/or call
+888-823-5627.
+Thanks!
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From Huang.Wu@nrc.ca  Thu Sep 25 06:55:49 1997
+From: "Wu, Huang" <Huang.Wu@nrc.ca>
+Date: Thu Sep 25 06:55:52 PDT 1997
+Subject: send file from vx
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+	send file from vx
+	ex. - send usrTime.shar from vx
+--MimeMultipartBoundary--
+
+
+From chenyc@fnal.gov  Thu Sep 25 08:38:22 1997
+From: Yenchu Chen <chenyc@fnal.gov>
+Date: Thu Sep 25 08:38:25 PDT 1997
+Subject: SCSI drivers in VxWorks 5.3
+--MimeMultipartBoundary
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+
+Hi,
+
+   Does the VxWorks 5.3 supports disconnect feature, i.e. in case I have
+multiple tape drives attached to one MVME167, can I send data block
+through SCSI bus to one tape drive, disconnect it and go to the next one
+before it finishes?
+
+Yen-Chu
+
+--MimeMultipartBoundary--
+
+
+From rtp.co.uk!ihw@rtp.co.uk  Thu Sep 25 08:53:33 1997
+From: Ian Willats <ihw@rtp.co.uk>
+Date: Thu Sep 25 08:53:36 PDT 1997
+Subject: Flash memory programming
+George Pontis asked:
+
+> The problem is that one cannot be fetching instructions from flash ROM
+> while simultaneously programming the same part. A simple solution would
+> be to locate the flash routines in RAM, then block interrupts while they
+> execute.
+   ...
+> Does anyone out there in netland have a semi-clean workaround to this
+> problem ?
+
+I had to do exactly this and ended up by having the flash programming 
+routines copy themselves on-demand (i.e. the first time they're called) 
+into dynamically-allocated RAM and executing from there, with interrupts 
+disabled.  Whether this satisfies the `semi-clean' criterion is debatable, 
+but it works and does not require the flash programming code to be loaded 
+at run-time.
+
+Let me know if you want to see the code I used, George.
+
+Ian
+----------------------------------------------------------------
+Ian Willats                          E-mail:       ihw@rtp.co.uk
+Real-Time Products Ltd.
+Unit 8, Holt Court,                  Telephone: +44 121 333 6955
+Aston Science Park,                  Fax:       +44 121 333 5433
+Jennens Road,
+Birmingham B7 4EJ. England.          Web:          www.rtp.co.uk
+----------------------------------------------------------------
+
+
+
+
+From Phil_Watson@masirv.com  Thu Sep 25 08:54:42 1997
+From: Phil_Watson@masirv.com (Phil Watson)
+Date: Thu Sep 25 08:54:49 PDT 1997
+Subject: Re: comp.os.vxworks newsdigest
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+------------- Begin Included Message -------------
+Date: 24 Sep 1997 17:04:25 GMT
+From: wendy@sw.stratus.com (Wendy McNaughton)
+
+Does anyone have any experiences that they can share with regards to using
+RPC on VxWorks?  Has anyone attempted to use RPC on VxWorks to talk to an
+NT-based RPC client/server?  Is it possible to use the VxWorks NT-based
+portmapper as a general purpose portmapper?
+------------- End Included Message -------------
+
+We have been using RPC on VxWorks for almost three years now. It works fairly 
+well, allowing for its task-specific nature in Vx. We have had some problems 
+with using TCP as the transport between two Vx hosts; WRS is aware of the 
+problems and had a patch or two. But we just use the UDP transport and avoid the 
+question.
+
+We have not used an NT-based server with a Vx box over RPC, but have used SunOS 
+and Windows 95 and 3.x. For the latter we used FTP Software's portmapper and RPC 
+library.
+
+Any more questions for me, let me know.
+
+PSW
+----
+Philip Watson, Phil_Watson@masirv.com
+Manager, Embedded Software Development
+Matsushita Avionics Systems Corp.
+15253 Bake Parkway
+Irvine, California, 92618  U.S.A.
+--MimeMultipartBoundary--
+
+
+From Huang.Wu@nrc.ca  Thu Sep 25 09:25:19 1997
+From: "Wu, Huang" <Huang.Wu@nrc.ca>
+Date: Thu Sep 25 09:25:26 PDT 1997
+Subject: send string.shar from vx
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+send string.shar from vx
+--MimeMultipartBoundary--
+
+
+From ZINGLEBJ@OCD231.md.essd.northgrum.com  Thu Sep 25 12:15:17 1997
+From: "Zingler, Bill J." <ZINGLEBJ@OCD231.md.essd.northgrum.com>
+Date: Thu Sep 25 12:15:20 PDT 1997
+Subject: Basic VxWorks Ethernet Questions
+
+Hello,
+
+We are late in our project and now need to add a new, separate ethernet   
+network to our system to connect our CPU board to a single subsystem.  We   
+are using a Radstone CPU-46 with an MXES-1 daughter card in our VMEBUS   
+target.  This configuration comes with ethernet on both boards with   
+separate connections to the backplane.  However, they share hardware on   
+the board.  Since I don't have the schematics, it is not clear exactly   
+what is shared.  What we would like to do is to use the MXES ethernet   
+(SN) for our download, shut this off, and then use the CPU-46 (SN) during   
+execution.  WRS provides documentation for setting up many types of   
+networks (SLIP, SM, etc.) but I haven't found anything that describes how   
+I would configure a standard ethernet interface (SN) beyond them telling   
+me to #INCLUDE_SN, or if VxWorks supports multiple ethernet connections   
+of the same type from one VxWorks image.  Also, since the boot SN   
+ethernet setup is done by VxWorks as a part of boot, how do I shut down,   
+or close this connection?
+
+Thanks for your help,
+
+Joe B.  
+
+
+From john.cunningham@das.honeywell.com  Thu Sep 25 12:40:05 1997
+From: "Cunningham, John S (NM75)" <john.cunningham@das.honeywell.com>
+Date: Thu Sep 25 12:40:09 PDT 1997
+Subject: floating point underflow errors
+
+I am getting floating-point underflow errors on a MVME2603 target using
+VxWorks.  I would like to disable the floating-point underflow error.
+Will I have to manually edit code to write to the PC603e registers in my
+>tasks to achive this or can I disable the underflow error in VxWorks?  Does
+anyone know how I might do this in VxWorks?  
+
+Thanks
+John
+
+
+From gretchen@wrs.com  Thu Sep 25 16:51:39 1997
+From: Gretchen Maddox <gretchen@wrs.com>
+Date: Thu Sep 25 16:51:42 PDT 1997
+Subject: WRS Developers Conference
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+
+
+Wind River Systems Announces Its 1998 Developers Conference,=20
+"IQ 1998: Smart Solutions for Smarter Products"
+=20
+Intel and Motorola to Co-Sponsor- May 11th - 13th 1998, San Francisco, CA=
+=20
+
+
+ALAMEDA, Calif., September 25, 1997 -- Wind River Systems (NSADAQ: WIND),
+the leading provider of integrated embedded software systems, today
+announced its premiere annual Developers Conference, IQ 1998: Smart
+Solutions for Smarter Products(TM), to be held at the Fairmont Hotel, San
+Francisco, CA on May 11th - 13th 1998. The conference will provide an
+educational and interactive forum for the most influential members of the
+embedded development community.=20
+
+Co-sponsored by Intel and Motorola, and focusing on embedded real-time
+solutions for software and hardware developers, the conference will open
+with keynote addresses by Jerry Fiddler, co-founder and chairman of Wind
+River Systems, and senior executives from Intel and Motorola.  In additio=
+n
+to numerous general sessions, over fifty educational and interactive
+breakout session opportunities will be available for attendees, covering =
+a
+full range of developer topics.  The conference will also feature a speci=
+al
+San Francisco evening event.=20
+
+Call For Papers
+Developers, industry and technology experts in the embedded software
+applications community are encourage to submit papers for presentation at
+the conference. Topics may include, but are not limited to: Industry
+Trends, Peripherals/Computing, Intelligent I/O, Development Tools, and
+Communications (telecomm/datacomm). Panel presentations as well as
+individual presentations are also accepted.=20
+
+To submit your 100 word abstract, contact Tonia Miller of LKE Productions=
+,
+by phone at (415) 544-9300, or email at tonia@lke.com.  Submission deadli=
+ne
+is Friday, October 31st, 1997.
+
+Wind River Systems=20
+Wind River Systems, Inc., is the leading provider of integrated software
+development tools for real-time embedded applications in the Internet,
+telecommunications, datacommunications, office automation, networking,
+computer peripherals, medical, automotive, industrial, aerospace, and
+multimedia markets.  Through the industry=92s most comprehensive product =
+line
+and customer support, Wind River enables customers to develop and reuse
+application software across a variety of products and platforms, shorteni=
+ng
+development cycles and improving time-to-market. Incorporated in 1983, Wi=
+nd
+River is headquartered in Alameda, California with operations in the UK,
+France, Germany, Sweden, Italy, Israel, Korea, and Japan and representati=
+on
+worldwide  Wind River reported revenues of 64 million dollars in fiscal
+year 1997, a 45% increase from fiscal year 1996.
+					####			=20
+								MCL-PR-DEV-97-9
+Tornado, VxWorks, Wind River Systems, "IQ 1998: Smart Solutions for Smart=
+er
+Products" and the Wind River Systems logo are all trademarks or registere=
+d
+trademarks of Wind River Systems, Inc. All other trademarks are the
+properties of their respective owners.
+
+
+***************************************************************
+Gretchen Maddox			 	        (510) 749-2396
+Wind River Systems				   Fax: (510) 749-2010
+1010 Atlantic Avenue				    http://www.wrs.com
+Alameda, CA  94501		   =09
+***************************************************************
+
+--MimeMultipartBoundary--
+
+
+From bob@seaweed.com  Thu Sep 25 19:56:02 1997
+From: bob schulman <bob@seaweed.com>
+Date: Thu Sep 25 19:56:05 PDT 1997
+Subject: Re: memory fragmentation
+Lori Smith <lsmith@fallschurch.esys.com> wrote:
+
+> We are using VxWorks 5.3.1 on a powerpc.  Our system needs to operate
+> for hours on end and we are worried about memory fragmentation.  If
+> we do a lot of malloc/frees (or C++ new/deletes), we are concerned
+> that we will end up with a completely fragmented memory space and
+> that we will not be able to function after a while.  Have any of you
+> run into this problem?  Do you know if there is any auto-deframenting
+> that goes on in the system?  Or something that we can invoke
+> periodically to defragment our memory?
+
+Seaweed Systems has a written-from-scratch memLib replacement. It
+has all the functionality which Wind River's memLib has...and more!
+
+It has memory leak detection, sanity checks at malloc/realloc/free
+time, user-callable memory arena sanity checker, constant-time allocation,
+better fragmentation behavior, callbacks for various low-memory
+conditions, and more! A real ginzu knife of an app.
+
+Please call or email for information:
+	info@seaweed.com
+	510.482-3575
+
+
+From rd1@idm-associates.com  Thu Sep 25 23:15:11 1997
+From: rd1@idm-associates.com
+Date: Thu Sep 25 23:15:14 PDT 1997
+Subject: Crime Pays
+Dear Fellow Citizen,
+
+CRIME-Don't say "it will never happen to me." Because that's exactly
+what I thought three months ago when my husband caught someone trying to
+come through our bedroom window at 2:00 a.m. With myself, two small
+girls, and my husband in the home what possibily could he have wanted
+from us?  Rape, burglary, murder...THANK GOODNESS we didn't have to find
+out.
+
+According to the U.S. Justice Department you have a 1 in 4 chance of
+being a victim in your own home.
+
+An ABC affiliate ran a story recently on home security and their
+conclusion was that your best defense is a home security system.
+
+You can now receive a state-of-the-art home security system with NO
+BASIC EQUIPMENT COST.  And YOU own the system.
+
+Isn't it worth the PROTECTION of YOUR FAMILY?  You bet it is!
+
+The product:  Wireless State-of-the-Art Home Security Systems with
+two-way voice.  It is user installable, portable, high quality
+technology.  The system is GIVEN away to home owners, business...EVEN apartment
+dwellers anywhere in the USA.
+
+There is also a business opportunity available to you.  Suppose we showed you how to make a full-time income at the same time.  We'll show you how to  GIVE AWAY (YES, GIVE AWAY) a FREE Home Security System and make $300 or more in doing so.
+
+Would YOU be interested?
+
+There is no inventory to carry or money to collect.  The customer signs
+a monitoring agreement with a UL listed company at a competitive rate.
+
+The opportunity our company represents is unmatched to any other company
+in the USA.  Along with earning generous commissions, this
+opportunity can also be networked.
+
+To learn how you can receive a home security system please visit our web
+site at: http://www.idm-associates.com/rd1/HA/HAa.htm
+Ffor more about the business opportunity, please visit our web  
+site at: http://www.idm-associates.com/rd1/HA/HAfreedom.htm
+
+
+///////////////////////////////////////////////////////////////////////////////
+This Message was Composed using Extractor Pro Bulk E- Mail Software. If 
+you wish to be removed from this advertiser's future mailings, please reply 
+with the subject "Remove" and this software will automatically block you 
+from their future mailings.
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+From rtp.co.uk!ihw@rtp.co.uk  Thu Sep 25 23:50:43 1997
+From: Ian Willats <ihw@rtp.co.uk>
+Date: Thu Sep 25 23:50:47 PDT 1997
+Subject: SCSI drivers in VxWorks v5.3
+Yenchu Chen <chenyc@fnal.gov> asked:
+
+>   Does the VxWorks 5.3 supports disconnect feature, 
+
+Yes, it does provided you INCLUDE_SCSI2 in config.h.
+
+Ian
+
+
+
+From ABonfiglio@sligos.es  Fri Sep 26 02:05:35 1997
+From: ABonfiglio@sligos.es
+Date: Fri Sep 26 02:05:39 PDT 1997
+Subject: AMD ELAN SC300
+--MimeMultipartBoundary
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Dear all,
+
+
+Does anybody know if there is a BSP for VxWorks, based in AMD ELAN =
+SC300
+microcontroller ?
+
+Thanks.
+
+
+
+
+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=
+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D
+=3D   Alberto BONFIGLIO
+=3D   SLIGOS Servicios Inform=E1ticos, S.L.
+
+=3D   Paseo de Castellana 141    planta 14
+
+=3D   28046 Madrid - SPAIN
+
+=3D
+=3D   Tel.:  +34 1 567.22.52
+
+=3D   Fax.: +34 1 571.49.74
+
+=3D   e-mail: ABonfiglio@sligos.es
+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=
+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D+=3D
+--MimeMultipartBoundary--
+
+
+From daemon@csg.lbl.gov  Fri Sep 26 04:03:17 1997
+From: daemon@csg.lbl.gov
+Date: Fri Sep 26 04:03:20 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Fri Sep 26 04:03:14 PDT 1997
+
+        Subject: Re: VxWorks RPC
+        Subject: Testing...please ignore
+        Subject: Re: Z85230 at MVME162
+        Subject: Re: Trouble accessing VME from mv2604 PPC
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: VxWorks RPC
+Date: Thu, 25 Sep 1997 14:49:49 GMT
+From: noblenet@world.std.com (NobleNet Inc.)
+Organization: NobleNet, Inc.
+Message-ID: <EH2Jv2.AIx@world.std.com>
+References: <60bh6p$f0h@transfer.stratus.com>
+
+In article <60bh6p$f0h@transfer.stratus.com>,
+Wendy McNaughton <wendy@sw.stratus.com> wrote:
+>Does anyone have any experiences that they can share with regards to using
+>RPC on VxWorks?  Has anyone attempted to use RPC on VxWorks to talk to an
+>NT-based RPC client/server?  Is it possible to use the VxWorks NT-based
+>portmapper as a general purpose portmapper?
+
+
+NobleNet sells ONC/RPC tools that support NT/95 and VxWorks platforms.
+We support VxWorks Host environments: Solaris, SunOS, HP-UX, ... , and
+NT.  VxWorks Target environments: 68k, x86, Sparc, i960, alpha, mips.
+
+Wind River Systems is our customer, and NobleNet is the supplier of the
+ONC/RPC for the VxWorks NT Tornado environment.
+
+NobleNet has also developed RPC server execution environment in VxWorks
+that can launch server tasks on demand. This functionality can also
+launch a server task per client.
+
+The purchase of NobleNet RPC 3.0 allows redistribution of ONC/RPC DLL's
+and portmapper executables for NT/95 without runtime fees. These
+re-distributable components also include install tools which install
+Portmapper as NT/Service or 95/Tray-Device to make your product
+installation easy.
+
+Steve Lemmo
+CTO, NobleNet Inc.
+
+NobleNet, Inc.
+337 Turnpike Road
+Southboro, MA  01772
+Voice +1 508 460 8222
+Fax +1 508 460 3456
+<http://www.noblenet.com/>
+
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Testing...please ignore
+Date: Thu, 25 Sep 1997 09:33:48 -0700
+From: Greg Nichols <gregoryn@wrs.com>
+Organization: Wind River Systems, Inc.
+Message-ID: <342A926C.5440@wrs.com>
+Reply-To: gregoryn@wrs.com
+
+This is a test...please ignore
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: Z85230 at MVME162
+Date: Thu, 25 Sep 1997 11:55:42 -0400
+From: dwp <penders@felix.kodak.com>
+Organization: theBorg Technology
+Message-ID: <342A897E.6CBF@felix.kodak.com>
+References: <342A72C8.C83@exp.bessy.de>
+Reply-To: dwp <penders@felix.kodak.com>
+
+Chris Hellwig wrote:
+> 
+> Hi,
+> 
+> I'm going to use the serial port 2 at a MVME162,
+> which is driven by a Zilog 85230.
+> 
+> Unfortunately the chip driver  z8530Serial.c only
+> supports FIOSETBAUDRATE in tyCoIoctl(), so I'm not
+> able to set parity, char-lenght and stopbits via
+> ioctl(). Is somebody out there who modified the
+> z8530Serial.c to support these things.
+> 
+> What is the way to make use of the interrupt capabilitys
+> of the chip???? I would like to have an interrupt if
+> CR appears at the port to take the whole string from
+> input buffer.
+
+Here's all the hints you need.  Have fun!
+dave
+
+	serState.pChan = (I8250_CHAN*)sysSerialChanGet(SERIAL_PORT_ONE);
+
+	if (!serState.pChan)
+		return(FALSE);
+
+	serState.fd = open("/tyCo/1", O_RDWR, 0);
+
+	if (!serState.fd)
+		return(FALSE);
+
+
+/*	set baudrate */
+	if (ioctl(serState.fd, FIOBAUDRATE, SIP_BAUD_RATE) == ERROR)
+	{
+		close(serState.fd);
+		return(FALSE);
+	}
+
+/*	flush the buffers */
+	if (ioctl(serState.fd, FIOFLUSH, 0) == ERROR)
+	{
+		close(serState.fd);
+		return(FALSE);
+	}
+
+/*	set serial I/O to raw character mode  */
+	if (ioctl(serState.fd, FIOSETOPTIONS, OPT_RAW) == ERROR)
+	{
+		close(serState.fd);
+		return(FALSE);
+	}
+
+/*	input buffer callback function */
+	if (ioctl(serState.fd, FIOPROTOHOOK, 
+				(int)((FUNCPTR)cb_getData)) == ERROR)
+	{
+		close(serState.fd);
+		return(FALSE);
+	}
+ 
+/*	callback function passed parameter */
+	if (ioctl(serState.fd, FIOPROTOARG, 0) == ERROR)
+	{
+		close(serState.fd);
+		return(FALSE);
+	}
+
+/* 
+	Set the serial port to:
+   	8 data bits, Even parity, 1 Stop bit, 
+*/
+
+	(*serState.pChan->outByte) (serState.pChan->lcr, 
+				SIP_I8250_LCR_WRD8 | 
+				SIP_I8250_LCR_SB1 |
+				SIP_I8250_LCR_PEV);
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: Trouble accessing VME from mv2604 PPC
+Date: 12 Sep 1997 06:02:40 GMT
+From: caoy@aol.com (Caoy)
+Organization: AOL http://www.aol.com
+Message-ID: <19970912060200.CAA01381@ladder01.news.aol.com>
+References: <georg.873311062@s2.sgl.ists.ca>
+
+
+Hi,  I am new to VME as well as to VxWorks. 
+
+I don't have the answer for this question, but I do have some related
+questions. 
+
+We have a MVME2604 board and a I/O board with dual port RAM 
+which we need to map to CPU's VME A24 memory window. How am I supposed to it??
+
+What is the difference in term of the purpose between mv2600.h
+and confgi.h?
+
+What is the difference between the Options: ???
+config.h: VME_A24_MSTR_BUS
+and
+mv2600.h: VME_A24_MSTR_LOCAL
+
+Any response is highly appreciated!!
+
+Yipu
+
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From nguyend2@ttc.com  Fri Sep 26 05:55:53 1997
+From: "Dzung Nguyen" <nguyend2@ttc.com>
+Date: Fri Sep 26 05:55:56 PDT 1997
+Subject: Custom Driver
+     
+     
+     
+     Hi,
+     
+     Could someone be so kind to tell me how to attach a custom driver to 
+     the TCP/IP stach in Tornado?  In Version 5.1 there is a function 
+     "if_attach", but this function seems to disappear in 5.3.x.
+     
+     Your email response is greatly appreciated.
+     
+     Thank you very much in advance.  
+     
+     Dzung
+
+
+
+From dbruce@targettech.com  Fri Sep 26 06:34:17 1997
+From: David Bruce <dbruce@targettech.com>
+Date: Fri Sep 26 06:34:20 PDT 1997
+Subject: Re: Crime Pays
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+remove
+-- 
+David R. Bruce                      phone: (508) 657-9940
+Senior Software Engineer            fax  : (508) 694-1485
+Target Technologies, Inc.           email: dbruce@targettech.com
+                                    WWW  : http://www.targettech.com
+--MimeMultipartBoundary--
+
+
+From dbruce@targettech.com  Fri Sep 26 06:34:22 1997
+From: David Bruce <dbruce@targettech.com>
+Date: Fri Sep 26 06:34:25 PDT 1997
+Subject: remove
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+-- 
+David R. Bruce                      phone: (508) 657-9940
+Senior Software Engineer            fax  : (508) 694-1485
+Target Technologies, Inc.           email: dbruce@targettech.com
+                                    WWW  : http://www.targettech.com
+--MimeMultipartBoundary--
+
+
+From jwc@ssd.ray.com  Fri Sep 26 07:32:43 1997
+From: Cosgrove <jwc@ssd.ray.com>
+Date: Fri Sep 26 07:32:46 PDT 1997
+Subject: ioTaskStdSet( )
+Hi, Folks,
+
+Does ioTaskStdSet() act as a "tee" or should it move all I/O?
+It my problem the fact I am running this thru windsh?
+
+My ~/.wind/windsh.tcl contains:
+
+        if { [shParse {tstz = open ("/vio/0",2,0)}] != -1 } {
+              shParse {vf0 = tstz};
+              shParse {ioTaskStdSet(0x17fc1a0, 0, vf0)};
+              shParse {ioTaskStdSet(0x17fc1a0, 1, vf0)};
+              shParse {ioTaskStdSet(0x17fc1a0, 2, vf0)};
+              shParse {logFdAdd (vf0)};
+              shParse {printf("Std I/O redirected for tLogTask\n")};
+	}
+
+where 0x17fc1a0 is the TID for tLogMsg...
+
+Any help is greatly appreciated...
+
+John Cosgrove
+Raytheon
+(401)842-4167 (desk)
+(401)842-3511 (lab)
+jwc@ssd.ray.com
+
+ 
+
+
+From lspadafora@algw2.lucent.com  Fri Sep 26 07:59:20 1997
+From: Louis Spadafora <lspadafora@lucent.com>
+Date: Fri Sep 26 07:59:23 PDT 1997
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Please remove me from the user group.
+
+Thank you
+Louis Spadafora
+
+--MimeMultipartBoundary--
+
+
+From lars.antback@pullmax.se  Fri Sep 26 09:46:51 1997
+From: lars.antback@pullmax.se
+Date: Fri Sep 26 09:46:54 PDT 1997
+Subject: RE: floating point underflow errors
+
+
+Question submitted by "Cunningham, John S (NM75)"   
+<john.cunningham@das.honeywell.com>
+
+As far as I have discovered you can not set some global initialization   
+data for items like the
+floating point registers in VxWorks. We ran in to a similar problem and   
+had to add code for each
+task to disable underflow and overflow errors. There is a couple of   
+usefull functions and macros
+defined in /h/arch/ppc/archPpc.h and /h/arch/ppc/vxPpcLib.h that   
+simpifies the code writing.
+
+>I am getting floating-point underflow errors on a MVME2603 target using
+>VxWorks.  I would like to disable the floating-point underflow error.
+>Will I have to manually edit code to write to the PC603e registers in my
+>tasks to achive this or can I disable the underflow error in VxWorks?   
+ Does
+>anyone know how I might do this in VxWorks?
+>
+>Thanks
+>John
+
+/Ant
+
+                              ////
+                             (0 0)
+ ________________________o00o_( )_o00o___________________________
+/                              |                                 \
+| Lars Antb„ck                 | tel: + 46 (0)31 57 07 00        |
+| Pullmax AB                   | email: ant@pullmax.se           |
+\________________________________________________________________/
+
+
+
+From cgrames@mdc.com  Fri Sep 26 13:53:21 1997
+From: Charlie Grames <cgrames@mdc.com>
+Date: Fri Sep 26 13:53:24 PDT 1997
+Subject: floating point underflow errors -Reply
+--MimeMultipartBoundary
+Content-Type: text/plain
+Content-Disposition: inline
+
+John,
+
+We ran into the same problem.  You can write your own floating-point initialization routine and
+have it run at the creation of each new task by setting the fppCreateHookRtn global variable to that
+routine.  Following is a short example of how you might do that:
+
+
+#include "usrConfig.h"
+
+
+LOCAL void usrFppCreateHook(FAST WIND_TCB *pTcb)
+{
+
+/*
+**  Modify the the floating-point status and control register in the floating-
+**  point context of the new task.
+*/
+    pTcb->pFpContext->fpcsr &= ~_PPC_FPSCR_UE;
+}
+
+
+void usrStartup(void)
+{
+    .
+    .
+    .
+/*
+**  Install a hook to modify the floating-point environment of all new tasks.
+*/
+    fppCreateHookRtn = (FUNCPTR)usrFppCreateHook;
+    .
+    .
+    .
+}
+
+Hope this helps.
+
+Charlie Grames
+The Boeing Company
+(314) 233-1956
+Charles.R.Grames@boeing.com
+
+
+Submitted-by john.cunningham@das.honeywell.com  Thu Sep 25 12:40:05 1997
+Submitted-by: "Cunningham, John S (NM75)" <john.cunningham@das.honeywell.com>
+
+
+I am getting floating-point underflow errors on a MVME2603 target using
+VxWorks.  I would like to disable the floating-point underflow error.
+Will I have to manually edit code to write to the PC603e registers in my
+>tasks to achive this or can I disable the underflow error in VxWorks?  Does
+anyone know how I might do this in VxWorks?  
+
+--MimeMultipartBoundary--
+
+
+From ZINGLEBJ@OCD231.md.essd.northgrum.com  Fri Sep 26 14:33:09 1997
+From: "Zingler, Bill J." <ZINGLEBJ@OCD231.md.essd.northgrum.com>
+Date: Fri Sep 26 14:33:16 PDT 1997
+Subject: Exception Handlers needed for CPU46
+
+Hello out there,
+
+I am looking for some generic exception handlers for use with the   
+Radstone CPU-46 board that I could implement in place of the VxWorks   
+exception handlers.  Specifically, the exception during an exception   
+which causes the target to reboot.  In our application this would be   
+utter (no, I do not work for Gateway) disaster, if it were ever to occur.   
+ The other exception handler I need is for the less disasterous   
+exceptions (bus error, etc) that causes VxWorks to suspend the offending   
+Task.  Searching their literature has turned up what looks like a viable   
+solution using setjmp/longjmp functions that need to be embedded into   
+each of the Tasks.  Has anyone used this to try and keep things limping   
+along after such a failure or is there a better way?
+
+Thanks for the help.
+
+Joe Blodgett  
+
+
+From chip@Fiberlane.com  Fri Sep 26 17:57:37 1997
+From: "Chip.Roberson" <chip@Fiberlane.com>
+Date: Fri Sep 26 17:57:40 PDT 1997
+Subject: WANTED: RTOS/firmware engineer
+This is a cryptographically signed message in MIME format.
+
+--------------ms544B16D6E99438E8F4EF53CF
+Content-Type: multipart/mixed; boundary="------------E728B252CF31D27FC1197E76"
+
+This is a multi-part message in MIME format.
+--------------E728B252CF31D27FC1197E76
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+My apologies if this is considered inappropriate for this
+list but we are looking explicitly for someone with VxWorks
+experience.
+
+OS and Firmware Engineer
+------------------------
+
+Position requires experience in specification, design, development and
+testing of hardware and low-level software for networking products, mainly
+switches, bridges and routers. Must have experience in getting Real-Time
+kernels (vxWorks) working on a hardware platform and all required
+hardware/software interactions. Must be well conversant with vxWorks,
+UNIX/C development environment, GNU tools. Must have experience in
+writing device-drivers, and low-level software. Must have sound
+knowledge of Operating systems. Must have a BSCS/BSEE and 3-5 years of
+experience in real time operating systems/kernels/device drivers/
+diagnostics.
+
+The position is located in Petaluma, CA which is 37 miles north of San
+Francisco in the Sonoma wine country.  Fiberlane is a venture-funded
+start up with handsome equity packages for employees.  If interested,
+please send your resume to mailto:staffing@fiberlane.com.
+
+Regards.
+--------------E728B252CF31D27FC1197E76
+Content-Type: text/x-vcard; charset=us-ascii; name="vcard.vcf"
+Content-Transfer-Encoding: 7bit
+Content-Description: Card for Charles Roberson
+Content-Disposition: attachment; filename="vcard.vcf"
+
+begin:          vcard
+fn:             Charles Roberson
+n:              Roberson;Charles
+org:            Fiberlane Communications, Inc.
+adr:            Suite 200;;1318 Redwood Way;Petaluma;CA;94954;USA
+email;internet: chip@fiberlane.com
+title:          Manager, Software Development
+tel;work:       (707) 793-1942
+tel;fax:        (707) 793-9057
+tel;home:       (707) 765-1675
+x-mozilla-cpt:  ;0
+x-mozilla-html: TRUE
+version:        2.1
+end:            vcard
+
+
+--------------E728B252CF31D27FC1197E76--
+
+--------------ms544B16D6E99438E8F4EF53CF
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIIQzwYJKoZIhvcNAQcCoIIQwDCCELwCAQExCzAJBgUrDgMCGgUAMAsGCSqGSIb3DQEHAaCC
+Dz0wggqHMIIJ8KADAgECAhBSQxvVaEkHB30WtCO9WNr7MA0GCSqGSIb3DQEBBAUAMGIxETAP
+BgNVBAcTCEludGVybmV0MRcwFQYDVQQKEw5WZXJpU2lnbiwgSW5jLjE0MDIGA1UECxMrVmVy
+aVNpZ24gQ2xhc3MgMSBDQSAtIEluZGl2aWR1YWwgU3Vic2NyaWJlcjAeFw05NzA3MTcwMDAw
+MDBaFw05ODA3MTcyMzU5NTlaMIIBHzERMA8GA1UEBxMISW50ZXJuZXQxFzAVBgNVBAoTDlZl
+cmlTaWduLCBJbmMuMTQwMgYDVQQLEytWZXJpU2lnbiBDbGFzcyAxIENBIC0gSW5kaXZpZHVh
+bCBTdWJzY3JpYmVyMUYwRAYDVQQLEz13d3cudmVyaXNpZ24uY29tL3JlcG9zaXRvcnkvQ1BT
+IEluY29ycC4gYnkgUmVmLixMSUFCLkxURChjKTk2MTMwMQYDVQQLEypEaWdpdGFsIElEIENs
+YXNzIDEgLSBOZXRzY2FwZSBGdWxsIFNlcnZpY2UxGzAZBgNVBAMTEkNoYXJsZXMgUyBSb2Jl
+cnNvbjEhMB8GCSqGSIb3DQEJARYSY2hpcEBmaWJlcmxhbmUuY29tMFwwDQYJKoZIhvcNAQEB
+BQADSwAwSAJBANromRBHimCh/jNky4zW4V0303OYhXGQ4HqR2n081+vQsimPqvQaMda7a79f
+3pQXMzTQ75duir+rWrMiocf8d8kCAwEAAaOCB8Ewgge9MAkGA1UdEwQCMAAwggIfBgNVHQME
+ggIWMIICEjCCAg4wggIKBgtghkgBhvhFAQcBATCCAfkWggGnVGhpcyBjZXJ0aWZpY2F0ZSBp
+bmNvcnBvcmF0ZXMgYnkgcmVmZXJlbmNlLCBhbmQgaXRzIHVzZSBpcyBzdHJpY3RseSBzdWJq
+ZWN0IHRvLCB0aGUgVmVyaVNpZ24gQ2VydGlmaWNhdGlvbiBQcmFjdGljZSBTdGF0ZW1lbnQg
+KENQUyksIGF2YWlsYWJsZSBhdDogaHR0cHM6Ly93d3cudmVyaXNpZ24uY29tL0NQUzsgYnkg
+RS1tYWlsIGF0IENQUy1yZXF1ZXN0c0B2ZXJpc2lnbi5jb207IG9yIGJ5IG1haWwgYXQgVmVy
+aVNpZ24sIEluYy4sIDI1OTMgQ29hc3QgQXZlLiwgTW91bnRhaW4gVmlldywgQ0EgOTQwNDMg
+VVNBIFRlbC4gKzEgKDQxNSkgOTYxLTg4MzAgQ29weXJpZ2h0IChjKSAxOTk2IFZlcmlTaWdu
+LCBJbmMuICBBbGwgUmlnaHRzIFJlc2VydmVkLiBDRVJUQUlOIFdBUlJBTlRJRVMgRElTQ0xB
+SU1FRCBhbmQgTElBQklMSVRZIExJTUlURUQuoA4GDGCGSAGG+EUBBwEBAaEOBgxghkgBhvhF
+AQcBAQIwLDAqFihodHRwczovL3d3dy52ZXJpc2lnbi5jb20vcmVwb3NpdG9yeS9DUFMgMBEG
+CWCGSAGG+EIBAQQEAwIHgDA2BglghkgBhvhCAQgEKRYnaHR0cHM6Ly93d3cudmVyaXNpZ24u
+Y29tL3JlcG9zaXRvcnkvQ1BTMIIEhwYJYIZIAYb4QgENBIIEeBaCBHRDQVVUSU9OOiBUaGUg
+Q29tbW9uIE5hbWUgaW4gdGhpcyBDbGFzcyAxIERpZ2l0YWwgCklEIGlzIG5vdCBhdXRoZW50
+aWNhdGVkIGJ5IFZlcmlTaWduLiBJdCBtYXkgYmUgdGhlCmhvbGRlcidzIHJlYWwgbmFtZSBv
+ciBhbiBhbGlhcy4gVmVyaVNpZ24gZG9lcyBhdXRoLQplbnRpY2F0ZSB0aGUgZS1tYWlsIGFk
+ZHJlc3Mgb2YgdGhlIGhvbGRlci4KClRoaXMgY2VydGlmaWNhdGUgaW5jb3Jwb3JhdGVzIGJ5
+IHJlZmVyZW5jZSwgYW5kIAppdHMgdXNlIGlzIHN0cmljdGx5IHN1YmplY3QgdG8sIHRoZSBW
+ZXJpU2lnbiAKQ2VydGlmaWNhdGlvbiBQcmFjdGljZSBTdGF0ZW1lbnQgKENQUyksIGF2YWls
+YWJsZQppbiB0aGUgVmVyaVNpZ24gcmVwb3NpdG9yeSBhdDogCmh0dHBzOi8vd3d3LnZlcmlz
+aWduLmNvbTsgYnkgRS1tYWlsIGF0CkNQUy1yZXF1ZXN0c0B2ZXJpc2lnbi5jb207IG9yIGJ5
+IG1haWwgYXQgVmVyaVNpZ24sCkluYy4sIDI1OTMgQ29hc3QgQXZlLiwgTW91bnRhaW4gVmll
+dywgQ0EgOTQwNDMgVVNBCgpDb3B5cmlnaHQgKGMpMTk5NiBWZXJpU2lnbiwgSW5jLiAgQWxs
+IFJpZ2h0cyAKUmVzZXJ2ZWQuIENFUlRBSU4gV0FSUkFOVElFUyBESVNDTEFJTUVEIEFORCAK
+TElBQklMSVRZIExJTUlURUQuCgpXQVJOSU5HOiBUSEUgVVNFIE9GIFRISVMgQ0VSVElGSUNB
+VEUgSVMgU1RSSUNUTFkKU1VCSkVDVCBUTyBUSEUgVkVSSVNJR04gQ0VSVElGSUNBVElPTiBQ
+UkFDVElDRQpTVEFURU1FTlQuICBUSEUgSVNTVUlORyBBVVRIT1JJVFkgRElTQ0xBSU1TIENF
+UlRBSU4KSU1QTElFRCBBTkQgRVhQUkVTUyBXQVJSQU5USUVTLCBJTkNMVURJTkcgV0FSUkFO
+VElFUwpPRiBNRVJDSEFOVEFCSUxJVFkgT1IgRklUTkVTUyBGT1IgQSBQQVJUSUNVTEFSClBV
+UlBPU0UsIEFORCBXSUxMIE5PVCBCRSBMSUFCTEUgRk9SIENPTlNFUVVFTlRJQUwsClBVTklU
+SVZFLCBBTkQgQ0VSVEFJTiBPVEhFUiBEQU1BR0VTLiBTRUUgVEhFIENQUwpGT1IgREVUQUlM
+Uy4KCkNvbnRlbnRzIG9mIHRoZSBWZXJpU2lnbiByZWdpc3RlcmVkCm5vbnZlcmlmaWVkU3Vi
+amVjdEF0dHJpYnV0ZXMgZXh0ZW5zaW9uIHZhbHVlIHNoYWxsIApub3QgYmUgY29uc2lkZXJl
+ZCBhcyBhY2N1cmF0ZSBpbmZvcm1hdGlvbiB2YWxpZGF0ZWQgCmJ5IHRoZSBJQS4wgYYGCmCG
+SAGG+EUBBgMEeBZ2ZDQ2NTJiZDYzZjIwNDcwMjkyOTg3NjNjOWQyZjI3NTA2OWM3MzU5YmVk
+MWIwNTlkYTc1YmM0YmM5NzAxNzQ3ZGE1ZDNmMjE0MWJlYWRiMmJkMmU4OTIxZmE5NjJmNGQz
+MTE0ODljYTBiYTQzZjRlNTk1NjU0MTAuBgpghkgBhvhFAQYHBCAWHjQ1YWY1MzQ4ZGMwYWY1
+NGUwZDIzNDZjY2E3M2EzYjANBgkqhkiG9w0BAQQFAAOBgQByyIkSPagGt4vOuc1zBoubeanp
+b7oPtWasBpI6/cHOsANI8drxsxx267QIFzyIaIUw1bCbXk5GjcdsgoEEMRoI6RJTU5KoiQka
+0COeAc2N6oIWW2jx3XJtLKkg7jfml/HGm9e7cL1QXzKaIZxo0/y5TQ0C+4OI0w/1i0owZHdr
+9jCCAnkwggHioAMCAQICEFIfNR3ycH4AK77KWYcE1TkwDQYJKoZIhvcNAQECBQAwXzELMAkG
+A1UEBhMCVVMxFzAVBgNVBAoTDlZlcmlTaWduLCBJbmMuMTcwNQYDVQQLEy5DbGFzcyAxIFB1
+YmxpYyBQcmltYXJ5IENlcnRpZmljYXRpb24gQXV0aG9yaXR5MB4XDTk2MDYyNzAwMDAwMFoX
+DTk5MDYyNzIzNTk1OVowYjERMA8GA1UEBxMISW50ZXJuZXQxFzAVBgNVBAoTDlZlcmlTaWdu
+LCBJbmMuMTQwMgYDVQQLEytWZXJpU2lnbiBDbGFzcyAxIENBIC0gSW5kaXZpZHVhbCBTdWJz
+Y3JpYmVyMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC2FKbPTdAFDdjKI9BvqrQpkmOO
+LPhvltcunXZLEbE2jVfJw/0cxrr+Hgi6M8qV6r7jW80GqLd5HUQq7XPysVKDaBBwZJHXPmv5
+912dFEObbpdFmIFH0S3L3bty10w/cariQPJUObwW7s987LrbP2wqsxaxhhKdrpM01bjV0Pc+
+qQIDAQABozMwMTAPBgNVHRMECDAGAQH/AgEBMAsGA1UdDwQEAwIBBjARBglghkgBhvhCAQEE
+BAMCAQYwDQYJKoZIhvcNAQECBQADgYEAwfr3AudXyhF1xpwM+it3T4dFFzvj0sHaD1g5jq6V
+mQOhqKE4/nmakxcLl4Y5x8poNGa7x4hF9sgMBe6+lyXv4NRu5H+ddlzOfboUoq4Ln/tnW0il
+ZyWvGWSI9nLYKSeqNxJqsSivJ4MYZWyN7UCeTcR4qIbs6SxQv6b5DduwpkowggIxMIIBmgIF
+AqQAAAEwDQYJKoZIhvcNAQECBQAwXzELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDlZlcmlTaWdu
+LCBJbmMuMTcwNQYDVQQLEy5DbGFzcyAxIFB1YmxpYyBQcmltYXJ5IENlcnRpZmljYXRpb24g
+QXV0aG9yaXR5MB4XDTk2MDEyOTAwMDAwMFoXDTk5MTIzMTIzNTk1OVowXzELMAkGA1UEBhMC
+VVMxFzAVBgNVBAoTDlZlcmlTaWduLCBJbmMuMTcwNQYDVQQLEy5DbGFzcyAxIFB1YmxpYyBQ
+cmltYXJ5IENlcnRpZmljYXRpb24gQXV0aG9yaXR5MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCB
+iQKBgQDlGb9to1ZhLZlIcfZn3rmN67eehoAKkQ76OCWvRoiC5XOooJskXQ0fzGVuDLDQVoQY
+h5oGmxChc9+0WDlrbsH2FdWoqD+qEgaNMax/sDTXjzRniAnNFBHiTkVWaR94AoDa3EeRKbs2
+yWNcxeDXLYd7obcysHswuiovMaruo2fa2wIDAQABMA0GCSqGSIb3DQEBAgUAA4GBAFJzuppV
+3Nw/gn2wkJhiKoJMdgBuJT3VwglwVwEMD3cfGKH7HGAOoHU7SSFB/qdcLUxCSdP/KNiM6p3+
+yQfid4JTI95V885Ek/r6TL3KNvNbZrKeyPIMXl7UobQhCTPKO1n8ksI4/K3ZliTgLfqjKfUz
+aHhOtLyfaTXiqJiUczvEMYIBWjCCAVYCAQEwdjBiMREwDwYDVQQHEwhJbnRlcm5ldDEXMBUG
+A1UEChMOVmVyaVNpZ24sIEluYy4xNDAyBgNVBAsTK1ZlcmlTaWduIENsYXNzIDEgQ0EgLSBJ
+bmRpdmlkdWFsIFN1YnNjcmliZXICEFJDG9VoSQcHfRa0I71Y2vswCQYFKw4DAhoFAKB9MBgG
+CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTk3MDkyNzAwNTcwOFow
+HgYJKoZIhvcNAQkPMREwDzANBggqhkiG9w0DAgIBKDAjBgkqhkiG9w0BCQQxFgQUeR1mAKah
+eOYNTvNSzHsJeem8fFYwDQYJKoZIhvcNAQEBBQAEQKWF+f19U/tVRI0MjY7Xyi++3bknIDth
+tHgVY/H4dJHpKp41R/qYrTsS99oZPkd0cIHdCmp+ymYwzA/7wx9CaVg=
+--------------ms544B16D6E99438E8F4EF53CF--
+
+
+
+From daemon@csg.lbl.gov  Sat Sep 27 04:02:53 1997
+From: daemon@csg.lbl.gov
+Date: Sat Sep 27 04:02:56 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Sat Sep 27 04:02:49 PDT 1997
+
+        Subject: Re-entrant version of telnetLib
+        Subject: Re: Changing interrupt priorities on mv2604 PowerPC?
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re-entrant version of telnetLib
+Date: Fri, 26 Sep 1997 09:30:40 -0400
+From: John Bliss <jbliss@ctron.com>
+Organization: Cabletron Systems Inc.
+Message-ID: <342BB900.3654@ctron.com>
+
+Hey Guys,
+
+The product I'm working on has the requirement to support multiple
+telnet sessions.  TelnetLib, as provided by WRS, can not support
+multiple telnetd sessions.
+
+Has anyone gone through the process of modifying telnetLib to support
+multiple sessions?
+
+Any input would be greatly appreciated?
+
+Thanks,
+
+JDB
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: Changing interrupt priorities on mv2604 PowerPC?
+Date: Wed, 24 Sep 1997 06:46:47 GMT
+From: mmcquade@aa.net (Mike)
+Organization: Alternate Access Inc.
+Message-ID: <3428b549.612679203@news.aa.net>
+References: <georg.874978644@s2.sgl.ists.ca>
+
+georg@sgl.ists.ca (Georg Feil) wrote:
+
+
+>
+>We are not using MPIC interrupts right now because it causes too many problems
+>(spurious interrupts & crashes) even though we have all the latest patches
+>from WindSurf. Therefore I assume the entries in mv2600.h to change priorities
+>are:
+>
+
+
+Georg,
+
+
+We are using MPIC interrupts on a 2603 board, we have not had any
+problems with Jumbo patch #2 installed, we are running 8000+ VME
+interrupts / second, +Mouse, Keyboard, and SCSI and LAN interrupts.
+
+
+When we installed Jumbo Patch #3, we couldn't run SCSI any more, so we
+had to drop back to jumbo patch #2.
+
+Other than that, we have been running the MPIC interrupts since early
+Febuary (before they we included in the BSP), and we have been very
+happy with the MPIC.
+
+
+*** Don't blame the "604" lockups on the MPIC ***
+
+
+Changing priority levels with the MPIC/RAVEN is very easy, and I would
+reccomend changing it from the way it comes in the BSP, with
+interrupts set to the same level.
+
+
+
+Mike.
+
+
+
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From 35574487@aol.com  Sat Sep 27 15:51:01 1997
+From: 35574487@aol.com
+Date: Sat Sep 27 15:51:04 PDT 1997
+Subject: Credit Card for you!!!!!
+<HTML><PRE><BODY BGCOLOR="#000000"><FONT COLOR="#00FFFF" SIZE=3>
+*************************************************************************************************
+This is a one time message, please forgive me if you are offended by receiving this---you will automatically be removed if you do not order.  thank you
+*************************************************************************************************
+
+
+NEW CREDIT FILE LEGALLY!!!!
+
+Bad credit? Judgements? Other problems?  THIS IS THE PROGRAM FOR YOU!!!!
+
+Learn how to open a second (or more) SEPERATE credit file.  This unique and virtually unknown program is 100% legal, and can work every time!!!
+
+This is the chance you have been looking for.  You no longer have to be embarrassed about your credit problems----THIS IS YOUR CHANCE FOR A NEW START!!!!----remember that it does not matter what your credit past is.
+
+You will now be able to get:
+***CREDIT CARDS
+***CAR LOANS
+***BANK LOANS
+***MORTGAGE LOANS
+***RENT AN APARTMENT
+
+This program will even show you how to REPAIR your old credit file, WHILE you enjoy your AAA credit, in as little as 30 days.  
+
+REMEMBER----YOU CAN ONCE AGAIN HAVE GOOD (AAA) CREDIT!!!!
+
+This is a first time promotional experiment on the internet.  Our program normally sells for $79, but act now to get our limited discount offer!!!
+ONLY $49 (PLUS $3 FOR S&H)
+
+ACT NOW!!!!!  ONLY A LIMITED NUMBER TO BE SOLD AT THIS PRICE (250) AND ONCE THEY ARE GONE--THAT IS IT!!!!!!
+
+SEND $52 ---CHECK, MONEY ORDER, OR CASH TO:
+
+D W C
+P.O. Box 54789
+Phoenix, AZ 85078
+
+Be sure to include your:
+
+NAME_________________________________
+ADDRESS_____________________________
+E-MAIL ADDRESS_______________________
+PHONE NUBER_________________________
+
+If you would like to learn how to make extra income write "I WANT TO EARN AN EXTRA $50,000 PER YEAR" on your order
+
+ 
+
+
+</FONT><FONT  COLOR="#000000" SIZE=3>
+
+
+
+From altan@venus.aselsan.com.tr  Mon Sep 29 05:52:53 1997
+From: Cagatay ALTAN <altan@venus.aselsan.com.tr>
+Date: Mon Sep 29 05:53:09 PDT 1997
+Subject: Flash memory programming problem
+--MimeMultipartBoundary
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+
+  Dear All,
+  I am trying to program the flash memory of an mvme162, but I receive an
+access fault every time it begins to write.
+  Before starting to write to the flash, I read the address 0xfffcc000 to
+a dummy variable which I hope gives me the write access to the flash, but
+it does not. Is there another thing to do to provide a write access?
+  I wonder if someone can find what I'm doing wrong or canv provide me
+with a C routine that performs this.
+  Thanks to all.
+						Cagatay Altan,
+						ASELSAN
+
+--MimeMultipartBoundary--
+
+
+From raman@net.com  Mon Sep 29 09:38:25 1997
+From: raman@net.com (Raj Raman)
+Date: Mon Sep 29 09:38:28 PDT 1997
+Subject: Re: comp.os.vxworks newsdigest
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+
+We've made changes to the "telnetLib" and "rlogLib" source code
+to ensure we could have multple concurrent sessions.
+
+The problem (Im sure you've figure out too) is the target-resident
+vxWorks shell-paser which is NOT reentrant. Since the telnet session
+brings up the shell, there could be only one session at a time.
+
+We've modified the source code to "listen/accept" connections and
+spawn a task associated with each connection that handshakes with
+an "User Interface" task that has the menu options. In gist, we've
+modified code to have a session-specific task be the server-side
+Interface task (as opposed to the Shell). 
+
+Feel freee to email me if you have any more questions.
+
+- raj 
+
+------------------------------------------------------------------------
+
+email: raman@net.com
+-------------------------------------------------------------------------
+
+% Hey Guys,
+% 
+% The product I'm working on has the requirement to support multiple
+% telnet sessions.  TelnetLib, as provided by WRS, can not support
+% multiple telnetd sessions.
+% 
+% Has anyone gone through the process of modifying telnetLib to support
+% multiple sessions?
+% 
+% Any input would be greatly appreciated?
+% 
+% Thanks,
+% 
+% JDB
+% 
+%
+--MimeMultipartBoundary--
+
+
+From stan@rti.com  Mon Sep 29 12:36:55 1997
+From: stan@rti.com (Stan Schneider)
+Date: Mon Sep 29 12:36:58 PDT 1997
+Subject: Re: Re-entrant version of telnetLib
+
+>> Date: Fri, 26 Sep 1997 09:30:40 -0400
+>> From: John Bliss <jbliss@ctron.com>
+
+>> Has anyone gone through the process of modifying telnetLib to support
+>> multiple sessions?
+
+Hi John,
+
+We have a simple reentrant shell called "rshell" that ships with RTILib.  It
+will support multiple connections, although you do it through a host terminal
+program, not telnet.  See www.rti.com for details.
+
+        -- Stan
+
+
+=============================================================================
+=                                           =                               =
+=   Stan Schneider                          =   email: stan@rti.com         =
+=   Real-Time Innovations, Inc.             =   Phone: (408) 720-8312 x104  =
+=   155A Moffett Park Drive, Suite 111      =   Fax:   (408) 734-5009       =
+=   Sunnyvale, CA 94089                     =   http://www.rti.com          =
+=                                           =                               =
+=============================================================================
+
+
+
+From pbrett@hathaway-systems.com  Tue Sep 30 03:29:16 1997
+From: pbrett@hathaway-systems.com (Pete Brett)
+Date: Tue Sep 30 03:29:20 PDT 1997
+Subject: Re: experience on PPP and TCP/IP  
+--MimeMultipartBoundary
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, 24 Sep 97 12:38:18 PDT, you wrote:
+
+>Submitted-by fenj@symmetrycomm.com  Wed Sep 24 12:38:13 1997
+>Submitted-by: Fen Jain <fenj@symmetrycomm.com>
+>
+>--MimeMultipartBoundary
+>Content-Type: text/plain; charset=3Dus-ascii
+>Content-Transfer-Encoding: 7bit
+>
+>I would like to get comments from anyone who has used TCP/IP from Wind
+>River and PPP from CoSystem or TeleNetwork (WindRiver partners) on your
+>experience in using the packages for Internet access.  We are interested
+>in kowning if you are able to use it successfully in real product and
+>how these two compared with PSOS.
+
+I have used PPP to connect not to the Internet but to a small internet
+comprising up to 16 data acquisition systems running vxWorks on a LAN.
+These machines send data to a 32-bit Windows machine for processing
+and viewing.
+With a patch applied to LCP.C, the vxWorks implementation appears to
+connect to Win95 or Unix machines with no problems, and maintain a
+solid connection.
+Unfortunately the same cannot be said of Windows NT machines. The
+problem is that Microsoft use two new authentication methods (CHAP80
+which is also known as MSCHAP and Shiva PAP). When vxWorks attempts to
+make a connection to Windows NT, the NT machine tries to negotiate for
+these two authentication methods, even if the "use any authentication
+method including clear text" option is selected. The vxWorks PPP
+implementation can authenticate using CHAP MD5 or PAP but not CHAP80
+or SPAP. Ideally, vxWorks should send a request for CHAP or PAP with
+each configure NAK sent in response to requests for CHAP80 or SPAP,
+but instead it sends only one configure request for an authentication
+method near the start of negotiation. The result is that the
+negotiation does not converge and the session is terminated.
+This problem does not occur if the NT machine initiates the connection
+to vxWorks.
+I have reported the problem to Microsoft and WindRiver, but so far
+have not got a solution.
+I have not used PSOS and so cannot compare it with vxWorks.
+
+Regards,
+	Pete
+--MimeMultipartBoundary--
+
+
+From daemon@csg.lbl.gov  Tue Sep 30 04:01:10 1997
+From: daemon@csg.lbl.gov
+Date: Tue Sep 30 04:01:14 PDT 1997
+Subject: comp.os.vxworks newsdigest
+Comp.Os.Vxworks Daily Digest    Tue Sep 30 04:01:07 PDT 1997
+
+        Subject: Re: Big endian and Little endian( PC to PPC)
+        Subject: Help on C++ cout
+
+-------------------------------------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Re: Big endian and Little endian( PC to PPC)
+Date: 19 Sep 1997 12:50:31 -0600
+From: bgeer@xmission.xmission.com (bgeer)
+Organization: XMission Internet (801 539 0900)
+Message-ID: <5vuhhn$3ii$1@xmission.xmission.com>
+References: <19970913215400.RAA10530@ladder02.news.aol.com>
+
+caoy@aol.com (Caoy) writes:
+
+ >We need send a data structure down to the target through TCP/IP from the
+ >PC host. On the PC side data format is little endian while big endian on
+ >the target 
+ >side.
+
+ >My question:
+
+ >1) If we send the data structure as normal from PC side,  what does the
+ >byte order of the structures look like?
+
+Assuming you are using a network driver, the payload (data) will be in
+the wrong byte order for the receiving processor.  Check out "man
+htonl" family of functions for host-to-network byte order conversion.
+
+I'm not sure about such things as socket headers.  An application must
+offer up a sockaddr struct when calling socket().  I assume the app
+would have to "htonl" (or whatever) any data it puts in the struct.
+
+I've been sloppy about this, having only worked on big endian systems
+to-date.  If (when?) I need to port my apps to a little endian
+machine, I'm sure I'll learn the answer...:-)
+
+Cheers, Bob
+- -- 
+<> Robert Geer & Donna Tomky /              *             <>
+<>    bgeer@xmission.com    |    _o      *   o *      o   <>
+<>   Salt Lake City, Utah   |   -\<,      * <\      </L   <>
+<>          U S A           |   O/ O     __ /__,    />    <>
+
+---------------------------
+
+Newsgroups: comp.os.vxworks
+Subject: Help on C++ cout
+Date: 29 Sep 1997 22:54:06 GMT
+From: "Raymond K.S. Yeung" <ryeung@adicomw.com>
+Organization: AdiCom Wireless
+Message-ID: <01bccd2a$ed562ea0$df60a9ce@host.hooked.net>
+
+This was originally "C++ cout output disappeared."
+I'm providing a code sample here and combination
+of things that I tried.  One (desired) combination
+led to the problem, while the other two has no
+problem.  I hope someone can shed some light
+here.  Thanks,
+Raymond
+
+C++ Code
+========
+void Dbg (int dbg_lvl, char * str1, int data1, int data2, int data3) {
+   if (DEBUG_LEVEL >= dbg_lvl) {
+      if (semTake (output_sema, sema_tmo) == ERROR)
+         return;
+
+      cout << "[" << taskName ( taskIdSelf () ) << "]: ";
+      cout << str1 << " " << data1 << " " << data2 << " " << data3 << endl;
+
+      semGive (output_sema);
+   }
+}
+void CP_DISPATCHER_CLASS::ShowCpTaskStat (void) {
+   int  inst_id;
+
+   for (inst_id=0; inst_id < CP_MAX_NUM_OF_CALLS; inst_id++) {
+      Dbg (LOW_DBG_LVL, "Inst ", inst_id, (int) cp_task [inst_id].state,
+(int) cp_task [inst_id].call_id);
+   }
+}
+
+Expected output is, for instance,   [CpDispatch]: Inst 1 0 45
+Instead, actual output is,               1045
+That is, all strings are missing, including the white space.
+
+Combinations to reproduce the problem
+=============================
+I've tried 3 combinations, one of them (the desired combination) has the
+problem:
+
+#1. Set CONSOLE_TTY=NONE and INCLUDE_STARTUP_SCRIPT   => problem
+#2. Set CONSOLE_TTY=0         and don't INCLUDE_STARTUP_SCRIPT => no
+problem
+#3. Set CONSOLE_TTY=NONE and don't INCLUDE_STARTUP_SCRIPT => no problem
+
+When STARTUP script is used, C/C++ application is brought up vi script by
+target shell.
+When STARTUP script is not used, C/C++ application is brought up manually
+via WindSh.
+
+
+---------------------------
+
+End of New-News digest
+**********************
+
+
+From naivar@telomere.lanl.gov  Tue Sep 30 07:58:30 1997
+From: Mark Naivar <naivar@telomere.lanl.gov>
+Date: Tue Sep 30 07:58:33 PDT 1997
+Subject: Re: Flash memory programming problem
+--MimeMultipartBoundary
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+
+On Mon, 29 Sep 1997, the vxWorks Users Group Exploder wrote:
+
+> Submitted-by altan@venus.aselsan.com.tr  Mon Sep 29 05:52:53 1997
+> Submitted-by: Cagatay ALTAN <altan@venus.aselsan.com.tr>
+> 
+> --MimeMultipartBoundary
+> Content-Type: TEXT/PLAIN; charset=US-ASCII
+> 
+>   Dear All,
+>   I am trying to program the flash memory of an mvme162, but I receive an
+> access fault every time it begins to write.
+>   Before starting to write to the flash, I read the address 0xfffcc000 to
+> a dummy variable which I hope gives me the write access to the flash, but
+> it does not. Is there another thing to do to provide a write access?
+>   I wonder if someone can find what I'm doing wrong or canv provide me
+> with a C routine that performs this.
+>   Thanks to all.
+> 						Cagatay Altan,
+> 						ASELSAN
+>
+
+You might try looking in $WIND_HOME/target/src/drv/mem, on my system 
+there is a file called flashMem.c which has some routines for reading and 
+writing to FLASH.  Reading from FLASH can be done with a pointer, but 
+writing involves some extra steps.  Hope this helps.
+
+-Mark 
+
+/-------------------------+--------------------------\
+| Mark Naivar             | mnaivar@lanl.gov         |
+| Los Alamos National Lab |                          |
+| LS-5,  MS M888          | (505) 665-2034 (office)  |
+| P.O. Box 1663           | (505) 665-6738 (lab)     |
+| Los Alamos, NM 87545    | (505) 667-1321 (FAX)     |
+\-------------------------+--------------------------/
+
+--MimeMultipartBoundary--
+
+
+From Eli_Wittner@cti-pet.com  Tue Sep 30 10:33:11 1997
+From: "Eli Wittner"<Eli_Wittner@cti-pet.com>
+Date: Tue Sep 30 10:33:14 PDT 1997
+Subject: Little endian vs Big Endian
+--MimeMultipartBoundary
+Content-type: text/plain; charset=US-ASCII
+
+
+
+
+
+>>caoy@aol.com (Caoy) writes:
+> >We need send a data structure down to the target through TCP/IP from the
+>>PC host. On the PC side data format is little endian while big endian on
+>>the target side.
+ >>My question:
+>>1) If we send the data structure as normal from PC side,  what does the
+>>byte order of the structures look like?
+I'm not sure if this will help, but we transfer data between a 68040
+vxWorks client and a PC running NT4.0.  We use Winsock for the TCP/IP end
+on the PC side and the (psuedo?) standard Berkeley Sockets on the vxWorks
+side.  The appropriate sockaddr structures must be set up appropriately on
+both sides, and there is a host of documentation for this.  We mainly
+transfer data TO the PC.  The following code snippits are a couple of
+routines at the vxWorks end that rearrange the bytes for both an integer
+array and a long integer array to a form readily useable on the PC side.
+We don't do the reverse, but this should give you a feel for the byte
+ordering.  It's not elegant, but it works.  It is possible that the canned
+routines (htonl, etc.) may also work, but I haven't used them except in
+conversion of internet addresses, etc.
+
+Good luck -- Eli Wittner -- CTI Cyclotron Systems, Inc.
+
+/**************************************************************************
+****
+ *  ROUTINE: intMemCpy
+                                                        *
+ *
+
+ *
+ *  This routine copies an integer array into a character buffer, swapping
+    *
+ *    bytes as we go so that the "little/big endian" differences between
+the  *
+ *    PC and Motorola computers are accounted for.
+                            *
+ *
+
+ *
+
+***************************************************************************
+***/
+
+static void intMemcpy ( unsigned char * szDest,
+                        unsigned int *szSource,
+                        int iNumBytes )
+{
+   register int i, j ;
+   unsigned int iT ;
+
+   for ( i=0; i<(iNumBytes/2); i++ )
+      {
+      j = i*2 ;
+      iT = *(szSource+i) ;
+
+      *(szDest+j)   = (unsigned char)(iT & 0x00ff ) ;
+      *(szDest+j+1) = (unsigned char)(iT>>8) ;
+      }
+
+}  /*  End function intMemcpy  */
+
+
+
+/**************************************************************************
+****
+ *  ROUTINE: longMemCpy
+                                                       *
+ *
+
+ *
+ *  This routine copies a long integer array into a character buffer,
+swapping    *
+ *    bytes as we go so that the "little/big endian" differences between
+the  *
+ *    PC and Motorola computers are accounted for.
+                            *
+ *
+
+ *
+
+***************************************************************************
+***/
+
+static void longMemcpy ( unsigned char * szDest,
+                         unsigned long *szSource,
+                         int iNumBytes )
+{
+   register int i, j ;
+   unsigned long iT ;
+
+   for ( i=0; i<(iNumBytes/4); i++ )
+      {
+      iT = *(szSource+i) ;
+      for ( j=0; j<4; j++ )
+         {
+         *(szDest+(i*4)+j) = iT & 0xff ;
+         iT = iT >>8 ;
+
+         }
+      }
+
+}  /*  End function longMemcpy  */
+
+
+
+--MimeMultipartBoundary--
+
+
+From pat.shaw@canada.cdev.com  Tue Sep 30 12:43:55 1997
+From: "Shaw, Pat" <pat.shaw@canada.cdev.com>
+Date: Tue Sep 30 12:43:58 PDT 1997
+Subject: AMD 79C970A
+This message is in MIME format. Since your mail reader does not understand
+this format, some or all of this message may not be legible.
+
+------ =_NextPart_000_01BCCDB7.0DF4FD80
+Content-Type: text/plain
+
+Hi:
+	I was wondering if anybody has ported the VxWorks AMD 79C970
+driver to a Pentium based BSD.  I am not totally familiar with the the
+various driver interaction that take place between VxWorks and PCI based
+devices.
+
+
+
+Thanks for your help,
+
+Patrick Shaw
+Computing Devices Canada
+
+------ =_NextPart_000_01BCCDB7.0DF4FD80
+Content-Type: application/ms-tnef
+Content-Transfer-Encoding: base64
+
+eJ8+IiQTAQaQCAAEAAAAAAABAAEAAQeQBgAIAAAA5AQAAAAAAADoAAEIgAcAGAAAAElQTS5NaWNy
+b3NvZnQgTWFpbC5Ob3RlADEIAQSAAQAMAAAAQU1EIDc5Qzk3MEEAhgIBCYABACEAAAA5MEFBNkM2
+MkE5MzlEMTExQjA5RjAwMjBBRjJEMDREQQAiBwEggAMADgAAAM0HCQAeAA8AJwAjAAIAVgEBBYAD
+AA4AAADNBwkAHgAPACkANgACAGsBAQ2ABAACAAAAAgACAAEDkAYARAQAABwAAAADAC4AAAAAAEAA
+OQAgIrfn2M28AR4AcAABAAAAGQAAAENyZWRpdCBDYXJkIGZvciB5b3UhISEhIQAAAAACAXEAAQAA
+ABsAAAABvMu2SvkmLm5MN54R0ay6AIBfppVhAIh/6IIAAgEJEAEAAAByAQAAbgEAAAwCAABMWkZ1
+gIP8Lf8ACgEPAhUCpAPkBesCgwBQEwNUAgBjaArAc2V07jIGAAbDAoMyA8YHEwKA/n0KgAjPCdkC
+gAqBDbELYMBuZzEwMzMK+xLyYQHQIEhpOgqGAZEg0Ekgd2EEIHcCIASBqQuAZyAGkCAAcHkG4Nhk
+eSARwAQgcBRxCYAAIHRoZSBWeFcFBbBrE2FNRCA3OahDOTcYAGQFEHYEkCUbYG8aMCBQCfB0aTB1
+bSBiGUAbQUJTKEQuIBkBYR4Abm+nBUAdUAGQbGwaoGYfAH8DEAcwBcAD8BtwG2MbcnZ9CsBpCGAE
+IBzlC4AbMHIvANAd0AIgG2FhH1Fha6sbkAtRYxuQYhIAdwnh5xunAHAbUFBDGRAeJA2w5HZpI9Bz
+LgqFJm8KsrpUEcBuHAECEAXAeQhhoRqwZWxwLCbcUCMg2QUQY2sGABHAdwqFCFDYbXB1HdAZ4UQl
+9CtwsQBwYWRhCoUT8QAtsAAAHgAxQAEAAAAPAAAAQ0M5NzAzRDE3NTc1RUUAAAMAGkAAAAAAHgAw
+QAEAAAAPAAAAQ0M5NzAzRDE3NTc1RUUAAAMAGUAAAAAAAwA2AAAAAAADACYAAAAAAAIB+T8BAAAA
+TQAAAAAAAADcp0DIwEIQGrS5CAArL+GCAQAAAAYAAAAvTz1DREMvT1U9T1RUQVdBL0NOPVJFQ0lQ
+SUVOVFMvQ049Q0M5NzAzRDE3NTc1RUUAAAAAHgD4PwEAAAAKAAAAU2hhdywgUGF0AAAAHgA4QAEA
+AAAPAAAAQ0M5NzAzRDE3NTc1RUUAAAIB+z8BAAAATQAAAAAAAADcp0DIwEIQGrS5CAArL+GCAQAA
+AAYAAAAvTz1DREMvT1U9T1RUQVdBL0NOPVJFQ0lQSUVOVFMvQ049Q0M5NzAzRDE3NTc1RUUAAAAA
+HgD6PwEAAAAKAAAAU2hhdywgUGF0AAAAHgA5QAEAAAAPAAAAQ0M5NzAzRDE3NTc1RUUAAEAABzDg
+SnFK2M28AUAACDDwa9qU2M28AR4APQABAAAAAQAAAAAAAAAeAB0OAQAAAAwAAABBTUQgNzlDOTcw
+QQALACkAAAAAAAsAIwAAAAAAAwAGEPsiddUDAAcQ5AAAAAMAEBAAAAAAAwAREAAAAAAeAAgQAQAA
+AGUAAABISTpJV0FTV09OREVSSU5HSUZBTllCT0RZSEFTUE9SVEVEVEhFVlhXT1JLU0FNRDc5Qzk3
+MERSSVZFUlRPQVBFTlRJVU1CQVNFREJTRElBTU5PVFRPVEFMTFlGQU1JTElBUldJAAAAALX+
+
+------ =_NextPart_000_01BCCDB7.0DF4FD80--
+
+
+From mmcquade@aa.net  Tue Sep 30 20:33:29 1997
+From: Mike McQuade <mmcquade@aa.net>
+Date: Tue Sep 30 20:33:32 PDT 1997
+Subject: mv2603/4 and PCI bursting
+--MimeMultipartBoundary
+Content-Type: text/plain; charset="us-ascii"
+
+
+
+We are working with an mv-2603 board, I have a Vmetro PCI analyzer
+on eval, one thing that Im curious about is PCI burst transactions,
+I don't see _ANY_ on this system.
+
+We have a PMC video board on the mv2603, in addition to the DEC21140,
+and the SCSI chip on the PCI bus.
+
+
+I have enabled burst transfers in the video chip, and the Raven
+chip has write posting on, yet no write bursts.
+
+
+Does anyone know if its possible to do PCI burst transactions ?
+
+
+OR do write bursts only occur when you have "WriteBack" cache ?
+
+
+Thanks
+
+
+Mike.
+
+
+
+
+
+
+
+--MimeMultipartBoundary--
+
+

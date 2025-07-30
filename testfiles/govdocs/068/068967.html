@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Separate GSO and PIN Events</TITLE>
+<META NAME="description" CONTENT="Separate GSO and PIN Events">
+<META NAME="keywords" CONTENT="abc">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="abc.css">
+<LINK REL="next" HREF="node29.html">
+<LINK REL="previous" HREF="node27.html">
+<LINK REL="up" HREF="node27.html">
+<LINK REL="next" HREF="node29.html">
+</HEAD>
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html494"
+ HREF="node29.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html491"
+ HREF="node27.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html485"
+ HREF="node27.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html493"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html495"
+ HREF="node29.html">Grade Selection</A>
+<B> Up:</B> <A NAME="tex2html492"
+ HREF="node27.html">HXD Screening</A>
+<B> Previous:</B> <A NAME="tex2html486"
+ HREF="node27.html">HXD Screening</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00524100000000000000">&#160;</A>
+<A NAME="gsoandpin">&#160;</A>
+<BR>
+Separate GSO and PIN Events
+</H3>
+
+<P>
+HXD event files have both  GSO and PIN events.
+An X-ray event can hit only a single detector (either GSO, PIN0,
+PIN1, PIN2 or PIN3) in a single Well-unit at a time, and
+the the UNIT_ID and DET_TYPE columns tell the unit ID
+and detector type for each event (p. <A HREF="node17.html#hxd_explanation"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="cross_ref_motif.gif"></A>).
+
+<P>
+To carry out a spectral analysis, GSO and PIN events  have to
+be separated (spectral responses are completely different),
+where these events might be combined to make a light curve.
+
+<P>
+All the GSO sensors  are considered to have almost identical
+characteristics, so are the PIN detectors.
+Therefore events from the 16 GSO sensors can be combined to make GSO spectra;
+the same for 64 PIN sensors to make  PIN energy spectra.
+
+<P>
+To select only GSO events:
+
+<P>
+<PRE>
+     select event "DET_TYPE==0"
+</PRE>
+<P>
+Or, to select only PIN events:
+
+<P>
+<PRE>
+     select event "DET_TYPE==1||DET_TYPE==2||DET_TYPE==3||DET_TYPE==4"
+</PRE>
+<P>
+Please remember that GSO and PIN event selections are exclusive.
+Therefore, if you are going to extract GSO and PIN energy spectra
+from the same event file, you will need <TT>clear select</TT> to reset
+after the first event selection.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html494"
+ HREF="node29.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html491"
+ HREF="node27.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html485"
+ HREF="node27.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html493"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html495"
+ HREF="node29.html">Grade Selection</A>
+<B> Up:</B> <A NAME="tex2html492"
+ HREF="node27.html">HXD Screening</A>
+<B> Previous:</B> <A NAME="tex2html486"
+ HREF="node27.html">HXD Screening</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ken Ebisawa</I>
+<BR><I>2000-01-24</I>
+</ADDRESS>
+</BODY>
+</HTML>
