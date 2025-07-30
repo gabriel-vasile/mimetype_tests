@@ -1,0 +1,165 @@
+<!-- MHonArc v2.5.4 -->
+<!--X-Subject: Re: ASCCII, [Fwd: Lessons about scatter2grid*, ie gridding point data] -->
+<!--X-From-R13: =?vfb&#45;8859&#45;1?C?X=T6et?= Ynqhx <wbretNwnfcre.fgnasbeq.rqh> -->
+<!--X-Date: Sat, 5 Aug 2000 13:24:06 &#45;0700 (PDT) -->
+<!--X-Message-Id: 398C77F4.E2C58AC3@jasper.stanford.edu -->
+<!--X-Content-Type: text/plain -->
+<!--X-Head-End-->
+<!doctype html public "-//W3C//DTD HTML//EN">
+<html>
+<head>
+<title>Re: ASCCII, [Fwd: Lessons about scatter2grid*, ie gridding point data]</title>
+</head>
+<body>
+<!--X-Body-Begin-->
+<!--X-User-Header-->
+<!--X-User-Header-End-->
+<!--X-TopPNI-->
+<HR>
+<center>[<a href="msg00334.html">Thread Prev</a>][<a href="msg00338.html">Thread Next</a>][<A HREF="threads.html#00335">Index</A>]</center>
+
+<!--X-TopPNI-End-->
+<!--X-MsgBody-->
+<!--X-Subject-Header-Begin-->
+<h1>Re: ASCCII, [Fwd: Lessons about scatter2grid*, ie gridding point data]</h1>
+<hr>
+<!--X-Subject-Header-End-->
+<!--X-Head-of-Message-->
+<ul>
+<li><strong>To</strong>: <strong>Guille &lt;<A HREF="mailto:gdescamp@DOMAIN.HIDDEN">gdescamp@xxxxxxxxxxxxx</A>&gt;</strong></li>
+<li><strong>Subject</strong>: <strong>Re: ASCCII, [Fwd: Lessons about scatter2grid*, ie gridding point data]</strong></li>
+<li><strong>From</strong>: <strong>Jörg Kaduk &lt;<A HREF="mailto:joerg@DOMAIN.HIDDEN">joerg@xxxxxxxxxxxxxxxxxxx</A>&gt;</strong></li>
+<li>Date: Sat, 05 Aug 2000 13:24:20 -0700</li>
+<li>Cc: &quot;<A HREF="mailto:ferret_users@DOMAIN.HIDDEN">ferret_users@xxxxxxxxxxxxxxxxxxx</A>&quot; &lt;<A HREF="mailto:ferret_users@DOMAIN.HIDDEN">ferret_users@xxxxxxxxxxxxxxxxxxx</A>&gt;</li>
+<li>Organization: Carnegie Institution</li>
+<li>Reply-to: <A HREF="mailto:joerg@DOMAIN.HIDDEN">joerg@xxxxxxxxxxxxxxxxxxx</A></li>
+<li>Sender: <A HREF="mailto:owner-ferret_users@DOMAIN.HIDDEN">owner-ferret_users@xxxxxxxxxxxxxxxxxxx</A></li>
+</ul>
+<!--X-Head-of-Message-End-->
+<!--X-Head-Body-Sep-Begin-->
+<hr>
+<!--X-Head-Body-Sep-End-->
+<!--X-Body-of-Message-->
+<pre>
+Hi Guille,
+
+seems you ran into similar problems Lev had a while ago -
+I have appended her mail below.
+
+&gt;From that, I figure, you should try:
+
+DEFINE AXIS/x=1:ndata:1 ndat      ! ndata no of data points
+define grid/x=ndat gin
+FILE/VAR=&quot;long,lat,data&quot; /GRID=gin sourcemodif.txt
+gridata=
+scatter2gridgauss_xy(long,lat,data,x[gx=40:50:5],y[gy=70:80:5],2.)
+
+I did not test it, though...
+
+Your approach:
+
+yes? DEFINE AXIS/X=40:50:5 xlong
+yes? DEFINE AXIS/Y=70:80:5 ylat
+yes? DEFINE GRID/X=xlong/Y=ylat gridata
+yes? FILE/VAR=&quot;long,lat,data&quot;/GRID=gridata sourcemodif.txt
+
+ran into trouble in this line already, because here you tell ferret,
+that all the variables, long,lat,data, are on the 2-d grid griddata and
+ferret will expect to read them in an appropriate order from the file.
+
+yes? LET gridata= scatter2gridgauss_xy(long,lat,data,xlong,ylat,2.)
+yes? CONTOUR gridata
+ **ERROR: variable unknown or not in data set: YLAT
+
+ylat is only the name of the new axis you like to use and not a variable
+for ferret. 
+
+The original grid your data are on is just one linear axis, as Lev
+points
+out below.
+
+For the terms x[gx=40:50:5],y[gy=70:80:5] have a look at the sections
+about regridding and dynamic axes in the user guide.
+<A  HREF="http://ferret.wrc.noaa.gov/Ferret/Documentation/Users_Guide/v50/index.html">http://ferret.wrc.noaa.gov/Ferret/Documentation/Users_Guide/v50/index.html</A>
+
+Good luck,
+Joerg
+
+
+Lev Tarasoff wrote:
+&gt; 
+&gt; A clarification for those gridding point data with scatter2grid*: make
+&gt; sure that your input data is in array (and not matrix) form. The function
+&gt; will not reshape matrices into arrays (and the gridding messes up). So to
+&gt; grid a set (array, or matrix) of point data, use the following general
+&gt; approach:
+&gt; 
+&gt; yes? define axis/x=1:(number of points):1 x1
+&gt; yes? define grid/x=x1 gin
+&gt; yes? FILE/VAR=&quot;xlong,ylat,data&quot; /GRID=gin my_input_data_file
+&gt; !also ensure that longitude is &gt;0. Ferret generally doesn't like
+&gt; longitude&lt;0
+&gt; 
+&gt; yes? Let gridded_data= scatter2gridgauss_xy(xlong,ylat,data,
+&gt;      x[gx=new_xaxis], y[gy=new_yaxis], cutoff_parameter)
+&gt; !smaller cutoff_parameter =&gt; less smoothing
+&gt; 
+&gt; Also, I've run into memory(?) problems with scatter2gridlaplace_xy
+&gt; when gridding a large number of points (at least on RH linux
+&gt; 6.0). However, scatter2gridgauss_xy has been quite stable for me.
+&gt; 
+&gt; cheers
+&gt; 
+&gt; Lev Tarasoff -  Dept of Physics, University of Toronto,
+&gt;                 60 St. George St., Toronto, Ontario, CANADA, M5S 1A7
+&gt;                 Tel (416)-946-3019  Fax (416)-978-8905
+&gt;                 email: lev@atmosp.physics.utoronto.ca
+
+--
+Jörg Kaduk                            Tel.: 1 650 325 1521 x 416
+Carnegie Institution of Washington    FAX: 1 650 325 6857
+Dept. of Plant Biology
+260 Panama Street                     joerg@jasper.stanford.edu
+Stanford, CA 94305-1297               <A  HREF="http://Jasper.Stanford.EDU/joerg/">http://Jasper.Stanford.EDU/joerg/</A>
+
+</pre>
+
+<!--X-Body-of-Message-End-->
+<!--X-MsgBody-End-->
+<!--X-Follow-Ups-->
+<hr>
+<ul><li><strong>Follow-Ups</strong>:
+<ul>
+<li><strong><a name="00338" href="msg00338.html">external functions</a></strong>
+<ul><li><em>From:</em> Elizabeth Dobbins</li></ul></li>
+</ul></li></ul>
+<!--X-Follow-Ups-End-->
+<!--X-References-->
+<!--X-References-End-->
+<!--X-BotPNI-->
+<UL>
+<li>Previous by thread:
+<strong><a href="msg00334.html">ASCII</a></strong>
+</li>
+<li>Next by thread:
+<strong><a href="msg00338.html">external functions</a></strong>
+</li>
+
+</UL>
+<center>[<a href="msg00334.html">Thread Prev</a>][<a href="msg00338.html">Thread Next</a>][<A HREF="threads.html#00335">Index</A>]</center>
+
+<!--X-BotPNI-End-->
+<!--X-User-Footer-->
+<hr>
+<font size=-1>
+<address>
+<a href="http://www.doc.gov">Dept of Commerce</a> / 
+<a href="http://www.noaa.gov">NOAA</a> /
+<a href="http://www.oar.noaa.gov">OAR</a> /
+<a href="http://www.pmel.noaa.gov">PMEL</a> /
+<a href="http://tmap.pmel.noaa.gov">TMAP</a>
+</address> <br> <a href="http://ferret.pmel.noaa.gov/Ferret/ferret_contact_us.html">Contact Us</a> | <a href="http://www.noaa.gov/privacy.html">Privacy Policy</a> | <a href="http://www.noaa.gov/disclaimer.html">Disclaimer</a> | <a href="accessibility.html">Accessibility Statement</a> 
+</font>
+<!--X-User-Footer-End-->
+</body>
+</html>

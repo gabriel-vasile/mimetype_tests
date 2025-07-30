@@ -1,0 +1,743 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-1 (1.68)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Vector Field Display: mmDisp</TITLE>
+<META NAME="description" CONTENT="Vector Field Display: mmDisp">
+<META NAME="keywords" CONTENT="userguide">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userguide.css">
+
+<LINK REL="next" HREF="Data_Archive_mmArchive.html">
+<LINK REL="previous" HREF="Data_Graph_Display_mmGraph.html">
+<LINK REL="up" HREF="userguide.html">
+<LINK REL="next" HREF="Data_Archive_mmArchive.html">
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF",text="#000000",LINK="#0000FF",
+            VLINK="#4498F0",ALINK="00FFFF">
+<!--Navigation Panel--><A NAME="tex2html1"
+  HREF="http://math.nist.gov/oommf"><IMG ALT="OOMMF Home" BORDER="2" SRC="oommficon.gif"></A> 
+<A NAME="tex2html447"
+  HREF="Data_Archive_mmArchive.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.gif"></A> 
+<A NAME="tex2html443"
+  HREF="userguide.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.gif"></A> 
+<A NAME="tex2html437"
+  HREF="Data_Graph_Display_mmGraph.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.gif"></A> 
+<A NAME="tex2html449"
+  HREF="userguide.html"><IMG ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.gif"></A> 
+<A NAME="tex2html445"
+  HREF="docindex.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.gif"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html448"
+  HREF="Data_Archive_mmArchive.html">Data Archive: mmArchive</A>
+<B> Up:</B> <A NAME="tex2html444"
+  HREF="userguide.html">OOMMF Documentation</A>
+<B> Previous:</B> <A NAME="tex2html438"
+  HREF="Data_Graph_Display_mmGraph.html">Data Graph Display: mmGraph</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION000140000000000000000"></A><A NAME="sec:mmdisp"></A>
+<BR>
+Vector Field Display: mmDisp
+</H1><A NAME="10462"></A>
+
+<P>
+<DIV ALIGN="CENTER">
+<IMG ALT="mmDisp Screen Shot" SRC="../giffiles/mmdisp-ss.gif">
+
+</DIV>
+
+<P>
+
+<P>
+<FONT SIZE="+2"><B>Overview</B></FONT>
+<BR>
+The application <B>mmDisp</B> displays two-dimensional spatial
+distributions of three-dimensional vectors (i.e., vector fields).  It
+can load vector fields from files in a variety of formats, or it can
+accept vector field data from a client application, typically a running
+solver.  <B>mmDisp</B> offers a rich interface for
+controlling the display of vector field data, and can also save the data
+to a file and produce Postscript print output.
+
+<P>
+
+<P>
+<FONT SIZE="+2"><B>Launching</B></FONT>
+<BR><B>mmDisp</B> may be started either by selecting the <FONT COLOR="#800000"><B>mmDisp</B></FONT> button
+on <A HREF="OOMMF_Launcher_Control_Inte.html#sec:mmlaunch"><B>mmLaunch</B></A>, or from the command line via
+<PRE>
+tclsh oommf.tcl mmDisp [standard options] [-net &lt;0|1&gt;] [filename]
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG><TT><B>-net <TT><B>&lt;</B></TT>0|1<TT><B>&gt;</B></TT></B></TT></STRONG></DT>
+<DD>Disable or enable a server which allows the data displayed by
+  <B>mmDisp</B> to be updated by another application.
+  By default, the server is enabled.  When the server is disabled,
+  <B>mmDisp</B> may only input data from a file.
+</DD>
+</DL>
+
+<P>
+If a filename is supplied on the command line, <B>mmDisp</B> takes
+it to be the name of a file containing vector field data for display.
+That file will be opened on startup.
+
+<P>
+
+<P>
+<FONT SIZE="+2"><B>Inputs</B></FONT>
+<BR>
+Input to <B>mmDisp</B> may come from either a file or from a client
+application (typically a running solver), in any of the
+<A HREF="Vector_Field_File_Format_OV.html#sec:vfformats"
+ NAME="10489">OOMMF vector field formats</A>.
+Other file formats can also be supported if a translation filter program
+is available.
+
+<P>
+Client applications that send data to <B>mmDisp</B> control the flow of
+data.  The user, interacting with the <B>mmDisp</B> window, determines
+how the vector field data are displayed.
+
+<P>
+File input is initiated through the <FONT COLOR="#800000"><B>File|Open...</B></FONT> dialog
+box.  Several example files are included in the OOMMF release in the
+directory <TT><B>app/mmdisp/examples</B></TT>.  When the <FONT COLOR="#800000"><B>Browse</B></FONT> button is
+enabled, the ``Open File'' dialog box will remain open after loading a
+file, so that multiple files may be displayed in sequence.  The
+<FONT COLOR="#800000"><B>Auto</B></FONT> configuration box determines whether the vector
+subsampling, data scale, zoom and slice settings should be
+determined automatically (based on the data in the file and the current
+display window size), or whether their values should be held constant
+while loading the file.
+
+<P>
+<A NAME="10496"></A>
+<B>mmDisp</B> permits local customization allowing for automatic
+translation from other file formats into one of the
+<A HREF="Vector_Field_File_Format_OV.html#sec:vfformats">OOMMF vector field formats</A> that <B>mmDisp</B> recognizes.  When loading
+a file, <B>mmDisp</B> compares the file name to a list of glob-style
+patterns.  These patterns typically match on the filename extension.
+An example pattern is <TT>*.gz</TT>.  The assumption is that the pattern
+identifies files containing data in a particular format.  For each
+pattern in the list, there is a corresponding translation program.
+<B>mmDisp</B> calls on that program as a filter which takes data in one
+format from standard input and writes to standard output the same data
+in one of the formats supported by <B>mmDisp</B>.  In its default
+configuration, <B>mmDisp</B> recognizes the pattern <TT>*.gz</TT> and invokes
+the translation program <TT>gzip -dc</TT><A NAME="10510"></A> to
+perform the ``translation.''  In this way, support for reading gzip
+compressed files is ``built in'' to <B>mmDisp</B> on any platform where
+the <B>gzip</B> program is installed.
+
+<P>
+New patterns and translation programs may be added to <B>mmDisp</B> by
+the usual method of <A HREF="Advanced_Installation.html#sec:custom"
+ NAME="10518">local customization</A>.  The
+command to add to the customization file is of the form
+<BLOCKQUOTE><PRE>
+Oc_Option Add mmDisp Input filters {{*.gz {gzip -dc}}}
+</PRE>
+</BLOCKQUOTE>
+The final argument in this command is a list of pairs.  The first
+element in each pair is the filename pattern.  The second element
+in each pair is the command line for launching the corresponding
+translation program.  If a program <TT>foo</TT> were known to translate
+a file format identified by the extension <TT><B>.bar</B></TT> into the
+OVF file format, that program could be made known to <B>mmDisp</B>
+by changing the above customization command to:
+<BLOCKQUOTE><PRE>
+Oc_Option Add mmDisp Input filters {{*.gz {gzip -dc}} {*.bar foo}}
+</PRE>
+</BLOCKQUOTE>
+<A NAME="10530"></A>
+
+<P>
+
+<P>
+<FONT SIZE="+2"><B>Outputs</B></FONT>
+<BR>
+The vector field displayed by <B>mmDisp</B> may be saved to disk via the
+<FONT COLOR="#800000"><B>File|Save As...</B></FONT><A NAME="10534"></A> dialog box.  The output
+is in the <A HREF="OVF_1.0_format.html#sec:ovfformat"
+ NAME="10539">OVF format</A>.  The OVF file
+options may be set by selecting the appropriate radio buttons in the
+OVF File Options panel.  The <FONT COLOR="#800000"><B>Title</B></FONT> and <FONT COLOR="#800000"><B>Desc</B></FONT> fields may be
+edited before saving.  Enabling the <FONT COLOR="#800000"><B>Browse</B></FONT> button allows for
+saving multiple files without closing the ``Save File'' dialog box.
+
+<P>
+The <FONT COLOR="#800000"><B>File|Print...</B></FONT><A NAME="10544"></A> dialog is used to
+produce a Postscript file of the current display.  On Unix systems, the
+output may be sent directly to a 
+printer<A NAME="10545"></A> 
+by filling the <FONT COLOR="#800000"><B>Print to:</B></FONT>
+entry with the appropriate pipe command, e.g., |<TT>lpr</TT>.  (The
+exact format is system dependent.)
+
+<P>
+To produce bitmap output, save the file to disk in the OVF format, and
+use the <A HREF="Making_Bitmaps_from_Vector_.html#sec:avf2ppm">avf2ppm</A><A NAME="10552"></A> utility to do the
+conversion.
+
+<P>
+
+<P>
+<FONT SIZE="+2"><B>Controls</B></FONT>
+<BR><A NAME="sec:mmdispcontrols"></A>
+<P>
+The menu selection <FONT COLOR="#800000"><B>File|Clear</B></FONT> clears the display window.
+The menu selection <FONT COLOR="#800000"><B>File|Exit</B></FONT> terminates the 
+<B>mmDisp</B> application.  The menu <FONT COLOR="#800000"><B>Help</B></FONT> provides
+the usual help facilities.
+
+<P>
+The <FONT COLOR="#800000"><B>View</B></FONT> menu provides high-level control over how the
+vector field is placed in the display window.  The menu selection
+<FONT COLOR="#800000"><B>View|Wrap Display</B></FONT> resizes the display window so that it just
+contains the entire vector field surrounded by a margin. <FONT COLOR="#800000"><B>View|
+Fill Display</B></FONT> resizes the vector field until it fills the current size
+of the display window.  If the aspect ratio of the display window does
+not match the aspect ratio of the vector field, a larger than requested
+margin appears along one edge to make up the difference. <FONT COLOR="#800000"><B>View|
+Rotate ccw</B></FONT> and <FONT COLOR="#800000"><B>View|Rotate cw</B></FONT> rotate the display one
+quarter turn counter-clockwise and clockwise respectively.  The display
+window also rotates, so that the portion of the vector field seen and
+any margins are preserved (unless the display of the control bar forces
+the display window to be wider).  <FONT COLOR="#800000"><B>View|reDraw</B></FONT> allows the user
+to invoke a redrawing of the display window.  The
+<FONT COLOR="#800000"><B>View|Viewpoint</B></FONT> tearable submenu supports rotation of the
+vector field out of the plane of the display, so that it may be viewed
+from along a different axis.
+
+<P>
+The menu selection <FONT COLOR="#800000"><B>Options|Configure...</B></FONT> brings up a
+dialog box through which the user may control many features of the
+vector field display.  Vectors in the vector field may be displayed as
+arrows, pixels, or both.  The <FONT COLOR="#800000"><B>Arrow</B></FONT> and <FONT COLOR="#800000"><B>Pixel</B></FONT> buttons in the
+<FONT COLOR="#800000"><B>Plot type</B></FONT> column on the left of the dialog box enable each type of
+display.
+
+<P>
+Columns 2-4 in the Configure dialog box control the use of color.  Both
+arrows and pixels may be independently colored to indicate some
+quantity<A NAME="10570"></A>.  The <FONT COLOR="#800000"><B>Color Quantity</B></FONT> column
+controls which scalar quantity the color of the arrow or pixel
+represents.  Available color quantities include vector <B><I>x</I></B>, <B><I>y</I></B>, and <B><I>z</I></B>
+components, total vector magnitude, slice depth, and angles as measured
+in-plane from a fixed axis.  On regularly gridded data the vector field
+divergence is also available for display.
+
+<P>
+The assignment of a color to a quantity value is determined by the
+<FONT COLOR="#800000"><B>Colormap</B></FONT><A NAME="10573"></A> selected.  Colormaps are labeled by a
+sequence of colors that are mapped across the range of the selected
+quantity.  For example, if the ``Red-Black-Blue'' colormap is applied to
+the <FONT COLOR="#800000"><B>Color Quantity</B></FONT> ``z'', then vectors pointing into the
+<B><I>xy</I></B>-plane (<B><I>z</I> &lt; 0</B>) are colored red, those lying in the plane (<B><I>z</I> = 0</B>) are
+colored black, and those pointing out of the plane (<B><I>z</I> &gt; 0</B>) are colored
+blue.  Values between the extremes are colored with intermediate colors,
+selected using a discretization determined by the <FONT COLOR="#800000"><B><TT>#</TT> of Colors</B></FONT>
+value.  This value governs the use of potentially limited color
+resources, and can be used to achieve some special coloring effects.
+(Note: The in-plane angle quantities are generally best viewed with a
+colormap that begins and ends with the same color, e.g.,
+``Red-Green-Blue-Red.'')  The ordering of the colormap can be reversed
+by selecting the <FONT COLOR="#800000"><B>Reverse</B></FONT> checkbox.  For example, this would change
+the ``Red-Black-Blue'' colormap to effectively ``Blue-Black-Red.''
+
+<P>
+Below the <FONT COLOR="#800000"><B>Reverse</B></FONT> checkbutton in the pixel plot type row is a
+<FONT COLOR="#800000"><B>Opaque</B></FONT> checkbutton.  If this is selected then arrows below the top
+row in the pixel slice range (see slice discussion below) will be hidden
+by the pixel object.  If disabled, then the pixel object is translucent,
+so objects further below are partially visible.
+
+<P>
+When there are many vectors in a vector field, a display of all of them
+may be more confusing than helpful.  The <FONT COLOR="#800000"><B>Subsample</B></FONT> column
+allows the user to request that only a sampling of vectors from the
+vector field be displayed.  The <FONT COLOR="#800000"><B>Subsample</B></FONT> value is roughly
+the number of vectors along one spatial dimension of the vector field
+which map to a single displayed vector (arrow or pixel).  Each vector
+displayed is an actual vector in the vector field--the selection of
+vectors for display is a sampling process, not an averaging or
+interpolation process.  The subsample rates for arrows and pixels may be
+set independently.  A subsample rate of 0 is interpreted specially to
+display all data.  (This is typically much quicker than subsampling at a
+small rate, e.g., 0.1.)
+
+<P>
+The length of an arrow represents the magnitude of the vector field.
+All arrows are drawn with a length between zero and ``full-scale.''
+By default, the full-scale arrow length is computed 
+so that it covers the region of the screen that one displayed
+vector is intended to represent, given the current subsample rate.
+Following this default, arrows do not significantly overlap each other,
+yet all non-zero portions of the vector field have
+a representation in the display.  Similarly, pixels are drawn with
+a default size that fills an area equal to the region of the screen
+one pixel is intended to represent, given the pixel subsample rate.
+The <FONT COLOR="#800000"><B>Size</B></FONT> column allows the user to (independently)  
+override the default size of pixels and full-scale arrows.
+A value of 1 represents the default size.  By
+changing to a larger or smaller <FONT COLOR="#800000"><B>Size</B></FONT> value, the user may
+request arrows or pixels larger or smaller than the default size.
+
+<P>
+Below the Arrow and Pixel Controls are several additional controls.  The
+<FONT COLOR="#800000"><B>Data Scale</B></FONT><A NAME="10584"></A><A NAME="html:mmdispdatascale"></A> entry
+affects the data value scaling.  As described above, all arrows are
+displayed with length between zero and full-scale.  The full-scale arrow
+length corresponds to some scalar value of the magnitude of the vector
+field.  The <FONT COLOR="#800000"><B>Data Scale</B></FONT><A NAME="10587"></A> entry allows the user to
+set the value at which the drawn arrow length goes full-scale.  Any
+vectors in the vector field with magnitude equal to or greater than the
+data scale value will be represented by arrows drawn at full scale.
+Other vectors will be represented by shorter arrows with length
+determined by a linear scale between zero and the data scale value.
+Similarly, the data scale value controls the range of values spanned by
+the colormap used to color pixels.  The usual use of the
+<FONT COLOR="#800000"><B>Data Scale</B></FONT><A NAME="10589"></A> entry is to reduce the data
+scale value so that more detail can be seen in those portions of
+the vector field which have magnitude less than other parts of the
+vector field.
+If the data scale value is increased, then the length of the
+arrows in the plot is reduced accordingly.  If the data scale value is
+decreased, then the length of the arrows is increased, until they
+reach full-scale.
+An arrow representing a vector with magnitude larger than the
+data scale value may be thought of as being truncated to the data scale
+value.  The initial (default) data scale value is usually the maximum
+vector magnitude in the field, so at this setting no arrows are
+truncated.  Entering <TT><B>0</B></TT> into the data scale box will cause the data
+scale to be reset to the default value.  (For <A HREF="OVF_1.0_format.html#sec:ovfformat"
+ NAME="10595">OVF files</A>,
+the default data scale value is set from the <TT>ValueRangeMaxMag</TT>
+header line.  This is typically set to the maximum vector magnitude, but
+this is not guaranteed.)  The data scale control is intended primarily
+for use with vector fields of varying magnitude (e.g., <B>H</B>-fields), but
+may also be used to adjust the pixel display contrast for any field
+type.
+
+<P>
+The <FONT COLOR="#800000"><B>Zoom</B></FONT><A NAME="10598"></A> entry controls the spatial scaling of
+the display.  The value roughly corresponds to the number of pixels per
+vector in the fully-sampled vector field.  (This value is not affected
+by the subsampling rate.)
+
+<P>
+The <FONT COLOR="#800000"><B>Margin</B></FONT> entry specifies the margin size, in pixels, to be
+maintained around the vector field.
+
+<P>
+The next row of entry boxes control slice<A NAME="10600"></A>
+display.  Slice selection allows display of that subset of the data
+that is within a specified distance of a plane running perpendicular
+to the view axis.  The location of that plane with respect to the view
+axis is specified in the <FONT COLOR="#800000"><B>X-slice center</B></FONT>, <FONT COLOR="#800000"><B>Y-slice center</B></FONT> or
+<FONT COLOR="#800000"><B>Z-slice center</B></FONT> entry, depending on the current view axis.
+The thickness of the slice may be varied separately for arrow and
+pixel displays, as specified in the next two entry boxes.  The slice
+span boxes interpret specially the following values: 0 resets the
+slice thickness to the default value, which is usually the thickness
+of a single cell.  Any negative value sets the slice thickness to be
+the full thickness of the mesh.  Values for all of the slice control
+entries are specified in the fundamental mesh spatial unit, for
+example, meters.  (Refer to the vector field
+<A HREF="Vector_Field_File_Format_OV.html#sec:vfformats">file format</A>
+documentation for more on mesh spatial units.)
+
+<P>
+Below the slice contols are controls to specify whether or not a
+bounding polygon<A NAME="10608"></A> is displayed, and the background
+color for the display window.
+
+<P>
+No changes made by the user in the <FONT COLOR="#800000"><B>Options|Configure...</B></FONT> dialog box affect the display window until either the
+<FONT COLOR="#800000"><B>Apply</B></FONT> or <FONT COLOR="#800000"><B>OK</B></FONT> button is selected.  If the <FONT COLOR="#800000"><B>OK</B></FONT> button is
+selected, the dialog box is also dismissed.  The <FONT COLOR="#800000"><B>Close</B></FONT>
+button dismisses the dialog without changing the display window.
+
+<P>
+The next item under the <FONT COLOR="#800000"><B>Options</B></FONT> menu is a checkbutton that
+toggles the display of a control bar.  The control bar offers
+alternative interfaces to some of the operations available from the
+<FONT COLOR="#800000"><B>Options|Configure...</B></FONT> dialog box and the <FONT COLOR="#800000"><B>View</B></FONT> menu.
+On the left end of the control bar is a display of the coordinate axes.
+These axes rotate along with the vector field in the display window to
+identify the coordinate system of the display, and are color coded to
+agree with the pixel (if active) or arrow coloring.  A click of the left
+mouse button on the coordinate axes causes a counter-clockwise rotation.
+A click of the right mouse button on the coordinate axes causes a
+clockwise rotation.
+
+<P>
+To the right of the coordinate axes are two rows of controls.  The top
+row allows the user to control the subsample rate and size of displayed
+arrows.  The subsample rate may be modified either by direct entry of a
+new rate, or by manipulation of the slider.  The second row controls the
+current data scale value and zoom (spatial magnification).  A vertical
+bar in the slider area marks the default data scale value.  Specifying
+<TT><B>0</B></TT> for the data scale value will reset the data scale to the
+default value.
+
+<P>
+The spatial magnification may be changed either by typing a value in the
+Zoom box of the control bar, or by using the mouse inside the display
+window.  A click and drag with the left mouse button displays a red
+rectangle that changes size as the mouse is dragged.  When the left
+mouse button is released, the vector field is rescaled so that the
+portion of the display window within the red rectangle expands until it
+reaches the edges of the display window.  Both dimensions are scaled by
+the same amount so there is no aspect distortion of the vector field.
+Small red arrows on the sides of the red rectangle indicate which
+dimension will expand to meet the display window boundaries upon release
+of the left mouse button.  After the rescaling, the red rectangle
+remains in the display window briefly, surrounding the same region of
+the vector field, but at the new scale.
+
+<P>
+A click and drag with the right mouse button displays a blue rectangle
+that changes size as the mouse is dragged.  When the right mouse button
+is released, the vector field is rescaled so that all of the vector
+field currently visible in the display window fits the size of the
+blue rectangle.  Both dimensions are scaled by the same amount so there
+is no aspect distortion of the vector field.  Small blue arrows on the
+sides of the blue rectangle indicate the dimension in which the vector
+field will shrink to exactly transform the display window size to the
+blue rectangle size.  After the rescaling, the blue rectangle remains in
+the display window briefly, surrounding the same region of the vector
+field, now centered in the display window, and at the new scale.
+
+<P>
+When the zoom value is large enough that a portion of the vector field
+lies outside the display window, scrollbars appear that may be used to
+translate the vector field so that different portions are visible in the
+display window.  On systems that have a middle mouse button, clicking
+the middle button on a point in the display window translates the vector
+field so that the selected point is centered within the display window.
+
+<P>
+<B>mmDisp</B> remembers the previous zoom value and data scale values.
+To revert to the previous settings, the user may hit the <TT><B>ESC</B></TT> key.
+This is a limited ``Undo'' feature.
+
+<P>
+Below the data scale and zoom controls in the control bar is the slice
+center selection control<A NAME="10620"></A>.  This will be
+labeled <FONT COLOR="#800000"><B>Z-slice</B></FONT>, <FONT COLOR="#800000"><B>X-slice</B></FONT>, or <FONT COLOR="#800000"><B>Y-slice</B></FONT>, depending on
+which view axis is selected.  The thickness of the slice can be set
+from the <FONT COLOR="#800000"><B>Options|Configure...</B></FONT> dialog box.
+
+<P>
+The final item under the <FONT COLOR="#800000"><B>Options</B></FONT> menu is the
+<FONT COLOR="#800000"><B>Options|Lock&nbsp;size</B></FONT> checkbutton.  By default, when the
+display is rotated in-plane, the width and height of the viewport are
+interchanged so that the same portion of the vector field remains
+displayed.  Selecting the <FONT COLOR="#800000"><B>Options|Lock&nbsp;size</B></FONT> checkbutton
+disables this behavior, and also other viewport changing operations
+(e.g., display wrap).
+
+<P>
+Several keyboard shortcuts are available as alternatives to menu- or
+mouse-based operations.  (These are in addition to the usual keyboard
+access to the menu.)  The effect of a key combination depends on which
+subwindow of <B>mmDisp</B> is active.  The <TT><B>TAB</B></TT> key may be used to
+change the active subwindow.  The <TT><B>SHIFT-TAB</B></TT> key combination also
+changes the active subwindow, in reverse order.
+
+<P>
+When the active subwindow is the display window, the following
+key combinations are active:
+
+<UL>
+<LI><TT><B>CTRL-o</B></TT> - same as menu selection <FONT COLOR="#800000"><B>File|Open...</B></FONT>
+</LI>
+<LI><TT><B>CTRL-s</B></TT> - same as menu selection <FONT COLOR="#800000"><B>File|Save
+                      as...</B></FONT><A NAME="10636"></A>
+</LI>
+<LI><TT><B>CTRL-p</B></TT> - same as menu selection <FONT COLOR="#800000"><B>File|
+                      Print...</B></FONT><A NAME="10639"></A> 
+</LI>
+<LI><TT><B>CTRL-c</B></TT> - same as menu selection 
+	<FONT COLOR="#800000"><B>Options|Configure...</B></FONT>
+</LI>
+<LI><TT><B>CTRL-v</B></TT> - launches viewpoint selection menu,
+	<FONT COLOR="#800000"><B>View|Viewpoint</B></FONT>
+</LI>
+<LI><TT><B>CTRL-w</B></TT> - same as menu selection <FONT COLOR="#800000"><B>View|Wrap Display</B></FONT>
+</LI>
+<LI><TT><B>CTRL-f</B></TT> - same as menu selection <FONT COLOR="#800000"><B>View|Fill Display</B></FONT>
+</LI>
+<LI><TT><B>HOME</B></TT> - First fill, then wrap the display.
+</LI>
+<LI><TT><B>CTRL-space</B></TT> - Center view in display.
+</LI>
+<LI><TT><B>CTRL-r</B></TT> - same as menu selection <FONT COLOR="#800000"><B>View|Rotate ccw</B></FONT>
+</LI>
+<LI><TT><B>SHIFT-CTRL-r</B></TT> - same as menu selection <FONT COLOR="#800000"><B>View|Rotate cw</B></FONT>
+</LI>
+<LI><TT><B>INSERT</B></TT> - decrease arrow subsample by 1
+</LI>
+<LI><TT><B>DEL</B></TT> - increase arrow subsample by 1
+</LI>
+<LI><TT><B>SHIFT-INSERT</B></TT> - decrease arrow subsample by factor of 2
+</LI>
+<LI><TT><B>SHIFT-DEL</B></TT> - increase arrow subsample by factor of 2
+</LI>
+<LI><TT><B>PAGEUP</B></TT> - increase the zoom value by a factor of 1.149
+</LI>
+<LI><TT><B>PAGEDOWN</B></TT> - decrease the zoom value by a factor of 1.149
+</LI>
+<LI><TT><B>SHIFT-PAGEUP</B></TT> - increase the zoom value by factor of 2
+</LI>
+<LI><TT><B>SHIFT-PAGEDOWN</B></TT> - decrease the zoom value by factor of 2
+</LI>
+<LI><TT><B>ESC</B></TT> - revert to previous data scale and zoom values
+</LI>
+</UL>
+
+<P>
+When the active subwindow is the control bar's coordinate axes display, 
+the following key combinations are active:
+
+<UL>
+<LI><TT><B>LEFT</B></TT> - same as menu selection <FONT COLOR="#800000"><B>View|Rotate ccw</B></FONT>
+</LI>
+<LI><TT><B>RIGHT</B></TT> - same as menu selection <FONT COLOR="#800000"><B>View|Rotate cw</B></FONT>
+</LI>
+</UL>
+
+<P>
+When the active subwindow is any of the control bar's value entry
+windows - arrow subsample, size, data scale or zoom, the following key
+combinations are active:
+
+<UL>
+<LI><TT><B>ESC</B></TT> - undo uncommitted value (displayed in red)
+</LI>
+<LI><TT><B>RETURN</B></TT> - commit entered value
+</LI>
+</UL>
+
+<P>
+When the active subwindow is in any of the control bar's sliders--arrow
+subsample, data scale or slice--the following key combinations are
+active:
+
+<UL>
+<LI><TT><B>LEFT</B></TT> - slide left (decrease value)
+</LI>
+<LI><TT><B>RIGHT</B></TT> - slide right (increase value)
+</LI>
+<LI><TT><B>ESC</B></TT> - undo uncommitted value (displayed in red)
+</LI>
+<LI><TT><B>RETURN</B></TT> - commit current value
+</LI>
+</UL>
+
+<P>
+When any of the separate dialog windows are displayed (e.g., the
+<FONT COLOR="#800000"><B>File|Open...</B></FONT> or <FONT COLOR="#800000"><B>Options|Configure...</B></FONT>
+dialogs), the shortcut <TT><B>CTRL-.</B></TT> (control-period) will raise and
+transfer keyboard focus back to the root <B>mmDisp</B> window.
+
+<P>
+
+<P>
+<FONT SIZE="+2"><B>Details</B></FONT>
+<BR>
+<P>
+The selection of vectors for display according to the 
+<FONT COLOR="#800000"><B>Subsample</B></FONT> differs depending on whether or not the data
+lie on a regular grid<A NAME="10686"></A>.  If so, <FONT COLOR="#800000"><B>Subsample</B></FONT>
+takes integer values and determines the ratio of data points to
+displayed points.  For example, a value of 5 means that every fifth
+vector on the grid is displayed.  This means that the number of vectors
+displayed is 25 times fewer than the number of vectors on the grid.
+
+<P>
+For an irregular grid of vectors, an average cell size is computed,
+and the <FONT COLOR="#800000"><B>Subsample</B></FONT> takes values in units of 0.1 times the
+average cell size.  A square grid of that size is overlaid on the
+irregular grid.  For each cell in the square grid, the data vector
+from the irregular grid closest to the center of the square grid
+cell is selected for display.  The vector is displayed at its true
+location in the irregular grid, not at the center of the square
+grid cell.  As the subsample rate changes, the set of displayed
+vectors also changes, which can in some circumstances substantially
+change the appearance of the displayed vector field.
+
+<P>
+
+<A NAME="pt:wwwhelpersetup"></A>
+
+<P>
+<FONT SIZE="+2"><B>Using <B>mmDisp</B> as a WWW browser helper application</B></FONT>
+<BR>
+<P>
+You may configure your web browser<A NAME="10690"></A> to
+automatically launch <B>mmDisp</B> when downloading an OVF file.  The
+exact means to do this depends on your browser, but a couple of examples
+are presented below.
+
+<P>
+In Netscape Navigator 4.X<A NAME="10692"></A>, bring up the
+<FONT COLOR="#800000"><B>Edit|Preferences...</B></FONT> dialog box, and select the  
+<TT>Category</TT> <FONT COLOR="#800000"><B>Navigator|Applications</B></FONT> subwindow.  Create a
+<FONT COLOR="#800000"><B>New Type</B></FONT>, with the following fields:
+<DL>
+<DT><STRONG>Description of type:</STRONG></DT>
+<DD>OOMMF Vector Field
+</DD>
+<DT><STRONG>MIME Type:</STRONG></DT>
+<DD>application/x-oommf-vf
+</DD>
+<DT><STRONG>Suffixes:</STRONG></DT>
+<DD>ovf,omf,ohf,obf
+</DD>
+<DT><STRONG>Application:</STRONG></DT>
+<DD><EM>tclsh</EM> <EM>oommfroot</EM>/oommf.tcl +fg mmDisp -net 0 ``<EM>arg</EM>''
+</DD>
+</DL>
+
+<P>
+On Windows platforms, the <TT>Suffixes</TT> field is labeled
+<TT>File Extension</TT>, and only one file extension may be entered.
+Files downloaded from a web server are handled according to their
+MIME Type, rather than their file extension, so that restriction 
+isn't important when web browsing.  If you wish to have files on the
+local disk with all the above file extensions recognized as
+OOMMF Vector Field<A NAME="10706"></A> files, you must repeat the
+<FONT COLOR="#800000"><B>New Type</B></FONT> entry for each file extension.  In the <TT>Application</TT>
+field, the values of <EM>tclsh</EM>, <EM>oommfroot</EM>, and <EM>arg</EM> vary
+with your platform configuration.  The value of <EM>tclsh</EM> is the full
+path to the <B>tclsh</B> application on your platform (see
+<A HREF="Command_Line_Launching.html#sec:cll">Command Line Launching</A>).  On Unix
+systems, <EM>tclsh</EM> may be omitted, assuming that the
+<TT><B>oommf.tcl</B></TT> script is executable.  If <EM>tclsh</EM> is not omitted
+on Unix systems, Netscape may issue a security warning each time it
+opens an OOMMF Vector Field file.  The value of <EM>oommfroot</EM> should
+be the full path to the root directory of your OOMMF installation.
+The value of <EM>arg</EM> should be ``%1'' on Windows and ``%s'' on
+Unix.  The MIME type ``application/x-oommf-vf'' must be configured on
+any HTTP server which provides OOMMF Vector Field files as well.
+
+<P>
+For Microsoft Internet
+Explorer<A NAME="10723"></A>&nbsp;3.X, bring up the
+<FONT COLOR="#800000"><B>View|Options...</B></FONT> dialog box, and select the
+<FONT COLOR="#800000"><B>Program</B></FONT> tab.  Hit the 
+<FONT COLOR="#800000"><B>File Types...</B></FONT> button, followed by the
+<FONT COLOR="#800000"><B>New Type...</B></FONT> button. Fill the resulting dialog box with
+<DL>
+<DT><STRONG>Description of type:</STRONG></DT>
+<DD>OOMMF Vector Field
+</DD>
+<DT><STRONG>Associated extension:</STRONG></DT>
+<DD>ovf
+</DD>
+<DT><STRONG>Content type (MIME):</STRONG></DT>
+<DD>application/x-oommf-vf
+</DD>
+</DL>
+You may also disable the <FONT COLOR="#800000"><B>Confirm open after download</B></FONT> checkbutton
+if you want.  Then hit the <FONT COLOR="#800000"><B>New...</B></FONT> button below the
+<TT>Actions:</TT> window, and in the pop-up fill in
+<DL>
+<DT><STRONG>Action:</STRONG></DT>
+<DD>open
+</DD>
+<DT><STRONG>Application used to perform action:</STRONG></DT>
+<DD> 
+<BR><EM>tclsh</EM> <EM>oommfroot</EM>/oommf.tcl +fg mmDisp -net 0 ``%1''
+</DD>
+</DL>
+Hit <FONT COLOR="#800000"><B>OK</B></FONT>, <FONT COLOR="#800000"><B>Close</B></FONT>, <FONT COLOR="#800000"><B>Close</B></FONT> and <FONT COLOR="#800000"><B>OK</B></FONT>.  Replace <EM>tclsh</EM>
+and <EM>oommfroot</EM> with the appropriate paths on your system
+(cf. <A HREF="Command_Line_Launching.html#sec:cll">Command Line Launching</A>).  This will
+set up an association on files with the .ovf extension. Internet
+Explorer 3.X apparently ignores the HTML Content Type field, so you must
+repeat this process for each file extension (.ovf, .omf, .ohf, .obf and
+.svf) that you want to recognize.  This means, however, that Internet
+Explorer will make the appropriate association even if the HTML server
+does not properly set the HTML Content Type field.
+
+<P>
+Microsoft Internet Explorer 4.X is integrated with the Windows operating
+system.  Internet Explorer 4.X doesn't offer any means to set up
+associations between particular file types and the applications which
+should be used to open them.  Instead, this association is configured
+within the Windows operating system.  
+To set up associations for the
+OOMMF Vector Field file type on Windows&nbsp;95 or Windows&nbsp;NT,
+select <FONT COLOR="#800000"><B>Settings|Control Panel</B></FONT> from the <FONT COLOR="#800000"><B>Start</B></FONT> menu.  
+The Control Panel window appears.  Select <FONT COLOR="#800000"><B>View|Options...</B></FONT>
+to display a dialog box.  
+A Windows&nbsp;98 shortcut to the same dialog box is to select 
+<FONT COLOR="#800000"><B>Settings|Folder Options...</B></FONT> from the <FONT COLOR="#800000"><B>Start</B></FONT> menu.  
+Select the <FONT COLOR="#800000"><B>File Types</B></FONT> tab and proceed as 
+described above for Internet Explorer 3.X.
+Depending on the exact release/service patch of your Windows operating
+system, the exact instructions may vary.
+
+<P>
+Once you have your browser configured, you can test with the following
+URL:
+<DIV ALIGN="CENTER">
+<A NAME="tex2html22"
+  HREF="http://math.nist.gov/~MDonahue/cubevortex.ovf">http://math.nist.gov/~MDonahue/cubevortex.ovf</A>
+
+</DIV>
+
+<P>
+
+<P>
+<FONT SIZE="+2"><B>Known Bugs</B></FONT>
+<BR>
+The slice selection feature does not work properly with irregular
+meshes.
+<HR>
+<!--Navigation Panel--><A NAME="tex2html1"
+  HREF="http://math.nist.gov/oommf"><IMG ALT="OOMMF Home" BORDER="2" SRC="oommficon.gif"></A> 
+<A NAME="tex2html447"
+  HREF="Data_Archive_mmArchive.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.gif"></A> 
+<A NAME="tex2html443"
+  HREF="userguide.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.gif"></A> 
+<A NAME="tex2html437"
+  HREF="Data_Graph_Display_mmGraph.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.gif"></A> 
+<A NAME="tex2html450"
+  HREF="userguide.html"><IMG ALIGN="BOTTOM" ALT="Contents" BORDER="0" SRC="contents.gif"></A> 
+<A NAME="tex2html445"
+  HREF="docindex.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.gif"></A>
+<BR>
+<!--End of Navigation Panel-->
+<BR><I><A HREF="Credits.html#sec:Credits">OOMMF Documentation Team</A><BR>October 30, 2002</I>
+</BODY>
+</HTML>

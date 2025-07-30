@@ -1,0 +1,628 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+  <HEAD>
+    
+    <style type="text/css">
+      a { text-decoration: none; }
+	.bordergc {background-color: #6699CC;}
+	.bordergd {background-color: #B6C7E5;}
+	.borderge {background-color: #EEF3FB;}
+	.bordergf {background-color: #FFFFFF;}
+	.bordergg {background-color: #CCCCCC;}
+      .small8b { font-size:8pt;
+                font-family: ariel,helvetica,sans-serif;
+                color:#6633cc;
+              }
+      .small8db { font-size:8pt;
+                font-family: ariel,helvetica,sans-serif;
+                color:#4411aa;
+              }
+
+    </style>
+    <META http-equiv="Content-Type"
+      content="text/html; charset=UTF-8">
+    <META name="keywords"
+      CONTENT="NCBI GEO Gene Expression Omnibus microarray oligonucleotide array SAGE">
+    <META name="description"
+      content="NCBI's Gene Expression Omnibus (GEO) is a public archive and resource for gene expression data.">
+    <SCRIPT LANGUAGE="JavaScript" src="/projects/geo/gds/gds_browse.js" type="text/javascript">
+    </SCRIPT>
+
+    <TITLE>
+    GEO Accession viewer
+    </TITLE>
+    <link rel="stylesheet"
+      href="http://www.ncbi.nlm.nih.gov/corehtml/ncbi.css">
+    <!-- GEO_SCRIPT -->
+
+<SCRIPT LANGUAGE="JavaScript1.2"
+SRC="http://www.ncbi.nlm.nih.gov/coreweb/javascript/imagemouseover.js"></SCRIPT>
+
+<SCRIPT LANGUAGE="JavaScript1.2"
+SRC="http://www.ncbi.nlm.nih.gov/coreweb/javascript/show_message.js"></SCRIPT>
+
+<script type="text/javascript" src="http://www.ncbi.nlm.nih.gov/corehtml/jsutils/utils.1.js"></script>
+
+<script type="text/javascript" src="http://www.ncbi.nlm.nih.gov/corehtml/jsutils/remote_data_provider.1.js"></script>
+
+<SCRIPT LANGUAGE="JavaScript1.2"
+SRC="../templates/help_def_messages.js"></SCRIPT>
+
+
+
+<LINK  rel = STYLESHEET href = "http://www.ncbi.nlm.nih.gov/geo/info/geo_style.css" Type  = "text/css" >
+  <script language="Javascript">
+
+  function OnFormFieldChange()
+  {
+    var view = document.getElementById("view");
+
+    if(document.getElementById("ViewOptions").form.value == 'html')
+    {
+        view.remove(3);
+        view.remove(2);
+    }
+    else
+    {
+        var NewOption = document.createElement("OPTION");
+
+        NewOption.text = "Full";
+        NewOption.value = "full";
+
+        try
+        {
+            view.add(NewOption, null);
+        }
+        catch(ex)
+        {
+            view.add(NewOption);
+        }
+
+        NewOption = document.createElement("OPTION");
+
+        NewOption.text = "Data";
+        NewOption.value = "data";
+
+        try
+        {
+            view.add(NewOption, null);
+        }
+        catch(ex)
+        {
+            view.add(NewOption);
+        }
+    }
+  }
+
+  function SubmitViewOptionsForm()
+  {
+    if(document.getElementById("ViewOptions").form.value == 'html')
+    {
+        document.forms.ViewOptions.submit();
+    }
+    else
+    {
+        window.open("acc.cgi?acc=" + document.forms.ViewOptions.acc.value + "&targ=" + document.forms.ViewOptions.targ.value +
+                  "&form=" + document.forms.ViewOptions.form.value + "&view=" + document.forms.ViewOptions.view.value +
+                  ((document.getElementById("token") == undefined || document.forms.ViewOptions.token.value.length == 0) ? "" :
+                  "&token=" + document.forms.ViewOptions.token.value), "_self");
+    }
+
+    return false;
+  }
+
+  function OpenFTP(url)
+  {
+    window.open(url, '_blank');
+  }
+
+  function OpenLink(url, where)
+  {
+    window.open(url, where);
+  }
+
+  utils.addEvent(window, "load", OnFormFieldChange)
+  </script>
+
+</head>
+<body background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/bg_main3.gif" topmargin="20" marginheight="20">
+
+<table width="680" border="0" cellspacing="0" cellpadding="0" align="center" >
+    <tr>
+        <td>
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+                <tr>
+                    <td><a href="http://www.ncbi.nlm.nih.gov"><img src="/projects/geo/img/ncbi_logo.gif" width="145" height="66" alt="" border="0"></a></td>
+                    <td width="100%" align="center" valign="middle" nowrap background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top_bg_white.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/pixel.gif" width="550" height="1" alt="" border="0"><br>
+                        <a href="/projects/geo/"><img src="/projects/geo/img/geo_main.gif" alt="" border="0"></a>
+                    </td>
+                    <td align="right" background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top_bg_white.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top_right.gif" alt="" width="5" height="66" border="0"></td>
+                </tr>
+            </table>
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+                <tr>
+                    <td><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top2_left.gif" width="601" height="2" alt="" border="0"></td>
+                    <td width="100%" background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top2_mid_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/pixel.gif" width="1" height="1" alt="" border="0"></td>
+                    <td align="right"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top2_right.gif" alt="" width="14" height="2" border="0"></td>
+                </tr>
+            </table>
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+                <tr>
+                    <td><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_ulm_no_a.gif" width="145" height="16" alt="" border="0" usemap="#unlmenu" name="unl_menu_pix"></td>
+                    <td background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_mid_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_left.gif" width="3" height="16" alt="" border="0"></td>
+                    <td width="100%" valign="middle" nowrap background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_mid_bg.gif">
+                        <table border="0" cellspacing="0" cellpadding="0" align="right">
+                            <tr>
+                                <td align="right"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_vertical_line.gif" width="1" height="16" alt="" border="0"></td>
+                                <td nowrap align="right"><a href="http://www.ncbi.nlm.nih.gov/projects/geo/info/GEOHandoutFinal.pdf" class="MainMenuFont">&nbsp; Handout &nbsp;</font></a></td>
+                                <td align="right"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_vertical_line.gif" width="1" height="16" alt="" border="0"></td>
+                                <td nowrap align="right"><a href="http://nar.oupjournals.org/cgi/content/full/gkl887?ijkey=ysG9Li2nfUYJvdZ&keytype=ref" class="MainMenuFont">&nbsp; NAR 2006 Paper &nbsp;</font></a></td>
+                                <td align="right"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_vertical_line.gif" width="1" height="16" alt="" border="0"></td>
+                                <td nowrap align="right"><a href="http://nar.oupjournals.org/cgi/content/full/30/1/207?ijkey=oxMPOWseARs7o&keytype=ref&siteid=nar" class="MainMenuFont">&nbsp; NAR 2002 Paper &nbsp;</font></a></td>
+                                <td align="right"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_vertical_line.gif" width="1" height="16" alt="" border="0"></td>
+                                <td nowrap align="right"><a href="/projects/geo/info/faq.html" class="MainMenuFont">&nbsp; FAQ &nbsp;</font></a></td>
+                                <td align="right"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_vertical_line.gif" width="1" height="16" alt="" border="0"></td>
+                                <td nowrap align="right"><a href="/projects/geo/info/MIAME.html" class="MainMenuFont">&nbsp; MIAME &nbsp;</font>
+                                </a></td>
+                                
+                                <td  align="right"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_vertical_line.gif" width="1" height="16" alt="" border="0"></td>
+                                <td nowrap align="right"><a href="mailto:geo@ncbi.nlm.nih.gov" class="MainMenuFont">&nbsp; Email GEO &nbsp;</a></td>
+                                
+                            </tr>
+                        </table>
+                    </td>
+                    <td background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_mid_bg.gif" align="right"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_right.gif" width="5" height="16" alt="" border="0"></td>
+                </tr>
+            </table>
+        
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+                <tr>
+                    <td><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top4_ulm_left.gif" width="145" height="4" alt="" border="0"></td>
+                    <td width="100%" background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top4_mid_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/pixel.gif" width="1" height="1" alt="" border="0"></td>
+                    <td align="right" background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top4_mid_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top4_ulm_right.gif" width="5" height="4" alt="" border="0"></td>
+                </tr>
+            </table>
+    
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+                <tr>
+                    <td width=1 background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_left_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_left_bg.gif" alt="" width="4" height="3" border="0"></td>
+                    <td width="10000" bgcolor="#F0F8FF">
+                        <table cellpadding="0" cellspacing="0" width="100%"><tr><td><font class="Top_Navigation_text" color="#2F6E87" face="Verdana" size="+1">&nbsp;&nbsp;&nbsp;<a href="http://www.ncbi.nlm.nih.gov">NCBI</a> &gt; <a href="../index.cgi"><font color="">GEO</font></a> &gt; <a href="acc.cgi"><b>Accession Display</b></a><a href="javascript:RPopUpWindow_Set(geologinbar_location,260,120,'','','#E1EAE6','','#538AA9','MessageBox2');" onmouseout="RPopUpWindow_Stop()"><img height="11" src="http://www.ncbi.nlm.nih.gov/coreweb/images/long_help4.gif" style="border: none" width="19"></a></font></td>
+<td align="right">Not logged in | <a href="../submission/geosubmi.cgi?rix=1&amp;ix=0dgBD0emMcz0Q5T-55Ra">Login</a><a href="javascript:RPopUpWindow_Set(geologinbar_login,260,200,'','','#E1EAE6','','#538AA9','MessageBox2');" onmouseout="RPopUpWindow_Stop()"><img height="11" src="http://www.ncbi.nlm.nih.gov/coreweb/images/long_help4.gif" style="border: none" width="19"></a></td>
+</tr></table>
+                    </td>
+                    <td width=1 background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_right_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_right_bg.gif" width="4" height="3" alt="" border="0"></td>
+                </tr>
+                <tr>
+                    <td background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_left_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_left_bg.gif" width="4" height="1" alt="" border="0"></td>
+                    <td width="10000" bgcolor="#E0EEEE"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/pixel.gif" width="1" height="1" alt="" border="0"></td>
+                    <td align="right" background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_right_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_right_bg.gif" alt="" width="4" height="1" border="0"></td>
+                </tr>
+
+                <tr>
+                    <td background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_left_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_left_bg.gif" width="4" height="3" alt="" border="0"></td>
+                    <td width="100%" bgcolor="White">
+                        <table width="98%" border="0" align="center">
+                            <tr>
+                                <td>
+                                    <table border="0" cellspacing="0" cellpadding="0" align="right" width="100%">
+                                        <tr>
+                                            <td>
+
+    <font color="red"></font>
+    <font color="blue"></font>
+<table cellpadding="0" cellspacing="0" style="border: 1px solid #C0F8FF"><tr><td><img height="35" src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/pixel.gif" width="1"></td>
+<td bgcolor="#F0F8FF" width="100%"><font color="#0066CC" face="Arial" size="1"><div id="HelpMessage" style="font: 11px/11px arial, sans-serif"><strong>GEO help:</strong> Mouse over screen elements for information.</div></font></td>
+</tr></table>
+<form action="acc.cgi" enctype="application/x-www-form-urlencoded" id="ViewOptions" method="POST" name="ViewOptions" target="_self"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td></td>
+<td bgcolor="#CCCCCC" nowrap valign="middle" width="100%"><table align="left" border="0" cellpadding="0" cellspacing="0"><tr><td nowrap><table border="0" cellpadding="0" cellspacing="0"><tr><td valign="middle">Scope:&nbsp;<select name="targ" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_scope)" style="font-size: 10px"><option selected value="self">Self</option>
+<option value="gpl">Platform</option>
+<option value="gsm">Samples</option>
+<option value="gse">Series</option>
+<option value="all">Family</option>
+</select>
+&nbsp;&nbsp;Format:&nbsp;<select id="form" name="form" onchange="OnFormFieldChange()" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_format)" style="font-size: 10px"><option value="html">HTML</option>
+<option value="text">SOFT</option>
+<option value="xml">MINiML</option>
+</select>
+&nbsp;&nbsp;Amount:&nbsp;<select id="view" name="view" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_amount)" style="font-size: 10px"><option value="brief">Brief</option>
+<option selected value="quick">Quick</option>
+</select>
+&nbsp;GEO&nbsp;accession:&nbsp;<input name="acc" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_acc)" style="font-size: 10px" type="text" value="GSM288860">&nbsp;&nbsp;</td>
+<td valign="middle"><img alt="Go" border="0" onclick="SubmitViewOptionsForm()" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_go)" src="http://www.ncbi.nlm.nih.gov/projects/geo/img/buttons/go_button.gif"></td>
+</tr></table></td></tr></table></td>
+</tr></table></form>
+    <table><tr><td><table cellpadding="2" cellspacing="0" width="600"><tr bgcolor="#cccccc" valign="top"><td colspan="2"><table width="600"><tr><td><strong><a href="acc.cgi?acc=GSM288860" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_recenter)">Sample GSM288860</a></strong></td>
+<td></td>
+<td align="right" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_gds)"><a href="http://www.ncbi.nlm.nih.gov/sites/entrez?db=gds&amp;term=GSM288860[Accession]&amp;cmd=search">Query DataSets for GSM288860</a></td>
+</tr></table></td></tr>
+<tr valign="top"><td>Status</td>
+<td>Public on Nov 01, 2008</td>
+</tr>
+<tr valign="top"><td nowrap>Title</td>
+<td style="text-align: justify">MC22</td>
+</tr>
+<tr valign="top"><td nowrap>Sample type</td>
+<td>genomic</td>
+</tr>
+<tr valign="top"><td nowrap>&nbsp;</td>
+<td></td>
+</tr>
+<tr valign="top"><td nowrap>Source Name</td>
+<td style="text-align: justify">Renal Neoplasm, Unclassified, DNA from Paraffin Embedded Tissue<br></td>
+</tr>
+<tr valign="top"><td>Organism(s)</td>
+<td><a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&amp;id=9606" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_organismus)">Homo sapiens</a></td>
+</tr>
+<tr valign="top"><td nowrap>Characteristics</td>
+<td style="text-align: justify">Sex:M<br>AgeDecade:60-69<br>Tumor Size:10<br>Furhman Nuclear Grade:3<br>TNM Stage:T2 Nx Mx<br>LymphoVascular Invasion:N<br></td>
+</tr>
+<tr valign="top"><td nowrap>Extracted molecule</td>
+<td>genomic DNA</td>
+</tr>
+<tr valign="top"><td nowrap>Extraction protocol</td>
+<td style="text-align: justify">Deparaffinization followed by Qiagen DNaasy Mini kit by manufacturer's instructions<br></td>
+</tr>
+<tr valign="top"><td nowrap>Label</td>
+<td style="text-align: justify">Biotinilated - Fragmented PCR products<br></td>
+</tr>
+<tr valign="top"><td nowrap>Label protocol</td>
+<td style="text-align: justify">Custom labeling protocol for FFPE tissue based on Affymetrix Mapping 10K Assay (Lyons-Weiler MA et al, Mol Diagn Pathol, 2008 Mar;17(1):3-13)<br></td>
+</tr>
+<tr valign="top"><td nowrap>&nbsp;</td>
+<td></td>
+</tr>
+<tr valign="top"><td nowrap>Hybridization protocol</td>
+<td style="text-align: justify">Affymetrix Mapping 10K Xba 2.0 Assay<br></td>
+</tr>
+<tr valign="top"><td nowrap>Scan protocol</td>
+<td style="text-align: justify">Affymetrix Mapping 10K Xba 2.0 Assay with an Affymetrix GeneChip 3000 7G scanner<br></td>
+</tr>
+<tr valign="top"><td nowrap>Description</td>
+<td style="text-align: justify">RenalTumor_Unclassified_FFPE_15<br></td>
+</tr>
+<tr valign="top"><td nowrap>Data processing</td>
+<td style="text-align: justify">Affymetrix GCOS 1.4, GTYPE 4.0 and GDAS 3.0<br></td>
+</tr>
+<tr valign="top"><td nowrap>&nbsp;</td>
+<td></td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td>Submission date</td>
+<td>May 14, 2008</td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td>Contact name</td>
+<td>Federico A Monzon</td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>E-mail(s)</td>
+<td><a href="mailto:famonzon@tmhs.org">famonzon@tmhs.org</a><br></td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>Organization name</td>
+<td style="text-align: justify">The Methodist Hospital Research Institute<br></td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>Department</td>
+<td style="text-align: justify">Pathology<br></td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>Street address</td>
+<td style="text-align: justify">6565 Fannin St., MS205<br></td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>City</td>
+<td style="text-align: justify">Houston</td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>State/province</td>
+<td style="text-align: justify">TX</td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>ZIP/Postal code</td>
+<td style="text-align: justify">77030</td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>Country</td>
+<td style="text-align: justify">USA</td>
+</tr>
+<tr valign="top"><td nowrap>&nbsp;</td>
+<td></td>
+</tr>
+<tr valign="top"><td>Platform ID</td>
+<td><a href="acc.cgi?acc=GPL2641">GPL2641</a></td>
+</tr>
+<tr valign="top"><td>Series (1)</td>
+<td onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_recenter)"><table cellpadding="3" style="position:relative;top:-5px;left:-5px"><tr><td valign="top"><a href="acc.cgi?acc=GSE11447" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_recenter)">GSE11447</a></td>
+<td valign="top">Diagnosis of Morphologically Challenging Cases of Renal Epithelial Neoplasms by Virtual Karyotypes with SNP Arrays</td>
+</tr></table></td>
+</tr>
+</table>
+<br><table cellspacing="3" width="600"><tr bgcolor="#eeeeee" valign="top"><td colspan="2"><strong>Data table header descriptions</strong></td></tr>
+<tr valign="top"><td><strong>ID_REF</strong></td>
+<td></td>
+</tr>
+<tr valign="top"><td><strong>VALUE</strong></td>
+<td>Genotypes: AA, AB, BB, No Call</td>
+</tr>
+<tr valign="top"><td><strong>CONFIDENCE</strong></td>
+<td></td>
+</tr>
+<tr valign="top"><td><strong>RAS1</strong></td>
+<td>Relative allele signal for the data in the first probe group</td>
+</tr>
+<tr valign="top"><td><strong>RAS2</strong></td>
+<td>Relative allele signal for the data in the second probe group</td>
+</tr>
+<tr valign="top"><td><strong>P-VALUE AA</strong></td>
+<td></td>
+</tr>
+<tr valign="top"><td><strong>P-VALUE AB</strong></td>
+<td></td>
+</tr>
+<tr valign="top"><td><strong>P-VALUE BB</strong></td>
+<td></td>
+</tr>
+<tr valign="top"><td><strong>P-VALUE NO CALL</strong></td>
+<td></td>
+</tr>
+</table>
+<br><div style="overflow:auto;width:950px;height:450px"><table cellpadding="2" cellspacing="2" width="950"><tr bgcolor="#eeeeee" valign="top"><td colspan="9"><strong>Data table</strong></td></tr>
+<tr valign="top"><td bgcolor="#EEEEEE"><strong>ID_REF</strong></td>
+<td bgcolor="#DEEBDC"><strong>VALUE</strong></td>
+<td bgcolor="#EEEEEE"><strong>CONFIDENCE</strong></td>
+<td bgcolor="#DEEBDC"><strong>RAS1</strong></td>
+<td bgcolor="#EEEEEE"><strong>RAS2</strong></td>
+<td bgcolor="#DEEBDC"><strong>P-VALUE AA</strong></td>
+<td bgcolor="#EEEEEE"><strong>P-VALUE AB</strong></td>
+<td bgcolor="#DEEBDC"><strong>P-VALUE BB</strong></td>
+<td bgcolor="#EEEEEE"><strong>P-VALUE NO CALL</strong></td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>AFFX-5Q-123</td>
+<td bgcolor="#DEEBDC" nowrap>No Call</td>
+<td bgcolor="#EEEEEE" nowrap>16035</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>AFFX-5Q-456</td>
+<td bgcolor="#DEEBDC" nowrap>No Call</td>
+<td bgcolor="#EEEEEE" nowrap>5579.5</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>AFFX-5Q-789</td>
+<td bgcolor="#DEEBDC" nowrap>No Call</td>
+<td bgcolor="#EEEEEE" nowrap>19728</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>AFFX-5Q-ABC</td>
+<td bgcolor="#DEEBDC" nowrap>No Call</td>
+<td bgcolor="#EEEEEE" nowrap>22796</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>SNP_A-1513509</td>
+<td bgcolor="#DEEBDC" nowrap>AB</td>
+<td bgcolor="#EEEEEE" nowrap>0.238172</td>
+<td bgcolor="#DEEBDC" nowrap>0.555714</td>
+<td bgcolor="#EEEEEE" nowrap>0.549745</td>
+<td bgcolor="#DEEBDC" nowrap>0.555714</td>
+<td bgcolor="#EEEEEE" nowrap>0.549745</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>SNP_A-1518411</td>
+<td bgcolor="#DEEBDC" nowrap>BB</td>
+<td bgcolor="#EEEEEE" nowrap>0.192394</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0.0103383</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0.0103383</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>SNP_A-1511066</td>
+<td bgcolor="#DEEBDC" nowrap>No Call</td>
+<td bgcolor="#EEEEEE" nowrap>1.45977</td>
+<td bgcolor="#DEEBDC" nowrap>0.353349</td>
+<td bgcolor="#EEEEEE" nowrap>0.385832</td>
+<td bgcolor="#DEEBDC" nowrap>0.353349</td>
+<td bgcolor="#EEEEEE" nowrap>0.385832</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>SNP_A-1517367</td>
+<td bgcolor="#DEEBDC" nowrap>AA</td>
+<td bgcolor="#EEEEEE" nowrap>0.19986</td>
+<td bgcolor="#DEEBDC" nowrap>0.978508</td>
+<td bgcolor="#EEEEEE" nowrap>0.852538</td>
+<td bgcolor="#DEEBDC" nowrap>0.978508</td>
+<td bgcolor="#EEEEEE" nowrap>0.852538</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>SNP_A-1512567</td>
+<td bgcolor="#DEEBDC" nowrap>BB</td>
+<td bgcolor="#EEEEEE" nowrap>0.238237</td>
+<td bgcolor="#DEEBDC" nowrap>0.0718358</td>
+<td bgcolor="#EEEEEE" nowrap>0.0899601</td>
+<td bgcolor="#DEEBDC" nowrap>0.0718358</td>
+<td bgcolor="#EEEEEE" nowrap>0.0899601</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>SNP_A-1519604</td>
+<td bgcolor="#DEEBDC" nowrap>BB</td>
+<td bgcolor="#EEEEEE" nowrap>0.224586</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0.0110594</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0.0110594</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>SNP_A-1507932</td>
+<td bgcolor="#DEEBDC" nowrap>BB</td>
+<td bgcolor="#EEEEEE" nowrap>0.287172</td>
+<td bgcolor="#DEEBDC" nowrap>0.100244</td>
+<td bgcolor="#EEEEEE" nowrap>0.0431034</td>
+<td bgcolor="#DEEBDC" nowrap>0.100244</td>
+<td bgcolor="#EEEEEE" nowrap>0.0431034</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>SNP_A-1519685</td>
+<td bgcolor="#DEEBDC" nowrap>AB</td>
+<td bgcolor="#EEEEEE" nowrap>0.776951</td>
+<td bgcolor="#DEEBDC" nowrap>0.512173</td>
+<td bgcolor="#EEEEEE" nowrap>0.38664</td>
+<td bgcolor="#DEEBDC" nowrap>0.512173</td>
+<td bgcolor="#EEEEEE" nowrap>0.38664</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>SNP_A-1516165</td>
+<td bgcolor="#DEEBDC" nowrap>BB</td>
+<td bgcolor="#EEEEEE" nowrap>0.208945</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>SNP_A-1514890</td>
+<td bgcolor="#DEEBDC" nowrap>AA</td>
+<td bgcolor="#EEEEEE" nowrap>0.462736</td>
+<td bgcolor="#DEEBDC" nowrap>0.618445</td>
+<td bgcolor="#EEEEEE" nowrap>0.886905</td>
+<td bgcolor="#DEEBDC" nowrap>0.618445</td>
+<td bgcolor="#EEEEEE" nowrap>0.886905</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>SNP_A-1507580</td>
+<td bgcolor="#DEEBDC" nowrap>BB</td>
+<td bgcolor="#EEEEEE" nowrap>0.137501</td>
+<td bgcolor="#DEEBDC" nowrap>0.0759312</td>
+<td bgcolor="#EEEEEE" nowrap>0.003996</td>
+<td bgcolor="#DEEBDC" nowrap>0.0759312</td>
+<td bgcolor="#EEEEEE" nowrap>0.003996</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>SNP_A-1510991</td>
+<td bgcolor="#DEEBDC" nowrap>AB</td>
+<td bgcolor="#EEEEEE" nowrap>0.264276</td>
+<td bgcolor="#DEEBDC" nowrap>0.45529</td>
+<td bgcolor="#EEEEEE" nowrap>0.462424</td>
+<td bgcolor="#DEEBDC" nowrap>0.45529</td>
+<td bgcolor="#EEEEEE" nowrap>0.462424</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>SNP_A-1516205</td>
+<td bgcolor="#DEEBDC" nowrap>No Call</td>
+<td bgcolor="#EEEEEE" nowrap>10</td>
+<td bgcolor="#DEEBDC" nowrap>-2</td>
+<td bgcolor="#EEEEEE" nowrap>-2</td>
+<td bgcolor="#DEEBDC" nowrap>-2</td>
+<td bgcolor="#EEEEEE" nowrap>-2</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>SNP_A-1512666</td>
+<td bgcolor="#DEEBDC" nowrap>No Call</td>
+<td bgcolor="#EEEEEE" nowrap>10</td>
+<td bgcolor="#DEEBDC" nowrap>-2</td>
+<td bgcolor="#EEEEEE" nowrap>-2</td>
+<td bgcolor="#DEEBDC" nowrap>-2</td>
+<td bgcolor="#EEEEEE" nowrap>-2</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>SNP_A-1512740</td>
+<td bgcolor="#DEEBDC" nowrap>BB</td>
+<td bgcolor="#EEEEEE" nowrap>0.172338</td>
+<td bgcolor="#DEEBDC" nowrap>0.102003</td>
+<td bgcolor="#EEEEEE" nowrap>0.0636994</td>
+<td bgcolor="#DEEBDC" nowrap>0.102003</td>
+<td bgcolor="#EEEEEE" nowrap>0.0636994</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>SNP_A-1512132</td>
+<td bgcolor="#DEEBDC" nowrap>AA</td>
+<td bgcolor="#EEEEEE" nowrap>0.156389</td>
+<td bgcolor="#DEEBDC" nowrap>0.903372</td>
+<td bgcolor="#EEEEEE" nowrap>0.979726</td>
+<td bgcolor="#DEEBDC" nowrap>0.903372</td>
+<td bgcolor="#EEEEEE" nowrap>0.979726</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+</tr>
+</table></div>
+<br>Total number of rows: <strong>10208</strong><br><br>Table truncated, full table size <strong>585 Kbytes</strong>.<br><br><input name="fulltable" onclick="window.open('acc.cgi?view=data&amp;acc=GSM288860&amp;id=991&amp;db=GeoDb_blob25', '_blank')" type="submit" value="View full table..."><br><br><br><table cellpadding="2" cellspacing="2" width="600"><tr bgcolor="#eeeeee" valign="top"><td align="middle" bgcolor="#CCCCCC"><strong>Supplementary file</strong></td>
+<td align="middle" bgcolor="#CCCCCC"><strong>Size</strong></td>
+<td align="middle" bgcolor="#CCCCCC"><strong>Download</strong></td>
+<td align="middle" bgcolor="#CCCCCC"><strong>File type/resource</strong></td>
+</tr>
+<tr valign="top"><td bgcolor="#DEEBDC">GSM288860.CEL.gz</td>
+<td bgcolor="#DEEBDC">1.9 Mb</td>
+<td bgcolor="#DEEBDC"><a href="ftp://ftp.ncbi.nih.gov/pub/geo/DATA/supplementary/samples/GSM288nnn/GSM288860/GSM288860%2ECEL%2Egz">(ftp)</a><a href="acc.cgi?mode=raw&amp;acc=GSM288860&amp;db=GSM288860%2ECEL%2Egz&amp;is_ftp=true">(http)</a></td>
+<td bgcolor="#DEEBDC">CEL</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE">GSM288860.CHP.gz</td>
+<td bgcolor="#EEEEEE">106.3 Kb</td>
+<td bgcolor="#EEEEEE"><a href="ftp://ftp.ncbi.nih.gov/pub/geo/DATA/supplementary/samples/GSM288nnn/GSM288860/GSM288860%2ECHP%2Egz">(ftp)</a><a href="acc.cgi?mode=raw&amp;acc=GSM288860&amp;db=GSM288860%2ECHP%2Egz&amp;is_ftp=true">(http)</a></td>
+<td bgcolor="#EEEEEE">CHP</td>
+</tr>
+<tr><td>Raw data provided as supplementary file</td></tr>
+<tr><td>Processed data included within Sample table</td></tr>
+<tr><td>Processed data provided as supplementary file</td></tr>
+</table>
+<br></td></tr></table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_right_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_right_bg.gif" width="4" height="3" alt="" border="0"></td>
+    </tr>
+    <tr>
+        <td background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/but_left.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/but_left.gif" width="4" height="4" alt="" border="0"></td>
+        <td width="10000" bgcolor="#FFFFFF" background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/but_mid_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/pixel.gif" width="1" height="1" alt="" border="0"></td>
+        <td align="right" background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/but_right.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/but_right.gif" alt="" width="4" height="4" border="0"></td>
+    </tr>
+</table>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+	<tr>
+        <td width="99%"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/pixel.gif" width="1" height="1" alt="" border="0"></td><td valign="top" align="right"  nowrap>
+	        <span class="HELPBAR">|<A HREF="http://www.nlm.nih.gov"> NLM </A>|<A HREF="http://www.nih.gov" CLASS="HELPBAR"> NIH </A>|<A HREF="mailto:geo@ncbi.nlm.nih.gov" CLASS="HELPBAR"> GEO Help </A>|<A HREF="/projects/geo/info/disclaimer.html" CLASS="HELPBAR"> Disclaimer </A>|<a href="http://www.ncbi.nlm.nih.gov/About/accessibility.html" class="HELPBAR"> Section 508 </a>|</span><br>
+        </td>
+	</tr>
+</table>
+
+
+
+
+
+</body>
+</html>
+<map name="unlmenu">
+<area alt="NCBI Home" coords="2,0,39,15" href="http://www.ncbi.nlm.nih.gov" onMouseOver="changpics(unl_menu_pix, unl_menu_home_a)" onMouseOut="changpics(unl_menu_pix, unl_menu_noa)">
+<area alt="NCBI Search" coords="40,0,91,15" href="http://www.ncbi.nlm.nih.gov/sites/entrez?db=ncbisearch" onMouseOver="changpics(unl_menu_pix, unl_menu_search_a)" onMouseOut="changpics(unl_menu_pix, unl_menu_noa)">
+<area alt="NCBI SiteMap" coords="92,0,143,15" href="http://www.ncbi.nlm.nih.gov/Sitemap/" onMouseOver="changpics(unl_menu_pix, unl_menu_sitemap_a)" onMouseOut="changpics(unl_menu_pix, unl_menu_noa)">
+</map>
+

@@ -1,0 +1,119 @@
+#!/usr/bin/perl
+
+
+# The script name : probe3pval.pl
+# This script is used for validating 3' sequence of rearrayed probes:
+# verify successful 3' sequencing of rearrayed probes
+# and updates the rearray probes relational table in mysql database
+# based on 5' validation results 
+# print only the 3' sequence for clones passed 5' validation process into fasta file 
+
+# You run this script only after you run probe5pval.pl
+# At command line type probe3pval.pl seq_file.fasta plate_number 
+# Author name and contact : David Hummel at hummel@pw.usda.gov
+
+
+use DBI;
+
+# usage
+unless ($ARGV[0]) {
+	die "\nusage: $0 <3p_fasta_file>\n\n";
+}
+
+# open db
+$dbh = DBI->connect("DBI:mysql:dbname", 'usrname', 'password');
+
+# update 3p_seq in nsf.probes
+&update3pseq;
+
+# generate 3' validated file from 3' sequence file
+# with only 5' validated sequences and WHE names
+&get3pvalfasta;
+
+# close db
+$dbh->disconnect;
+
+print ("All done!\n");
+
+######
+
+sub update3pseq {
+	print "validating 3' sequencing results...";
+	my ($albany_plate,@albany_plates,$well,$sql,$sth,$ErrNum,$ErrText);
+	# check for successful sequencing
+	open (FAS, $ARGV[0]) or die "couldn't open $ARGV[0]\n";
+	while (<FAS>) {
+		if (($albany_plate,$well) = (/>(\d+)_([A-H]\d\d)/)) {
+			if ($albany_plate != $albany_plates[-1]) { # new plate detected
+				push (@albany_plates,$albany_plate);
+				# reset 3p_seq to null for this plate
+				#print "resetting probes.3p_seq to NULL for: $albany_plate\n";
+				#$sql = "update probes set 3p_seq = NULL where albany_plate = $albany_plate";
+				#$sth = $dbh->prepare($sql); $sth->execute; $ErrNum = $dbh->err; $ErrText = $dbh->errstr; $sth->finish;
+				#if ($ErrNum) {
+				#	print "couldn't reset 3p_seq for: ${albany_plate}\n";
+				#} else {
+				#	#print "reset 3p_seq for: ${albany_plate}\n";
+				#}
+			}
+			$sql = "update probes set 3p_seq = 'y' where albany_plate = $albany_plate and well = '$well'";
+			$sth = $dbh->prepare($sql); $sth->execute; $ErrNum = $dbh->err; $ErrText = $dbh->errstr; $sth->finish;
+			if ($ErrNum) {
+				print "couldn't set 3p_seq = 'y' for: ${albany_plate}_$well\n";
+			} else {
+				#print "set 3p_seq = 'y' for: ${albany_plate}_$well\n";
+			}
+		}
+	}
+	close (FAS);
+	# set unsuccessful sequences (missing from fasta file) to 'n' for each albany_plate
+	foreach (@albany_plates) {
+		$sql = "update probes set 3p_seq = 'n' where albany_plate = $_ and 3p_seq is null";
+		$sth = $dbh->prepare($sql); $sth->execute; $ErrNum = $dbh->err; $ErrText = $dbh->errstr; $sth->finish;
+		if ($ErrNum) {
+			print "couldn't set 3p_seq = 'n' for plate: $_\n";
+		} else {
+			#print "set 3p_seq = 'n' for plate: $_\n";
+		}
+	}
+	print "done\n";
+}
+
+sub get3pvalfasta {
+	print "generating 3' validated fasta file...";
+	my ($albany_plate,$well,@row,$sql,$sth,$ErrNum,$ErrText);
+	# generate 3' validated file from 3' sequence file
+	# with only 5' validated sequences and WHE names
+	open (FAS, $ARGV[0]) or die "couldn't open $ARGV[0]\n";
+	open (NEWFAS, ">$ARGV[0].3p_val") or die "couldn't open $ARGV[0].3p_val for writing\n";
+	while (<FAS>) {
+		if (($albany_plate,$well) = (/>(\d+)_([A-H]\d\d)/)) { # new sequence
+			# see if 5' validated
+			$sql = "select est,5p_seq,5p_val from probes where albany_plate = $albany_plate and well = '$well'";
+			$sth = $dbh->prepare($sql); $sth->execute; $ErrNum = $dbh->err; $ErrText = $dbh->errstr;
+			if ($ErrNum) {die "sorry, there was a problem with 3' validated fasta file generation\n";}
+			if (@row = $sth->fetchrow) {
+				if ($row[1] eq 'y' and $row[2] eq 'y') { # 5' validated!
+					# print sequence to new file
+					#do {print NEWFAS $_ unless /^\s*$/; $_ = <FAS>;} while (defined($_) && $_ !~ />/);
+					do {
+						if (/>/) {print NEWFAS ">$row[0]\n";} # print WHE name if nameline
+						else {print NEWFAS $_ unless /^\s*$/;}
+						$_ = <FAS>;
+					} while (defined($_) && $_ !~ />/);
+					redo if defined($_);
+				} else {
+					# skip to next sequence
+					do {$_ = <FAS>;} while (defined($_) && $_ !~ />/);
+					redo if defined($_);
+				}
+			} else {
+				print "sorry, the sequence ${albany_plate}_$well was not found in probes\n";
+			}
+			$sth->finish;
+		}
+	}
+	close (FAS);
+	close (NEWFAS);
+	print "done\nsee $ARGV[0].3p_val\n";
+}

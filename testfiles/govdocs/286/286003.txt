@@ -1,0 +1,547 @@
+' PROGRAM:    2000  ROBOT2001_WFH.bsx
+' Written by: Innovation First, Inc.
+' Date:       12/28/99
+'        mod  02/15/01         Jack Fried
+'
+' Define BS2-SX Project Files
+'
+' {$STAMP BS2SX}
+
+
+
+
+'========== DECLARE VARIABLES ================================================
+'=============================================================================
+'  Below is a list of declared input and output variables.  Comment or un-comment
+'  the variables as needed.  Declare any additional variables required in
+'  your main program loop.  Note that you may only use 26 total variables.
+
+
+'---------- Operator Interface (OI) - Analog Inputs --------------------------
+
+p1_x		VAR byte	'Port 1, X-axis on Joystick
+p2_x		VAR byte	'Port 2, X-axis on Joystick
+'p3_x		VAR byte	'Port 3, X-axis on Joystick       NOT USED	JF
+p4_x		VAR byte	'Port 4, X-axis on Joystick
+
+p1_y		VAR byte	'Port 1, Y-axis on Joystick
+p2_y		VAR byte	'Port 2, Y-axis on Joystick
+p3_y		VAR byte	'Port 3, Y-axis on Joystick
+p4_y		VAR byte	'Port 4, Y-axis on Joystick
+
+p1_wheel	VAR byte	'Port 1, Wheel on Joystick
+p2_wheel	VAR byte	'Port 2, Wheel on Joystick
+p3_wheel	VAR byte	'Port 3, Wheel on Joystick
+p4_wheel	VAR byte	'Port 4, Wheel on Joystick
+
+'p1_aux	VAR byte	'Port 1, Aux on Joystick
+'p2_aux	VAR byte	'Port 2, Aux on Joystick
+'p3_aux	VAR byte	'Port 3, Aux on Joystick
+'p4_aux	VAR byte	'Port 4, Aux on Joystick
+
+
+'---------- Operator Interface - Digital Inputs ------------------------------
+
+oi_swA	VAR byte	'OI Digital Switch Inputs 1 thru 8
+oi_swB	VAR byte	'OI Digital Switch Inputs 9 thru 16
+
+
+'---------- Robot Controller (RC) - Analog Inputs ----------------------------
+
+
+		
+sensor1    	VAR byte	'RC Analog Input 1, connector pin 2	USED FOR ARM POSITION	JF
+'sensor2	VAR byte	'RC Analog Input 2, connector pin 16
+'sensor3	VAR byte	'RC Analog Input 3, connector pin 5
+'sensor4	VAR byte	'RC Analog Input 4, connector pin 19
+'sensor5	VAR byte	'RC Analog Input 5, connector pin 8
+'sensor6	VAR byte	'RC Analog Input 6, connector pin 22
+'sensor7	VAR byte	'RC Analog Input 7, connector pin 11
+'bat_volt	VAR byte	'RC Analog Input 8, hardwired to the Battery
+				'Vin = ((4.7/14.7)* Battery voltage)-0.4
+				'Binary Battery Voltage = (Vin/5.0 V)*255
+
+
+'---------- Robot Controller - Digital Inputs --------------------------------
+
+rc_swA	VAR byte	'RC Digital Inputs 1 thru 8
+rc_swB	VAR byte	'RC Digital Inputs 9 thru 16
+
+
+'---------- Robot Controller - Digital Outputs -------------------------------
+
+relayA	VAR byte
+relayB	VAR byte
+
+
+'---------- Misc. ------------------------------------------------------------
+
+				'LEFT DRIVE MOTOR
+PWM1		VAR byte	'define variable for use in serout command			JF
+				'RIGHT DRIVE MOTOR
+PWM2		VAR byte	'define variable for use in serout command			JF
+				
+temp		VAR byte	'TEMP VARIABLE USED TO STORE ARM POSITION			JF
+
+PB_mode	VAR byte
+'packet_num	VAR byte
+'delta_t	VAR byte
+
+
+
+
+'========== DEFINE ALIASES ===================================================
+'=============================================================================
+'  Aliases are variables which are sub-divisions of variables defined
+'  above.  Aliases don't require any additional RAM.
+
+
+'---------- Aliases for each OI switch input ---------------------------------
+'  Below are aliases for the digital inputs located on the Operator Interface.
+'  Ports 1 & 3 have their inputs duplicated in ports 4 & 2 respectively.  The 
+'  inputs from ports 1 & 3 may be disabled via the 'Disable' dip switch 
+'  located on the Operator Interface.  See Users Manual for details.
+
+p1_sw_trig	VAR oi_swA.bit0	'Joystick Trigger Button,	same as Port4 pin5 
+p1_sw_top	VAR oi_swA.bit1	'Joystick Top Button,		same as Port4 pin8
+p1_sw_aux1	VAR oi_swA.bit2	'Aux input,				same as Port4 pin9
+p1_sw_aux2	VAR oi_swA.bit3	'Aux input,				same as Port4 pin15
+
+p3_sw_trig	VAR oi_swA.bit4	'Joystick Trigger Button,	same as Port2 pin5 
+p3_sw_top	VAR oi_swA.bit5	'Joystick Top Button,		same as Port2 pin8
+p3_sw_aux1	VAR oi_swA.bit6	'Aux input,				same as Port2 pin9
+p3_sw_aux2	VAR oi_swA.bit7	'Aux input,				same as Port2 pin15
+
+p2_sw_trig	VAR oi_swB.bit0	'Joystick Trigger Button
+p2_sw_top	VAR oi_swB.bit1	'Joystick Top Button
+p2_sw_aux1	VAR oi_swB.bit2	'Aux input
+p2_sw_aux2	VAR oi_swB.bit3	'Aux input
+
+p4_sw_trig	VAR oi_swB.bit4	'Joystick Trigger Button
+p4_sw_top	VAR oi_swB.bit5	'Joystick Top Button
+p4_sw_aux1	VAR oi_swB.bit6	'Aux input
+p4_sw_aux2	VAR oi_swB.bit7	'Aux input
+
+
+'---------- Aliases for each RC switch input ---------------------------------
+'  Below are aliases for the digital inputs located on the Robot Controller.
+
+rc_sw1	VAR rc_swA.bit0
+rc_sw2	VAR rc_swA.bit1
+rc_sw3	VAR rc_swA.bit2
+rc_sw4	VAR rc_swA.bit3
+rc_sw5	VAR rc_swA.bit4
+rc_sw6	VAR rc_swA.bit5
+rc_sw7	VAR rc_swA.bit6
+rc_sw8	VAR rc_swA.bit7
+rc_sw9	VAR rc_swB.bit0
+rc_sw10	VAR rc_swB.bit1
+rc_sw11	VAR rc_swB.bit2
+rc_sw12	VAR rc_swB.bit3
+rc_sw13	VAR rc_swB.bit4
+rc_sw14	VAR rc_swB.bit5
+rc_sw15	VAR rc_swB.bit6
+rc_sw16	VAR rc_swB.bit7
+
+
+'---------- Aliases for each RC Relay outputs ---------------------------------
+'  Below are aliases for the relay outputs located on the Robot Controller.
+
+relay1_fwd	VAR RelayA.bit0
+relay1_rev	VAR RelayA.bit1
+relay2_fwd	VAR RelayA.bit2
+relay2_rev	VAR RelayA.bit3
+relay3_fwd	VAR RelayA.bit4
+relay3_rev	VAR RelayA.bit5
+relay4_fwd	VAR RelayA.bit6
+relay4_rev	VAR RelayA.bit7
+
+relay5_fwd	VAR RelayB.bit0
+relay5_rev	VAR RelayB.bit1
+relay6_fwd	VAR RelayB.bit2
+relay6_rev	VAR RelayB.bit3
+relay7_fwd	VAR RelayB.bit4
+relay7_rev	VAR RelayB.bit5
+relay8_fwd	VAR RelayB.bit6
+relay8_rev	VAR RelayB.bit7
+
+
+'---------- Aliases for the Pbasic Mode Byte (PB_mode) -----------------------
+'  The last bit of the PB_mode byte (aliased as comp_mode) indicates the status
+'  of the Competition Control, either Enabled or Disabled.  This indicates the
+'  starting and stopping of rounds at the competitions.  Comp_mode is the same
+'  as the "Disabled" LED on the Operator Interface.
+'  Comp_mode = 1 for Enabled, 0 for Disabled.
+
+comp_mode		VAR PB_mode.bit7
+
+
+
+
+'========= DEFINE CONSTANTS FOR INITIALIZATION ===============================
+'=============================================================================
+'  The initialization code is used to select the input data used by PBASIC.
+'  The Master micro-processor (uP) sends the data you select to the BS2SX
+'  PBASIC uP.  You may select up to 26 constants, corresponding
+'  to 26 variables, from the 32 available to you.  Make sure that you have 
+'  variables for all the bytes recieved in the serin command.
+'
+'  The constants below have a "c_" prefix, as compared to the variables that 
+'  they will represent.
+'
+'  Set the Constants below to 1 for each data byte you want to recieve.
+'  Set the Constants below to 0 for the unneeded data bytes.
+
+
+'---------- Set the Initialization constants you want to read ----------------
+
+c_p1_y		CON	1
+c_p2_y		CON	1
+c_p3_y		CON	1
+c_p4_y		CON	1
+
+c_p1_x		CON	1
+c_p2_x		CON	1
+c_p3_x		CON	0	' removed from serin  string
+c_p4_x		CON	1
+
+c_p1_wheel		CON	1
+c_p2_wheel		CON	1
+c_p3_wheel		CON	1
+c_p4_wheel		CON	1
+
+c_p1_aux		CON	0
+c_p2_aux		CON	0
+c_p3_aux		CON	0
+c_p4_aux		CON	0
+
+c_oi_swA		CON	1
+c_oi_swB		CON	1
+
+c_sensor1		CON	1	' added to serin string
+c_sensor2		CON	0
+c_sensor3		CON	0
+c_sensor4		CON	0
+c_sensor5		CON	0
+c_sensor6		CON	0
+c_sensor7		CON	0
+c_batt_volt		CON	0
+
+c_rc_swA		CON	1
+c_rc_swB		CON	1
+
+c_delta_t		CON	0
+c_PB_mode		CON	1
+c_packet_num	CON	0
+c_res01		CON	0
+
+
+'---------- Initialization Constant VOLTAGE - USER DEFINED -------------------
+'  This is the 'Low Battery' detect voltage.  The 'Low Battery' LED will
+'  blink when the voltage drops below this value.
+'  Basically set VOLTAGE = INT ((DESIRED FLASH VOLTAGE + 0.4) * 16.3)
+'  Example, for a 10 Volt trigger, set Voltage eq 170.
+
+dataInitVolt	CON 153	'9.0 Volts
+
+
+
+
+'========== DEFINE CONSTANTS (DO NOT CHANGE) =================================
+'=============================================================================
+' Baud rate for communications with User CPU
+OUTBAUD	CON	20	' (62500, 8N1, Noninverted)
+INBAUD	CON	20	' (62500, 8N1, Noninverted)
+
+USERCPU	CON 4
+FPIN		CON 1
+COMA		CON 1
+COMB		CON 2
+COMC		CON 3
+
+
+
+
+'========== MAIN PROGRAM =====================================================
+'=============================================================================
+
+'---------- Input & Output Declarations --------------------------------------
+
+Output	COMB
+Input		COMA
+Input		COMC
+
+Output	7	'define Basic Run LED on RC => out7
+
+Output      8	'define Robot Feedback LED => out8	=> PWM1 Green
+Output      9	'define Robot Feedback LED => out9	=> PWM1 Red
+Output      10	'define Robot Feedback LED => out10	=> PWM2 Green
+Output      11	'define Robot Feedback LED => out11 => PWM2 Red
+Output      12	'define Robot Feedback LED => out12 => Relay1 Red
+Output      13	'define Robot Feedback LED => out13 => Relay1 Green
+Output      14	'define Robot Feedback LED => out14 => Relay2 Red
+Output      15	'define Robot Feedback LED => out15 => Relay2 Green
+
+
+'---------- Initialize Inputs & Outputs --------------------------------------
+
+Out7  = 1		'Basic Run LED on RC
+Out8  = 0		'PWM1 LED - Green
+Out9  = 0		'PWM1 LED - Red
+Out10 = 0		'PWM2 LED - Green
+Out11 = 0		'PWM2 LED - Red
+Out12 = 0		'Relay1 LED - Red
+Out13 = 0		'Relay1 LED - Green
+Out14 = 0		'Relay2 LED - Red
+Out15 = 0		'Relay2 LED - Green
+
+p1_x = 127		'Port 1, X-axis on Joystick
+p2_x = 127		'Port 2, X-axis on Joystick
+'p3_x = 127		'Port 3, X-axis on Joystick
+'p4_x = 127		'Port 4, X-axis on Joystick
+
+p1_y = 127		'Port 1, Y-axis on Joystick
+p2_y = 127		'Port 2, Y-axis on Joystick
+p3_y = 127		'Port 3, Y-axis on Joystick
+p4_y = 127		'Port 4, Y-axis on Joystick
+
+p1_wheel = 127	'Port 1, Wheel on Joystick
+p2_wheel = 127	'Port 2, Wheel on Joystick
+p3_wheel = 127	'Port 3, Wheel on Joystick
+p4_wheel = 127	'Port 4, Wheel on Joystick
+
+'p1_aux = 127	'Port 1, Aux Analog
+'p2_aux = 127	'Port 2, Aux Analog
+'p3_aux = 127	'Port 3, Aux Analog
+'p4_aux = 127	'Port 4, Aux Analog
+
+
+
+
+'========== PBASIC - MASTER uP INITIALIZATION ROUTINE ========================
+'=============================================================================
+'  DO NOT CHANGE THIS!  DO NOT MOVE THIS!
+'  The init routine sends 5 bytes to the Master uP, defining which data bytes to receive.
+'  1)  Collect init.
+'  2)  Lower the COMA line, which is the clk line for the shift out command.
+'  3)  Lower COMB line to tell pic that we are ready to send init data.
+'  4)  Wait for pic to lower the COMC line, signaling pic is ready for data.
+'  5)  Now send out init dat to pic, all 5 bytes.
+'  6)  Now set direction and levels for the COMA and COMB pins.
+
+tempA		CON	c_p3_x <<1 + c_p4_x <<1 + c_p1_x <<1 + c_p2_x <<1 + c_rc_swB
+dataInitA	CON	tempA <<1 + c_rc_swA <<1 + c_oi_swB <<1 + c_oi_swA
+tempB		CON	c_sensor4 <<1 + c_sensor3 <<1 + c_p1_y <<1 + c_p2_y <<1 + c_sensor2
+dataInitB	CON	tempB <<1 + c_sensor1 <<1 + c_packet_num <<1 + c_PB_mode
+tempC		CON	c_batt_volt <<1 + c_sensor7 <<1 + c_p1_wheel <<1 + c_p2_wheel <<1 + c_sensor6
+dataInitC	CON	tempC <<1 + c_sensor5 <<1 + c_p3_y <<1 + c_p4_y
+tempD		CON	c_res01 <<1 + c_delta_t <<1 + c_p3_aux <<1 + c_p4_aux <<1 + c_p1_aux
+dataInitD	CON	tempD <<1 + c_p2_aux  <<1 + c_p3_wheel <<1 + c_p4_wheel
+
+Output	COMA
+low		COMA
+low		COMB
+Wait_init:	if IN3 = 1 then Wait_init:
+Shiftout	COMB,COMA,1, [dataInitA,dataInitB,dataInitC,dataInitD,dataInitVolt]
+Input		COMA
+high		COMB
+
+
+
+
+'========== MAIN LOOP ========================================================
+'=============================================================================
+
+MainLoop:
+
+
+'---------- Serin Command - Get Data from Master uP --------------------------
+'  Construct the "serin" command using the following rules:
+'  1) There must be one variable for every input defined in the "Define Constants for Init" section.
+'  2) The order must match the order in the EXAMPLE SERIN COMMAND below.
+'  3) The total number of all variables may not exceed 26.
+'  4) Only use one "Serin" command.
+'  5) The Serin command must occupy one line.
+'
+'  If you see a BASIC INIT ERR on the Robot Controller after programming and pressing RESET, then
+'  there is a problem with the Serin command below.  Check the number of variables.  A BASIC INIT ERR
+'  will not occur if you have the variables in the wrong order, however your code will not work correctly.
+'
+'  EXAMPLE SERIN COMMAND
+'  This example exceed the 26 variable limit and is not on one line:
+'
+'  Serin COMA\COMB, INBAUD, [oi_swA,oi_swB,rc_swA,rc_swB,p2_x,p1_x,p4_x,p3_x,PB_mode,packet_num,sensor1,
+'				     sensor2,p2_y,p1_y,sensor3,sensor4,p4_y,p3_y,sensor5,sensor6,p2_wheel,p1_wheel,
+'				     sensor7,sensor8,p4_wheel,p3_wheel,p2_aux,p1_aux,p4_aux,p3_aux,delta_t,res01]
+'
+							'MODIFIED BY JF
+   Serin COMA\COMB, INBAUD, [oi_swA,oi_swB,rc_swA,rc_swB,p2_x,p1_x,p4_x,PB_mode,sensor1,p2_y,p1_y,p4_y,p3_y,p2_wheel,p1_wheel,p4_wheel,p3_wheel]
+
+
+'---------- Blink BASIC RUN LED ----------------------------------------------
+Toggle 7			'Basic Run LED on the RC is toggled ON/OFF every loop.
+
+
+'========== PERFORM OPERATIONS ===============================================
+'  Add your custom code here.
+'  Delete any of the following sections below (except for Output Data) as desired.
+
+ 
+'---------- Buttons to Relays ------------------------------------------------
+
+'  The &  used below is the PBASIC symbol for AND
+'  The &~ used below is the PBASIC symbol for AND NOT
+
+
+					'CONTROL  PUMP
+
+relay1_fwd = rc_sw2 		' rc_sw2 is the pressure sensor and relay1 controls the PUMP.	JF
+				' when the sensor reads ture turn on the PUMP
+
+					' CONTROL ELBOW
+relay2_rev = p2_sw_top	 	' Used to control elbow on the arm					JF
+relay2_fwd = p2_sw_trig  	' Used to control elbow on the arm 					JF
+
+				'CONTROL PADDLE
+relay3_fwd = 0				'CLOSE THE PADDLES						JF
+if p2_wheel < 200 then paddle:	'									JF
+    relay3_fwd = 1 			'IF THE WHEEL IS GREATER THEN 200 close the paddle	JF
+paddle:
+
+				'CONTROL CLAW
+
+relay4_fwd = p2_sw_trig			'control the claw							JF
+
+
+relay8_fwd = 1				'Relay 8 always Forward
+relay8_rev = 0				'Relay 8 always Forward
+
+
+		'REMOVE NEXT LINE TO REMOVE DEAD ZONE					
+Gosub alterp1_y			' This routine adds the deadzone and rampup for the drive joystick (FWD and BK)	JF
+
+		'REMOVE NEXT LINE TO REMOVE DEAD ZONE					
+Gosub alterp1_x			' This routine adds the deadzone and rampup for the drive joystick (LEFT and RIGHT)	JF
+				'REMOVE NEXT LINE TO REMOVE FEAD BACK system  (THIS WILL STOP THE OSCILATION OF THE ARM)
+Gosub alterp2_y			' This routine adds memory to the ARM so that the arm will not fall			JF
+
+
+PWM1 = (((2000 + p1_y - p1_x + 127) Min 2000 Max 2254) - 2000)	' SET the value for the right PWM drive motor	JF
+PWM2 = (((2000 + p1_y + p1_x - 127) Min 2000 Max 2254) - 2000)	' SET the value for the left  PWM drive motor	JF
+
+
+
+'---------- Feedback LEDs for PWM1, PWM2 -------------------------------------
+
+Out8  =   pwm1/216  'LED is ON when Victor883 full forward (default CAL)
+Out9  = ~(pwm1/56  max 1) 'LED is ON when Victor883 full reverse (default CAL)
+Out10 =   pwm2/216  'LED is ON when Victor883 full forward (default CAL)
+Out11 = ~(pwm2/56  max 1) 'LED is ON when Victor883 full reverse (default CAL)
+
+'---------- Feedback LEDs for Relay1, Relay2 ---------------------------------
+
+Out13 = relay1_fwd		'LED is ON when Relay 1 is Forward
+Out12 = relay1_rev		'LED is ON when Relay 1 is Reverse
+Out15 = relay2_fwd		'LED is ON when Relay 2 is Forward
+Out14 = relay2_rev		'LED is ON when Relay 2 is Reverse
+
+
+
+'========== OUTPUT DATA ======================================================
+'=============================================================================
+'  The Serout line sends data to the Output uP.  The Output uP passes this to each PWM 1-16
+'  and Relay 1-8.  The Output uP will not output data if there is no communication with the
+'  Operator Interface or if the Competition Mode is Disabled.  Do not delete any elements
+'  from the Serout array.  Set unused PWM outputs to 127.  Set unused relay outputs to 0.
+'
+'  Serout USERCPU, OUTBAUD, [255,255,(PWM1),relayA,(PWM2),relayB,(PWM3),(PWM4),(PWM5),(PWM6),(PWM7),(PWM8),(PWM9),(PWM10),(PWM11),(PWM12),(PWM13),(PWM14),(PWM15),(PWM16)]
+
+					'MODIFIED BY JF
+   Serout USERCPU, OUTBAUD, [255,255,PWM1,relayA,PWM2,relayB,p2_y,p4_y,p1_x,p2_x,127,127,p1_wheel,p2_wheel,p3_wheel,p4_wheel,127,127,127,127]
+
+Goto MainLoop:
+
+
+
+'-------------------------------------------------------------------------------------------------
+'	           	ADDED BY JACK FRIED   <START>
+'-------------------------------------------------------------------------------------------------
+
+		' JOYSTICK 1 Y  DEAD ZONE AND RAMP ROUTINE
+
+alterp1_y:
+ if p1_y < 138 and p1_y > 116 then neutral       	' set dead ZONE  for +-11 on each side of joystick 
+   if p1_y < 117 then doReverse
+    p1_y = p1_y + 10 - ((p1_y-138)*10/116) max 254    ' POSITIVE RAMP UP   
+   Return
+doReverse:
+    p1_y = p1_y - (p1_y*10/117) min 0			' NEGATIVE RAMP DOWN
+   Return
+neutral:
+    p1_y = 127
+   Return
+
+
+		' JOYSTICK 1 X  DEAD ZONE AND RAMP ROUTINE
+alterp1_x:
+ if p1_x < 138 and p1_x > 116 then neutral1		' set dead ZONE  for +-11 on each side of joystick 
+   if p1_x < 117 then doReverse1
+    p1_x = p1_x + 10 - ((p1_x-138)*10/116) max 254	 ' POSITIVE RAMP UP   
+   Return
+doReverse1:
+    p1_x = p1_x - (p1_x*10/117) min 0			' NEGATIVE RAMP DOWN
+   Return
+neutral1:
+    p1_x = 127
+   Return
+
+
+
+		' ARM MEMORY and FEED BACK SYSTEM
+
+alterp2_y:
+ if p2_y < 138 and p2_y > 116 then neutral2		' DEAD ZONE ON JOYSTICK 
+									' CALL neutral2
+ if p2_y < 117 then doReverse2				' IF  arm is to be moved
+ put 1,sensor1							' store arm position in up direction
+ Return
+ doReverse2:
+ put 1,sensor1							' sotre arm postion going in the down direction
+ Return
+				' FEED BACK SECTION
+
+'------------------------------
+'
+'			The feed back sensitivity can be changed by changing these lines 
+'
+'   if sensor1 > (temp-<SENSITIVITY>) and sensor1 < (temp+<SENSITIVITY>) then stay 
+'   if sensor1 < (temp-<SENSITIVITY>) then fixshort	
+'		
+'		where <SENSITIVITY> is a number form 0 to 30.  default = 5
+'
+'		The push back can also be changed from the default of 155 and 100 respectivly.
+'
+'------------------------------
+
+
+
+ neutral2:
+ get 1,temp			' RECALL LAST POSITION
+   if sensor1 > (temp-5) and sensor1 < (temp+5) then stay   ' IF THE ARM IS WITHIN  +-5 of sensor position
+							    ' CALL STAY and DO NOTHING
+   if sensor1 < (temp-5) then fixshort				' IF ARM IS  TO HIGH  CALL FIX SHORT
+	p2_y =  155						' ARM IS falling towrds the front push in UP direction
+return
+fixshort:
+	p2_y = 100						' ARM IS falling towrds the backn push in UP direction
+return
+stay:
+	p2_y = 127						' The arm is IN a good postion stay neutral.
+Return
+
+
+'-------------------------------------------------------------------------------------------------
+'	           	ADDED BY JACK FRIED   <END>
+'-------------------------------------------------------------------------------------------------
+
+Stop

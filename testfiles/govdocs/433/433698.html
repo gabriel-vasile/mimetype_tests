@@ -1,0 +1,76 @@
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<HTML>
+<HEAD>
+	<SCRIPT LANGUAGE="JavaScript" SRC="javascript/aimsResource.js" TYPE="text/javascript"></SCRIPT>
+	<SCRIPT TYPE="text/javascript" LANGUAGE="JavaScript">	
+		
+		// Designer will set the next variable - theTitle
+		var theTitle = "SSD Fire Detection Program";
+		if (theTitle.indexOf("###TITLE##")!=-1) theTitle = titleList[0];
+		var cmdString = document.location.search;
+
+		var webParams = cmdString;
+		var reloadTimer=0;
+		var browser = navigator.appName;
+		//var moreStuff = "";
+		var moreStuff = 'onresize="reloadApp()"';
+		var addNS = 0;
+		if (browser=="Netscape") {
+			//moreStuff = 'onresize="reloadApp()"';
+			addNS = 3;
+		}
+		
+		var formURL = "jsForm.htm";
+		var connectorType = "Servlet"; //Types are "Servlet" or "JSP"
+		if (connectorType=="JSP") formURL = "jspForm.jsp";
+
+		document.writeln("<TITLE>" + theTitle + "</TITLE>");
+		
+		function doIt() {
+			MapFrame.useJava=false;
+			MapFrame.checkParams();
+		}
+		function replacePlus(inText) {
+		     var re = /\+/g;
+		      inText = inText.replace(re," ");
+		     return inText;
+		}
+		
+		function reloadApp() {
+				//document.location = "default.htm";
+				window.clearTimeout(reloadTimer);
+				reloadTimer = window.setTimeout("document.location = 'viewer.htm' + cmdString",1000);
+		}	
+		
+
+		
+	document.writeln('</HEAD>');
+	document.writeln('<FRAMESET ROWS="' + (80+addNS) + ',*,50,85,0" FRAMEBORDER="No" FRAMESPACING="0" onload="doIt()" BORDER=0 ' + moreStuff + '>');
+	document.writeln('	<FRAME NAME="TopFrame" SRC="top.htm" MARGINWIDTH="5" MARGINHEIGHT="0" SCROLLING="No" FRAMEBORDER="0" NORESIZE>');
+	document.writeln('	<FRAMESET COLS="' + (50+addNS) + ',*,230" FRAMEBORDER="No" FRAMESPACING="0" BORDER=0>');
+	document.writeln('		<FRAME NAME="ToolFrame" SRC="blank.htm" MARGINWIDTH="0" MARGINHEIGHT="0" SCROLLING="No" FRAMEBORDER="0" NORESIZE FRAMESPACING="0" BORDER="0">');
+	document.writeln('		<FRAMESET ROWS="*,80">	');
+	document.writeln('			<FRAME NAME="MapFrame" SRC="MapFrame.htm" MARGINWIDTH="0" MARGINHEIGHT="0" SCROLLING="No" FRAMEBORDER="Yes" RESIZE="YES">');
+	document.writeln('			<FRAME NAME="TextFrame" SRC="text.htm" MARGINWIDTH="0" MARGINHEIGHT="0" SCROLLING="Auto" FRAMEBORDER="Yes" RESIZE="YES">');
+	document.writeln('		</FRAMESET> ');
+	document.writeln('		<FRAMESET ROWS="65,*">	');
+	document.writeln('			<FRAME NAME="ToggleFrame" SRC="ToggleFrame.htm" MARGINWIDTH="0" MARGINHEIGHT="0" SCROLLING="No" FRAMEBORDER="Yes" RESIZE="No">');
+	document.writeln('			<FRAME NAME="TOCFrame" SRC="TOCFrame.htm" MARGINWIDTH="0" MARGINHEIGHT="0" SCROLLING="Auto" FRAMEBORDER="Yes" RESIZE="YES">');
+	document.writeln('		</FRAMESET>');
+	document.writeln('	</FRAMESET>');
+	document.writeln('	<FRAMESET COLS="230,*" FRAMEBORDER="0" BORDER=0 FRAMESPACING="0">');
+	document.writeln('		<FRAME NAME="ModeFrame" SRC="blank.htm" MARGINWIDTH="0" MARGINHEIGHT="0" SCROLLING="No" FRAMEBORDER="No" RESIZE="YES">');		
+	document.writeln('		<FRAME NAME="BottomFrame" SRC="bottom.htm" MARGINWIDTH="0" MARGINHEIGHT="0" SCROLLING="No" FRAMEBORDER="No" RESIZE="YES">');
+	document.writeln('	</FRAMESET>');
+	document.writeln('	<FRAME NAME="UpdateFrame" SRC="lastUpdate.htm" MARGINWIDTH="0" MARGINHEIGHT="0" SCROLLING="No" FRAMEBORDER="0" NORESIZE FRAMESPACING="0" BORDER="0">');
+	document.writeln('	<FRAME NAME="PostFrame" SRC="' + formURL + '" MARGINWIDTH="0" MARGINHEIGHT="0" SCROLLING="No" FRAMEBORDER="0" NORESIZE FRAMESPACING="0" BORDER="0">');
+	document.writeln('</FRAMESET>');
+</SCRIPT>
+
+<NOFRAMES>
+<BODY>
+<P>
+</BODY>
+</NOFRAMES>
+</HTML>

@@ -1,0 +1,529 @@
+<TITLE> Delila Program: ev </TITLE>
+<body bgcolor="#ffffff">
+<H1>
+ev program
+</H1>
+<H2>
+<ul>
+<li>
+<A HREF ="ftp://ftp.ncifcrf.gov/pub/delila/ev.p"
+>Pascal source code: ev.p</A>
+(<A HREF ="http://www.ccrnp.ncifcrf.gov/~toms/wget.html#ftp"
+>wget instructions</A>)
+<li>
+<A HREF ="ftp://ftp.ncifcrf.gov/pub/delila/c/ev.c"
+>C source code: ev.c</A><BR>
+(There are <a href = "http://www.ccrnp.ncifcrf.gov/~toms/software.html#How.To.Compile">
+special instructions on compiling</a>.)
+<li>
+<A HREF ="ftp://ftp.ncifcrf.gov/pub/delila/bin/ev"
+>Sun 4 binary: ev</A>
+<li>
+<a href = "mailto:toms@ncifcrf.gov?subject=ev.html:broken.link">Please report broken links</a>
+<li>
+<A HREF = "delilaprograms.html">
+Alphabetic List of Delila Programs</A>
+<li>
+<A HREF = "http://www.ccrnp.ncifcrf.gov/~toms/timelist.html">
+Delila Programs by Most Recent Update</A>
+<li>
+<A HREF = "http://www.ccrnp.ncifcrf.gov/~toms/copyright.html">
+Copyright Statement for Delila Programs</A>
+</H2>
+</ul>
+<p>
+<H3>
+Documentation for the ev program is below,
+with links to related programs in the "see also" section.
+</H3>
+<p>
+<!-- htmlink 1.52 -->
+<font size = 4>
+<strong>
+<PRE>
+{  version = 4.05; (* of ev.p 2006 Jun 28}
+
+(* begin module describe.ev *)
+(*
+name
+   ev: evolution of binding sites
+
+synopsis
+   ev(list: out, all: inout, evp: inout, output: out)
+
+files
+
+   list: a record of the evolutionary events that occurred.  See the
+      description of evp for the kinds of data that can be printed.  The data
+      may be graphed as desired using the xyplo program.  The first few lines
+      of the file form an informative header.  All of these lines begin with
+      an asterisk, '*', which acts as a comment.  The data themselves are
+      organized into individual lines broken by spaces into a set of tokens.
+      These are described in the header.
+
+   all:  All the variables, genome sequences and genetic structure to allow
+      continuation of the evolution.  Start this as an empty file.  Under
+      unix you can use:
+
+         touch all
+
+      After the ev program has been run, the all file will be filled with the
+      last generation.  If you run ev again, it will use the current all file
+      to continue.  To make a movie, step by 1 or more generations and use
+      evd to extract information from the all file.  When you want to start
+      over, clear the file out.  To do this under unix you can:
+
+          echo -n "" &gt; all
+
+   evp: parameters to control the program, one per line:
+
+      parameterversion: The version number of the program.  This allows the
+         user to be warned if an old parameter file is used.
+         When possible, the program will upgrade old parameter files.
+
+      Number of creatures (c, integer).
+
+      Number of potential binding sites per creature (G=Genome, integer).
+
+      Number of sites per creature (gamma, integer).
+
+      Width of the recognizer in bases (width, integer).
+
+      Bases per integer of the recognizer weights (bpi, integer).
+
+      Mutation rate.  The original method gives the rate in hits per
+      creature per generation (mu, integer).
+
+         New method as of 2006 Jun 28: mutations can be specified in
+         two ways: per genome or per base.
+
+         This is determined by the first character on the line.
+         if the first character is:
+
+           'g': mutations per genome per generation
+           'b': mutations per base   per generation
+
+         If the first character is a digit or a space, then the
+         original method (g, mutations per genome) is used.
+
+         Each of these is followed by an integer.
+
+         When mutations per base are given, the form is mutations
+         in a defined length of sequence.
+{mmm}
+
+         Method: Provide mutations per base as a real number: "1 in
+         every ______ bases" Compute: m = genome size * mutations /
+         bases. To create mutations in an organism, split m into
+         integer (mi) and decimal (md) parts. Do the integer part of m
+         mutations. Chose a random number r between 0 and 1. If r &lt;=
+         md, do an additional mutation. In this way the requested
+         mutations will be done on average.
+
+         Note:  The original method was implemented for speed. 
+         However, it is not natural in the sense that polymerases and
+         other factors work on a per base basis.  So the new method is
+         more reasonable to use if one is exploring effects of genome
+         size.
+
+      Seed: a real number between 0 and 1 used to start the random
+         number generator.  The date and time is used if this
+         number is outside 0 to 1.
+
+      Cycles: number of additional generations to run (cycles, integer).
+
+      Display interval:  for example, 10 means every 10th generation.
+
+      Display control: the first 7 characters on the line control
+         the kind of data printed to the list file:
+             a = display average number of mistakes and the standard
+                 deviation for the population.
+             c = display changes in the number of mistakes.
+                 The current Rsequence is given if r (below) is turned on.
+                 This allows graphs of Rsequence vs mistakes to be made.
+             g = display genomic uncertainty, Hg.  If this deviates much
+                 from 2.0, then the model is probably bad.
+             i = display individuals' mistakes
+             o = display orbits: information of individual sites is shown
+             r = display information (Rsequence, bits)
+             s = current status (range of mistakes) is printed to the output
+                 file.
+             m = current status (range of mistakes) is printed to the list
+                 file.
+
+         These may be in any order.   Any other characters (eg, blanks) are
+         ignored.
+
+      Selecting: boolean. If true (ie the first character is 't'), then the
+         organisms are sorted by their mistakes.   If false, then the
+         organisms are randomly sorted.  Normally this should be 'true', but
+         it does allow one to switch the selection off suddenly and watch
+         random drift (with no evolution) and the decay of existing patterns
+         by entropy increase.  Selecting is true unless the first character
+         on the line is an 'f'.
+
+      StorageFrequency:  The frequency (every so many generations) with which
+         to store a copy of everything in the all file.  If the computer
+         crashes part way through a long run, then the run can be continued
+         from the last storage.  Of course, a storage is always made at the
+         end of the evolution.
+
+      RandomSites:  If the first character is 'r' then the gamma sites are
+         placed randomly.  'n' means that the sites are placed randomly,
+         but not overlapping.  'a' means that the sites are placed in a
+         regular array with constant spacing.  In either case sites are
+         placed outside the recognizer gene, and there are exactly gamma
+         sites.  That is, two randomly placed sites cannot be in the same
+         place.  This avoids conflicts that would make interpretation of the
+         results difficult.
+
+      dummy: real.
+         This function has been removed.  Just use 0 as the value.
+
+      specialrule: char.  SPECIAL RULE parameter.  This parameter (introduced
+         [2001 June 6]) determines what to do when two organisms tie for
+         survival.  If the first character on the line is:
+         r - random survival of one organism
+         b - both survive (original method)
+         s - one survives depending on the sorting algorithm.  This is an
+             arbitrary function of how the quicksort routine works and is
+             therefore generally not a good way to make the decision.
+         See below for more details.
+
+      haltoncondition: char.  This parameter (introduced
+         [2006 June 24]) causes ev to halt when a given condition
+         has occured.
+         If the first character on the line is:
+         - none   - no halting condition
+         r Rs&gt;=Rf - the best creature has Rs at least equal to Rf
+         m mistakes 0 - the best creature makes no mistakes
+         b both r and m
+
+      Note: As of version 3.68 the program can automatically upgrade
+         the parameter file.
+
+   output: messages to the user, including warnings about conditions,
+      If the display control in evp (see above) includes 'o', then 
+      the generation number and the range of mistakes are given.
+      If the display control includes 'a', then the mean and standard
+      deviation of the mistakes are also given.
+
+description
+
+   A population of evolving creatures is modelled.  Each creature
+   consists of a genome made of the 4 bases.  All creatures have a
+   certain number of binding sites, and the recognizer for the sites
+   is encoded by a gene in each genome.  The genomes are completely
+   random at first.  The recognizer of each creature is translated
+   from the gene form to a perceptron-like weight matrix.  This matrix
+   is scanned across the genome.  The number of mistakes made is
+   counted.  There are two kinds of mistake:
+
+       how many times the recognizer misses a real site
+
+   and
+
+       how many times a non-site is detected by the recognizer.
+
+   These are weighted equally.  (If they were weighted differently it
+   should affect the rate but not the final product of the model.) 
+   All creatures are ranked by their number of mistakes.  The half of
+   the population with the most mistakes dies; the other half
+   reproduces to take over the empty positions.  Then all creatures
+   are mutated and the process repeats.
+
+   The integer weights of the recognizer are stored as base 4 numbers
+   in twos complement notation.  a=00, c=01, g=10, t=11.  If 'bases
+   per integer' were 3, then aaa encodes 0, acg is 6, etc.  txx and
+   gxx (where x is any base) are negative numbers; ttt is -1.
+
+   The threshold for recognition of a site is encoded in the genome
+   just after the individual weights.  It is encoded by one integer.
+
+   ************************************************************************
+
+   SPECIAL RULE: if the bugs have the same number of mistakes, reproduction
+   (by replacement) does not take place.  This ensures that the quicksort
+   algorithm does not affect who takes over the population, and it also
+   preserves the diversity of the population.  [1988 October 26]  Without
+   this, the population quickly is taken over and evolution is extremely
+   slow!
+
+   [2001 June 6] In response to William Dembski's objection (see below for a
+   link) that this rule is inserting information into the results, a new
+   parameter is now available to turn off this rule.
+
+   What does this rule mean?  It means that in a duel it is possible for two
+   bugs to have a tie.  This is not an unreasonable result, and it frequently
+   happens in the natural world!  What does removing the rule mean?  It means
+   that the bugs will duel to the death, even if it is an arbitrary death!
+   Clearly this cannot affect the overall evolution, but it might slow things
+   down.  Indeed it is interesting because it is often the case that in
+   fights the combatants are not killed.
+
+   ************************************************************************
+
+   TO RUN THE PROGRAM, create an empty all file (see the description of the
+   all file for how to do this) and obtain a copy of an evp file (see the
+   "see also" section below for links to examples).  Note that in parameter
+   files everything to the right of the actual parameter is ignored on each
+   line.  Do not delete this material, it serves as a comment to remind you
+   what the parameter does!  Then you can run the ev program.  The results
+   are in the list and all files.  To see the contents of the all file (which
+   will be a binary on your computer) use the evd program.  You can use the
+   xyplo program to plot items from the list file.
+
+   HISTORICAL NOTE:  After getting the idea that Rsequence is close to
+   Rfrequency from data on ribosome binding sites (on 1982 December
+   7), it became clear that this had to have evolved.  Eventually I
+   recognized that Rsequence must evolve toward a more or less set
+   Rfrequency.  (See the paper Schneider.ev2000 for a discussion of
+   this.)  The challenge was to test this hypothesis.  My first
+   thinking was that a model of the evolution would take thousands of
+   years on a computer.  However, I read the book "Ever Since Darwin,
+   Reflections in Natural History" by Stephen J.  Gould and found in
+   there an interesting chapter "Is the Cambrian Explosion a Sigmoid
+   Fraud?" (Gould1977.sigmoid)  This described Gould and Eldredge's
+   idea of punctuated equilibrium.  I realized that with selection, if
+   an organism has an advantage it can take over a population
+   exponentially.  By 1984 I had written up my thesis (on the
+   observation that Rs ~ Rf, Schneider1986) and had a week before my
+   defense in which I had nothing more to do.  So I wrote the ev
+   program and it showed that Rs does indeed evolve toward Rf.  I
+   don't recall that I even mentioned this during the defense, but it
+   was a nice backup!
+
+documentation
+
+   For information calculations, see:
+
+   @article{Schneider1986,
+   author = "T. D. Schneider
+    and G. D. Stormo
+    and L. Gold
+    and A. Ehrenfeucht",
+   title = "Information content of binding sites on nucleotide sequences",
+   journal = "J. Mol. Biol.",
+   volume = "188",
+   pages = "415-431",
+   year = "1986"}
+
+   The inspirational article is:
+
+   @inproceedings{Gould1977.sigmoid,
+   author = "S. J. Gould",
+   title = " Is the Cambrian Explosion a Sigmoid Fraud?",
+   booktitle = "Ever Since Darwin, Reflections in Natural History",
+   publisher = "W. W. Norton \&amp; Co.",
+   address = "N. Y.",
+   name ="Stephen Jay",
+   pages = "126-133",
+   year = "1977"}
+
+   Applying the Perceptron (a simple neural net) to binding sites:
+
+   @article{StormoPerceptron1982,
+   author = "G. D. Stormo
+    and T. D. Schneider
+    and L. Gold
+    and A. Ehrenfeucht",
+   title = "Use of the {`Perceptron'} algorithm to distinguish translational
+   initiation sites in {{\em E. coli}}",
+   journal = "Nucl. Acids Res.",
+   volume = "10",
+   pages = "2997-3011",
+   year = "1982"}
+
+   The evolution paper describing this program is:
+
+   @article{Schneider.ev2000,
+   author = "T. D. Schneider",
+   title = "Evolution of Biological Information",
+   journal = "Nucleic Acids Res",
+   volume = "28",
+   number = "14",
+   pages = "2794-2799",
+   year = "2000"}
+
+examples
+
+A lovely (but long) evolution can be had with the following evp:
+
+*******************************************************************************
+3.42  version of ev that this parameter file is designed for.
+   32 NUMBER OF CREATURES 
+ 1024 NUMBER OF BASES PER CREATURE, G
+   64 NUMBER OF SITES PER CREATURE, gamma
+    6 WIDTH OF THE RECOGNIZER IN BASES
+    5 BASES PER INTEGER OF THE RECOGNIZER 
+    1 MUTATION RATE IN HITS PER CREATURE PER GENERATION 
+ 0.50 SEED FOR THE RANDOM NUMBER GENERATOR
+40000 CYCLES
+   10 DISPLAY INTERVAL
+cgrs5678 a=av, c=change, i=indivls, g=Hg, r=Rs, o=orbit, s=status, m=mistakes
+true  SELECTING
+ 1000 STORAGE FREQUENCY
+a     r = random site placement, n = no overlap random, a = array
+0     sigma
+b     SPECIAL RULE for ties: r: random, b: both, s: sort
+-     halt on condition: - none; r Rs&gt;=Rf; m mistakes 0; b both r and m
+*******************************************************************************
+
+The list file may be plotted with this parameter file for xyplo, the xyplop:
+
+*******************************************************************************
+3 6       zerox zeroy         graph coordinate center
+x 0 40000 zx min max          (character, real, real) if zx='x' then set xaxis
+y -1 6    zy min max          (character, real, real) if zy='y' then set yaxis
+10 28 1 1 xinterval yinterval xsubintervals ysubintervals: axis intervals
+8 8       xwidth    ywidth    width of numbers in characters
+0 2       xdecimal  ydecimal  number of decimal places
+15 15     xsize     ysize     size of axes in cm
+generation
+Rsequence (bits) | Hg (bits) near 2 | mistakes/gamma are connected circles
+a         zc                  'c' crosshairs, axXyYnN
+n 2       zxl base            if zxl='l' then make x axis log to the given base
+n 2       zyl base            if zyl='l' then make y axis log to the given base
+          *********************************************************************
+1 3       xcolumn   ycolumn   columns of xyin that determine plot location
+2         symbol column       the xyin column to read symbols from
+0  0      xscolumn  yscolumn  columns of xyin that determine the symbol size
+0 0 0     hue saturation brightness   columns for color manipulation
+          *********************************************************************
+          symbol to plot      'c'=circle, 'b','d'=box, 'x', '+', 'I', 'f', 'g'
+r         symbol flag         character in xyin that indicates that this symbol
+0.05      symbol sizex        side in inches on the x axis of the symbol.
+0.05      symbol sizey        as for the x axis, get size from yscolumn
+cl 0.05   connection (example for connection is c- 0.05 for dashed 0.05 inch)
+n  0.05   linetype  size      linetype l.-in and size of dashes or dots
+          *********************************************************************
+          symbol to plot      'c'=circle, 'b','d'=box, 'x', '+', 'I', 'f', 'g'
+g         symbol flag         character in xyin that indicates that this symbol
+0.05      symbol sizex        side in inches on the x axis of the symbol.
+0.05      symbol sizey        as for the x axis, get size from yscolumn
+cl 0.05   connection (example for connection is c- 0.05 for dashed 0.05 inch)
+n  0.05   linetype  size      linetype l.-in and size of dashes or dots
+          *********************************************************************
+c         symbol to plot      'c'=circle, 'b','d'=box, 'x', '+', 'I', 'f', 'g'
+c         symbol flag         character in xyin that indicates that this symbol
+0.05      symbol sizex        side in inches on the x axis of the symbol.
+0.05      symbol sizey        as for the x axis, get size from yscolumn
+cl 0.05   connection (example for connection is c- 0.05 for dashed 0.05 inch)
+n  0.05   linetype  size      linetype l.-in and size of dashes or dots
+          *********************************************************************
+.
+          **** version 8.50 of xyplop: uses cm for distances
+. 0 6 0.10
+. 0 5 0.10
+- 0 4 0.10
+. 0 3 0.10
+. 0 2 0.10
+. 0 1 0.10
+l 0 0 1
+*******************************************************************************
+
+Note that dotted lines are placed across the graph for each bit, but a
+dashed line is put for Rfrequence (= 4 bits).  The vertical axis represents
+the three kinds of data in the list file.
+
+see also
+
+   OTHER PROGRAMS
+   Program to display the current population: <A HREF ="evd.html">evd.p</A>
+   Program to graph the list file: <A HREF ="xyplo.html">xyplo.p</A>
+
+   EXAMPLE FILES
+   A very early original test run:
+
+       parameter file <A HREF ="ftp://ftp.ncifcrf.gov/pub/delila/ev.original.evp">ev.original.evp</A>
+       list           <A HREF ="ftp://ftp.ncifcrf.gov/pub/delila/ev.original.list">ev.original.list</A>
+
+        output from the <A HREF ="evd.html">evd.p</A> display program:
+       display        <A HREF ="ftp://ftp.ncifcrf.gov/pub/delila/ev.original.display">ev.original.display</A>
+       evfeatures     <A HREF ="ftp://ftp.ncifcrf.gov/pub/delila/ev.original.evfeatures">ev.original.evfeatures</A>
+       genomes        <A HREF ="ftp://ftp.ncifcrf.gov/pub/delila/ev.original.genomes">ev.original.genomes</A>
+       sites          <A HREF ="ftp://ftp.ncifcrf.gov/pub/delila/ev.original.sites">ev.original.sites</A>
+
+   Example ev parameter file: <A HREF ="ftp://ftp.ncifcrf.gov/pub/delila/ev.example.evp">ev.example.evp</A>
+   Example xyplop parameter file given above: <A HREF ="ftp://ftp.ncifcrf.gov/pub/delila/ev.example.xyplop">ev.example.xyplop</A>
+
+   Parameter file for selective phase in the paper: <A HREF ="ftp://ftp.ncifcrf.gov/pub/delila/evp.selection">evp.selection</A>
+   Parameter file for atrophy   phase in the paper: <A HREF ="ftp://ftp.ncifcrf.gov/pub/delila/evp.atrophy">evp.atrophy</A>
+
+   LINKS TO THE PAPER
+   The "Evolution of Biological Information" paper (with active hypertext
+   links in references): <A HREF ="http://www.lecb.ncifcrf.gov/~toms/paper/ev/">http://www.lecb.ncifcrf.gov/~toms/paper/ev/</A>
+
+   The "Evolution of Biological Information" paper at Nucleic Acids
+   Research: <A HREF ="http://nar.oupjournals.org/cgi/content/full/28/14/2794">http://nar.oupjournals.org/cgi/content/full/28/14/2794</A>
+
+   <IMG SRC ="http://www.lecb.ncifcrf.gov/~toms/icons/donor.pure.gif"> TO MAKE LOGOS:
+   Briefly, use the <A HREF ="evd.html">evd.p</A> program to get the sequences (in the sites file)
+   followed by <A HREF ="makebk.html">makebk.p</A> (preferably in automatic mode) to create a Delila
+   book.  Then use the delila system to create the logo:
+   <A HREF ="http://www.lecb.ncifcrf.gov/~toms/delila.html">http://www.lecb.ncifcrf.gov/~toms/delila.html</A>.  More details are given in
+   the <A HREF ="evd.html">evd.p</A> program documentation.
+
+   ***********************************************************************
+
+   COMPILING AND TIME FUNCTIONS:
+   <A HREF ="http://www.lecb.ncifcrf.gov/~toms/delila.html#How.To.Compile">http://www.lecb.ncifcrf.gov/~toms/delila.html#How.To.Compile</A>
+
+   ***********************************************************************
+
+   RELATED WORKS:
+
+   William Dembski's objection:
+   <A HREF ="http://www.metanexus.net/archives/message_fs.asp?list=views&amp;listtype=Magazine&amp;action=sp_simple_archive_&amp;page=1&amp;ARCHIVEID=3294">http://www.metanexus.net/archives/message_fs.asp?list=views&amp;listtype=Magazine&amp;action=sp_simple_archive_&amp;page=1&amp;ARCHIVEID=3294</A>
+
+   Page testing William Dembski's claim:
+   <A HREF ="http://www.lecb.ncifcrf.gov/~toms/paper/ev/dembski">http://www.lecb.ncifcrf.gov/~toms/paper/ev/dembski</A>
+
+   Page on William Dembski:
+   <A HREF ="http://www.fred.net/tds/anti/william.dembski/">http://www.fred.net/tds/anti/william.dembski/</A>
+
+author
+
+   Thomas Dana Schneider
+
+bugs
+
+   none known (well, actually it's full of them... ;-)
+
+technical notes
+
+   RANDOM NUMBERS: The program can use the date and time to create random
+   numbers.  These are computer system calls and may not function correctly
+   on other computers.  One solution is to simply delete the calls to disable
+   them if you are having trouble compiling.  You can always set different
+   seeds to start the random numbers by hand.  See the link above for modules
+   to change the time function for different compilers.
+
+   SPEED IMPROVEMENT: 2002 April 3.  I noticed that not all cases of passing
+   the e: everything were by var.  They were being passed by value.  Since
+   this means that a *copy* of "everything" is made for each call, this
+   should be very expensive!  I ran the program (version 3.71) on an
+   evp.original and it took 9.5 or 9.6 user seconds on my Sun Ultra 60
+   according to the Unix time function.  I then changed the variable e:
+   everything in the dorseq procedure to be var (passed as a variable
+   pointer) and the time dropped to 5.7 seconds!  Here are the successive
+   improvements for the changes:
+
+      no change      9.51+/-0.08 seconds in 10 tries
+      dorseq         5.72+/-0.04 seconds in 10 tries   !!!
+      puteverything  5.74+/-0.05 seconds in 10 tries
+      listparams     4.12+/-0.04 seconds in 10 tries
+      dori           4.05+/-0.05 seconds in 10 tries
+      dogenomich     2.01+/-0.03 seconds in 10 tries   !!!
+      makemoreheader 2.01+/-0.03 seconds in 10 tries
+      putout         2.00+/-0.02 seconds in 20 tries (2.005 seconds)
+      dori           2.01+/-0.03 seconds in 20 tries change fbl
+
+   Wow, nearly a 10 fold speed up ...
+
+*)
+(* end module describe.ev version = 2.50; (@ of ev 1988 oct 6 *)
+{This manual page was created by makman 1.44}
+</PRE>
+</strong>
+{<a href = "htmlink.html">created by htmlink 1.52</a>}

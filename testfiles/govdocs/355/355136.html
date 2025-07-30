@@ -1,0 +1,2730 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en-US">
+<head>
+<meta name="Page" content="DefaultSingle">
+<meta name="Title" content=" A Sample Application Using Object-Relational Features ">
+<title>A Sample Application Using Object-Relational Features</title>
+<link rel="home" href="../../index.htm" title="Library">
+<link rel="toc" href="toc.htm" title="Contents">
+<link rel="index" href="index.htm" title="Index">
+<link rel="copyright" href="../../dcommon/html/cpyr.htm" title="Copyright">
+<link rel="up" href="toc.htm" title="Up">
+<link rel="next" href="index.htm" title="Next">
+<link rel="previous" href="adobjdes.htm" title="Previous">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../dcommon/css/doccd.css" rel="stylesheet" title="Default" type="text/css">
+</head>
+<body bgcolor="white">
+<a name="top"></a> <a href="#BEGIN">Skip Headers</a><br>
+<br>
+<table summary="" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td align="left" valign="top"><font color="#330099" face="Helvetica, Arial, sans-serif"><strong>Oracle9<i>i</i> Application Developer's Guide - Object-Relational Features<br>
+Release 2 (9.2)</strong><br>
+Part Number A96594-01</font></td>
+<td valign="bottom" align="right" width="144">
+<table summary="" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td align="center" valign="top" width="16%"><a href="../../index.htm"><img src="../../dcommon/gifs/prodicon.gif" alt="Go To Documentation Library" border="0"><br>
+<font size="-2">Home</font></a></td>
+<td align="center" valign="top" width="17%"><a href="../../nav/docindex.htm"><img src="../../dcommon/gifs/bookicon.gif" alt="Go To Product List" border="0"><br>
+<font size="-2">Book List</font></a></td>
+<td align="center" valign="top" width="17%"><a href="toc.htm"><img src="../../dcommon/gifs/conticon.gif" alt="Go To Table Of Contents" border="0"><br>
+<font size="-2">Contents</font></a></td>
+<td align="center" valign="top" width="20%"><a href="index.htm"><img src="../../dcommon/gifs/indxicon.gif" alt="Go To Index" border="0"><br>
+<font size="-2">Index</font></a></td>
+<!--  mix  -->
+<td align="center" valign="top" width="17%"><a href="../../mix.920/a96625/toc.htm"><img src="../../dcommon/gifs/mix.gif" alt="" border="0"><br>
+<font size="-2">Master Index</font></a></td>
+<!--  fdbk  -->
+<td align="center" valign="top" width="17%"><a href="../../dcommon/html/feedback.htm"><img src="../../dcommon/gifs/feedback.gif" alt="" border="0"><br>
+<font size="-2">Feedback</font></a></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+
+<hr>
+<p><a href="adobjdes.htm"><img src="../../dcommon/gifs/larrow.gif" alt="Go to previous page" border="0"></a> <a href="index.htm"><img src="../../dcommon/gifs/rarrow.gif" alt="Go to next page" border="0"></a> <a name="BEGIN"></a></p>
+
+<div class="IND"><!-- End Header -->
+<a name="441286"></a> <!--TOC=Title-"441286"-->
+<h1 class="Title"><font face="Arial, Helvetica, sans-serif" color="#330099">9<br>
+ <a name="ADOBJ009">A Sample Application Using Object-Relational Features</a></font></h1>
+
+<!--/TOC=Title-->
+<a name="455571"></a> 
+
+<p class="BP">This chapter contains an extended example that gives an overview of how to create and use user-defined datatypes (Oracle Objects).</p>
+
+<a name="455574"></a> 
+
+<p class="BP">The example develops different versions of a database schema for an application that manages customer purchase orders. First a purely relational version is shown, and then an equivalent, object-relational version. Both versions provide for the same basic kinds of entities--customers, purchase orders, line items, and so on. But the object-relational version creates user-defined types for these entities and manages data for particular customers and purchase orders by instantiating instances of the respective user-defined types.</p>
+
+<a name="442729"></a> 
+
+<p class="BP">This chapter contains the following sections:</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="431306"></a><a href="adobjxmp.htm#445588">Introduction</a></li>
+
+<li class="LB1" type="disc"><a name="444866"></a><a href="adobjxmp.htm#455736">Implementing the Schema on the Relational Model</a></li>
+
+<li class="LB1" type="disc"><a name="455554"></a><a href="adobjxmp.htm#440189">Implementing the Schema on the Object-Relational Model</a></li>
+
+<li class="LB1" type="disc"><a name="455555"></a><a href="adobjxmp.htm#452582">Evolving User-Defined Types</a></li>
+
+<li class="LB1" type="disc"><a name="451296"></a><a href="adobjxmp.htm#455883">Manipulating Objects with Oracle Objects for OLE</a></li>
+</ul>
+
+<a name="445588"></a> <!--TOC=h1-"445588"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Introduction</font></h2>
+
+<!--/TOC=h1-->
+<a name="431320"></a> 
+
+<p class="BP">User-defined types are schema objects in which users formalize the data structures and operations that appear in their applications.</p>
+
+<a name="431335"></a> 
+
+<p class="BP">The example in this chapter illustrates the most important aspects of defining, using, and evolving user-defined types. One important aspect of working with user-defined types is creating methods that perform operations on objects. In the example, definitions of object type methods use the PL/SQL language. Other aspects of using user-defined types, such as defining a type, use SQL.</p>
+
+<a name="445496"></a> 
+
+<p class="BP">PL/SQL and Java provide additional capabilities beyond those illustrated in this chapter, especially in the area of accessing and manipulating the elements of collections.</p>
+
+<a name="455693"></a> 
+
+<p class="BP">Client applications that use the Oracle Call Interface (OCI), Pro*C/C++, or Oracle Objects for OLE (OO4O) can take advantage of its extensive facilities for accessing objects and collections, and manipulating them on clients.</p>
+
+<a name="455741"></a> 
+
+<div align="center">
+<table class="NoteAlso" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="NoteAlso">
+<td class="NoteAlso"><a name="455745"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="455781"></a> 
+
+<ul class="TLB">
+<li class="TLB" type="disc"><a name="455790"></a><em class="Italic"><a href="../../server.920/a96540/toc.htm">Oracle9i SQL Reference</a></em> for a complete description of SQL syntax and usage for user-defined types.</li>
+
+<li class="TLB" type="disc"><a name="455796"></a><em class="Italic"><a href="../../appdev.920/a96624/toc.htm">PL/SQL User's Guide and Reference</a></em> for a complete discussion of PL/SQL capabilities</li>
+
+<li class="TLB" type="disc"><a name="455802"></a> <em class="Italic"><a href="../../java.920/a96659/toc.htm">Oracle9i Java Stored Procedures Developer's Guide</a></em> for a complete discussion of Java.</li>
+
+<li class="TLB" type="disc"><a name="455808"></a><em class="Italic"><a href="../../appdev.920/a96584/toc.htm">Oracle Call Interface Programmer's Guide</a></em>,</li>
+
+<li class="TLB" type="disc"><a name="455814"></a><em class="Italic"><a href="../../appdev.920/a97269/toc.htm">Pro*C/C++ Precompiler Programmer's Guide</a></em></li>
+</ul>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="455736"></a> <!--TOC=h1-"455736"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Implementing the Schema on the Relational Model</font></h2>
+
+<!--/TOC=h1-->
+<a name="454714"></a> 
+
+<p class="BP">This section implements the relational version of the purchase order schema depicted in <a href="adobjxmp.htm#439209">Figure&nbsp;9-1</a>.</p>
+
+<a name="439209"></a> 
+
+<h4 class="FT"><font face="Arial, Helvetica, sans-serif"><em>Figure 9-1 Entity-Relationship Diagram for Purchase Order Application</em></font></h4>
+
+<a name="439212"><img src="adobj001.gif" alt="Text description of adobj001.gif follows"></a><a href="img_text/adobj001.htm"><br>
+Text description of the illustration adobj001.gif</a><br>
+<br>
+ <a name="439989"></a> <!--TOC=h2-"439989"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Entities and Relationships</font></h3>
+
+<!--/TOC=h2-->
+<a name="439975"></a> 
+
+<p class="BP">The basic entities in this example are:</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="439976"></a>Customers</li>
+
+<li class="LB1" type="disc"><a name="439977"></a>The stock of products for sale</li>
+
+<li class="LB1" type="disc"><a name="439978"></a>Purchase orders</li>
+</ul>
+
+<a name="439979"></a> 
+
+<p class="BP">As you can see from <a href="adobjxmp.htm#439209">Figure&nbsp;9-1</a>, a customer has contact information, so that the address and set of telephone numbers is exclusive to that customer. The application does not allow different customers to be associated with the same address or telephone numbers. If a customer changes his address, the previous address ceases to exist. If someone ceases to be a customer, the associated address disappears.</p>
+
+<a name="439980"></a> 
+
+<p class="BP">A customer has a one-to-many relationship with a purchase order: a customer can place many orders, but a given purchase order is placed by one customer. Because a customer can be defined before he places an order, the relationship is optional rather than mandatory.</p>
+
+<a name="439981"></a> 
+
+<p class="BP">Similarly, a purchase order has a many-to-many relationship with a stock item. Because this relationship does not show which stock items appear on which purchase orders, the entity-relationship has the notion of a line item. A purchase order must contain one or more line items. Each line item is associated only with one purchase order.</p>
+
+<a name="439711"></a> 
+
+<p class="BP">The relationship between line item and stock item is that a stock item can appear on zero, one, or many line items, but each line item refers to exactly one stock item.</p>
+
+<a name="439260"></a> <!--TOC=h2-"439260"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Creating Tables Under the Relational Model</font></h3>
+
+<!--/TOC=h2-->
+<a name="440000"></a> 
+
+<p class="BP">The relational approach normalizes everything into tables. The table names are <code>Customer_reltab</code>, <code>PurchaseOrder_reltab</code>, and <code>Stock_reltab</code>.</p>
+
+<a name="440001"></a> 
+
+<p class="BP">Each part of an address becomes a column in the <code>Customer_reltab</code> table.</p>
+
+<a name="447748"></a> 
+
+<p class="BP">Structuring telephone numbers as columns sets an arbitrary limit on the number of telephone numbers a customer can have.</p>
+
+<a name="440002"></a> 
+
+<p class="BP">The relational approach separates line items from their purchase orders and puts each into its own table, named <code>PurchaseOrder_reltab</code> and <code>LineItems_reltab</code>. As depicted in <a href="adobjxmp.htm#439209">Figure&nbsp;9-1</a>, a line item has a relationship to both a purchase order and a stock item. These are implemented as columns in <code>LineItems_reltab</code> table with foreign keys to <code>PurchaseOrder_reltab</code> and <code>Stock_reltab</code>.</p>
+
+<!--AnN_AnchorNote will not be supported in future releases -->
+<a name="440249"></a> 
+
+<div align="center">
+<table class="Note" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="Note">
+<td class="Note">
+<hr>
+<a name="440252"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">Note:</strong></font> <a name="440253"></a> 
+
+<p class="NB">We have adopted a convention in this section of adding the suffix <code>_reltab</code> to the names of relational tables. Such a self-describing notation can make your code easier to maintain. <a name="442453"></a></p>
+
+<p class="NB">You may find it useful to make distinctions between tables (<code>_tab</code>) and types (<code>_typ</code>). But you can choose any names you want; one of the advantages of object-relational constructs is that you can give them names that closely model the corresponding real-world objects.</p>
+
+<hr>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="442848"></a> 
+
+<p class="BP">The relational approach results in the following tables:</p>
+
+<a name="439322"></a> <!--TOC=h3-"439322"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Customer_reltab</font></h4>
+
+<!--/TOC=h3-->
+<a name="442851"></a> 
+
+<p class="BP">The <code>Customer_reltab</code> table has the following definition:</p>
+
+<pre class="CE">
+<a name="439324"></a>CREATE TABLE Customer_reltab (
+<a name="430563"></a>  CustNo                NUMBER NOT NULL,
+<a name="430564"></a>  CustName              VARCHAR2(200) NOT NULL,
+<a name="430565"></a>  Street                VARCHAR2(200) NOT NULL,
+<a name="430566"></a>  City                  VARCHAR2(200) NOT NULL,
+<a name="430567"></a>  State                 CHAR(2) NOT NULL,
+<a name="430568"></a>  Zip                   VARCHAR2(20) NOT NULL,
+<a name="433223"></a>  Phone1                VARCHAR2(20),
+<a name="433224"></a>  Phone2                VARCHAR2(20),
+<a name="433225"></a>  Phone3                VARCHAR2(20),
+<a name="430569"></a>  PRIMARY KEY (CustNo)
+<a name="430570"></a>  ) ;
+<a name="437503"></a>
+</pre>
+
+<a name="439598"></a> 
+
+<p class="BP">This table, <code>Customer_reltab</code>, stores all the information about customers, which means that it fully contains information that is intrinsic to the customer (defined with the <code>NOT</code> <code>NULL</code> constraint) and information that is not as essential. According to this definition of the table, the application requires that every customer have a shipping address.</p>
+
+<a name="439599"></a> 
+
+<p class="BP">Our Entity-Relationship (E-R) diagram showed a customer placing an order, but the table does not make allowance for any relationship between the customer and the purchase order. This relationship must be managed by the purchase order.</p>
+
+<a name="439483"></a> <!--TOC=h3-"439483"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">PurchaseOrder_reltab</font></h4>
+
+<!--/TOC=h3-->
+<a name="442878"></a> 
+
+<p class="BP">The <code>PurchaseOrder_reltab</code> table has the following definition:</p>
+
+<pre class="CE">
+<a name="440298"></a>CREATE TABLE PurchaseOrder_reltab (    
+<a name="440299"></a>   PONo        NUMBER, <em class="Italic">/* purchase order no</em> */  
+<a name="440322"></a>   Custno      NUMBER references Customer_reltab, /* <em class="Italic">Foreign KEY referencing 
+</em><a name="442037"></a> <em class="Italic">                                                customer</em> */
+<a name="440302"></a>   OrderDate   DATE, <em class="Italic">/*  date of order */  
+</em><a name="440303"></a>   ShipDate    DATE, <em class="Italic">/* date to be shipped */    
+</em><a name="440304"></a>   ToStreet    VARCHAR2(200), <em class="Italic">/* shipto address */</em>    
+<a name="440305"></a>   ToCity      VARCHAR2(200),    
+<a name="440306"></a>   ToState     CHAR(2),    
+<a name="440307"></a>   ToZip       VARCHAR2(20),    
+<a name="440308"></a>   PRIMARY KEY(PONo)    
+<a name="440309"></a>   ) ;   
+<a name="440310"></a>  
+</pre>
+
+<a name="439653"></a> 
+
+<p class="BP"><code>PurchaseOrder_reltab</code> manages the relationship between the customer and the purchase order by means of the foreign key (FK) column <code>CustNo</code>, which references the <code>CustNo</code> key of the <code>Customer_reltab</code>. The <code>PurchaseOrder_reltab</code> table contains no information about related line items. The line items table (next section) uses the purchase order number to relate a line item to its parent purchase order.</p>
+
+<a name="439493"></a> <!--TOC=h3-"439493"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">LineItems_reltab</font></h4>
+
+<!--/TOC=h3-->
+<a name="442893"></a> 
+
+<p class="BP">The <code>LineItems_reltab</code> table has the following definition:</p>
+
+<pre class="CE">
+<a name="439292"></a>CREATE TABLE LineItems_reltab (
+<a name="439293"></a>  LineItemNo           NUMBER,
+<a name="439294"></a>  PONo                 NUMBER REFERENCES PurchaseOrder_reltab,
+<a name="439295"></a>  StockNo              NUMBER REFERENCES Stock_reltab,
+<a name="439296"></a>  Quantity             NUMBER,
+<a name="439297"></a>  Discount             NUMBER,
+<a name="439298"></a>  PRIMARY KEY (PONo, LineItemNo)
+<a name="439299"></a>  ) ;
+</pre>
+
+<!--AnN_AnchorNote will not be supported in future releases -->
+<a name="439593"></a> 
+
+<div align="center">
+<table class="Note" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="Note">
+<td class="Note">
+<hr>
+<a name="444513"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">Note:</strong></font> <a name="444514"></a> 
+
+<p class="NB">The <code>Stock_reltab</code> table, described in <a href="adobjxmp.htm#439499">"Stock_reltab"</a><a href="adobjxmp.htm#439499"></a>, must be created before the <code>LineItems_reltab</code> table.</p>
+
+<hr>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="444510"></a> 
+
+<p class="BP">The table name is in the plural form <code>LineItems_reltab</code> to emphasize to someone reading the code that the table holds a collection of line items.</p>
+
+<a name="439574"></a> 
+
+<p class="BP">As shown in the E-R diagram, the list of line items has relationships with both the purchase order and the stock item. These relationships are managed by <code>LineItems_reltab</code> by means of two foreign key columns:</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="442934"></a><code>PONo</code>, which references the <code>PONo</code> column in <code>PurchaseOrder_reltab</code></li>
+
+<li class="LB1" type="disc"><a name="442937"></a><code>StockNo</code>, which references the <code>StockNo</code> column in <code>Stock_reltab</code></li>
+</ul>
+
+<a name="439499"></a> <!--TOC=h3-"439499"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Stock_reltab</font></h4>
+
+<!--/TOC=h3-->
+<a name="442915"></a> 
+
+<p class="BP">The <code>Stock_reltab</code> table has the following definition:</p>
+
+<pre class="CE">
+<a name="437458"></a>CREATE TABLE Stock_reltab (
+<a name="437459"></a>  StockNo      NUMBER PRIMARY KEY,
+<a name="430587"></a>  Price        NUMBER,
+<a name="433181"></a>  TaxRate      NUMBER
+<a name="430588"></a>  ) ;
+</pre>
+
+<a name="437139"></a> <!--TOC=h2-"437139"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Inserting Values Under the Relational Model</font></h3>
+
+<!--/TOC=h2-->
+<a name="437140"></a> 
+
+<p class="BP">In our application, statements like these insert data into the tables:</p>
+
+<a name="439739"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Establish Inventory</font></h5>
+
+<pre class="CE">
+<a name="439746"></a>INSERT INTO Stock_reltab VALUES(1004, 6750.00, 2) ;
+<a name="439740"></a>INSERT INTO Stock_reltab VALUES(1011, 4500.23, 2) ;
+<a name="439741"></a>INSERT INTO Stock_reltab VALUES(1534, 2234.00, 2) ;
+<a name="439742"></a>INSERT INTO Stock_reltab VALUES(1535, 3456.23, 2) ;
+</pre>
+
+<a name="439748"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Register Customers</font></h5>
+
+<pre class="CE">
+<a name="437141"></a>INSERT INTO Customer_reltab
+<a name="437142"></a>  VALUES (1, 'Jean Nance', '2 Avocet Drive',
+<a name="437143"></a>         'Redwood Shores', 'CA', '95054',
+<a name="437144"></a>         '415-555-1212', NULL, NULL) ;
+<a name="439727"></a>
+<a name="439773"></a>INSERT INTO Customer_reltab
+<a name="439728"></a>  VALUES (2, 'John Nike', '323 College Drive',
+<a name="439729"></a>         'Edison', 'NJ', '08820',
+<a name="439730"></a>         '609-555-1212', '201-555-1212', NULL) ;
+</pre>
+
+<a name="439760"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Place Orders</font></h5>
+
+<pre class="CE">
+<a name="439732"></a>INSERT INTO PurchaseOrder_reltab
+<a name="439733"></a>  VALUES (1001, 1, SYSDATE, '10-MAY-1997',
+<a name="437153"></a>          NULL, NULL, NULL, NULL) ;
+<a name="437154"></a>
+<a name="437155"></a>INSERT INTO PurchaseOrder_reltab
+<a name="437156"></a>  VALUES (2001, 2, SYSDATE, '20-MAY-1997',
+<a name="437157"></a>         '55 Madison Ave', 'Madison', 'WI', '53715') ;
+</pre>
+
+<a name="439770"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Detail Line Items</font></h5>
+
+<pre class="CE">
+<a name="437164"></a>INSERT INTO LineItems_reltab VALUES(01, 1001, 1534, 12,  0) ;
+<a name="437165"></a>INSERT INTO LineItems_reltab VALUES(02, 1001, 1535, 10, 10) ;
+<a name="437166"></a>INSERT INTO LineItems_reltab VALUES(01, 2001, 1004,  1,  0) ;
+<a name="437167"></a>INSERT INTO LineItems_reltab VALUES(02, 2001, 1011,  2,  1) ;
+</pre>
+
+<a name="447783"></a> <!--TOC=h2-"447783"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Querying Data Under The Relational Model</font></h3>
+
+<!--/TOC=h2-->
+<a name="447784"></a> 
+
+<p class="BP">The application can execute queries like these:</p>
+
+<a name="447785"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Get Customer and Line Item Data for a Specific Purchase Order</font></h5>
+
+<pre class="CE">
+<a name="434591"></a>SELECT   C.CustNo, C.CustName, C.Street, C.City, C.State,
+<a name="433315"></a>         C.Zip, C.phone1, C.phone2, C.phone3,
+<a name="433320"></a>         P.PONo, P.OrderDate,
+<a name="433297"></a>         L.StockNo, L.LineItemNo, L.Quantity, L.Discount
+<a name="433246"></a> FROM    Customer_reltab C,
+<a name="433323"></a>         PurchaseOrder_reltab P,
+<a name="433324"></a>         LineItems_reltab L
+<a name="433247"></a> WHERE   C.CustNo = P.CustNo
+<a name="433326"></a>  AND    P.PONo = L.PONo
+<a name="433327"></a>  AND    P.PONo = 1001 ;
+</pre>
+
+<a name="433250"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Get the Total Value of Purchase Orders</font></h5>
+
+<pre class="CE">
+<a name="434590"></a>SELECT     P.PONo, SUM(S.Price * L.Quantity)
+<a name="433253"></a> FROM      PurchaseOrder_reltab P,
+<a name="433333"></a>           LineItems_reltab L,
+<a name="433334"></a>           Stock_reltab S
+<a name="433341"></a> WHERE     P.PONo = L.PONo
+<a name="433342"></a>  AND      L.StockNo = S.StockNo
+<a name="433255"></a> GROUP BY P.PONo ;
+</pre>
+
+<a name="433257"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Get the Purchase Order and Line Item Data for those LineItems That Use a Stock Item Identified by a Specific Stock Number</font></h5>
+
+<pre class="CE">
+<a name="434589"></a>SELECT    P.PONo, P.CustNo,
+<a name="433261"></a>          L.StockNo, L.LineItemNo, L.Quantity, L.Discount
+<a name="433262"></a> FROM     PurchaseOrder_reltab P,
+<a name="433367"></a>          LineItems_reltab     L
+<a name="433263"></a> WHERE    P.PONo = L.PONo
+<a name="433368"></a>   AND    L.StockNo = 1004 ;
+</pre>
+
+<a name="430679"></a> <!--TOC=h2-"430679"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Updating Data Under The Relational Model</font></h3>
+
+<!--/TOC=h2-->
+<a name="431551"></a> 
+
+<p class="BP">The application can execute statements like these to update the data:</p>
+
+<a name="430680"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Update the Quantity for Purchase Order 1001 and Stock Item 1534</font></h5>
+
+<pre class="CE">
+<a name="430682"></a>UPDATE LineItems_reltab
+<a name="430684"></a>   SET      Quantity = 20
+<a name="430686"></a>   WHERE    PONo     = 1001
+<a name="430687"></a>   AND      StockNo  = 1534 ;
+</pre>
+
+<a name="430691"></a> <!--TOC=h2-"430691"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Deleting Data Under The Relational Model</font></h3>
+
+<!--/TOC=h2-->
+<a name="431612"></a> 
+
+<p class="BP">The application can execute statements like these to delete data:</p>
+
+<a name="430692"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Delete Purchase Order 1001</font></h5>
+
+<pre class="CE">
+<a name="434588"></a>DELETE
+<a name="431633"></a>   FROM   LineItems_reltab
+<a name="431634"></a>   WHERE  PONo = 1001 ;
+<a name="431635"></a>
+<a name="430694"></a>DELETE
+<a name="430695"></a>   FROM   PurchaseOrder_reltab
+<a name="437641"></a>   WHERE  PONo = 1001 ;
+</pre>
+
+<a name="440189"></a> <!--TOC=h1-"440189"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Implementing the Schema on the Object-Relational Model</font></h2>
+
+<!--/TOC=h1-->
+<a name="451729"></a> 
+
+<p class="BP">The object-relational (O-R) approach begins with the same entity relationships as in <a href="adobjxmp.htm#439989">"Entities and Relationships"</a><a href="adobjxmp.htm#439989"></a>. Viewing these from the object-oriented perspective, as in the following class diagram, allows us to translate more of the real-world structure into the database schema.</p>
+
+<a name="451746"></a> 
+
+<h4 class="FT"><font face="Arial, Helvetica, sans-serif"><em>Figure 9-2 Class Diagram for Purchase Order Application</em></font></h4>
+
+<a name="440194"><img src="adobj002.gif" alt="Text description of adobj002.gif follows"></a><a href="img_text/adobj002.htm"><br>
+Text description of the illustration adobj002.gif</a><br>
+<br>
+ <a name="433405"></a> 
+
+<p class="BP">Instead of breaking up addresses or multiple phone numbers into unrelated columns in relational tables, the O-R approach defines types to represent an entire address and an entire list of phone numbers. Similarly, the O-R approach uses nested tables to keep line items with their purchase orders instead of storing them separately.</p>
+
+<a name="433408"></a> 
+
+<p class="BP">The main entities--customers, stock, and purchase orders--become object types. Object references are used to express some of the relationships among them. Collection types--varrays and nested tables--are used to model multi-valued attributes.</p>
+
+<a name="433387"></a> 
+
+<div align="center">
+<table class="Note" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="Note">
+<td class="Note">
+<hr>
+<a name="454772"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">Note:</strong></font> <a name="454773"></a> 
+
+<p class="NB">This chapter implements an object-relational interface by building an object-relational schema from scratch. On this approach, we create <em class="Italic">object tables</em> for data storage. Alternatively, instead of object tables, you can use <em class="Italic">object views</em> to implement an object-relational interface to existing data stored in relational tables. <a href="adobjvew.htm#433584">Chapter&nbsp;5</a> discusses object views.</p>
+
+<hr>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="431678"></a> <!--TOC=h2-"431678"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Defining Types</font></h3>
+
+<!--/TOC=h2-->
+<a name="431690"></a> 
+
+<p class="BP">You create a user-defined type with a <code>CREATE TYPE</code> statement. For example, the following statement creates the type <code>StockItem_objtyp</code>:</p>
+
+<pre class="CE">
+<a name="454812"></a>CREATE TYPE StockItem_objtyp AS OBJECT (
+<a name="454813"></a>  StockNo    NUMBER,
+<a name="454814"></a>  Price      NUMBER,
+<a name="454815"></a>  TaxRate    NUMBER
+<a name="454816"></a>  );
+<a name="454817"></a>
+</pre>
+
+<a name="454832"></a> 
+
+<p class="BP">Instances of type <code>StockItem_objtyp</code> are objects representing the stock items that customers order. They have three numeric attributes.</p>
+
+<a name="454818"></a> 
+
+<h4 class="FT"><font face="Arial, Helvetica, sans-serif"><em>Figure 9-3 Object Relational Representation of the StockItem_objtyp</em></font></h4>
+
+<a name="454822"><img src="adobj007.gif" alt="Text description of adobj007.gif follows"></a><a href="img_text/adobj007.htm"><br>
+Text description of the illustration adobj007.gif</a><br>
+<br>
+ <a name="454804"></a> 
+
+<p class="BP">The order in which you define types can make a difference. Ideally, you want to wait to define types that refer to other types until you have defined the other types they refer to.</p>
+
+<a name="454837"></a> 
+
+<p class="BP">For example, the type <code>LineItem_objtyp</code> refers to, and thus presupposes, <code>StockItem_objtyp</code> by containing an attribute that is a <code>REF</code> to objects of <code>StockItem_objtyp</code>. You can see this in the statement that creates the type <code>LineItem_objtyp</code>:</p>
+
+<pre class="CE">
+<a name="454844"></a>CREATE TYPE LineItem_objtyp AS OBJECT (
+<a name="454845"></a>  LineItemNo   NUMBER,
+<a name="454846"></a>  Stock_ref    REF StockItem_objtyp,
+<a name="454847"></a>  Quantity     NUMBER,
+<a name="454848"></a>  Discount     NUMBER
+<a name="454849"></a>  );
+<a name="454850"></a>
+</pre>
+
+<a name="454851"></a> 
+
+<h4 class="FT"><font face="Arial, Helvetica, sans-serif"><em>Figure 9-4 Object Relational Representation of LineItem_objtyp Type</em></font></h4>
+
+<a name="454855"><img src="adobj005.gif" alt="Text description of adobj005.gif follows"></a><a href="img_text/adobj005.htm"><br>
+Text description of the illustration adobj005.gif</a><br>
+<br>
+ <a name="454856"></a> 
+
+<p class="BP">Instances of type <code>LineItem_objtyp</code> are objects that represent line items. They have three numeric attributes and one <code>REF</code> attribute. The <code>LineItem_objtyp</code> models the line item entity and includes an object reference to the corresponding stock object.</p>
+
+<a name="454840"></a> 
+
+<p class="BP">Sometimes the web of references among types makes it difficult or impossible to avoid creating a type before all the types that it presupposes are created. To deal with this sort of situation, you can create what is called an <strong class="Bold">incomplete type</strong> to use as a placeholder for other types that you want to create to refer to. Then, when you have created the other types, you can come back and replace the incomplete type with a complete one.</p>
+
+<a name="454905"></a> 
+
+<p class="BP">For example, if we had needed to create <code>LineItem_objtyp</code> before we created <code>StockItem_objtyp</code>, we could have used a statement like the following to create <code>LineItem_objtyp</code> as an incomplete type:</p>
+
+<pre class="CE">
+<a name="454915"></a>CREATE TYPE LineItem_objtyp;
+<a name="454920"></a>
+</pre>
+
+<a name="454906"></a> 
+
+<p class="BP">The form of the <code>CREATE TYPE</code> statement used to create an incomplete type lacks that phrase <code>AS OBJECT</code> and also lacks the specification of attributes.</p>
+
+<a name="454923"></a> 
+
+<p class="BP">To replace an incomplete type with a complete definition, include the phrase <code>OR REPLACE</code> as shown in the following example:</p>
+
+<pre class="CE">
+<a name="454927"></a>CREATE OR REPLACE TYPE LineItem_objtyp AS OBJECT (
+<a name="454928"></a>  LineItemNo   NUMBER,
+<a name="454929"></a>  Stock_ref    REF StockItem_objtyp,
+<a name="454930"></a>  Quantity     NUMBER,
+<a name="454931"></a>  Discount     NUMBER
+<a name="454932"></a>  );
+<a name="454924"></a>
+</pre>
+
+<a name="454921"></a> 
+
+<p class="BP">It is never wrong to include the words <code>OR REPLACE</code>, even if you have no incomplete type to replace.</p>
+
+<a name="431687"></a> 
+
+<p class="BP">Now let's create the remaining types we need for the schema. The following statement defines an array type for the list of phone numbers:</p>
+
+<pre class="CE">
+<a name="430723"></a>CREATE TYPE PhoneList_vartyp AS VARRAY(10) OF VARCHAR2(20);
+<a name="440484"></a>
+</pre>
+
+<a name="454953"></a> 
+
+<p class="BP">Any data unit, or instance, of type <code>PhoneList_vartyp</code> is a varray of up to 10 telephone numbers, each represented by a data item of type <code>VARCHAR2</code>.</p>
+
+<a name="454955"></a> 
+
+<p class="BP">Either a varray or a nested table could be used to contain a list of phone numbers. In this case, the list is the set of contact phone numbers for a single customer. A varray is a better choice than a nested table for the following reasons:</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="433412"></a>The order of the numbers might be important: varrays are ordered while nested tables are unordered.</li>
+
+<li class="LB1" type="disc"><a name="433414"></a>The number of phone numbers for a specific customer is small. Varrays force you to specify a maximum number of elements (10 in this case) in advance. They use storage more efficiently than nested tables, which have no special size limitations.</li>
+
+<li class="LB1" type="disc"><a name="433415"></a>You can query a nested table but not a varray. But there is no reason to query the phone number list, so using a nested table offers no benefit.</li>
+</ul>
+
+<a name="433413"></a> 
+
+<p class="BP">In general, if ordering and bounds are not important design considerations, then designers can use the following rule of thumb for deciding between varrays and nested tables: If you need to query the collection, then use nested tables; if you intend to retrieve the collection as a whole, then use varrays.</p>
+
+<!--AnN_AnchorNote will not be supported in future releases -->
+<a name="444120"></a> 
+
+<div align="center">
+<table class="Note" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="Note">
+<td class="Note">
+<hr>
+<a name="444123"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="444124"></a> 
+
+<p class="NB"><a href="adobjdes.htm#441286">Chapter&nbsp;8, "Design Considerations for Oracle Objects"</a> for more information about the design considerations for varrays and nested tables.</p>
+
+<hr>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="443157"></a> 
+
+<p class="BP">The following statement defines the object type <code>Address_objtyp</code> to represent addresses:</p>
+
+<pre class="CE">
+<a name="430726"></a>CREATE TYPE Address_objtyp AS OBJECT (
+<a name="430727"></a>  Street         VARCHAR2(200),
+<a name="430728"></a>  City           VARCHAR2(200),
+<a name="430729"></a>  State          CHAR(2),
+<a name="430730"></a>  Zip            VARCHAR2(20)
+<a name="430731"></a>  ) 
+<a name="443662"></a>/
+</pre>
+
+<a name="452109"></a> 
+
+<h4 class="FT"><font face="Arial, Helvetica, sans-serif"><em>Figure 9-5 Object Relational Representation of Address_objtyp Type</em></font></h4>
+
+<a name="452112"><img src="adob004a.gif" alt="Text description of adob004a.gif follows"></a><a href="img_text/adob004a.htm"><br>
+Text description of the illustration adob004a.gif</a><br>
+<br>
+ <a name="452111"></a> 
+
+<p class="BP">All of the attributes of an address are character strings, representing the usual parts of a simplified mailing address.</p>
+
+<a name="431808"></a> 
+
+<p class="BP">The following statement defines the object type <code>Customer_objtyp</code>, which uses other user-defined types as building blocks.</p>
+
+<pre class="CE">
+<a name="430737"></a>CREATE TYPE Customer_objtyp AS OBJECT (
+<a name="430738"></a>  CustNo           NUMBER,
+<a name="430739"></a>  CustName         VARCHAR2(200),
+<a name="430740"></a>  Address_obj      Address_objtyp,
+<a name="430741"></a>  PhoneList_var    PhoneList_vartyp,
+<a name="443486"></a>
+<a name="430747"></a>  ORDER MEMBER FUNCTION
+<a name="430748"></a>    compareCustOrders(x IN Customer_objtyp) RETURN INTEGER
+<a name="430752"></a>) NOT FINAL;
+<a name="443663"></a>
+</pre>
+
+<a name="441106"></a> 
+
+<p class="BP">Instances of the type <code>Customer_objtyp</code> are objects that represent blocks of information about specific customers. The attributes of a <code>Customer_objtyp</code> object are a number, a character string, an <code>Address_objtyp</code> object, and a varray of type <code>PhoneList_vartyp</code>.</p>
+
+<a name="455411"></a> 
+
+<p class="BP">The clause <code>NOT FINAL</code> enables us to create subtypes of the customer type later if we wish. By default, types are created as <code>FINAL</code>, which means that the type cannot be further specialized by deriving subtypes from it. We define a subtype of <code>Customer_objtyp</code> for a more specialized kind of customer later in this chapter.</p>
+
+<a name="431825"></a> 
+
+<p class="BP">Every <code>Customer_objtyp</code> object also has an associated order method, one of the two types of comparison methods. Whenever Oracle needs to compare two <code>Customer_objtyp</code> objects, it implicitly invokes the <code>compareCustOrders</code> method to do so.</p>
+
+<!--AnN_AnchorNote will not be supported in future releases -->
+<a name="443205"></a> 
+
+<div align="center">
+<table class="Note" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="Note">
+<td class="Note">
+<hr>
+<a name="443208"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">Note::</strong></font> <a name="443222"></a> 
+
+<p class="NB">The PL/SQL to implement the comparison method appears in <a href="adobjxmp.htm#432204">"The compareCustOrders Method"</a><a href="adobjxmp.htm#432204"></a>.</p>
+
+<hr>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="443186"></a> 
+
+<p class="BP">The two types of comparison methods are map methods and order methods. This application uses one of each for purposes of illustration.</p>
+
+<a name="443193"></a> 
+
+<p class="BP">An <code>ORDER</code> method must be called for every two objects being compared, whereas a <code>MAP</code> method is called once for each object. In general, when sorting a set of objects, the number of times an <code>ORDER</code> method is called is more than the number of times a <code>MAP</code> method would be called.</p>
+
+<a name="451872"></a> 
+
+<div align="center">
+<table class="NoteAlso" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="NoteAlso">
+<td class="NoteAlso"><a name="451876"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="451877"></a> 
+
+<ul class="NL">
+<li class="NL" type="disc"><a name="451878"></a><a href="adobjbas.htm#453072">Chapter&nbsp;2</a> for more information about map and order methods</li>
+
+<li class="NL" type="disc"><a name="451887"></a> <a href="../../appdev.920/a96624/toc.htm"><em class="Italic">PL/SQL User's Guide and Reference</em></a> for details about how to use pragma declarations</li>
+</ul>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="443242"></a> 
+
+<p class="BP">The following statement defines a type for a nested table of line items. Each purchase order will use an instance of this nested table type to contain the line items for that purchase order:</p>
+
+<pre class="CE">
+<a name="438423"></a>CREATE TYPE LineItemList_ntabtyp AS TABLE OF LineItem_objtyp; 
+<a name="438424"></a>
+</pre>
+
+<a name="431875"></a> 
+
+<p class="BP">An instance of this type is a nested table object (in other words, a nested table), each row of which contains an object of type <code>LineItem_objtyp</code>. A nested table of line items is a better choice to represent the multivalued line item list than a varray of <code>LineItem_objtyp</code> objects, because:</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="433495"></a>Most applications will need to query the contents of line items. This can be done using SQL if the line items are stored in a nested table but not if they are stored in a varray.</li>
+
+<li class="LB1" type="disc"><a name="433496"></a>If an application needs to index on line item data, this can be done with nested tables but not with varrays.</li>
+
+<li class="LB1" type="disc"><a name="433502"></a>The order in which line items are stored is probably not important, and a query can order them by line item number when necessary.</li>
+
+<li class="LB1" type="disc"><a name="433503"></a>There is no practical upper bound on the number of line items on a purchase order. Using a varray requires specifying an arbitrary upper bound on the number of elements.</li>
+</ul>
+
+<a name="433469"></a> 
+
+<p class="BP">The following statement defines the object type <code>PurchaseOrder_objtyp</code>:</p>
+
+<pre class="CE">
+<a name="432378"></a>CREATE TYPE PurchaseOrder_objtyp AUTHID CURRENT_USER AS OBJECT (
+<a name="432379"></a>  PONo                 NUMBER,
+<a name="432380"></a>  Cust_ref             REF Customer_objtyp,
+<a name="432381"></a>  OrderDate            DATE,
+<a name="432382"></a>  ShipDate             DATE,
+<a name="432383"></a>  LineItemList_ntab    LineItemList_ntabtyp,
+<a name="432384"></a>  ShipToAddr_obj       Address_objtyp,
+<a name="432385"></a>
+<a name="431887"></a>  MAP MEMBER FUNCTION
+<a name="431888"></a>    getPONo RETURN NUMBER,
+<a name="430777"></a>
+<a name="430778"></a>  MEMBER FUNCTION
+<a name="430779"></a>    sumLineItems RETURN NUMBER
+<a name="430781"></a>  );
+<a name="443665"></a>
+</pre>
+
+<a name="441044"></a> 
+
+<h4 class="FT"><font face="Arial, Helvetica, sans-serif"><em>Figure 9-6 Object Relational Representation of the PuchaseOrder_objtyp</em></font></h4>
+
+<a name="441048"><img src="adobj006.gif" alt="Text description of adobj006.gif follows"></a><a href="img_text/adobj006.htm"><br>
+Text description of the illustration adobj006.gif</a><br>
+<br>
+ <a name="431903"></a> 
+
+<p class="BP">Instances of type <code>PurchaseOrder_objtyp</code> are objects representing purchase orders. They have six attributes, including a <code>REF</code> to <code>Customer_objtyp</code>, an <code>Address_objtyp</code> object, and a nested table of type <code>LineItemList_ntabtyp</code>, which is based on type <code>LineItem_objtyp</code>.</p>
+
+<a name="431926"></a> 
+
+<p class="BP">Objects of type <code>PurchaseOrder_objtyp</code> have two methods: <code>getPONo</code> and <code>sumLineItems</code>. One, <code>getPONo</code>, is a <code>MAP</code> method, one of the two kinds of comparison methods. A <code>MAP</code> method returns the relative position of a given record within the order of records within the object. So, whenever Oracle needs to compare two <code>PurchaseOrder_objtyp</code> objects, it implicitly calls the <code>getPONo</code> method to do so.</p>
+
+<a name="431927"></a> 
+
+<p class="BP">The two pragma declarations provide information to PL/SQL about what sort of access the two methods need to the database.</p>
+
+<a name="431931"></a> 
+
+<p class="BP">The statement does not include the actual PL/SQL programs implementing the methods <code>getPONo</code> and <code>sumLineItems</code>. Those appear in <a href="adobjxmp.htm#431996">"Method Definitions"</a><a href="adobjxmp.htm#431996"></a>.</p>
+
+<a name="431996"></a> <!--TOC=h2-"431996"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Method Definitions</font></h3>
+
+<!--/TOC=h2-->
+<a name="443399"></a> 
+
+<p class="BP">If a type has no methods, its definition consists just of a <code>CREATE TYPE</code> statement. However, for a type that has methods, you must also define a type body to complete the definition of the type. You do this with a <code>CREATE TYPE BODY</code> statement. As with <code>CREATE TYPE</code>, you can include the words <code>OR REPLACE</code>. You must include this phrase if you are replacing an existing type body with a new one, to change the methods.</p>
+
+<a name="455004"></a> 
+
+<p class="BP">The following statement defines the body of the type <code>PurchaseOrder_objtyp</code>. The statement supplys the PL/SQL programs that implement the type's methods:</p>
+
+<pre class="CE">
+<a name="443400"></a>CREATE OR REPLACE TYPE BODY PurchaseOrder_objtyp AS 
+<a name="444182"></a>
+<a name="444185"></a>MAP MEMBER FUNCTION getPONo RETURN NUMBER is   
+<a name="444186"></a>   BEGIN  
+<a name="444187"></a>      RETURN PONo;   
+<a name="444188"></a>   END;    
+<a name="443401"></a>   
+<a name="444192"></a>MEMBER FUNCTION sumLineItems RETURN NUMBER is  
+<a name="443402"></a>      i             INTEGER;  
+<a name="443403"></a>      StockVal      StockItem_objtyp;  
+<a name="443404"></a>      Total         NUMBER := 0;  
+<a name="443405"></a>   
+<a name="443406"></a>   BEGIN  
+<a name="443407"></a>      FOR i in 1..SELF.LineItemList_ntab.COUNT LOOP  
+<a name="443408"></a>         UTL_REF.SELECT_OBJECT(LineItemList_ntab(i).Stock_ref,StockVal);  
+<a name="443409"></a>         Total := Total + SELF.LineItemList_ntab(i).Quantity * StockVal.Price;  
+<a name="443410"></a>      END LOOP;  
+<a name="443411"></a>      RETURN Total;  
+<a name="443412"></a>   END;
+<a name="444542"></a>END;         
+<a name="443668"></a>/   
+</pre>
+
+<a name="437092"></a> <!--TOC=h3-"437092"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">The getPONo Method</font></h4>
+
+<!--/TOC=h3-->
+<a name="436505"></a> 
+
+<p class="BP">The <code>getPONo</code> method simply returns the value of the <code>PONo</code> attribute--namely, the purchase order number--of whatever instance of the type <code>PurchaseOrder_objtyp</code> that calls the method. Such "get" methods allow you to avoid reworking code that uses the object if its internal representation changes.</p>
+
+<a name="436507"></a> <!--TOC=h3-"436507"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">The sumLineItems Method</font></h4>
+
+<!--/TOC=h3-->
+<a name="436029"></a> 
+
+<p class="BP">The <code>sumLineItems</code> method uses a number of object-relational features:</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="436076"></a>As already noted, the basic function of the <code>sumLineItems</code> method is to return the sum of the values of the line items of its associated <code>PurchaseOrder_objtyp</code> object. The keyword <code>SELF</code>, which is implicitly created as a parameter to every function, lets you refer to that object.</li>
+
+<li class="LB1" type="disc"><a name="443343"></a>The keyword <code>COUNT</code> gives the count of the number of elements in a PL/SQL table or array. Here, in combination with <code>LOOP</code>, the application iterates through all the elements in the collection -- in this case, the items of the purchase order. In this way <code>SELF</code>.<code>LineItemList_ntab</code>.<code>COUNT</code> counts the number of elements in the nested table that match the <code>LineItemList_ntab</code> attribute of the <code>PurchaseOrder_objtyp</code> object, here represented by <code>SELF</code>.</li>
+
+<li class="LB1" type="disc"><a name="443344"></a>A method from package <code>UTL_REF</code> is used in the implementation. The <code>UTL_REF</code> methods are necessary because Oracle does not support implicit dereferencing of <code>REF</code>s within PL/SQL programs. The <code>UTL_REF</code> package provides methods that operate on object references. Here, the <code>SELECT_OBJECT</code> method is called to obtain the <code>StockItem_objtyp</code> object corresponding to the <code>Stock_ref</code>.</li>
+
+<li class="LB1" type="disc"><a name="444201"></a>The <code>AUTHID CURRENT_USER</code> syntax specifies that the <code>PurchaseOrder_objtyp</code> is defined using invoker-rights: the methods are executed under the rights of the current user, not under the rights of the user who defined the type.</li>
+
+<li class="LB1" type="disc"><a name="441359"></a>The PL/SQL variable <code>StockVal</code> is of type <code>StockItem_objtyp</code>. The <code>UTL_REF</code>.<code>SELECT_OBJECT</code> sets it to the object whose reference is the following: 
+
+<pre class="CE1">
+<a name="443353"></a>(<code>LineItemList_ntab(i)</code>.<code>Stock_ref</code>) 
+<a name="443357"></a>
+</pre>
+
+<a name="443358"></a> 
+
+<p class="BP1">This object is the actual stock item referred to in the currently selected line item.</p>
+</li>
+
+<li class="LB1" type="disc"><a name="438199"></a>Having retrieved the stock item in question, the next step is to compute its cost. The program refers to the stock item's cost as <code>StockVal</code>.<code>Price</code>, the <code>Price</code> attribute of the <code>StockItem_objtyp</code> object. But to compute the cost of the item, you also need to know the quantity of items ordered. In the application, the term <code>LineItemList_ntab(i)</code>.<code>Quantity</code> represents the <code>Quantity</code> attribute of the currently selected <code>LineItem_objtyp</code> object.</li>
+</ul>
+
+<a name="432768"></a> 
+
+<p class="BP">The remainder of the method program is a loop that sums the values of the line items. The method returns the total.</p>
+
+<a name="432204"></a> <!--TOC=h3-"432204"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">The compareCustOrders Method</font></h4>
+
+<!--/TOC=h3-->
+<a name="436518"></a> 
+
+<p class="BP">The following statement defines the <code>compareCustOrders</code> method in the type body of the <code>Customer_objtyp</code> object type:</p>
+
+<pre class="CE">
+<a name="436527"></a>CREATE OR REPLACE TYPE BODY Customer_objtyp AS
+<a name="436529"></a>  ORDER MEMBER FUNCTION
+<a name="432135"></a>  compareCustOrders (x IN Customer_objtyp) RETURN INTEGER IS
+<a name="432085"></a>  BEGIN
+<a name="433530"></a>    RETURN CustNo - x.CustNo;
+<a name="433531"></a>  END;
+<a name="432090"></a>END;
+<a name="443674"></a>/
+<a name="435172"></a>
+</pre>
+
+<a name="432810"></a> 
+
+<p class="BP">As mentioned earlier, the order method <code>compareCustOrders</code> operation compares information about two customer orders. It takes another <code>Customer_objtyp</code> object as an input argument and returns the difference of the two <code>CustNo</code> numbers. The return value is:</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="443372"></a>a negative number if its own object has a smaller value of <code>CustNo</code></li>
+
+<li class="LB1" type="disc"><a name="443377"></a>a positive number if its own object has a larger value of <code>CustNo</code></li>
+
+<li class="LB1" type="disc"><a name="443378"></a>zero if the two objects have the same value of <code>CustNo</code>--in which case both orders are associated with the same customer.</li>
+</ul>
+
+<a name="442518"></a> 
+
+<p class="BP">Whether the return value is positive, negative, or zero signifies the relative order of the customer numbers. For example, perhaps lower numbers are created earlier in time than higher numbers. If either of the input arguments (<code>SELF</code> and the explicit argument) to an <code>ORDER</code> method is <code>NULL</code>, Oracle does not call the <code>ORDER</code> method and simply treats the result as <code>NULL</code>.</p>
+
+<a name="432853"></a> 
+
+<p class="BP">We have now defined all of the user-defined types for the object-relational version of the purchase order schema. We have not yet created any instances of these types to contain actual purchase order data, nor have we created any tables in which to store such data. We show how to do this in the next section.</p>
+
+<a name="431968"></a> <!--TOC=h2-"431968"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Creating Object Tables</font></h3>
+
+<!--/TOC=h2-->
+<a name="431982"></a> 
+
+<p class="BP">Creating an object type is not the same as creating a table. Creating a type merely defines a logical structure; it does not create storage. To use an object-relational interface to your data, you must create object types whether you intend to store your data in object tables or leave it in relational tables and access it through object views. Object views and object tables alike presuppose object types: an object table or object view is always a table or view <em class="Italic">of a certain object type</em>. In this respect it is like a relational column, which always has a specified data type.</p>
+
+<a name="455058"></a> 
+
+<div align="center">
+<table class="NoteAlso" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="NoteAlso">
+<td class="NoteAlso"><a name="455075"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="455076"></a> 
+
+<p class="NB"><a href="adobjvew.htm#433584">Chapter&nbsp;5, "Applying an Object Model to Relational Data"</a> for a discussion of object views</p>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="431990"></a> 
+
+<p class="BP">Like a relational column, an object table can contain rows of just one kind of thing, namely, object instances of the same declared type as the table. (And, if the table is substitutable, it can contain instances of subtypes of its declared type as well.)</p>
+
+<a name="455115"></a> 
+
+<p class="BP">Each row in an object table is a single object instance. So, in one sense, an object table has, or consists of, only a single column of the declared object type. But this is not as different as it may seem from the case with relational tables. Each row in a relational table theoretically represents a single entity as well--for example, a customer, in a relational <code>Customers</code> table. The columns of a relational table store data for attributes of this entity.</p>
+
+<a name="455130"></a> 
+
+<p class="BP">Similarly, in an object table, attributes of the object type map to columns that can be inserted into and selected from. The major difference is that, in an object table, data is stored--and can be retrieved--in the structure defined by the table's type, making it possible for you to retrieve an entire, multilevel structure of data with a very simple query.</p>
+
+<a name="443475"></a> <!--TOC=h3-"443475"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">The Object Table Customer_objtab</font></h4>
+
+<!--/TOC=h3-->
+<a name="443477"></a> 
+
+<p class="BP">The following statement defines an object table <code>Customer_objtab</code> to hold objects of type <code>Customer_objtyp</code>:</p>
+
+<pre class="CE">
+<a name="430795"></a>CREATE TABLE Customer_objtab OF Customer_objtyp (CustNo PRIMARY KEY) 
+<a name="440668"></a>   OBJECT IDENTIFIER IS PRIMARY KEY ;   
+<a name="440666"></a>
+</pre>
+
+<a name="443536"></a> 
+
+<p class="BP">Unlike with relational tables, when you create an object table, you specify a data type for it, namely, the type of objects it will contain.</p>
+
+<a name="455155"></a> 
+
+<p class="BP">The table has a column for each attribute of <code>Customer_objtyp</code>, namely:</p>
+
+<pre class="CE">
+<a name="443537"></a>CustNo           NUMBER
+<a name="443538"></a>CustName         VARCHAR2(200)
+<a name="436682"></a>Address_obj      Address_objtyp
+<a name="436683"></a>PhoneList_var    PhoneList_vartyp
+<a name="436687"></a>
+</pre>
+
+<a name="441131"></a> 
+
+<h4 class="FT"><font face="Arial, Helvetica, sans-serif"><em>Figure 9-7 Object Relational Representation of Table Customer_objtab</em></font></h4>
+
+<a name="441127"><img src="adobj008.gif" alt="Text description of adobj008.gif follows"></a><a href="img_text/adobj008.htm"><br>
+Text description of the illustration adobj008.gif</a><br>
+<br>
+ <a name="436671"></a> <!--TOC=h2-"436671"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Object Datatypes as a Template for Object Tables</font></h3>
+
+<!--/TOC=h2-->
+<a name="436922"></a> 
+
+<p class="BP">Because there is a type <code>Customer_objtyp</code>, you could create numerous object tables of the same type. For example, you could create an object table <code>Customer_objtab2</code> also of type <code>Customer_objtyp</code>.</p>
+
+<a name="441380"></a> 
+
+<p class="BP">You can introduce variations when creating multiple tables. The statement that created <code>Customer_objtab</code> defined a primary key constraint on the <code>CustNo</code> column. This constraint applies only to this object table. Another object table of the same type might not have this constraint.</p>
+
+<a name="441391"></a> <!--TOC=h2-"441391"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Object Identifiers and References</font></h3>
+
+<!--/TOC=h2-->
+<a name="441389"></a> 
+
+<p class="BP"><code>Customer_objtab</code> contains customer objects, represented as row objects. Oracle allows row objects to be referenceable, meaning that other row objects or relational rows may reference a row object using its object identifier (OID). For example, a purchase order row object may reference a customer row object using its object reference. The object reference is a system-generated value represented by the type <code>REF</code> and is based on the row object's unique OID.</p>
+
+<a name="442533"></a> 
+
+<p class="BP">Oracle requires every row object to have a unique OID. You may specify the unique OID value to be system-generated or specify the row object's primary key to serve as its unique OID. You indicate this when you execute the <code>CREATE</code> <code>TABLE</code> statement by specifying <code>OBJECT</code> <code>IDENTIFIER IS</code> <code>PRIMARY</code> <code>KEY</code> or <code>OBJECT</code> <code>IDENTIFIER IS</code> <code>SYSTEM</code> <code>GENERATED</code>. The latter is the default. Using the primary key as the object identifier can be more efficient in cases where the primary key value is smaller than the default 16 byte system-generated identifier. For our example, the primary key is used as the row object identifier.</p>
+
+<a name="441386"></a> <!--TOC=h2-"441386"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Object Tables with Embedded Objects</font></h3>
+
+<!--/TOC=h2-->
+<a name="436925"></a> 
+
+<p class="BP">Note that the <code>Address_obj</code> column of <code>Customer_objtab</code> contains <code>Address_objtyp</code> objects. As this shows, an object type may have attributes that are themselves object types. Object instances of the declared type of an object table are called <strong class="Bold">row objects</strong> because one object instance occupies an entire row of the table. But embedded objects such as those in the <code>Address_obj</code> column are referred to as <strong class="Bold">column objects</strong>. These differ from row objects in that they do not take up an entire row. Consequently, they are not referenceable--they cannot be the target of a <code>REF</code>. Also, they can be <code>NULL</code>.</p>
+
+<a name="441599"></a> 
+
+<p class="BP">The attributes of <code>Address_objtyp</code> objects are of built-in types. They are scalar rather than complex (that is, they are not object types with attributes of their own), and so are called <strong class="Bold">leaf-level</strong> attributes to reflect that they represent an end to branching. Columns for <code>Address_objtyp</code> objects and their attributes are created in the object table <code>Customer_objtab</code>. You can refer or <em class="Italic">navidate</em> to these columns using the dot notation. For example, if you want to build an index on the <code>Zip</code> column, you can refer to it as <code>Address</code>.<code>Zip</code>.</p>
+
+<a name="446326"></a> 
+
+<p class="BP">The <code>PhoneList_var</code> column contains varrays of type <code>PhoneList_vartyp</code>. We defined each object of type <code>PhoneList_vartyp</code> as a varray of up to 10 telephone numbers, each represented by a data item of type <code>VARCHAR2</code>:</p>
+
+<pre class="CE">
+<a name="446327"></a>CREATE TYPE PhoneList_vartyp AS VARRAY(10) OF VARCHAR2(20);
+<a name="440495"></a>
+</pre>
+
+<a name="436941"></a> 
+
+<p class="BP">Because each varray of type <code>PhoneList_vartyp</code> can contain no more than 200 characters (10 x 20), plus a small amount of overhead, Oracle stores the varray as a single data unit in the <code>PhoneList_var</code> column. Oracle stores varrays that do not exceed 4000 bytes in "inline" <code>BLOB</code>s, which means that a portion of the varray value could potentially be stored outside the table.</p>
+
+<a name="436876"></a> <!--TOC=h3-"436876"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">The Object Table Stock_objtab</font></h4>
+
+<!--/TOC=h3-->
+<a name="436823"></a> 
+
+<p class="BP">The next statement creates an object table for <code>StockItem_objtyp</code> objects:</p>
+
+<pre class="CE">
+<a name="430800"></a>CREATE TABLE Stock_objtab OF StockItem_objtyp (StockNo PRIMARY KEY)
+<a name="440687"></a>   OBJECT IDENTIFIER IS PRIMARY KEY ;      
+<a name="435176"></a>
+</pre>
+
+<a name="432296"></a> 
+
+<p class="BP">Each row of the table is a <code>StockItem_objtyp</code> object having three numeric attributes:</p>
+
+<pre class="CE">
+<a name="436856"></a>StockNo    NUMBER
+<a name="436857"></a>Price      NUMBER
+<a name="436858"></a>TaxRate    NUMBER
+<a name="436859"></a>
+</pre>
+
+<a name="436854"></a> 
+
+<p class="BP">Oracle creates a column for each attribute. The <code>CREATE</code> <code>TABLE</code> statement places a primary key constraint on the <code>StockNo</code> column and specifies that the primary key be used as the row object's identifier.</p>
+
+<a name="436886"></a> <!--TOC=h3-"436886"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">The Object Table PurchaseOrder_objtab</font></h4>
+
+<!--/TOC=h3-->
+<a name="432362"></a> 
+
+<p class="BP">The next statement defines an object table for <code>PurchaseOrder_objtyp</code> objects:</p>
+
+<pre class="CE">
+<a name="444559"></a>CREATE TABLE PurchaseOrder_objtab OF PurchaseOrder_objtyp (  /* Line 1 */
+<a name="444560"></a>   PRIMARY KEY (PONo),                                       /* Line 2 */
+<a name="444561"></a>   FOREIGN KEY (Cust_ref) REFERENCES Customer_objtab)        /* Line 3 */
+<a name="444562"></a>   OBJECT IDENTIFIER IS PRIMARY KEY                          /* Line 4 */
+<a name="444563"></a>   NESTED TABLE LineItemList_ntab STORE AS PoLine_ntab (     /* Line 5 */
+<a name="444564"></a>     (PRIMARY KEY(NESTED_TABLE_ID, LineItemNo))              /* Line 6 */
+<a name="444627"></a>     ORGANIZATION INDEX COMPRESS)                            /* Line 7 */
+<a name="444629"></a>   RETURN AS LOCATOR                                         /* Line 8 */
+<a name="444557"></a>/   
+<a name="444623"></a>
+</pre>
+
+<a name="441133"></a> 
+
+<p class="BP">The preceding <code>CREATE TABLE</code> statement creates the <code>PurchaseOrder_objtab</code> object table. The significance of each line is as follows:</p>
+
+<a name="441467"></a> <!--TOC=h4-"441467"-->
+<h5 class="H4"><font face="Arial, Helvetica, sans-serif" color="#330099">Line 1:</font></h5>
+
+<!--/TOC=h4-->
+<a name="441468"></a> 
+
+<pre class="CE">
+<a name="443735"></a>CREATE TABLE PurchaseOrder_objtab OF PurchaseOrder_objtyp (
+<a name="443740"></a>
+</pre>
+
+<a name="443730"></a> 
+
+<p class="BP">This line indicates that each row of the table is a <code>PurchaseOrder_objtyp</code> object. Attributes of <code>PurchaseOrder_objtyp</code> objects are:</p>
+
+<pre class="CE">
+<a name="440713"></a>  PONo                 NUMBER
+<a name="440714"></a>  Cust_ref             REF Customer_objtyp
+<a name="440715"></a>  OrderDate            DATE
+<a name="440716"></a>  ShipDate             DATE
+<a name="440717"></a>  LineItemList_ntab    LineItemList_ntabtyp
+<a name="440718"></a>  ShipToAddr_obj       Address_objtyp
+</pre>
+
+<a name="441161"></a> 
+
+<h4 class="FT"><font face="Arial, Helvetica, sans-serif"><em>Figure 9-8 Object Relational Representation of Table PurchaseOrder_objtab</em></font></h4>
+
+<a name="441165"><img src="adobj009.gif" alt="Text description of adobj009.gif follows"></a><a href="img_text/adobj009.htm"><br>
+Text description of the illustration adobj009.gif</a><br>
+<br>
+ <a name="430810"></a> <!--TOC=h4-"430810"-->
+<h5 class="H4"><font face="Arial, Helvetica, sans-serif" color="#330099">Line 2:</font></h5>
+
+<!--/TOC=h4-->
+<a name="441469"></a> 
+
+<pre class="CE">
+<a name="443741"></a>PRIMARY KEY (PONo),
+<a name="443747"></a>
+</pre>
+
+<a name="443742"></a> 
+
+<p class="BP">This line specifies that the <code>PONo</code> attribute is the primary key for the table.</p>
+
+<a name="441466"></a> <!--TOC=h4-"441466"-->
+<h5 class="H4"><font face="Arial, Helvetica, sans-serif" color="#330099">Line 3:</font></h5>
+
+<!--/TOC=h4-->
+<a name="441477"></a> 
+
+<pre class="CE">
+<a name="443748"></a>FOREIGN KEY (Cust_ref) REFERENCES Customer_objtab)
+<a name="443750"></a>
+</pre>
+
+<a name="443749"></a> 
+
+<p class="BP">This line specifies a referential constraint on the <code>Cust_ref</code> column. This referential constraint is similar to those specified for relational tables. When there is no constraint, the <code>REF</code> column allows you to reference any row object. However, in this case, the <code>Cust_ref</code> <code>REF</code>s can refer only to row objects in the <code>Customer_objtab</code> object table.</p>
+
+<a name="441481"></a> <!--TOC=h4-"441481"-->
+<h5 class="H4"><font face="Arial, Helvetica, sans-serif" color="#330099">Line 4:</font></h5>
+
+<!--/TOC=h4-->
+<a name="441485"></a> 
+
+<pre class="CE">
+<a name="443755"></a>OBJECT IDENTIFIER IS PRIMARY KEY
+<a name="443757"></a>
+</pre>
+
+<a name="443756"></a> 
+
+<p class="BP">This line indicates that the primary key of the <code>PurchaseOrder_objtab</code> object table be used as the row's OID.</p>
+
+<a name="441487"></a> <!--TOC=h4-"441487"-->
+<h5 class="H4"><font face="Arial, Helvetica, sans-serif" color="#330099">Line 5 - 8:</font></h5>
+
+<!--/TOC=h4-->
+<a name="441494"></a> 
+
+<pre class="CE">
+<a name="444742"></a>NESTED TABLE LineItemList_ntab STORE AS PoLine_ntab (
+<a name="444743"></a>     (PRIMARY KEY(NESTED_TABLE_ID, LineItemNo))
+<a name="444744"></a>     ORGANIZATION INDEX COMPRESS) 
+<a name="444745"></a>   RETURN AS LOCATOR 
+<a name="444740"></a>
+</pre>
+
+<a name="443763"></a> 
+
+<p class="BP">These lines pertain to the storage specification and properties of the nested table column, <code>LineItemList_ntab</code>. The rows of a nested table are stored in a separate storage table. This storage table is not directly queryable by the user but can be referenced in DDL statements for maintenance purposes. A hidden column in the storage table, called the <code>NESTED_TABLE_ID,</code> matches the rows with their corresponding parent row. All the elements in the nested table belonging to a particular parent have the same <code>NESTED_TABLE_ID</code> value. For example, all the elements of the nested table of a given row of <code>PurchaseOrder_objtab</code> have the same value of <code>NESTED_TABLE_ID</code>. The nested table elements that belong to a different row of <code>PurchaseOrder_objtab</code> have a different value of <code>NESTED_TABLE_ID</code>.</p>
+
+<a name="441498"></a> 
+
+<p class="BP">In the preceding <code>CREATE</code> <code>TABLE</code> example, Line 5 indicates that the rows of <code>LineItemList_ntab</code> nested table are to be stored in a separate table (referred to as the storage table) named <code>PoLine_ntab</code>. The <code>STORE</code> <code>AS</code> clause also allows you to specify the constraint and storage specification for the storage table. In this example, Line 7 indicates that the storage table is an index-organized table (<code>IOT</code>). In general, storing nested table rows in an IOT is beneficial because it provides clustering of rows belonging to the same parent. The specification of <code>COMPRESS</code> on the <code>IOT</code> saves storage space because, if you do not specify <code>COMPRESS</code>, the <code>NESTED_TABLE_ID</code> part of the <code>IOT</code>'s key is repeated for every row of a parent row object. If, however, you specify <code>COMPRESS</code>, the <code>NESTED_TABLE_ID</code> is stored only once for each parent row object.</p>
+
+<a name="450522"></a> 
+
+<p class="BP">The <code>SCOPE</code> <code>FOR</code> constraint on a <code>REF</code> is not allowed in a <code>CREATE</code> <code>TABLE</code> statement. Therefore, to specify that <code>Stock_ref</code> can reference only the object table <code>Stock_objtab</code>, issue the following <code>ALTER</code> <code>TABLE</code> statement on the <code>PoLine_ntab</code> storage table:</p>
+
+<pre class="CE">
+<a name="450523"></a>ALTER TABLE PoLine_ntab
+<a name="450524"></a>   ADD (SCOPE FOR (Stock_ref) IS stock_objtab) ;
+<a name="450525"></a>
+</pre>
+
+<a name="450526"></a> 
+
+<p class="BP">Note that this statement is executed on the storage table, not the parent table.</p>
+
+<!--AnN_AnchorNote will not be supported in future releases -->
+<a name="444148"></a> 
+
+<div align="center">
+<table class="Note" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="Note">
+<td class="Note">
+<hr>
+<a name="444151"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="444152"></a> 
+
+<p class="NB"><a href="adobjdes.htm#441428">"Nested Table Storage"</a><a href="adobjdes.htm#441428"></a> for information about the benefits of organizing a nested table as an IOT, specifying nested table compression, and for more information about nested table storage in general.</p>
+
+<hr>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="441500"></a> 
+
+<p class="BP">In Line 6, the specification of <code>NESTED_TABLE_ID</code> and <code>LineItemNo</code> attribute as the primary key for the storage table serves two purposes: first, it specifies the key for the <code>IOT</code>; second, it enforces uniqueness of the column <code>LineItemNo</code> of the nested table within each row of the parent table. By including the <code>LineItemNo</code> column in the key, the statement ensures that the <code>LineItemNo</code> column contains distinct values within each purchase order.</p>
+
+<a name="444312"></a> 
+
+<p class="BP">Line 8 indicates that the nested table, <code>LineItemList_ntab</code>, is returned in the locator form when retrieved. If you do not specify <code>LOCATOR</code>, the default is <code>VALUE</code>, which causes the entire nested table to be returned instead of just a locator to it. If a nested table collection contains many elements, it is inefficient to return the entire nested table whenever the containing row object or the column is selected.</p>
+
+<a name="442559"></a> 
+
+<p class="BP">Specifying that the nested table's locator is returned enables Oracle to send the client only a locator to the actual collection value. An application can find whether a fetched nested table is in the locator or value form by calling the <code>LNOCICollIsLocator</code> or <code>UTL_COLL</code>.<code>IS_LOCATOR</code> interfaces. Once you know that the locator has been returned, the application can query using the locator to fetch only the desired subset of row elements in the nested table. This locator-based retrieval of the nested table rows is based on the original statement's snapshot, to preserve the value or copy semantics of the nested table. That is, when the locator is used to fetch a subset of row elements in the nested table, the nested table snapshot reflects the nested table when the locator was first retrieved.</p>
+
+<a name="441713"></a> 
+
+<p class="BP">Recall the implementation of the <code>sumLineItems</code> method of <code>PurchaseOrder_objtyp</code> in <a href="adobjxmp.htm#431996">"Method Definitions"</a><a href="adobjxmp.htm#431996"></a>. That implementation assumed that the <code>LineItemList_ntab</code> nested table would be returned as a <code>VALUE</code>. In order to handle large nested tables more efficiently, and to take advantage of the fact that the nested table in the <code>PurchaseOrder_objtab</code> is returned as a locator, the <code>sumLineItems</code> method must be rewritten as follows:</p>
+
+<pre class="CE">
+<a name="441720"></a>CREATE OR REPLACE TYPE BODY PurchaseOrder_objtyp AS 
+<a name="444395"></a>
+<a name="444398"></a>   MAP MEMBER FUNCTION getPONo RETURN NUMBER is   
+<a name="444399"></a>      BEGIN  
+<a name="444400"></a>         RETURN PONo;   
+<a name="444401"></a>      END;   
+<a name="444402"></a>    
+<a name="441722"></a>   MEMBER FUNCTION sumLineItems RETURN NUMBER IS  
+<a name="441723"></a>      i          INTEGER;  
+<a name="441724"></a>      StockVal   StockItem_objtyp;  
+<a name="441725"></a>      Total      NUMBER := 0;
+<a name="445381"></a>  
+<a name="443703"></a>   BEGIN
+<a name="441728"></a>      IF (UTL_COLL.IS_LOCATOR(LineItemList_ntab)) -- check for locator
+<a name="441729"></a>         THEN
+<a name="441730"></a>            SELECT SUM(L.Quantity * L.Stock_ref.Price) INTO Total
+<a name="441731"></a>            FROM   TABLE(CAST(LineItemList_ntab AS LineItemList_ntabtyp)) L;
+<a name="443706"></a>      ELSE
+<a name="441733"></a>         FOR i in 1..SELF.LineItemList_ntab.COUNT LOOP  
+<a name="441734"></a>            UTL_REF.SELECT_OBJECT(LineItemList_ntab(i).Stock_ref,StockVal);  
+<a name="441735"></a>            Total := Total + SELF.LineItemList_ntab(i).Quantity * 
+<a name="443719"></a>                                                            StockVal.Price;  
+<a name="441736"></a>         END LOOP;  
+<a name="441737"></a>      END IF;  
+<a name="441738"></a>   RETURN Total;  
+<a name="441739"></a>   END;  
+<a name="444614"></a>END;     
+<a name="441746"></a>/
+<a name="441749"></a>
+</pre>
+
+<a name="442560"></a> 
+
+<p class="BP">The rewritten <code>sumLineItems</code> method checks whether the nested table attribute, <code>LineItemList_ntab</code>, is returned as a locator using the <code>UTL_COLL</code>.<code>IS_LOCATOR</code> function. If the condition evaluates to <code>TRUE</code>, the nested table locator is queried using the <code>TABLE</code> expression.</p>
+
+<!--AnN_AnchorNote will not be supported in future releases -->
+<a name="441921"></a> 
+
+<div align="center">
+<table class="Note" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="Note">
+<td class="Note">
+<hr>
+<a name="441924"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">Note:</strong></font> <a name="441925"></a> 
+
+<p class="NB">The <code>CAST</code> expression is currently required in such <code>TABLE</code> expressions to tell the SQL compilation engine the actual type of the collection attribute (or parameter or variable) so that it can compile the query.</p>
+
+<hr>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="441753"></a> 
+
+<p class="BP">The querying of the nested table locator results in more efficient processing of the large line item list of a purchase order. The previous code that iterates over the <code>LineItemList_ntab</code> is kept to deal with the case where the nested table is returned as a <code>VALUE</code>.</p>
+
+<a name="444762"></a> 
+
+<p class="BP">After the table is created, the following <code>ALTER TABLE</code> statement is issued:</p>
+
+<pre class="CE">
+<a name="444786"></a>ALTER TABLE PoLine_ntab
+<a name="444787"></a>   ADD (SCOPE FOR (Stock_ref) IS stock_objtab);
+<a name="444784"></a> 
+</pre>
+
+<a name="444772"></a> 
+
+<p class="BP">This statement specifies that the <code>Stock_ref</code> column of the nested table is scoped to <code>Stock_objtab</code>. This indicates that the values stored in this column must be references to row objects in <code>Stock_objtab</code>. The <code>SCOPE</code> constraint is different from the referential constraint in that the <code>SCOPE</code> constraint has no dependency on the referenced object. For example, any referenced row object in <code>Stock_objtab</code> may be deleted, even if it is referenced in the <code>Stock_ref</code> column of the nested table. Such a deletion renders the corresponding reference in the nested table a <code>DANGLING&nbsp;REF</code>.</p>
+
+<a name="444836"></a> 
+
+<h4 class="FT"><font face="Arial, Helvetica, sans-serif"><em>Figure 9-9 Object Relational Representation of Nested Table LineItemList_ntab</em></font></h4>
+
+<a name="444840"><img src="adobj010.gif" alt="Text description of adobj010.gif follows"></a><a href="img_text/adobj010.htm"><br>
+Text description of the illustration adobj010.gif</a><br>
+<br>
+ <a name="444763"></a> 
+
+<p class="BP">Oracle does not support a referential constraint specification for storage tables. In this situation, specifying the <code>SCOPE</code> clause for a <code>REF</code> column is useful. In general, specifying scope or referential constraints for <code>REF</code> columns has several benefits:</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="444764"></a>It saves storage space because it allows Oracle to store just the row object's unique identifier as the <code>REF</code> value in the column.</li>
+
+<li class="LB1" type="disc"><a name="444765"></a>It enables an index to be created on the storage table's <code>REF</code> column.</li>
+
+<li class="LB1" type="disc"><a name="444766"></a>It allows Oracle to rewrite queries containing dereferences of these <code>REF</code>s as joins involving the referenced table.</li>
+</ul>
+
+<a name="432443"></a> 
+
+<p class="BP">At this point, all of the tables for the purchase order application are in place. The next section shows how to operate on these tables.</p>
+
+<a name="441255"></a> 
+
+<h4 class="FT"><font face="Arial, Helvetica, sans-serif"><em>Figure 9-10 Object Relational Representation of Table PurchaseOrder_objtab</em></font></h4>
+
+<a name="441259"><img src="adobj011.gif" alt="Text description of adobj011.gif follows"></a><a href="img_text/adobj011.htm"><br>
+Text description of the illustration adobj011.gif</a><br>
+<br>
+ <a name="432566"></a> <!--TOC=h3-"432566"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Inserting Values</font></h4>
+
+<!--/TOC=h3-->
+<a name="432576"></a> 
+
+<p class="BP">Here is how to insert the same data into the object tables that we inserted earlier into relational tables. Notice how some of the values incorporate calls to the constructors for object types, to create instances of the types.</p>
+
+<a name="432610"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Stock_objtab</font></h5>
+
+<pre class="CE">
+<a name="432580"></a>INSERT INTO Stock_objtab VALUES(1004, 6750.00, 2) ;
+<a name="432581"></a>INSERT INTO Stock_objtab VALUES(1011, 4500.23, 2) ;
+<a name="430848"></a>INSERT INTO Stock_objtab VALUES(1534, 2234.00, 2) ;
+<a name="430849"></a>INSERT INTO Stock_objtab VALUES(1535, 3456.23, 2) ;
+</pre>
+
+<a name="430853"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Customer_objtab</font></h5>
+
+<pre class="CE">
+<a name="432613"></a>INSERT INTO Customer_objtab
+<a name="430854"></a>  VALUES (
+<a name="430855"></a>    1, 'Jean Nance',
+<a name="430856"></a>    Address_objtyp('2 Avocet Drive', 'Redwood Shores', 'CA', '95054'),
+<a name="430857"></a>    PhoneList_vartyp('415-555-1212')
+<a name="430859"></a>    ) ;
+<a name="430861"></a>
+<a name="430862"></a>INSERT INTO Customer_objtab
+<a name="430863"></a>  VALUES (
+<a name="430864"></a>    2, 'John Nike',
+<a name="430865"></a>    Address_objtyp('323 College Drive', 'Edison', 'NJ', '08820'),
+<a name="430866"></a>    PhoneList_vartyp('609-555-1212','201-555-1212')
+<a name="430868"></a>    ) ;
+</pre>
+
+<a name="432619"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">PurchaseOrder_objtab</font></h5>
+
+<pre class="CE">
+<a name="430871"></a>INSERT INTO PurchaseOrder_objtab
+<a name="430872"></a>  SELECT  1001, REF(C),
+<a name="430873"></a>          SYSDATE, '10-MAY-1999',
+<a name="430874"></a>          LineItemList_ntabtyp(),
+<a name="430875"></a>          NULL
+<a name="430876"></a>   FROM   Customer_objtab C
+<a name="430877"></a>   WHERE  C.CustNo = 1 ;
+<a name="434863"></a>
+</pre>
+
+<a name="432873"></a> 
+
+<p class="BP">The preceding statement constructs a <code>PurchaseOrder_objtyp</code> object with the following attributes:</p>
+
+<pre class="CE">
+<a name="432877"></a>  PONo                1001
+<a name="432878"></a>  Cust_ref            REF to customer number 1
+<a name="432879"></a>  OrderDate           SYSDATE
+<a name="432880"></a>  ShipDate            10-MAY-1999
+<a name="432881"></a>  LineItemList_ntab   an empty LineItem_ntabtyp
+<a name="432882"></a>  ShipToAddr_obj      NULL
+<a name="435167"></a>
+</pre>
+
+<a name="432874"></a> 
+
+<p class="BP">The statement uses a query to construct a <code>REF</code> to the row object in the <code>Customer_objtab</code> object table that has a <code>CustNo</code> value of <code>1</code>.</p>
+
+<a name="432914"></a> 
+
+<p class="BP">The following statement uses a <code>TABLE</code> expression to identify the nested table as the target for the insertion, namely the nested table in the <code>LineItemList_ntab</code> column of the row object in the <code>PurchaseOrder_objtab</code> table that has a <code>PONo</code> value of 1001.</p>
+
+<!--AnN_AnchorNote will not be supported in future releases -->
+<a name="441946"></a> 
+
+<div align="center">
+<table class="Note" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="Note">
+<td class="Note">
+<hr>
+<a name="441957"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">Note:</strong></font> <a name="441950"></a> 
+
+<p class="NB">The "flattened subquery" or "<code>THE</code> (subquery)" expression supported in Oracle release 8.0 to identify a nested table is now deprecated in favor of <code>TABLE</code> expression syntax like that shown in the following example.</p>
+
+<hr>
+</td>
+</tr>
+</table>
+</div>
+
+<pre class="CE">
+<a name="441608"></a>INSERT INTO TABLE (
+<a name="433828"></a>  SELECT  P.LineItemList_ntab
+<a name="433829"></a>   FROM   PurchaseOrder_objtab P
+<a name="433830"></a>   WHERE  P.PONo = 1001
+<a name="433831"></a>  )
+<a name="433832"></a>  SELECT  01, REF(S), 12, 0
+<a name="433833"></a>   FROM   Stock_objtab S
+<a name="433834"></a>   WHERE  S.StockNo = 1534 ;
+<a name="443939"></a>
+</pre>
+
+<a name="430888"></a> 
+
+<p class="BP">The preceding statement inserts a line item into the nested table identified by the <code>TABLE</code> expression. The inserted line item contains a <code>REF</code> to the row object with a <code>StockNo</code> value of <code>1534</code> in the object table <code>Stock_objtab</code>.</p>
+
+<a name="432926"></a> 
+
+<p class="BP">The following statements follow the same pattern as the previous ones:</p>
+
+<pre class="CE">
+<a name="430890"></a>INSERT INTO PurchaseOrder_objtab
+<a name="430891"></a>  SELECT  2001, REF(C),
+<a name="430892"></a>          SYSDATE, '20-MAY-1997',
+<a name="430893"></a>          LineItemList_ntabtyp(),
+<a name="430894"></a>          Address_objtyp('55 Madison Ave','Madison','WI','53715')
+<a name="430895"></a>   FROM   Customer_objtab C
+<a name="430896"></a>   WHERE  C.CustNo = 2 ;
+<a name="430898"></a>
+<a name="430918"></a>INSERT INTO TABLE (
+<a name="430919"></a>  SELECT  P.LineItemList_ntab
+<a name="430920"></a>   FROM   PurchaseOrder_objtab P
+<a name="430921"></a>   WHERE  P.PONo = 1001
+<a name="430922"></a>  )
+<a name="430923"></a>  SELECT  02, REF(S), 10, 10
+<a name="430924"></a>   FROM   Stock_objtab S
+<a name="430925"></a>   WHERE  S.StockNo = 1535 ;
+<a name="443958"></a>
+<a name="430928"></a>INSERT INTO TABLE (
+<a name="430929"></a>  SELECT  P.LineItemList_ntab
+<a name="430930"></a>   FROM   PurchaseOrder_objtab P
+<a name="430931"></a>   WHERE  P.PONo = 2001
+<a name="430932"></a>  )
+<a name="430933"></a>  SELECT  10, REF(S), 1, 0
+<a name="430934"></a>   FROM   Stock_objtab S
+<a name="430935"></a>   WHERE  S.StockNo = 1004 ;
+<a name="443961"></a>
+<a name="430948"></a>INSERT INTO TABLE (
+<a name="430949"></a>  SELECT  P.LineItemList_ntab
+<a name="430950"></a>   FROM   PurchaseOrder_objtab P
+<a name="430951"></a>   WHERE  P.PONo = 2001
+<a name="430952"></a>  )
+<a name="441530"></a>  VALUES(11, (SELECT REF(S)
+<a name="441531"></a>    FROM  Stock_objtab S
+<a name="441532"></a>    WHERE S.StockNo = 1011), 2, 1) ;
+</pre>
+
+<a name="431023"></a> <!--TOC=h3-"431023"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Querying</font></h4>
+
+<!--/TOC=h3-->
+<a name="432960"></a> 
+
+<p class="BP">The following query statement implicitly invokes a comparison method. It shows how Oracle orders objects of type <code>PurchaseOrder_objtyp</code> using that type's comparison method:</p>
+
+<pre class="CE">
+<a name="432985"></a>SELECT  p.PONo
+<a name="432986"></a> FROM   PurchaseOrder_objtab p
+<a name="432987"></a> ORDER BY VALUE(p) ;
+<a name="435579"></a>
+</pre>
+
+<a name="440930"></a> 
+
+<p class="BP">Oracle invokes the map method <code>getPONo</code> for each <code>PurchaseOrder_objtyp</code> object in the selection. Because that method returns the object's <code>PONo</code> attribute, the selection produces a list of purchase order numbers in ascending numerical order.</p>
+
+<a name="440934"></a> 
+
+<p class="BP">The following queries correspond to the queries executed under the relational model.</p>
+
+<a name="440935"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Customer and Line Item Data for Purchase Order 1001</font></h5>
+
+<pre class="CE">
+<a name="433902"></a>SELECT  DEREF(p.Cust_ref), p.ShipToAddr_obj, p.PONo, 
+<a name="433946"></a>        p.OrderDate, LineItemList_ntab
+<a name="433903"></a> FROM   PurchaseOrder_objtab p
+<a name="433948"></a> WHERE  p.PONo = 1001 ;
+</pre>
+
+<a name="444414"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Total Value of Each Purchase Order</font></h5>
+
+<pre class="CE">
+<a name="444415"></a>SELECT   p.PONo, p.sumLineItems()
+<a name="444416"></a> FROM    PurchaseOrder_objtab p ;
+</pre>
+
+<a name="444417"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Purchase Order and Line Item Data Involving Stock Item 1004</font></h5>
+
+<pre class="CE">
+<a name="433913"></a>SELECT   po.PONo, po.Cust_ref.CustNo,
+<a name="433958"></a>         CURSOR (
+<a name="433959"></a>           SELECT  *
+<a name="433967"></a>            FROM   TABLE (po.LineItemList_ntab) L
+<a name="433914"></a>            WHERE  L.Stock_ref.StockNo = 1004
+<a name="434000"></a>           )
+<a name="433960"></a> FROM    PurchaseOrder_objtab po ; 
+<a name="445312"></a>
+</pre>
+
+<a name="442569"></a> 
+
+<p class="BP">The preceding query returns a nested cursor for the set of <code>LineItem_obj</code> objects selected from the nested table. The application can fetch from the nested cursor to get the individual <code>LineItem_obj</code> objects. The query can also be expressed by unnesting the nested set with respect to the outer result:</p>
+
+<pre class="CE">
+<a name="441543"></a>SELECT   po.PONo, po.Cust_ref.CustNo, L.*
+<a name="441547"></a> FROM    PurchaseOrder_objtab po, TABLE (po.LineItemList_ntab) L
+<a name="441576"></a> WHERE   L.Stock_ref.StockNo = 1004 ;
+<a name="442139"></a>
+</pre>
+
+<a name="441577"></a> 
+
+<p class="BP">The preceding query returns the result set as a "flattened" form (or First Normal Form). This type of query is useful when accessing Oracle collection columns from relational tools and APIs, such as ODBC. In the preceding unnesting example, only the rows of the <code>PurchaseOrder_objtab</code> object table that have any <code>LineItemList_ntab</code> rows are returned. To fetch all rows of the <code>PurchaseOrder_objtab</code> table, regardless of the presence of any rows in their corresponding <code>LineItemList_ntab</code>, then the (+) operator is required:</p>
+
+<pre class="CE">
+<a name="441583"></a>SELECT   po.PONo, po.Cust_ref.CustNo, L.*
+<a name="441584"></a> FROM    PurchaseOrder_objtab po, TABLE (po.LineItemList_ntab) (+) L
+<a name="441581"></a> WHERE   L.Stock_ref.StockNo = 1004 ;
+</pre>
+
+<a name="441578"></a> <!--TOC=h3-"441578"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Average Discount across all Line Items of all Purchase Orders</font></h4>
+
+<!--/TOC=h3-->
+<a name="441589"></a> 
+
+<p class="BP">This request requires querying the rows of all <code>LineItemList_ntab</code> nested tables of all <code>PurchaseOrder_objtab</code> rows. Again, unnesting is required:</p>
+
+<pre class="CE">
+<a name="441592"></a>SELECT   AVG(L.DISCOUNT)
+<a name="441593"></a> FROM    PurchaseOrder_objtab po, TABLE (po.LineItemList_ntab) L ;
+</pre>
+
+<a name="441588"></a> <!--TOC=h3-"441588"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Deleting</font></h4>
+
+<!--/TOC=h3-->
+<a name="434070"></a> 
+
+<p class="BP">The following example has the same effect as the two deletions needed in the relational case (see <a href="adobjxmp.htm#430691">"Deleting Data Under The Relational Model"</a><a href="adobjxmp.htm#430691"></a>). Here Oracle deletes the entire purchase order object, including its line items, in a single SQL operation. In the relational case, line items for the purchase order must be deleted from the line items table, and the purchase order must be separately deleted from the purchase orders table.</p>
+
+<a name="434081"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Delete Purchase Order 1001</font></h5>
+
+<pre class="CE">
+<a name="434065"></a>DELETE
+<a name="434066"></a> FROM   PurchaseOrder_objtab
+<a name="434067"></a> WHERE  PONo = 1001 ;
+<a name="435600"></a>
+</pre>
+
+<a name="452582"></a> <!--TOC=h1-"452582"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Evolving User-Defined Types</font></h2>
+
+<!--/TOC=h1-->
+<a name="452583"></a> 
+
+<p class="BP">Even a completed, fully built application tends to be a work in progress. Sometimes requirements change, forcing us to change an underlying object model or schema to adapt it to new circumstances, and sometimes we simply see ways to improve an object model so that it does a better job of what it was originally intended to do.</p>
+
+<a name="452619"></a> 
+
+<p class="BP">Suppose that, after living with our object-relational application for a while, we discover some ways that we could improve the design. In particular, suppose that we discover that users almost always want to see a history of purchases when they bring up the record for a customer. To do this with the present object model requires a join on the two tables <code>Customer_objtab</code> and <code>PurchaseOrder_objtab</code> that hold information about customers and purchase orders. We decide that a better design would be to provide access to data about related purchase orders directly from the customers table.</p>
+
+<a name="452664"></a> 
+
+<p class="BP">One way to do this is to change the <code>Customer_objtyp</code> so that information about a customer's purchase orders is included right in the object instance that represents that customer. In other words, we want to add an attribute for purchase order information to <code>Customer_objtyp</code>. To hold information about multiple purchase orders, the attribute must be a collection type--a nested table.</p>
+
+<a name="452719"></a> 
+
+<p class="BP">Adding an attribute is one of several ways that you can alter, or <em class="Italic">evolve</em>, a user-defined type. When you evolve a type, Oracle applies your changes to the type itself and to all its dependent schema objects, including subtypes of the type, other object types that have the altered type as an attribute, and tables and columns of the altered type.</p>
+
+<a name="452730"></a> 
+
+<p class="BP">To change <code>Customer_objtyp</code> to add an attribute for a nested table of purchase orders, we need to do several steps:</p>
+
+<ol class="LN1" type="1">
+<li class="LN1" type="1" value="1"><a name="452735"></a>Create a new type for a nested table of purchase orders</li>
+
+<li class="LN1" type="1" value="2"><a name="452738"></a>Alter <code>Customer_objtyp</code> to add a new attribute of the new type</li>
+
+<li class="LN1" type="1" value="3"><a name="452745"></a>In the <code>Customer_objtab</code> object table, name and scope the storage tables for the newly added nested tables 
+
+<p><a name="452756"></a></p>
+
+<p class="BP1">Upgrading the <code>Customer_objtab</code> object table for the new attribute actually adds two levels of nested tables, one inside the other, because a purchase order itself contains a nested table of line items.</p>
+
+<a name="452780"><img src="adobj033.gif" alt="Text description of adobj033.gif follows"></a><a href="img_text/adobj033.htm"><br>
+Text description of the illustration adobj033.gif</a><br>
+<br>
+ <a name="452781"></a> 
+
+<p class="BP1">Both the purchase orders nested table and the line items nested table need to be scoped so that they can contain primary key-based <code>REF</code>s. More on this in the next section.</p>
+</li>
+</ol>
+
+<a name="452779"></a> 
+
+<p class="BP">When we are done with the preceding steps, information about customers and purchase orders will be more logically related in our model, and we will be able to query the customers table for all information about customers, purchase orders, and line items. We will also be able to insert a new purchase order for a new customer with a single <code>INSERT</code> statement on the customers table.</p>
+
+<a name="452807"></a> <!--TOC=h2-"452807"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Adding an Attribute to the Customer Type</font></h3>
+
+<!--/TOC=h2-->
+<a name="452819"></a> 
+
+<p class="BP">Before we can add a nested table of purchase orders as an attribute of <code>Customer_objtyp</code>, we need to define a type for this sort of nested table. The following statement does this:</p>
+
+<pre class="CE">
+<a name="452830"></a>CREATE TYPE PurchaseOrderList_ntabtyp AS TABLE OF PurchaseOrder_objtyp;
+<a name="452835"></a>
+</pre>
+
+<a name="452597"></a> 
+
+<p class="BP">Now we can use an <code>ALTER TYPE</code> statement to add an attribute of this type to <code>Customer_objtyp</code>:</p>
+
+<pre class="CE">
+<a name="452843"></a>ALTER TYPE Customer_objtyp
+<a name="452844"></a>  ADD ATTRIBUTE (PurchaseOrderList_ntab PurchaseOrderList_ntabtyp)
+<a name="452845"></a>  INVALIDATE;
+<a name="452853"></a>
+</pre>
+
+<a name="452841"></a> 
+
+<p class="BP">Everything about this <code>ALTER TYPE</code> statement is straightforward except the <code>INVALIDATE</code> option at the end. This option has to do with updating types and tables that refer to the <code>Customer_objtyp</code>.</p>
+
+<a name="452854"></a> 
+
+<p class="BP">If a type being altered has dependent types or tables, an <code>ALTER TYPE</code> statement on the type needs to specify either <code>CASCADE</code> or <code>INVALIDATE</code> to say how to apply the change to the dependents.</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="452876"></a><code>CASCADE</code> performs validation checks on the dependents before applying a type change. These checks confirm that the change does not entail doing something illegal, such as dropping an attribute that is being used as a partitioning key of a table. If a dependent fails validation, the type change aborts. On the other hand, if all dependents validate successfully, the system goes ahead with whatever changes to metadata and data are required to propagate the change to the type. These can include automatically adding and dropping columns, creating storage tables for nested tables, and so forth.</li>
+
+<li class="LB1" type="disc"><a name="452896"></a>The <code>INVALIDATE</code> option skips the preliminary validation checks and directly applies the type change to dependents. These are then validated the next time that they are accessed. Altering a type this way is saves the time required to do the validations, but if a dependent table cannot be validated later when someone tries to access it, its data cannot be accessed until the table is made to pass the validation.</li>
+</ul>
+
+<a name="452915"></a> 
+
+<p class="BP">The reason that we used the riskier <code>INVALIDATE</code> option in our <code>ALTER TYPE</code> statement was not to save time but to prevent the system from automatically creating and naming storage tables for the new nested tables of purchase orders and line items that must be added to the <code>Customer_objtab</code> table. This object table is a dependent table of the <code>Customer_objtyp</code> type. <code>CASCADE</code> would cause the storage tables to be automatically created and would give them system-generated names. We do not want to allow this because we need to be able to alter these tables to add scope for a <code>REF</code> column in each one. To do this we must set up the storage tables ourselves (with an <code>ALTER TABLE</code> statement on the table <code>Customer_objtab</code>) so that we have the opportunity to name them. Then, using the names we have given them, we can alter the storage tables with a couple more <code>ALTER TABLE</code> statements to add scope for their <code>REF</code> columns.</p>
+
+<a name="453049"></a> 
+
+<p class="BP">The reason we must do all this is that, in order for a column to store <code>REF</code>s to objects in a table that bases its object identifiers on the primary key, the column must be scoped to that table (or have a referential constraint placed on it). Scoping a column to a particular table declares that all <code>REF</code>s in the column are <code>REF</code>s to objects in that table. This declaration is necessary because a primary key-based object identifier is guaranteed unique only in the context of the particular table: it may not be unique across all tables. If you try to insert a primary key-based <code>REF</code> (or "user-defined <code>REF</code>," as these are also called) into an unscoped column, you will get an error like this: "cannot <code>INSERT</code> object view <code>REF</code> or user-defined <code>REF</code>."</p>
+
+<a name="453021"></a> 
+
+<p class="BP">Line items contain a <code>REF</code> to objects in table <code>Stock_objtab</code>, whose object identifier uses the table's primary key. This is why we had to add scope for the <code>REF</code> column in the storage table for the line items nested table in table <code>PurchaseOrder_objtab</code> after we created that table. Now we have to do it again for the new nested table of line items in table <code>Customer_objtab</code>.</p>
+
+<a name="455367"></a> 
+
+<p class="BP">We have to do the same again for the new nested table of purchase orders we are adding in table <code>Customer_objtab</code>: a purchase order references a customer in the table <code>Customer_objtab</code>, and object identifiers in this table are primary-key based as well.</p>
+
+<a name="453047"></a> 
+
+<p class="BP">Here is the <code>ALTER TABLE</code> statement that upgrades table <code>Customer_objtab</code> to take account of the change to the table's declared type and to set up storage tables for the new nested tables:</p>
+
+<a name="453073"></a> 
+
+<div align="center">
+<table class="Note" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="Note">
+<td class="Note">
+<hr>
+<a name="453076"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">Note:</strong></font> <a name="453077"></a> 
+
+<p class="NB">The two <code>ALTER TYPE</code> statements preceding the <code>ALTER TABLE</code> are a workaround for a bug that exists in Release 9.2.0 at this writing (but may be fixed by the time you read this). The statements force the referenced dependent types of <code>Customer_objtyp</code> to recompile. They should recompile automatically.</p>
+
+<hr>
+</td>
+</tr>
+</table>
+</div>
+
+<pre class="CE">
+<a name="453081"></a>ALTER TYPE PurchaseOrder_objtyp COMPILE;
+<a name="453082"></a>
+<a name="453083"></a>ALTER TYPE PurchaseOrderList_ntabtyp COMPILE;
+<a name="453084"></a>
+<a name="453085"></a>ALTER TABLE Customer_objtab UPGRADE
+<a name="453086"></a>NESTED TABLE PurchaseOrderList_ntab STORE AS PO_List_nt
+<a name="453087"></a>  (NESTED TABLE LineItemList_ntab STORE AS Items_List_nt);
+<a name="453024"></a>
+</pre>
+
+<a name="452836"></a> 
+
+<p class="BP">The new storage tables are named <code>PO_List_nt</code> and <code>Items_List_nt</code>. The following statements scope the <code>REF</code> columns in these tables to specific tables:</p>
+
+<pre class="CE">
+<a name="453100"></a>ALTER TABLE PO_List_nt ADD (SCOPE FOR (Cust_Ref) IS Customer_objtab);
+<a name="453101"></a>
+<a name="453102"></a>ALTER TABLE Items_List_nt ADD (SCOPE FOR (Stock_ref) IS Stock_objtab);
+<a name="453094"></a>
+</pre>
+
+<a name="453091"></a> 
+
+<p class="BP">Now there is just one more thing to do before we can insert purchase orders for customers in <code>Customer_objtab</code>: we must instantiate an actual nested table of <code>PurchaseOrderList_ntabtyp</code> for each customer in the table.</p>
+
+<a name="453108"></a> 
+
+<p class="BP">When a column is added to a table for a new attribute, column values for existing rows are initialized to <code>NULL</code>. This means that each existing customer's nested table of purchase orders is atomically <code>NULL</code>--there is no actual nested table there, not even an empty one. Until we instantiate a nested table for each customer, attempts to insert purchase orders will get an error like this: "reference to <code>NULL</code> table value."</p>
+
+<a name="453119"></a> 
+
+<p class="BP">The following statement prepares the column to hold purchase orders by updating each row to contain an actual nested table instance:</p>
+
+<pre class="CE">
+<a name="453130"></a>UPDATE Customer_objtab c
+<a name="453131"></a>  SET c.PurchaseOrderList_ntab = PurchaseOrderList_ntabtyp();
+<a name="453128"></a>
+</pre>
+
+<a name="453092"></a> 
+
+<p class="BP">In the preceding statement, <code>PurchaseOrderList_ntabtyp()</code> is a call to the nested table type's constructor method. This call, with no purchase orders specified, creates an empty nested table.</p>
+
+<a name="453143"></a> <!--TOC=h2-"453143"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Working with Multilevel Collections</font></h3>
+
+<!--/TOC=h2-->
+<a name="453151"></a> 
+
+<p class="BP">At this point, we have evolved the type <code>Customer_objtyp</code> to add a nested table of purchase orders, and we have set up the table <code>Customer_objtab</code> so that it is ready to store purchase orders in the nested table. Now we are ready to insert purchase orders into <code>Customer_objtab</code>.</p>
+
+<a name="453158"></a> 
+
+<p class="BP">There are two purchase orders already in table <code>PurchaseOrder_objtab</code>. The following two statements copy these into <code>Customer_objtab</code>:</p>
+
+<pre class="CE">
+<a name="453173"></a>INSERT INTO TABLE (
+<a name="453174"></a>  SELECT   c.PurchaseOrderList_ntab
+<a name="453175"></a>    FROM   Customer_objtab c
+<a name="453193"></a>    WHERE  c.CustNo = 1
+<a name="453194"></a>  )
+<a name="453195"></a>  SELECT VALUE(p)
+<a name="453179"></a>    FROM PurchaseOrder_objtab p
+<a name="453180"></a>    WHERE p.Cust_Ref.CustNo = 1;
+<a name="453181"></a>
+<a name="453182"></a>INSERT INTO TABLE (
+<a name="453183"></a>  SELECT   c.PurchaseOrderList_ntab
+<a name="453184"></a>    FROM   Customer_objtab c
+<a name="453185"></a>    WHERE  c.CustNo = 2
+<a name="453186"></a>  )
+<a name="453187"></a>  SELECT VALUE(p)
+<a name="453188"></a>    FROM PurchaseOrder_objtab p
+<a name="453189"></a>    WHERE p.Cust_Ref.CustNo = 2;
+<a name="453171"></a>
+</pre>
+
+<a name="453144"></a> <!--TOC=h3-"453144"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Inserting into Nested Tables</font></h4>
+
+<!--/TOC=h3-->
+<a name="455388"></a> 
+
+<p class="BP">Each of the preceding <code>INSERT</code> statements has two main parts: a <code>TABLE</code> expression that specifies the target table of the insert operation, and a <code>SELECT</code> that gets the data to be inserted. The <code>WHERE</code> clause in each part picks out the customer object to receive the purchase orders (in the <code>TABLE</code> expression) and the customer whose purchase orders are to be selected (in the subquery that gets the purchase orders).</p>
+
+<a name="453368"></a> 
+
+<p class="BP">The <code>WHERE</code> clause in the subquery uses dot notation to navigate to the <code>CustNo</code> attribute: <code>p.Cust_Ref.CustNo</code>. Note that a table alias--<code>p</code> in this case--is required whenever you use dot notation. To omit it and say instead <code>Cust_Ref.CustNo</code> would produce an error.</p>
+
+<a name="453369"></a> 
+
+<p class="BP">Another thing to note about the dot notation in this <code>WHERE</code> clause is that we are able to navigate to the <code>CustNo</code> attribute of a customer right through the <code>Cust_Ref</code> <code>REF</code> attribute of a purchase order. SQL (though not PL/SQL) implicitly dereferences a <code>REF</code> used with the dot notation in this way.</p>
+
+<a name="453370"></a> 
+
+<p class="BP">The <code>TABLE</code> expression in the first part of the <code>INSERT</code> statement tells the system to treat the collection returned by the expression as a table. The expression is used here to select the nested table of purchase orders for a particular customer as the target of the insert.</p>
+
+<a name="453214"></a> 
+
+<p class="BP">In the second part of the <code>INSERT</code> statement, the <code>VALUE()</code> function returns selected rows as objects. In this case, each row is a purchase order object, complete with its own collection of line items. Purchase order rows are selected from one table of type <code>PurchaseOrder_objtyp</code> for insertion into another table of that type.</p>
+
+<a name="453198"></a> 
+
+<p class="BP">The preceding <code>INSERT</code> statements use the customer-reference attribute of <code>PurchaseOrder_objtyp</code> to identify the customer to whom each of the existing purchase orders belongs. However, now that all the old purchase orders are copied from the purchase orders table into the upgraded <code>Customer_objtab</code>, this customer-reference attribute of a purchase order is obsolete. Now purchase orders are stored right in the customer object itself.</p>
+
+<a name="453271"></a> 
+
+<p class="BP">The following <code>ALTER TYPE</code> statement evolves <code>PurchaseOrder_objtyp</code> to drop the customer-reference attribute. The statement also drops the <code>ShipToAddr_obj</code> attribute as redundant (on the somewhat dubious assumption that the shipping address is always the same as the customer address...).</p>
+
+<pre class="CE">
+<a name="453289"></a>ALTER TYPE PurchaseOrder_objtyp
+<a name="453290"></a>  DROP ATTRIBUTE Cust_ref,
+<a name="453291"></a>  DROP ATTRIBUTE ShipToAddr_obj
+<a name="453292"></a>  CASCADE;
+<a name="453256"></a>
+</pre>
+
+<a name="453145"></a> 
+
+<p class="BP">This time we were able to use the <code>CASCADE</code> option to let the system perform validations and make all necessary changes to dependent types and tables.</p>
+
+<a name="453298"></a> <!--TOC=h3-"453298"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Inserting a New Purchase Order with Line Items</font></h4>
+
+<!--/TOC=h3-->
+<a name="453146"></a> 
+
+<p class="BP">The previous <code>INSERT</code> example showed how to use the <code>VALUE()</code> function to select and insert into the nested table of purchase orders an existing purchase order object complete with its own nested table of line items. The following example shows how to insert a new purchase order that has not already been instantiated as a purchase order object. In this case, the purchase order's nested table of line items must be instantiated, as well as each line item object with its data. (Line numbers are shown on the left for reference.)</p>
+
+<pre class="CE">
+<a name="453326"></a>SQL&gt; INSERT INTO TABLE (
+<a name="453327"></a>  2    SELECT c.PurchaseOrderList_ntab
+<a name="453328"></a>  3      FROM Customer_objtab c
+<a name="453329"></a>  4      WHERE c.CustName = 'John Nike'
+<a name="453330"></a>  5     )
+<a name="453331"></a>  6    VALUES (1020, SYSDATE, SYSDATE + 1,
+<a name="453332"></a>  7      LineItemList_ntabtyp(
+<a name="453333"></a>  8        LineItem_objtyp(1, MAKE_REF(Stock_objtab, 1004), 1, 0),
+<a name="453334"></a>  9        LineItem_objtyp(2, MAKE_REF(Stock_objtab, 1011), 3, 5),
+<a name="453335"></a> 10        LineItem_objtyp(3, MAKE_REF(Stock_objtab, 1535), 2, 10)
+<a name="453336"></a> 11       )
+<a name="453337"></a> 12     );
+<a name="453093"></a>
+</pre>
+
+<a name="452598"></a> 
+
+<p class="BP">Lines 1-5 use a <code>TABLE</code> expression to select the nested table to insert into--namely, the nested table of purchase orders for customer John Nike.</p>
+
+<a name="453401"></a> 
+
+<p class="BP">The <code>VALUES</code> clause (lines 6-12) contains a value for each attribute of the new purchase order, namely:</p>
+
+<dl class="LS">
+<dt class="LSF"><a name="453410"></a><code>PONo</code></dt>
+
+<dt class="LSF"><a name="453411"></a><code>OrderDate</code></dt>
+
+<dt class="LSF"><a name="453412"></a><code>ShipDate</code></dt>
+
+<dt class="LSF"><a name="453413"></a><code>LineItemList_ntab</code></dt>
+
+<dt class="LSF"><a name="453414"></a></dt>
+</dl>
+
+<a name="453575"></a> 
+
+<p class="BP">Line 6 of the <code>INSERT</code> statement specifies values for the three purchase order attributes <code>PONo</code>, <code>OrderDate</code>, and <code>ShipDate</code>.</p>
+
+<a name="453469"></a> 
+
+<p class="BP">Only attribute values are given; no purchase order constructor is specified. You do not need to explicitly specify a purchase order constructor to instantiate a purchase order instance in the nested table because the nested table is declared to be a nested table of purchase orders. If you omit a purchase order constructor, the system instantiates a purchase order automatically. You can, however, specify the constructor if you want to, in which case the <code>VALUES</code> clause will look like this:</p>
+
+<pre class="CE">
+<a name="453491"></a>VALUES (
+<a name="453492"></a>  PurchaseOrder_objtyp(1020, SYSDATE, SYSDATE + 1,
+<a name="453493"></a>    LineItemList_ntabtyp(
+<a name="453494"></a>      LineItem_objtyp(1, MAKE_REF(Stock_objtab, 1004), 1, 0),
+<a name="453495"></a>      LineItem_objtyp(2, MAKE_REF(Stock_objtab, 1011), 3, 5),
+<a name="453496"></a>      LineItem_objtyp(3, MAKE_REF(Stock_objtab, 1535), 2, 10)
+<a name="453497"></a>     )
+<a name="453498"></a>  )
+<a name="453499"></a>)
+<a name="453488"></a>
+</pre>
+
+<a name="453513"></a> 
+
+<p class="BP">Lines 7-11 instantiate and supply data for a nested table of line items. The constructor method <code>LineItemList_ntabtyp(...)</code> creates an instance of such a nested table that contains three line items.</p>
+
+<a name="453429"></a> 
+
+<p class="BP">The line item constructor <code>LineItem_objtyp()</code> creates an object instance for each line item. Values for line item attributes are supplied as arguments to the constructor.</p>
+
+<a name="453543"></a> 
+
+<p class="BP">The <code>MAKE_REF</code> function creates a <code>REF</code> for the <code>Stock_ref</code> attribute of a line item. The arguments to <code>MAKE_REF</code> are the name of the stock table and the primary key value of the stock item there that we want to reference. We can use <code>MAKE_REF</code> here because object identifiers in the stock table are based on the primary key: if they were not, we would have to use the <code>REF</code> function in a subquery to get a <code>REF</code> to a row in the stock table.</p>
+
+<a name="453560"></a> <!--TOC=h3-"453560"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Querying Multilevel Nested Tables</font></h4>
+
+<!--/TOC=h3-->
+<a name="453598"></a> 
+
+<p class="BP">You can query a top-level nested table column by naming it in the <code>SELECT</code> list like any other top-level (as opposed to embedded) column or attribute, but the result is not very readable. For instance, the following query selects the nested table of purchase orders for John Nike:</p>
+
+<pre class="CE">
+<a name="453608"></a>SELECT c.PurchaseOrderList_ntab
+<a name="453609"></a>  FROM Customer_objtab c
+<a name="453610"></a>  WHERE CustName = 'John Nike';
+<a name="453606"></a>
+</pre>
+
+<a name="453444"></a> 
+
+<p class="BP">The query produces a result like this:</p>
+
+<pre class="CE">
+<a name="453617"></a>PURCHASEORDERLIST_NTAB(PONO, ORDERDATE, SHIPDATE, LINEITEMLIST_NTAB(LINEITEMNO,
+<a name="453618"></a>--------------------------------------------------------------------------------
+<a name="453619"></a>PURCHASEORDERLIST_NTABTYP(PURCHASEORDER_OBJTYP(2001, '25-SEP-01', '20-MAY-97', L
+<a name="453620"></a>INEITEMLIST_NTABTYP(LINEITEM_OBJTYP(10, 00004A038A00468ED552CE6A5803ACE034080020
+<a name="453621"></a>B8C8340000001426010001000100290000000000090600812A00078401FE0000000B03C20B050000
+<a name="453622"></a>0000000000000000000000000000000000, 1, 0), LINEITEM_OBJTYP(11, 00004A038A00468ED
+<a name="453623"></a>552CE6A5803ACE034080020B8C8340000001426010001000100290000000000090600812A0007840
+<a name="453624"></a>1FE0000000B03C20B0C00000000000000000000000000000000000000, 2, 1))), PURCHASEORDE
+<a name="453625"></a>R_OBJTYP(1020, '25-SEP-01', '26-SEP-01', LINEITEMLIST_NTABTYP(LINEITEM_OBJTYP(1,
+<a name="453626"></a> 00004A038A00468ED552CE6A5803ACE034080020B8C834000000142601000100010029000000000
+<a name="453627"></a>0090600812A00078401FE0000000B03C20B0500000000000000000000000000000000000000, 1,
+<a name="453628"></a>0), LINEITEM_OBJTYP(2, 00004A038A00468ED552CE6A5803ACE034080020B8C83400000014260
+<a name="453629"></a>10001000100290000000000090600812A00078401FE0000000B03C20B0C000000000000000000000
+<a name="453630"></a>00000000000000000, 3, 5), LINEITEM_OBJTYP(3, 00004A038A00468ED552CE6A5803ACE0340
+<a name="453631"></a>80020B8C8340000001426010001000100290000000000090600812A00078401FE0000000B03C2102
+<a name="453632"></a>400000000000000000000000000000000000000, 2, 10))))
+<a name="453615"></a>
+</pre>
+
+<a name="453669"></a> 
+
+<p class="BP">For humans, at least, you probably want to display the instance data in an unnested form and not to show the <code>REF</code>s at all. <code>TABLE</code> expressions--this time in the <code>FROM</code> clause of a query--can help you do this.</p>
+
+<a name="453697"></a> 
+
+<p class="BP">For example, the following query selects the PO number, order date, and shipdate for all purchase orders belonging to John Nike:</p>
+
+<pre class="CE">
+<a name="453699"></a>SELECT p.PONo, p.OrderDate, p.Shipdate
+<a name="453700"></a>FROM Customer_objtab c, TABLE(c.PurchaseOrderList_ntab) p
+<a name="453701"></a>WHERE c.CustName = 'John Nike';
+<a name="453702"></a>
+<a name="453703"></a> 
+<a name="453704"></a>      PONO ORDERDATE SHIPDATE
+<a name="453705"></a>---------- --------- ---------
+<a name="453706"></a>      2001 25-SEP-01 26-SEP-01
+<a name="453707"></a>      1020 25-SEP-01 26-SEP-01
+<a name="453670"></a>
+</pre>
+
+<a name="453745"></a> 
+
+<p class="BP">A <code>TABLE</code> expression takes a collection as an argument and can be used like a SQL table in SQL statements. In the preceding query, listing the nested table of purchase orders in a <code>TABLE</code> expression in the <code>FROM</code> clause enables us to select columns of the nested table just as if they were columns of an ordinary table. The columns are identified as belonging to the nested table by the table alias they use: <code>p</code>. As the example shows, a <code>TABLE</code> expression in the <code>FROM</code> clause can have its own table alias.</p>
+
+<a name="453753"></a> 
+
+<p class="BP">Inside the <code>TABLE</code> expression, the nested table is identified as a column of customer table <code>Customer_objtab</code> by the customer table's own table alias <code>c</code>. Note that the table <code>Customer_objtab</code> appears in the <code>FROM</code> clause before the <code>TABLE</code> expression that refers to it. This ability of a <code>TABLE</code> expressions to make use of a table alias that occurs to the left of it in the <code>FROM</code> clause is called <em class="Italic">left correlation</em>. It enables you to daisy-chain tables and <code>TABLE</code> expressions--including <code>TABLE</code> expressions that make use of the table alias of another <code>TABLE</code> expression. In fact, this is how you are able to select columns of nested tables that are embedded in other nested tables.</p>
+
+<a name="453746"></a> 
+
+<p class="BP">Here, for example, is a query that selects information about all line items for PO number 1020:</p>
+
+<pre class="CE">
+<a name="453803"></a>SELECT p.PONo, i.LineItemNo, i.Stock_ref.StockNo, i.Quantity, i.Discount
+<a name="453804"></a>  FROM Customer_objtab c, TABLE(c.PurchaseOrderList_ntab) p,
+<a name="453805"></a>    TABLE(p.LineItemList_ntab) i
+<a name="453806"></a>  WHERE p.PONo = 1020;
+<a name="453808"></a> 
+<a name="453809"></a>      PONO LINEITEMNO STOCK_REF.STOCKNO   QUANTITY   DISCOUNT
+<a name="453810"></a>---------- ---------- ----------------- ---------- ----------
+<a name="453811"></a>      1020          1              1004          1          0
+<a name="453812"></a>      1020          2              1011          3          5
+<a name="453813"></a>      1020          3              1535          2         10
+<a name="453801"></a>
+</pre>
+
+<a name="453695"></a> 
+
+<p class="BP">The query uses two <code>TABLE</code> expressions, the second referring to the first. Line item information is selected from the inner nested table that belongs to purchase order number 1020 in the outer nested table.</p>
+
+<a name="453829"></a> 
+
+<p class="BP">Notice that no column from the customer table occurs in either the <code>SELECT</code> list or the <code>WHERE</code> clause. The customer table is listed in the <code>FROM</code> clause solely to provide a starting point from which to access the nested tables.</p>
+
+<a name="453853"></a> 
+
+<p class="BP">Here is a variation on the preceding query. This version shows that you can use the "<code>*</code>" wildcard to specify all columns of a <code>TABLE</code> expression collection:</p>
+
+<pre class="CE">
+<a name="453854"></a>SELECT p.PONo, i.*
+<a name="453833"></a>  FROM Customer_objtab c, TABLE(c.PurchaseOrderList_ntab) p,
+<a name="453834"></a>    TABLE(p.LineItemList_ntab) i
+<a name="453835"></a>  WHERE p.PONo = 1020;
+<a name="453830"></a>
+</pre>
+
+<a name="453824"></a> <!--TOC=h2-"453824"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Type Inheritance and Substitutable Columns</font></h3>
+
+<!--/TOC=h2-->
+<a name="453869"></a> 
+
+<p class="BP">Suppose that we deal with a lot of our larger, regular customers through an account manager. We would like to add a field for the ID of the account manager to the customer record for these customers.</p>
+
+<a name="453898"></a> 
+
+<p class="BP">Earlier, when we wanted to add an attribute for a nested table of purchase orders, we evolved the customer type itself. We could do that again to add an attribute for account manager ID, or we could create a subtype of the customer type and add the attribute only in the subtype. Which should we do?</p>
+
+<a name="453901"></a> 
+
+<p class="BP">To make this kind of decision, you need to consider whether the proposed new attribute can be meaningfully and usefully applied to all instances of the base type--to all customers, in other words--or only to an identifiable subclass of the base type.</p>
+
+<a name="453910"></a> 
+
+<p class="BP">All customers have purchase orders, so it was appropriate to alter the type itself to add an attribute for them. But not all customers have an account manager; in fact, it happens that only our corporate customers do. So, instead of evolving the customer type to add an attribute that will not be meaningful for customers in general, it makes more sense to create a new subtype for the special <em class="Italic">kind</em> of customer that we have identified and to add the new attribute there.</p>
+
+<a name="453969"></a> <!--TOC=h3-"453969"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Creating a Subtype</font></h4>
+
+<!--/TOC=h3-->
+<a name="453972"></a> 
+
+<p class="BP">You can create a subtype under a base type only if the base type allows subtypes. Whether a type can be subtyped depends on the type's <code>FINAL</code> property. By default, new types are created as <code>FINAL</code>. This means that they are the last of the series and cannot have subtypes created under them. To create a type that can be subtyped, you must specify <code>NOT FINAL</code> in the <code>CREATE TYPE</code> statement as we did when we created the customer type.</p>
+
+<a name="453919"></a> 
+
+<p class="BP">You define a subtype by using a <code>CREATE TYPE</code> statement with the <code>UNDER</code> keyword. The following statement creates a new subtype <code>Corp_Customer_objtyp</code> under <code>Customer_objtyp</code>. The type is created as <code>NOT FINAL</code> so that it can have subtypes if we want to add them later.</p>
+
+<pre class="CE">
+<a name="453932"></a>CREATE TYPE Corp_Customer_objtyp UNDER Customer_objtyp
+<a name="453933"></a>  (account_mgr_id     NUMBER(6) ) NOT FINAL;
+<a name="453930"></a>
+</pre>
+
+<a name="453825"></a> 
+
+<p class="BP">When you use a <code>CREATE TYPE</code> statement to create a new subtype, you list only the new attributes and methods that you are adding. The subtype inherits all existing attributes and methods from its base type, so these do not need to be specified. The new attributes and and methods are added after the inherited ones. For example, the complete list of attributes for the new <code>Corp_Customer_objtyp</code> subtype looks like this:</p>
+
+<dl class="LS">
+<dt class="LSF"><a name="453955"></a><code>CustNo</code></dt>
+
+<dt class="LSF"><a name="453956"></a><code>CustName</code></dt>
+
+<dt class="LSF"><a name="453957"></a><code>Address_obj</code></dt>
+
+<dt class="LSF"><a name="453958"></a><code>Phonelist_var</code></dt>
+
+<dt class="LSF"><a name="453959"></a><code>PurchaseOrderList_ntab</code></dt>
+
+<dt class="LSF"><a name="453963"></a><code>Account_mgr_id</code></dt>
+
+<dt class="LSF"><a name="453953"></a></dt>
+</dl>
+
+<a name="453994"></a> 
+
+<p class="BP">By default, you can store instances of a subtype in any column or object table that is of any base type of the subtype. This ability to store subtype instances in a base type slot is called <strong class="Bold">substitutability</strong>. Columns and tables are substitutable unless they have been explicitly declared to be <code>NOT SUBSTITUTABLE</code>. The system automatically adds new columns for subtype attributes and another, hidden column for the type ID of the instance stored in each row.</p>
+
+<a name="454014"></a> 
+
+<p class="BP">Actually, it is possible to create a subtype of a <code>FINAL</code> type, but first you must use an <code>ALTER TYPE</code> statement to evolve the type from a <code>FINAL</code> type to a <code>NOT FINAL</code> one. If you want existing columns and tables of the altered type to be able to store instances of new subtypes, specify the <code>CASCADE</code> option <code>CONVERT TO SUBSTITUTABLE</code> in the <code>ALTER TYPE</code> statement.</p>
+
+<a name="455428"></a> 
+
+<div align="center">
+<table class="NoteAlso" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="NoteAlso">
+<td class="NoteAlso"><a name="455439"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="455432"></a> 
+
+<p class="NB"><a href="adobjadv.htm#1006384">"Type Evolution"</a> in <a href="adobjadv.htm#1001055">Chapter&nbsp;6</a></p>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="453826"></a> <!--TOC=h3-"453826"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Inserting Subtypes</font></h4>
+
+<!--/TOC=h3-->
+<a name="453968"></a> 
+
+<p class="BP">If a column or object table is substitutable, you can insert into it not only instances of the declared type of the column or table but also instances of any subtype of the declared type. In the case of table <code>Customer_objtab</code>, this means that the table can be used to store information about all kinds of customers, both ordinary and corporate. However, there is one important difference in the way information is inserted for a subtype: you must explicitly specify the subtype's constructor. Use of the constructor is optional only for instances of the declared type of the column or table.</p>
+
+<a name="454091"></a> 
+
+<p class="BP">For example, the following statement inserts a new ordinary customer, William Kidd.</p>
+
+<pre class="CE">
+<a name="454094"></a>INSERT INTO Customer_objtab
+<a name="454095"></a>  VALUES (
+<a name="454096"></a>    3, 'William Kidd',
+<a name="454097"></a>    Address_objtyp('43 Harbor Drive', 'Redwood Shores', 'CA', '95054'),
+<a name="454098"></a>    PhoneList_vartyp('415-555-1212'),
+<a name="454099"></a>    PurchaseOrderList_ntabtyp()
+<a name="454100"></a>  );
+<a name="454092"></a>
+</pre>
+
+<a name="453696"></a> 
+
+<p class="BP">The <code>VALUES</code> clause contains data for each <code>Customer_objtyp</code> attribute but omits the <code>Customer_objtyp</code> constructor. The constructor is optional here because the declared type of the table is <code>Customer_objtyp</code>. For the nested table attribute, the constructor <code>PurchaseOrderList_ntabtyp()</code> creates an empty nested table, but no data is specified for any purchase orders.</p>
+
+<a name="454104"></a> 
+
+<p class="BP">Here is a statement that inserts a new corporate customer in the same table. Note the use of the constructor <code>Corp_Customer_objtyp()</code> and the extra data value <code>531</code> for the account manager ID:</p>
+
+<pre class="CE">
+<a name="454167"></a>INSERT INTO Customer_objtab
+<a name="454168"></a>  VALUES (
+<a name="454169"></a>    Corp_Customer_objtyp(        -- Subtype requires a constructor
+<a name="454170"></a>      4, 'Edward Teach',
+<a name="454171"></a>      Address_objtyp('65 Marina Blvd', 'San Francisco', 'CA', '94777'),
+<a name="454172"></a>      PhoneList_vartyp('415-555-1212', '416-555-1212'),
+<a name="454173"></a>      PurchaseOrderList_ntabtyp(), 531
+<a name="454174"></a>    )
+<a name="454175"></a>  );
+<a name="454142"></a>
+</pre>
+
+<a name="454105"></a> 
+
+<p class="BP">The following statements insert a purchase order for each of the two new customers. Unlike the statements that insert the new customers, the two statements that insert purchase orders are structurally the same (except for the number of line items in the purchase orders):</p>
+
+<pre class="CE">
+<a name="454191"></a>            -- Insert PO for ordinary customer
+<a name="454192"></a>
+<a name="454193"></a>INSERT INTO TABLE (
+<a name="454194"></a>  SELECT c.PurchaseOrderList_ntab
+<a name="454195"></a>    FROM Customer_objtab c
+<a name="454196"></a>    WHERE c.CustName = 'William Kidd'
+<a name="454197"></a>   )
+<a name="454198"></a>  VALUES (1021, SYSDATE, SYSDATE + 1,
+<a name="454199"></a>    LineItemList_ntabtyp(
+<a name="454200"></a>      LineItem_objtyp(1, MAKE_REF(Stock_objtab, 1535), 2, 10),
+<a name="454201"></a>      LineItem_objtyp(2, MAKE_REF(Stock_objtab, 1534), 1, 0)
+<a name="454202"></a>     )
+<a name="454203"></a>   );
+<a name="454204"></a>
+<a name="454205"></a>            -- Insert PO for corporate customer
+<a name="454240"></a>
+<a name="454256"></a>INSERT INTO TABLE (
+<a name="454257"></a>  SELECT c.PurchaseOrderList_ntab
+<a name="454258"></a>    FROM Customer_objtab c
+<a name="454259"></a>    WHERE c.CustName = 'Edward Teach'
+<a name="454260"></a>   )
+<a name="454261"></a>  VALUES (1022, SYSDATE, SYSDATE + 1,
+<a name="454262"></a>    LineItemList_ntabtyp(
+<a name="454263"></a>      LineItem_objtyp(1, MAKE_REF(Stock_objtab, 1011), 1, 0),
+<a name="454264"></a>      LineItem_objtyp(2, MAKE_REF(Stock_objtab, 1004), 3, 0),
+<a name="454265"></a>      LineItem_objtyp(3, MAKE_REF(Stock_objtab, 1534), 2, 0)
+<a name="454266"></a>     )
+<a name="454267"></a>   );
+<a name="454254"></a>
+</pre>
+
+<a name="454251"></a> <!--TOC=h3-"454251"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Querying Substitutable Columns</font></h4>
+
+<!--/TOC=h3-->
+<a name="454271"></a> 
+
+<p class="BP">A substitutable column or table can contain data of several data types. This enables you, for example, to retrieve information about all kinds of customers with a single query of the customers table. But you can also retrieve information just about a particuar kind of customer, or about a particular attribute of a particular kind of customer.</p>
+
+<a name="454290"></a> 
+
+<p class="BP">The following examples show some useful techniques for getting the information you want from a substitutable table or column.</p>
+
+<a name="454272"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Selecting all customers</font></h5>
+
+<a name="454298"></a> 
+
+<p class="BP">The following query uses the <code>VALUE()</code> function to select instances of every kind of customer in the table:</p>
+
+<pre class="CE">
+<a name="454301"></a>SELECT VALUE(c)
+<a name="454302"></a>  FROM Customer_objtab c;
+<a name="454299"></a>
+</pre>
+
+<a name="454295"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Selecting All Corporate Customers (and Their Subtypes)</font></h5>
+
+<a name="454310"></a> 
+
+<p class="BP">The following query uses a <code>WHERE</code> clause that contains an <code>IS OF</code> predicate to filter out customers that are not some kind of corporate customer. In other words, the query returns all kinds of corporate customers but does not return instances of any other kind of customer:</p>
+
+<pre class="CE">
+<a name="454313"></a>SELECT VALUE(c)
+<a name="454314"></a>  FROM Customer_objtab c
+<a name="454315"></a>  WHERE VALUE(c) IS OF (Corp_Customer_objtyp);
+<a name="454311"></a>
+</pre>
+
+<a name="454273"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Selecting All Corporate Customers (No Subtypes)</font></h5>
+
+<a name="454500"></a> 
+
+<p class="BP">This query is identical to the preceding one except that it adds the <code>ONLY</code> keyword in the <code>IS OF</code> predicate to filter out any subtypes of <code>Corp_Customer_objtyp</code>. Rows are returned only for instances whose most specific type is <code>Corp_Customer_objtyp</code>:</p>
+
+<pre class="CE">
+<a name="454503"></a>SELECT p.PONo
+<a name="454504"></a>  FROM Customer_objtab c, TABLE(c.PurchaseOrderList_ntab) p
+<a name="454505"></a>  WHERE VALUE(c) IS OF (ONLY Corp_Customer_objtyp);
+<a name="454501"></a>
+</pre>
+
+<a name="454493"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Selecting PONo Just for Corporate Customers</font></h5>
+
+<a name="454351"></a> 
+
+<p class="BP">The following query uses a <code>TABLE</code> expression to get purchase order numbers (from the nested table of purchase orders). Every kind of customer has this attribute, but the <code>WHERE</code> clause confines the search just to corporate customers:</p>
+
+<pre class="CE">
+<a name="454345"></a>SELECT p.PONo
+<a name="454346"></a>  FROM Customer_objtab c, TABLE(c.PurchaseOrderList_ntab) p
+<a name="454347"></a>  WHERE VALUE(c) IS OF (Corp_Customer_objtyp);
+<a name="454343"></a>
+</pre>
+
+<a name="454340"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Selecting a Subtype Attribute</font></h5>
+
+<a name="454380"></a> 
+
+<p class="BP">The following query returns data for account manager ID. This is an attribute possessed only by the corporate customer subtype: the declared type of the table lacks it.</p>
+
+<a name="454392"></a> 
+
+<p class="BP">In this query the <code>TREAT()</code> function is used to cause the system to try to regard or treat each customer as a corporate customer in order to access the subtype attribute <code>Account_mgr_id</code>:</p>
+
+<pre class="CE">
+<a name="454383"></a>SELECT CustName, TREAT(VALUE(c) AS Corp_Customer_objtyp).Account_mgr_id
+<a name="454384"></a>  FROM Customer_objtab c
+<a name="454473"></a>  WHERE VALUE(c) IS OF (ONLY Corp_Customer_objtyp);
+<a name="454381"></a>
+</pre>
+
+<a name="454341"></a> 
+
+<p class="BP"><code>TREAT()</code> is necessary here because <code>Account_mgr_id</code> is not an attribute of the table's declared type <code>Customer_objtyp</code>. If you simply list the attribute in the <code>SELECT</code> list as if it were, a query like the following one will return the error "invalid column name." This is so even with a <code>WHERE</code> clause that excludes all but instances of <code>Corp_Customer_objtyp</code>. The <code>WHERE</code> clause is not enough here because it merely excludes rows from the result.</p>
+
+<pre class="CE">
+<a name="454482"></a>    -- Returns error, "invalid column name" for Account_mgr_id
+<a name="455463"></a>
+<a name="455464"></a>SELECT CustName, Account_mgr_id
+<a name="454483"></a>  FROM Customer_objtab
+<a name="454488"></a>  WHERE VALUE(c) IS OF (ONLY Corp_Customer_objtyp);
+<a name="454484"></a>
+</pre>
+
+<a name="454459"></a> 
+
+<h5 class="SH2"><font face="Arial, Helvetica, sans-serif">Discovering the (Sub)Type of Each Instance</font></h5>
+
+<a name="454560"></a> 
+
+<p class="BP">Every substitutable column or object table has an associated hidden type-ID column that identifies the type of the instance in each row. You can look up the type ID of a type in the <code>USER_TYPES</code> catalog view.</p>
+
+<a name="454564"></a> 
+
+<p class="BP">The function <code>SYS_TYPEID()</code> returns the type ID of a particular instance. The following query uses <code>SYS_TYPEID()</code> and a join on the <code>USER_TYPES</code> catalog view to return the type name of each customer instance in the table <code>Customer_objtab</code>:</p>
+
+<pre class="CE">
+<a name="454561"></a>SELECT c.CustName, u.TYPE_NAME
+<a name="454547"></a>  FROM Customer_objtab c, USER_TYPES u
+<a name="454548"></a>  WHERE SYS_TYPEID(VALUE(c)) = u.TYPEID;
+<a name="454544"></a>
+<a name="454575"></a>CUSTNAME
+<a name="454576"></a>--------------------------------------------------------------------------------
+<a name="454577"></a>TYPE_NAME
+<a name="454578"></a>------------------------------
+<a name="454579"></a>Jean Nance
+<a name="454580"></a>CUSTOMER_OBJTYP
+<a name="454581"></a> 
+<a name="454582"></a>John Nike
+<a name="454583"></a>CUSTOMER_OBJTYP
+<a name="454584"></a> 
+<a name="454585"></a>William Kidd
+<a name="454586"></a>CUSTOMER_OBJTYP
+<a name="454587"></a> 
+<a name="454588"></a>Edward Teach
+<a name="454589"></a>CORP_CUSTOMER_OBJTYP
+<a name="454573"></a>
+</pre>
+
+<a name="455481"></a> 
+
+<div align="center">
+<table class="NoteAlso" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="NoteAlso">
+<td class="NoteAlso"><a name="455484"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="455489"></a> 
+
+<p class="NB"><a href="adobjbas.htm#461680">"Functions and Predicates Useful with Objects"</a> in <a href="adobjbas.htm#453072">Chapter&nbsp;2</a> for more on <code>SYS_TYPEID()</code>, <code>VALUE()</code>, and <code>TREAT()</code></p>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="455883"></a> <!--TOC=h1-"455883"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Manipulating Objects with Oracle Objects for OLE</font></h2>
+
+<!--/TOC=h1-->
+<a name="446822"></a> 
+
+<p class="BP">On Windows systems, you can use Oracle Objects for OLE (OO4O) to write object-oriented database programs in Visual Basic or other environments that support the COM protocol, such as Excel.</p>
+
+<a name="448680"></a> 
+
+<p class="BP">The following examples all begin with a similar header section that connects to the database. Then each shows how to perform a different operation on object data.</p>
+
+<a name="447810"></a> <!--TOC=h2-"447810"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Selecting Data</font></h3>
+
+<!--/TOC=h2-->
+<a name="448681"></a> 
+
+<p class="BP">Here is an event handler for a button that performs a <code>SELECT</code> operation.</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="448682"></a>We get a set of rows from the database, each row containing some relational columns and some columns that are objects.</li>
+
+<li class="LB1" type="disc"><a name="448683"></a>Using the name of the <code>CUSTREF</code> column, we retrieve its value, which is an object.</li>
+
+<li class="LB1" type="disc"><a name="451823"></a>Then we can use the dot notation to access the attributes of the object. We define the variable as a generic object type, <code>OraObject</code>. After it is instantiated with a real object, it takes on the properties of the corresponding object type. 
+
+<pre class="CE">
+<a name="451569"></a>Private Sub obj_select_Click() 
+<a name="452288"></a> Dim OO4OSession As OraSession 
+<a name="452289"></a> Dim InvDB As OraDatabase 
+<a name="452290"></a> Dim PurchaseOrder As OraDynaset 
+<a name="452291"></a> Dim CustomerInfo As OraRef 
+<a name="452292"></a> Dim LineItemsList As OraCollection 
+<a name="452293"></a> Dim LineItem As OraObject 
+<a name="452294"></a> Dim ShipToAddr As OraObject 
+<a name="452295"></a> Dim StockInfo As OraRef 
+<a name="452296"></a> Dim CustomerAddr As OraObject 
+<a name="452297"></a>  
+<a name="452298"></a> 'Create the OraSession Object. 
+<a name="452299"></a> Set OO4OSession = CreateObject("OracleInProcServer.XOraSession") 
+<a name="452300"></a>  
+<a name="452301"></a> 'Create the OraDatabase Object by opening a connection to Oracle. 
+<a name="452302"></a> Set InvDB = OO4OSession.OpenDatabase("exampledb", "scott/tiger", 0&amp;) 
+<a name="452303"></a>  
+<a name="452304"></a> 'Select from purchase_tab 
+<a name="452305"></a> Set PurchaseOrder = InvDB.CreateDynaset("select * from purchase_tab", 0&amp;) 
+<a name="452306"></a>    
+<a name="452307"></a> 'Get the custref attribute from PurchaseOrder 
+<a name="452308"></a> Set CustomerInfo = PurchaseOrder.Fields("custref").Value 
+<a name="452309"></a>  
+<a name="452310"></a> ' Accessing attributes CustomerInfo object 
+<a name="452311"></a>     
+<a name="452312"></a> 'Display custno,custname,phonelist attibutes of CustomerInfo 
+<a name="452313"></a> MsgBox CustomerInfo.custno 
+<a name="452314"></a> MsgBox CustomerInfo.custname 
+<a name="452315"></a>  
+<a name="452316"></a> 'Get address and phonelist attibutes of CustomerInfo 
+<a name="452317"></a> Set CustomerAddr = CustomerInfo.Address 
+<a name="452318"></a>  
+<a name="452319"></a> 'Display all the atributes of CustomerAddr 
+<a name="452320"></a> MsgBox CustomerAddr.Street 
+<a name="452321"></a> MsgBox CustomerAddr.State 
+<a name="452322"></a> MsgBox CustomerAddr.Zip 
+<a name="452323"></a>  
+<a name="452324"></a> '  Accessing elements of LineItemsList Object 
+<a name="452325"></a>  
+<a name="452326"></a> 'Get line_item_list attribute from PurchaseOrder 
+<a name="452327"></a> Set LineItemsList = PurchaseOrder.Fields("line_item_list").Value 
+<a name="452328"></a>  
+<a name="452329"></a> 'Get LineItem object element from LineItemList collection 
+<a name="452330"></a>  Set LineItem = LineItemsList(1) 
+<a name="452331"></a>   
+<a name="452332"></a> 'Display lineitemno,quantity,discount attibutes 
+<a name="452333"></a> MsgBox LineItem.lineitemno 
+<a name="452334"></a> MsgBox LineItem.quantity 
+<a name="452335"></a> MsgBox LineItem.discount 
+<a name="452336"></a>  
+<a name="452337"></a> 'Access stockref attribute of LineItem 
+<a name="452338"></a> Set StockInfo = LineItem.Stockref 
+<a name="452339"></a>  
+<a name="452340"></a> 'Display stockno,cost,tax_code of StockInfo 
+<a name="452341"></a> MsgBox StockInfo.stockno 
+<a name="452342"></a> MsgBox StockInfo.cost 
+<a name="452343"></a> MsgBox StockInfo.tax_code 
+<a name="452344"></a>  
+<a name="452345"></a>End Sub 
+<a name="452346"></a>
+</pre>
+</li>
+</ul>
+
+<a name="451292"></a> <!--TOC=h2-"451292"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Inserting Data</font></h3>
+
+<!--/TOC=h2-->
+<a name="448685"></a> 
+
+<p class="BP">Here is a program that retrieves a set of rows from the database, then adds a new row.</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="448686"></a>We create some objects of the appropriate object types.</li>
+
+<li class="LB1" type="disc"><a name="448687"></a>We populate the objects with sample values.</li>
+
+<li class="LB1" type="disc"><a name="448688"></a>We create a new row for the purchase order table, and fill in the values for its columns. The columns that are not objects can be set directly. The columns that are objects must be set using the <code>VALUE</code> field. 
+
+<pre class="CE">
+<a name="451647"></a>Dim OO4OSession As OraSession 
+<a name="452348"></a>Dim InvDB As OraDatabase 
+<a name="452349"></a>Dim PurchaseOrder As OraDynaset 
+<a name="452350"></a>Dim CustomerInfo As OraRef 
+<a name="452351"></a>Dim LineItemsList As OraCollection 
+<a name="452352"></a>Dim LineItem As OraObject 
+<a name="452353"></a>Dim ShipToAddr As OraObject 
+<a name="452354"></a>Dim StockInfo As OraRef 
+<a name="452355"></a>Dim CustomerAddr As OraObject 
+<a name="452356"></a>  
+<a name="452357"></a> 'Create the OraSession Object. 
+<a name="452358"></a> Set OO4OSession = CreateObject("OracleInProcServer.XOraSession") 
+<a name="452359"></a>  
+<a name="452360"></a> 'Create the OraDatabase Object by opening a connection to Oracle. 
+<a name="452361"></a> Set InvDB = OO4OSession.OpenDatabase("exampledb", "scott/tiger", 0&amp;) 
+<a name="452362"></a>  
+<a name="452363"></a> 'Select from purchase_tab 
+<a name="452364"></a> Set PurchaseOrder = InvDB.CreateDynaset("select * from purchase_tab", 0&amp;) 
+<a name="452365"></a>    
+<a name="452366"></a> '  Step 1  - Creating CustomerInfo ref object 
+<a name="452367"></a>  
+<a name="452368"></a> 'select a ref from customer_tab for custono 2 
+<a name="452369"></a> Set CustomerDyn = InvDB.CreateDynaset("select REF(C) from customer_tab c 
+<a name="452370"></a>where c.custno  = 2", 0&amp;) 
+<a name="452371"></a>  
+<a name="452372"></a> 'get the CustomerInfo ref object 
+<a name="452373"></a> Set CustomerInfo = CustomerDyn.Fields(0).Value 
+<a name="452374"></a>  
+<a name="452375"></a> ' Step 2  - Creating LineItemsList object 
+<a name="452376"></a>  
+<a name="452377"></a> ' Create a new line_items_list object 
+<a name="452378"></a> Set LineItemsList = InvDB.CreateOraObject("line_item_list_t") 
+<a name="452379"></a>  
+<a name="452380"></a> ' Create a new line_items object 
+<a name="452381"></a> Set LineItem = InvDB.CreateOraObject("line_item_t") 
+<a name="452382"></a>  
+<a name="452383"></a> 'set attributes of LineItem object 
+<a name="452384"></a> LineItem.lineitemno = 2 
+<a name="452385"></a> LineItem.quantity = 15 
+<a name="452386"></a> LineItem.discount = 30 
+<a name="452387"></a> LineItem.Stockref = Null 
+<a name="452388"></a>  
+<a name="452389"></a> 'set the LineItem to first element of LineItemList 
+<a name="452390"></a> LineItemsList(1) = LineItem 
+<a name="452391"></a>  
+<a name="452392"></a> ' Step 3 - Creating ShipToAddr object 
+<a name="452393"></a>  
+<a name="452394"></a> ' create a shiptoaddr object 
+<a name="452395"></a> Set ShipToAddr = InvDB.CreateOraObject("address_t") 
+<a name="452396"></a>  
+<a name="452397"></a> 'set the attributes of ShipToAddr Object 
+<a name="452398"></a> ShipToAddr.city = "Belmont" 
+<a name="452399"></a> ShipToAddr.Street = "Continentals way" 
+<a name="452400"></a> ShipToAddr.Zip = "94002" 
+<a name="452401"></a> ShipToAddr.State = "CA" 
+<a name="452402"></a>  
+<a name="452403"></a> ' Start the AddNew operation on PurchaseOrder dynaset 
+<a name="452404"></a>  
+<a name="452405"></a> PurchaseOrder.AddNew 
+<a name="452406"></a>   
+<a name="452407"></a>  PurchaseOrder.Fields("pono").Value = 1002 
+<a name="452408"></a>  PurchaseOrder.Fields("orderdate").Value = "5/15/99" 
+<a name="452409"></a>  PurchaseOrder.Fields("shipdate").Value = "6/15/99" 
+<a name="452410"></a>  
+<a name="452411"></a>  'set the custref field to CustomerInfo object created in step1 
+<a name="452412"></a>  PurchaseOrder.Fields("custref").Value = CustomerInfo 
+<a name="452413"></a>  
+<a name="452414"></a>  'set the line_item_list  field to LineItemslist object created in step2 
+<a name="452415"></a>  PurchaseOrder.Fields("line_item_list").Value = LineItemsList 
+<a name="452416"></a>  
+<a name="452417"></a>  'set the shiptoaddr  field to ShipToAddr  object created in step3 
+<a name="452418"></a>  PurchaseOrder.Fields("shiptoaddr").Value = ShipToAddr 
+<a name="452419"></a>  
+<a name="452420"></a> ' Call the update method on Purchaseorder Dynaset which inserts a new row 
+<a name="452421"></a> ' in purchase_tab table 
+<a name="452422"></a>
+<a name="452423"></a> PurchaseOrder.Update 
+<a name="452424"></a>
+</pre>
+</li>
+</ul>
+
+<a name="451293"></a> <!--TOC=h2-"451293"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Updating Data</font></h3>
+
+<!--/TOC=h2-->
+<a name="448689"></a> 
+
+<p class="BP">Here is a program that retrieves some rows from the database, then updates a specific one.</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="448690"></a>We select the purchase order using a query that returns a single row.</li>
+
+<li class="LB1" type="disc"><a name="448691"></a>We get individual data items to manipulate from other tables and from the original purchase order.</li>
+
+<li class="LB1" type="disc"><a name="448694"></a>We lock the purchase order row for updating, and put in the new values. 
+
+<pre class="CE">
+<a name="451686"></a>Dim OO4OSession As OraSession 
+<a name="452426"></a>Dim InvDB As OraDatabase 
+<a name="452427"></a>Dim PurchaseOrder As OraDynaset 
+<a name="452428"></a>Dim CustomerInfo As OraRef 
+<a name="452429"></a>Dim LineItemsList As OraCollection 
+<a name="452430"></a>Dim LineItem As OraObject 
+<a name="452431"></a>Dim ShipToAddr As OraObject 
+<a name="452432"></a>Dim StockInfo As OraRef 
+<a name="452433"></a>Dim CustomerAddr As OraObject 
+<a name="452434"></a>
+<a name="452435"></a>'Create the OraSession Object. 
+<a name="452436"></a>Set OO4OSession = CreateObject("OracleInProcServer.XOraSession") 
+<a name="452437"></a>
+<a name="452438"></a>'Create the OraDatabase Object by opening a connection to Oracle. 
+<a name="452439"></a>Set InvDB = OO4OSession.OpenDatabase("exampledb", "scott/tiger", 0&amp;) 
+<a name="452440"></a>
+<a name="452441"></a>'Select from purchase_tab for pono 1002 
+<a name="452442"></a>Set PurchaseOrder = InvDB.CreateDynaset("select * from purchase_tab where 
+<a name="452443"></a>pono = 1002", 0&amp;) 
+<a name="452444"></a>
+<a name="452445"></a>'Create a StockInfo from stock_tab for stockno 1535 
+<a name="452446"></a>Set StockDyn = InvDB.CreateDynaset("select REF(s) from stock_tab s where 
+<a name="452447"></a>s.stockno = 1535", 0&amp;) 
+<a name="452448"></a>Set StockInfo = StockDyn.Fields(0).Value 
+<a name="452449"></a>
+<a name="452450"></a>'Get line_item_list attribute from PurchaseOrder 
+<a name="452451"></a>Set LineItemsList = PurchaseOrder.Fields("line_item_list").Value 
+<a name="452452"></a>
+<a name="452453"></a>'Get LineItem object element from LineItemList collection 
+<a name="452454"></a>Set LineItem = LineItemsList(1) 
+<a name="452455"></a>
+<a name="452456"></a>'Start the edit operation on PurchaseOrder dynaset 
+<a name="452457"></a>PurchaseOrder.Edit 
+<a name="452458"></a> 
+<a name="452459"></a>' Set the StockInfo object created in Step1 to stockref attribute 
+<a name="452460"></a>' of LineItem 
+<a name="452461"></a>LineItem.Stockref = StockInfo 
+<a name="452462"></a>PurchaseOrder.Update 
+<a name="452463"></a>
+</pre>
+</li>
+</ul>
+
+<a name="451294"></a> <!--TOC=h2-"451294"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Calling a Method Function</font></h3>
+
+<!--/TOC=h2-->
+<a name="448784"></a> 
+
+<p class="BP">Here is a program that retrieves a purchase order, and calls its member function <code>TOTAL_VALUE</code> to sum the cost of the line items that are part of the purchase order.</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="448823"></a>We select one row from the purchase order table. Notice we select the <code>VALUE</code> so that the result comes back as an object.</li>
+
+<li class="LB1" type="disc"><a name="448824"></a>We get a pointer to the purchase order object (the zero'th column of the result row). Later this pointer is passed to a PL/SQL stored procedure, to simulate the <code>SELF</code> pointer in Java or C++ methods.</li>
+
+<li class="LB1" type="disc"><a name="448825"></a>We build a list of parameters corresponding to the implicit <code>SELF</code> parameter and the return value of the method function. For each, we specify the bind variable, its value, its mode, and its type.</li>
+
+<li class="LB1" type="disc"><a name="448826"></a>We call the stored procedure corresponding to the method function, storing the result in the <code>TOTALVALUE</code> bind variable.</li>
+
+<li class="LB1" type="disc"><a name="448827"></a>To use the result, we retrieve the return value from the parameter list. 
+
+<pre class="CE">
+<a name="451719"></a>Dim OO4OSession As OraSession 
+<a name="452465"></a>Dim InvDB As OraDatabase 
+<a name="452466"></a>Dim PurchaseOrderObj As OraDynaset 
+<a name="452467"></a>
+<a name="452468"></a>'Create the OraSession Object. 
+<a name="452469"></a>Set OO4OSession = CreateObject("OracleInProcServer.XOraSession") 
+<a name="452470"></a>
+<a name="452471"></a>'Create the OraDatabase Object by opening a connection to Oracle. 
+<a name="452472"></a>Set InvDB = OO4OSession.OpenDatabase("exampledb", "scott/tiger", 0&amp;) 
+<a name="452473"></a>
+<a name="452474"></a>'Select from purchase_tab 
+<a name="452475"></a>Set PurchaseOrderDyn = InvDB.CreateDynaset("select VALUE(p)  from 
+<a name="452476"></a>purchase_tab p where p.pono = 1001", 0&amp;) 
+<a name="452477"></a>
+<a name="452478"></a>'Get the PurchaseOrderObj 
+<a name="452479"></a>Set PurchaseOrderObj = PurchaseOrderDyn.Fields(0).Value 
+<a name="452480"></a>
+<a name="452481"></a>'Create a OraParameter object for purchase_order_t object and set it to 
+PurchaseOrder 
+<a name="452482"></a>InvDB.Parameters.Add "PURCHASEORDER", PurchaseOrderObj, ORAPARM_BOTH, 
+<a name="452483"></a>ORATYPE_OBJECT, "PURCHASE_ORDER_T" 
+<a name="452484"></a>
+<a name="452485"></a>'Create a parameter for total_value return 
+<a name="452486"></a>InvDB.Parameters.Add "TOTALVALUE", "", ORAPARM_OUTPUT 
+<a name="452487"></a>
+<a name="452488"></a>'Execute a member method 
+<a name="452489"></a>InvDB.ExecuteSQL ("BEGIN :TOTALVALUE := 
+<a name="452490"></a>PURCHASE_ORDER_T.TOTAL_VALUE(:PURCHASEORDER); END;") 
+<a name="452491"></a>                   
+<a name="452492"></a>'Display the totalvalue 
+<a name="452493"></a>MsgBox InvDB.Parameters("TOTALVALUE").Value 
+<a name="452494"></a>
+<a name="452495"></a>
+<a name="452496"></a>
+<a name="451339"></a>
+</pre>
+</li>
+</ul>
+
+<!-- Start Footer -->
+</div>
+
+<div class="OUTD">
+<hr>
+<table summary="" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td valign="bottom" width="33%">
+<table summary="" cellspacing="0" cellpadding="0">
+<tr>
+<td align="center"><a href="adobjdes.htm"><img src="../../dcommon/gifs/larrow.gif" alt="Go to previous page" border="0"></a></td>
+<td align="center"><a href="index.htm"><img src="../../dcommon/gifs/rarrow.gif" alt="Go to next page" border="0"></a></td>
+</tr>
+</table>
+</td>
+<td align="center" width="34%"><a href="../../dcommon/html/cpyr.htm"><img src="../../dcommon/gifs/oracle.gif" alt="Oracle" border="0"><br>
+<font size="-2">Copyright &copy; 1996, 2002 Oracle Corporation.</font></a><br>
+<font size="-2">All Rights Reserved.</font></td>
+<td valign="bottom" align="right" width="33%">
+<table summary="" cellspacing="0" cellpadding="0" width="144">
+<tr>
+<td align="center" valign="top" width="16%"><a href="../../index.htm"><img src="../../dcommon/gifs/prodicon.gif" alt="Go To Documentation Library" border="0"><br>
+<font size="-2">Home</font></a></td>
+<td align="center" valign="top" width="17%"><a href="../../nav/docindex.htm"><img src="../../dcommon/gifs/bookicon.gif" alt="Go To Product List" border="0"><br>
+<font size="-2">Book List</font></a></td>
+<td align="center" valign="top" width="17%"><a href="toc.htm"><img src="../../dcommon/gifs/conticon.gif" alt="Go To Table Of Contents" border="0"><br>
+<font size="-2">Contents</font></a></td>
+<td align="center" valign="top" width="20%"><a href="index.htm"><img src="../../dcommon/gifs/indxicon.gif" alt="Go To Index" border="0"><br>
+<font size="-2">Index</font></a></td>
+<!--  mix  -->
+<td align="center" valign="top" width="17%"><a href="../../mix.920/a96625/toc.htm"><img src="../../dcommon/gifs/mix.gif" alt="" border="0"><br>
+<font size="-2">Master Index</font></a></td>
+<!--  fdbk  -->
+<td align="center" valign="top" width="17%"><a href="../../dcommon/html/feedback.htm"><img src="../../dcommon/gifs/feedback.gif" alt="" border="0"><br>
+<font size="-2">Feedback</font></a></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</div>
+</body>
+</html>
+

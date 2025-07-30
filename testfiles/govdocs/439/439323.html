@@ -1,0 +1,156 @@
+<HTML><title>OMAC API Task Programming Module Reference Documentation</title>
+<meta name="Keywords" content="automation, controller, softlogic, OMAC, API, robotics, CNC, PLC, I/O, open, modular, controller">
+<BODY background="./images/OmacUserGroupBackground.gif">
+<FONT face="verdana,arial,helvetica" size="2">
+
+
+<h1><a NAME="COMOverview"></a>COM Overview </h1>
+
+<p>The Component Object Model (COM) is a framework for creating and using components. COM
+allows you to build software from parts, not from scratch. COM makes software easier to
+reuse. COM consists of a well-defined and publicly available specification, as well as
+numerous platform implementations. COM is supported by a wide choice in services, tools,
+languages, applications, and development tools. </p>
+
+<p>COM is based on component development. It is important to distinguish components from
+objects. Components are not the same as objects, and component software development should
+not be confused with object-oriented programming. Object-oriented programming is concerned
+with creating objects. Object-oriented programming builds language-dependent objects that
+can be used as software components. Component based development is a technology that
+allows you to combine object-based components created using many different tools and
+languages. Component based development is concerned with making objects work together. </p>
+
+<p>COM is a technology that allows objects to interact within a single process or across
+process and machine boundaries. COM enables object interaction by specifying that the only
+way to manipulate the data associated with an object is through an interface on the
+object. COM components are specified by an interfaces. All COM interfaces are by
+definition: 
+
+<ol>
+  <li>immutable </li>
+  <li>derive from the interface IUnknown </li>
+  <li>have a globally unique identifier (GUID) </li>
+  <li>return HRESULT from each method </li>
+  <li>use Unicode for string parameters </li>
+  <li>are described in a type library with MIDL that includes a reasonable human-readable
+    name.</li>
+</ol>
+
+<p>COM interfaces correspond to <code>abstract class </code>in cpp; and an <code>interface
+</code>in Java.TM </p>
+
+<p>COM supports three types of interfaces: Custom, Automation, and Dual. A Custom COM
+interfaces is similar to C++ virtual function tables, and is derived from IUnknown, (for
+C++). Method lookup is done statically at runtime using a vtable. Automation interfaces
+are a dispatch type COM interface, and involve dynamic tokenized lookup instead of a
+vtable pointer-based mechanism. These interfaces are derived from IDispatch (for
+scripting) and are slower. Dual COM interfaces are both custom COM interfaces and dispatch
+interfaces rolled into one. </p>
+
+<p>There are two basic ways to create COM objects. The first way is to ask an existing,
+non-class factory object to create the object, and the second way is to use a class
+factory. In both cases, there is a running server (either in-process, local or remote)
+capable of creating other COM objects. So, a server creates COM objects and is itself also
+a COM object. A COM object is an implementation of a group of interfaces in binary code.
+Each COM class is identified by a CLSID, a unique 128-bit GUID, which the server must
+register. COM uses this CLSID, at the request of a client, to associate a specific DLL or
+EXE containing code that implements the class, thus creating an instance of the object.
+See <a href="IOmacModuleClassFactory.html#IOmacModuleClassFactory">IOmac Module Class Factory</a> for more details. </p>
+
+<h2>Com Features </h2>
+
+<p>COM offers a variety of features and benefits including: <!--
+<ul>
+  <li>Binary standard - for basic component interoperability and allows use by just about any
+    programming language </li>
+  <li>Local/Remote Transparency - any location (in-process, cross-process, cross-machine) </li>
+  <li>Activation </li>
+  <li>Versioning </li>
+  <li>Discovery </li>
+  <li>Security </li>
+  <li>Component Categories </li>
+  <li>Event and Notification Handling </li>
+  <li>International Support </li>
+  <li>Docucentric Features  <LI>“Zero” sacrifice in-process performance
+<LI>Enable extensibility and adaptability
+<LI>Cross Platform Availability
+<LI>Multiple Transport Mechanisms </li>
+</ul>
+--> 
+
+<dl>
+  <dt><b>Binary Standard</b> </dt>
+  <dd>COM uses a binary standard for method calling between components. The binary standard
+    allows for language independence. Fundamental to COM is the use of Universally Unique
+    Identifiers (UUID). COM uses globally unique identifiers (IID, GUID, CLSID, CATID)
+    &#151;128-bit integers that are guaranteed to be unique in the world across space and
+    time&#151;to identify every interface and every component object class as defined by the
+    Open Software Foundation Distributed Computing Environment. Example:
+    {884A52F5-F116-11d2-AAB1-00C04FA375A6} </dd>
+  <dt><b>Local/Remote Transparency</b> </dt>
+  <dd>COM activation service will activate a component&#146;s server and then set up component
+    interactions for either in-process (DLL), local (EXE in separate process on the same
+    machine), and remote (DLL or EXE on a different machine via Distributed COM, or DCOM).
+    This activation service enables component Local/Remote Transparency. </dd>
+  <dt><b>Activation</b> </dt>
+  <dd>COM has a mechanism for establishing connections to components and creating new
+    instances of components. These mechanisms are commonly referred to as activation
+    mechanisms. COM activation service determines from a class identifier which server
+    implements that class and where that server is located. </dd>
+  <dt><b>Versioning</b> </dt>
+  <dd>COM interfaces are immutable and are never versioned. This means that interfaces cannot
+    have syntax changes, or semantic changes, or marshaling changes. Since interfaces are
+    immutable, to create a new version, you must create a new interface. However, this is
+    straightforward as you can derive from the old interface. For each new version of an
+    interface, a new unique identifier is assigned. </dd>
+  <dt><b>Discovery</b> </dt>
+  <dd>Versioning is a way for components to dynamically discover the interfaces implemented by
+    other components. Any COM class may be registered in the system registry in order to
+    become a COM server. (This is an optional step.) COM provides locator services to
+    determine from a class UUID defined in the system registry which server implements that
+    class and where that server is located. </dd>
+  <dt><b>Security</b> </dt>
+  <dd>COM provides security for applications, regardless of whether they run remotely. There
+    is a default level of security that is provided to non-security-aware. Beyond the default,
+    applications that are security-aware can control who is granted access to their services
+    and the type of access that is granted. </dd>
+  <dt><b>Licensing</b> </dt>
+  <dd>Allows server facilities for creating licensed components and supporting the subsequent
+    use of those components by authorized clients. </dd>
+  <dt><b>Component Categories</b> </dt>
+  <dd>Component categories identify those interfaces (or functionality) that a software
+    component implements and requires. A registry entry is used for each category or
+    identified area of functionality. Each component category is identified by a globally
+    unique identifier (GUID). When a component is installed it registers its categories in the
+    system registry using the component category ID. </dd>
+  <dt><b>Event and Notification Handling</b> </dt>
+  <dd>COM supports an event model as well as event notification. COM supports connectable
+    objects, which is a generalized mechanism through which advisory connections are
+    established between some source object and some sink object. COM provides IConnectionPoint
+    &amp; IConnectionPointContainer interfaces that supply a standard mechanism in support of
+    connecting event sources/generators to event receivers/sinks. COM defines a standard event
+    mechanism, called Connection Points, a protocol for subscribing to events, as well as a
+    protocol for event notification. </dd>
+  <dt><b>International Support</b> </dt>
+  <dd>COM provides internationalization support indirectly through Windows. In Windows,
+    internationalization is supported through the use of locales. A locale is a set of user
+    preference information related to the user's language and sublanguage. Locales provide
+    international support through the National Language Support API (NLSAPI), the Multilingual
+    API (MLAPI), and Windows resource files. Locales make it easier to create globalized
+    applications that support multilingual data and a multilingual UI&#151;without using
+    special tools, multiple editions of the operating system, or writing specialized codes. </dd>
+  <dt><b>Docucentric Features</b> </dt>
+  <dd>COM through OLE interfaces provides numerous docucentric capabilities. Through the use
+    of Automation (Dynamic Invocation) interfaces, scripting of components is possible. OLE
+    defines monikers as a means of standardized naming. OLE through OBCD and OLE DB offers
+    standard interfaces for database access and management. OLE supports the Microsoft
+    Transaction Server (MTS) that provides data transaction capabilities. Finally, OLE
+    provides facilities for in-place activation, drag-and-drop, and structured storage common
+    to Windows applications. The OLE features are of not directly applicable to the OMAC API,
+    but were discussed to show the breadth of COM's application. </dd>
+</dl>
+
+<p>&nbsp;</p>
+</FONT>
+</BODY>
+</HTML>

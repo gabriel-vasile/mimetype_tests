@@ -1,0 +1,248 @@
+Comments on D0 coding guidelines
+Guidelines are dated 17oct97
+D. Adams
+24dec97
+
+I begin with some general comments and then give comments on
+specific sections.
+
+
+General
+-------
+
+1.  It is not clear in what spirit the guidelines are intended.
+I take them as guidelines rather than requirements.  My comments
+would likely change if these were strict requirements.
+A list of requirements would be much shorter and might include:
+R1 - Code must be well-designed, well documented, have easily
+     understood headers, have easily understood implementations
+     and behave correctly.  In that order.
+R2 - All non-inline function and static class attribute definitions
+     go in implementation files -- not headers.
+R3 - Use unique code guards in all headers.
+
+2.  I have heard the comment that the document is too long but
+I do not agree.  The language is complex and has many pitfalls
+and we should expect the document to grow.  Also much of the length
+comes from examples which generally serve to clarify.
+
+3. What about namespaces?
+
+4. Indent each block 2-4 spaces.
+
+5. What about exceptions?
+
+
+Specific (by section)
+---------------------
+
+2.1 File layout
+
+I would advocate .h rather than .hpp as this is a more
+conventional choice.  Regardless, it should be easy in our
+CVS/SRT environment to provide an external interface with
+either (or both) conventions for either choice by a particular
+package author.
+
+In addition to header and implementation files, there are
+template implementation files.  These are where (non-inline)
+template functions are defined.  Many compilers will find these
+in the header.  Others will require that they be in a separate file.
+Many (including KCC) allow either.  I advocate a separate file
+because 1) it reduces physical coupling and 2) it is easy to use
+an include statement to put them back in the header.
+
+The above does not refer to inline function definitions which
+some would advocate putting into another file.
+
+I would also like to see every component provide a test file
+as described by Lakos.
+
+
+2.2 Header comment
+
+Some files will be changed 50-100 or more times.  Is it intended
+that these changes all be documented in the files themselves
+or will we make use of a external mechanism?
+
+
+2.3 Included header files
+
+It should be stated that the order of the headers should not affect
+the compilation.  That is each header should include everthing it
+needs and not depend on something being included beforehand.
+
+Give this, the order indicated seems reasonable except that I would
+like to see the component header file appear first in the component
+implementation.  This helps to guarantee that my first condition
+is met.
+
+The code guard is essential and its existence one item I would pull
+out as a requirement.  I would make no requirement on the naming 
+convention except that it should include the class name to help
+avoid clashes.
+requirement.
+
+
+2.4 -- there is no section 2.4 --
+
+
+2.6 The globals section
+
+I state more strongly that there is rarely need for globals.
+Much better to define these within the scope of a class as
+enum for int or static data for any other type.
+
+If they have to be global and are immutable, then use const
+instead of static.
+
+
+2.7 functions and 2.8 operations
+
+It is important that the definitions be well organized and
+understandable--I don't thnink it matters which appear first.
+
+
+3.1 Class header comment
+
+Typically there will be one class per header and the appropriate
+place to document the class is at the top of the header.  I find
+it easier to read the signatures if there are just one or two
+lines attached to each method.
+
+
+3.3 Class layout
+
+One can make equally valid arguments for other class layouts.
+I find the String example fairly difficult to read.  This is how
+I would write it:
+
+class String {
+
+private:  // attributes
+  char* _str;
+
+private:  // methods
+  String(size_t len, const char s[], size_t slen);
+  void detach();
+  void unique();
+
+public:  // methods
+
+  // constructor
+  String();
+
+  // constructor from char string
+  String(const char s[]);
+
+  // constructor from a single char.
+  String(char ch);
+
+  // copy constructor
+  String& String(const String& rhs)
+
+  // assignment operator
+  String& operator==(const String& rhs);
+
+  // destructor
+  ~String();
+
+  // Overwrite a character
+  void set(int pos, char ch);
+
+  // Reference a character.
+  char& operator[](int pos);
+
+// etc...
+
+
+The example looks much like the compiler header which I find almost
+useless for understanding how the class operates.
+
+I prefer to put very short inline methods in the class definition.
+These are typcially get and put routines.  E.g.:
+
+class MyClass
+
+private:  // attributes
+   int _length;
+
+public: // methods
+
+   // constructor
+   MyClass(int length);
+
+   // set the length
+   void set_length(int length);
+
+   // get the length
+   int get_length() const { return _length; };
+
+};
+
+In this example, I assume there is checking when the length
+is set so the constructor and setter are not inlined or would
+be defined in the inline section.  However, the getter is so
+simple that its implementation aids the documentation.
+
+
+4.3 Function parameters
+
+Ahhh - pointers vs. references.  The document seems to come down
+squarely on the side of references and then backs off at the end.
+I do not understand the distinction made between heap and stack
+pointers.  I almost always use references unless I want to allow
+for a missing object (NULL pointer).
+
+I would be even stronger about not returning with arguments.
+If a function needs to return two objects, then return one which
+contains the two.  Non-const argument references should be reserved
+for fundtions which modify the specified object.
+
+It is probably worthwhile to point out that passing a const copy
+is meaningless and may upset some compilers: i.e. use
+energy(Jet emjet) not energy(const Jet emjet).
+
+
+5.3 Pointers & references
+
+I disagree.  Between
+
+  Shape *pshp;
+
+and
+
+  Shape* pshp;
+
+I feel the latter more clearly indicates that pshp is a Shape pointer.
+(I suppose we could compromise with Shape * pshp and then everyone would
+be confused).  Of course one cannot make multiple declarations in one
+statement with my convention.
+
+
+5.4 Global variables
+
+This section is confusing.  Again the main point is don't.
+
+
+7.1 The if statement
+
+Text implies there is indentation--it just did not survive translation
+to html.  This should be fixed.
+
+
+7.4  Nonlinear control flow
+
+The statement is too strong--break and continue can help to clarify
+the flow of control in loops with multiple tests.  The same is true
+for multiple returns from a function.
+
+
+8.1 Naming convention.
+
+I also strongly encourage prepending all pointers with p; e.g.
+Jet* pjet, Track* ptrk, etc.  For member data, use _p:
+
+class MyTrack {
+  Track* _ptrk;
+};

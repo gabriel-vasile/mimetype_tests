@@ -1,0 +1,158 @@
+#!/bin/sh
+#set -x
+USAGE="usage: fnafos pil infile mach dir test"
+#VERS="version: ${USHutil}/fnafos 2000-03-14 11:30L "
+#in production $USHutil}=/nwprod/util/ush/
+#___________________________________________________________________________
+# NAME     : fnafos
+# Author   : Peter Henrichsen
+# Purpose  : This script is started by DBNET via a Foreign alert.
+#            This is the parent script to foreign_afos.
+#            The fnafos makes a script job that is qsub.
+#            This job runs script foreign_afos.
+#            The foreign_afos script converts AFOS graphics from 
+#            utf format into AWIPS Redbook format and then reblocks 
+#            the AFOS file for sending.
+#
+# History  : 1999-07-01 Peter Henrichsen
+#          : 1999-12-15 Peter Henrichsen modified to use USHutil
+#          : 2000-03-14 Peter Henrichsen modify to remove llsubmit
+#            so that dbnet can run this script.
+#
+#
+# Location : This script is found on hp36 as:
+#          : /tmp_mnt/export/sgi73/peterhen/util/scripts/ibm/fnafos
+#          : & on ncosp as          
+#          : /nwprod/util/ush/fnafos or
+#          : /nfsuser/g02/wx12ph/util/ush/fnafos           
+#        
+# Argumemts: 'pil' this is the AFOS pil number to convert.
+#          : 'infile' is the input AFOS utf file (fullpath).
+#          : 'mach' is the name of the workstation where the AFOS utf
+#          : file was created.
+#          : The 4th & 5th args are optional "dir" & "test" are used in
+#          : testing.
+#          : Arg 4 is the test base dir for the fix, ush, sorc & exec.
+#           ie /nfsuser/g01/wx12ph or /nwtest.
+#          : Arg5 is used to send in test mode if it is "send".        
+#          
+#___________________________________________________________________________
+#
+integer   istat
+
+set -x
+export PATH=${PATH}:.
+
+# export child script name.
+
+export  MEMBER=foreign_afos
+ 
+#___________________________________________________________________________
+#    get varables to exportation to child scripts $MEMBER .
+#___________________________________________________________________________
+
+export NAME="$1"
+export INFILE="$2"
+export MACH="$3"
+export USR="$3"
+
+export whatdir=fnafos
+  
+ if test $# -ge 4
+ then 
+  export homedir="$4"
+  export HOMEutil=$homedir 
+  comout=$HOMEutil/com/foreign/test/output 
+  export HOMEout=/gpfstmp/$LOGNAME
+  pcom=$HOMEutil/pcom/foreign 
+   if test $# -eq 5
+   then
+    what="$5"
+     if test "$what" = 'send'
+     then
+      envir=prod
+      SENDCOM=YES
+      SENDDBN=YES
+     else 
+      envir=test
+      SENDCOM=NO
+      SENDDBN=NO
+     fi   
+   fi  
+  else
+   envir=prod
+   SENDCOM=YES
+   SENDDBN=YES
+   who=$LOGNAME
+    if test "$who" = 'dbnprd'
+    then
+      export HOMEout=/tmpnwprd/dbnprd
+    else
+      export HOMEout=/gpfstmp/dbnprd    
+    fi
+    export HOMEutil=/nwprod  
+    comout=/com/foreign/$envir
+    pcom=/pcom/foreign
+ fi
+#
+# ########################################
+# Set up this job's temporary directory to
+# store processing files.
+# ########################################
+
+export DATA=$HOMEout/$whatdir.$$
+mkdir -m 775 -p $DATA  >/dev/null 2>&1  
+export FIXutil=$HOMEutil/util/fix
+export EXECutil=$HOMEutil/util/exec
+export USHutil=$HOMEutil/util/ush
+export utilities=$HOMEutil/util/ush
+
+export envir SENDCOM SENDDBN
+mkdir -m 775 -p  $pcom >/dev/null 2>&1
+mkdir -m 775 -p  $comout >/dev/null 2>&1 
+cd $DATA 
+  
+echo "  set the CYCLE"
+CYCLE=t00z
+cycle=$CYCLE
+export CYCLE cycle
+
+# run setup to initialize working directory and utility scripts
+ 
+export utilexec=/nwprod/util/exec
+export utilscript=/nwprod/util/ush
+
+# Run setup to initialize working directory and utility scripts
+sh $utilscript/setup.sh
+
+# Run setpdy and initialize PDY variables
+sh $utilscript/setpdy.sh
+
+. ./PDY
+
+job=FN$MACH
+
+jlogfile=/com/logs/snd2forgn_log 
+ 
+export pid=$$ 
+export reqid=${$}
+
+export pgmout=$job.$NAME.$pid
+jobid="${job}.o${reqid}"
+
+model=man
+
+export output=output.$job.$NAME.$pid
+export comout envir jlogfile jobid model pcom job  
+
+
+
+# _______________________________________________________________________
+#   start the script $MEMBER
+# _______________________________________________________________________
+
+ $USHutil/$MEMBER >>$DATA/$pgmout 1>>$DATA/$pgmout 2>>$DATA/$pgmout
+cd
+rm -rf  $DATA
+
+exit 

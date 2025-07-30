@@ -1,0 +1,930 @@
+
+
+<html>
+
+<head>
+<title>Medicare.gov - Medicare Fraud Prevention and Detection Tips</title>
+
+<meta name="Description" content="Gives tips on how to detect and prevent Medicare fraud and abuse.">
+<LINK rel="stylesheet" type="text/css" title="PrinterFriendly" href="/Stylesheets/mcgsmallfont.css">
+</head>
+
+<body bgcolor="#FFFFFF" link="#660000" vlink="#660000">
+
+
+<div style="position: absolute; left: -1000em; width: 20em"><a href="#d" title="Skip Navigation">Skip Navigation</a></div>
+
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="/Library/incCookies.js"></SCRIPT>
+
+
+<!--Top of the page anchor.  Please keep them inside <P> tag. -->
+<!--This style is meant to make the element virtually disappear -->
+<p style="MARGIN: 0; COLOR: white; LINE-HEIGHT: 0; FONT-SIZE: 1pt; FONT-WEIGHT: normal;">
+	<a name="Top"></a>
+</p>
+
+
+
+<script type="text/javascript" LANGUAGE="JavaScript">
+
+function navigateTo(sLink, bprint){
+	document.frmNavigate.action = sLink;
+	if (bprint == true) document.frmNavigate.PrinterFriendly.value = 'True';
+	else document.frmNavigate.PrinterFriendly.value = 'False';
+	document.frmNavigate.submit();
+	}
+	
+/* This is a generic select all function, that is called onclick for a select all button
+   for a set of check boxes.  You must pass the function references to the check box 
+   item and the name of the submit button */
+function selectAllOnClick(chkCheckBoxRef, btnSubmitRef)
+{
+	// if there is more than 1 check box, loop through them, selecting each one
+	if (chkCheckBoxRef.length)
+	 {
+		for (i=0; i < chkCheckBoxRef.length; i++)
+		{
+			chkCheckBoxRef[i].checked = true;
+		}
+	}
+	else 
+	{
+		chkCheckBoxRef.checked = true;
+	}
+    
+    btnSubmitRef.click();
+}
+
+</script>
+
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript">
+
+function WriteJavaScriptDetectionCookie (){
+	/*This function uses JavaScript to write a cookie*/
+	/*The existence of this cookie implies that JavaScript is on */
+	/*The absence of this cookie implies that either JavaScript is off or cookies are off*/
+	/*Cookies exist for an entire session*/
+	/*If you have JS on and turn it off, the cookie will remain and it will appear like JS is on */
+	/*If you have JS off and turn it on, everything will work fine*/
+	var sCookieValueBefore;
+	var sCookieValueAfter;
+	sCookieValueBefore = getCookie("JavaScriptOn");
+	/*document.write ("CookieValueBefore : |" + sCookieValueBefore+ "|");*/
+	 /*Check for a missing Javascript cookie.  This should only happen on first page */
+	if (sCookieValueBefore == null) {
+		/*document.write ("No JS Cookie Found..writing cookie");*/
+		setCookie("JavaScriptOn", "TRUE");
+		sCookieValueAfter = getCookie("JavaScriptOn");
+		/*Are cookies enabled?.  If the cookie has not changed, then cookies are disabled*/
+		if (sCookieValueBefore != sCookieValueAfter) {
+			window.location.reload(); /*This line causes problems when Javascript is on but cookies are off*/			
+		}
+	}
+	
+	return true;
+}
+
+WriteJavaScriptDetectionCookie();
+
+</SCRIPT>
+
+<script type="text/javascript" LANGUAGE="JavaScript">
+
+function addHiddenParamToForm(frmTo, sName, sValue) {
+	/*This function is used to add/modify a hidden parameter client-side to a form*/
+	/*It can be used to persist a parameter client-side into a form such as frmNavigate or frmTabs*/
+	
+	var objTempNode;
+	var objThisElement;
+	var bFound;
+	var i;
+	
+	bFound = false;
+		
+	if(frmTo) {
+		for (i=0; i < frmTo.elements.length; i++) {
+			objThisElement = frmTo.elements[i];
+			if (objThisElement.name == sName) {
+				objThisElement.value = sValue;		
+				bFound = true;				
+				break;
+			}		
+				
+		}//for loop
+	
+		if (!(bFound)) {
+			objTempNode = document.createElement("input");
+			objTempNode.setAttribute("type","hidden");
+			objTempNode.setAttribute("name", sName);
+			objTempNode.setAttribute("value", sValue);
+			frmTo.appendChild(objTempNode);			
+		} //if !(bfound)
+	} //if frmTo
+}
+
+</script>
+
+<script type="text/javascript" language="JavaScript" >
+<!--
+function mmLoadMenus() {
+  if (window.mm_menu_0513141417_0) return;
+	//Help menu - English
+	window.mm_menu_0513141417_0 = new Menu("root",150,20,null,12,"#ffffff","#014478","#014478","#ffffff","left","middle",3,0,500,-5,7,true,true,true,0,true,true);
+	mm_menu_0513141417_0.addMenuItem("Overview","location='/Help/Overview.asp'");
+	mm_menu_0513141417_0.addMenuItem("Site&nbsp;Viewing&nbsp;Tips","location='/Help/SiteHelp.asp'");
+	mm_menu_0513141417_0.addMenuItem("Search&nbsp;Help","location='/SearchTools/SearchTips.asp'");
+	mm_menu_0513141417_0.addMenuItem("Comments","location='/comments.asp?refer=http://www.medicare.gov/fraudabuse/tips.asp'");
+	mm_menu_0513141417_0.addMenuItem("Awards","location='/FAQs/WebsiteAwards.asp'");
+	mm_menu_0513141417_0.addMenuItem("Website&nbsp;Accessibility","location='http://www.cms.hhs.gov/AboutWebsite/03_Policiesforaccessibility.asp'");
+	mm_menu_0513141417_0.addMenuItem("Website&nbsp;Privacy","location='http://www.cms.hhs.gov/AboutWebsite/02_Privacy%20Policy.asp'");
+	mm_menu_0513141417_0.hideOnMouseOut=true;
+	mm_menu_0513141417_0.menuBorder=1;
+	mm_menu_0513141417_0.menuLiteBgColor='#ffffff';
+	mm_menu_0513141417_0.menuBorderBgColor='#666666';
+	mm_menu_0513141417_0.bgColor='#333333';
+    //Help menu - Spanish
+	window.mm_menu_span_help = new Menu("root",230,20,null,12,"#ffffff","#014478","#014478","#ffffff","left","middle",3,0,500,-5,7,true,true,true,0,true,true);
+	mm_menu_span_help.addMenuItem("Descripción","location='/Help/Overview.asp'");
+	mm_menu_span_help.addMenuItem("Consejos&nbsp;sobre&nbsp;el&nbsp;sitio&nbsp;web","location='/Help/SiteHelp.asp'");
+	mm_menu_span_help.addMenuItem("Consejos&nbsp;para&nbsp;la&nbsp;búsqueda","location='/SearchTools/SearchTips.asp'");
+	mm_menu_span_help.addMenuItem("Comentarios","location='/comments.asp?refer=http://www.medicare.gov/fraudabuse/tips.asp'");
+	mm_menu_span_help.addMenuItem("Menciones","location='/FAQs/WebsiteAwards.asp'");
+	mm_menu_span_help.addMenuItem("Accesibilidad&nbsp;del&nbsp;sitio&nbsp;de&nbsp;internet","location='http://cms.hhs.gov/AboutWebsite/03_Policiesforaccessibility.asp'");
+	mm_menu_span_help.addMenuItem("Privacidad&nbsp;del&nbsp;sitio&nbsp;de&nbsp;internet","location='http://cms.hhs.gov/AboutWebsite/02_Privacy%20Policy.asp'");
+	mm_menu_span_help.hideOnMouseOut=true;
+	mm_menu_span_help.menuBorder=1;
+	mm_menu_span_help.menuLiteBgColor='#ffffff';
+	mm_menu_span_help.menuBorderBgColor='#666666';
+	mm_menu_span_help.bgColor='#333333';
+    //Medicare Enrollment menu - English
+	window.mm_menu_0506103234_0 = new Menu("root",180,20,"Verdana, Arial, Helvetica, sans-serif",12,"#660000","#ffffff","#ffffcc","#014478","left","middle",3,0,500,-5,7,true,true,true,0,true,true);
+	mm_menu_0506103234_0.addMenuItem("Overview","location='/Basics/Overview.asp'");
+	mm_menu_0506103234_0.addMenuItem("Eligibilty","location='/Basics/Eligibility.asp'");
+	mm_menu_0506103234_0.addMenuItem("Enrollment","location='/Basics/HowToEnroll.asp'");
+	mm_menu_0506103234_0.addMenuItem("Initial&nbsp;Enrollment&nbsp;Package","location='/Basics/EnrollmentPackage.asp'");
+	mm_menu_0506103234_0.addMenuItem("Medicare&nbsp;Card","location='/Basics/ymc.asp'");
+	mm_menu_0506103234_0.hideOnMouseOut=true;
+	mm_menu_0506103234_0.menuBorder=1;
+	mm_menu_0506103234_0.menuLiteBgColor='#ffffff';
+	mm_menu_0506103234_0.menuBorderBgColor='#555555';
+	mm_menu_0506103234_0.bgColor='#333333';
+	//Medicare Billing menu - English
+	window.mm_menu_0506103800_1 = new Menu("root",170,20,"Verdana, Arial, Helvetica, sans-serif",12,"#660000","#ffffff","#ffffcc","#014478","left","middle",3,0,500,-5,7,true,true,true,0,true,true);
+	mm_menu_0506103800_1.addMenuItem("Overview","location='/Basics/ClaimsOverview.asp'");
+	mm_menu_0506103800_1.addMenuItem("File&nbsp;a&nbsp;Claim","location='/Basics/FAC.asp'");
+	mm_menu_0506103800_1.addMenuItem("Claims&nbsp;Forms","location='http://cms.hhs.gov/ElectronicBillingEDITrans/'");
+	mm_menu_0506103800_1.addMenuItem("Summary&nbsp;Notice","location='/Basics/SummaryNotice.asp'");
+	mm_menu_0506103800_1.addMenuItem("Fraud","location='/FraudAbuse/Overview.asp'");
+	mm_menu_0506103800_1.hideOnMouseOut=true;
+	mm_menu_0506103800_1.menuBorder=1;
+	mm_menu_0506103800_1.menuLiteBgColor='#ffffff';
+	mm_menu_0506103800_1.menuBorderBgColor='#555555';
+	mm_menu_0506103800_1.bgColor='#333333';
+	//Medicare Appeals menu - English
+	window.mm_menu_01302004_1 = new Menu("root",175,20,"Verdana, Arial, Helvetica, sans-serif",12,"#660000","#ffffff","#ffffcc","#014478","left","middle",3,0,500,-5,7,true,true,true,0,true,true);
+	mm_menu_01302004_1.addMenuItem("Overview","location='/Basics/appealsoverview.asp'");
+	mm_menu_01302004_1.addMenuItem("Appeals&nbsp;and&nbsp;Grievances","location='/publications/pubs/nonpdf/appeals.asp'");
+	mm_menu_01302004_1.addMenuItem("Appeals&nbsp;Forms","location='/Basics/forms/default.asp'");
+	mm_menu_01302004_1.addMenuItem("Appeals&nbsp;of&nbsp;LCDs","location='/coverage/static/appeals.asp'");
+	mm_menu_01302004_1.hideOnMouseOut=true;
+	mm_menu_01302004_1.menuBorder=1;
+	mm_menu_01302004_1.menuLiteBgColor='#ffffff';
+	mm_menu_01302004_1.menuBorderBgColor='#555555';
+	mm_menu_01302004_1.bgColor='#333333';
+	//Long Term Care menu - English
+	window.mm_menu_0506104224_2 = new Menu("root",175,18,"Verdana, Arial, Helvetica, sans-serif",12,"#660000","#ffffff","#ffffcc","#014478","left","middle",3,0,500,-5,7,true,true,true,0,true,true);
+		window.mm_menu_0506104224_2 = new Menu("root",245,18,"Verdana, Arial, Helvetica, sans-serif",12,"#660000","#ffffff","#ffffcc","#014478","left","middle",3,0,500,-5,7,true,true,true,0,true,true);
+	mm_menu_0506104224_2.addMenuItem("Long-Term Care Planning Tool", "location='/LTCPlanning/Home.asp'");
+	mm_menu_0506104224_2.addMenuItem("What is Long-Term Care?","location='/LongTermCare/Static/Home.asp'");
+	mm_menu_0506104224_2.addMenuItem("Steps to Choosing Long-Term Care","location='/LongTermCare/Static/StepsOverview.asp'");
+	mm_menu_0506104224_2.addMenuItem("Types of Long-Term Care","location='/LongTermCare/Static/TypesOverview.asp'");
+	mm_menu_0506104224_2.addMenuItem("Paying for Long-Term Care","location='/LongTermCare/Static/Medicare.asp'");
+	mm_menu_0506104224_2.addMenuItem("Resources","location='/LongTermCare/Static/Counseling.asp'");
+	mm_menu_0506104224_2.hideOnMouseOut=true;
+	mm_menu_0506104224_2.menuBorder=1;
+	mm_menu_0506104224_2.menuLiteBgColor='#ffffff';
+	mm_menu_0506104224_2.menuBorderBgColor='#555555';
+	mm_menu_0506104224_2.bgColor='#333333';
+	//Plan Choices menu - English
+	window.mm_menu_0506110521_3 = new Menu("root",300,18,"Verdana, Arial, Helvetica, sans-serif",12,"#660000","#ffffff","#ffffcc","#014478","left","middle",3,0,500,-5,7,true,true,true,0,true,true);
+	mm_menu_0506110521_3.addMenuItem("Overview","location='/Choices/Overview.asp'");
+	mm_menu_0506110521_3.addMenuItem("Medicare Advantage Plans","location='/Choices/Advantage.asp'");
+	mm_menu_0506110521_3.addMenuItem("Medigap (Supplemental Insurance) Policies","location='/medigap/default.asp'");
+	mm_menu_0506110521_3.addMenuItem("Medicare Prescription Drug Plans","location='/Choices/PDP.asp'");
+	mm_menu_0506110521_3.addMenuItem("Employer&nbsp;or Union Coverage","location='/Choices/Employer.asp'");
+	mm_menu_0506110521_3.addMenuItem("PACE","location='/Nursing/Alternatives/Pace.asp'");
+	mm_menu_0506110521_3.hideOnMouseOut=true;
+	mm_menu_0506110521_3.menuBorder=1;
+	mm_menu_0506110521_3.menuLiteBgColor='#ffffff';
+	mm_menu_0506110521_3.menuBorderBgColor='#555555';
+	mm_menu_0506110521_3.bgColor='#333333';
+	//Stay Healthy menu - English
+	window.mm_menu_0506131400_4 = new Menu("root",320,18,"Verdana, Arial, Helvetica, sans-serif",12,"#660000","#ffffff","#ffffcc","#014478","left","middle",3,0,500,-5,7,true,true,true,0,true,true);
+	mm_menu_0506131400_4.addMenuItem("Overview","location='/Health/Overview.asp'");
+	mm_menu_0506131400_4.addMenuItem("Physical&nbsp;Exam","location='/Health/physicalexam.asp'");
+	mm_menu_0506131400_4.addMenuItem("Cardiovascular&nbsp;Screening","location='/Health/cardio.asp'");
+	mm_menu_0506131400_4.addMenuItem("Cancer","location='/Health/cancer.asp'");
+	mm_menu_0506131400_4.addMenuItem("Shots","location='/Health/shots.asp'");
+	mm_menu_0506131400_4.addMenuItem("Bone&nbsp;Mass&nbsp;Measurements","location='/Health/osteoporosis.asp'");
+	mm_menu_0506131400_4.addMenuItem("Diabetes","location='/Health/Diabetes.asp'");
+	mm_menu_0506131400_4.addMenuItem("Glaucoma","location='/Health/glaucoma.asp'");
+	mm_menu_0506131400_4.addMenuItem("Medical Nutrition Therapy","location='/Health/nutritiontherapy.asp'");
+	mm_menu_0506131400_4.addMenuItem("Abdominal&nbsp;Aortic&nbsp;Aneurysm","location='/Health/AAA.asp'");
+	mm_menu_0506131400_4.addMenuItem("Other&nbsp;Health&nbsp;Information","location='/Health/otherhealth.asp'");
+	mm_menu_0506131400_4.hideOnMouseOut=true;
+	mm_menu_0506131400_4.menuBorder=1;
+	mm_menu_0506131400_4.menuLiteBgColor='#ffffff';
+	mm_menu_0506131400_4.menuBorderBgColor='#555555';
+	mm_menu_0506131400_4.bgColor='#333333';
+	//Search Tools menu - English
+	window.mm_menu_0506132152_5 = new Menu("root",335,18,"Verdana, Arial, Helvetica, sans-serif",12,"#660000","#ffffff","#ffffcc","#014478","left","middle",3,0,500,-5,7,true,true,true,0,true,true);
+	mm_menu_0506132152_5.addMenuItem("Compare&nbsp;Medicare&nbsp;Prescription&nbsp;Drug&nbsp;Plans","location='/MPDPF/Public/Include/DataSection/Questions/MPDPFIntro.asp'");
+	mm_menu_0506132152_5.addMenuItem("Compare&nbsp;Dialysis&nbsp;Facilities&nbsp;in&nbsp;Your&nbsp;Area","location='/Dialysis/Home.asp'");
+	mm_menu_0506132152_5.addMenuItem("Find&nbsp;Helpful&nbsp;Phone&nbsp;Numbers&nbsp;and&nbsp;Websites","location='/Contacts/Home.asp'");
+	mm_menu_0506132152_5.addMenuItem("Compare&nbsp;Home&nbsp;Health&nbsp;Agencies&nbsp;in&nbsp;Your&nbsp;Area","location='/HHCompare/Home.asp'");	
+	mm_menu_0506132152_5.addMenuItem("Compare&nbsp;Hospitals&nbsp;in&nbsp;Your&nbsp;Area", "location='http://www.hospitalcompare.hhs.gov'");
+	mm_menu_0506132152_5.addMenuItem("Plan&nbsp;for&nbsp;Your&nbsp;Long-Term&nbsp;Care&nbsp;Needs", "location='/LTCPlanning/Home.asp'");
+	mm_menu_0506132152_5.addMenuItem("Find&nbsp;Out&nbsp;Your&nbsp;Medicare&nbsp;Eligibility", "location='/MedicareEligibility/Home.asp'");
+	mm_menu_0506132152_5.addMenuItem("Compare&nbsp;Health&nbsp;Plan&nbsp;Options&nbsp;in&nbsp;Your&nbsp;Area","location='/MPPF/home.asp'");
+	mm_menu_0506132152_5.addMenuItem("Compare&nbsp;Nursing&nbsp;Homes&nbsp;in&nbsp;Your&nbsp;Area","location='/NHCompare/home.asp'");
+	mm_menu_0506132152_5.addMenuItem("Find&nbsp;a&nbsp;Doctor&nbsp;or&nbsp;Other&nbsp;Healthcare&nbsp;Professional","location='/Physician/Home.asp'");
+	//mm_menu_0506132152_5.addMenuItem("Your&nbsp;Medicare&nbsp;Prescription&nbsp;Coverage&nbsp;Options","location='/AssistancePrograms/Home.asp'");
+	mm_menu_0506132152_5.addMenuItem("Find&nbsp;a&nbsp;Medicare&nbsp;Publication","location='/Publications/home.asp'");
+	mm_menu_0506132152_5.addMenuItem("Find&nbsp;Suppliers&nbsp;of&nbsp;Medical&nbsp;Equipment&nbsp;in&nbsp;Your&nbsp;Area","location='/Supplier/Home.asp'");
+	mm_menu_0506132152_5.addMenuItem("Find&nbsp;Out&nbsp;What&nbsp;Medicare&nbsp;Covers","location='/Coverage/Home.asp'");
+//	mm_menu_0506132152_5.addMenuItem("Assistance&nbsp;Programs","location='/AssistancePrograms/Home.asp'");
+//	mm_menu_0506132152_5.addMenuItem("Medicare&nbsp;Health&nbsp;Plan&nbsp;Compare","location='/MPHCompare/Home.asp'");
+//	mm_menu_0506132152_5.addMenuItem("Medigap&nbsp;Compare","location='/MGCompare/Home.asp'");
+	mm_menu_0506132152_5.hideOnMouseOut=true;
+	mm_menu_0506132152_5.menuBorder=1;
+	mm_menu_0506132152_5.menuLiteBgColor='#ffffff';
+	mm_menu_0506132152_5.menuBorderBgColor='#555555';
+	mm_menu_0506132152_5.bgColor='#333333';
+	//Ombudsman menu - English
+	window.mm_menu_0506132152_6 = new Menu("root",435,18,"Verdana, Arial, Helvetica, sans-serif",12,"#660000","#ffffff","#ffffcc","#014478","left","middle",3,0,500,-5,7,true,true,true,0,true,true);
+	mm_menu_0506132152_6.addMenuItem("Inquiries&nbsp;and&nbsp;Complaints","location='/Ombudsman/resources.asp'");	
+	mm_menu_0506132152_6.addMenuItem("Activities&nbsp;of&nbsp;the&nbsp;Ombudsman","location='/Ombudsman/activities.asp'");
+	mm_menu_0506132152_6.addMenuItem("What&nbsp;People&nbsp;with&nbsp;Medicare&nbsp;Need&nbsp;to&nbsp;Know", "location='/Ombudsman/omoneedtoknow.asp'");
+	//mm_menu_0506132152_6.addMenuItem("About&nbsp;Your&nbsp;Ombudsman","location='/Ombudsman/generalinfo.asp'");
+	//  mm_menu_0506132152_6.addMenuItem("Other&nbsp;Helpful&nbsp;Resources", "location='/Ombudsman/other.asp'");
+	//mm_menu_0506132152_6.addMenuItem("Frequently&nbsp;Asked&nbsp;Questions", "location='/Ombudsman/faqs.asp'"); 
+	mm_menu_0506132152_6.hideOnMouseOut=true;
+	mm_menu_0506132152_6.menuBorder=1;
+	mm_menu_0506132152_6.menuLiteBgColor='#ffffff';
+	mm_menu_0506132152_6.menuBorderBgColor='#555555';
+	mm_menu_0506132152_6.bgColor='#333333';
+	//Personal Health Records menu - English
+	window.mm_menu_0506132152_7 = new Menu("root",285,18,"Verdana, Arial, Helvetica, sans-serif",12,"#660000","#ffffff","#ffffcc","#014478","left","middle",3,0,500,-5,7,true,true,true,0,true,true);
+	mm_menu_0506132152_7.addMenuItem("Home","location='/PHR/Default.asp'");	
+	mm_menu_0506132152_7.addMenuItem("Learn More About PHR's","location='/PHR/LearnMoreAboutPHR.asp'");
+	mm_menu_0506132152_7.addMenuItem("Medicare PHR Choice", "location='/PHR/PHRChoice.asp'");
+	mm_menu_0506132152_7.addMenuItem("MyPHRSC", "location='/PHR/MyPHRSC.asp'");
+	mm_menu_0506132152_7.addMenuItem("Medicare Advantage Plan PHRs", "location='/PHR/MedicareAdvantagePlanPHRs.asp'");
+	//mm_menu_0506132152_7.addMenuItem("Caregivers&nbsp;and&nbsp;PHRs", "location='/PHR/CaregiversandPHR.asp'");
+	//mm_menu_0506132152_7.addMenuItem("Resources&nbsp;for&nbsp;PHRs", "location='/PHR/Resources.asp'");
+	mm_menu_0506132152_7.hideOnMouseOut=true;
+	mm_menu_0506132152_7.menuBorder=1;
+	mm_menu_0506132152_7.menuLiteBgColor='#ffffff';
+	mm_menu_0506132152_7.menuBorderBgColor='#555555';
+	mm_menu_0506132152_7.bgColor='#333333';
+
+    
+    mm_menu_0506132152_7.writeMenus(); //this line is needed so all menus get written to the browser
+    
+//    mm_menu_0506132152_5.writeMenus(); //this line is needed so all menus get written to the browser
+    
+} // mmLoadMenus()
+
+//-->
+</script>
+  
+<script type="text/JavaScript" language="JavaScript1.2" src="/library/javascript/menu.js"></script>
+
+
+	<script type="text/JavaScript" language="JavaScript1.2">mmLoadMenus();</script>
+<!-- MCGPageCount: 0 -->	
+					
+				<!-- d link for visually impaired users -->
+				<!--This style is meant to make the element virtually disappear -->
+				<!-- <p style="MARGIN: 0; COLOR: white; LINE-HEIGHT: 0; FONT-SIZE: 1pt; FONT-WEIGHT: normal;">-->
+					<!--This style is meant to make the element virtually disappear -->
+					<!-- <a style="MARGIN: 0; COLOR: white; LINE-HEIGHT: 0; FONT-SIZE: 1pt; FONT-WEIGHT: normal;" href="#d">d</a>-->
+				<!-- </p>-->
+				
+				 
+						<table border="0" width="100%" cellspacing="0" cellpadding="0">
+						<tr>
+						<td>
+						<!--Start Top toolbar -->
+							
+	<table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#FFFFFF">
+		<tr>
+			<td colspan="3">
+				
+				<table border="0" cellpadding="0" cellspacing="0" width="100%">
+					<tr>
+						<td align="left" style="background-image: url('/images/hhs_back_new.gif')"><a href="http://www.hhs.gov"><img alt="Link to HHS" border="0" src="/images/hhs_left_new.gif" WIDTH="201" HEIGHT="41"></a>
+						</td>
+				
+						<td align="right" style="background-image: url('/images/hhs_back_new.gif')"><a href="http://www.hhs.gov"><img alt="Link to HHS" border="0" src="/images/hhs_right_new.gif" WIDTH="587" HEIGHT="41"></a>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td class="TopToolBar" width="100%" height="25" align="left" colspan="3" valign="bottom">
+				<table border="0" style="color:#FFFFFF; font-size:13px; border-bottom:2px solid; background-color: #014478; border-color: #9DCEF9;" cellpadding="2" cellspacing="0" width="100%">
+					<tr>
+						<td width="98%" style="font-size:13px;">
+							&nbsp;
+							<a class="TopToolBar" href="/default.asp" title='Home'>Home</a>&nbsp;|&nbsp;
+
+								<a class="TopToolBar" title="FAQ" href="http://questions.medicare.gov/cgi-bin/medicare.cfg/php/enduser/std_alp.php">FAQs</a>&nbsp;|&nbsp;
+							<a class="TopToolBar" href="/default.asp?ScreenReaderOn=True" title='Toggle Screen Reader' rel="nofollow">Screen Reader Version</a>&nbsp;|&nbsp;
+<a class="TopToolBar" href="/Spanish/Overview.asp" title='Español'>Español</a>
+
+								&nbsp;|&nbsp;
+								<a class="TopToolBar" title="Mailing List" href="http://service.govdelivery.com/service/multi_subscribe.html?code=USCMS&amp;custom_id=565">Mailing List</a>
+						</td>
+						<td align="right" valign="bottom" nowrap width="2%">
+							<!-- <form name="gs" method="get" action="http://search.medicare.gov/search" style="margin-bottom: 0px;"> -->
+							<form name="gs" method="get" action="http://search.cms.hhs.gov/search" style="margin-bottom: 0px;">
+								
+								<label for="q">
+								<input type="text" name="q" id="q" accesskey="j" tabindex="0" size="25" maxlength="75" value="Search Medicare.gov" onClick="document.getElementById('q').value='';" style="font-size:10pt !important;">
+								&nbsp;								
+								</label>
+								
+								<input type="hidden" name="client" value="medicare_frontend">
+								 <input type="hidden" name="proxystylesheet" value="medicare_frontend"> 
+								<input type="hidden" name="output" value="xml_no_dtd">
+								<input type="hidden" name="numgm" value="5"> 
+								<input type="hidden" name="site" value="medicare_collection"> 
+								
+												
+								
+								<input type="image" style="vertical-align:bottom" name="sa" id="sa" tabindex="1" title="Search" alt="Search Button" src="/images/go_english.gif">
+								&nbsp;
+									
+												
+							</form>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<table border="0" cellpadding="0" style="border-bottom:0;background-color:#014478" cellspacing="0" width="100%">
+					<tr>
+						
+							<td valign="top" width="20%">
+							<a class="" href="/default.asp"><img src="/images/banner_flag.gif" WIDTH="419" HEIGHT="50" border="0" alt="Medicare.gov site Flag Logo"></a>
+
+							</td>
+						
+						
+						<td width="100%" height="100%" align="left" class="TopToolBar" valign="bottom" colspan="2" style="font-size:13px;">
+							<div style="font-family:verdana;font-size:13px;"><strong>&nbsp;&nbsp;&nbsp;&nbsp;The Official U.S. Government Site for People with Medicare</strong></div>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+					
+		</table>
+
+						<!-- End Top Toolbar -->
+							
+						<!-- Start Top Search Toolbar -->
+
+						<!-- End Top Search Toolbar -->
+
+
+						<!-- Start table containing left toolbar, content -->
+						<table width="100%" cellpadding="10" cellspacing="0" border="0" bgcolor="#FFFFCC">
+						<colgroup span="3"></colgroup>
+							<tr>
+							<!-- Left Toolbar Column -->
+								<td class="LeftToolBar" width="192" height="100%" bgcolor="#FFFFCC" valign="top" style="border-right: 1px solid #660000"> 
+								<p></p>
+												
+
+<script type="text/javascript" language="javascript" src="/Library/JavaScript/MyMedicareLogin.js"></script>
+		<table cellpadding="10" cellspacing="0" border="0">
+				
+<!-- Replacing with MET -->				
+<!--<tr>					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r4_c1').style.color='white';" onMouseOut="document.getElementById('nextGen_LHTB_r4_c1').style.color='#660000';this.bgColor='#FFFFCC';" nowrap>						<p align="right"><a name="nextGen_LHTB_r4_c1" id="nextGen_LHTB_r4_c1" href="/Basics/Overview.asp" style="color: #660000; text-decoration: none;" class="LeftToolBar" title="Medicare Enrollment">Medicare Enrollment</a></p>					</td>				</tr>-->
+			
+<!--  <tr>					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r4_c1').style.color='white';MM_showMenu(window.mm_menu_0506103234_0,202,0,null,'nextGen_LHTB_r4_c1');" onMouseOut="document.getElementById('nextGen_LHTB_r4_c1').style.color='#660000';this.bgColor='#FFFFCC';MM_startTimeout();" nowrap>																			<p align="right"><a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r4_c1" id="nextGen_LHTB_r4_c1" href="/Basics/Overview.asp">Medicare Enrollment&nbsp;												</a></p>						</td>				</tr>-->
+
+
+				<tr>
+					<td nowrap>
+						<table border="0" cellspacing="0" cellpadding="0" width="100%">
+							<tr>
+								<td colspan="1" align="center">
+									<table border="0" cellspacing="0" cellpadding="0" width="100%">
+										<tr>
+											<td align="left" style="background:#064473" >
+											  <img src="/images/MM_Lcurve.gif" width="18" height="28" alt="">
+											</td>	
+											
+											
+											<!-- use help file in Siebel -->										
+											<td width="*" style="background:#064473" align="center" valign="middle">
+												<div style="color:#FFFFFF; font-family:verdana; font-weight:bold;font-size:.75em">
+													<strong>MyMedicare.gov &nbsp;</strong>									    
+													
+														<a target="MBPSECURITYHELP" title="Opens in new window - Click this padlock image to see more information about MyMedicare.gov security."  href="https://myportal.medicare.gov/eservice_enu/help/CMS-MBP_Security.html">
+														<img style="border: medium none ;" src="/images/MBP/CMS-MBP_padlock.jpg" alt="Opens in a new window - Click this padlock image to see more information about MyMedicare.gov security" height="14" width="10">
+														</a>
+													
+												</div>
+											</td>	
+											
+								            	
+											<td align="right" style="background:#064473" >
+											  <img src="/images/MM_Rcurve.gif" width="18" height="28" alt=""> 
+											</td>											
+										</tr>	
+										<tr>
+										    <td colspan="3" width="*" style="background:#064473" align="center" height="25" valign="top">
+												<div style="color:#FFFFFF; font-family:verdana; font-weight:bold;font-size:.67em">
+													Secure Sign In
+												</div>
+										    </td>
+										</tr>																			
+										<tr>
+										  <td colspan="3" width="*" style="background:#064473" align="center">
+										    <div style="color:#9aa0f1; font:italic bold .60em verdana">										     
+										     This is an optional and free service
+										    </div>
+										  </td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="1" align="center">
+									
+									
+										<FORM METHOD="POST" ACTION="https://myportal.medicare.gov/eservice_enu/start.swe" NAME="frmEnter" id="frmEnter" TARGET="_top" style="margin: 0">
+									
+							        	<table border="0" cellspacing="0" cellpadding="3" width="100%">
+										<tr>
+											<td style="background:#DEEAF6" nowrap>
+												<input type="hidden" name="SWECmd" value="ExecuteLogin">
+												<div style="font-weight:bold;font-size:.75em;">
+												<label for="SWEUserName" accesskey="S" title="Press Alt + S to access the Sign In ID textbox">
+												<span style="text-decoration: underline">S</span>ign In ID:
+												</label>
+												</div>
+											</td>
+											<td style="background:#DEEAF6">
+												<input type="text" name="SWEUserName" id="SWEUserName" size="12" MAXLENGTH="12" tabindex="2">
+											</td>
+										</tr>
+										<tr>
+											<td style="background:#DEEAF6" nowrap>
+												<div style="font-weight:bold;font-size:.75em;">
+												<label for="SWEPassword" accesskey="P" title="Press Alt + P to access the Password textbox">
+												<span style="text-decoration: underline">P</span>assword:
+												</label>
+												</div>
+											</td>
+											<td style="background:#DEEAF6">
+												<input type="password" name="SWEPassword" id="SWEPassword"  size="12" MAXLENGTH="16" tabindex="3">
+											</td>
+										</tr>
+										<tr>
+											<td colspan="2" align="right" style="background:#DEEAF6">
+												
+													<label for='SignIn'>
+													<input type='submit' value='Sign In' id='SignIn' name='SignIn' accesskey='I' title='Click here to sign in' tabindex="4">
+													&nbsp;
+													</label>
+													
+												
+											</td>
+										</tr>
+										<tr>
+											<td colspan="2" align='center' style="background:#DEEAF6">
+											<font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+											
+												<a href="http://mymedicare.gov/" target="_blank" title="Learn More">
+											
+											learn more</a> |
+											
+												<a  href="https://myportal.medicare.gov/eservice_enu/start.swe?SWECmd=InvokeMethod&amp;SWEMethod=FrameEventMethodRegisterNewUser&amp;SWEView=CMS-MBP+Login+View&amp;SWEApplet=Login+Applet" target="_blank" title="Sign up">
+											
+											sign up</a></font>
+											</td>
+										</tr>
+									</table>
+									</form>									
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+	
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r35_c2').style.color='white';" onMouseOut="document.getElementById('nextGen_LHTB_r35_c2').style.color='#660000';this.bgColor='#FFFFCC';" nowrap>
+						<p align="right"><a style="color: #660000; text-decoration:none;" class="LeftToolBar" name="nextGen_LHTB_r35_c2" id="nextGen_LHTB_r35_c2" href="/pdphome.asp" title="Prescription Drug Plan">Prescription Drug Plan</a> </p>
+					</td>
+				</tr>
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r38_c2').style.color='white';" onMouseOut="document.getElementById('nextGen_LHTB_r38_c2').style.color='#660000';this.bgColor='#FFFFCC';" nowrap>
+						<p align="right"><span class="smallred">NEW!</span>&nbsp;<a style="color: #660000; text-decoration:none;" class="LeftToolBar" name="nextGen_LHTB_r38_c2" id="nextGen_LHTB_r38_c2" href="/Library/PDFNavigation/PDFInterim.asp?Language=English&amp;Type=Pub&amp;PubID=10050" title="Medicare &amp; You 2009">Medicare &amp; You 2009</a></p>
+					</td>
+				</tr>
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r48_c2').style.color='white';" onMouseOut="document.getElementById('nextGen_LHTB_r48_c2').style.color='#660000';this.bgColor='#FFFFCC';" nowrap>
+						<p align="right"><a style="color: #660000; text-decoration:none;" class="LeftToolBar" name="nextGen_LHTB_r48_c2" id="nextGen_LHTB_r48_c2" href="/MedicareEligibility/home.asp" title="Am I Eligible">Am I Eligible?</a></p>
+					</td>
+				</tr>
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r8_c1').style.color='white';MM_showMenu(window.mm_menu_0506103800_1,148,0,null,'nextGen_LHTB_r8_c1');" onMouseOut="document.getElementById('nextGen_LHTB_r8_c1').style.color='#660000';this.bgColor='#FFFFCC';MM_startTimeout();" nowrap>
+						
+							<p align="right"><a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r8_c1" id="nextGen_LHTB_r8_c1" href="/Basics/ClaimsOverview.asp">Medicare Billing&nbsp;
+						
+						</a></p>
+					</td>
+				</tr>
+	<!--Appeals Menu -->			
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r30_c1').style.color='white';MM_showMenu(window.mm_menu_01302004_1,162,0,null,'nextGen_LHTB_r30_c1');" onMouseOut="document.getElementById('nextGen_LHTB_r30_c1').style.color='#660000';this.bgColor='#FFFFCC';MM_startTimeout();" nowrap>
+						
+							<p align="right"><a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r30_c1" id="nextGen_LHTB_r30_c1" href="/Basics/appealsoverview.asp">Medicare Appeals&nbsp;
+						
+						</a></p>
+					</td>
+				</tr>
+				
+		<!--Longterm Care Menu -->							
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r12_c1').style.color='white';MM_showMenu(window.mm_menu_0506104224_2,148,0,null,'nextGen_LHTB_r12_c1');" onMouseOut="document.getElementById('nextGen_LHTB_r12_c1').style.color='#660000';this.bgColor='#FFFFCC';MM_startTimeout();" nowrap>
+						
+							<p align="right">
+<a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r12_c1" id="nextGen_LHTB_r12_c1" href="/LongTermCare/Static/Home.asp">Long-Term Care&nbsp;
+
+						</a></p>
+					</td>
+				</tr>
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r14_c1').style.color='white';MM_showMenu(window.mm_menu_0506110521_3,126,0,null,'nextGen_LHTB_r14_c1');" onMouseOut="document.getElementById('nextGen_LHTB_r14_c1').style.color='#660000';this.bgColor='#FFFFCC';MM_startTimeout();" nowrap>
+						<p align="right">							<a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r14_c1" id="nextGen_LHTB_r14_c1" href="/Choices/Overview.asp">Plan Choices&nbsp;
+
+						</a></p>
+					</td>
+				</tr>
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r16_c1').style.color='white';MM_showMenu(window.mm_menu_0506131400_4,128,-100,null,'nextGen_LHTB_r16_c1');" onMouseOut="document.getElementById('nextGen_LHTB_r16_c1').style.color='#660000';this.bgColor='#FFFFCC';MM_startTimeout();" nowrap>
+						
+							<p align="right">
+<a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r16_c1" id="nextGen_LHTB_r16_c1" href="/Health/Overview.asp">Preventive Services&nbsp;
+
+						</a></p>
+					</td>
+				</tr>
+
+		<!--PHR Menu -->							
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r16_c2').style.color='white';MM_showMenu(window.mm_menu_0506132152_7,211,0,null,'nextGen_LHTB_r16_c2');" onMouseOut="document.getElementById('nextGen_LHTB_r16_c2').style.color='#660000';this.bgColor='#FFFFCC';MM_startTimeout();" nowrap>
+						
+							<p align="right">
+							<a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r16_c2" id="nextGen_LHTB_r16_c2" href="/PHR/default.asp">Personal Health Records&nbsp;
+						
+						</a></p>
+					</td>
+				</tr>
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r36_c3').style.color='white';" onMouseOut="document.getElementById('nextGen_LHTB_r36_c3').style.color='#660000';this.bgColor='#FFFFCC';" nowrap>
+						<p align="right">
+<a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r36_c3" id="nextGen_LHTB_r36_c3" href="/MedicareEligibility/Home.asp?dest=NAV|Home|GeneralEnrollment|AddressChange#TabTop" title="Address Change">Address Change</a></p>
+					</td>
+				</tr>
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r46_c3').style.color='white';" onMouseOut="document.getElementById('nextGen_LHTB_r46_c3').style.color='#660000';this.bgColor='#FFFFCC';" nowrap>
+						<p align="right">
+<a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r46_c3" id="nextGen_LHTB_r46_c3" href="/MedicareEligibility/Home.asp?dest=NAV|Home|GeneralEnrollment|AboutCard#TabTop" title="Replacement Card">Replacement Card</a></p>
+					</td>
+				</tr>
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r6_c3').style.color='white';" onMouseOut="document.getElementById('nextGen_LHTB_r6_c3').style.color='#660000';this.bgColor='#FFFFCC';" nowrap>
+						<p align="right"><a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r6_c3" id="nextGen_LHTB_r6_c3" href="http://www.cms.hhs.gov/MedicaidGenInfo/" title="Information For Medicaid Beneficiaries and People with Disabilities">Medicaid Enrollment</a></p>
+					</td>
+				</tr>
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r10_c5').style.color='white';" onMouseOut="document.getElementById('nextGen_LHTB_r10_c5').style.color='#660000';this.bgColor='#FFFFCC';" nowrap>
+						<p align="right">
+<a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r10_c5" id="nextGen_LHTB_r10_c5" href="http://www.cms.hhs.gov/" title="Information for Providers and Other Professionals">Provider Information</a></p> 
+					</td>
+				</tr>
+				<tr>
+
+	<!--				<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r40_c2').style.color='white';" onMouseOut="document.getElementById('nextGen_LHTB_r40_c2').style.color='#660000';this.bgColor='#FFFFCC';" nowrap> -->
+
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r40_c2').style.color='white';MM_showMenu(window.mm_menu_0506132152_6,126,0,null,'nextGen_LHTB_r40_c2');" onMouseOut="document.getElementById('nextGen_LHTB_r40_c2').style.color='#660000';this.bgColor='#FFFFCC';MM_startTimeout();" nowrap>  
+					
+						<p align="right">
+<!--- 						<a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r40_c2" id="nextGen_LHTB_r40_c2" href="http://www.cms.hhs.gov/center/ombudsman.asp" title="Ombudsman">Ombudsman Center&nbsp;</a>  --->
+						<a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r40_c2" id="nextGen_LHTB_r40_c2" href="#" title="Ombudsman">Ombudsman&nbsp;</a> 
+						</p>
+					
+					</td>
+				</tr>
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r39_c2').style.color='white';" onMouseOut="document.getElementById('nextGen_LHTB_r39_c2').style.color='#660000';this.bgColor='#FFFFCC';" nowrap>
+						<p align="right">
+<a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r39_c2" id="nextGen_LHTB_r39_c2" href="http://www.cms.hhs.gov/Emergency/01_overview.asp#TopOfPage" title="Emergency">Emergency</a></p>
+					</td>
+				</tr>
+				
+				
+					
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r22_c2').style.color='white';" onMouseOut="document.getElementById('nextGen_LHTB_r22_c2').style.color='#660000';this.bgColor='#FFFFCC';" nowrap>
+						<p align="right">
+<a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r22_c2" id="nextGen_LHTB_r22_c2" href="/Glossary/Search.asp" title="Medicare Glossary Definitions">Glossary</a></p>
+					</td>
+				</tr>			
+
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;" onMouseOver="this.bgColor='#014478'; document.getElementById('nextGen_LHTB_r18_c4').style.color='white';" onMouseOut="document.getElementById('nextGen_LHTB_r18_c4').style.color='#660000';this.bgColor='#FFFFCC';" nowrap>
+						<p align="right">
+<a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r18_c4" id="nextGen_LHTB_r18_c4" href="/privacy.asp" title="Medicare Privacy Practices">Privacy Practices</a></p>
+					</td>
+				</tr>
+			
+					
+				<tr>
+					<td style="BORDER-TOP: #660000 1px solid;BORDER-BOTTOM: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r41_c2').style.color='white';" onMouseOut="document.getElementById('nextGen_LHTB_r41_c2').style.color='#660000';this.bgColor='#FFFFCC';" nowrap>
+						<p align="right">
+<a style="color: #660000; text-decoration: none;" class="LeftToolBar" name="nextGen_LHTB_r41_c2" id="nextGen_LHTB_r41_c2" href="/MedicareOnlineForms/" title="Medicare Online Forms">Medicare Online Forms</a></p>
+					</td>
+				</tr>	
+				
+					<tr>
+					<td style="BORDER-BOTTOM: #660000 1px solid;" onMouseOver="this.bgColor='#014478';document.getElementById('nextGen_LHTB_r20_c1').style.color='white';MM_showMenu(window.mm_menu_0506132152_5,126,-175,null,'nextGen_LHTB_r20_c1');" onMouseOut="document.getElementById('nextGen_LHTB_r20_c1').style.color='#660000';this.bgColor='#FFFFCC';MM_startTimeout();" nowrap>
+						
+
+							<p align="right">
+<a  id="nextGen_LHTB_r20_c1" name="nextGen_LHTB_r20_c1" class="LeftToolBar" href="/default.asp#stool">Search Tools</a>
+
+						</p>
+						 
+					</td>
+				</tr>
+			
+
+				<tr>
+					<td align="center">
+						<br><br>
+						<a href="/Library/ExternalSiteRedirector.asp?Language=English&amp;URLPath=http://www.hhs.gov/"><img src="/Images/HHS.jpg" alt="Link to Department of Health and Human Services Website" border="0" WIDTH="84" HEIGHT="84"></a>
+					</td>
+				</tr>
+
+		</table>				
+				
+				
+
+								</td>
+								<!-- End left toolbar column -->
+								
+								<!-- cell containing Content -->
+								<td valign="top" bgcolor="#FFFFFF" style="border-bottom: 1px solid #660000; border-top:1px solid #660000">
+									
+					
+				<a name="d"></a>			
+									<!-- Customized Content starts here -->
+			
+
+	
+	<!--The following form is used by the javascript navigateto function -->
+	<form Name="frmNavigate" id="frmNavigate" style="margin-bottom:0;margin-top:0;display:none;" method="GET" enctype="application/x-www-form-urlencoded" action="/FraudAbuse/Tips.asp">
+		
+		<input type="hidden"  name='PrinterFriendly' value='False'>
+	</form>
+
+
+<div style="position: absolute; left: -1000em; width: 20em">Start Content</div>
+
+	<!-- Start of customized content -->
+	
+<table width="100%" cellpadding="5">
+<tr >
+<td  width="75%">
+
+		<H1>Medicare Fraud</H1>
+		<H2>Detection and Prevention Tips</H2>
+	
+		<P class="SubTitle">What is Fraud?</P>
+	
+		<P>Medicare fraud is purposely billing Medicare for services that were never provided 
+		or received.</P>
+	
+		<P>Some examples of Medicare fraud include:</P>
+		<UL>
+			<LI>Billling Medicare or another insurer for services or items you never got.<BR><BR></LI>
+			<LI>Billing Medicare for services or equipment which are different from what you got.<BR><BR></LI>
+			<LI>Use of another person’s Medicare card to get medical care, supplies, or equipment.<BR><BR></LI>
+			<LI>Billing Medicare for home medical equipment after it has been returned.<BR><BR></LI>
+		</UL>
+		
+	
+		<P class="SubTitle">Detection Tips</P>
+	
+		<p>You should be suspicious if the provider tells you that:</p>
+		<ul>
+			<li>The test is free; he only needs your Medicare number for his records. NOTE: For 
+			clinical laboratory tests, there is no co-payment and a provider may in good faith 
+			state that the test is free, since there is not cost to the person with Medicare.<BR><BR></li>
+			
+			<li>Medicare wants you to have the item or service.<BR><BR></li>
+			
+			<li>They know how to get Medicare to pay for it.<BR><BR></li>
+			
+			<li>The more tests they provide the cheaper they are.<BR><BR></li>
+			
+			<li>The equipment or service is free; it won't cost you anything.<BR><BR></li>
+		</ul>
+	
+		<p>Be suspicious of providers that:</p>
+		<ul>
+			<li>Charge co-payments on clinical laboratory tests, and on
+			<a href='/Library/PDFNavigation/PDFInterim.asp?Language=English&amp;Type=Pub&amp;PubID=10110' title='Click to view the Medicare covered preventive services publication'>Medicare covered preventive services</a> 
+			such as PAP smears, prostate specific antigen (PSA) tests, or flu and pneumonia shots.<BR><BR></li>
+			
+			<li>Routinely waive co-payments on any services, other than those previously mentioned, 
+			without checking your ability to pay.<BR><BR></li>
+			
+			<li>Advertise &quot;free&quot; consultations to People with Medicare.<BR><BR></li>
+			
+			<li>Claim they represent Medicare.<BR><BR></li>
+			
+			<li>Use pressure or scare tactics to sell you high priced medical services or 
+			diagnostic tests.<BR><BR></li>
+			
+			<li>Bill Medicare for services you did not receive.<BR><BR></li>
+			
+			<li>Use telemarketing and door-to-door selling as marketing tools.<BR><BR></li>
+		</ul>
+	
+		<p class="SubTitle">Prevention Tips</p>
+	
+		<p>To help prevent Medicare fraud, you should report suspected instances of fraud. 
+		Whenever you receive a payment notice from Medicare, review it for errors. The payment 
+		notice shows what Medicare was billed for, what Medicare paid and what you owe. Make 
+		sure Medicare was not billed for health care services or medical supplies and equipment 
+		you did not receive.</p>
+	
+		<p>The following is a list of tips to prevent fraud:</p>
+	
+		<ul>
+			<li>Don't ever give out your Medicare Health Insurance Claim Number (on your Medicare 
+			card) except to your physician or other Medicare provider.<BR><BR></li>
+			
+			<li>Don't allow anyone, except appropriate medical professionals, to review your 
+			medical records or recommend services.<BR><BR></li>
+			
+			<li>Don't contact your physician to request a service that you do not need.<BR><BR></li>
+			
+			<li>Do be careful in accepting Medicare services that are represented as being free.<BR><BR></li>
+			
+			<li>Do be cautious when you are offered free testing or screening in exchange for your 
+			Medicare card number.<BR><BR></li>
+			
+			<li>Do be cautious of any provider who maintains they have been endorsed by the 
+			Federal government or by Medicare.<BR><BR></li>
+			
+			<li>Do avoid a provider of health care items or services who tells you that the item 
+			or service is not usually covered, but they know how to bill Medicare to get it paid.<BR><BR></li>
+		</ul>
+	
+		<p>It is in your best interest and that of all citizens to report suspected fraud. 
+		Health care fraud, whether against Medicare or private insurers, increases everyone's 
+		health care costs, much the same as shoplifting increases the costs of the food we eat 
+		and the clothes we wear. If we are to maintain and sustain our current health care 
+		system, we must work together to reduce costs.</p>
+		
+		<P><b>Correction to previous information concerning ambulance services:</b><br>
+		In a previous fraud flyer intended to assist beneficiaries in recognizing fraudulent 
+		practices in the Medicare program, we advised beneficiaries to be suspicious of 
+		ambulance companies that bill for trips that are not emergency in nature. That 
+		statement is misleading. Non-emergency ambulance services are covered by the 
+		Medicare program when reasonable and necessary. We apologize for any misunderstandings 
+		or confusion that may have resulted from this statement.</P>
+	
+		<P align="center">
+		<a href='#Top' class='GoToLink' title='Click here to go to the top of this page'><img src = '/images/ArrowUp_trans.gif' alt='Link to top of page' border ='0'>Top of page</a>
+
+		</P>
+				   	
+		</td>
+<td  valign=top>
+<table style='width:100%;border:1px solid #660000;border-spacing:0; padding:0;'>
+<tr valign='top'>
+<th class='RightToolBar' align='left'>
+
+<table border=0>
+<tr>
+<td class='RightToolBarPrinterFriendly'><a href='/FraudAbuse/Tips.asp?PrinterFriendly=true' class='RightToolBarPrinterFriendly' title='Printable-Version'>Printable-Version</a></td>
+<td><a href='/FraudAbuse/Tips.asp?PrinterFriendly=true'><IMG SRC='/images/PrinterEasyPrint.gif' alt='Printable-Version' title='Printable-Version' hspace='3' align='middle' border=0></a></td>
+</tr>
+</table>
+</th>
+</tr>
+<tr valign='top'>
+<th class='RightToolBar' align='left'>
+
+<table border=0>
+<tr>
+<td class='RightToolBarPrinterFriendly'><a href="/EmailThisPage/emailform.asp?url=%2FFraudAbuse%2FTips%2Easp" title="E-mail This Page" class="RightToolBarPrinterFriendly">E-mail This Page</a></td>
+<td><a href="/EmailThisPage/emailform.asp?url=%2FFraudAbuse%2FTips%2Easp" title="E-mail This Page"><IMG src='/images/mail.gif' alt='E-mail This Page' title='E-mail This Page' hspace='3' align='middle' border=0></a></td>
+</tr>
+</table>
+</th>
+</tr>
+
+<tr valign='top'><td class='RightToolBar'>
+<a class='RightToolBar' href='Overview.asp' title='Click to view Medicare Fraud Overview'>Overview</a><br><br>
+<a class='RightToolBar' href='Tips.asp' title='Click to view Fraud Detection / Prevention Tips'>Fraud Detection / Prevention Tips</a><br><br>
+<a class='RightToolBar' href='HowToReport.asp' title='Click to view How to Report Fraud and Abuse'>How to Report Fraud and Abuse</a><br><br>
+<a class='RightToolBar' href='/Publications/Search/Results.asp?version=alternate&amp;browser=Wget%7C1%2E11%7CUnknown&amp;Language=English&amp;pagelist=Home&amp;comingFrom=13&amp;dest=NAV%7CHome%7CSearch%7CResults%7CSearchCriteria&amp;Type=NameCat&amp;PubName=&amp;PubCat=140%7CRights+and+Protections' title='Click to view Fraud and Abuse Publications'>Fraud and Abuse Publications</a><br>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<br />
+Page Last Updated: March 27, 2008
+
+	
+<!-- End of customized content -->
+   
+
+
+<!--<p><a name="Bottom"><font color="white">&nbsp;</font></a></p>-->
+<!-- The inline	styles on the following	P and a	tags are used to virtually hide	the	element.  Please donot remove. -->
+ <p	style="MARGIN: 0; COLOR: white;	LINE-HEIGHT: 0;	FONT-SIZE: 1pt;	FONT-WEIGHT: normal;">
+		<a id =	"Bottom" name="Bottom" style="MARGIN: 0; COLOR:	white; LINE-HEIGHT:	0; FONT-SIZE: 1pt; FONT-WEIGHT:	normal;">&nbsp;</a>
+ </p>
+	
+		
+							<!-- End of	Customized content -->
+							</td>
+							<!-- End of	column containing search tool bar and content -->
+						</tr>
+					</table>
+					 
+					<!-- End of	table containing left toolbar, search toolbar and content -->
+					<!-- Bottom	toolbar	/Templates/Toolbars/Toolbarbottom.asp -->
+					
+	<table width="100%" bgcolor="#FFFFCC" cellpadding="1" cellspacing="0" border="0">
+	
+			
+	
+		
+		<tr>
+			<td>&nbsp;</td>
+		</tr>
+		
+		<tr>
+			<td align="center" valign="bottom">
+				<a class="FooterText" href="http://questions.medicare.gov/cgi-bin/medicare.cfg/php/enduser/std_alp.php" title="Click to view the Frequently Asked Questions section">Frequently Asked Questions</a>&nbsp;|&nbsp;<a class="FooterText" href="/ContactUs.asp" title='Click to view the Contact Us page'>Contact Us</a>&nbsp;|&nbsp;
+				<a class="FooterText" href="http://www.cms.hhs.gov/AboutWebsite/02_Privacy%20Policy.asp" title="Click to view the Website Policies page on www.cms.hhs.gov website">Website Privacy</a>&nbsp;|&nbsp;<a class="FooterText" href="/WebsitePolicies.asp" title='Click to view the Website Policies section'>Website Policies</a>
+				<br/>
+				<a class="FooterText" href="http://www.cms.hhs.gov/AboutWebsite/04_FOIA.asp" title="Click to view the Freedom of Information Act section on www.cms.hhs.gov website">Freedom of Information Act</a>&nbsp;|&nbsp;<a class="FooterText" href="/Library/ExternalSiteRedirector.asp?Language=English&amp;URLPath=http://www.USA.gov" title='Click to view the www.USA.gov website'>USA.gov</a>
+			</td>
+		</tr>
+		
+		<tr>
+			<td align="right" class="FootNote">
+			
+			56
+
+			</td>
+		</tr>
+		<tr  style="background-color:#014478;">
+			<td align="center" style="color:#FFFFFF;font-weight:bold;font-size:9pt;">
+					<a class="BlueFooter" href="http://www.cms.hhs.gov/" title="Click to view the www.cms.hhs.gov homepage">Centers for Medicare &amp; Medicaid Services</a>&nbsp;|&nbsp;<a class="BlueFooter" href="/Library/ExternalSiteRedirector.asp?Language=English&amp;URLPath=http://www.hhs.gov/" title='Click to view the www.hhs.gov website'>U.S. Department of Health and Human Services</a>
+			</td>
+			
+		</tr>
+	</table>
+
+
+					</td>
+					</tr>
+					</table>
+			
+
+
+</body>
+
+</html>
+

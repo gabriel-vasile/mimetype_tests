@@ -1,0 +1,414 @@
+
+
+
+
+
+
+
+<html>
+<head>
+    <meta content="issuesummary" name="decorator" />
+    <title>[#WWJ-97] Vec4, Matrix, Quaternion cache computations </title>
+</head>
+<body>
+<style type="text/css">
+<!--
+.fieldArea .fieldLabelArea { width: 10%; }
+.fieldArea .fieldValueArea { width: 90%; }
+#pinCommentContainer { float: right; font-size: 10px; }
+#pinCommentContainer a { margin: 0 0.2em; }
+-->
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table cellpadding="1" cellspacing="0" border="0" bgcolor="#bbbbbb" width="100%" align="center">
+<tr><td width="100%" colspan="2" valign="top">
+<table id="issue_header" cellpadding="4" cellspacing="0" border="0" width="100%" bgcolor="#ffffff">
+<tr>
+    <td bgcolor="#f0f0f0" width="100%" colspan="2" valign="top">
+    <table width="100%" cellpadding="0" cellspacing="0">
+        <tr><td bgcolor="#f0f0f0" width="80%" valign="top">
+            <b><a href="/browse/WWJ">
+                World Wind Java</a></b><br>
+
+            
+
+            <h3 class="formtitle"><img src="/images/icons/link_out_bot.gif" width="16" height="16"
+                              border="0" alt="" /> Vec4, Matrix, Quaternion cache computations </h3>
+            <font size="1">
+                Created: <span class="date">10/Oct/07 03:00 PM</span> &nbsp;
+                Updated: <span class="date">15/Oct/07 03:47 PM</span>
+
+                
+                    
+                
+            </font>
+        </td>
+            
+            
+        </tr></table>
+</tr>
+
+
+    
+        <tr>
+            <td width="20%"><b>Component/s:</b></td>
+            <td width="80%">
+                
+                    
+
+
+    
+        <a href="/browse/WWJ/component/10062;jsessionid=2565B4D62F2FAE36B8A665F9A4D2C1B6" title="Library WorldWind API functionality">Library</a>
+    
+
+
+
+                
+            </td>
+        </tr>
+    
+
+    
+        <tr>
+            <td width="20%"><b>Affects Version/s:</b></td>
+            <td width="80%">
+                
+                    
+
+
+    
+        Current Daily
+    
+
+
+
+                
+            </td>
+        </tr>
+    
+
+    
+        <tr>
+            <td width="20%"><b>Fix Version/s:</b></td>
+            <td width="80%">
+                
+                    
+
+
+    
+        <a href="/browse/WWJ/fixforversion/10100;jsessionid=2565B4D62F2FAE36B8A665F9A4D2C1B6" title="Current Daily Nightly Build">Current Daily</a>
+    
+
+
+
+                
+            </td>
+        </tr>
+    
+    
+    
+        
+        
+            
+        
+    
+    
+
+</table>
+</td></tr></table>
+
+
+
+
+    
+        
+
+
+<br/>
+<table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td>
+            <table cellpadding="4" cellspacing="1" class="tt_outer">
+                <tr>
+                    <td id="tt_heading" class="tt_heading" style="line-height:150%;">
+                        Time Tracking:
+                        
+                    </td>
+                    <td class="tt_infoarea">
+                        
+                        
+                            
+
+
+<table id="tt_single_table_info" class="tt_inner">
+    
+        <tr>
+            <td>
+                Not Specified
+            </td>
+        </tr>
+    
+    
+</table>
+
+
+                        
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+
+
+    
+    
+
+
+<br>
+
+
+
+
+
+
+
+<table id="tab1" class="gridTabBox" cellpadding="3" cellspacing="1" align="center" width="100%">
+    
+    
+        
+             
+            
+                <tr id="rowForcustomfield_10020">
+                    <td bgcolor="#f0f0f0" width="20%" valign="top"><b>Operating System:</b></td>
+                    <td bgcolor="#ffffff" width="80%">
+                                  All or Unknown    
+                    </td>
+                </tr>
+            
+        
+    
+        
+             
+            
+                <tr id="rowForcustomfield_10032">
+                    <td bgcolor="#f0f0f0" width="20%" valign="top"><b>Graphics Hardware:</b></td>
+                    <td bgcolor="#ffffff" width="80%">
+                                  All or Unknown    
+                    </td>
+                </tr>
+            
+        
+    
+</table>
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+<div id="description-open">
+<table cellpadding="2" cellspacing="0" border="0" width="100%" align="center">
+<tr>
+	<td bgcolor="#bbbbbb" width="1%" nowrap align="center">
+			&nbsp;<font color="#ffffff"><b>Description</b></font>&nbsp;
+	</td>
+    <td align="right"><a href="" onClick="toggleDivsWithCookie('description-closed', 'description-open'); return false;" class="smallgrey">&laquo; Hide</a></td>
+</tr>
+</table>
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr>
+	<td id="descriptionArea">
+        <div id="description_full">
+            Vec4, Matrix and Quaternion cache certain computations (e.g. length, normal, inverse). This behavior violates the immutability contract (these classes are immutable), and causes a bottleneck in the constructor (cached values are initialized).<br />
+        </div>
+    </td>
+</tr>
+</table>
+</div>
+
+<div id="description-closed" style="display:none;">
+<table cellpadding="2" cellspacing="0" border="0" width="100%" align="center" class="table-layout: fixed;">
+<tr>
+	<td bgcolor="#bbbbbb" width="1%" nowrap align="center">
+			&nbsp;<font color="#ffffff"><b>Description</b></font>&nbsp;
+	</td>
+    <td style="padding: 1px; margin: 0px; border-bottom: #bbb 1px solid;"><div style="height: 1.2em; overflow: hidden; text-overflow: ellipsis;">&nbsp; &nbsp;Vec4, Matrix and Quaternion cache certain computations (e.g. length, normal, inverse). This behavior violates the immutability contract (these classes are immutable), and causes a bottleneck in the constructor (cached values are initialized).</div></td>
+    <td width="1%" align="right" nowrap style="padding: 1px; margin: 0px; border-bottom: #bbb 1px solid;"><a href="" onClick="toggleDivsWithCookie('description-open', 'description-closed'); return false;" class="smallgrey">Show &raquo;</a></td>
+</tr>
+</table>
+</div>
+
+<script language="JavaScript" type="text/javascript">
+<!--
+    restoreDivFromCookie('description-open', 'jira.viewissue.cong.cookie', '1');
+    restoreDivFromCookie('description-closed', 'jira.viewissue.cong.cookie', '0');
+//-->
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+<table cellpadding="2" cellspacing="0" border="0" width="100%" align="center">
+<tr>
+	
+        
+        
+            <td width="1%" nowrap align="center">
+                &nbsp;<b><a href="/browse/WWJ-97;jsessionid=2565B4D62F2FAE36B8A665F9A4D2C1B6?page=com.atlassian.jira.plugin.system.issuetabpanels%3Aall-tabpanel">All</a></b>&nbsp;
+            </td>
+        
+    
+        
+            <td bgcolor="#bbbbbb" width="1%" nowrap align="center">
+                &nbsp;<font color="#ffffff"><b>Comments</b></font>&nbsp;
+            </td>
+        
+        
+    
+        
+        
+            <td width="1%" nowrap align="center">
+                &nbsp;<b><a href="/browse/WWJ-97;jsessionid=2565B4D62F2FAE36B8A665F9A4D2C1B6?page=com.atlassian.jira.plugin.system.issuetabpanels%3Aworklog-tabpanel">Work Log</a></b>&nbsp;
+            </td>
+        
+    
+        
+        
+            <td width="1%" nowrap align="center">
+                &nbsp;<b><a href="/browse/WWJ-97;jsessionid=2565B4D62F2FAE36B8A665F9A4D2C1B6?page=com.atlassian.jira.plugin.system.issuetabpanels%3Achangehistory-tabpanel">Change History</a></b>&nbsp;
+            </td>
+        
+    
+
+	<td>&nbsp;</td>
+    <td width="1%" bgcolor="#e5e5e5" nowrap>
+        &nbsp;
+        Sort Order:
+        
+            <a rel="nofollow" href="/browse/WWJ-97;jsessionid=2565B4D62F2FAE36B8A665F9A4D2C1B6?actionOrder=desc"><img src="/images/icons/arrow_down_blue_small.gif" class="sortArrow" alt="Ascending order - Click to sort in descending order" title="Ascending order - Click to sort in descending order" border="0" /></a>
+        
+        
+    </td>
+</tr>
+</table>
+
+
+    <div class="issuePanelContainer" id="issue_actions_container">
+    
+        
+            
+            <div id="comment-12482-open">
+<div class="actionContainer">
+    <div class="action-links subText smallgrey">
+    [
+        <a href="/browse/WWJ-97?focusedCommentId=12482&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#action_12482" title="A permanent link to this comment." class="smallgrey">Permlink</a>
+                      | <a href="" onClick="toggleDivsWithCookie('comment-12482-closed', 'comment-12482-open'); return false;" class="smallgrey">&laquo; Hide</a>
+    ]
+    </div>
+    <div class="action-details">    <a name="action_12482" />
+    
+    
+    
+                <a id="comment_12482_header_dcollins" href="/secure/ViewProfile.jspa?name=dcollins">Paul Collins</a> added a comment  - <span class=subText><span class=date>15/Oct/07 03:46 PM</span></span>  </div>
+    <div class="action-body">Vec4, Quaternion and Matrix now place the responsibility of caching computations on the client. The only remaining &quot;cached&quot; value in each class is the hash-code. </div>
+</div>
+</div>
+
+
+<div id="comment-12482-closed" style="display: none;">
+<div class="actionContainer" style="background-color:#f0f0f0;">
+    <div class="action-links subText smallgrey">
+    [ <a href="" onClick="toggleDivsWithCookie('comment-12482-open', 'comment-12482-closed'); return false;" class="smallgrey">Show &raquo;</a> ]
+    </div>
+    <div class="action-details" style="overflow: hidden; height: 1em;">
+                <a name="action_12482" />
+    
+    
+    
+                <a id="comment_12482_header_dcollins" href="/secure/ViewProfile.jspa?name=dcollins">Paul Collins</a> added a comment  - <span class=subText><span class=date>15/Oct/07 03:46 PM</span></span>               Vec4, Quaternion and Matrix now place the responsibility of caching computations on the client. The only remaining &quot;cached&quot; value in each class is the hash-code.     </div>
+</div>
+</div>
+<br clear="all" />
+<script language="JavaScript" type="text/javascript">
+<!--
+    restoreDivFromCookie('comment-12482-open', 'jira.viewissue.cong.cookie', '1');
+    restoreDivFromCookie('comment-12482-closed', 'jira.viewissue.cong.cookie', '0');
+//-->
+</script>
+
+            
+        
+    
+    
+    </div>
+
+<br/>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,2535 @@
+<!-- @(#) $Id: acl2.html,v 1.42 2009/01/25 03:08:23 leres Exp $ (LBL)-->
+<html>
+<head><title>
+Second generation ACL blocker notes
+</title></head>
+<body bgcolor="#ffffff" text="#000000" link="blue" alink="red" vlink="#ff0000">
+
+<font size="+3">
+<b> Second generation ACL blocker notes </b>
+</font>
+
+<table width="100%">
+<tr align=right><td>
+<em>
+24-Jan-2009
+</em>
+</td></tr>
+</table>
+
+<hr>
+
+Here are some notes on the second generation ACL blocker.
+
+<h3>
+High level requirements:
+</h3>
+
+<ul>
+
+<li>
+Implement blocks in shortest possible amount of time
+
+<li>
+Persistent daemon keeps router connection open
+
+<li>
+Configuration file defines expect script for specific router models
+
+<li>
+Configuration file defines multiple passwords to allow for graceful
+password changes
+
+<li>
+Ability to "batch" block or unblock
+
+<li>
+Full capabilities available from command line client
+
+<li>
+Client interface available from C library
+<font color=blue><em>(not implemented)</em></font>
+
+<li>
+Requests include a cookie which is returned with response message
+
+</ul>
+
+<h3>
+ACL blocker communication details
+</h3>
+
+Clients will talk to the ACL blocker via an inet socket on a port
+on localhost. It is possible to use telnet to interact with the
+daemon.
+
+<p>
+The command line clients will be implemented as expect scripts.
+Initially, Bro will use these scripts. Ultimately, Bro will use
+the C library interface and keep a connection open to the ACL
+blocker to save time.
+
+<p>
+Commands include a cookie (32-bit unsigned value). This cookie is
+included in response messages from the ACL blocker to allow clients
+to match return status with requests. The value zero (0) may be
+used if this feature is not needed.
+
+<p>
+Commands may be streamed without waiting for status.
+
+<h3>
+ACL blocker interface
+</h3>
+
+Communications with the ACL blocker occurs over a socket. Commands
+consist of a keyword, a cookie (32-bit unsigned value) and optional
+arguments. In addition, many commands (e.g. <b>drop</b>) optionally
+use multi-line text (see below).
+
+<p>
+Each command issued (eventually) results in a response and may be
+sent out of order. Responses consist of a raw unix timestamp (seconds
+and microseconds midnight, January 1, 1970), the cookie value and
+a status word. Responses can return multi-line text containing error
+messages, informational messages, comments or other text.
+
+<p>
+Response timestamps document when the requested action was taken.
+Note that some routers accept and commit an ACL change to configuration
+memory but must perform additional processing before the change
+actually takes effect.
+
+<p>
+Command and response lines that need to submit or return multi-line
+text end with a trailing dash ("-") character. Text is then read,
+stripping leading periods ("."), until a period on a line by itself
+is read.
+
+<p>
+When the ACL blocker first receives a connection from a client, it
+sends an initial message to let the client know it's ready for
+work. For example:
+
+<p>
+<blockquote>
+<tt>
+1024631441.934568 0 acld -
+<br>
+ready for action
+<br>
+.
+</tt>
+</blockquote>
+
+<p>
+As with response to a regular client command, a timestamp is displayed.
+Since there is no cookie value to give back, zero is used.
+
+<p>
+Unknown commands (and other garbage) may not have comments and their
+cookies are ignored. Responses will always use a cookie value of
+zero and may include a comment indicating what the problem was.
+For example:
+
+<p>
+<blockquote>
+<tt>
+junk 554
+<br>
+1078353422.923969 0 unknown-failed -
+<br>
+unknown command "junk"
+<br>
+.
+</tt>
+</blockquote>
+
+<h3>
+ACL blocker client command summary
+</h3>
+
+<blockquote>
+<table border=2 cellpadding=2>
+<tr>
+    <th> Command </th>
+    <th> Arguments </th>
+</tr>
+
+<tr>
+    <td>
+	<a href="#drop">drop</a> <br>
+	<a href="#restore">restore</a> <br>
+	<a href="#query">query</a> <br>
+    </td>
+    <td>
+	cookie addr <br>
+	cookie addr/netwidth <br>
+	cookie addr netmask
+    </td>
+</tr>
+
+<tr>
+    <td>
+	<a href="#querywhitelist">querywhitelist</a>
+    </td>
+    <td>
+	cookie addr <br>
+	cookie addr/netwidth <br>
+	cookie addr netmask
+    </td>
+</tr>
+
+<tr>
+    <td>
+	<a href="#droptcpport">droptcpport</a> <br>
+	<a href="#dropudpport">dropudpport</a> <br>
+	<a href="#restoretcpport">restoretcpport</a> <br>
+	<a href="#restoreudpport">restoreudpport</a>
+    </td>
+    <td> cookie port </td>
+</tr>
+
+<tr>
+    <td>
+	<a href="#droptcpdsthostport">droptcpdsthostport</a> <br>
+	<a href="#permittcpdsthostport">permittcpdsthostport</a> <br>
+	<a href="#restoretcpdsthostport">restoretcpdsthostport</a> <br>
+	<a href="#unpermittcpdsthostport">unpermittcpdsthostport</a>
+    </td>
+    <td> cookie addr port </td>
+</tr>
+
+<tr>
+    <td>
+	<a href="#addwhitelist">addwhitelist</a> <br>
+	<a href="#remwhitelist">remwhitelist</a> <br>
+    </td>
+    <td>
+	cookie addr <br>
+	cookie addr/netwidth <br>
+	cookie addr netmask
+    </td>
+</tr>
+
+<tr>
+    <td>
+	<a href="#nullzero">nullzero</a> <br>
+	<a href="#nonullzero">nonullzero</a>
+    </td>
+    <td>
+	cookie addr <br>
+	cookie addr/netwidth <br>
+	cookie addr netmask
+    </td>
+</tr>
+
+<tr>
+    <td>
+	<a href="#listacl">listacl</a> <br>
+	<a href="#compact">compact</a>
+    </td>
+    <td> cookie acl </td>
+</tr>
+
+<tr>
+    <td>
+	<a href="#listroute">listroute</a> <br>
+	<a href="#state">state</a> <br>
+	<a href="#reload">reload</a> <br>
+	<a href="#help">help</a>
+    </td>
+    <td> cookie </td>
+</tr>
+
+</table>
+</blockquote>
+
+<h3>
+ACL blocker client command details
+</h3>
+
+<p>
+<ul>
+
+<li>
+<a name="addwhitelist">
+<b> addwhitelist cookie addr [-] </b>
+</a>
+<li>
+<b> addwhitelist cookie addr/netwidth [-] </b>
+<li>
+<b> addwhitelist cookie addr netmask [-] </b>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    <li>
+    addr is the ip address to block
+
+    <li>
+    netwidth is an optional network width (e.g. 131.243.1.0/24)
+
+    <li>
+    netmask is an optional network mask (e.g. 255.255.255.0
+
+    <li>
+    optional multi-line text is logged
+
+    </ul>
+
+    <p>
+    This command is used to add a whitelist address or network.
+
+    <p>
+    The command accepts a comment allowing a client to document
+    why the entry is being added.
+
+    <p>
+    The implementation will refuse to whitelist a network with a
+    netmask width wider than /24.
+
+    <p>
+    The implementation will refuse to accept a netmask that is not
+    contiguous and left justified.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>addwhitelist</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>addwhitelist-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="compact">
+<b> compact cookie acl </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    <li>
+    acl is the name of the ACL
+
+    </ul>
+
+    <p>
+    This command requests that the specified acl be compacted.
+
+    <p>
+    <em>
+    Note that compaction is only scheduled and completes at some
+    future time.
+    </em>
+
+    <p>
+    Response:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>compact</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="drop">
+<b> drop cookie addr [-] </b>
+</a>
+<li>
+<b> drop cookie addr/netwidth [-] </b>
+<li>
+<b> drop cookie addr netmask [-] </b>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    <li>
+    addr is the ip address to block
+
+    <li>
+    netwidth is an optional network width (e.g. 131.243.1.0/24)
+
+    <li>
+    netmask is an optional network mask (e.g. 255.255.255.0
+
+    <li>
+    optional multi-line text is logged
+
+    </ul>
+
+    <p>
+    This command is used to block access by addr.
+
+    <p>
+    The command accepts a comment allowing a client to document
+    why the block is being applied.
+
+    <p>
+    The implementation will refuse to block an address width smaller
+    than /16.
+
+    <p>
+    The implementation will refuse to accept a netmask that is not
+    contiguous and left justified.
+
+    <p>
+    It's unlikely daemon clients (e.g. Bro) will use the network
+    netwidth capability.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>drop</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>drop-failed</b> [-]
+
+    </ul>
+
+    <p>
+    Here's an example <b>drop</b> command:
+    <blockquote>
+    <tt>
+    drop 198.137.240.92
+    </tt>
+    </blockquote>
+
+    <p>
+    The response might be:
+    <blockquote>
+    <tt>
+    drop
+    </tt>
+    </blockquote>
+
+    <p>
+    or:
+    <blockquote>
+    <tt>
+    drop -
+    <br>
+    sequence too large (65536 &gt; 65535)"
+    <br>
+    .
+    </tt>
+    </blockquote>
+
+    <p>
+
+<li>
+<a name="droptcpdsthostport">
+<b> droptcpdsthostport cookie addr port [-] </b>
+</a>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    <li>
+    addr is the ip address to block
+
+    <li>
+    port is the tcp or udp port to block
+
+    </ul>
+
+    <p>
+    This command is used to block access by destination address and
+    port.
+
+    <p>
+    The command accepts a comment allowing a client to document
+    why the block is being applied.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>droptcpdsthostport</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>droptcpdsthostport-failed</b> [-]
+
+    </ul>
+
+    <p>
+    Here's an example <b>droptcpdsthostport</b> command:
+    <blockquote>
+    <tt>
+    droptcpdsthostport 1102 128.203.111.2 443 -
+    <br>
+
+    Rod disabling https until this server can be patched
+    <br>
+
+    .
+    </tt>
+    </blockquote>
+
+    <p>
+    The response might be:
+    <blockquote>
+    <tt>
+    1143084820.839264 1102 droptcpdsthostport
+    </tt>
+    </blockquote>
+
+<li>
+<a name="droptcpport">
+<b> droptcpport cookie port [-] </b>
+</a>
+<li>
+<a name="dropudpport">
+<b> dropudpport cookie port [-] </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    <li>
+    port is the tcp or udp port to block
+
+    </ul>
+
+    <p>
+    This command is used to block access by port.
+
+    <p>
+    The command accepts a comment allowing a client to document
+    why the block is being applied.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>droptcpportdrop</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>dropudpportdrop</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>droptcpport-failed</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>dropudpport-failed</b> [-]
+
+    </ul>
+
+    <p>
+    Here's an example <b>droptcpport</b> command:
+    <blockquote>
+    <tt>
+    droptcpport 4042322056 80 -
+    <br>
+
+    Rod disabling http until web servers can be patched
+    <br>
+
+    .
+    </tt>
+    </blockquote>
+
+    <p>
+    The response might be:
+    <blockquote>
+    <tt>
+    1143084820.839264 4042322056 droptcpport
+    </tt>
+    </blockquote>
+
+<li>
+<a name="help">
+<b> help cookie </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    </ul>
+
+    <p>
+    This command returns a command summary.
+
+    <p>
+    Response:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>help</b> [-]
+
+    </ul>
+
+<li>
+<a name="listacl">
+<b> listacl cookie acl </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    <li>
+    acl is the name of the ACL
+
+    </ul>
+
+    <p>
+    This command is used to list the contents of the ACL.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>listacl</b> acl [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>listacl-failed</b> [-]
+
+    </ul>
+
+    <p>
+    Here's an example <b>listacl</b> report:
+    <blockquote>
+    <tt>
+    1024631592.946718 107775 listacl OUTSIDE -
+    <br>
+    1000 56 blockhost 194.117.194.120
+    <br>
+    1001 0 blockhost 207.45.69.69
+    <br>
+    1004 2 blockhost 202.96.113.20
+    <br>
+    1005 89 blocknet 64.154.61.0/24
+    <br>
+    1010 58 blockhost 210.233.49.116
+    <br>
+    1031 0 blockhost 212.139.3.131
+    <br>
+    1042 0 blockhost 212.139.3.132
+    <br>
+    1045 0 blockhost 209.61.194.83
+    <br>
+    1046 341 blockhost 192.102.234.119
+    <br>
+    1051 174 blockhost 128.218.182.205
+    <br>
+    1052 829 blockhost 193.251.23.218
+    <br>
+    .
+    </tt>
+    </blockquote>
+
+    <p>
+    The first number is the sequence number (or 0 if the router
+    does not use sequence numbers). The second number is the count
+    of how many times the ACL has matched a packet (or 0 if the
+    router does not know).
+
+    <p>
+    If it blocked address is a network, its mask is displayed as a
+    width (for example 64.154.61.0/24).
+
+    <p>
+
+<li>
+<a name="listroute">
+<b> listroute cookie </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    </ul>
+
+    <p>
+    This command is used to list the routes.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>listroute</b> acl [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>listroute-failed</b> [-]
+
+    </ul>
+
+    <p>
+    Here's an example <b>listroute</b> report:
+    <blockquote>
+    <tt>
+    1147222080.950994 903041 listroute -
+    <br>
+    D 0.0.0.0 172.16.100.1
+    <br>
+    D 172.16.111.0/24 172.16.100.2
+    <br>
+    D 172.16.112.0/24 172.16.100.2
+    <br>
+    D 172.16.113.0/24 172.16.100.2
+    <br>
+    I 172.16.114.0/24
+    <br>
+    I 172.16.115.0/24
+    <br>
+    I 172.16.116.0/24
+    <br>
+    S 172.16.116.128/23 172.16.116.90
+    <br>
+    N 172.16.116.54
+    <br>
+    N 172.16.116.54
+    <br>
+    D 172.16.117.0/24 172.16.100.4
+    <br>
+    D 172.16.118.0/24 172.16.100.4
+    <br>
+    D 172.16.119.0/24 172.16.100.4
+    <br>
+    .
+    </tt>
+    </blockquote>
+
+    <p>
+    First is a character that describes the route type:
+    <blockquote>
+    <b>S</b>tatic
+    <br>
+    <b>D</b>ynamic
+    <br>
+    <b>I</b>nterface
+    <br>
+    <b>N</b>ull zero
+    </blockquote>
+
+    <p>
+    Next is the destination address or network. Last is the optional
+    gateway address or network.
+
+    <p>
+
+<li>
+<a name="nonullzero">
+<b> nonullzero cookie addr </b> [-]
+<li>
+<b> nonullzero cookie addr/netwidth [-] </b>
+<li>
+<b> nonullzero cookie addr netmask [-] </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    <li>
+    addr is the ip address to remove the null zero route for
+
+    <li>
+    netwidth is an optional network width (e.g. 131.243.1.0/24)
+
+    <li>
+    netmask is an optional network mask (e.g. 255.255.255.0
+
+    <li>
+    optional multi-line text is logged
+
+    </ul>
+
+    <p>
+    This command is used to remove a null zero route for a host.
+
+    <p>
+    The command accepts a comment allowing a client to document
+    why the null zero route is being removed.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>nonullzero</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>nonullzero-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="nullzero">
+<b> nullzero cookie addr [-] </b>
+<li>
+<b> nullzero cookie addr/netwidth [-] </b>
+<li>
+<b> nullzero cookie addr netmask [-] </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    <li>
+    addr is the ip address to create a null zero route for
+
+    <li>
+    netwidth is an optional network width (e.g. 131.243.1.0/24)
+
+    <li>
+    netmask is an optional network mask (e.g. 255.255.255.0
+
+    <li>
+    optional multi-line text is logged
+
+    </ul>
+
+    <p>
+    This command is used to isolate a host by installing a null
+    zero route for it.
+
+    <p>
+    The command accepts a comment allowing a client to document
+    why the null zero route is being installed.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>nullzero</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>nullzero-failed</b> [-]
+
+    </ul>
+
+    <p>
+    Here's an example <b>nullzero</b> command:
+    <blockquote>
+    <tt>
+    nullzero 16711728 212.139.15.101 -
+    <br>
+    Infected with a virus
+    <br>
+    .
+    </tt>
+    </blockquote>
+
+    <p>
+    The response might be:
+    <blockquote>
+    <tt>
+    1143685680.182807 16711728 nullzero
+    </tt>
+    </blockquote>
+
+    <p>
+    or:
+    <blockquote>
+    <tt>
+    1143685680.182807 16711728 nullzero -
+    <br>
+    Note: There is already a null zero route for 212.139.15.101
+    <br>
+    .
+    </tt>
+    </blockquote>
+
+    <p>
+
+<li>
+<a name="permittcpdsthostport">
+<b> permittcpdsthostport cookie addr port [-] </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    <li>
+    addr is the ip address
+
+    <li>
+    port is the tcp port
+
+    </ul>
+
+    <p>
+    This command is used to install an exception for a specific
+    host and tcp port.
+
+    <p>
+    The command accepts a comment allowing a client to document
+    why the acl is being installed.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>permittcpdsthostport</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>permittcpdsthostport-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="query">
+<b> query cookie addr </b>
+</a>
+<li>
+<b> query cookie addr/netwidth </b>
+<li>
+<b> query cookie addr netmask </b>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    <li>
+    addr is the ip address to query
+
+    <li>
+    netwidth is an optional network width (e.g. 131.243.1/24)
+
+    <li>
+    netmask is an optional network mask (e.g. 131.243.1 255.255.255.0)
+
+    </ul>
+
+    <p>
+    This command is used to determine if an address is blocked or not.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>query</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>query-failed</b> [-]
+
+    </ul>
+
+    <p>
+    Here's an example <b>query</b> report:
+    <blockquote>
+    <tt>
+    1024632280.869878 123401 query -
+    <br>
+    acl OUTSIDE
+    <br>
+    1002 45 blockhost 64.111.222.33
+    <br>
+    .
+    </tt>
+    </blockquote>
+
+    <p>
+    The first line documents which ACL the rule is in.
+    The second line is the same as the <b>listacl</b> report would show.
+
+    <p>
+
+<li>
+<a name="querywhitelist">
+<b> querywhitelist cookie addr </b>
+</a>
+<li>
+<b> querywhitelist cookie addr/netwidth </b>
+<li>
+<b> querywhitelist cookie addr netmask </b>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    <li>
+    addr is the ip address to check
+
+    <li>
+    netwidth is an optional network width (e.g. 131.243.1/24)
+
+    <li>
+    netmask is an optional network mask (e.g. 131.243.1 255.255.255.0)
+
+    </ul>
+
+    <p>
+    This command is used to determine if an address or network is
+    on the whitelist.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>querywhitelist</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>querywhitelist-failed</b> [-]
+
+    </ul>
+
+    <p>
+    Here's an example <b>querywhitelist</b> report:
+    <blockquote>
+    <tt>
+    1208125354.869878 66580 querywhitelist -
+    <br>
+    172.16.192.177
+    <br>
+    .
+    </tt>
+    </blockquote>
+
+    <p>
+    This shows that the requested address is on the whitelist. If
+    the specified address was whitelisted by a network rule, the
+    network and mask would have been displayed.
+
+    <p>
+
+<li>
+<a name="reload">
+<b> reload cookie </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    </ul>
+
+    <p>
+    This command requests that the daemon kill expect child process,
+    reload the daemon configuration file and restart the child
+    process.
+
+    <p>
+    <em>
+    Note that as a side effect, all client connections are terminated.
+    </em>
+
+    <p>
+    Response:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>reload</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="remwhitelist">
+<b> remwhitelist cookie addr [-] </b>
+</a>
+<li>
+<b> remwhitelist cookie addr/netwidth [-] </b>
+<li>
+<b> remwhitelist cookie addr netmask [-] </b>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    <li>
+    addr is the ip address to block
+
+    <li>
+    netwidth is an optional network width (e.g. 131.243.1.0/24)
+
+    <li>
+    netmask is an optional network mask (e.g. 255.255.255.0
+
+    <li>
+    optional multi-line text is logged
+
+    </ul>
+
+    <p>
+    This command is used to remove a whitelist address or network.
+
+    <p>
+    The command accepts a comment allowing a client to document
+    why the entry is being removed.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>remwhitelist</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>remwhitelist-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="restore">
+<b> restore cookie addr </b> [-]
+</a>
+<li>
+<b> restore cookie addr/netwidth [-] </b>
+<li>
+<b> restore cookie addr netmask [-] </b>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    <li>
+    addr is the ip address to unblock
+
+    <li>
+    netwidth is an optional network width (e.g. 131.243.1.0/24)
+
+    <li>
+    netmask is an optional network mask (e.g. 131.243.1 255.255.255.0)
+
+    <li>
+    optional multi-line text is logged
+
+    </ul>
+
+    <p>
+    This command is used to unblock access by addr.
+
+    <p>
+    The command accepts a comment allowing a client to document
+    why the block is being lifted.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>restore</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>restore-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="restoretcpdsthostport">
+<b> restoretcpdsthostport cookie addr port </b> [-]
+</a>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    <li>
+    addr is the ip address
+
+    <li>
+    port is the tcp port
+
+    <li>
+    optional multi-line text is logged
+
+    </ul>
+
+    <p>
+    This command is used to unblock access by port.
+
+    <p>
+    The command accepts a comment allowing a client to document
+    why the block is being lifted.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>restoretcpdsthostport</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>restoretcpdsthostport-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="restoretcpport">
+<b> restoretcpport cookie port </b> [-]
+</a>
+<li>
+<a name="restoreudpport">
+<b> restoreudpport cookie port </b> [-]
+</a>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    <li>
+    port is the tcp or udp port to unblock
+
+    <li>
+    optional multi-line text is logged
+
+    </ul>
+
+    <p>
+    This command is used to unblock access by port.
+
+    <p>
+    The command accepts a comment allowing a client to document
+    why the block is being lifted.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>restoretcpport</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>restoreudpport</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>restoretcpport-failed</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>restoreudpport-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="state">
+<b> state cookie </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    </ul>
+
+    <p>
+    This command requests the ACL blocker to report on its current
+    state.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>state</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>state-failed</b> [-]
+
+    </ul>
+
+    <p>
+    Here's an example <b>state</b> report:
+    <blockquote>
+    <tt>
+    1024631592.946718 107774 state -
+    <br>
+    # state loggedin
+    <br>
+    # version 0.2
+    <br>
+    # config "/usr/local/etc/acld.conf"
+    <br>
+    router "10.0.0.2"
+    <br>
+    expect "/usr/local/bin/expect"
+    <br>
+    script "cisco8500.expect"
+    <br>
+    whitelist "whitelist.txt"
+    <br>
+    port 1776
+    <br>
+    netsfac local1
+    <br>
+    sync_secs 86400
+    <br>
+    incrseq 1
+    <br>
+    seqrange 5000 65000
+    <br>
+    maxseq 7600
+    <br>
+    # lastseq for ACL LOCAL is 5495
+    <br>
+    # lastseq for ACL OUTSIDE is 46490
+    <br>
+    # acllen for ACL LOCAL is 56
+    <br>
+    # acllen for ACL OUTSIDE is 1973
+    <br>
+    # whitelistlen 369
+    <br>
+    acl LOCAL 128.3.0.0/16
+    <br>
+    acl OUTSIDE default
+    <br>
+    interface gigabitethernet 0/0 OUTSIDE
+    <br>
+    interface gigabitethernet 0/2 LOCAL
+    <br>
+    nullzeronet 128.3.0.0/16
+    <br>
+    nullzeronet 192.16.0.0/16
+    <br>
+    nullzeromax 8000
+    <br>
+    # nullzerolen is 15
+    <br>
+    .
+    </tt>
+    </blockquote>
+
+    <p>
+    The ACL blocker is using the expect script "cisco8500.expect" and
+    ip address 10.0.0.2 to communicate with the router.
+
+    <p>
+
+<li>
+<a name="unpermittcpdsthostport">
+<b> unpermittcpdsthostport cookie addr port </b> [-]
+</a>
+    <p>
+    <ul>
+
+    <li>
+    cookie is a 32-bit unsigned value
+
+    <li>
+    addr is the ip address
+
+    <li>
+    port is the tcp port
+
+    <li>
+    optional multi-line text is logged
+
+    </ul>
+
+    <p>
+    This command is used to remove an exception for a specific host
+    and tcp port.
+
+    <p>
+    The command accepts a comment allowing a client to document
+    why the acl is being removed.
+    why the block is being lifted.
+
+    <p>
+    Possible responses:
+
+    <p>
+    <ul>
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>unpermittcpdsthostport</b> [-]
+
+    <li>
+    &lt;timestamp&gt; &lt;cookie&gt; <b>unpermittcpdsthostport-failed</b> [-]
+
+    </ul>
+
+</ul>
+
+<h3>
+Expect script summary
+</h3>
+
+<blockquote>
+<table border=2 cellpadding=2>
+<tr>
+    <th> Command </th>
+    <th> Arguments </th>
+</tr>
+
+<tr>
+    <td>
+	<a href="#ex-drop">drop</a> <br>
+	<a href="#ex-restore">restore</a>
+    </td>
+    <td>
+	addr acl seq <br>
+	addr/netwidth acl seq
+    </td>
+</tr>
+
+<tr>
+    <td>
+	<a href="#ex-droptcpport">droptcpport</a> <br>
+	<a href="#ex-dropudpport">dropudpport</a> <br>
+	<a href="#ex-restoretcpport">restoretcpport</a> <br>
+	<a href="#ex-restoreudpport">restoreudpport</a>
+    </td>
+    <td> port acl seq </td>
+</tr>
+
+<tr>
+    <td>
+	<a href="#ex-droptcpdsthostport">droptcpdsthostport</a> <br>
+	<a href="#ex-permittcpdsthostport">permittcpdsthostport</a> <br>
+	<a href="#ex-restoretcpdsthostport">restoretcpdsthostport</a> <br>
+	<a href="#ex-unpermittcpdsthostport">unpermittcpdsthostport</a>
+    </td>
+    <td> addr port acl seq </td>
+</tr>
+
+<tr>
+    <td>
+	<a href="#ex-adddefault">adddefault</a> <br>
+	<a href="#ex-removedefault">removedefault</a>
+    </td>
+    <td> acl seq </td>
+</tr>
+
+<tr>
+    <td>
+	<a href="#ex-nonullzero">nonullzero</a> <br>
+	<a href="#ex-nullzero">nullzero</a>
+    </td>
+    <td>
+	addr <br>
+	addr/netwidth
+    </td>
+</tr>
+
+<tr>
+    <td> <a href="#ex-login">login</a> </td>
+    <td> addr cuser cpass1 cpass2 euser epass1 epass2 </td>
+</tr>
+
+<tr>
+    <td> <a href="#ex-listacl">listacl</a> </td>
+    <td> acl interface </td>
+</tr>
+
+<tr>
+    <td>
+	<a href="#ex-ayt">ayt</a> <br>
+	<a href="#ex-listroute">listroute</a> <br>
+	<a href="#ex-logout">logout</a> <br>
+	<a href="#ex-sync">sync</a>
+    </td>
+    <td> &nbsp; </td>
+</tr>
+
+</table>
+</blockquote>
+
+<h3>
+Expect script details
+</h3>
+
+<em>
+This is a really low level interface and does not contain features
+of the higher level interface such as timestamps.
+</em>
+
+<p>
+The following expect procedures must be defined before the ACL
+blocker can support a router:
+
+<ul>
+
+<li>
+<a name="ex-adddefault">
+<b> adddefault { acl seq } </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    acl is the name of the ACL
+
+    <li>
+    seq is the sequence number in the access list
+
+    </ul>
+
+    <p>
+    This procedure is used to add the default "allow anything" rule
+    to an ACL.
+
+    <p>
+    This is implemented by these steps:
+
+    <p>
+    <ul>
+
+    <li>
+    If necessary, enter ACL configure mode
+
+    <li>
+    If necessary, add the "allow anything" rule to the ACL
+
+    </ul>
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>adddefault</b> [-]
+
+    <li>
+    <b>adddefault-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="ex-ayt">
+<b> ayt {} </b>
+</a>
+    <p>
+    This procedure is used check if the router still responds to commands.
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>ayt</b> [-]
+
+    <li>
+    <b>ayt-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="ex-drop">
+<b> drop { addr acl seq } </b>
+<li>
+<b> drop { addr/netwidth acl seq } </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    addr is the ip address to block
+
+    <li>
+    netwidth is an optional network width (e.g. 131.243.1.0/24)
+
+    <li>
+    acl is the name of the ACL
+
+    <li>
+    seq is the sequence number in the access list
+
+    </ul>
+
+    <p>
+    This procedure is used to add a block for an ip address on an ACL.
+
+    <p>
+    This is implemented by these steps:
+
+    <p>
+    <ul>
+
+    <li>
+    If necessary, enter ACL configure mode
+
+    <li>
+    Add addr to the ACL
+
+    </ul>
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>drop</b> [-]
+
+    <li>
+    <b>drop-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="ex-droptcpdsthostport">
+<b> droptcpdsthostport { addr port acl seq } </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    addr is the ip address
+
+    <li>
+    port is the tcp port
+
+    <li>
+    acl is the name of the ACL
+
+    <li>
+    seq is the sequence number in the access list
+
+    </ul>
+
+    <p>
+    This procedure is used to block a destination host port pair.
+
+    <p>
+    This is implemented by these steps:
+
+    <p>
+    <ul>
+
+    <li>
+    If necessary, enter ACL configure mode
+
+    <li>
+    Add address and port to the ACL
+
+    </ul>
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>droptcpdsthostport</b> [-]
+
+    <li>
+    <b>droptcpdsthostport-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="ex-droptcpport">
+<b> droptcpport { port acl seq } </b>
+</a>
+<li>
+<a name="ex-dropudpport">
+<b> dropudpport { port acl seq } </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    port is the port to block
+
+    <li>
+    acl is the name of the ACL
+
+    <li>
+    seq is the sequence number in the access list
+
+    </ul>
+
+    <p>
+    This procedure is used to add a block for a tcp or udp port on an ACL.
+
+    <p>
+    This is implemented by these steps:
+
+    <p>
+    <ul>
+
+    <li>
+    If necessary, enter ACL configure mode
+
+    <li>
+    Add port to the ACL
+
+    </ul>
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>droptcpport</b> [-]
+
+    <li>
+    <b>dropudpport</b> [-]
+
+    <li>
+    <b>droptcpport-failed</b> [-]
+
+    <li>
+    <b>dropudpport-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="ex-listacl">
+<b> listacl { acl interface } </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    acl is the name of the ACL
+
+    <li>
+    interface is the name of the interface
+
+    </ul>
+
+    <p>
+    This procedure is used to list the contents of the ACL.
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>listacl</b> [-]
+
+    <li>
+    <b>listacl-failed</b> [-]
+
+    </ul>
+
+    <p>
+    Here's an example <b>listacl</b> report:
+    <blockquote>
+    <tt>
+    listacl -
+    <br>
+    10 12 blockhost 194.117.194.120
+    <br>
+    15 0 blockhost 207.45.69.69
+    <br>
+    20 2 blockhost 202.96.113.20
+    <br>
+    25 0 blocknet 64.154.61.0/24
+    <br>
+    30 58 blockhost 210.233.49.116
+    <br>
+    35 0 blockhost 212.139.3.131
+    <br>
+    40 0 blockhost 212.139.3.132
+    <br>
+    45 0 blockhost 209.61.194.83
+    <br>
+    50 341 blockhost 192.102.234.119
+    <br>
+    55 174 blockhost 128.218.182.205
+    <br>
+    60 829 blockhost 193.251.23.218
+    <br>
+    65535 0 permitany
+    <br>
+    .
+    </tt>
+    </blockquote>
+
+    <p>
+    The first number is the sequence number (or 0 if the router does
+    not use sequence numbers). The second number is the count of how
+    many times the ACL has matched a packet.
+
+    <p>
+
+<li>
+<a name="ex-listroute">
+<b> listroute { } </b>
+</a>
+    <p>
+    This procedure is used to list routes.
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>listroute</b> [-]
+
+    <li>
+    <b>listroute-failed</b> [-]
+
+    </ul>
+
+    <p>
+    Here's an example <b>listroute</b> report:
+
+    <blockquote>
+    <tt>
+    listroute -
+    <br>
+    D 0.0.0.0 172.16.100.1
+    <br>
+    D 172.16.111.0/24 172.16.100.2
+    <br>
+    D 172.16.112.0/24 172.16.100.2
+    <br>
+    D 172.16.113.0/24 172.16.100.2
+    <br>
+    I 172.16.114.0/24
+    <br>
+    I 172.16.115.0/24
+    <br>
+    I 172.16.116.0/24
+    <br>
+    S 172.16.116.128/23 172.16.116.90
+    <br>
+    N 172.16.116.54
+    <br>
+    N 172.16.116.54
+    <br>
+    D 172.16.117.0/24 172.16.100.4
+    <br>
+    D 172.16.118.0/24 172.16.100.4
+    <br>
+    D 172.16.119.0/24 172.16.100.4
+    <br>
+    .
+    </tt>
+    </blockquote>
+
+    <p>
+    See the <a href="#listroute"><b>listroute</b></a> command for
+    a description of the output format.
+
+    <p>
+
+<li>
+<a name="ex-login">
+<b> login { addr cuser cpass1 cpass2 euser epass1 epass2 } </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    addr is the ip address of the router
+
+    <li>
+    cuser is the connect username
+
+    <li>
+    cpass1 is the primary connect password
+
+    <li>
+    cpass2 is the backup connect password
+
+    <li>
+    euser is the enable username
+
+    <li>
+    epass1 is the primary enable password
+
+    <li>
+    epass2 is the backup enable password
+
+    </ul>
+
+    <p>
+    This procedure is used to login to the router. If the ACL
+    blocker is not currently logged in, it will attempt to login.
+    If it is already is logged in, it will logout and then login
+    again.
+
+    <p>
+    The login procedure uses two connect and two enable passwords.
+    If the primary password fails, the backup password is tried.
+    This allows router passwords to be changed without a window of
+    vulnerability.
+
+    <p>
+    Note that using more than two passwords can make the expect
+    scripts more complicated (e.g. Ciscos terminate the telnet
+    connection after three connect password failures).
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>login</b> [-]
+
+    <li>
+    <b>login-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="ex-logout">
+<b> logout {} </b>
+</a>
+    <p>
+    This procedure is used to logout of the router.
+
+    <p>
+    The child process is killed and cleaned up after.
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>logout</b> [-]
+
+    <li>
+    <b>logout-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="ex-nonullzero">
+<b> nonullzero { addr } </b>
+<li>
+<b> nonullzero { addr/netwidth } </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    addr is the ip address to remove the null zero route for
+
+    <li>
+    netwidth is an optional network width (e.g. 131.243.1.0/24)
+
+    </ul>
+
+    <p>
+    This procedure is used to remove a null zero route for a host.
+
+    <p>
+    This is implemented by these steps:
+
+    <p>
+    <ul>
+
+    <li>
+    If necessary, enter configure mode
+
+    <li>
+    Remove the static null zero route
+
+    </ul>
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>nonullzero</b> [-]
+
+    <li>
+    <b>nonullzero-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="ex-nullzero">
+<b> nullzero { addr } </b>
+<li>
+<b> nullzero { addr/netwidth } </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    addr is the ip address to create a null zero route for
+
+    <li>
+    netwidth is an optional network width (e.g. 131.243.1.0/24)
+
+    </ul>
+
+    <p>
+    This procedure is used to isolate a host by installing a null
+    zero route for it.
+
+    <p>
+    This is implemented by these steps:
+
+    <p>
+    <ul>
+
+    <li>
+    If necessary, enter configure mode
+
+    <li>
+    Add a static null zero route
+
+    </ul>
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>nullzero</b> [-]
+
+    <li>
+    <b>nullzero-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="ex-permittcpdsthostport">
+<b> permittcpdsthostport { addr port acl seq } </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    addr is the ip address
+
+    <li>
+    port is the tcp port
+
+    <li>
+    acl is the name of the ACL
+
+    <li>
+    seq is the sequence number in the access list
+
+    </ul>
+
+    <p>
+    This procedure is used to install an exception for a specific
+    host and tcp port in an ACL.
+
+    <p>
+    This is implemented by these steps:
+
+    <p>
+    <ul>
+
+    <li>
+    If necessary, enter ACL configure mode
+
+    <li>
+    Add address and port to the ACL
+
+    </ul>
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>permittcpdsthostport</b> [-]
+
+    <li>
+    <b>permittcpdsthostport-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="ex-removedefault">
+<b> removedefault { acl seq } </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    acl is the name of the ACL
+
+    <li>
+    seq is the sequence number in the access list
+
+    </ul>
+
+    <p>
+    This procedure is used to remove the default "allow anything" rule
+    from an ACL.
+
+    <p>
+    This is implemented by these steps:
+
+    <p>
+    <ul>
+
+    <li>
+    If necessary, enter ACL configure mode
+
+    <li>
+    If necessary, remove the "allow anything" rule from the ACL
+
+    </ul>
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>removedefault</b> [-]
+
+    <li>
+    <b>removedefault-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="ex-restore">
+<b> restore { addr acl seq } </b>
+<li>
+<b> restore { addr/netwidth acl seq } </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    addr is the ip address to unblock
+
+    <li>
+    acl is the name of the ACL
+
+    <li>
+    netwidth is an optional network width (e.g. 131.243.1.0/24)
+
+    <li>
+    seq is the sequence number in the access list
+
+    </ul>
+
+    <p>
+    This procedure is used to remove a block for an ip address on an ACL.
+
+    <p>
+    This is implemented by these steps:
+
+    <p>
+    <ul>
+
+    <li>
+    If necessary, enter ACL configure mode
+
+    <li>
+    Remove the ip address from the ACL
+
+    </ul>
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>restore</b> [-]
+
+    <li>
+    <b>restore-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="ex-restoretcpdsthostport">
+<b> restoretcpdsthostport { addr port acl seq } </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    addr is the ip address
+
+    <li>
+    port is the tcp port
+
+    <li>
+    acl is the name of the ACL
+
+    <li>
+    seq is the sequence number in the access list
+
+    </ul>
+
+    <p>
+    This procedure is used to remove a destination host port pair
+    block.
+
+    <p>
+    This is implemented by these steps:
+
+    <p>
+    <ul>
+
+    <li>
+    If necessary, enter ACL configure mode
+
+    <li>
+    Remove address and port form the ACL
+
+    </ul>
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>restoretcpdsthostport</b> [-]
+
+    <li>
+    <b>restoretcpdsthostport-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="ex-restoretcpport">
+<b> restoretcpport { port acl seq } </b>
+</a>
+<li>
+<a name="ex-restoreudpport">
+<b> restoreudpport { port acl seq } </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    port is the port to unblock
+
+    <li>
+    acl is the name of the ACL
+
+    <li>
+    seq is the sequence number in the access list
+
+    </ul>
+
+    <p>
+    This procedure is used to remove a block for a tcp or udp port in an ACL.
+
+    <p>
+    This is implemented by these steps:
+
+    <p>
+    <ul>
+
+    <li>
+    If necessary, enter ACL configure mode
+
+    <li>
+    Remove the port from the ACL
+
+    </ul>
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>restoretcpport</b> [-]
+
+    <li>
+    <b>restoreudpport</b> [-]
+
+    <li>
+    <b>restoretcpport-failed</b> [-]
+
+    <li>
+    <b>restoreudpport-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="ex-sync">
+<b> sync {} </b>
+</a>
+    <p>
+    This procedure does whatever is necessary to save recent changes
+    made to the router.
+
+    <p>
+    This is implemented by these steps:
+
+    <p>
+    <ul>
+
+    <li>
+    Router configuration changes are committed to nonvolatile memory
+    <br>
+    For example, "write memory" on a Cisco or "copy running-config
+    startup-config on a Force 10
+
+    </ul>
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>sync</b> [-]
+
+    <li>
+    <b>sync-failed</b> [-]
+
+    </ul>
+
+    <p>
+
+<li>
+<a name="ex-unpermittcpdsthostport">
+<b> unpermittcpdsthostport { addr port acl seq } </b>
+</a>
+    <p>
+    <ul>
+
+    <li>
+    addr is the ip address
+
+    <li>
+    port is the tcp port
+
+    <li>
+    acl is the name of the ACL
+
+    <li>
+    seq is the sequence number in the access list
+
+    </ul>
+
+    <p>
+    This procedure is used to remove an exception for a specific
+    host and tcp port in an ACL.
+
+    <p>
+    This is implemented by these steps:
+
+    <p>
+    <ul>
+
+    <li>
+    If necessary, enter ACL configure mode
+
+    <li>
+    Remove address and port from the ACL
+
+    </ul>
+
+    <p>
+    Possible return statuses:
+
+    <p>
+    <ul>
+
+    <li>
+    <b>unpermittcpdsthostport</b> [-]
+
+    <li>
+    <b>unpermittcpdsthostport-failed</b> [-]
+
+    </ul>
+
+</ul>
+
+<h3>
+Implementation details
+</h3>
+
+When the ACL blocker starts up it:
+
+<ul>
+
+<li>
+Reads the configuration file(s) which tell it:
+
+    <p>
+    <ul>
+
+    <li>
+    The router ip address
+
+    <li>
+    The router username(s) and passwords (up to two connect and two
+    enable)
+
+    <li>
+    The router expect script
+
+    <li>
+    The local port to listen for clients
+
+    <li>
+    ACL configuration (ACL names, network/netmask list and interface/acl
+    assignments)
+
+    <li>
+    The number of seconds between <b>sync</b> commands
+
+    <li>
+    The minimum and maximum sequence numbers to use
+
+    </ul>
+
+<p>
+<li>
+Connects to the router, logs in and gains privileges
+
+<li>
+Fetches the contents of each configured ACL
+
+<li>
+Fetches the route list
+
+<li>
+Loops waiting for client requests
+
+<li>
+Periodically check to make sure the router is still responsive to
+commands
+
+<li>
+Periodically tell the router to save its configuration to nonvolatile
+memory
+
+</ul>
+
+</body></html>

@@ -1,0 +1,34 @@
+<html><head>
+<title> AFNI program:  3dDWItoDT </title></head>
+<body><center><h1> AFNI program:  3dDWItoDT </h1>
+<h2>Output of -help</h2></center>
+<hr /><pre>
+Usage: 3dDWItoDT [options] gradient-file dataset
+Computes 6 principle direction tensors from multiple gradient vectors
+ and corresponding DTI image volumes.
+ The program takes two parameters as input :  
+    a 1D file of the gradient vectors with lines of ASCII floats Gxi,Gyi,Gzi
+.    a 3D bucket dataset with Np+1 sub-briks where the first sub-brik is the volume
+    acquired with no diffusion weighting.
+ Options:
+   -automask =  so that the correlation is only computed between
+   high-intensity (presumably brain) voxels.  The
+   intensity level is determined the same way that
+   3dClipLevel works.
+ The output is a 6 sub-brick bucket dataset containing Dxx,Dxy,Dxz,Dyy,Dyz,Dzz.
+ These results are appropriate as the input to the 3dDTeig program.
+
+
+INPUT DATASET NAMES
+-------------------
+This program accepts datasets that are modified on input according to the
+following schemes:
+  'r1+orig[3..5]'                                    {sub-brick selector}
+  'r1+orig<100.200>'                                 {sub-range selector}
+  'r1+orig[3..5]<100..200>'                          {both selectors}
+  '3dcalc( -a r1+orig -b r2+orig -expr 0.5*(a+b) )'  {calculation}
+For the gruesome details, see the output of 'afni -help'.
+</pre>
+<hr /><b>This page generated on
+Fri Mar 18 15:57:21 EST 2005
+</b></body></html>

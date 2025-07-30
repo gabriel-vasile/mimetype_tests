@@ -1,0 +1,900 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- START PPOMIT -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head profile="http://dublincore.org/documents/dcq-html/">
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Centers for Medicare &amp; Medicaid Services</title>
+<meta name="TransitPubID" content="4797" />
+
+
+
+<meta name="Section_Page" content="Creditable Coverage">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" title="Dublin Core Metadata Element Set" />
+<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" title="Dublin Core Terms" />
+
+<meta name="Description" content="MCD Overview Page" />
+<meta name="Keywords" content />
+<meta name="DC.title" content="MCD Overview Page" />
+<meta name="DC.subject" content="MCD" />
+<meta name="DC.description" content="MCD Overview Page" />
+<meta name="DC.language" content="en" />
+<meta name="DC.date.created" content="12/2/2008 12:48:24 PM" />
+<meta name="DC.date.reviewed" content="12/2/2008 12:48:24 PM" />
+<meta name="DCTERMS.audience" content="?" />
+
+<link href="/styles/screen1.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript" src="/jscripts/addEvent.js"></script>
+
+<script type="text/javascript" language="javascript">
+<!--
+	//history.forward();
+
+	var bSemi = true;
+	var bPer = true;
+	var numPer = 0;
+
+	// convert all characters to lowercase to simplify testing 
+	var agt=navigator.userAgent.toLowerCase(); 
+
+	// *** BROWSER VERSION *** 
+	var is_major = parseInt(navigator.appVersion); 
+	var is_minor = parseFloat(navigator.appVersion); 
+
+	var is_nav  = ((agt.indexOf('mozilla')!=-1) && (agt.indexOf('spoofer')==-1) 
+	            && (agt.indexOf('compatible') == -1) && (agt.indexOf('opera')==-1) 
+	            && (agt.indexOf('webtv')==-1)); 
+	var is_nav4up = (is_nav && (is_major >= 4)); 
+	var is_nav5up = (is_nav && (is_major >= 5));
+
+	var is_ie   = (agt.indexOf("msie") != -1); 
+	var is_ie4up  = (is_ie  && (is_major >= 4)); 
+
+	var popUp = null;
+
+	function createPopUp(in_url, width, height)
+	{
+		var maxWidth = 800;
+		var maxHeight = 600;
+		
+		if(width > maxWidth)
+			width = maxWidth;
+		
+		if(height > maxHeight)
+			height = maxHeight;	
+
+		if(popUp != null)
+		{
+			if(!popUp.closed)
+				popUp.close();
+		}
+		else if(is_nav && !is_nav5up)
+		{
+			popUp = window.open(in_url, "", "height=" + height + ", width=" + width + ",resizable=yes,scrollbars,status,toolbar,menubar");
+			popUp.location.href = in_url;
+			popUp.close();
+		}
+
+		if(is_nav && !is_nav5up)
+		{
+			popUp = window.open(in_url, "", "height=" + height + ", width=" + width + ",resizable=yes,scrollbars,status,toolbar,menubar");
+			popUp.location.href = in_url;
+			popUp.location.reload();
+		}
+		else if(is_ie || is_nav5up)
+		{
+			popUp = window.open(in_url, "test", "height=" + height + ", width=" + width + ",resizable=yes,scrollbars,status,toolbar,menubar");
+		}
+		
+		if(popUp)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+		
+
+		//popUp.focus();
+	}
+	
+	function createPopUpHelp(in_url, width, height)
+	{
+		var maxWidth = 700;
+		var maxHeight = 480;
+		
+		if(width > maxWidth)
+			width = maxWidth;
+		
+		if(height > maxHeight)
+			height = maxHeight;	
+
+		if(popUp != null)
+		{
+			if(!popUp.closed)
+				popUp.close();
+		}
+		else if(is_nav && !is_nav5up)
+		{
+			popUp = window.open(in_url, "", "height=" + height + ", width=" + width + ",status,menubar");
+			popUp.location.href = in_url;
+			popUp.close();
+		}
+
+		if(is_nav && !is_nav5up)
+		{
+			popUp = window.open(in_url, "", "height=" + height + ", width=" + width + ",status,menubar");
+			popUp.location.href = in_url;
+			popUp.location.reload();
+		}
+		else if(is_ie || is_nav5up)
+		{
+			popUp = window.open(in_url, "test", "height=" + height + ", width=" + width + ",status,menubar");
+		}
+
+		if(popUp)
+		{
+			return false;
+		}
+		
+		return true;
+
+		//popUp.focus();
+	}
+
+	function checkDate(obj)
+	{
+		var strDate = obj.value;
+		var upperDay;
+		var tempDate;
+		
+		if(strDate != "")
+		{
+			if(strDate.substr(2,1) != "/" || strDate.substr(5,1) != "/" || strDate.length != 10)
+			{
+				alert("Invalid date format! \nPlease enter date as \"MM/DD/YYYY\".");
+				obj.focus();
+				return false;
+			}
+			else
+			{
+				tempDate = strDate.split('/');
+				if(tempDate.length != 3)
+				{
+					alert("Invalid date format! \nPlease enter date as \"MM/DD/YYYY\".");
+					obj.focus();
+					return false;
+				}
+				
+				month = eval(strDate.substr(0,2));
+				day	= eval(strDate.substr(3,2));
+				year = eval(strDate.substr(6,4));
+				
+				if(	month < 0 || month > 12) 
+				{
+					alert("Invalid month!");
+					obj.focus();
+					return false;
+				}
+
+		        // make sure day is valid for the entered month
+				if(month == 2)
+				{
+					if(year % 4 > 0)
+						upperDay = 28;
+					else
+						upperDay = 29;
+				}
+				else if(month == 4 || month == 6 || month == 9 || month == 11)
+				{
+					upperDay = 30;
+				}
+				else
+				{
+					upperDay = 31;
+				}
+				if(	day < 1 || day > upperDay) 
+				{
+					alert("Invalid date!");
+					obj.focus();
+					return false;
+				}
+				if(	year < 1900 || year > 2100) 
+				{
+					alert("Invalid year!");
+					obj.focus();
+					return false;
+				}
+			}
+		}
+		else
+		{
+			alert("Invalid date!");
+			obj.focus();
+			return false;
+		}
+		return true;
+	}
+
+	function chkNum()
+	{
+		// make sure a number was entered
+		if((event.keyCode < 48) || (event.keyCode > 57))
+		{
+			event.returnValue = false;
+			return false;
+		}
+	}
+
+	function chkNumSemi()
+	{
+		// make sure a number was entered
+		if((event.keyCode < 48 || event.keyCode > 57) && event.keyCode != 59)
+		{
+			event.returnValue = false;
+			return false;
+		}
+		else if(event.keyCode == 59)
+		{
+			if(bSemi)
+			{
+				event.returnValue = false;
+				return false;
+			}
+			else bSemi = true;
+		}
+		else if(event.keyCode >= 48 && event.keyCode <= 57)
+			bSemi = false;
+	}
+
+	function chkNumNav(e)
+	{
+		var keyCode = e.which;
+		if((keyCode < 48 || keyCode > 57) && keyCode != 8)
+			return false;
+	}
+
+	function chkNumSemiNav(e)
+	{
+		var keyCode = e.which;
+		if((keyCode < 48 || keyCode > 57) && keyCode != 59 && keyCode != 32 && keyCode != 8)
+		{
+			return false;
+		}
+		else if(keyCode == 59)
+		{
+			if(bSemi)
+				return false;
+			else bSemi = true;
+		}
+		else if(keyCode >= 48 && keyCode <= 57)
+			bSemi = false;
+	}
+
+	function chkDateNum()
+	{
+		// make sure a number or a / was entered
+		if((event.keyCode < 47) || (event.keyCode > 57))
+		{
+			event.returnValue = false;
+			return false;
+		}
+	}
+
+	function chkDateNumNav(e)
+	{
+		var keyCode = e.which;
+		if((keyCode < 47 || keyCode > 57) && keyCode != 8)
+			return false;
+	}
+	
+	function chkCodes()
+	{
+		//alert(event.keyCode);
+		if((event.keyCode < 48 || event.keyCode > 57) && event.keyCode != 46 && event.keyCode != 13 && event.keyCode != 91 && event.keyCode != 93 && event.keyCode != 42 && (event.keyCode < 65 || event.keyCode > 90) && (event.keyCode < 97 || event.keyCode > 122))
+		{
+			event.returnValue = false;
+			return false;
+		}
+	}
+
+	function chkCodesNav(e)
+	{
+		var keyCode = e.which;
+		//alert(keyCode);
+		if((keyCode < 48 || keyCode > 57) && keyCode != 46 && keyCode != 13 && keyCode != 91 && keyCode != 93 && keyCode != 42 && keyCode != 8 && (keyCode < 65 || keyCode > 90) && (keyCode < 97 || keyCode > 122))
+			return false;
+	}
+
+	function chkRanges()
+	{
+		if((event.keyCode < 48 || event.keyCode > 57) && event.keyCode != 46 && (event.keyCode < 65 || event.keyCode > 90) && (event.keyCode < 97 || event.keyCode > 122))
+		{
+			event.returnValue = false;
+			return false;
+		}
+		else if(event.keyCode == 46)
+		{
+			if(bPer)
+			{
+				event.returnValue = false;
+				return false;
+			}
+			else bPer = true;
+		}
+		else if(event.keyCode >= 48 && event.keyCode <= 57)
+			bPer = false;
+	}
+
+	function chkRangesNav(e)
+	{
+		var keyCode = e.which;
+		if((keyCode < 48 || keyCode > 57) && keyCode != 46 && keyCode != 8 && (keyCode < 65 || keyCode > 90) && (keyCode < 97 || keyCode > 122))
+		{
+			return false;
+		}
+		else if(keyCode == 46)
+		{
+			if(bPer)
+				return false;
+			else bPer = true;
+		}
+		else if(keyCode >= 48 && keyCode <= 57)
+			bPer = false;
+	}
+
+//-->
+</script>
+
+
+</head>
+
+<body style="margin:0;" onload="boldLeftLink()">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:0;">
+	<tr>
+		<td align="left" style="background-image:url(/hhs_back_new.gif);">
+		<a id="hhsleft" href="http://www.hhs.gov/" title="Health and Human Services Home Page"><img src="/hhs_left_new.gif" width="201" height="41" alt="U S Department of Health and Human Services" title="U S Department of Health and Human Services" style="border:0;" />
+		</td>
+		<td align="right" style="background-image:url(/hhs_back_new.gif);">
+		<a id="hhsright" href="http://www.hhs.gov/" title="Health and Human Services Home Page"><img src="/hhs_right_new.gif" width="587" height="41" alt="www.hhs.gov" title="www.hhs.gov" style="border:0;" /></a>
+		</td>
+	</tr>
+</table>
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<tr><td>
+<div id="masthead">
+	<a href="/" title="Centers for Medicare &amp; Medicaid Services"> <img src="/images/banners/banner-text.jpg" width="650" height="60" alt="Centers for Medicare &amp; Medicaid Services" title="Centers for Medicare &amp; Medicaid Services" style="border:0;" /> </a>
+	<div id="divhead">
+		<form action="http://search.cms.hhs.gov/search" id="gs" style="display: inline;">
+
+			<input type="text" name="q" id="q" value="Search now" size="10" maxlength="50" style="width: 108px; height: 15px; padding: 0; margin: 0px 0; border: 1px solid #f5d7b4; font: 10px verdana, lucida,  sans-serif; vertical-align: top;" onfocus="this.value='';" />
+
+			
+			<input type="submit" name="btnG" id="btnG" class="Searchbutton" alt="Search" value="Search" title="Search">
+
+			<input value="cms_collection" name="site" type="hidden" />
+			<input value="xml_no_dtd" name="output" type="hidden" />
+			<input value="cms_frontend" name="client" type="hidden" />
+			<input value="cms_frontend" name="proxystylesheet" type="hidden" />
+			<input value="UTF-8" name="oe" type="hidden" />
+		</form>
+	</div>
+</div>
+
+</td>
+</tr><tr>
+	<td align="center" nowrap="nowrap">
+		<ul id="global-toolbar">
+		    <li><a href="#jump_content" class="skip">Skip to content</a></li>
+		    <li class="firstLink"><a href="/" title="CMS Home Page" >Home</a></li>
+			<li><a href="/home/medicare.asp" title="For Healthcare Professionals" >Medicare</a></li>
+		    <li><a href="/home/medicaid.asp" title="People With Medicaid and Healthcare Professionals" >Medicaid</a></li>
+		    <li><a href="/home/schip.asp" title="State Children's Health Insurance Program" >SCHIP</a></li>
+		    <li><a href="/home/aboutcms.asp" title="Who We Are and What We Do" >About CMS</a></li>		
+		    <li><a href="/home/regsguidance.asp" title="Includes Policies &amp; Legislation" >Regulations &amp; Guidance</a></li>
+		    <li><a href="/home/rsds.asp" title="Analytical and Technical Information" >Research, Statistics, Data &amp; Systems</a></li>
+		    <li><a href="/home/outreacheducation.asp" title="Training and Learning Resources" >Outreach &amp; Education</a></li>
+		    <li><a href="/home/tools.asp" title="Includes Applications and Databases" >Tools</a></li>		    
+		</ul>
+	</td>
+</tr>
+
+
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+
+var da = (document.all) ? 1 : 0;
+var pr = (window.print) ? 1 : 0;
+var mac = (navigator.userAgent.indexOf("Mac") != -1);
+
+function printPage() {
+  if (pr) // NS4, IE5
+    window.print()
+  else if (da && !mac) // IE4 (Windows)
+    vbPrintPage()
+  else // other browsers
+    alert("Sorry, your browser doesn't support this feature.");
+  return false;
+}
+
+if (da && !pr && !mac) with (document) {
+  writeln('<OBJECT ID="WB" WIDTH="0" HEIGHT="0" CLASSID="clsid:8856F961-340A-11D0-A96B-00C04FD705A2"></OBJECT>');
+  writeln('<' + 'SCRIPT LANGUAGE="VBScript">');
+  writeln('Sub window_onunload');
+  writeln('  On Error Resume Next');
+  writeln('  Set WB = nothing');
+  writeln('End Sub');
+  writeln('Sub vbPrintPage');
+  writeln('  OLECMDID_PRINT = 6');
+  writeln('  OLECMDEXECOPT_DONTPROMPTUSER = 2');
+  writeln('  OLECMDEXECOPT_PROMPTUSER = 1');
+  writeln('  On Error Resume Next');
+  writeln('  WB.ExecWB OLECMDID_PRINT, OLECMDEXECOPT_DONTPROMPTUSER');
+  writeln('End Sub');
+  writeln('<' + '/SCRIPT>');
+}
+
+// -->
+</SCRIPT>
+
+
+<tr>
+	<td align="center">
+	<ul id="support-toolbar">
+	    <li class="firstLink"><a href="/center/PeopleWithMedicareCenter.asp" title="Important Medicare and Medicaid Information" >People with Medicare &amp; Medicaid</a></li>
+	    <li><a href="http://questions.cms.hhs.gov" title="Frequently Asked Questions" >Questions</a></li>
+	    <li><a href="/CareersAtCMS/" title="Jobs and Opportunities at CMS" >Careers</a></li>
+	    <li><a href="/center/press.asp" title="Media Resources and Tools">Newsroom</a></li>
+	    <li><a href="/ContactCMS/" title="How to Reach CMS" >Contact CMS</a></li>
+	    <li><a href="/apps/acronyms/" title="Common Acronyms" >Acronyms</a></li>
+	    <li><a href="/AboutWebsite/11_Help.asp" title="File Formats and Plug-ins" >Help</a></li>
+		<li> <a href="/sp/sendpage.asp" title="Email Page"><img src="/images/icons/large/mail_16.gif" width="16" height="16" alt="Email Page" title="Email Page" style="vertical-align:middle; border: none;" /> Email</a> </li>
+
+
+
+		<li> <a href="/pf/printpage.asp?ref=http://www.cms.hhs.gov/mcd/ncpc_viewpubliccomments.asp?id=15&expand=Y" title="Print Page"><img src="/images/icons/large/print_16.gif" width="16" height="16" style="vertical-align:middle; border: none;" alt="Print Page" title="Print Page" /> Print</a> </li>
+	</ul>
+	</td>
+</tr>
+
+</table>
+
+
+<!-- END PPOMIT -->
+
+
+
+<!-- START PPOMIT -->
+<table border="0" width="100%">
+	<tr>
+		<td width="22%">&nbsp;</td>
+		<td width="78%" class="bodytext">
+<a href="http://www.cms.hhs.gov/">CMS Home</a> &gt; <span><a href="http://www.cms.hhs.gov/home/medicare.asp">Medicare</a></span> &gt; <span><a href="http://www.cms.hhs.gov/CoverageGenInfo/">Medicare Coverage - General Information</a></span> &gt; <span><a href="http://www.cms.hhs.gov/mcd/">Medicare Coverage Database</a></span> &gt;
+<a href="indexes.asp">Indexes Home</a> &gt; <a href="index_list.asp?list_type=mcd_6">Compendia</a> &gt; <a href="ncpc_view_document.asp?id=15">View Document</a> &gt; <span>View Public Comments</span>
+
+		</td>
+	</tr>
+</table>
+<!-- END PPOMIT -->
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+  <!-- START PPOMIT -->
+   	<td valign="top" width="25%">
+
+
+<!-- START PPOMIT -->
+<div class="box" id="leftdiv"><h3>Medicare Coverage Database</h3><ul>
+<li><a href="overview.asp" target="_top" title="View Overview Page">Overview</a></li>
+<li><a href="search.asp?clickon=search" target="_top" title="View Search">Search</a></li>
+<li><a href="indexes.asp?clickon=index" target="_top" title="View Indexes">Indexes</a></li>
+<li><a href="reports.asp?clickon=report" target="_top" title="View Reports">Reports</a></li>
+<li><a href="cpt_license.asp?type=download&page=overview.asp" target="_top" title="Downloads Page">Downloads</a></li>
+<li><a href="basket.asp" title="View Basket" target="_top">Basket</a></li>
+<li><a href="./help/nationalindexes_help.asp" target="_new" title="View Page Help" onclick="createPopUp('./help/nationalindexes_help.asp', 700, 400); return false;">MCD Help</a></li>
+</ul></div>
+
+   	</td>
+  <!-- END PPOMIT -->
+   	<td align="left" valign="top" colspan="2" width="75%">
+
+
+
+
+<div class="centerbox">
+    <a name="jump_content" class="skip">Content Section</a>
+
+
+  <h3 class="header" id="titleh3">View Public Comments for Thomson Micromedex DrugPoints Compendium Revision Request - CAG-00390</strong></h3>
+<table border="0" width="100%" cellspacing="0" cellpadding="6"><tr><td width="100%">
+
+
+<br>
+<table width="95%" bgcolor="#ffffff">
+<tbody>
+	<tr>
+	<td width="2%">&nbsp;</td>
+	<td width="98%">
+		<table width="100%" cellspacing="10" cellpadding="0" bgcolor="#ffffff">
+		<tbody>
+			<tr>
+			<td>
+
+				<a href="ncpc_viewpubliccomments.asp?id=15&expand=N">Collapse All Comments</a><br><br>
+
+			</td>
+			</tr>
+		</tbody>
+		</table>
+	</td>
+	</tr>
+</tbody>
+</table>
+
+<br>
+<table width="95%" bgcolor="#ffffff">
+<tbody>
+	<tr>
+	<td width="2%">&nbsp;</td>
+	<td width="98%">
+		<table width="100%" cellpadding="2" cellspacing="0" class="rowcolor2">
+		<tbody>
+			<tr>
+			<td>
+				<strong>&nbsp;Public Comments</strong>
+			</td>
+			</tr>
+
+			<tr>
+			<td>
+				<table width="100%" cellspacing="10" cellpadding="0" bgcolor="#ffffff">
+				<tbody>
+					<tr>
+					<td>
+
+						<table width="100%">
+						<colgroup>
+							<col span="1" width="15%">
+							<col span="1" width="85%" style="text-align: left;">
+						</colgroup>
+						<tbody>
+							<tr>
+								<td><a name="comment244"></a><strong>Commenter:</strong></td>
+								<td>
+									<strong>Kaye, Thomas</strong>
+								</td>
+							</tr>
+
+							<tr>
+								<td>Title:</td>
+								<td>Sr. Pharmacy Director</td>
+							</tr>
+
+							<tr>
+								<td>Organization:</td>
+								<td>Amerihealthmercy health plan- DBA Passport Health Plan</td>
+							</tr>
+
+							<tr>
+								<td>Date:</td>
+								<td>2/12/2008 1:35:15 PM</td>
+							</tr>
+							<tr>
+								<td colspan="2">Comment:</td>
+							</tr>
+							<tr>
+								<td colspan="2"><p>The official compendia listings of medications <br>and transference of information must be <br>maintained with the absolute highest integrity <br>and without bias to purpose. <br>Both ASCO and previously NCCN have both been <br>eager to suggest that this task should be <br>awarded to them.  CMS should view this in a very <br>cautious manner.  NCCN received manufactures <br>support for the development, listing and <br>recommendations for drug use.  ASCO on the other <br>hand is presented with sponsorships from <br>internal oncology practices as well as Pharma <br>companies though outcomes research.<br><br>Neither of these organizations provides a <br>resolute environment of “no bias” in scientific <br>reporting that reaches acceptable levels. Both <br>ASCO and NCCN remain conflicted which may not <br>insulate the intended results from influence <br>from the pharmaceutical manufactures or the end <br>users of the medical products.  <br>Because these”official compendia” are stipulated <br>in regulatory acts, and these compendia carry an <br>awesome responsibility for appropriate use for <br>medication, I recommend that neither of these <br>groups be appointed to set directions or <br>approvals for medications. <br><br></p></td>
+							</tr>
+						</tbody>
+						</table>
+
+						<br><br>
+
+						<table width="100%">
+						<colgroup>
+							<col span="1" width="15%">
+							<col span="1" width="85%" style="text-align: left;">
+						</colgroup>
+						<tbody>
+							<tr>
+								<td><a name="comment247"></a><strong>Commenter:</strong></td>
+								<td>
+									<strong>Coffey, JD, LLM, Justine</strong>
+								</td>
+							</tr>
+
+							<tr>
+								<td>Title:</td>
+								<td>Director, Federal Regulatory Affairs</td>
+							</tr>
+
+							<tr>
+								<td>Organization:</td>
+								<td>American Society of Health-System Pharmacists</td>
+							</tr>
+
+							<tr>
+								<td>Date:</td>
+								<td>3/12/2008 11:00:00 PM</td>
+							</tr>
+							<tr>
+								<td colspan="2">Comment:</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+American Society of<br />
+
+Health-System Pharmacists<br />
+
+7272 Wisconsin Avenue<br />
+
+Bethesda, Maryland&#160; 20814<br />
+
+(301) 657-3000<br />
+
+Fax: (301) 664-8877<br />
+
+www.ashp.org<br />
+
+
+
+<p>March 13, 2008</p>
+
+
+
+<p>Centers for Medicare &amp; Medicaid Services<br />
+Department of Health and Human Services<br />Baltimore, MD 21244-8018</p>
+
+
+
+<p><b>Comments Relating to The American Society of Clinical Oncology&#8217;s Request That CMS Recognize Thomson Micromedex DrugPoints Compedium As An Authoritative Compendium for Medicare Coverage Purposes &#8211; CAG-00390</b></p>
+
+<p>Dear Sir/Madam:</p>
+
+
+<p>ASHP represents pharmacists who practice in hospitals and health systems.&#160; The Society&#8217;s more than 30,000 members include pharmacists and pharmacy technicians who practice in a variety of health-system settings, including inpatient, outpatient, home care, and long-term-care settings.&#160; ASHP is also the publisher of the American Hospital Formulary Service Drug Information (AHFS DI), a comprehensive, independent reference on the clinical use of medications marketed in the United States.&#160;</p>
+
+
+
+<p>The American Society of Clinical Oncology (ASCO) is requesting that the Thomson Micromedex DrugPoints Compendium (DrugPoints) be included by the Centers for Medicare and Medicaid Services (CMS) in the list of compendia appropriate for identifying medically accepted indications for purposes of Medicare Part B.&#160; In its request, ASCO states that &#8220;DrugPoints is the successor publication to the U.S. Pharmacopoeia &#8211; Drug Information, which is one of the authoritative compendia specified in the Act.&#8221;</p>
+
+
+
+<p>Section 1861(t)(2)(B)(ii)(I) of the Social Security Act lists three drug compendia that may be used in determining the medically accepted indications of drugs and biologicals used in an anti-cancer chemotherapeutic regimen.&#160; The three drug compendia are: AHFS DI, American Medical Association Drug Evaluations (AMA-DE), and United States Pharmacopoeia Dispensing Information (USP-DI).&#160;</p>
+
+
+
+<p>In 2007, Thomson Healthcare announced that it was replacing the USP DI with its own previously existing DrugPoints database.<a id="_ftnref1" title="" href="#_ftn1" name="_ftnref1"><span class="MsoFootnoteReference"><span class="MsoFootnoteReference">[1]</span></span></a>&#160;&#160; While Thomson chose to use the term &#8220;succeeded&#8221; in its press release announcing the change to subscribers,<a id="_ftnref2" title="" href="#_ftn2" name="_ftnref2"><span class="MsoFootnoteReference"><span class="MsoFootnoteReference">[2]</span></span></a> DrugPoints clearly is not a &#8220;successor&#8221; database since it bears little resemblance to the previous USP DI database in content or editorial oversight by USP&#8217;s Expert Committees, and it existed simultaneously for many years in Thomson&#8217;s drug database collection.&#160;</p>
+
+
+
+<p>If CMS is unable to determine whether DrugPoints is a successor or substitute publication, ASHP recommends that CMS contact the originator of USP DI, the United States Pharmacopeial Convention (USP), to advise CMS about the nature of DrugPoints relative to USP DI.</p>
+
+
+
+<p>CMS should also note that DrugPoints information is derived from Thomson Micromedex&#8217;s Drugdex database.&#160; ASCO&#8217;s request makes particular note of this fact stating: &#8220;the information contained in DrugPoints is derived from and summarizes more detailed information from Micromedex&#8217;s Drugdex Information System.&#8221;&#160; Thomson Micromedex has filed a compendium revision request for Drugdex, and ASHP intends to submit comments regarding that request.&#160; Therefore, any determination by CMS must be for the parent database (Drugdex).</p>
+
+
+
+<p>Feel free to contact me if you have any questions regarding our comments.&#160; I can be reached by telephone at 301-664-8702, or by e-mail at <a href="mailto:jcoffey@ashp.org">jcoffey@ashp.org</a>.</p>
+
+
+
+<p>Sincerely,</p>
+
+
+<p>Justine Coffey, JD, LLM<br />
+Director, Federal Regulatory Affairs</p>
+
+<div><br clear="all" />
+<hr align="left" width="33%" size="1" />
+<div id="ftn1">
+<p class="MsoFootnoteText"><a id="_ftn1" title="" href="#_ftnref1" name="_ftn1"><span class="MsoFootnoteReference"><span class="MsoFootnoteReference">[1]</span></span></a> <font size="2">Thomson Healthcare.&#160; Important notice:&#160; USP DI drug information for the health care professional.&#160; Greenwood, CO; 2007 May.&#160; Press release No. HC-4684b rev 05/07.</font></p>
+</div>
+</td>
+							</tr>
+						</tbody>
+						</table>
+
+						<br><br>
+
+						<table width="100%">
+						<colgroup>
+							<col span="1" width="15%">
+							<col span="1" width="85%" style="text-align: left;">
+						</colgroup>
+						<tbody>
+							<tr>
+								<td><a name="comment255"></a><strong>Commenter:</strong></td>
+								<td>
+									<strong>Ying, Dr. Alan</strong>
+								</td>
+							</tr>
+
+							<tr>
+								<td>Title:</td>
+								<td>Chief Medical Officer</td>
+							</tr>
+
+							<tr>
+								<td>Organization:</td>
+								<td>Thomson Healthcare Inc.</td>
+							</tr>
+
+							<tr>
+								<td>Date:</td>
+								<td>4/2/2008 11:00:00 PM</td>
+							</tr>
+							<tr>
+								<td colspan="2">Comment:</td>
+							</tr>
+							<tr>
+								<td colspan="2"><p>April 3, 2008</p>
+
+<p></p>
+
+<p>Louis Jacques, MD<br />
+Director, Division of Items and Devices<br />
+Centers for Medicare and Medicaid Services<br />
+Room 445-G Hubert Humphrey Building<br />
+200 Independence Ave., S.W.<br />
+Washington, D.C. &#160;20201</p>
+
+<p>Re: Response to Comments on the Applications for DrugPoints and DrugDex</p>
+
+<p>Dear Dr. Jacques:</p>
+
+<p>Earlier this year, Thomson Micromedex submitted a request for the inclusion of our product DrugDex on the list of compendia recognized by the Medicare program for the determination of coverage of off-label use. &#160;&#160;In addition, the American Society of Clinical Oncologists ("ASCO") has submitted a request for the inclusion of our product DrugPoints as a listed compendium. &#160;</p>
+
+<p>We were disappointed to see certain misleading comments filed in response to these requests. &#160;We thought it important to clarify the record and note that, under the drug compendia application process described in 42 C.F.R. &#167; 414.930(b)(iii), "CMS may consider additional reasonable factors" in consideration of each compendium.</p>
+
+<p>Clarification Regarding DrugPoints</p>
+
+<p>On February 12, 2008, CMS accepted an application by ASCO to add the DrugPoints compendium to the list of compendia specified in Section 1861(t)(2)(B)(ii)(I) of the Social Security Act. &#160;On March 13, 2008, the American Society of Health-System Pharmacists ("ASHP") submitted a comment adverse to the inclusion of DrugPoints as a CMS-recognized drug compendium. &#160;The ASHP comment stated that "DrugPoints clearly is not a 'successor' database since it bears little resemblance to the previous [United States Pharmacopoeia Dispensing Information ("USP DI")] database in content or editorial oversight by USP&#8217;s Expert Committees, and it existed simultaneously for many years in Thomson&#8217;s drug database collection." &#160;</p>
+
+<p>Effective July, 2007, Thomson Micromedex is no longer publishing a professional product under the USP DI name and, thus, USP DI is no longer being updated. &#160;Thomson Micromedex is publishing its successor product to USP DI, "DrugPoints," and regularly updating this product. &#160;Thomson Micromedex believes that the facts and circumstances make clear that, effective July 2007 DrugPoints became the successor compendium to USP DI. &#160;&#160;</p>
+
+<p>A "successor" is literally that which follows; comes next in time, or replaces another in position. &#160;&#160;&#160;There is ample evidence to support a determination that DrugPoints is the successor publication to USP DI and not a substitute. &#160;It is important to recognize that, although Thomson Micromedex has published a product under the name "DrugPoints" for several years, it is not simply replacing USP DI with the prior DrugPoints product. &#160;Rather, comprehensive changes have been made to DrugPoints as a consequence of its new role as the successor to USP DI. &#160;</p>
+
+<p>Thomson Micromedex enhanced the DrugPoints product as of July, 2007, specifically to ensure that it would succeed the USP DI product in all essential components, such as the inclusion of indication ratings, references, clinical teaching, toxicology information and common synonyms. &#160;The name change is the final step in a long, involved process of transitioning USP DI to DrugPoints. &#160;This transition occurred over a two year period and is described below.</p>
+
+<p>In September, 1998, Thomson Micromedex purchased the USP DI content and licensed the rights to the &#8220;USP DI&#8221; trademark from the United States Pharmacopeial Convention, Inc. (USP). &#160;In May, 2004, editorial review responsibility transitioned to Thomson Micromedex and USP expert committees were no longer involved in evidence rating reviews. &#160;At that time USP and Thomson Micromedex agreed that the license to the USP DI trademark would cease in 2007 and thereafter neither party would use the mark &#8220;USP DI.&#8221; &#160;</p>
+
+<p>Thomson Micromedex continued to develop evidence-based content, as before, following a defined editorial process that utilizes outside experts. &#160;In addition, Thomson Micromedex created the Oncology Advisory Board. &#160;Like the USP committee members, these experts are well known in their fields and associated with major organizations and healthcare facilities throughout the nation. &#160;Consistent with the USP approach to expert review, Thomson Micromedex has found the Oncology Advisory Board members extremely helpful in contributing the combination of practical experience and clinical research to the review process. &#160;</p>
+
+<p>The final step in the transition occurred in early 2007 when Thomson Micromedex began notifying USP DI customers of the pending succession of DrugPoints and the name change from USP DI to DrugPoints pursuant to its contractual obligation to cease using the name USP DI. &#160;In July, 2007, Thomson Micromedex ceased publication and updating of USP DI.</p>
+
+<p>We would also note that Thomson Micromedex has been briefing CMS and Congress on this transition and the impending name change since at least 2005. &#160;Thomson Micromedex actively advocated before Congress to secure inclusion of Section 6001(f)(1) of the Deficit Reduction Act of 2005 ("DRA") and it was understood by lawmakers and staff involved in this amendment that the purpose was to recognize the Thomson Micromedex product that would succeed to USP DI. &#160;CMS was also informed of this legislative advocacy and the intent at the time it was underway.</p>
+
+<p>ASHP also asserted that any determination by CMS must be made for DrugDex instead of DrugPoints because "the information contained in DrugPoints is derived from and summarizes more detailed information from Micromedex's DrugDex Information System." &#160;While this statement is factually correct regarding the relationship between the two products, CMS is in no way required to take the course of action desired by ASHP. &#160;DrugPoints and DrugDex independently meet the definition of a "compendium" as set forth at 42 C.F.R. &#167; 414.930 and may be independently considered for inclusion.<br />
+<br />
+By way of background, DrugDex was first developed over 30 years ago. &#160;It contains comprehensive evidence-based drug information including detailed information on dosing, pharmacokinetics, adverse effects, FDA-approved and off-label uses, comparative efficacy, and other critical information on the appropriate use of drugs. &#160;The information is referenced to the underlying studies and intended to provide the healthcare professional with both broad and in-depth review of all aspects of prescription drugs. &#160;&#160;DrugPoints was initially developed approximately ten years ago and has been greatly enhanced during the last two years in anticipation of becoming the successor to USP DI. &#160;DrugPoints contains summary drug information aimed at the point of care clinician. &#160;Derived from the same core drug information as DrugDex, DrugPoints provides evidence-based information delivered in a concise format to enhance readability and ease of quickly finding needed information. &#160;Sections include dosing, adverse effects, FDA-approved and off-label indications, interactions, toxicology, and pharmacokinetics.</p>
+
+<p>Clarification Regarding DrugDex</p>
+
+<p>On February 19, 2008, CMS accepted an application by Thomson Micromedex to add the DrugDex compendium to the list of compendia specified in Section 1861(t)(2)(B)(ii)(I) of the Social Security Act. &#160;On March 20, 2008, ASHP submitted a comment adverse to the inclusion of DrugDex as a CMS-recognized drug compendium. &#160;</p>
+
+<p>ASHP's comment asserted that "Thomson's request is beyond the scope of the sub-regulatory process by which CMS can accept and definitively act on requests to recognize the addition and/or deletion of existing compendia, since this process applies only to Medicare Part B, not Medicare Part A." &#160;To the extent that this comment by ASHP was actually intended as a serious objection, we would note that our request was only for consideration within the scope of this process and the reference to Part A was simply for completeness.</p>
+
+<p>ASHP also referred to an October 23, 2003 article in the Wall Street Journal (which itself contained numerous errors) to allege that we "used a paid pharmaceutical manufacturer consultant to author the gabapentin (Neurontin) monograph." &#160;&#160;&#160;This is a false and misleading statement. &#160;A professor by the name of Nina Graves was one of six individuals who reviewed an initial monograph on Neurontin in the early 1990s. &#160;However, Ms. Graves work on Neurontin was discontinued prior to her entering into a financial relationship with drug manufacturer Parke-Davis. &#160;As detailed in our request for inclusion of &#160;DrugDex as a listed compendium, Thomson Micromedex adheres to a conflict of interest policy that is consistent with industry standards. &#160;The policy is intended to ensure that individuals involved in literature evaluation and content development are not influenced by financial conflicts of interest. &#160;It is a three-tiered policy which provides that, for de-minimis levels, disclosure is not required; for additional levels, disclosure is required but is not deemed to be disqualifying; and, finally, disqualification results in situations where there is a significant potential for conflict due to the size or nature of a financial relationship. &#160;Our policy is not only robust, but entirely transparent &#8211; it is easily reviewed on our website.</p>
+
+<p>Thomson Micromedex is committed to providing unbiased, evidence-based information. &#160;We appreciate this opportunity to clarify the record in this regard.</p>
+
+<p>Sincerely,</p>
+
+<p><br />
+Dr. Alan Ying<br />
+Chief Medical Officer<br />
+Thomson Healthcare Inc.</p>
+</td>
+							</tr>
+						</tbody>
+						</table>
+
+					</td>
+					</tr>
+				</tbody>
+				</table>
+			</td>
+			</tr>
+		</tbody>
+		</table>
+	</td>
+	</tr>
+</tbody>
+</table>
+
+
+
+<!-- START PPOMIT -->
+<br><hr>
+<p>
+<img src="/images/newsearch.gif" alt="new search" WIDTH="16" HEIGHT="16">&nbsp;<a href="default.asp?reset=Y">New Search</a>
+</p>
+<!-- END PPOMIT -->
+
+
+<!-- START PPOMIT -->
+
+
+<br />
+<hr />
+<p class="bodytext">
+	<strong>Page Last Modified: 12/2/2008 12:48:24 PM</strong>
+	<br /><br />
+	<a href="http://www.cms.hhs.gov/help/default.asp" target="_blank">Help with File Formats and Plug-Ins</a>
+	<br /><br />
+	<a href="http://questions.cms.hhs.gov/cgi-bin/cmshhs.cfg/php/enduser/ask.php?p_prods=8,13,826" target="_new" title="MCD Feedback" onclick="createPopUp('http://questions.cms.hhs.gov/cgi-bin/cmshhs.cfg/php/enduser/ask.php?p_prods=8,13,826', 700, 400); return false;">Submit Feedback</a>
+</p>
+
+
+<!-- END PPOMIT -->
+
+</td></tr></table>
+   	</div>
+
+
+
+	</td>
+   </tr>
+</table>
+
+
+<!-- START PPOMIT -->
+
+
+<table border="0" valign="top" cellspacing="0" cellpadding="0" width="80%" align="center">
+
+	<tr>
+		<td valign="bottom"  nowrap="nowrap" align="center">
+		<br/>
+		<br/>
+		<br/>
+			<ul class="footer-toolbar_top">
+			   <li><a href="http://www.hhs.gov">Department of Health &amp; Human Services</a></li>
+			   <li><a href="http://www.medicare.gov">Medicare.gov</a></li>
+			   <li class="lastitem"><a href="http://www.usa.gov">USA.gov</a></li>
+			</ul>
+		</td>
+	</tr>
+
+	<tr>
+		<td valign="top"  nowrap="nowrap" align="center">
+			<ul class="footer-toolbar_top">
+				<li class="firstitem"><a href="/aboutwebsite/">Web Policies &amp; Important Links</a> </li>
+				<li> <a href="/AboutWebsite/02_Privacy%20Policy.asp">Privacy Policy</a> </li>
+				<li> <a href="/AboutWebsite/04_FOIA.asp">Freedom of Information Act</a> </li>
+				<li class="lastitem"> <a href="/AboutWebsite/06_NoFearAct.asp">No Fear Act</a> </li>
+			</ul>
+		</td>
+	</tr>
+
+	<tr>
+		<td valign="top"  nowrap="nowrap" colspan="1" align="center" >
+			<div id="footer-address">
+			Centers for Medicare &amp; Medicaid Services, 7500 Security Boulevard Baltimore, MD 21244
+			</div>
+	        <br />
+		</td>
+	</tr>
+
+
+	<tr>
+		<td align="right" class="FootNote">
+			<span class="footersmall">www2</span>
+		</td>
+	</tr>
+
+</table>
+
+
+
+<!-- END PPOMIT -->
+
+</body>
+</html>
+

@@ -1,0 +1,6272 @@
+%-12345X@PJL ENTER LANGUAGE = POSTSCRIPT
+%!PS-Adobe
+/wpdict	120 dict def
+wpdict	begin
+/bdef	{bind def} bind def
+
+/bflg	false def
+/Bfont	0 def
+/bon	false def
+
+/psz	0 def
+/_S	/show load def
+/_t	{0 rmoveto} bdef
+
+/_pixelsnap
+	{transform .25 sub round .25 add
+	 exch .25 sub round .25 add exch itransform
+	} bdef
+/_pixeldsnap
+	{ dtransform round exch round exch idtransform } bdef
+
+/_lt	{_pixelsnap lineto} bdef
+/_rlt	{_pixeldsnap rlineto} bdef
+/_mt	{_pixelsnap moveto} bdef
+/_rmt	{_pixeldsnap rmoveto} bdef
+
+/bshow	{gsave psz 30 div 0 _rmt dup show grestore show} bdef
+
+/DUx	0 def
+/DUy	0 def
+/hscl	0 def
+
+/M	{_mt
+	 2 mul -2 2
+	 { -2 roll 0 _rmt _S } for
+	} bdef
+
+/makeoutl
+	{ dup /OutlineFlag known not
+	  { dup dup length 2 add dict begin
+	    {1 index /FID ne { def }{ pop pop } ifelse } forall
+	    /UniqueID known {/UniqueID UniqueID 10000 add def} if
+	    /PaintType PaintType 0 eq { 2 }{ PaintType } ifelse def
+	    /StrokeWidth 15 def
+	    /OutlineFlag true def
+	    /OutlineFont currentdict end definefont
+	  } if
+	} bdef
+
+/nbuff	50 string def
+/orntsv	0 def
+/plen	0 def
+/pwid	0 def
+/picstr	1 string def
+
+/WPencoding StandardEncoding 256 array copy def 0
+ [ 127/Aacute/Acircumflex/Adieresis/Agrave/Aring/Atilde/Ccedilla
+  /Delta/Eacute/Ecircumflex/Edieresis/Egrave/Eth/Gamma/Iacute
+  /Icircumflex/Idieresis/Igrave/Lambda/Ntilde/Oacute
+  /Ocircumflex/Odieresis/Ograve/Omega/Otilde/Phi/Pi/Psi
+  /Scaron/Sigma/TeXtext32/Theta/Thorn
+  209/Uacute/Ucircumflex/Udieresis/Ugrave/Upsilon/Xi/Yacute
+  /Ydieresis/Zcaron/aacute/acircumflex/adieresis/agrave
+  /aring/atilde/brokenbar
+  228/ccedilla/copyright/degree/divide
+  236/dotlessj/eacute/ecircumflex/edieresis/egrave
+  242/eth/ff/ffi
+  246/ffl/iacute
+  252/icircumflex/idieresis/igrave/logicalnot
+  1/minus/mu/multiply/ntilde/oacute/ocircumflex/odieresis
+  /ograve/onehalf/onequarter/onesuperior/otilde/plusminus
+  /registered/scaron/thorn/threequarters/threesuperior
+  /trademark/twosuperior/uacute/ucircumflex/udieresis
+  /ugrave/yacute/ydieresis/zcaron
+]
+{ dup type /nametype eq
+  { WPencoding 2 index 2 index put pop 1 add }
+  { exch pop } ifelse
+} forall pop
+
+/reencode
+{ dup FontDirectory exch known
+   { findfont }
+   {  dup nbuff cvs dup length 1 sub get 82 eq
+   {dup nbuff cvs dup length 1 sub 0 exch getinterval
+   findfont begin
+   currentdict dup length dict begin
+{ 1 index /FID ne {def} {pop pop} ifelse } forall
+/FontName exch def
+
+/Encoding WPencoding def
+currentdict dup end end
+/FontName get exch definefont
+     }
+     { findfont } ifelse
+  } ifelse
+} bdef
+
+/WPDLencoding StandardEncoding 256 array copy def 0
+[ 127     /SA420000/SD630000/SF010000/SF020000/SF030000
+/SF040000/SF050000/SF060000/SF070000/SF080000/SF090000
+/SF100000/SF110000/SF140000/SF150000/SF160000/SF190000
+/SF200000/SF210000/SF220000/SF230000/SF240000/SF250000/SF260000
+/SF270000/SF280000/SF360000/SF370000/SF380000/SF390000/SF400000
+/SF410000/SF420000/SF430000
+209 /SF440000/SF450000/SF460000/SF470000/SF480000
+/SF490000/SF500000/SF510000/SF520000/SF530000/SF540000
+/SF570000/SF580000/SF590000/SF600000/SF610000
+228 /SM570001/SM590000/SM600000/SM630000
+236 /SM680000/SM690000/SM700000/SM750000/SM750002
+242 /SM770000/SM790000/SP320000
+246 /SS000000/SS010000
+252 /SS260000/SS270000/SV040000/apostrophereverse
+1/arrowboth/arrowdown/arrowleft/arrowright/arrowup/club
+/deutschmark/diamond/diamondopen/exclamdbl/female
+/fiveeighths/franc/heart/male/musicalnote/musicalnotedbl
+/napostrophe/nsuperior/oneeighths/seveneighths/spade
+/threeeights/underscoredbl/SM760000
+]
+{ dup type /nametype eq
+  { WPDLencoding 2 index 2 index put pop 1 add }
+  { exch pop } ifelse
+} forall pop
+
+/reencodeL
+    { dup FontDirectory exch known
+      { findfont }
+      {  dup nbuff cvs dup length 1 sub get 76 eq
+         {    dup nbuff cvs dup length 1 sub 0 exch getinterval
+         findfont begin
+         currentdict dup length dict begin
+         { 1 index /FID ne {def} {pop pop} ifelse } forall
+         /FontName exch def
+         /Encoding WPDLencoding def
+         currentdict dup end end
+         /FontName get exch definefont
+         }
+         { findfont } ifelse
+      } ifelse
+    } bdef
+
+/ron	false def
+/sflg	false def
+/slan	0 def
+/sp	32 def
+
+/sshow
+	{ save exch
+	   gsave
+	    psz 20 div dup neg _rmt dup show
+	   grestore
+	   dup
+	   save exch
+	    Bfont setfont
+	    1 setgray show
+	   restore
+	   currentfont makeoutl setfont show
+	   currentpoint 3 -1 roll
+	  restore _mt
+	} bdef
+
+/Sx	0 def
+/Sy	0 def
+/Ux	0 def
+/Uy	0 def
+/W	/widthshow load def
+
+/_B	{/bflg true def
+	 sflg not {/_S /bshow load def /bon true def} if
+	} bdef
+/_b	{/bflg false def
+	 bon {/_S /show load def /bon false def} if
+	} bdef
+/_bd	{save} bdef
+/_bp	{save 2 setmiterlimit .06 .06 scale 0 0 _mt} bdef
+/_ccprocs
+	{/proc2 exch cvlit def
+	 /proc1 exch cvlit def
+	 /newproc proc1 length proc2 length add
+	 array def
+	 newproc 0 proc1 putinterval
+	 newproc proc1 length proc2 putinterval
+	 newproc cvx
+	} def
+/_clr	{3 {255 div 3 1 roll} repeat
+	 ron {6 3 roll pop pop pop} {setrgbcolor} ifelse
+	} bdef
+/_cp	/closepath load def
+/_cw	{stroke initclip _mt 0 2 index
+	 _rlt 0 _rlt 0 exch neg
+	 _rlt clip newpath
+	} bdef
+/_d	/setdash load def
+/_DU	{currentpoint /DUy exch def /DUx exch def} bdef
+/_du	{gsave
+	  save
+	  8 setlinewidth
+      currentpoint -30 add _mt
+      DUx DUy -30 add _lt stroke
+	  restore
+	  8 setlinewidth
+	  currentpoint -50 add _mt
+	  DUx DUy -50 add _lt stroke
+	 grestore
+	} bdef
+/_ed	{restore} bdef
+/_ep	{restore showpage 0 0 _mt} bdef
+/_f	/eofill load def
+/_ff	{ exch reencode exch
+	  3 div dup /psz exch def
+	  scalefont dup /Bfont exch def setfont
+	} bdef
+/_ffs	{ /slan exch 10 div def /hscl exch 1000 div def
+	  /psz exch 3 div def
+	  [ psz hscl mul 0 slan dup sin exch cos div psz mul psz 0 0 ]
+	  exch reencode exch makefont dup /Bfont exch def setfont
+	} bdef
+/_g	/setgray load def
+/_gs	{neg 100 add 100 div setgray} bdef
+/_i	{gsave
+	  dup /picstr exch 7 add 8 idiv string def
+	  3 1 roll translate dup 1 scale
+	  dup 1 1 [5 -1 roll 0 0 1 0 0]
+	  {currentfile picstr readhexstring pop} image
+         grestore
+        } bdef
+/_is	{save 4 1 roll
+	  dup /picstr exch 7 add 8 idiv string def
+	  3 1 roll translate dup 1 scale
+	  dup 1 1 [5 -1 roll 0 0 1 0 0]
+	  {currentfile picstr readhexstring pop} image
+	 restore
+	} bdef
+/_ie	{1 eq { {1 exch sub} currenttransfer _ccprocs settransfer} if
+	 /_isx exch def /_isy exch def
+	 _isx mul exch _isy mul translate
+	 add 2 div /_txc exch def
+	 add 2 div /_tyc exch def
+	 _txc _isx mul _tyc _isy mul translate
+	 360 exch sub rotate
+	 1 eq { _isx neg _isy scale }
+	 { _isx _isy scale }
+	 ifelse _txc neg _tyc neg translate
+	} bdef
+/_irms	{save
+	  12 1 roll
+	  1 eq {{1 exch sub} currenttransfer _ccprocs settransfer} if
+	  /picstr exch string def translate
+	  2 index 6 index sub 2 div 2 index 6 index sub 2 div neg
+	  translate
+	  5 index 5 index 2 div neg exch 2 div exch
+	  2 copy neg exch neg exch 5 2 roll translate
+	  360 exch sub rotate
+	  3 index 3 index 7 index div exch 8 index div exch scale
+	  translate pop pop 2 index 2 index scale
+	  3 index 0 eq
+	  { [ 3 index 0 0 5 index neg 0 0 ] }
+	  { 3 index 1 eq
+      { [ 3 index 0 0 5 index 0 7 index ] }
+      { 3 index 128 eq
+	  { [ 3 index neg 0 0 5 index neg 7 index 0 ] }
+	  { [ 3 index neg 0 0 5 index 7 index 7 index ] } ifelse
+	    } ifelse
+	  } ifelse
+          {currentfile picstr readhexstring pop} image
+          pop
+	 restore
+	} bdef
+
+/_l	{_lt} bdef
+/_lr	{_rlt} bdef
+/_m	{_mt} bdef
+/_O	{currentfont makeoutl setfont} bdef
+/_o	{Bfont setfont} bdef
+/_ornt	{/pwid exch def /plen exch def
+	 orntsv 1 eq {0 pwid translate -90 rotate} if
+	 orntsv 2 eq {pwid plen translate 180 rotate} if
+	 orntsv 3 eq {plen 0 translate 90 rotate} if
+	 dup 1 eq {pwid 0 translate 90 rotate} if
+	 dup 2 eq {pwid plen translate 180 rotate} if
+	 dup 3 eq {0 plen translate -90 rotate} if
+	 /orntsv exch def
+	} bdef
+/_lod1	{currentpoint orntsv plen pwid 6 -1 roll restore save} bdef
+/_lod2	{_bp 7 2 roll _ornt _mt} bdef
+/_unlod	{currentpoint orntsv plen pwid 7 -2 roll restore restore
+	 _bp 6 1 roll _ornt _mt
+	} bdef
+/_p	{2 copy _mt 1 0 _rlt _mt} bdef
+/_pl	{{_lt} repeat} bdef
+/_R      { /ron true def /_S /_rshow load def /_t /_red load def} bdef
+/_rshow	 { save exch
+	   currentpoint
+	   /RSy exch def /RSx exch def
+	   ron {
+		 sflg
+		 {	currentpoint
+			/Ry exch def /Rx exch def
+			dup stringwidth pop Rx Ry psz 4 div add _mt
+			Rx psz 15 add setlinewidth .95 setgray 0 setlinecap
+			add Ry psz 4 div add _lt stroke Rx Ry _mt 0 0 0 setrgbcolor
+			dup show Rx Ry _mt
+			sshow
+		 }
+		 { _redshow
+		 }ifelse
+	   }
+	   {	 sflg {sshow} if
+	   }ifelse
+	   currentpoint 3 -1 roll
+	   restore _mt
+	 } bdef
+/_red	{ gsave dup
+         currentpoint /Ry exch def /Rx exch def
+         Rx Ry psz 4 div add _mt
+         Rx psz 15 add setlinewidth .95 setgray 0 setlinecap
+         add Ry psz 4 div add _lt stroke
+         Rx Ry _mt
+         grestore
+         0 rmoveto
+    }bdef
+/_redshow {currentpoint
+         /Ry exch def /Rx exch def
+         dup stringwidth pop Rx Ry psz 4 div add _mt
+         Rx psz 15 add setlinewidth .95 setgray 0 setlinecap
+         add Ry psz 4 div add _lt stroke Rx Ry _mt 0 0 0 setrgbcolor
+         show currentpoint _mt
+    }bdef
+/_rmxy	{_rmt} bdef
+/_s	/stroke load def
+/_SH	bon {/bon false def} if
+	{/sflg true def /_S /_rshow load def
+	} bdef
+/_sh	{ ron 	{/sflg false def bflg {_B} if}
+		{/_S /show load def /sflg false def bflg {_B} if}ifelse
+	}bdef
+/_sp	{ gsave stroke grestore } bdef
+/_ST     {currentpoint /Sy exch def /Sx exch def} bdef
+/_st     {gsave
+          currentpoint
+          psz 4 div add _mt
+          Sx Sy psz 4 div add _lt
+          10 setlinewidth
+          stroke
+          grestore
+          } bdef
+/_U	{currentpoint /Uy exch def /Ux exch def} bdef
+/_u	{gsave
+	  currentpoint
+	  -30 add _mt
+	  Ux Uy -30 add _lt
+	  12 setlinewidth
+	  stroke
+	 grestore
+	} bdef
+/_w	/setlinewidth load def
+end
+/#copies 1 def /wpdict2 100 dict def
+wpdict begin wpdict2 begin
+_bd
+/_rhs{readhexstring}bdef/_tr{translate}bdef
+/_ix{index}bdef/_mx{matrix}bdef
+/ife{ifelse}bdef/_x{exch}bdef
+/_is{save 4 1 roll
+dup/picstr _x 7 add 8 idiv string def
+3 1 roll _tr dup 1 scale
+dup 1 1[5 -1 roll 0 0 1 0 0]
+{currentfile picstr _rhs pop}image restore}bdef
+/_epsi{1 eq{{1 _x sub}currenttransfer _ccprocs settransfer}if
+/yp _x def/xp _x def/dhgt _x def/dwid _x def
+4 copy sub/swid _x def
+sub/shgt _x def
+add 2 div/icx _x def add 2 div/icy _x def
+xp dwid 2 div add icx sub yp dhgt 2 div sub
+icy sub _tr icx icy _tr
+360 _x sub rotate
+dwid swid div/xsc _x def _x
+dhgt shgt div/ysc _x def _x
+dup 1 eq{xsc neg/xsc _x def pop}
+{dup 2 eq{ysc neg /ysc _x def pop}
+{3 eq{ysc neg/ysc _x def xsc neg/xsc _x def}
+{}ife}ife}ife
+xsc ysc scale
+100 div _x 100 div _x scale
+icx neg icy neg _tr}bdef
+/_c{3{255 div 3 1 roll}repeat setrgbcolor}bdef
+/eq3{3 copy 2 _ix eq{eq{true}{false}ife}{pop
+pop false}ife}bdef
+/g{255 div setgray}bdef
+/_clr{ron{6 3 roll pop pop pop}{eq3{pop
+pop g}{_c}ife}ife}bdef
+/_r{/ron false def eq3{1 sub neg g pop
+pop}{setrgbcolor}ife}bdef
+/_ircms{save 15 1 roll
+1 eq{{1 exch sub}currenttransfer _ccprocs settransfer}if
+/pstr _x string def _tr
+/Cli _x def/USy _x def/USx _x def/Rot _x def/HTd _x def
+/WDd _x def/Bdep _x def/HTs _x def/WDs _x def/MIR _x def
+USx 100 div USy 100 div scale
+WDd WDs sub 2 div HTd HTs sub 2 div neg _tr
+WDs HTs 2 div neg _x 2 div _x _tr
+Rot 360 _x sub rotate WDd HTd HTs div _x WDs div _x scale
+WDs 2 div neg HTs 2 div _tr
+WDs HTs scale WDs HTs Bdep MIR 0
+eq{[WDs 0 0 HTs neg 0 0]}{MIR 1 eq{[WDs 0 0 HTs 0 HTs]}
+{MIR 128 eq{[WDs neg 0 0 HTs neg WDs 0]}
+{[WDs neg 0 0 HTs WDs HTs]}ife}ife}ife
+{currentfile pstr _rhs pop}Cli
+0 eq{image}{false 3 colorimage}ife
+restore}bdef
+/_bp{save 2 setlinecap 2 setmiterlimit
+.06 .06 scale 0 0 moveto}bdef
+/tctm _mx def/trot _mx def/tscale _mx def/rmtx _mx def
+/fr{72 0 rmtx defaultmatrix dtransform
+/yres _x def/xres _x def
+xres dup mul yres dup mul add sqrt}bdef
+/sus{/spotf _x def/sang _x def/csz _x def
+/m tctm currentmatrix def/rm sang trot rotate def
+/sm csz dup tscale scale def
+sm rm m m concatmatrix m concatmatrix pop
+1 0 m dtransform /y1 _x def/x1 _x def
+/veclength x1 dup mul y1 dup mul add sqrt def
+/frcy fr veclength div def /nsang y1 x1 atan def
+frcy nsang/spotf load setscreen}bdef
+/bitis{/ybit _x def /xbit _x def
+/bval bstring ybit bwidth mul xbit 8 idiv add get def
+/mask 1 7 xbit 8 mod sub bitshift def
+bval mask and 0 ne}bdef
+/bps{/y _x def /x _x def
+/xndx x 1 add 2 div bpside mul cvi def
+/yndx y 1 add 2 div bpside mul cvi def
+xndx yndx bitis
+{/onb onb 1 add def 1}{/ofb ofb 1 add def 0}ife}bdef
+/stpatt{/csz _x def /angle _x def /bwidth _x def
+/bpside _x def /bstring _x def
+/onb 0 def /ofb 0 def
+csz angle /bps load
+sus{}settransfer
+ofb ofb onb add div _g}bdef
+/_fp{8 1 0 cpi stpatt}bdef
+/_pf{gsave eofill grestore}bdef
+/_np{newpath}bdef/_lc{setlinecap}bdef
+/_sr{/cpi _x def}bdef
+/nbuff 50 string def
+<</Policies  <</PageSize 2 >> >> setpagedevice << /PageSize [612 792] >> setpagedevice <</Policies  <</PageSize 0 >> >> setpagedevice <</InputAttributes <<0<< /PageSize [612 792]  /MediaType (Standard) >>/Priority [0 1 3 2]>> >>setpagedevice << /PageSize [612 792]  /MediaType (Standard) >> setpagedevice _bp 0 13200 10200 _ornt /Times-BoldR 500 _ff
+0 13200 10200 _ornt 
+/_r      { sflg {/_t {0 rmoveto}bdef /ron false def}
+         { /_S /show load def /_t {0 rmoveto}bdef /ron false def}ifelse
+     }bdef
+1200 12455 _m
+/Times-BoldR 600 _ff
+_B _b 1819 11756 _m
+_B (MEDLARS)_S (\016)_S 67 _t
+(PRICING)_S 67 _t
+(SCHEDULE-DOMESTIC)_S 67 _t
+(&)_S 67 _t
+(NON-U.S.CHARGES)_S _b /Times-BoldR 500 _ff
+4181 11547 _m
+_B (Effective)_S 56 _t
+(October)_S 56 _t
+(1,)_S 56 _t
+(1995)_S _b 1200 10940 _m
+/Helvetica-BoldR 500 _ff
+(PART)_S 56 _t
+(1:)_S 56 _t
+(LEASING)_S 56 _t
+(TAPE)_S 56 _t
+(COPIES)_S 56 _t
+(OF)_S 56 _t
+(NLM)_S 56 _t
+(DATABASES)_S 56 _t
+/HelveticaR 500 _ff
+1200 10542 _m
+(The)_S 56 _t
+(following)_S 56 _t
+(is)_S 56 _t
+(a)_S 56 _t
+(listing)_S 56 _t
+(of)_S 56 _t
+(annual)_S 56 _t
+(license)_S 56 _t
+(fees)_S 56 _t
+(for)_S 56 _t
+(databases)_S 56 _t
+(available)_S 56 _t
+(from)_S 56 _t
+(NLM.)_S 112 _t
+1200 10142 _m
+(There)_S 39 _t
+(are)_S 39 _t
+(no)_S 39 _t
+(use)_S 38 _t
+(charges;)_S 39 _t
+(however,)_S 39 _t
+(unless)_S 39 _t
+(otherwise)_S 39 _t
+(noted,)_S 38 _t
+(in)_S 39 _t
+(addition)_S 39 _t
+(to)_S 39 _t
+(the)_S 38 _t
+(annual)_S 39 _t
+(license)_S 39 _t
+(fee,)_S 39 _t
+(licensees)_S 1200 9942 _m
+(in)_S 46 _t
+(foreign)_S 46 _t
+(countries,)_S 46 _t
+(licensees)_S 45 _t
+(whose)_S 46 _t
+(databases)_S 46 _t
+(run)_S 45 _t
+(on)_S 46 _t
+(computers)_S 46 _t
+(outside)_S 46 _t
+(the)_S 45 _t
+(U.S.,)_S 46 _t
+(or)_S 46 _t
+(domestic)_S 45 _t
+(licensees)_S 1200 9742 _m
+(who)_S 56 _t
+(provide)_S 56 _t
+(data)_S 56 _t
+(outside)_S 56 _t
+(the)_S 56 _t
+(U.S.)_S 56 _t
+(are)_S 56 _t
+(subject)_S 56 _t
+(to)_S 56 _t
+(a)_S 56 _t
+(surcharge.)_S 112 _t
+(See)_S 56 _t
+(page)_S 56 _t
+(5,)_S 56 _t
+(Additional)_S 56 _t
+(Fees,)_S 56 _t
+(for)_S 56 _t
+(details.)_S 1600 9342 _m
+_U (DATABASE)_S _u 4200 9342 _m
+_U (ANNUAL)_S 56 _t
+(LICENSE)_S 56 _t
+(FEE)_S _u 1288 _t
+/CourierR 500 _ff
+1600 8987 _m
+(AIDSDRUGS)_S 3600 8987 _m
+(-)_S 4200 8987 _m
+(No)_S 100 _t
+(annual)_S 100 _t
+(license)_S 100 _t
+(fee)_S 100 _t
+(or)_S 100 _t
+(foreign)_S 100 _t
+(surcharge.)_S 400 _t
+4200 8820 _m
+(AIDSDRUGS)_S 100 _t
+(and)_S 100 _t
+(AIDSTRIALS)_S 100 _t
+(are)_S 100 _t
+(leased)_S 100 _t
+(together.)_S 200 _t
+4200 8653 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1200 8486 _m
+100 _t
+1200 8319 _m
+100 _t
+1600 8319 _m
+(AIDSLINE\016)_S 3600 8319 _m
+(-)_S 4200 8319 _m
+(No)_S 100 _t
+(annual)_S 100 _t
+(license)_S 100 _t
+(fee)_S 100 _t
+(or)_S 100 _t
+(foreign)_S 100 _t
+(surcharge.)_S 300 _t
+1600 8152 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1200 7818 _m
+100 _t
+100 _t
+100 _t
+1600 7818 _m
+(AIDSTRIALS)_S 2800 7818 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+3600 7818 _m
+(-)_S 100 _t
+4200 7818 _m
+(No)_S 100 _t
+(annual)_S 100 _t
+(license)_S 100 _t
+(fee)_S 100 _t
+(or)_S 100 _t
+(foreign)_S 100 _t
+(surcharge.)_S 400 _t
+4200 7651 _m
+(AIDSDRUGS)_S 100 _t
+(and)_S 100 _t
+(AIDSTRIALS)_S 100 _t
+(are)_S 100 _t
+(leased)_S 100 _t
+(together.)_S 300 _t
+3200 7484 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1200 7317 _m
+100 _t
+1600 7150 _m
+(AVLINE\016)_S 2800 7150 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+3600 7150 _m
+(-)_S 4200 7150 _m
+($1,000)_S 100 _t
+(current)_S 100 _t
+(year:)_S 100 _t
+(updated)_S 100 _t
+(monthly.)_S 900 _t
+4200 6983 _m
+($1,000)_S 100 _t
+(one)_S 100 _t
+(time)_S 100 _t
+(fee)_S 100 _t
+(for)_S 100 _t
+(base)_S 100 _t
+(file)_S 100 _t
+(\(up)_S 100 _t
+(to)_S 600 _t
+4200 6816 _m
+(current)_S 100 _t
+(year\).)_S 3200 _t
+9000 6816 _m
+100 _t
+4200 6649 _m
+(Foreign)_S 100 _t
+(surcharge)_S 100 _t
+(does)_S 100 _t
+(not)_S 100 _t
+(apply.)_S 1300 _t
+1200 6482 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 6315 _m
+(Available)_S 100 _t
+(in)_S 100 _t
+(MARC-compatible)_S 100 _t
+(format)_S 100 _t
+(only.)_S 600 _t
+4200 6148 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1200 5981 _m
+100 _t
+1600 5981 _m
+(BIOETHICSLINE\016)_S 3200 5981 _m
+100 _t
+3600 5981 _m
+(-)_S 4200 5981 _m
+($1,000)_S 4000 _t
+1200 5814 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1200 5647 _m
+100 _t
+100 _t
+1600 5647 _m
+(CANCERLIT\016)_S 700 _t
+3600 5647 _m
+(-)_S 4200 5647 _m
+($3,000;)_S 100 _t
+(however,)_S 100 _t
+(NLM)_S 100 _t
+(licenses)_S 100 _t
+(CANCERLIT)_S 100 _t
+(only)_S 200 _t
+4200 5480 _m
+(to)_S 100 _t
+(official)_S 100 _t
+(International)_S 100 _t
+(MEDLARS)_S 100 _t
+(Centers.)_S 400 _t
+3600 5313 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+(All)_S 100 _t
+(other)_S 100 _t
+(prospective)_S 100 _t
+(licensees)_S 100 _t
+(of)_S 100 _t
+(CANCERLIT)_S 400 _t
+4200 5146 _m
+(should)_S 100 _t
+(contact)_S 100 _t
+(NCI)_S 100 _t
+(\(National)_S 100 _t
+(Cancer)_S 100 _t
+(Institute\))_S 300 _t
+1200 4979 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 4812 _m
+(R.A.)_S 100 _t
+(Bloch)_S 100 _t
+(International)_S 100 _t
+(Cancer)_S 100 _t
+(Information)_S 300 _t
+4200 4645 _m
+100 _t
+100 _t
+(Center)_S 3800 _t
+4200 4478 _m
+(9030)_S 100 _t
+(Old)_S 100 _t
+(Georgetown)_S 100 _t
+(Road)_S 2200 _t
+4200 4311 _m
+(Bethesda,)_S 100 _t
+(MD)_S 200 _t
+(20852)_S 2700 _t
+4200 4144 _m
+(\(301\))_S 100 _t
+(496-7406)_S 3200 _t
+1200 3977 _m
+100 _t
+1600 3810 _m
+(CATLINE\016)_S 2800 3810 _m
+100 _t
+3600 3810 _m
+(-)_S 4200 3810 _m
+($6,000)_S 100 _t
+(current)_S 100 _t
+(year:)_S 100 _t
+(updated)_S 100 _t
+(weekly.)_S 1100 _t
+1200 3643 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4800 3643 _m
+(-or-)_S 6000 3643 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 3476 _m
+($4,000)_S 100 _t
+(current)_S 100 _t
+(year:)_S 100 _t
+(updated)_S 100 _t
+(monthly.)_S 1000 _t
+1200 3309 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1200 3142 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 3142 _m
+($3,000)_S 100 _t
+(one-time)_S 100 _t
+(fee)_S 100 _t
+(for)_S 100 _t
+(base)_S 100 _t
+(file)_S 100 _t
+(\(1965)_S 800 _t
+4200 2975 _m
+(up)_S 100 _t
+(to)_S 100 _t
+(the)_S 100 _t
+(current)_S 100 _t
+(year\).)_S 2500 _t
+1200 2808 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 2641 _m
+($3,000)_S 100 _t
+(one)_S 100 _t
+(time)_S 100 _t
+(fee)_S 100 _t
+(for)_S 100 _t
+(retrospective)_S 100 _t
+(file)_S 500 _t
+4200 2474 _m
+(\(pre-1965\).)_S 3600 _t
+4200 2307 _m
+(Foreign)_S 100 _t
+(surcharge)_S 100 _t
+(does)_S 100 _t
+(not)_S 100 _t
+(apply.)_S 1400 _t
+4200 2140 _m
+(Available)_S 100 _t
+(in)_S 100 _t
+(MARC-compatible)_S 100 _t
+(format)_S 100 _t
+(only.)_S 700 _t
+7200 971 _m
+(Rev.)_S 100 _t
+(November)_S 100 _t
+(1995)_S _ep
+<</Policies  <</PageSize 0 >> >> setpagedevice <</InputAttributes <<0<< /PageSize [612 792]  /MediaType (Standard) >>/Priority [0 1 3 2]>> >>setpagedevice << /PageSize [612 792]  /MediaType (Standard) >> setpagedevice _bp /CourierR 500 _ff
+0 13200 10200 _ornt 
+/_r      { sflg {/_t {0 rmoveto}bdef /ron false def}
+         { /_S /show load def /_t {0 rmoveto}bdef /ron false def}ifelse
+     }bdef
+5050 12479 _m
+/Times-BoldR 600 _ff
+_B (2)_S _b /CourierR 500 _ff
+1200 12086 _m
+1600 11585 _m
+_U (DATABASE)_S _u 4200 11585 _m
+_U (ANNUAL)_S 100 _t
+(LICENSE)_S 100 _t
+(FEE)_S _u 3000 _t
+1200 11251 _m
+100 _t
+100 _t
+100 _t
+1600 11251 _m
+(CHEMICAL)_S 100 _t
+3600 11251 _m
+(-)_S 4200 11251 _m
+($1,000)_S 4100 _t
+1600 11084 _m
+(CARCINOGENESIS)_S 5900 _t
+1600 10917 _m
+(RESEARCH)_S 100 _t
+(INFORMATION)_S 5300 _t
+1600 10750 _m
+(SYSTEM)_S 100 _t
+(\(CCRIS\))_S 6000 _t
+1600 10416 _m
+(ChemID)_S 3600 10416 _m
+(-)_S 4200 10416 _m
+($1,000)_S 4100 _t
+4200 10249 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 10082 _m
+(Licensees)_S 100 _t
+(must)_S 100 _t
+(make)_S 100 _t
+(separate)_S 100 _t
+(arrangements)_S 600 _t
+4200 9915 _m
+(with)_S 100 _t
+(two)_S 100 _t
+(data)_S 100 _t
+(suppliers)_S 100 _t
+(in)_S 100 _t
+(advance:)_S 100 _t
+(U.S.)_S 700 _t
+1200 9748 _m
+100 _t
+4200 9748 _m
+(Pharmacopeial)_S 100 _t
+(Convention,)_S 100 _t
+(Inc.,)_S 100 _t
+(and)_S 100 _t
+(Cosmetic)_S 300 _t
+4200 9581 _m
+(Toiletries)_S 100 _t
+(and)_S 100 _t
+(Fragrance)_S 100 _t
+(Association.)_S 1100 _t
+1200 9247 _m
+100 _t
+100 _t
+100 _t
+1600 9247 _m
+(CHEMLINE\016)_S 2800 9247 _m
+100 _t
+3200 9247 _m
+100 _t
+3600 9247 _m
+(-)_S 4200 9247 _m
+($1,000)_S 100 _t
+(plus)_S 100 _t
+(royalties.)_S 2500 _t
+1200 9080 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 8913 _m
+(CHEMLINE)_S 100 _t
+(tape)_S 100 _t
+(royalties)_S 100 _t
+(are)_S 100 _t
+(not)_S 100 _t
+(paid)_S 100 _t
+(to)_S 100 _t
+(NLM)_S 400 _t
+4200 8746 _m
+(but)_S 100 _t
+(are)_S 100 _t
+(negotiated)_S 100 _t
+(with)_S 100 _t
+(and)_S 100 _t
+(paid)_S 100 _t
+(directly)_S 100 _t
+(to)_S 300 _t
+4200 8579 _m
+(the)_S 100 _t
+(file)_S 100 _t
+(content)_S 100 _t
+(provider,)_S 100 _t
+(Chemical)_S 100 _t
+(Abstracts)_S 200 _t
+4200 8412 _m
+(Service)_S 100 _t
+(\(CAS\).)_S 200 _t
+(Licensees)_S 100 _t
+(must)_S 100 _t
+(make)_S 100 _t
+(separate)_S 300 _t
+4200 8245 _m
+(arrangements)_S 100 _t
+(with)_S 100 _t
+(CAS)_S 100 _t
+(in)_S 100 _t
+(advance.)_S 1400 _t
+1600 7911 _m
+(DEVELOPMENTAL)_S 100 _t
+3600 7911 _m
+(-)_S 4200 7911 _m
+($1,000)_S 4100 _t
+1600 7744 _m
+(AND)_S 100 _t
+(REPRODUCTIVE)_S 5700 _t
+1600 7577 _m
+(TOXICOLOGY)_S 100 _t
+(\(DART\023\))_S 5500 _t
+1600 7243 _m
+(DIRLINE)_S 3600 7243 _m
+(-)_S 4200 7243 _m
+(No)_S 100 _t
+(annual)_S 100 _t
+(license)_S 100 _t
+(fee)_S 100 _t
+(or)_S 100 _t
+(foreign)_S 100 _t
+(surcharge.)_S 400 _t
+1200 7076 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1600 6742 _m
+(ENVIRONMENTAL)_S 3600 6742 _m
+(-)_S 4200 6742 _m
+($1,000)_S 4100 _t
+1600 6575 _m
+(TERATOLOGY)_S 100 _t
+(INFORMATION)_S 5100 _t
+1600 6408 _m
+(CENTER)_S 100 _t
+(BACKFILE)_S 100 _t
+(\(ETICBACK\))_S 4700 _t
+1600 6074 _m
+(GENE-TOX)_S 3600 6074 _m
+(-)_S 4200 6074 _m
+($1,000)_S 4100 _t
+1200 5907 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1600 5740 _m
+(HAZARDOUS)_S 100 _t
+3600 5740 _m
+(-)_S 4200 5740 _m
+($2,500)_S 4100 _t
+1600 5573 _m
+(SUBSTANCES)_S 100 _t
+(DATA)_S 5800 _t
+1600 5406 _m
+(BANK)_S 100 _t
+(\(HSDB\016\))_S 1400 _t
+(The)_S 100 _t
+(Emergency)_S 100 _t
+(Medical)_S 100 _t
+(Treatment)_S 100 _t
+(\(EMT\))_S 100 _t
+(field)_S 400 _t
+4200 5239 _m
+(in)_S 100 _t
+(HSDB)_S 100 _t
+(is)_S 100 _t
+(not)_S 100 _t
+(distributed)_S 100 _t
+(in)_S 100 _t
+(the)_S 100 _t
+(leased)_S 700 _t
+4200 5072 _m
+(database.)_S 3800 _t
+1600 4738 _m
+(HealthSTAR)_S 3600 4738 _m
+(-)_S 4200 4738 _m
+($3,000)_S 4100 _t
+1600 4571 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1600 4404 _m
+(HISTLINE\016)_S 3600 4404 _m
+(-)_S 4200 4404 _m
+($1,000)_S 4100 _t
+1600 4070 _m
+(MEDLINE\016)_S 100 _t
+3600 4070 _m
+(-)_S 4200 4070 _m
+(Current)_S 100 _t
+(Year)_S 100 _t
+(\(1996\))_S 100 _t
+(data:)_S 2200 _t
+4200 3903 _m
+($9,000)_S 100 _t
+(weekly)_S 100 _t
+(updates)_S 100 _t
+(-OR-)_S 2100 _t
+4200 3736 _m
+($5,000)_S 100 _t
+(monthly)_S 100 _t
+(updates)_S 6600 3736 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1200 3569 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 3402 _m
+(Older)_S 100 _t
+(data:)_S 100 _t
+(licensees)_S 100 _t
+(requesting)_S 100 _t
+(older)_S 100 _t
+(data)_S 400 _t
+4200 3235 _m
+(must)_S 100 _t
+(select)_S 100 _t
+(one)_S 100 _t
+(of)_S 100 _t
+(the)_S 100 _t
+(6)_S 100 _t
+(groupings)_S 100 _t
+(of)_S 100 _t
+(years)_S 400 _t
+4200 3068 _m
+(as)_S 100 _t
+(shown)_S 100 _t
+(below.)_S 3200 _t
+1200 2901 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 2734 _m
+_U (Fees)_S _u 5400 2734 _m
+100 _t
+_U (Years)_S 100 _t
+(of)_S 100 _t
+(Publication)_S _u 8400 2734 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1200 2567 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+2800 2400 _m
+100 _t
+100 _t
+4200 2400 _m
+($1,750.00)_S 6000 2400 _m
+(1993)_S 100 _t
+(-)_S 100 _t
+(1995)_S 1800 _t
+2400 2233 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 2233 _m
+($1,750.00)_S 6000 2233 _m
+(1990)_S 100 _t
+(-)_S 100 _t
+(1995)_S 1800 _t
+2800 2066 _m
+100 _t
+100 _t
+4200 2066 _m
+($3,500.00)_S 6000 2066 _m
+(1985)_S 100 _t
+(-)_S 100 _t
+(1995)_S 8400 2066 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 1899 _m
+($5,250.00)_S 6000 1899 _m
+(1980)_S 100 _t
+(-)_S 100 _t
+(1995)_S 8400 1899 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 1732 _m
+($5,250.00)_S 6000 1732 _m
+(1975)_S 100 _t
+(-)_S 100 _t
+(1995)_S 8400 1732 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 1565 _m
+($7,000.00)_S 6000 1565 _m
+(1966)_S 100 _t
+(-)_S 100 _t
+(1995)_S 1800 _t
+_ep
+<</Policies  <</PageSize 0 >> >> setpagedevice <</InputAttributes <<0<< /PageSize [612 792]  /MediaType (Standard) >>/Priority [0 1 3 2]>> >>setpagedevice << /PageSize [612 792]  /MediaType (Standard) >> setpagedevice _bp /CourierR 500 _ff
+0 13200 10200 _ornt 
+/_r      { sflg {/_t {0 rmoveto}bdef /ron false def}
+         { /_S /show load def /_t {0 rmoveto}bdef /ron false def}ifelse
+     }bdef
+5050 12479 _m
+/Times-BoldR 600 _ff
+_B (3)_S _b /CourierR 500 _ff
+1200 12086 _m
+1600 11585 _m
+_U (DATABASE)_S _u 4200 11585 _m
+_U (ANNUAL)_S 100 _t
+(LICENSE)_S 100 _t
+(FEE)_S _u 1600 11251 _m
+(MeSH)_S 2400 11251 _m
+100 _t
+3600 11251 _m
+(-)_S 4200 11251 _m
+($1,000)_S 100 _t
+(on)_S 100 _t
+(tape)_S 100 _t
+(\(no)_S 100 _t
+(charge)_S 100 _t
+(with)_S 100 _t
+(MEDLINE\).)_S 800 _t
+1600 11084 _m
+(VOCABULARY)_S 100 _t
+(FILE\016)_S 4200 11084 _m
+(Foreign)_S 100 _t
+(surcharge)_S 100 _t
+(does)_S 100 _t
+(not)_S 100 _t
+(apply.)_S 200 _t
+(No)_S 100 _t
+(license)_S 100 _t
+(or)_S 4200 10917 _m
+(fee)_S 100 _t
+(applies)_S 100 _t
+(if)_S 100 _t
+(the)_S 100 _t
+(data)_S 100 _t
+(are)_S 100 _t
+(used)_S 100 _t
+(for)_S 100 _t
+(translation)_S 4200 10750 _m
+(purposes)_S 100 _t
+(only.)_S 1300 _t
+1200 10583 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 10416 _m
+(Available)_S 100 _t
+(in)_S 100 _t
+(ELHILL)_S 100 _t
+(Unit)_S 100 _t
+(Record)_S 100 _t
+(Format)_S 100 _t
+(\(EURF\))_S 200 _t
+4200 10249 _m
+(or)_S 100 _t
+(MARC-compatible)_S 100 _t
+(format.)_S 200 _t
+(EURF)_S 100 _t
+(is)_S 100 _t
+(updated)_S 400 _t
+4200 10082 _m
+(either)_S 100 _t
+(monthly)_S 100 _t
+(\(to)_S 100 _t
+(receive)_S 100 _t
+(newly)_S 100 _t
+(added)_S 4200 9915 _m
+(supplementary)_S 100 _t
+(chemical)_S 100 _t
+(records\))_S 100 _t
+(or)_S 100 _t
+(annually;)_S 4200 9748 _m
+(MARC)_S 100 _t
+(format)_S 100 _t
+(is)_S 100 _t
+(updated)_S 100 _t
+(annually)_S 100 _t
+(and)_S 100 _t
+(does)_S 100 _t
+(not)_S 4200 9581 _m
+(contain)_S 100 _t
+(the)_S 100 _t
+(supplementary)_S 100 _t
+(chemical)_S 100 _t
+(records.)_S 1200 9414 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 9247 _m
+(The)_S 100 _t
+(National)_S 100 _t
+(Library)_S 100 _t
+(of)_S 100 _t
+(Medicine)_S 100 _t
+(also)_S 100 _t
+(makes)_S 4200 9080 _m
+(certain)_S 100 _t
+(MeSH)_S 100 _t
+(data)_S 100 _t
+(available)_S 100 _t
+(at)_S 100 _t
+(no)_S 100 _t
+(charge)_S 100 _t
+(on)_S 100 _t
+(the)_S 4200 8913 _m
+(Internet.)_S 200 _t
+(See)_S 100 _t
+(page)_S 100 _t
+(6)_S 100 _t
+(for)_S 100 _t
+(additional)_S 4200 8746 _m
+(information.)_S 1600 8412 _m
+(PDQ\016)_S 100 _t
+3600 8412 _m
+(-)_S 4200 8412 _m
+(Available)_S 100 _t
+(from)_S 100 _t
+(NCI.)_S 2800 _t
+1200 8245 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 8078 _m
+(All)_S 100 _t
+(prospective)_S 100 _t
+(domestic)_S 100 _t
+(and)_S 100 _t
+(non-U.S.)_S 100 _t
+8400 8078 _m
+100 _t
+100 _t
+100 _t
+100 _t
+4200 7911 _m
+(licensees)_S 100 _t
+(of)_S 100 _t
+(PDQ)_S 100 _t
+(should)_S 100 _t
+(contact)_S 100 _t
+(NCI)_S 1200 _t
+4200 7744 _m
+(\(National)_S 100 _t
+(Cancer)_S 100 _t
+(Institute\):)_S 1900 _t
+1200 7577 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+2400 7410 _m
+100 _t
+4200 7410 _m
+(R.A.)_S 100 _t
+(Bloch)_S 100 _t
+(International)_S 100 _t
+(Cancer)_S 1600 _t
+4200 7243 _m
+(Information)_S 100 _t
+(Center)_S 2900 _t
+4200 7076 _m
+(9030)_S 100 _t
+(Old)_S 100 _t
+(Georgetown)_S 100 _t
+(Road)_S 2300 _t
+4200 6909 _m
+(Bethesda,)_S 100 _t
+(MD)_S 200 _t
+(20852)_S 2800 _t
+4200 6742 _m
+(\(301\))_S 100 _t
+(496-7406)_S 3300 _t
+4200 6575 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1600 6408 _m
+(POPLINE\016)_S 3600 6408 _m
+(-)_S 4200 6408 _m
+($2,000)_S 4100 _t
+1200 6241 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1600 6074 _m
+(REGISTRY)_S 100 _t
+(OF)_S 100 _t
+(TOXIC)_S 100 _t
+3600 6074 _m
+(-)_S 4200 6074 _m
+(Available)_S 100 _t
+(from)_S 100 _t
+(NTIS.)_S 2700 _t
+1600 5907 _m
+(EFFECTS)_S 100 _t
+(OF)_S 100 _t
+(CHEMICAL)_S 5400 _t
+1600 5740 _m
+(SUBSTANCES)_S 100 _t
+(\(RTECS\016\))_S 4200 5740 _m
+(Prospective)_S 100 _t
+(domestic)_S 100 _t
+(and)_S 100 _t
+(non-U.S.)_S 100 _t
+(licensees)_S 100 _t
+(of)_S 100 _t
+4200 5573 _m
+(RTECS)_S 100 _t
+(should)_S 100 _t
+(contact)_S 100 _t
+(NTIS)_S 100 _t
+(\(National)_S 100 _t
+(Technical)_S 200 _t
+4200 5406 _m
+(Information)_S 100 _t
+(Service\):)_S 2600 _t
+1200 5239 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 5072 _m
+(NTIS)_S 4300 _t
+4200 4905 _m
+(5285)_S 100 _t
+(Port)_S 100 _t
+(Royal)_S 100 _t
+(Road)_S 2700 _t
+4200 4738 _m
+(Springfield,)_S 100 _t
+(VA)_S 200 _t
+(22161)_S 2500 _t
+4200 4571 _m
+(\(703\))_S 100 _t
+(487-4650)_S 3300 _t
+4200 4404 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1600 4237 _m
+(SDILINE\016)_S 3600 4237 _m
+(-)_S 4200 4237 _m
+($5,000)_S 100 _t
+(updated)_S 100 _t
+(monthly)_S 100 _t
+(\(if)_S 100 _t
+(leased)_S 100 _t
+(separately)_S 300 _t
+4200 4070 _m
+(from)_S 100 _t
+(MEDLINE\).)_S 3300 _t
+1600 3736 _m
+(SERLINE\016)_S 3600 3736 _m
+(-)_S 4200 3736 _m
+($1,000.)_S 200 _t
+(Foreign)_S 100 _t
+(surcharge)_S 100 _t
+(does)_S 100 _t
+(not)_S 100 _t
+(apply.)_S 700 _t
+1200 3569 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 3402 _m
+(Certain)_S 100 _t
+(SERLINE)_S 100 _t
+(data)_S 100 _t
+(elements)_S 100 _t
+(related)_S 100 _t
+(to)_S 700 _t
+4200 3235 _m
+(holdings)_S 100 _t
+(information)_S 100 _t
+(are)_S 100 _t
+(not)_S 100 _t
+(distributed)_S 100 _t
+(in)_S 400 _t
+4200 3068 _m
+(the)_S 100 _t
+(leased)_S 100 _t
+(database.)_S 2600 _t
+4200 2734 _m
+(Certain)_S 100 _t
+(SERLINE)_S 100 _t
+(data)_S 100 _t
+(are)_S 100 _t
+(also)_S 100 _t
+(available)_S 100 _t
+(at)_S 100 _t
+(no)_S 4200 2567 _m
+(charge)_S 100 _t
+(on)_S 100 _t
+(the)_S 100 _t
+(Internet.)_S 200 _t
+(See)_S 100 _t
+(page)_S 100 _t
+(6)_S 100 _t
+(for)_S 4200 2400 _m
+(additional)_S 100 _t
+(information.)_S 1600 2066 _m
+(SPACELINE)_S 3600 2066 _m
+(-)_S 4200 2066 _m
+($1,000)_S 4300 _t
+1200 1899 _m
+100 _t
+100 _t
+100 _t
+_ep
+<</Policies  <</PageSize 0 >> >> setpagedevice <</InputAttributes <<0<< /PageSize [612 792]  /MediaType (Standard) >>/Priority [0 1 3 2]>> >>setpagedevice << /PageSize [612 792]  /MediaType (Standard) >> setpagedevice _bp /CourierR 500 _ff
+0 13200 10200 _ornt 
+/_r      { sflg {/_t {0 rmoveto}bdef /ron false def}
+         { /_S /show load def /_t {0 rmoveto}bdef /ron false def}ifelse
+     }bdef
+5050 12479 _m
+/Times-BoldR 600 _ff
+_B (4)_S _b /CourierR 500 _ff
+1200 12086 _m
+1600 11585 _m
+_U (DATABASE)_S _u 4200 11585 _m
+_U (ANNUAL)_S 100 _t
+(LICENSE)_S 100 _t
+(FEE)_S _u 1600 11251 _m
+(TOXIC)_S 100 _t
+(CHEMICAL)_S 3600 11251 _m
+(-)_S 4200 11251 _m
+(Available)_S 100 _t
+(from)_S 100 _t
+(NTIS.)_S 2700 _t
+1600 11084 _m
+(RELEASE)_S 100 _t
+(INVENTORY)_S 5600 _t
+1600 10917 _m
+(\(TRI87,)_S 100 _t
+(TRI88,)_S 100 _t
+(TRI89,)_S 4200 10917 _m
+(Prospective)_S 100 _t
+(domestic)_S 100 _t
+(and)_S 100 _t
+(non-U.S.)_S 100 _t
+(licensees)_S 400 _t
+1200 10750 _m
+100 _t
+1600 10750 _m
+(TRI90,)_S 100 _t
+(TRI91,)_S 900 _t
+4200 10750 _m
+(of)_S 100 _t
+(TRI)_S 100 _t
+(should)_S 100 _t
+(contact)_S 100 _t
+(NTIS)_S 100 _t
+(\(National)_S 100 _t
+(Technical)_S 100 _t
+1600 10583 _m
+(TRI92)_S 100 _t
+(and)_S 100 _t
+(TRI93\))_S 4200 10583 _m
+(Information)_S 100 _t
+(Service\):)_S 1700 _t
+4200 10249 _m
+(NTIS)_S 4300 _t
+4200 10082 _m
+(5285)_S 100 _t
+(Port)_S 100 _t
+(Royal)_S 100 _t
+(Road)_S 2700 _t
+4200 9915 _m
+(Springfield,)_S 100 _t
+(VA)_S 200 _t
+(22161)_S 2500 _t
+4200 9748 _m
+(\(703\))_S 100 _t
+(487-4650)_S 3300 _t
+3600 9581 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1600 9414 _m
+(TOXLINE\016)_S 200 _t
+3600 9414 _m
+(-)_S 4200 9414 _m
+($2,500)_S 100 _t
+(plus)_S 100 _t
+(royalties)_S 100 _t
+(for)_S 100 _t
+(the)_S 100 _t
+(current)_S 100 _t
+(file)_S 500 _t
+1600 9247 _m
+(&)_S 100 _t
+(TOXLINE65)_S 4200 9247 _m
+(\(1981)_S 100 _t
+(through)_S 100 _t
+(the)_S 100 _t
+(current)_S 100 _t
+(year\).)_S 1500 _t
+4200 9080 _m
+($2,500)_S 100 _t
+(plus)_S 100 _t
+(royalties)_S 100 _t
+(for)_S 100 _t
+(the)_S 100 _t
+(backfile)_S 900 _t
+1200 8913 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 8913 _m
+(\(1965-80\).)_S 3900 _t
+1200 8746 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 8579 _m
+(The)_S 100 _t
+(NIOSHTIC)_S 100 _t
+(subfile)_S 100 _t
+(produced)_S 100 _t
+(by)_S 100 _t
+(the)_S 100 _t
+(National)_S 200 _t
+4200 8412 _m
+(Institute)_S 100 _t
+(for)_S 100 _t
+(Occupational)_S 100 _t
+(Safety)_S 100 _t
+(and)_S 100 _t
+(Health)_S 300 _t
+4200 8245 _m
+(\(NIOSH\))_S 100 _t
+(is)_S 100 _t
+(not)_S 100 _t
+(distributed)_S 100 _t
+(in)_S 100 _t
+(the)_S 100 _t
+(leased)_S 700 _t
+4200 8078 _m
+(databases.)_S 3700 _t
+1200 7911 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 7744 _m
+(There)_S 100 _t
+(are)_S 100 _t
+(tape)_S 100 _t
+(royalties)_S 100 _t
+(for)_S 100 _t
+(TOXLINE)_S 100 _t
+(and)_S 700 _t
+4200 7577 _m
+(TOXLINE65)_S 100 _t
+(which)_S 100 _t
+(must)_S 100 _t
+(be)_S 100 _t
+(negotiated)_S 100 _t
+(with)_S 100 _t
+(and)_S 400 _t
+4200 7410 _m
+(paid)_S 100 _t
+(directly)_S 100 _t
+(to)_S 100 _t
+(two)_S 100 _t
+(of)_S 100 _t
+(the)_S 100 _t
+(file)_S 100 _t
+(content)_S 700 _t
+4200 7243 _m
+(providers,)_S 100 _t
+(Biological)_S 100 _t
+(Abstracts,)_S 100 _t
+(Incorporated)_S 200 _t
+4200 7076 _m
+(\(BIOSIS\))_S 100 _t
+(and)_S 100 _t
+(the)_S 100 _t
+(American)_S 100 _t
+(Society)_S 100 _t
+(of)_S 100 _t
+(Hospital)_S 200 _t
+4200 6909 _m
+(Pharmacists)_S 100 _t
+(\(ASHP\).)_S 200 _t
+(Licensees)_S 100 _t
+(must)_S 100 _t
+(make)_S 700 _t
+4200 6742 _m
+(separate)_S 100 _t
+(arrangements)_S 100 _t
+(with)_S 100 _t
+(those)_S 100 _t
+(data)_S 1000 _t
+4200 6575 _m
+(suppliers)_S 100 _t
+(in)_S 100 _t
+(advance.)_S 2600 _t
+1200 6408 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 6241 _m
+(There)_S 100 _t
+(are)_S 100 _t
+(two)_S 100 _t
+(leasing)_S 100 _t
+(options)_S 100 _t
+(available)_S 100 _t
+(for)_S 400 _t
+4200 6074 _m
+(TOXLINE)_S 100 _t
+(and)_S 100 _t
+(TOXLINE65:)_S 100 _t
+(1.)_S 100 _t
+(all)_S 100 _t
+(subfiles)_S 100 _t
+(except)_S 200 _t
+4200 5907 _m
+(NIOSHTIC;)_S 100 _t
+(2.)_S 100 _t
+(all)_S 100 _t
+(subfiles)_S 100 _t
+(except)_S 100 _t
+(NIOSHTIC,)_S 500 _t
+4200 5740 _m
+(BIOSIS,)_S 100 _t
+(and)_S 100 _t
+(IPA.)_S 200 _t
+(The)_S 100 _t
+(charges)_S 100 _t
+(are)_S 100 _t
+(the)_S 100 _t
+(same)_S 500 _t
+4200 5573 _m
+(because)_S 100 _t
+(the)_S 100 _t
+(same)_S 100 _t
+(number)_S 100 _t
+(of)_S 100 _t
+(update)_S 100 _t
+(tapes)_S 100 _t
+(are)_S 400 _t
+4200 5406 _m
+(sent.)_S 200 _t
+(Please)_S 100 _t
+(specify)_S 100 _t
+(which)_S 100 _t
+(TOXLINE)_S 100 _t
+(version)_S 400 _t
+4200 5239 _m
+(is)_S 100 _t
+(to)_S 100 _t
+(be)_S 100 _t
+(licensed.)_S 400 _t
+7200 5239 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1200 5072 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1600 4905 _m
+(TOXLIT\016)_S 100 _t
+3600 4905 _m
+(-)_S 4200 4905 _m
+($2,500)_S 100 _t
+(plus)_S 100 _t
+(royalties)_S 100 _t
+(for)_S 100 _t
+(the)_S 100 _t
+(current)_S 100 _t
+(file)_S 400 _t
+1600 4738 _m
+(&)_S 100 _t
+(TOXLIT65)_S 4200 4738 _m
+(\(1981)_S 100 _t
+(through)_S 100 _t
+(the)_S 100 _t
+(current)_S 100 _t
+(year\).)_S 8400 4738 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 4571 _m
+($2,500)_S 100 _t
+(plus)_S 100 _t
+(royalties)_S 100 _t
+(for)_S 100 _t
+(the)_S 100 _t
+(backfile)_S 900 _t
+1200 4404 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 4404 _m
+(\(1965-80\))_S 4000 _t
+1200 4237 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 4070 _m
+(There)_S 100 _t
+(are)_S 100 _t
+(tape)_S 100 _t
+(royalties)_S 100 _t
+(for)_S 100 _t
+(TOXLIT)_S 100 _t
+(and)_S 800 _t
+4200 3903 _m
+(TOXLIT65)_S 100 _t
+(which)_S 100 _t
+(are)_S 100 _t
+(not)_S 100 _t
+(paid)_S 100 _t
+(to)_S 100 _t
+(NLM)_S 100 _t
+(but)_S 100 _t
+(are)_S 500 _t
+4200 3736 _m
+(negotiated)_S 100 _t
+(with)_S 100 _t
+(and)_S 100 _t
+(paid)_S 100 _t
+(directly)_S 100 _t
+(to)_S 100 _t
+(the)_S 100 _t
+(file)_S 200 _t
+4200 3569 _m
+(content)_S 100 _t
+(provider,)_S 100 _t
+(Chemical)_S 100 _t
+(Abstracts)_S 100 _t
+(Service)_S 300 _t
+4200 3402 _m
+(\(CAS\).)_S 200 _t
+(Licensees)_S 100 _t
+(must)_S 100 _t
+(make)_S 100 _t
+(separate)_S 100 _t
+(arrange-)_S 200 _t
+1200 3235 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 3235 _m
+(ments)_S 100 _t
+(with)_S 100 _t
+(CAS)_S 100 _t
+(in)_S 100 _t
+(advance.)_S 2100 _t
+1200 3068 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1600 2901 _m
+(TOXNET\016)_S 100 _t
+(Databases)_S 3600 2901 _m
+(-)_S 4200 2901 _m
+(See)_S 100 _t
+(individual)_S 200 _t
+(database)_S 100 _t
+(names:)_S 100 _t
+(CCRIS,)_S 100 _t
+(DART,)_S 300 _t
+1600 2734 _m
+(&)_S 100 _t
+(Databanks)_S 4200 2734 _m
+(ETICBACK,)_S 100 _t
+(GENE-TOX,)_S 100 _t
+(HSDB,)_S 100 _t
+(RTECS,)_S 100 _t
+(TRI.)_S 1000 _t
+1200 2567 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1200 2400 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+_ep
+<</Policies  <</PageSize 0 >> >> setpagedevice <</InputAttributes <<0<< /PageSize [612 792]  /MediaType (Standard) >>/Priority [0 1 3 2]>> >>setpagedevice << /PageSize [612 792]  /MediaType (Standard) >> setpagedevice _bp /CourierR 500 _ff
+0 13200 10200 _ornt 
+/_r      { sflg {/_t {0 rmoveto}bdef /ron false def}
+         { /_S /show load def /_t {0 rmoveto}bdef /ron false def}ifelse
+     }bdef
+5050 12479 _m
+/Times-BoldR 600 _ff
+_B (5)_S _b /CourierR 500 _ff
+1200 12086 _m
+_U _u 1200 11919 _m
+_U (ADDITIONAL)_S 100 _t
+(FEES:)_S _u 1200 11585 _m
+(1.)_S 1600 11585 _m
+_U (Surcharge)_S _u 100 _t
+(-)_S 100 _t
+(foreign)_S 100 _t
+(users,)_S 100 _t
+(as)_S 100 _t
+(non-U.S.)_S 100 _t
+(taxpayers,)_S 100 _t
+(pay)_S 100 _t
+(a)_S 100 _t
+(surcharge)_S 100 _t
+(that)_S 1600 11418 _m
+(represents)_S 100 _t
+(their)_S 100 _t
+(proportional)_S 100 _t
+(share)_S 100 _t
+(of)_S 100 _t
+(the)_S 100 _t
+(costs)_S 100 _t
+(of)_S 100 _t
+(creating)_S 100 _t
+(the)_S 100 _t
+(National)_S 1600 11251 _m
+(Library)_S 100 _t
+(of)_S 100 _t
+(Medicine)_S 100 _t
+(databases.)_S 200 _t
+(Foreign)_S 100 _t
+(users)_S 100 _t
+(include)_S 100 _t
+(licensees)_S 100 _t
+(in)_S 100 _t
+(foreign)_S 1600 11084 _m
+(countries,)_S 100 _t
+(licensees)_S 100 _t
+(whose)_S 100 _t
+(databases)_S 100 _t
+(run)_S 100 _t
+(on)_S 100 _t
+(computers)_S 100 _t
+(outside)_S 100 _t
+(the)_S 100 _t
+(U.S.,)_S 100 _t
+(or)_S 1600 10917 _m
+(domestic)_S 100 _t
+(licensees)_S 100 _t
+(who)_S 100 _t
+(provide)_S 100 _t
+(data)_S 100 _t
+(outside)_S 100 _t
+(the)_S 100 _t
+(U.S.)_S 200 _t
+(The)_S 100 _t
+(surcharge)_S 100 _t
+(is)_S 100 _t
+(as)_S 1600 10750 _m
+(follows:)_S 1600 10416 _m
+(a.)_S 2000 10416 _m
+(Online)_S 100 _t
+(systems)_S 100 _t
+(\(including)_S 100 _t
+(the)_S 100 _t
+(Internet\))_S 100 _t
+(and)_S 100 _t
+(networked)_S 100 _t
+(CD-ROMs)_S 100 _t
+(or)_S 100 _t
+(other)_S 2000 10249 _m
+(storage)_S 100 _t
+(media)_S 100 _t
+(that)_S 100 _t
+(may)_S 100 _t
+(serve)_S 100 _t
+(26)_S 100 _t
+(or)_S 100 _t
+(more)_S 100 _t
+(concurrent)_S 100 _t
+(users:)_S 200 _t
+(The)_S 2000 10082 _m
+(algorithm)_S 100 _t
+(for)_S 100 _t
+(calculating)_S 100 _t
+(the)_S 100 _t
+(surcharge,)_S 100 _t
+(based)_S 100 _t
+(on)_S 100 _t
+(the)_S 100 _t
+(number)_S 100 _t
+(of)_S 2000 9915 _m
+(connect)_S 100 _t
+(hours,)_S 100 _t
+(online)_S 100 _t
+(characters)_S 100 _t
+(transmitted,)_S 100 _t
+(and)_S 100 _t
+(citations)_S 100 _t
+(printed)_S 2000 9748 _m
+(offline)_S 100 _t
+(remains)_S 100 _t
+(at)_S 100 _t
+($2.50/connect)_S 100 _t
+(hour,)_S 100 _t
+($0.02/1,000)_S 100 _t
+(characters)_S 2000 9581 _m
+(transmitted,)_S 100 _t
+(and)_S 100 _t
+($0.02/citation)_S 100 _t
+(printed)_S 100 _t
+(offline.)_S 200 _t
+(Licensees)_S 100 _t
+(will)_S 2000 9414 _m
+(report)_S 100 _t
+(the)_S 100 _t
+(sum)_S 100 _t
+(of)_S 100 _t
+(this)_S 100 _t
+(algorithm,)_S 100 _t
+(but)_S 100 _t
+(will)_S 100 _t
+(pay)_S 100 _t
+(only)_S 100 _t
+(75%)_S 100 _t
+(of)_S 100 _t
+(these)_S 2000 9247 _m
+(charges.)_S 200 _t
+([Licensees)_S 100 _t
+(may)_S 100 _t
+(propose)_S 100 _t
+(an)_S 100 _t
+(alternative)_S 100 _t
+(to)_S 100 _t
+(the)_S 100 _t
+(NLM)_S 100 _t
+(algorithm)_S 2000 9080 _m
+(for)_S 100 _t
+(calculating)_S 100 _t
+(the)_S 100 _t
+(foreign)_S 100 _t
+(surcharge.])_S 1600 8746 _m
+(b.)_S 200 _t
+(Single)_S 100 _t
+(user,)_S 100 _t
+(non-networked)_S 100 _t
+(CD-ROMs)_S 100 _t
+(-)_S 100 _t
+($50.00)_S 100 _t
+(per)_S 100 _t
+(subscription.)_S 1600 8412 _m
+(c.)_S 2000 8412 _m
+(Online)_S 100 _t
+(systems)_S 100 _t
+(or)_S 100 _t
+(networked)_S 100 _t
+(CD-ROMs)_S 100 _t
+(or)_S 100 _t
+(other)_S 100 _t
+(storage)_S 100 _t
+(media)_S 100 _t
+(that)_S 100 _t
+(may)_S 2000 8245 _m
+(serve)_S 100 _t
+(25)_S 100 _t
+(or)_S 100 _t
+(fewer)_S 100 _t
+(concurrent)_S 100 _t
+(users:)_S 100 _t
+(Licensees)_S 100 _t
+(may)_S 100 _t
+(choose)_S 100 _t
+(either)_S 100 _t
+(the)_S 2000 8078 _m
+(algorithm)_S 100 _t
+(listed)_S 100 _t
+(above)_S 100 _t
+(in)_S 100 _t
+(Item)_S 100 _t
+(1.a.)_S 100 _t
+(including)_S 100 _t
+(the)_S 100 _t
+(25%)_S 100 _t
+(reduction)_S 100 _t
+(OR)_S 2000 7911 _m
+($200.00)_S 100 _t
+(per)_S 100 _t
+(concurrent)_S 100 _t
+(user)_S 100 _t
+(based)_S 100 _t
+(on)_S 100 _t
+(the)_S 100 _t
+(maximum)_S 100 _t
+(number)_S 100 _t
+(of)_S 100 _t
+(concurrent)_S 2000 7744 _m
+(users)_S 100 _t
+(that)_S 100 _t
+(the)_S 100 _t
+(system)_S 100 _t
+(can)_S 100 _t
+(support.)_S 1600 7410 _m
+(NOTES:)_S 1600 7076 _m
+(1.)_S 200 _t
+(For)_S 100 _t
+(portions)_S 100 _t
+(of)_S 100 _t
+(a)_S 100 _t
+(MEDLARS)_S 100 _t
+(file)_S 100 _t
+(used)_S 100 _t
+(in)_S 100 _t
+(a)_S 100 _t
+(licensee's)_S 100 _t
+(system/product:)_S 2000 6909 _m
+(a.)_S 2400 6909 _m
+(MEDLINE:)_S 100 _t
+(if)_S 100 _t
+(a)_S 100 _t
+(licensee's)_S 100 _t
+(system/product)_S 100 _t
+(contains)_S 100 _t
+(fewer)_S 100 _t
+(than)_S 100 _t
+(12,000)_S 2400 6742 _m
+(citations)_S 100 _t
+(from)_S 100 _t
+(each)_S 100 _t
+(corresponding)_S 100 _t
+(year)_S 100 _t
+(of)_S 100 _t
+(MEDLINE,)_S 100 _t
+(then)_S 100 _t
+(no)_S 2400 6575 _m
+(surcharge)_S 100 _t
+(is)_S 100 _t
+(due.)_S 2000 6408 _m
+(b.)_S 2400 6408 _m
+(For)_S 100 _t
+(MEDLARS)_S 100 _t
+(files)_S 100 _t
+(other)_S 100 _t
+(than)_S 100 _t
+(MEDLINE:)_S 100 _t
+(if)_S 100 _t
+(fewer)_S 100 _t
+(than)_S 100 _t
+(25%)_S 100 _t
+(of)_S 100 _t
+(the)_S 2400 6241 _m
+(records)_S 100 _t
+(in)_S 100 _t
+(the)_S 100 _t
+(leased)_S 100 _t
+(file)_S 100 _t
+(is)_S 100 _t
+(used)_S 100 _t
+(each)_S 100 _t
+(year)_S 100 _t
+(in)_S 100 _t
+(a)_S 100 _t
+(licensee's)_S 2400 6074 _m
+(system/product,)_S 100 _t
+(then)_S 100 _t
+(no)_S 100 _t
+(surcharge)_S 100 _t
+(is)_S 100 _t
+(due.)_S 1600 5740 _m
+(2.)_S 2000 5740 _m
+(For)_S 100 _t
+(full)_S 100 _t
+(databases)_S 100 _t
+(other)_S 100 _t
+(than)_S 100 _t
+(MEDLINE:)_S 2000 5573 _m
+(a.)_S 2400 5573 _m
+(When)_S 100 _t
+(provided)_S 100 _t
+(along)_S 100 _t
+(side)_S 100 _t
+(a)_S 100 _t
+(MEDLINE)_S 100 _t
+(product)_S 100 _t
+(available)_S 100 _t
+(through)_S 100 _t
+(a)_S 2400 5406 _m
+(customer's)_S 100 _t
+(local)_S 100 _t
+(area)_S 100 _t
+(network,)_S 100 _t
+(no)_S 100 _t
+(surcharge)_S 100 _t
+(is)_S 100 _t
+(due.)_S 200 _t
+(The)_S 100 _t
+(surcharge)_S 2400 5239 _m
+(for)_S 100 _t
+(MEDLINE)_S 100 _t
+(does)_S 100 _t
+(apply.)_S 2000 5072 _m
+(b.)_S 2400 5072 _m
+(When)_S 100 _t
+(provided)_S 100 _t
+(as)_S 100 _t
+(separate)_S 100 _t
+(products)_S 100 _t
+(not)_S 100 _t
+(on)_S 100 _t
+(a)_S 100 _t
+(local)_S 100 _t
+(area)_S 100 _t
+(network,)_S 2400 4905 _m
+(the)_S 100 _t
+(surcharge)_S 100 _t
+(listed)_S 100 _t
+(above)_S 100 _t
+(applies.)_S 2000 4738 _m
+(c.)_S 2400 4738 _m
+(When)_S 100 _t
+(provided)_S 100 _t
+(with)_S 100 _t
+(no)_S 100 _t
+(MEDLINE)_S 100 _t
+(product,)_S 100 _t
+(the)_S 100 _t
+(surcharge)_S 100 _t
+(listed)_S 100 _t
+(above)_S 2400 4571 _m
+(applies.)_S 1200 4237 _m
+(2.)_S 1600 4237 _m
+_U (Non-recurring)_S 100 _t
+("personal)_S 100 _t
+(use")_S 100 _t
+(subsets.)_S _u 2000 3903 _m
+(One-time)_S 100 _t
+(retrieval)_S 100 _t
+(from)_S 100 _t
+(the)_S 100 _t
+(current)_S 100 _t
+(year)_S 100 _t
+(and/or)_S 100 _t
+(older)_S 100 _t
+(data;)_S 100 _t
+(limited)_S 100 _t
+(to)_S 2000 3736 _m
+(150,000)_S 100 _t
+(citations;)_S 100 _t
+(no)_S 100 _t
+(updates;)_S 100 _t
+(data)_S 100 _t
+(must)_S 100 _t
+(be)_S 100 _t
+(leased)_S 100 _t
+(directly)_S 100 _t
+(from)_S 100 _t
+(NLM;)_S 2000 3569 _m
+(applicable)_S 100 _t
+(for)_S 100 _t
+(domestic)_S 100 _t
+(licensees)_S 100 _t
+(only.)_S 200 _t
+(Cost)_S 100 _t
+(is)_S 100 _t
+($500.00.)_S 1200 3235 _m
+(3.)_S 1600 3235 _m
+_U (Sample)_S 100 _t
+(data)_S _u 2000 2901 _m
+(A)_S 100 _t
+(sample)_S 100 _t
+(tape)_S 100 _t
+(is)_S 100 _t
+(available)_S 100 _t
+(upon)_S 100 _t
+(written)_S 100 _t
+(request)_S 100 _t
+(for)_S 100 _t
+(a)_S 100 _t
+(fee)_S 100 _t
+(of)_S 100 _t
+($50.00)_S 2000 2734 _m
+(for)_S 100 _t
+(domestic)_S 100 _t
+(and)_S 100 _t
+($62.50)_S 100 _t
+(for)_S 100 _t
+(non-U.S.)_S 100 _t
+(requests.)_S 200 _t
+(\(There)_S 100 _t
+(is)_S 100 _t
+(no)_S 100 _t
+(fee)_S 100 _t
+(for)_S 2000 2567 _m
+(AIDSDRUGS/AIDSTRIALS,)_S 100 _t
+(AIDSLINE,)_S 100 _t
+(or)_S 100 _t
+(DIRLINE)_S 100 _t
+(sample)_S 100 _t
+(tapes.\))_S 200 _t
+(MeSH)_S 100 _t
+(data)_S 2000 2400 _m
+(in)_S 100 _t
+(MARC-compatible)_S 100 _t
+(format)_S 100 _t
+(is)_S 100 _t
+(available)_S 100 _t
+(via)_S 100 _t
+(ftp)_S 100 _t
+(at)_S 100 _t
+(no)_S 100 _t
+(charge)_S 100 _t
+(\(see)_S 100 _t
+(page)_S 2000 2233 _m
+(6\).)_S 1200 1899 _m
+(4.)_S 1600 1899 _m
+_U (GENER)_S 100 _t
+(format)_S _u 2000 1565 _m
+(If)_S 100 _t
+(Current)_S 100 _t
+(Year)_S 100 _t
+(MEDLINE)_S 100 _t
+(\(SDILINE\))_S 100 _t
+(data)_S 100 _t
+(are)_S 100 _t
+(supplied)_S 100 _t
+(in)_S 100 _t
+(GENER)_S 100 _t
+(format,)_S 2000 1398 _m
+(there)_S 100 _t
+(is)_S 100 _t
+(an)_S 100 _t
+(extra,)_S 100 _t
+(annual)_S 100 _t
+(flat-rate)_S 100 _t
+(fee)_S 100 _t
+(of)_S 100 _t
+($1,000.00)_S 100 _t
+(for)_S 100 _t
+(domestic)_S 2000 1231 _m
+(licensees)_S 100 _t
+(and)_S 100 _t
+($1,250.00)_S 100 _t
+(for)_S 100 _t
+(non-U.S.)_S 100 _t
+(licensees.)_S _ep
+<</Policies  <</PageSize 0 >> >> setpagedevice <</InputAttributes <<0<< /PageSize [612 792]  /MediaType (Standard) >>/Priority [0 1 3 2]>> >>setpagedevice << /PageSize [612 792]  /MediaType (Standard) >> setpagedevice _bp /CourierR 500 _ff
+0 13200 10200 _ornt 
+/_r      { sflg {/_t {0 rmoveto}bdef /ron false def}
+         { /_S /show load def /_t {0 rmoveto}bdef /ron false def}ifelse
+     }bdef
+5050 12479 _m
+/Times-BoldR 600 _ff
+_B (6)_S _b /CourierR 500 _ff
+1200 12086 _m
+1200 11919 _m
+(5.)_S 1600 11919 _m
+_U (Replacement)_S 100 _t
+(tapes)_S _u 200 _t
+1200 11585 _m
+100 _t
+2000 11585 _m
+(Replacement)_S 100 _t
+(tapes)_S 100 _t
+(cost)_S 100 _t
+($75.00/tape)_S 100 _t
+(for)_S 100 _t
+(domestic)_S 100 _t
+(licensees)_S 100 _t
+(and)_S 2000 11418 _m
+($93.75/tape)_S 100 _t
+(for)_S 100 _t
+(non-U.S.)_S 100 _t
+(licensees.)_S 1200 10917 _m
+_U (MEDLARS)_S 100 _t
+(DATA)_S 100 _t
+(ON)_S 100 _t
+(THE)_S 100 _t
+(INTERNET)_S _u 1200 10583 _m
+(1.)_S 200 _t
+(MeSH)_S 100 _t
+(TREES)_S 100 _t
+(FILE:)_S 1200 10249 _m
+(The)_S 100 _t
+(National)_S 100 _t
+(Library)_S 100 _t
+(of)_S 100 _t
+(Medicine)_S 100 _t
+(makes)_S 100 _t
+(its)_S 100 _t
+(annual)_S 100 _t
+(Medical)_S 100 _t
+(Subject)_S 100 _t
+(Headings)_S 1200 10082 _m
+(\(MeSH\))_S 100 _t
+(with)_S 100 _t
+(their)_S 100 _t
+(associated)_S 100 _t
+(hierarchical)_S 100 _t
+(tree)_S 100 _t
+(numbers)_S 100 _t
+(\(referred)_S 100 _t
+(to)_S 100 _t
+(as)_S 100 _t
+(the)_S 1200 9915 _m
+("Trees)_S 100 _t
+(file"\))_S 100 _t
+(available)_S 100 _t
+(over)_S 100 _t
+(the)_S 100 _t
+(Internet.)_S 200 _t
+(The)_S 100 _t
+(file)_S 100 _t
+(contains)_S 100 _t
+(only)_S 100 _t
+(MeSH)_S 1200 9748 _m
+(Headings)_S 100 _t
+(with)_S 100 _t
+(tree)_S 100 _t
+(numbers.)_S 200 _t
+(For)_S 100 _t
+(those)_S 100 _t
+(without)_S 100 _t
+(Internet)_S 100 _t
+(access,)_S 100 _t
+(the)_S 100 _t
+(Trees)_S 100 _t
+(file)_S 1200 9581 _m
+(is)_S 100 _t
+(available)_S 100 _t
+(on)_S 100 _t
+(a)_S 100 _t
+(3.5")_S 100 _t
+(DOS)_S 100 _t
+(diskette.)_S 200 _t
+(There)_S 100 _t
+(is)_S 100 _t
+(no)_S 100 _t
+(charge)_S 100 _t
+(or)_S 100 _t
+(license)_S 100 _t
+(required)_S 1200 9414 _m
+(for)_S 100 _t
+(either)_S 100 _t
+(version.)_S 200 _t
+(The)_S 100 _t
+(Trees)_S 100 _t
+(file)_S 100 _t
+(may)_S 100 _t
+(be)_S 100 _t
+(obtained)_S 100 _t
+(by)_S 100 _t
+(anonymous)_S 100 _t
+(ftp)_S 100 _t
+(from)_S 100 _t
+(the)_S 1200 9247 _m
+(host)_S 100 _t
+(nlmpubs.nlm.nih.gov)_S 100 _t
+(in)_S 100 _t
+(directory)_S 100 _t
+(/online)_S 100 _t
+(as)_S 100 _t
+(MTREES96.ZIP.)_S 200 _t
+(This)_S 1200 9080 _m
+(compressed)_S 100 _t
+(file)_S 100 _t
+(contains)_S 100 _t
+(the)_S 100 _t
+(trees)_S 100 _t
+(data)_S 100 _t
+(file)_S 100 _t
+(as)_S 100 _t
+(well)_S 100 _t
+(as)_S 100 _t
+(the)_S 100 _t
+(documentation)_S 100 _t
+(and)_S 1200 8913 _m
+(terms/conditions)_S 100 _t
+(statement.)_S 200 _t
+(For)_S 100 _t
+(those)_S 100 _t
+(without)_S 100 _t
+(Internet)_S 100 _t
+(access,)_S 100 _t
+(requests)_S 100 _t
+(for)_S 1200 8746 _m
+(the)_S 100 _t
+(diskette,)_S 100 _t
+(documentation)_S 100 _t
+(and)_S 100 _t
+(terms/conditions)_S 100 _t
+(statement)_S 100 _t
+(should)_S 100 _t
+(be)_S 100 _t
+(sent)_S 100 _t
+(to:)_S 1200 8579 _m
+(Ms.)_S 100 _t
+(Jane)_S 100 _t
+(L.)_S 100 _t
+(Rosov,)_S 100 _t
+(MEDLARS)_S 100 _t
+(Management)_S 100 _t
+(Section,)_S 100 _t
+(National)_S 100 _t
+(Library)_S 100 _t
+(of)_S 100 _t
+(Medicine,)_S 1200 8412 _m
+(Bethesda,)_S 100 _t
+(MD)_S 100 _t
+(20894)_S 100 _t
+(\(fax:)_S 100 _t
+(301-496-0822\).)_S 1200 8245 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1200 8078 _m
+(2.)_S 200 _t
+(MeSH)_S 100 _t
+(in)_S 100 _t
+(MARC-COMPATIBLE)_S 100 _t
+(FORMAT:)_S 1200 7744 _m
+(MeSH)_S 100 _t
+(in)_S 100 _t
+(MARC-compatible)_S 100 _t
+(format)_S 100 _t
+(is)_S 100 _t
+(available)_S 100 _t
+(via)_S 100 _t
+(ftp)_S 100 _t
+(at)_S 100 _t
+(no)_S 100 _t
+(cost.)_S 200 _t
+(Sample)_S 100 _t
+(MeSH)_S 1200 7577 _m
+(MARC)_S 100 _t
+(data)_S 100 _t
+(may)_S 100 _t
+(be)_S 100 _t
+(obtained)_S 100 _t
+(by)_S 100 _t
+(anonymous)_S 100 _t
+(ftp)_S 100 _t
+(from)_S 100 _t
+(the)_S 100 _t
+(host)_S 100 _t
+(nlmpubs.nlm.nih.gov)_S 1200 7410 _m
+(in)_S 100 _t
+(the)_S 100 _t
+(directory)_S 100 _t
+(/nlminfo/agreements/leased/mesh.)_S 200 _t
+(Read)_S 100 _t
+(the)_S 100 _t
+(readme)_S 100 _t
+(file)_S 100 _t
+(first.)_S 100 _t
+1200 7243 _m
+(A)_S 100 _t
+(license)_S 100 _t
+(agreement)_S 100 _t
+(is)_S 100 _t
+(required)_S 100 _t
+(to)_S 100 _t
+(ftp)_S 100 _t
+(the)_S 100 _t
+(full)_S 100 _t
+(MARC)_S 100 _t
+(file)_S 100 _t
+(unless)_S 100 _t
+(it's)_S 100 _t
+(for)_S 1200 7076 _m
+(translation)_S 100 _t
+(purposes)_S 100 _t
+(only.)_S 1200 6742 _m
+(3.)_S 200 _t
+(SERLINE)_S 100 _t
+(DATA:)_S 1200 6408 _m
+(Certain)_S 100 _t
+(SERLINE)_S 100 _t
+(data)_S 100 _t
+(are)_S 100 _t
+(available)_S 100 _t
+(via)_S 100 _t
+(ftp)_S 100 _t
+(at)_S 100 _t
+(no)_S 100 _t
+(cost.)_S 200 _t
+(Tagged)_S 100 _t
+(information,)_S 1200 6241 _m
+(sorted)_S 100 _t
+(alphabetically)_S 100 _t
+(by)_S 100 _t
+(the)_S 100 _t
+(title)_S 100 _t
+(of)_S 100 _t
+(the)_S 100 _t
+(journal,)_S 100 _t
+(may)_S 100 _t
+(be)_S 100 _t
+(obtained)_S 100 _t
+(by)_S 1200 6074 _m
+(anonymous)_S 100 _t
+(ftp)_S 100 _t
+(from)_S 100 _t
+(the)_S 100 _t
+(host)_S 100 _t
+(nlmpubs.nlm.nih.gov)_S 100 _t
+(in)_S 100 _t
+(the)_S 100 _t
+(directory)_S 1200 5907 _m
+(/online/journals.)_S 200 _t
+(There)_S 100 _t
+(are)_S 100 _t
+(six)_S 100 _t
+(files,)_S 100 _t
+(each)_S 100 _t
+(beginning)_S 100 _t
+(with)_S 100 _t
+(the)_S 100 _t
+(name)_S 100 _t
+("List)_S 100 _t
+(of)_S 1200 5740 _m
+(Serials)_S 100 _t
+(Indexed)_S 100 _t
+(-)_S 100 _t
+(Tagged)_S 100 _t
+(Data:".)_S 200 _t
+(A)_S 100 _t
+(license)_S 100 _t
+(agreement)_S 100 _t
+(is)_S 100 _t
+(not)_S 100 _t
+(required)_S 100 _t
+(to)_S 100 _t
+(ftp)_S 1200 5573 _m
+(these)_S 100 _t
+(data.)_S 200 _t
+1200 5072 _m
+(PLEASE)_S 100 _t
+(DIRECT)_S 100 _t
+(ANY)_S 100 _t
+(LEASING)_S 100 _t
+(QUESTIONS)_S 100 _t
+(TO:)_S 1600 4738 _m
+(Mr.)_S 100 _t
+(Sheldon)_S 100 _t
+(Kotzin)_S 1600 4571 _m
+(Chief,)_S 100 _t
+(Bibliographic)_S 100 _t
+(Services)_S 100 _t
+(Division)_S 1600 4404 _m
+(National)_S 100 _t
+(Library)_S 100 _t
+(of)_S 100 _t
+(Medicine)_S 1600 4237 _m
+(8600)_S 100 _t
+(Rockville)_S 100 _t
+(Pike)_S 1600 4070 _m
+(Bethesda,)_S 100 _t
+(MD)_S 200 _t
+(20894)_S 1600 3903 _m
+(Telephone:)_S 100 _t
+(301-496-6217)_S 1600 3736 _m
+(FAX:)_S 100 _t
+(301-496-0822)_S 1600 3569 _m
+(INTERNET:)_S 100 _t
+(kotzin@nlm.nih.gov)_S 1200 3068 _m
+(A)_S 100 _t
+(National)_S 100 _t
+(Library)_S 100 _t
+(of)_S 100 _t
+(Medicine)_S 100 _t
+(data)_S 100 _t
+(leasing)_S 100 _t
+(information)_S 100 _t
+(packet)_S 100 _t
+(is)_S 100 _t
+(available)_S 1200 2901 _m
+(from)_S 100 _t
+(the)_S 100 _t
+(address)_S 100 _t
+(listed)_S 100 _t
+(above)_S 100 _t
+(and)_S 100 _t
+(also)_S 100 _t
+(may)_S 100 _t
+(be)_S 100 _t
+(obtained)_S 100 _t
+(by)_S 100 _t
+(anonymous)_S 100 _t
+(ftp)_S 100 _t
+(from)_S 1200 2734 _m
+(the)_S 100 _t
+(host)_S 100 _t
+(nlmpubs.nlm.nih.gov)_S 100 _t
+(in)_S 100 _t
+(the)_S 100 _t
+(directory)_S 1200 2567 _m
+(/online/agreements/leased/license.)_S _ep
+<</Policies  <</PageSize 0 >> >> setpagedevice <</InputAttributes <<0<< /PageSize [612 792]  /MediaType (Standard) >>/Priority [0 1 3 2]>> >>setpagedevice << /PageSize [612 792]  /MediaType (Standard) >> setpagedevice _bp /CourierR 500 _ff
+0 13200 10200 _ornt 
+/_r      { sflg {/_t {0 rmoveto}bdef /ron false def}
+         { /_S /show load def /_t {0 rmoveto}bdef /ron false def}ifelse
+     }bdef
+5050 12479 _m
+/Times-BoldR 600 _ff
+_B (7)_S _b /CourierR 500 _ff
+1200 12086 _m
+1200 11919 _m
+(PART)_S 100 _t
+(2:)_S 200 _t
+(ONLINE)_S 100 _t
+(ACCESS)_S 100 _t
+(TO)_S 100 _t
+(THE)_S 100 _t
+(NLM)_S 100 _t
+(DATABASES)_S /Courier-BoldR 500 _ff
+/CourierR 500 _ff
+1200 11585 _m
+(Online)_S 100 _t
+(charges)_S 100 _t
+(are)_S 100 _t
+(calculated)_S 100 _t
+(by)_S 100 _t
+(using)_S 100 _t
+(an)_S 100 _t
+(algorithm)_S 100 _t
+(which)_S 100 _t
+(includes)_S 100 _t
+(connect)_S 1200 11418 _m
+(hour)_S 100 _t
+(charges)_S 100 _t
+(and)_S 100 _t
+(charges)_S 100 _t
+(for)_S 100 _t
+(search)_S 100 _t
+(statements,)_S 100 _t
+(citations,)_S 100 _t
+(computer)_S 100 _t
+(resources)_S 1200 11251 _m
+(\(i.e.,)_S 100 _t
+(disk)_S 100 _t
+(accesses\),)_S 100 _t
+(and)_S 100 _t
+(characters)_S 100 _t
+(transmitted)_S 100 _t
+(to)_S 100 _t
+(the)_S 100 _t
+(user's)_S 100 _t
+(terminal.)_S 200 _t
+(The)_S 1200 11084 _m
+(charges)_S 100 _t
+(remain)_S 100 _t
+(the)_S 100 _t
+(same)_S 100 _t
+(regardless)_S 100 _t
+(of)_S 100 _t
+(time)_S 100 _t
+(of)_S 100 _t
+(day.)_S 200 _t
+(Reduced)_S 100 _t
+(charges)_S 1200 10917 _m
+(approximating)_S 100 _t
+(50%)_S 100 _t
+(of)_S 100 _t
+(regular)_S 100 _t
+(online)_S 100 _t
+(rates)_S 100 _t
+(are)_S 100 _t
+(available)_S 100 _t
+(under)_S 100 _t
+(the)_S 100 _t
+(NLM)_S 100 _t
+(Student)_S 1200 10750 _m
+(Code)_S 100 _t
+(Program.)_S 1200 10416 _m
+_U (NON-U.S.)_S 100 _t
+(USERS)_S _u (:)_S 100 _t
+(In)_S 100 _t
+(addition)_S 100 _t
+(to)_S 100 _t
+(the)_S 100 _t
+(algorithm)_S 100 _t
+(a)_S 100 _t
+(foreign)_S 100 _t
+(surcharge)_S 100 _t
+(applies)_S 100 _t
+(for)_S 1200 10249 _m
+(online)_S 100 _t
+(access)_S 100 _t
+(to)_S 100 _t
+(NLM)_S 100 _t
+(by)_S 100 _t
+(users)_S 100 _t
+(outside)_S 100 _t
+(the)_S 100 _t
+(U.S.)_S 200 _t
+(The)_S 100 _t
+(surcharge)_S 100 _t
+(is)_S 100 _t
+($0.75/connect)_S 1200 10082 _m
+(hour)_S 100 _t
+(and)_S 100 _t
+($0.02/1,000)_S 100 _t
+(characters)_S 100 _t
+(transmitted)_S 100 _t
+(\(the)_S 100 _t
+(equivalent)_S 100 _t
+(of)_S 100 _t
+($3.75/hour)_S 100 _t
+(for)_S 1200 9915 _m
+(users)_S 100 _t
+(transmitting)_S 100 _t
+(125,000)_S 100 _t
+(characters/hour\))_S 100 _t
+(which)_S 100 _t
+(represents)_S 100 _t
+(a)_S 100 _t
+(25%)_S 100 _t
+(reduction)_S 1200 9748 _m
+(from)_S 100 _t
+(the)_S 100 _t
+(surcharge)_S 100 _t
+(rate)_S 100 _t
+(prior)_S 100 _t
+(to)_S 100 _t
+(Oct.)_S 100 _t
+(1,)_S 100 _t
+(1994.)_S 200 _t
+(There)_S 100 _t
+(is)_S 100 _t
+(a)_S 100 _t
+($0.10/page)_S 1200 9581 _m
+(surcharge)_S 100 _t
+(for)_S 100 _t
+(offline)_S 100 _t
+(print)_S 100 _t
+(pages)_S 100 _t
+(\(or)_S 100 _t
+(a)_S 100 _t
+($0.10/2,000)_S 100 _t
+(characters)_S 100 _t
+(surcharge)_S 100 _t
+(for)_S 1200 9414 _m
+(automatic)_S 100 _t
+(SDIs)_S 100 _t
+(disseminated)_S 100 _t
+(via)_S 100 _t
+(ftp\).)_S 1200 9080 _m
+(The)_S 100 _t
+(following)_S 100 _t
+(is)_S 100 _t
+(a)_S 100 _t
+(listing)_S 100 _t
+(of)_S 100 _t
+(the)_S 100 _t
+(NLM)_S 100 _t
+(ELHILL)_S 100 _t
+(databases)_S 100 _t
+(that)_S 100 _t
+(are)_S 100 _t
+(available)_S 1200 8913 _m
+(online)_S 100 _t
+(at)_S 100 _t
+(NLM)_S 100 _t
+(and)_S 100 _t
+(charged)_S 100 _t
+(according)_S 100 _t
+(to)_S 100 _t
+(the)_S 100 _t
+(algorithm)_S 100 _t
+(that)_S 100 _t
+(is)_S 100 _t
+(presented)_S 100 _t
+(in)_S 1200 8746 _m
+(detail)_S 100 _t
+(at)_S 100 _t
+(the)_S 100 _t
+(end)_S 100 _t
+(of)_S 100 _t
+(Part)_S 100 _t
+(2.)_S 200 _t
+(The)_S 100 _t
+(foreign)_S 100 _t
+(surcharge)_S 100 _t
+(does)_S 100 _t
+(not)_S 100 _t
+(apply)_S 100 _t
+(for)_S 1200 8579 _m
+(AIDSDRUGS,)_S 100 _t
+(AIDSLINE,)_S 100 _t
+(AIDSTRIALS,)_S 100 _t
+(AVLINE,)_S 100 _t
+(CATLINE,)_S 100 _t
+(DIRLINE,)_S 100 _t
+(DOCUSER\016,)_S 100 _t
+(MeSH,)_S 100 _t
+(and)_S 1200 8412 _m
+(SERLINE.)_S 4050 8078 _m
+_U (NLM)_S 100 _t
+(ELHILL)_S 100 _t
+(DATABASES)_S _u (*)_S 2400 7577 _m
+(AVLINE\016)_S 6000 7577 _m
+(MEDLINE\016)_S 100 _t
+(and)_S 100 _t
+(BACKFILES)_S 200 _t
+2400 7243 _m
+(BIOETHICSLINE\016)_S 6000 7243 _m
+(MeSH)_S 100 _t
+(VOCABULARY)_S 100 _t
+(FILE\016)_S 2400 6909 _m
+(CANCERLIT\016)_S 200 _t
+6000 6909 _m
+(POPLINE\016)_S 100 _t
+2400 6575 _m
+(CATLINE\016)_S 6000 6575 _m
+(SDILINE\016)_S 2400 6241 _m
+(ChemID\016)_S 6000 6241 _m
+(SERLINE\016)_S 2400 5907 _m
+(DENTALPROJ\023)_S 6000 5907 _m
+(SPACELINE)_S 100 _t
+2400 5573 _m
+(HealthSTAR)_S 200 _t
+6000 5573 _m
+(TOXLINE\016)_S 100 _t
+(&)_S 100 _t
+(TOXLINE65)_S 2400 5239 _m
+(HISTLINE\016)_S 1200 4905 _m
+(*Additional)_S 100 _t
+(ELHILL)_S 100 _t
+(databases)_S 100 _t
+(charged)_S 100 _t
+(at)_S 100 _t
+(differing)_S 100 _t
+(rates,)_S 100 _t
+(as)_S 100 _t
+(well)_S 100 _t
+(as)_S 100 _t
+(PDQ)_S 100 _t
+(and)_S 1200 4738 _m
+(the)_S 100 _t
+(TOXNET)_S 100 _t
+(databases)_S 100 _t
+(and)_S 100 _t
+(databanks,)_S 100 _t
+(are)_S 100 _t
+(listed)_S 100 _t
+(below.)_S 1200 4404 _m
+100 _t
+1600 4404 _m
+(The)_S 100 _t
+(following)_S 100 _t
+(databases)_S 100 _t
+(are)_S 100 _t
+(exceptions)_S 100 _t
+(to)_S 100 _t
+(the)_S 100 _t
+(pricing)_S 100 _t
+(algorithm:)_S 1000 _t
+1200 4237 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1600 4070 _m
+(AIDSDRUGS,)_S 100 _t
+(AIDSLINE)_S 3600 4070 _m
+(-)_S 4200 4070 _m
+(No)_S 100 _t
+(charges.)_S 3600 _t
+1600 3903 _m
+(AIDSTRIALS,)_S 100 _t
+(DIRLINE,)_S 5300 _t
+1200 3736 _m
+100 _t
+100 _t
+100 _t
+1600 3736 _m
+(DOCUSER\016)_S 6500 _t
+1200 3569 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1600 3402 _m
+(ALERT)_S 100 _t
+(&)_S 100 _t
+(LOAN)_S 100 _t
+(STATUS)_S 3600 3402 _m
+(-)_S 4200 3402 _m
+(The)_S 100 _t
+(charges)_S 100 _t
+(for)_S 100 _t
+(citations)_S 100 _t
+(and)_S 100 _t
+(characters)_S 700 _t
+4200 3235 _m
+(do)_S 100 _t
+(not)_S 100 _t
+(apply.)_S 3400 _t
+4200 2901 _m
+(Effective)_S 100 _t
+(January)_S 100 _t
+(1,)_S 100 _t
+(1996:)_S 1600 2734 _m
+(CHEMLINE\016)_S 1100 _t
+(-)_S 4200 2734 _m
+(For)_S 100 _t
+(domestic)_S 100 _t
+(users,)_S 100 _t
+(CHEMLINE)_S 100 _t
+(royalty)_S 100 _t
+(charges)_S 200 _t
+4200 2567 _m
+(of)_S 100 _t
+($0.68)_S 100 _t
+(per)_S 100 _t
+(online)_S 100 _t
+(citation)_S 100 _t
+(and)_S 100 _t
+($1.01)_S 100 _t
+(per)_S 4200 2400 _m
+(search)_S 100 _t
+(statement)_S 100 _t
+(are)_S 100 _t
+(added)_S 100 _t
+(to)_S 100 _t
+(the)_S 100 _t
+(algorithm.)_S 4200 2233 _m
+(Offline)_S 100 _t
+(page)_S 100 _t
+(charges)_S 100 _t
+(of)_S 100 _t
+($1.83)_S 100 _t
+(per)_S 100 _t
+(page)_S 100 _t
+(include)_S 4200 2066 _m
+($1.53)_S 100 _t
+(per)_S 100 _t
+(page)_S 100 _t
+(royalty.)_S 200 _t
+(Royalty)_S 100 _t
+(charges)_S 100 _t
+(are)_S 4200 1899 _m
+(subject)_S 100 _t
+(to)_S 100 _t
+(change)_S 100 _t
+(without)_S 100 _t
+(advance)_S 100 _t
+(notice.)_S 800 _t
+4200 1732 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 1565 _m
+(For)_S 100 _t
+(non-U.S.)_S 100 _t
+(users,)_S 100 _t
+(effective)_S 100 _t
+(January)_S 100 _t
+(1988,)_S 100 _t
+(NLM)_S 4200 1398 _m
+(negotiates)_S 100 _t
+(with)_S 100 _t
+(and)_S 100 _t
+(collects)_S 100 _t
+(royalties)_S 100 _t
+(for)_S 100 _t
+(the)_S 4200 1231 _m
+(Chemical)_S 100 _t
+(Abstracts)_S 100 _t
+(Service)_S 100 _t
+(for)_S 100 _t
+(CHEMLINE)_S 100 _t
+(from)_S 100 _t
+(the)_S 4200 1064 _m
+(non-U.S.)_S 100 _t
+(Online)_S 100 _t
+(Center.)_S 1500 _t
+7200 897 _m
+(Rev.)_S 100 _t
+(November)_S 100 _t
+(1995)_S 100 _t
+1200 730 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+_ep
+<</Policies  <</PageSize 0 >> >> setpagedevice <</InputAttributes <<0<< /PageSize [612 792]  /MediaType (Standard) >>/Priority [0 1 3 2]>> >>setpagedevice << /PageSize [612 792]  /MediaType (Standard) >> setpagedevice _bp /CourierR 500 _ff
+0 13200 10200 _ornt 
+/_r      { sflg {/_t {0 rmoveto}bdef /ron false def}
+         { /_S /show load def /_t {0 rmoveto}bdef /ron false def}ifelse
+     }bdef
+5050 12479 _m
+/Times-BoldR 600 _ff
+_B (8)_S _b /CourierR 500 _ff
+1600 12086 _m
+(PDQ\016)_S 3600 12086 _m
+(-)_S 4200 12086 _m
+(A)_S 100 _t
+(flat-rate)_S 100 _t
+(of)_S 100 _t
+($18.00/hour)_S 100 _t
+(is)_S 100 _t
+(charged.)_S 900 _t
+1200 11919 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+3600 11752 _m
+(-)_S 4200 11752 _m
+(Effective)_S 100 _t
+(January)_S 100 _t
+(1,)_S 100 _t
+(1996:)_S 2000 _t
+1600 11585 _m
+(TOXLIT\016)_S 800 _t
+3600 11585 _m
+(-)_S 4200 11585 _m
+(For)_S 100 _t
+(domestic)_S 100 _t
+(users,)_S 100 _t
+(TOXLIT)_S 100 _t
+(royalty)_S 100 _t
+(charges)_S 100 _t
+(of)_S 1200 11418 _m
+100 _t
+1600 11418 _m
+(&)_S 100 _t
+(TOXLIT65)_S 4200 11418 _m
+($1.14)_S 100 _t
+(per)_S 100 _t
+(online)_S 100 _t
+(citation)_S 100 _t
+(and)_S 100 _t
+($1.72)_S 100 _t
+(per)_S 100 _t
+(search)_S 4200 11251 _m
+(statement)_S 100 _t
+(are)_S 100 _t
+(added)_S 100 _t
+(to)_S 100 _t
+(the)_S 100 _t
+(basic)_S 100 _t
+(online)_S 4200 11084 _m
+(algorithm.)_S 200 _t
+(Offline)_S 100 _t
+(page)_S 100 _t
+(charges)_S 100 _t
+(of)_S 100 _t
+($2.98)_S 100 _t
+(per)_S 4200 10917 _m
+(page)_S 100 _t
+(include)_S 100 _t
+($2.68)_S 100 _t
+(per)_S 100 _t
+(page)_S 100 _t
+(royalty.)_S 200 _t
+(Royalty)_S 4200 10750 _m
+(charges)_S 100 _t
+(are)_S 100 _t
+(subject)_S 100 _t
+(to)_S 100 _t
+(change)_S 100 _t
+(without)_S 100 _t
+(advance)_S 4200 10583 _m
+(notice.)_S 200 _t
+8400 10583 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 10416 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+4200 10249 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+1600 10082 _m
+(TOXNET\016)_S 3600 10082 _m
+(-)_S 4200 10082 _m
+(These)_S 100 _t
+(files)_S 100 _t
+(include)_S 100 _t
+(CCRIS,)_S 100 _t
+(DART,)_S 100 _t
+(EMIC,)_S 1100 _t
+1600 9915 _m
+(Databases)_S 100 _t
+(&)_S 4200 9915 _m
+(EMICBACK,)_S 100 _t
+(ETICBACK,)_S 100 _t
+(GENE-TOX,)_S 100 _t
+(HSDB,)_S 100 _t
+(IRIS,)_S 600 _t
+1600 9748 _m
+(Databanks)_S 100 _t
+4200 9748 _m
+(RTECS,)_S 100 _t
+(TRI)_S 100 _t
+(and)_S 100 _t
+(TRIFACTS.)_S 200 _t
+(The)_S 100 _t
+(algorithm)_S 100 _t
+(used)_S 300 _t
+1200 9581 _m
+100 _t
+100 _t
+4200 9581 _m
+(to)_S 100 _t
+(price)_S 100 _t
+(online)_S 100 _t
+(searching)_S 100 _t
+(on)_S 100 _t
+(these)_S 100 _t
+(files)_S 700 _t
+1200 9414 _m
+100 _t
+4200 9414 _m
+(approximates)_S 100 _t
+(the)_S 100 _t
+(ELHILL)_S 100 _t
+(algorithm.)_S 1500 _t
+1200 9247 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+2400 9080 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+6600 8746 _m
+100 _t
+100 _t
+100 _t
+100 _t
+100 _t
+_ep
+_ed end end
+%-12345X

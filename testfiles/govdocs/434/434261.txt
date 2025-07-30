@@ -1,0 +1,144 @@
+Version 3 routines for conformal and smoothed mappings from various
+polyhedra to the sphere. R. J. Purser, NCEP 2003 (jim.purser@ncep.noaa)
+
+	OVERVIEW OF THE MAPPING SUITE
+The geometries supported are given 3-letter codes as follows:
+	cub : cubic
+	dod : dodecagonal
+	ico : icosahedral 
+	oct : octagonal
+	sqr : square
+	tet : tetrahedral
+with the prefix, c, (for example, ccub) denoting the conformal variety, and
+the prefix, s, (for example, scub) denoting the "smoothed" (more homogeneous)
+variety. The "primary" utility routines that must be compiled (and preferably
+organized into their respective libraries) before using the higher level
+mapping routines are prefixed by p and are as follows:
+	pkinds : The module supplying the Fortran 90/95 real and complex
+	         "kind" parameters for single and double precision.
+		 COMPILE THIS FIRST AND PUT THE MODULE WHERE IT IS 
+                 AVAILABLE TO ALL THE OTHER PROGRAMS.
+	pfft   : Fourier routines, only used by routines in ccub1.f90,
+                 cdod1.f90, etc, to initialize the conformal coefficients.
+	pgeo   : Standard geography transformation routines.
+	pinv   : Linear inversion utilities.   } Not used for conformal, but
+	pleg   : Spherical harmonics utilities } only for smoothed mappings.
+	ptay   : Taylor series utilities.
+
+	pfig   : If you want a crude graphics package, create new directory,
+                 "pfig" and copy the contents of pfig_src into it. (Keep
+	         pfig_src as safe back-up, because the Makefile often
+	         messes things up too badly to allow easy recovery!) Adapt
+		 the Makefile carefully, and use it to construct the 
+		 library, libpfig.a, in the desired location. However,
+		 this suite is not an integral part of the mapping suite
+		 and no guarantees are given!
+
+A "secondary" suite of generic "hedral" utilities, used only for the smoothed
+mapping options, must only be compiled AFTER the compilation of pleg:
+	shed   : General input/output and smooth sphere-to-sphere mappings
+                 (used only for the "smoothed" mapping options).
+
+The higher level routines deal with the complete mappings. We will take the
+cubic geometry as the representative example.
+
+	CONFORMAL MAPPINGS
+	In directory ccub, the source file, ccub.f90, contains the main
+suite of utility mapping routines and modules. COMPILE IT BEFORE THE OTHERS.
+If the dataset containing the Taylor series is not given, or if it is 
+required to compute it again at a different truncation or precision, it is
+necessary to compile source file, ccub1.f90. Typically, ccub.o and ccub1.o
+are stored in a convenient library. For graphical depiction of maps obtained
+under these transformations, some routines analogous to those given in
+the suite, ccub2.f90, will be needed. ccub2.f90 use the graphics package
+"pfig" (source provided, for completeness, in directory pfig_src) but the 
+user will invariably wish to use his/her own graphics utilities and rewrite 
+some of the tasks performed in ccub2.f90 in his/her own way. Other source
+files provided as examples are: ccuba.f90, the program that controls the
+initial creation of dataset(s) containing the basic conformal mapping
+coefficients for this hedron; ccubb.f90, a program illustrating the creation
+of maps (using the pfig package).
+
+	SMOOTHED MAPPINGS
+	Continuing with the cube as the paradigm, the "smoothed" mapping
+routines are contained in directory scub. The main source code is provided
+in scub.f90. ENSURE THAT THE ROUTINES IN ccub.f90 ARE COMPILED FIRST AND
+THEIR MODULES AND COEFFICIENT DATASETS ARE MADE AVAILABLE HERE. The example 
+program, scuba.f90, shows how to create a dataset containing the coefficients
+needed to modify the conformal mapping to a more homogeneuos "smoothed"
+mapping. Prerequisites are the pair of relevant symmetry files for this 
+hedron. For the cube, the suggested names for the "integer" and "real" parts 
+of the symmetry data are ticub080.dat and trcub080.dat, which encode the
+symmetric combinations of vector spherical harmonics up to truncation 80.
+These binary files are hardware dependent, so they must be created from
+a generic source, which is the ASCII file tacub080.dat in directory shed.
+To convert the ASCII file to the binary pair, use the program atofg.f90
+also supplied in /shed/. scubb.f90 provides some graphics examples 
+(cf. ccubb.f90). which invoke the routines of scub2.f90 (cf. ccub2.f90).
+
+	VERSION 3 CONVENTIONS. Note that the variational principle, upon
+which the definitions of the smoothed mappings depend, has been modified
+in two ways since version 2:
+	1.  	To start with, the non-conformal penalty
+component, sa, is weighted by (1-alpha) and the inhomogeneity penalty, sb,
+by alpha, which puts these two terms on a more equal footing than in
+Version 2 (where the sa term was unweighted and the alpha was allowed to
+be any nonnegative value). In Version 3, alpha=0 still implies the unaltered
+conformal solution, but quasi-homogeneous mappings now require that alpha
+be within the range [0,1]. The "homogeneous" extreme, alpha=1, is now a
+possible option, but do not expect the actual mapping jacobian to be
+a constant everywhere - remember that the variational principle is solved
+only in the restricted subspace of distortions of the conformal mapping
+that are feasible in terms of the prescribed spectral truncation of the
+vector harmonics used to generate these distortions.
+	2.	A new penalty, sc, has been added to the variational
+function. sc is a quadratic penalty on the individual coefficients, rco,
+of the spectral distortion components. The purpose of this additional term
+is to suppress Gibbs effects apparent at relatively large values of alpha
+caused by the abrupt truncation of the spectrum of distortion components.
+If n is the total wavenumber of the vector spherical harmonic associated
+with the particular component with coefficient, rco(k), the contribution of 
+this component to sc is given by sc(k)= .5*(gibbssc*n)**gibbsexp*rco(k)**2.
+The Gibbs suppression coefficient, gibbssc, is typically between 0 and 1;
+the Gibbs exponent, gibbsexp, is real, nonnegative, and typically between
+6. and 20. One has to use iterative trials to achieve the best combination
+of spectral trunction (nleg), alpha, gibbssc and gibbsexp for each 
+application. In many cases it will suffice to dispense with the additional
+complication of the Gibbs terms and just set them both to zero. Even
+for the larger values of alpha where Gibbs suppression might be desirable,
+it is best to see how the grid looks with gibbssc=gibbsexp=0 and tune
+alpha first, and only then apply gibbs suppression if it is needed,
+with sparing use of gibbssc.
+
+	SYMMETRIES
+	The six hedral mapping geometries derive their symmetries from five
+distinct symmetry groups. Note that the octagon and dodecagon geometries
+do NOT possess symmetries of the regular forms of these polygons' dihedra,
+but rather the lower symmetries of the square and hexagonal dihedra
+respectively. (The quasi-regular octagon and dodecagon must have shapes that
+allow continuous gridding by a square grid and a triangular grid 
+respectively.) Here are the symmetries, their mnemonics, their orders, and
+the geometries they underlie:
+Symmetry          	mnemonic       order       associated geometries
+cubic: 			"cub" 		48 		"cub"
+hexagonal dihedron	"hex"           24              "dod"           
+icosahedral:    	"ico"	       120              "ico"
+square dihedron:        "sqr"		16           	"sqr", "oct"
+tetrahedron:            "tet"           24              "tet"
+(No hexagonal dihedral geometry is supported because it possesses no
+compelling advantages). 
+
+Although the square dihedron naturally suggests a square gridding and
+the tetrahedron neturally suggests a regular triangular gridding, the
+180-degree  vertex angles of these two geometries means that a 
+QUASI-equilateral triangular gridding of the square dihedron and a
+QUASI-square gridding of the tetrahedron are also possible. For these, it
+is convenient to exploit one or other of the following approximations to
+the ratio, {sqrt(3):1}:
+{7:4}, {19:11}, {26:15}, {71:41}, {97:56}, etc.
+The programs ssqrc.f90 and stetc.f90 are provided (together with additional
+routines in rtom.f90) as examples of this approach.
+
+	 
+	
+	

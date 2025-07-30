@@ -1,0 +1,91 @@
+EXTRA-TEGIES
+------------
+This package contains the strategies: FIELD, CANCEL-BY, and some other
+"extra-tegies". Most of the strategies in this package act on relational
+formulas, i.e., arithmetic formulas having the form e [] f, where [] is one
+of =,<,<=,>,=>.
+
+Cesar Munoz (munoz@icase.edu)
+http://www.icase.edu/~munoz
+ICASE October 2001
+Version Field 1.g
+
+FIELD
+-----
+FIELD is a semi-decision procedure for the field of real numbers.  It was 
+originally based on Field of Coq V7 (Mayero, Delahaye), but it has been 
+extensively adapted to cope with PVS idiosyncrasies. First, it removes 
+inverses, and then it simplifies using PVS decision procedures. It also tries 
+to prove that inverses are not null.
+
+The strategy was implemented in collaboration with Micaela Mayero
+(Micaela.Mayero@inria.fr).
+
+CANCEL-BY
+---------
+CANCEL-BY tries to eliminate a common term in both sides of a relational 
+formula. First, it divides by the common term, then it distributes, and 
+finally,  it simplifies the expressions using PVS decision procedures. 
+It also tries to prove that the common term is not null.
+
+OTHER STRATEGIES
+---------------
+GRIND-REALS   : Applies GRIND with real_props and extra_real_props.
+REAL-PROPS    : Applies AUTO-REWRITE on real_props and extra_real_props.
+NAME-DISTRIBS : Introduces new names to block distributive laws in a 
+                relational formula.
+REPLACES      : Iterates REPLACE using a list of formulas.
+
+NEG-FORMULA   : Negates both sides of a relational formula.
+ADD-FORMULAS  : Adds two relational formulas.
+WRAP-FORMULA  : Wraps both sides of a relational formula with a string.
+SPLASH        : Asymmetrically splits a conjunction in the consequent 
+               (or a disjunction in the antecedent).
+
+
+INSTALLATION
+------------
+0. Install Ben Di Vito package for manipulation of arithmetic expressions. It
+   is available at: 
+   http://shemesh.larc.nasa.gov/fm/ftp/larc/PVS2-library/pvslib.html.
+
+1. Untar gzip the file field.<xx>.tgz, where <xx> denotes the version number 
+   (currently 1g). 
+
+2. You must have at least the following files in the directory Field.<xx>/
+- README: This file
+- extra-tegies: support strategies
+- field-strategies: FIELD and CANCEL-BY
+- test.pvs: Some examples
+- new.pvs: More examples. Some of them are just intended to show the 
+           functionality of the strategies, without having any logical 
+           meaning.
+- extend/extra_tegies.pvs: An extension to the prelude library
+- extend/extra_tegies.prf: Proof file of extra_tegies.pvs
+- extend/extra_tegies.bin: Binary file of extra_tegies.bin
+- extend/.pvscontex: Context of extend directory
+
+3. Copy the directory Field.<xx> wherever you want it. Let's say <path>.
+
+4. Include in your pvs-strategies file the lines (<path> should be expanded):
+(load "<path>/Field.<xx>/extra-tegies")
+(load "<path>/Field.<xx>/field-strategies")
+
+5. Include in your .pvsemacs file the line (<path> should be expanded):
+(load-prelude-library "<path>/Field.<xx>/extend")
+
+EXAMPLES
+--------
+Check the file test.pvs for examples. Some of them are taken from 
+actual developments at ICASE-NASA LaRC.
+
+The file test.pvs imports reals@sqrt. It assumes that you 
+have installed NASA LaRC library "reals", which is available at: 
+http://shemesh.larc.nasa.gov/ftp/larc/PVS-library/pvslib.html. However, you do
+not need it to use FIELD, or any other of the strategies in this package.
+
+DOCUMENTATION 
+-------------
+Please visit: http://www.icase.edu/~munoz/Field/field.html
+
+Comments, questions, and bug reports: Cesar Munoz (munoz@icase.edu)

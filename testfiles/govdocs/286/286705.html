@@ -1,0 +1,1181 @@
+<html><head><title>aptplqu.f</title></head><pre>
+      subroutine aptplqu (ax, ay, az, bx, by, bz, qc, qx, qy, qz,
+     &                    qxy, qyz, qzx, qxx, qyy, qzz, tol,
+     &                    nqtype, px, py, pz, qcenx, qceny, qcenz,
+     &                    dplqu, dpx, dpy, dpz, nextr, ex, ey, ez,
+     &                    dplex, pex, pey, pez, dpex, dpey, dpez,
+     &                    actype, nlen, alen, dlen,
+     &                    npin, apin, pinx, piny, pinz,
+     &                    nvin, avin, vinx, viny, vinz,
+     &                    sc, sx, sy, sz, sxy, syz, szx, sxx, syy, szz,
+     &                    nerr)
+
+ccbeg.
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c
+c                             SUBROUTINE APTPLQU
+c
+c     call aptplqu (ax, ay, az, bx, by, bz, qc, qx, qy, qz,
+c    &              qxy, qyz, qzx, qxx, qyy, qzz, tol,
+c    &              nqtype, px, py, pz, qcenx, qceny, qcenz,
+c    &              dplqu, dpx, dpy, dpz, nextr, ex, ey, ez,
+c    &              dplex, pex, pey, pez, dpex, dpey, dpez,
+c    &              actype, nlen, alen, dlen,
+c    &              npin, apin, pinx, piny, pinz,
+c    &              nvin, avin, vinx, viny, vinz,
+c    &              sc, sx, sy, sz, sxy, syz, szx, sxx, syy, szz,
+c    &              nerr)
+c
+c     Version:  aptplqu  Updated    1995 February 2 17:40.
+c               aptplqu  Originated 1995 January 25 13:30.
+c
+c     Author:   Arthur L. Edwards, LLNL, L-298, Telephone (925) 422-4123.
+c
+c
+c     Purpose:  For the plane through the point a = (ax, ay, az) with normal
+c               vector b = (bx, by, bz), and the quadric surface specified
+c               by the implicit quadric equation coefficients qc, ..., qzz,
+c               to find the distances of separation or overlap between the
+c               plane and the quadric surface, any proximal points or lines
+c               on the plane and the quadric surface, and the nature of and
+c               properties of any point or quadric curve of intersection.
+c
+c               Center of quadric surface:  to find the type nqtype of quadric
+c               surface, the point p = (px, py, pz) on the plane nearest the
+c               center qcen = (qcenx, qceny, qcenz) of the quadric surface;
+c               the distance dplqu between points "p" and "qcen", and
+c               the vector "dp" = (dpx, dpy, dpz) between those two points.
+c
+c               Proximal and distal points:  to find the number nextr of
+c               extreme points on the quadric surface in the direction of
+c               vector "b", the coordinates e = (ex, ey, ez) of any such
+c               extreme points, the distances dplex of these extreme points
+c               from the plane, the coordinates pe = (pex, pey, pez) of the
+c               corresponding nearest points on the plane, and the vectors
+c               dpe = (dpex, dpey, dpez) from those planar points to the
+c               extreme points on the quadric surface.
+c
+c               Intersection between plane and quadric surface:  to find the
+c               type actype of any quadric curve of intersection;
+c               nlen (up to 5) distances, lengths or radii associated with the
+c               intersection, of type alen, value dlen;
+c               npin (up to 11) points associated with the intersection, of
+c               type apin, coordinates pin = (pinx, piny, pinz);
+c               nvin (up to 2) vectors associated with the intersection, of
+c               type avin, components vin = (vinx, viny, vinz);
+c               and the coefficients sc, ..., szz of the implicit quadric
+c               equation for the cylindrical quadric surface perpendicular t
+c               the plane and through any curve of intersection.
+c
+c               If the plane is defined only by its implicit quadric equation,
+c
+c               f(x,y,z) = qc1 + qx1 * x + qy1 * y + qz1 * z = 0,
+c
+c               a point "a" and the normal vector "b" may be found from:
+c
+c               b = (bx, by, bz) = (qx1, qy1, qz1)
+c               b**2 = qx1**2 + qy1**2 + qz1**2
+c               a = (ax, ay, az) = -(qc1 / b**2) * (qx1, qy1, qz1)
+c               
+c               Any input error will be indicated by a nonzero value of nerr.
+c
+c     Input:    ax, ay, az, bx, by, bz, qc, qx, qy, qz, qxy, qyz, qzx,
+c               qxx, qyy, qzz, tol.
+c
+c     Output:   nqtype, px, py, pz, qcenx, qceny, qcenz,
+c               dplqu, dpx, dpy, dpz, nextr, ex, ey, ez,
+c               dplex, pex, pey, pez, dpex, dpey, dpez, actype,
+c               nlen, alen, dlen, npin, apin, pinx, piny, pinz,
+c               nvin, avin, vinx, viny, vinz,
+c               sc, sx, sy, sz, sxy, syz, szx, sxx, syy, szz, nerr)
+c
+c     Calls: <a href="aptaxis.html">aptaxis,</a> <a href="aptmopv.html">aptmopv,</a> <a href="aptplis.html">aptplis,</a> <a href="aptptpl.html">aptptpl,</a> <a href="aptqexv.html">aptqexv,</a> 
+c               <a href="aptrois.html">aptrois,</a> <a href="aptrotv.html">aptrotv,</a> <a href="apttran.html">apttran,</a> <a href="aptvdis.html">aptvdis,</a> <a href="aptvuna.html">aptvuna</a> 
+c               
+c
+c     Glossary:
+c
+c     alen      Output   A 16-character ASCII word describing a distance,
+c                          length, or radius associated with an intersection:
+c                          'Radius',               'Eccentricity',
+c                          'Center to vertex',     'Center to focus',
+c                          'Major semiaxis',       'Minor semiaxis',
+c                          'Trans semiaxis',       'Conj  semiaxis',
+c                          'Latus rectum',         'Half-angle deg',
+c                          or blank, if nlen = 0.  Array size = 6.
+c                          The corresponding value is dlen.
+c
+c     apin      Output   A 16-character ASCII word describing a point associated
+c                          with an intersection:
+c                          'Center pt  (xyz)',     'Circle pt 1(xyz)',
+c                          'Circle pt 2(xyz)',     'Circle pt 3(xyz)',
+c                          'Circle pt 4(xyz)',     'Focus point(xyz)',
+c                          'Focus pt 1 (xyz)',     'Focus pt 2 (xyz)',
+c                          'Lat rect 1 (xyz)',     'Lat rect 1a(xyz)',
+c                          'Lat rect 1b(xyz)',     'Lat rect 2 (xyz)',
+c                          'Lat rect 2a(xyz)',     'Lat rect 2b(xyz)',
+c                          'Line 1 pt  (xyz)',     'Line 2 pt  (xyz)',
+c                          'Line point (xyz)',     'Maj axis 1 (xyz)',
+c                          'Maj axis 2 (xyz)',     'Min axis 1 (xyz)',
+c                          'Min axis 2 (xyz)',     'Tangent pt (xyz)',
+c                          'Vertex pt  (xyz)',     'Vertex pt 1(xyz)',
+c                          'Vertex pt 2(xyz)',
+c                          or blank if npin = 0.  Array size = 11.
+c
+c     actype     Output   A 24-character ASCII word describing a quadric curve
+c                          of intersection of the plane and the quadric surface:
+c                          'vertex of cone',       'point, tangent',
+c                          'line, simple',         'lines, coincident',
+c                          'lines, parallel',      'lines, intersecting',
+c                          'parabola',             'hyperbola',
+c                          'ellipse',              'circle',
+c                          or blank if no intersection is found.
+c
+c     avin      Output   A 16-character ASCII word describing a vector
+c                          associated with an intersection:
+c                          'Axis vector(xyz)',     'Line vector(xyz)',
+c                          'Line 1 vect(xyz)',     'Line 2 vect(xyz)',
+c                          'Maj axis   (xyz)',     'Min axis   (xyz)',
+c                          'Normal vect(xyz)',
+c                          or blank if nvin = 0.  Array size 2.
+c
+c     ax,ay,az  Input    The x, y, z coordinates of point "a" in the plane.
+c
+c     bx,by,bz  Input    The x, y, z components of the normal vector "b" of the
+c                          plane.
+c
+c     dlen      Output   A distance, length or radius associated with an
+c                          intersection, of type alen.  Array size = 6.
+c
+c     dpex,y,z  Output   The x, y, z components of the vectors from proximal
+c                          points "pe" in the plane to the corresponding extreme
+c                          points "e" in the quadric surface.  Array size = 2.
+c                          Always parallel or antiparallel to vector "b".
+c
+c     dplex     Output   The perpendicular distances from the plane (point "p")
+c                          to the extreme points "e" on the quadric surface.
+c                          Positive if in the same direction as vector "b",
+c                          otherwise negative,  or zero if the plane is tangent
+c                          to the quadric surface at point "p" = "e".
+c                          If nextr = 2, the minimum absolute value of the two
+c                          dplex values indicates a proximal point, and the
+c                          other a distal point on the quadric surface.
+c                          Array size = 2.
+c
+c     dplqu     Output   The minimum distance from the plane (point "p") to the
+c                          center of the quadric surface (point "qcen").
+c                          Zero if the plane passes through point "qcen".
+c
+c     dpx,y,z   Output   The x, y, z components of the vector "dp" from point
+c                          "p" on the plane to the center of the quadric
+c                          surface, point "qcen".
+c                          Always parallel or antiparallel to vector "b".
+c
+c     ex,ey,ez  Input    The x, y, z coordinates of extreme points "e" on the
+c                          quadric surface, at minimum or maximum distances from
+c                          the plane.  Array size = 2.
+c
+c     nerr      Output   Indicates an input error, if not zero:
+c                          1 if the normal vector "b" of the plane is null.
+c                          2 if the coefficients qc, ..., qzz do not define
+c                            a real quadric surface.
+c
+c     nextr     Output   The number of extreme points "e" on the quadric surface
+c                          in the direction perpendicular to the plane,
+c                          vector "b".
+c
+c     nqtype    Output   The type of quadric surface represented by the
+c                          coefficients qc, ..., qzz:
+c                           0 = A simple plane, 1 = Coincident planes,
+c                           2 = Parallel planes, 3 = Intersecting planes,
+c                           4 = Parabolic cylinder, 5 = Hyperbolic cylinder,
+c                           6 = Elliptic cylinder, 7 = Circular cylinder,
+c                           8 = Hyperbolic paraboloid, 9 = Elliptic paraboloid,
+c                          10 = Circular paraboloid, 11 = Elliptic cone,
+c                          12 = Circular cone, 13 = Hyperboloid of 1 sheet,
+c                          14 = Hyperboloid of 2 sheets, 15 = Ellipsoid,
+c                          16 = Sphere, 17 to 24 = Imaginary.
+c
+c     pe,pe,pe  Output   The x, y, z coordinates of points "pe" in the plane,
+c                          nearest the extreme points "e" in the quadric
+c                          surface.  Array size = 2.
+c
+c     pinx,y,z  Output   The x, y, z coordinates of points associated with an
+c                          intersection, of type apin.  Array size = 11.
+c                          Always in the plane.
+c
+c     px,py,pz  Output   The x, y, z coordinates of point "p" in the plane,
+c                          nearest the center "qcen" of the quadric surface.
+c
+c     qc, ...   Input    Coefficients of the implicit equation for the quadric
+c                          surface:
+c                          qc + qx  * x     + qy  * y     + qz  * z +
+c                               qxy * x * y + qyz * y * z + qzx * z * x +
+c                               qxx * x**2  + qyy * y**2  + qxx * z**2 = 0
+c
+c     qcenx,y,z Output   The x, y, z coordinates of point "qcen", the center of
+c                          the quadric surface.
+c
+c     sc, ...   Output   Coefficients of the implicit equation for the
+c                          cylindrical quadric surface perpendicular to the
+c                          plane and through any intersection curve:
+c                          sc + sx  * x     + sy  * y     + sz  * z +
+c                               sxy * x * y + syz * y * z + szx * z * x +
+c                               sxx * x**2  + syy * y**2  + sxx * z**2 = 0
+c
+c     vinx,y,z  Output   The x, y, z components of vectors associated with an
+c                          intersection, of type avin.  Array size = 2.
+c                          Always in the plane, and perpendicular to vector "b".
+c
+c     tol       Input    Numerical tolerance limit.  With 64-bit floating point
+c                          numbers, 1.e-5 to 1.e-11 is recommended.
+c
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+ccend.
+
+c.... Type character arguments.
+
+      character*24 actype             ! Type of intersection curve.
+
+c.... Dimensioned arguments.
+
+      dimension ex(2)                 ! Coordinate x of an extreme point "e".
+      dimension ey(2)                 ! Coordinate y of an extreme point "e".
+      dimension ez(2)                 ! Coordinate z of an extreme point "e".
+
+      dimension pex(2)                ! Coordinate x of planar pt prox to "e".
+      dimension pey(2)                ! Coordinate y of planar pt prox to "e".
+      dimension pez(2)                ! Coordinate z of planar pt prox to "e".
+
+      dimension dpex(2)               ! Component x of vector from "pe" to "e".
+      dimension dpey(2)               ! Component y of vector from "pe" to "e".
+      dimension dpez(2)               ! Component z of vector from "pe" to "e".
+
+      dimension dplex(2)              ! Distance from point "pe" to point "e".
+
+      dimension alen(6)               ! Type of int radius, length or distance.
+      character*16 alen               ! Type of int radius, length or distance.
+      dimension dlen(6)               ! Radius, length or distance.
+
+      dimension apin(11)              ! Type of intersection point.
+      character*16 apin               ! Type of intersection point.
+      dimension pinx(11)              ! Coordinate x of an intersection point.
+      dimension piny(11)              ! Coordinate y of an intersection point.
+      dimension pinz(11)              ! Coordinate z of an intersection point.
+
+      dimension avin(2)               ! Type of intersection vector.
+      character*16 avin               ! Type of intersection vector.
+      dimension vinx(2)               ! Component x of an intersection vector.
+      dimension viny(2)               ! Component y of an intersection vector.
+      dimension vinz(2)               ! Component z of an intersection vector.
+
+c.... Local arrays.
+
+      common /laptplqu/ adir(2)       ! Type of extreme point.
+      character*8       adir          ! Type of extreme point.
+
+      common /laptplqu/ prot(3,3)     ! Rotation tensor, normal to z axis.
+      common /laptplqu/ trot(3,3)     ! Rotation tensor of intersection curve.
+
+c=======================================================================********
+cbugc***DEBUG begins.
+cbug 9901 format (/ 'aptplqu finding distance between plane and',
+cbug     &  ' quadric surface.',
+cbug     &  '  tol=',1pe13.5)
+cbug 9902 format (
+cbug     &  '  ax, ay, az= ',1p3e22.14 /
+cbug     &  '  bx, by, bz= ',1p3e22.14 )
+cbug 9903 format (
+cbug     &  '  Quadric  qc=',1pe22.14 /
+cbug     &  '  qx,qy,qz=   ',1p3e22.14 /
+cbug     &  '  qxy,qyz,qzx=',1p3e22.14 /
+cbug     &  '  qxx,qyy,qzz=',1p3e22.14)
+cbug      write ( 3, 9901) tol
+cbug      write ( 3, 9902) ax, ay, az, bx, by, bz
+cbug      write ( 3, 9903) qc, qx, qy, qz, qxy, qyz, qzx, qxx, qyy, qzz
+cbugc***DEBUG ends.
+
+c.... Initialize.
+
+      nextr = 0
+      nlen  = 0
+      npin  = 0
+      nvin  = 0
+
+      dplqu = -1.e99
+      px    = -1.e99
+      py    = -1.e99
+      pz    = -1.e99
+      dpx   = -1.e99
+      dpy   = -1.e99
+      dpz   = -1.e99
+
+      actype = ' '
+
+      do 115 n = 1, 6
+        alen(n) = ' '
+        dlen(n) = -1.e99
+  115 continue
+
+      do 120 n = 1, 11
+        apin(n)  = ' '
+        pinx(n)  = -1.e99
+        piny(n)  = -1.e99
+        pinz(n)  = -1.e99
+  120 continue
+
+      do 150 n = 1, 2
+        dplex(n) = -1.e99
+        pex(n)   = -1.e99
+        pey(n)   = -1.e99
+        pez(n)   = -1.e99
+        dpex(n)  = -1.e99
+        dpey(n)  = -1.e99
+        dpez(n)  = -1.e99
+  150 continue
+
+      do 110 n = 1, 2
+        ex(n)    = -1.e99
+        ey(n)    = -1.e99
+        ez(n)    = -1.e99
+        avin(n)  = '                '
+        vinx(n)  = -1.e99
+        viny(n)  = -1.e99
+        vinz(n)  = -1.e99
+  110 continue
+
+      sc  = -1.e99
+      sx  = -1.e99
+      sy  = -1.e99
+      sz  = -1.e99
+      sxy = -1.e99
+      syz = -1.e99
+      szx = -1.e99
+      sxx = -1.e99
+      syy = -1.e99
+      szz = -1.e99
+
+c=======================================================================********
+
+c.... Find the center of the quadric surface.
+c....   Coefficients tc, ..., tzz and tensor trot are temporary, and
+c....   will be used again later with different definitions.
+
+      tc  = qc
+      tx  = qx
+      ty  = qy
+      tz  = qz
+      txy = qxy
+      tyz = qyz
+      tzx = qzx
+      txx = qxx
+      tyy = qyy
+      tzz = qzz
+
+      call aptaxis (tc, tx, ty, tz, txy, tyz, tzx, txx, tyy, tzz, tol,
+     &              qcenx, qceny, qcenz, trot, nqtype, nerra)
+
+      if (nerra .ne. 0) then
+        nerr = 2
+        go to 999
+      endif
+
+c.... Find the distance dplqu from the plane to the center of the quadric
+c....   surface, and the proximal point p = (px, py, pz) on the plane.
+
+      call aptptpl (qcenx, qceny, qcenz, ax, ay, az, bx, by, bz, 1, tol,
+     &              dplqu, px, py, pz, itrun, nerra)
+
+      if (nerra .ne. 0) then
+        nerr = 1
+        go to 999
+      endif
+
+c.... Find the vector dp = (dpx, dpy, dpz) from the plane to the center of the
+c....   quadric surface.
+
+      call aptvdis (px, py, pz, qcenx, qceny, qcenz, 1, tol,
+     &              dpx, dpy, dpz, dplqu, nerra)
+
+      if ((dplqu .eq. 0.0) .and.
+     &    ((nqtype .eq. 11) .or. (nqtype .eq. 12))) then
+
+        actype  = 'vertex of cone'
+
+        nlen    = 0
+        npin    = 1
+        nvin    = 0
+
+        apin(1) = 'Vertex pt  (xyz)'
+        pinx(1) = qcenx
+        piny(1) = qceny
+        pinz(1) = qcenz
+
+      endif
+
+c=======================================================================********
+
+c.... Find any extrema on the quadric surface in the direction of the normal
+c....   vector of the plane.
+
+      call aptqexv (bx, by, bz, qc, qx, qy, qz,
+     &              qxy, qyz, qzx, qxx, qyy, qzz, tol,
+     &              nextr, ex, ey, ez, adir, nerr)
+
+c.... Find any proximal points on the plane, and the distances and vectors to
+c....   any extrema on the quadric surface.
+
+      if (nextr .gt. 0) then          ! Tangent or proximal points exist.
+
+        do 210 n = 1, nextr           ! Loop over extrema.
+
+c....   Find the point on the plane proximal to the quadric extremum.
+
+          call aptptpl (ex(n), ey(n), ez(n),
+     &                  ax, ay, az,
+     &                  bx, by, bz, 1, tol,
+     &                  dplex(n), pex(n), pey(n), pez(n), itrun, nerra)
+
+c....   Find the distance and vector from the plane to the quadric extremum.
+
+          call aptvdis (pex(n), pey(n), pez(n), ex(n), ey(n), ez(n),
+     &                  1, tol, dpex(n), dpey(n), dpez(n), dplex(n),
+     &                  nerra)
+
+          if (dplex(n) .eq. 0.0) then
+
+            actype  = 'point, tangent'
+    
+            nlen    = 0
+            npin    = 1
+            nvin    = 0
+    
+            apin(1) = 'Tangent pt (xyz)'
+            pinx(1) = pex(n)
+            piny(1) = pey(n)
+            pinz(1) = pez(n)
+
+          endif
+
+  210   continue                      ! End of loop over extrema.
+
+      endif                           ! Tested for tangent or proximal points.
+
+c=======================================================================********
+
+c.... Find any curve of intersection of the plane and the quadric surface.
+
+c.... Find the rotation tensor to point the normal vector of the plane in
+c....   the z direction.
+
+      call aptrotv (bx, by, bz, 0.0, 0.0, 1.0, tol,
+     &              prot, nerra)
+
+      if (nerra .ne. 0) then
+        nerr = 1
+        go to 999
+      endif
+cbugcbugc***DEBUG begins.
+cbugcbug 9210 format ('Rotation tensor prot to make plane a z plane.' /
+cbugcbug     &  '  op11,op12,op13  ',1p3e20.12 /
+cbugcbug     &  '  op21,op22,op23  ',1p3e20.12 /
+cbugcbug     &  '  op31,op32,op33  ',1p3e20.12)
+cbugcbug      write ( 3, 9210) ((prot(i,j), j = 1, 3), i = 1, 3)
+cbugcbugc***DEBUG ends.
+
+c.... Rotate the quadric surface around the center of the plane, point "a",
+c.....  with tensor prot, to get quadric "g".
+
+      gc  = qc
+      gx  = qx
+      gy  = qy
+      gz  = qz
+      gxy = qxy
+      gyz = qyz
+      gzx = qzx
+      gxx = qxx
+      gyy = qyy
+      gzz = qzz
+
+      call aptrois (prot, 0, ax, ay, az,
+     &              gc, gx, gy, gz, gxy, gyz, gzx, gxx, gyy, gzz, tol,
+     &              nerra)
+cbugcbugc***DEBUG begins.
+cbugcbug 9211 format ('Quadric rotated with prot to make plane a z plane.' /
+cbugcbug     &  '  gc              ',1pe20.12 /
+cbugcbug     &  '  gx, gy, gz      ',1p3e20.12 /
+cbugcbug     &  '  gxy, gyz, gzx   ',1p3e20.12 /
+cbugcbug     &  '  gxx, gyy, gzz   ',1p3e20.12)
+cbugcbug      write ( 3, 9211) gc, gx, gy, gz, gxy, gyz, gzx, gxx, gyy, gzz
+cbugcbugc***DEBUG ends.
+
+c.... Find the intersection of the plane z = az with the rotated quadric.
+c....   The result is quadric "s",  a z-axis cylinder through the intersection
+c....   curve.  Quadric "s" must be rotated around point "a" by the inverse of
+c....   tensor prot, to get the original coordinates.
+
+      call aptplis (3, az,
+     &              gc, gx, gy, gz, gxy, gyz, gzx, gxx, gyy, gzz,
+     &              1, tol,
+     &              sc, sx, sy, sz, sxy, syz, szx, sxx, syy, szz, nerra)
+cbugcbugc***DEBUG begins.
+cbugcbug 9214 format ('Intersection of plane z = az with rotated',
+cbugcbug     &  ' quadric.' /
+cbugcbug     &  '  sc              ',1pe20.12 /
+cbugcbug     &  '  sx, sy, sz      ',1p3e20.12 /
+cbugcbug     &  '  sxy, syz, szx   ',1p3e20.12 /
+cbugcbug     &  '  sxx, syy, szz   ',1p3e20.12)
+cbugcbug      write ( 3, 9214) sc, sx, sy, sz, sxy, syz, szx, sxx, syy, szz
+cbugcbugc***DEBUG ends.
+
+c.... Find quadric "t", the standard form of the intersection quadric, its type,
+c....   its center and its rotation matrix.  Quadric "t" must be rotated around
+c....   the origin by the inverse of trot, translated by (tcenx, tceny, tcenz),
+c....   then rotated around point "a" by the inverse of tensor prot, to get the
+c....   original coordinates.
+
+      tc  = sc
+      tx  = sx
+      ty  = sy
+      tz  = sz
+      txy = sxy
+      tyz = syz
+      tzx = szx
+      txx = sxx
+      tyy = syy
+      tzz = szz
+
+      call aptaxis (tc, tx, ty, tz, txy, tyz, tzx, txx, tyy, tzz, tol,
+     &              tcenx, tceny, tcenz, trot, ntype, nerra)
+cbugcbugc***DEBUG begins.
+cbugcbug 9212 format ('Rotation tensor trot to make rotated intersection',
+cbugcbug     &  ' quadric standard.' /
+cbugcbug     &  '  op11,op12,op13  ',1p3e20.12 /
+cbugcbug     &  '  op21,op22,op23  ',1p3e20.12 /
+cbugcbug     &  '  op31,op32,op33  ',1p3e20.12)
+cbugcbug 9222 format ('Center of non-standard rotated intersection quadric.' /
+cbugcbug     &  '  tcenx,y,z       ',1p3e20.12)
+cbugcbug 9213 format ('Quadric translated with tcen, and rotated to standard',
+cbugcbug     &  ' form with trot.' /
+cbugcbug     &  '  tc              ',1pe20.12 /
+cbugcbug     &  '  tx, ty, tz      ',1p3e20.12 /
+cbugcbug     &  '  txy, tyz, tzx   ',1p3e20.12 /
+cbugcbug     &  '  txx, tyy, tzz   ',1p3e20.12)
+cbugcbug      write ( 3, 9212) ((trot(i,j), j = 1, 3), i = 1, 3)
+cbugcbug      write ( 3, 9222) tcenx, tceny, tcenz
+cbugcbug      write ( 3, 9213) tc, tx, ty, tz, txy, tyz, tzx, txx, tyy, tzz
+cbugcbugc***DEBUG ends.
+
+      if (nerra .gt. 0) ntype = 999
+
+      if (ntype .gt. 7) then
+        go to 999
+      endif
+
+c.... Find the intersection curve for each type of curve.
+
+      tranx = -tcenx
+      trany = -tceny
+      tranz = -tcenz
+
+      go to (300, 310, 320, 330, 340, 350, 360, 370), ntype + 1
+
+c-----------------------------------------------------------------------********
+
+c.... Line x = 0.
+
+  300 actype  = 'line, simple'
+
+      nlen    = 0
+      npin    = 1
+      nvin    = 1
+
+      apin(1) = 'Line point (xyz)'
+      pinx(1) = 0.0
+      piny(1) = 0.0
+      pinz(1) = az
+
+      avin(1) = 'Line vector(xyz)'
+      vinx(1) = 0.0
+      viny(1) = 1.0
+      vinz(1) = 0.0
+
+      go to 400
+
+c-----------------------------------------------------------------------********
+
+c.... Coincident lines x**2 = 0.
+
+  310 actype  = 'lines, coincident'
+
+      nlen    = 0
+      npin    = 1
+      nvin    = 1
+
+      apin(1) = 'Line point (xyz)'
+      pinx(1) = 0.0
+      piny(1) = 0.0
+      pinz(1) = az
+
+      avin(1) = 'Line vector(xyz)'
+      vinx(1) = 0.0
+      viny(1) = 1.0
+      vinz(1) = 0.0
+
+      go to 400
+
+c-----------------------------------------------------------------------********
+
+c.... Parallel lines tc + txx * x**2 = 0 (tc / txx < 0)
+
+  320 actype  = 'lines, parallel'
+
+      nlen    = 1
+      npin    = 2
+      nvin    = 2
+
+      alen(1) = 'Trans semiaxis'
+      dlen(1) = sqrt (-tc / txx)
+
+      apin(1) = 'Line 1 pt  (xyz)'
+      pinx(1) = -dlen(1)
+      piny(1) = 0.0
+      pinz(1) = az
+
+      avin(1) = 'Line 1 vect(xyz)'
+      vinx(1) = 0.0
+      viny(1) = 1.0
+      vinz(1) = 0.0
+
+      apin(2) = 'Line 2 pt  (xyz)'
+      pinx(2) = dlen(1)
+      piny(2) = 0.0
+      pinz(2) = az
+
+      avin(2) = 'Line 2 vect(xyz)'
+      vinx(2) = 0.0
+      viny(2) = 1.0
+      vinz(2) = 0.0
+
+      go to 400
+
+c-----------------------------------------------------------------------********
+
+c.... Intersecting lines txx * x**2 + tyy * y**2 = 0 (txx/tyy < 0).
+
+  330 actype  = 'lines, intersecting'
+
+      nlen    = 1
+      npin    = 3
+      nvin    = 2
+
+      alen(1) = 'Half-angle deg'
+      fact = 180.0 / acos (-1.0)
+
+      dlenxy  = fact * atan (sqrt (-txx / tyy))
+      dlenyx  = fact * atan (sqrt (-tyy / txx))
+      if (abs (dlenxy) .le. abs (dlenyx)) then
+        dlen(1) = dlenxy
+      else
+        dlen(1) = dlenyx
+      endif
+
+      apin(1) = 'Vertex pt  (xyz)'
+      pinx(1) = 0.0
+      piny(1) = 0.0
+      pinz(1) = az
+
+      apin(2) = 'Line 1 pt  (xyz)'
+      pinx(2) = 1.0
+      piny(2) = sqrt (-txx / tyy)
+      pinz(2) = az
+
+      apin(3) = 'Line 2 pt  (xyz)'
+      pinx(3) = 1.0
+      piny(3) = -piny(2)
+      pinz(3) = az
+
+      avin(1) = 'Line 1 vect(xyz)'
+      vinx(1) = 1.0
+      viny(1) = piny(2)
+      vinz(1) = 0.0
+
+      call aptvuna (vinx(1), viny(1), vinz(1), 1, tol, vlen, nerra)
+
+      avin(2) = 'Line 2 vect(xyz)'
+      vinx(2) = vinx(1)
+      viny(2) = -viny(1)
+      vinz(2) = 0.0
+
+      go to 400
+
+c-----------------------------------------------------------------------********
+
+c.... Parabola ty * y + txx * x**2 = 0.
+
+  340 actype  = 'parabola'
+
+      nlen    = 2
+      npin    = 4
+      nvin    = 1
+
+      alen(1) = 'Center to focus'
+      dlen(1) = 0.25 * abs (ty / txx)
+
+      alen(2) = 'Latus rectum'
+      dlen(2) = 4.0 * dlen(1)
+
+      apin(1) = 'Vertex pt  (xyz)'
+      pinx(1) = 0.0
+      piny(1) = 0.0
+      pinz(1) = az
+
+      apin(2) = 'Focus point(xyz)'
+      pinx(2) = 0.0
+      piny(2) = -0.25 * ty / txx
+      pinz(2) = az
+
+      apin(3) = 'Lat rect 1 (xyz)'
+      pinx(3) = -0.5 * dlen(2)
+      piny(3) = piny(2)
+      pinz(3) = az
+
+      apin(4) = 'Lat rect 2 (xyz)'
+      pinx(4) = -pinx(3)
+      piny(4) = piny(2)
+      pinz(4) = az
+
+      avin(1) = 'Axis vector(xyz)'
+      vinx(1) = 0.0
+      viny(1) = sign (1.0, ty)
+      vinz(1) = 0.0
+
+      go to 400
+
+c-----------------------------------------------------------------------********
+
+c.... Hyperbola tc + txx * x**2 + tyy * y**2 = 0 (txx > 0, tyy < 0).
+
+  350 actype  = 'hyperbola'
+
+      nlen    = 6
+      npin    = 9
+      nvin    = 1
+
+      if (tc .gt. 0.0) then           ! Axis is y axis.
+
+        alen(1) = 'Trans semiaxis'
+        dlen(1) = sqrt (-tc / tyy)
+  
+        alen(2) = 'Conj  semiaxis'
+        dlen(2) = sqrt ( tc / txx)
+
+        alen(3) = 'Center to focus'
+        dlen(3) = sqrt (dlen(1)**2 + dlen(2)**2)
+  
+        alen(4) = 'Latus rectum'
+        dlen(4) = 2.0 * dlen(2)**2 / dlen(1)
+  
+        alen(5) = 'Half-angle deg'
+        fact = 180.0 / acos (-1.0)
+
+        dlenxy  = fact * atan (sqrt (-txx / tyy))
+        dlenyx  = fact * atan (sqrt (-tyy / txx))
+        if (abs (dlenxy) .le. abs (dlenyx)) then
+          dlen(5) = dlenxy
+        else
+          dlen(5) = dlenyx
+        endif
+  
+        alen(6) = 'Eccentricity'
+        dlen(6) = sqrt (1.0 + (dlen(2) / dlen(1))**2)
+  
+        apin(1) = 'Center pt  (xyz)'
+        pinx(1) = 0.0
+        piny(1) = 0.0
+        pinz(1) = az
+  
+        apin(2) = 'Vertex pt 1(xyz)'
+        pinx(2) = 0.0
+        piny(2) = -dlen(1)
+        pinz(2) = az
+  
+        apin(3) = 'Focus pt 1 (xyz)'
+        pinx(3) = 0.0
+        piny(3) = -dlen(3)
+        pinz(3) = az
+  
+        apin(4) = 'Lat rect 1a(xyz)'
+        pinx(4) = -0.5 * dlen(4)
+        piny(4) = -dlen(3)
+        pinz(4) = az
+  
+        apin(5) = 'Lat rect 1b(xyz)'
+        pinx(5) = 0.5 * dlen(4)
+        piny(5) = piny(3)
+        pinz(5) = az
+  
+        apin(6) = 'Vertex pt 2(xyz)'
+        pinx(6) = 0.0
+        piny(6) = dlen(1)
+        pinz(6) = az
+  
+        apin(7) = 'Focus pt 2 (xyz)'
+        pinx(7) = 0.0
+        piny(7) = dlen(3)
+        pinz(7) = az
+  
+        apin(8) = 'Lat rect 2a(xyz)'
+        pinx(8) = -0.5 * dlen(4)
+        piny(8) = dlen(3)
+        pinz(8) = az
+  
+        apin(9) = 'Lat rect 2b(xyz)'
+        pinx(9) = 0.5 * dlen(4)
+        piny(9) = dlen(3)
+        pinz(9) = az
+  
+        avin(1) = 'Axis vector(xyz)'
+        vinx(1) = 0.0
+        viny(1) = 1.0
+        vinz(1) = 0.0
+
+      else                            ! Axis is x axis.
+
+        alen(1) = 'Trans semiaxis'
+        dlen(1) = sqrt (-tc / txx)
+  
+        alen(2) = 'Conj  semiaxis'
+        dlen(2) = sqrt ( tc / tyy)
+
+        alen(3) = 'Center to focus'
+        dlen(3) = sqrt (dlen(1)**2 + dlen(2)**2)
+  
+        alen(4) = 'Latus rectum'
+        dlen(4) = 2.0 * dlen(2)**2 / dlen(1)
+  
+        alen(5) = 'Half-angle deg'
+        fact = 180.0 / acos (-1.0)
+
+        dlenxy  = fact * atan (sqrt (-txx / tyy))
+        dlenyx  = fact * atan (sqrt (-tyy / txx))
+        if (abs (dlenxy) .le. abs (dlenyx)) then
+          dlen(5) = dlenxy
+        else
+          dlen(5) = dlenyx
+        endif
+  
+        alen(6) = 'Eccentricity'
+        dlen(6) = sqrt (1.0 + (dlen(2) / dlen(1))**2)
+  
+        apin(1) = 'Center pt  (xyz)'
+        pinx(1) = 0.0
+        piny(1) = 0.0
+        pinz(1) = az
+  
+        apin(2) = 'Vertex pt 1(xyz)'
+        pinx(2) = -dlen(1)
+        piny(2) = 0.0
+        pinz(2) = az
+  
+        apin(3) = 'Focus pt 1 (xyz)'
+        pinx(3) = -dlen(3)
+        piny(3) = 0.0
+        pinz(3) = az
+  
+        apin(4) = 'Lat rect 1a(xyz)'
+        pinx(4) = -dlen(3)
+        piny(4) = -0.5 * dlen(4)
+        pinz(4) = az
+  
+        apin(5) = 'Lat rect 1b(xyz)'
+        pinx(5) = -dlen(3)
+        piny(5) = 0.5 * dlen(4)
+        pinz(5) = az
+  
+        apin(6) = 'Vertex pt 2(xyz)'
+        pinx(6) = dlen(1)
+        piny(6) = 0.0
+        pinz(6) = az
+  
+        apin(7) = 'Focus pt 2 (xyz)'
+        pinx(7) = dlen(3)
+        piny(7) = 0.0
+        pinz(7) = az
+  
+        apin(8) = 'Lat rect 2a(xyz)'
+        pinx(8) = dlen(3)
+        piny(8) = -0.5 * dlen(4)
+        pinz(8) = az
+  
+        apin(9) = 'Lat rect 2b(xyz)'
+        pinx(9) = dlen(3)
+        piny(9) = 0.5 * dlen(4)
+        pinz(9) = az
+  
+        avin(1) = 'Axis vector(xyz)'
+        vinx(1) = 0.0
+        viny(1) = 1.0
+        vinz(1) = 0.0
+
+      endif                           ! Tested sign of tc.
+
+      go to 400
+
+c-----------------------------------------------------------------------********
+
+c.... Ellipse tc + txx * x**2 + tyy * y**2 = 0 (tc < 0, txx > tyy > 0).
+
+  360 actype  = 'ellipse'
+
+      nlen    = 5
+      npin    = 11
+      nvin    = 2
+
+      alen(1) = 'Major semiaxis'
+      dlen(1) = sqrt (-tc / tyy)
+
+      alen(2) = 'Minor semiaxis'
+      dlen(2) = sqrt (-tc / txx)
+
+      alen(3) = 'Center to focus'
+      dlen(3) = sqrt (dlen(1)**2 - dlen(2)**2)
+  
+      alen(4) = 'Latus rectum'
+      dlen(4) = 2.0 * dlen(2)**2 / dlen(1)
+
+      alen(5) = 'Eccentricity'
+      dlen(5) = sqrt (1.0 - (dlen(2) / dlen(1))**2)
+
+      apin(1) = 'Center pt  (xyz)'
+      pinx(1) = 0.0
+      piny(1) = 0.0
+      pinz(1) = az
+
+      apin(2) = 'Focus pt 1 (xyz)'
+      pinx(2) = 0.0
+      piny(2) = -dlen(3)
+      pinz(2) = az
+  
+      apin(3) = 'Lat rect 1a(xyz)'
+      pinx(3) = -0.5 * dlen(4)
+      piny(3) = -dlen(3)
+      pinz(3) = az
+
+      apin(4) = 'Lat rect 1b(xyz)'
+      pinx(4) = 0.5 * dlen(4)
+      piny(4) = -dlen(3)
+      pinz(4) = az
+
+      apin(5) = 'Focus pt 2 (xyz)'
+      pinx(5) = 0.0
+      piny(5) = dlen(3)
+      pinz(5) = az
+  
+      apin(6) = 'Lat rect 2a(xyz)'
+      pinx(6) = -0.5 * dlen(4)
+      piny(6) = dlen(3)
+      pinz(6) = az
+
+      apin(7) = 'Lat rect 2b(xyz)'
+      pinx(7) = 0.5 * dlen(4)
+      piny(7) = dlen(3)
+      pinz(7) = az
+
+      apin(8) = 'Maj axis 1 (xyz)'
+      pinx(8) = 0.0
+      piny(8) = -dlen(1)
+      pinz(8) = az
+
+      apin(9) = 'Maj axis 2 (xyz)'
+      pinx(9) = 0.0
+      piny(9) = dlen(1)
+      pinz(9) = az
+
+      apin(10) = 'Min axis 1 (xyz)'
+      pinx(10) = -dlen(2)
+      piny(10) = 0.0
+      pinz(10) = az
+
+      apin(11) = 'Min axis 2 (xyz)'
+      pinx(11) = dlen(2)
+      piny(11) = 0.0
+      pinz(11) = az
+
+      avin(1) = 'Maj axis   (xyz)'
+      vinx(1) = 0.0
+      viny(1) = 1.0
+      vinz(1) = 0.0
+
+      avin(2) = 'Min axis   (xyz)'
+      vinx(2) = 1.0
+      viny(2) = 0.0
+      vinz(2) = 0.0
+
+      go to 400
+
+c-----------------------------------------------------------------------********
+
+c.... Circle tc + txx * x**2 + tyy * y**2 = 0 (tc < 0, txx = tyy > 0).
+
+  370 actype  = 'circle'
+
+      nlen    = 1
+      npin    = 5
+      nvin    = 1
+
+      alen(1) = 'Radius'
+      dlen(1) = sqrt (-tc / txx)
+
+      apin(1) = 'Center pt  (xyz)'
+      pinx(1) = 0.0
+      piny(1) = 0.0
+      pinz(1) = az
+
+      apin(2) = 'Circle pt 1(xyz)'
+      pinx(2) = 0.0
+      piny(2) = -dlen(1)
+      pinz(2) = az
+
+      apin(3) = 'Circle pt 2(xyz)'
+      pinx(3) = 0.0
+      piny(3) = dlen(1)
+      pinz(3) = az
+
+      apin(4) = 'Circle pt 3(xyz)'
+      pinx(4) = -dlen(1)
+      piny(4) = 0.0
+      pinz(4) = az
+
+      apin(5) = 'Circle pt 4(xyz)'
+      pinx(5) = dlen(1)
+      piny(5) = 0.0
+      pinz(5) = az
+
+      avin(1) = 'Normal vect(xyz)'    
+      vinx(1) = 0.0
+      viny(1) = 0.0
+      vinz(1) = 1.0
+
+      go to 400
+
+c-----------------------------------------------------------------------********
+
+c.... Rotate and translate back to original coordinates.
+
+  400 do 410 n = 1, npin
+
+        call aptmopv (trot, 1, 0., 0., 0., pinx(n), piny(n), pinz(n),
+     &                1, tol, nerra)
+
+        call apttran (tranx, trany, tranz, pinx(n), piny(n), pinz(n),
+     &                1, tol, nerra)
+
+        call aptmopv (prot, 1, ax, ay, az,
+     &                pinx(n), piny(n), pinz(n), 1, tol, nerra)
+
+  410 continue
+
+      do 420 n = 1, nvin
+
+        call aptmopv (trot, 1, 0., 0., 0., vinx(n), viny(n), vinz(n),
+     &                1, tol, nerra)
+        call aptmopv (prot, 1, 0., 0., 0.,
+     &                vinx(n), viny(n), vinz(n), 1, tol, nerra)
+
+  420 continue
+
+      call aptrois (prot, 1, ax, ay, az,
+     &              sc, sx, sy, sz, sxy, syz, szx, sxx, syy, szz, tol,
+     &              nerra)
+
+c=======================================================================********
+
+
+  999 continue
+cbugc***DEBUG begins.
+cbug 9920 format ('aptplqu results.  nerr=',i2)
+cbug      write ( 3, 9920) nerr
+cbug
+cbug 9935 format ('The quadric surface is type ',i3,'.')
+cbug 9921 format ('The plane passes through the center of the',
+cbug     &  ' quadric surface.' /
+cbug     &  '  Center     (xyz)',1p3e20.12 )
+cbug 9934 format ('The plane intersects the vertex of a cone.' )
+cbug 9922 format ('The plane has a point proximal to the center of the',
+cbug     &  ' quadric surface:' /
+cbug     &  '  Point pl   (xyz)',1p3e20.12 /
+cbug     &  '  Point q cen(xyz)',1p3e20.12 /
+cbug     &  '  Distance pl to q',1pe20.12 /
+cbug     &  '  Vector     (xyz)',1p3e20.12 )
+cbug      write ( 3, 9935) nqtype
+cbug      if (dplqu .eq. 0.0) then
+cbug        write ( 3, 9921) qcenx, qceny, qcenz
+cbug        if ((nqtype .eq. 11) .or. (nqtype .eq. 12)) then
+cbug          write ( 3, 9934)
+cbug        endif
+cbug      else
+cbug        write ( 3, 9922) px, py, pz, qcenx, qceny, qcenz,
+cbug     &    dplqu, dpx, dpy, dpz
+cbug      endif
+cbug
+cbug 9923 format ('Number of extrema on the quadric, in the direction',
+cbug     &  ' normal to the plane, is',i2,'.')
+cbug 9924   format ('Extremum',i2,' is tangent to the plane:' /
+cbug     &    '  Tangent pt (xyz)',1p3e20.12 )
+cbug 9925   format ('Extremum',i2,' is proximal or distal to the plane:' )
+cbug 9926   format ('Extremum',i2,' is proximal to the plane:' )
+cbug 9927   format ('Extremum',i2,' is distal to the plane:' )
+cbug 9928   format ('  Point pl   (xyz)',1p3e20.12 /
+cbug     &          '  Point q ex (xyz)',1p3e20.12 /
+cbug     &          '  Distance pl to q',1pe20.12  /
+cbug     &          '  Vector     (xyz)',1p3e20.12 )
+cbug      write ( 3, 9923) nextr
+cbug        do 215 n = 1, nextr           ! Loop over extrema.
+cbugc....     See if the plane is tangent to the quadric surface or not.
+cbug          if (dplex(n) .eq. 0.0) then  ! Tangent.         
+cbug            write ( 3, 9924) n, ex(n), ey(n), ez(n)
+cbug          else                        ! See if proximal or distal.
+cbug            if (nextr .eq. 1) then    ! Indeterminate.
+cbug              write ( 3, 9925) n
+cbug            elseif (abs (dplex(n)) .lt. abs (dplex(3-n))) then  ! Proximal.
+cbug              write ( 3, 9926) n
+cbug            else                      ! Distal.
+cbug              write ( 3, 9927) n
+cbug            endif
+cbug            write ( 3, 9928) pex(n), pey(n), pez(n),
+cbug     &        ex(n), ey(n), ez(n), dplex(n), dpex(n), dpey(n), dpez(n)
+cbug          endif
+cbug  215   continue                      ! End of loop over extrema.
+cbug
+cbug 9930 format ('There is no intersection curve.')
+cbug      if (ntype .gt. 7) then
+cbug        write ( 3, 9930)
+cbug      endif
+cbug
+cbug 9931 format ('Type of intersection:  ',a24)
+cbug 9932 format (2x,a16,1pe20.12)
+cbug 9933 format (2x,a16,1p3e20.12 )
+cbug 9940 format ('Quadric cylinder perpendicular to intersection curve:' /
+cbug     &  '  Quadric  sc=    ',1pe20.12 /
+cbug     &  '  sx,sy,sz=       ',1p3e20.12 /
+cbug     &  '  sxy,syz,szx=    ',1p3e20.12 /
+cbug     &  '  sxx,syy,szz=    ',1p3e20.12)
+cbug      if (actype .ne. '') then
+cbug        write ( 3, 9931) actype
+cbug        write ( 3, 9932) (alen(n), dlen(n), n = 1, nlen)
+cbug        write ( 3, 9933) (apin(n), pinx(n), piny(n), pinz(n),
+cbug     &    n = 1, npin)
+cbug        write ( 3, 9933) (avin(n), vinx(n), viny(n), vinz(n),
+cbug     &    n = 1, nvin)
+cbug        write ( 3, 9940) sc, sx, sy, sz, sxy, syz, szx, sxx, syy, szz
+cbug      endif
+cbugc***DEBUG ends.
+
+      return
+
+c.... End of subroutine aptplqu.      (+1 line)
+      end
+
+UCRL-WEB-209832
+</pre></html>

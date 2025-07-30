@@ -1,0 +1,2052 @@
+%!PS-Adobe
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Download file for monospaced postscript driver.
+
+/MONODICT 300 dict def
+MONODICT begin
+/reencsmalldict 16 dict def
+reencsmalldict begin
+ /SuperScale 0.75 def
+ /SuperOffset 0.5 def
+ /SubOffset -0.3 def
+ /SuperMatrix [SuperScale 0.0 0.0 SuperScale 0.0 SuperOffset] def
+ /SubMatrix  [SuperScale 0.0 0.0 SuperScale 0.0 SubOffset ] def
+ /Itemdict 5 dict def
+ Itemdict begin
+   /FID {pop pop} bind def
+   /FontName {exch pop newfont exch newfontname put} bind def
+   /Encoding {exch pop newencodingvector newfont 3 1 roll put} bind def
+   /FontMatrix {exch cvlit transmat matrix concatmatrix
+          newfont 3 1 roll put} bind def
+   /FontBBox {exch cvlit aload pop
+     transmat transform 4 2 roll
+     transmat transform 4 2 roll
+     4 array astore
+     newfont 3 1 roll put} bind def
+ end
+end
+
+/MakeMARCFont
+ {reencsmalldict begin
+ /newencodingvector exch def
+ /basefontname exch def
+ /newfontname exch def
+ FontDirectory newfontname known not
+ {/basefontdict basefontname findfont def
+  /newfont basefontdict maxlength dict def
+  basefontdict
+  {exch dup /FID ne
+   {dup /Encoding eq
+    {exch pop newencodingvector}
+    {exch}
+   ifelse
+   newfont 3 1 roll put
+   }
+   {pop pop}
+  ifelse
+  } forall
+  newfont /FontName newfontname put
+  newfontname newfont definefont pop
+ }
+ if
+ end
+}bind def
+/MakeSuperFont
+ {reencsmalldict begin
+ dup type /nametype eq {load} if
+   /transmat exch def
+ exch
+ /basefontname exch def
+ exch
+ /newfontname exch def
+ FontDirectory newfontname known
+  {pop}
+  {/basefontdict basefontname findfont def
+  /newfont basefontdict maxlength dict def
+  dup /Encoding eq
+   {pop basefontdict /Encoding get}
+  if
+  /newencodingvector exch def
+  basefontdict
+   {exch dup Itemdict exch known
+    {dup Itemdict exch get exec}
+    {exch newfont 3 1 roll put}
+   ifelse
+   } forall
+   newfontname newfont definefont pop
+  }
+ ifelse
+ end
+}bind def
+/NewStdChar
+%% {dup /Courier findfont /CharStrings get exch known
+ {dup /PrestigeElite findfont /CharStrings get exch known
+  {put}
+  {pop pop pop}
+  ifelse
+ } bind def
+/DefaultVector {exch dup where not {exch def}{pop pop pop} ifelse} bind def
+/MARC-EURO-MINI StandardEncoding DefaultVector
+/MARC-EURO-PC  StandardEncoding DefaultVector
+/MakeDecTech {
+  FontDirectory /DecTech known not
+   {/DecTech /Symbol /Symbol findfont /Encoding get MakeMARCFont
+    /MARC-Greek-MathEncoding 256 array
+    0 1 255 {exch dup 3 -1 roll /.notdef put} for def}
+  if
+} bind def
+/MakeChemMath {
+  FontDirectory /MARC-Chem-Math known not
+   {/MARC-Chem-Math /Symbol /Symbol findfont /Encoding get MakeMARCFont}
+  if
+} bind def
+/MARC-ISOEncoding
+systemdict /ISOLatin1Encoding known
+  {ISOLatin1Encoding dup length array copy
+   dup 8#327 /OE put
+   dup 8#367 /oe put
+   dup 8#236 /Ydieresis put
+  }
+  {StandardEncoding}
+ifelse
+def
+
+%%/SetTray {gsave statusdict begin setpapertray end grestore} bind def
+%%/PrinterDict 5 dict def
+%%PrinterDict begin
+%% (Silentwriter) {
+%%  /TopBin  {2 SetTray} def
+%%  /BottomBin {1 SetTray} def
+%%  /LegalBin {2 SetTray} def
+%% } bind def
+%%
+%%(Dataproducts LZR 2665) {
+%%  /TopBin  {0 SetTray} def
+%%  /BottomBin {1 SetTray} def
+%%  /LegalBin {} def
+%% } bind def
+%
+%
+% Define printer-dependent commands for all supported printers.
+% commands for bin-selection for all supported printers
+%
+%
+/tno 0 def
+/l1s {gsave statusdict begin setpapertray end grestore} def
+/l2s {currentpoint /p1 {} def /p2 {} def
+      statusdict begin tno setpapertray end p1 p2 moveto
+       WMNORIENT} def
+/languagelevel where
+ {pop languagelevel} {1} ifelse
+ 2 lt {/SetTray /l1s load def}
+      {/SetTray /l2s load def} ifelse
+
+% PrinterDict contains printer dependent code which is executed if the
+% printer returns the appropriate name from the statusdict "product"
+% operator.  Note that the keys to this dictionary are not names, but
+% rather are product strings
+%
+/PrinterDict 25 dict def
+PrinterDict begin
+%
+(Texas Instruments OmniLaser 2115) {
+ /TopBin   {0 SetTray} def
+ /BottomBin {1 SetTray} def
+  /LegalBin {} def
+ } bind def
+(OmniLaser) {
+ /TopBin   {0 SetTray} def
+ /BottomBin {1 SetTray} def
+ /LegalBin {} def
+} bind def
+%
+(HP LaserJet IIISi) {
+ /TopBin   {/tno 0 def 0 SetTray} def
+ /BottomBin {/tno 1 def 1 SetTray} def
+ /LegalBin {} def
+} bind def
+%
+(LaserJet 4Si) {
+  /TopBin     {/tno 0 def 0 SetTray} def
+  /BottomBin  {/tno 1 def 1 SetTray} def
+  /LegalBin {} def
+} bind def
+%
+ (UNKNOWN) {
+  /TopBin {} bind dup dup /BottomBin exch def /LegalBin exch def def
+ } def
+end
+
+PrinterDict dup statusdict begin
+  product dup 3 1 roll known not
+   {pop (UNKNOWN)}
+  if
+  get end exec
+
+/LM 0 def
+/CR  {currentpoint exch pop LM exch moveto} bind def
+/S {show} bind def
+/adj {transform round exch round exch itransform} bind def
+/ATRTAB 8 array def
+/AtrSet {dup /CurAtrb exch def ATRTAB exch get setfont} bind def
+/AtrOn {  CurAtrb or dup /CurAtrb exch def ATRTAB exch get setfont} bind def
+/AtrOff {not CurAtrb and dup /CurAtrb exch def ATRTAB exch get setfont} bind def
+/SU {currentfont dup /FontInfo known
+    { begin FontInfo begin
+      0 UnderlinePosition FontMatrix dtransform
+       dup mul exch dup mul add sqrt neg
+      0 UnderlineThickness FontMatrix dtransform
+      dup mul exch dup mul add sqrt
+     end end
+     /UTHK exch def
+     /UOFS exch def
+    }
+    { pop
+     /UTHK 0.25 def
+     /UOFS 1 def
+   }
+   ifelse
+} bind def
+/Uon {
+  currentpoint UOFS add adj
+} bind def
+/Uoff {
+  gsave
+   currentpoint UOFS add adj moveto
+   lineto UTHK setlinewidth stroke
+   grestore
+} bind def
+/WMSAVE {/WMDASAVE save def} bind def
+/WMRESTORE {WMDASAVE restore} bind def
+
+/Pointsize 12 def
+
+% ATRTAB and MakeNormalFont lines lines below have had the font
+% name Courier changed to PrestigeElite, Bold to Slanted. Bold
+% remains Bold
+
+ATRTAB 0 /PrestigeElite findfont Pointsize scalefont put
+ATRTAB 1 /PrestigeElite-Bold findfont Pointsize scalefont put
+ATRTAB 2 /PrestigeElite-Slanted findfont Pointsize scalefont put
+ATRTAB 3 /PrestigeElite-BoldSlanted findfont Pointsize scalefont put
+ATRTAB 4 [/PrestigeElite findfont Pointsize scalefont dup dup dup] putinterval
+/MakeNormalFonts {
+ dup /MARC-PrestigeElite     /PrestigeElite       3 -1 roll MakeMARCFont
+ dup /MARC-PrestigeElite-Bold   /PrestigeElite-Bold    3 -1 roll MakeMARCFont
+ dup /MARC-PrestigeElite-Slanted /PrestigeElite-Slanted   3 -1 roll MakeMARCFont
+ /MARC-PrestigeElite-BoldSlanted /PrestigeElite-BoldSlanted 3 -1 roll MakeMARCFont
+} bind def
+
+/MakeSciFont {
+ dup dup FontDirectory exch known not
+   {dup /MARC-Greek-Math eq
+     {dup FontDirectory /DecTech known
+      {/DecTech MARC-Greek-MathEncoding MakeMARCFont}
+      {/PrestigeElite /MARC-PrestigeElite findfont /Encoding get MakeMARCFont}
+     ifelse
+     }
+     {/PrestigeElite /MARC-PrestigeElite findfont /Encoding get MakeMARCFont}
+   ifelse
+   }
+   {pop}
+ ifelse
+ findfont /SciFont exch def
+} bind def
+/SetPitch {
+ gsave 72 exch div
+ /PrestigeElite findfont setfont
+ ( ) stringwidth pop div
+ /Pointsize exch def
+ ATRTAB 0 /MARC-PrestigeElite      findfont Pointsize scalefont put
+ ATRTAB 1 /MARC-PrestigeElite-Bold    findfont Pointsize scalefont put
+ ATRTAB 2 /MARC-PrestigeElite-Slanted    findfont Pointsize scalefont put
+ ATRTAB 3 /MARC-PrestigeElite-BoldSlanted findfont Pointsize scalefont put
+ ATRTAB 4 [SciFont Pointsize scalefont dup dup dup] putinterval
+ grestore
+ 0 AtrSet SU
+} bind def
+
+/FormFeed {showpage PageSave restore /PageSave save def} bind def
+/FirstFFFlag false def
+/FirstFormFeed {
+  FirstFFFlag
+   /FormFeed load
+   {/FirstFFFlag true def}
+ ifelse
+} bind def
+
+/LastFF {
+  showpage
+  PageSave restore
+  /FirstFFFlag false def
+  /PageSave save def
+} bind def
+
+
+/HalfLine {2 currentpoint Pointsize 2 div sub exch pop moveto } bind def
+/LF    { 2 currentpoint Pointsize sub exch pop moveto } bind def
+
+/WMPSIZEX 612.0 def
+/WMPSIZEY 792.0 def
+
+%% The lines between here and /Portrait were added as were the lines
+%% /orient # def and WMORIENT in /Portrait and /Landscape below
+
+/WMORIENT {/orient where
+		{pop orient} {1} ifelse
+		2 lt {/WMNORIENT {Portrait} def }
+		     {/WMNORIENT {LandScp} def }
+		ifelse} def
+%
+WMORIENT
+/WMLEGAL 0.0 def
+
+/Portrait {
+  /PageTop WMPSIZEY 7.0 sub def
+  2 PageTop moveto
+  /Landscaped false def
+  /PageSave save def
+  /orient 2 def
+  WMORIENT
+} bind def
+/Landscape {
+  -90 rotate
+  WMPSIZEY neg 0.0 translate
+  /PageTop WMPSIZEX 7.0 sub def
+  2 PageTop moveto
+  /Landscaped true def
+  /PageSave save def
+  /orient 1 def
+  WMORIENT
+} bind def
+/DrafQ {
+%%    /TopBin {} def
+%%    /BottomBin {} def
+    /WMPSIZEY 1008.0 def
+%%    LegalBin
+    legaltray end
+} bind def
+
+MARC-EURO-MINI MakeNormalFonts()pop
+/DecTech MakeSciFont()pop 11 SetPitch()pop Portrait()pop 11 SetPitch()S FirstFormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(                      DIVESTITURE AS AN ANTITRUST REMEDY IN BANK MERGERS)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              by)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(                                          Jim Burke*)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(            *Senior Economist, Division of Research and Statistics, Board of)S LF
+(            Governors of the Federal Reserve System, Washington, D.C. 20551.  The)S LF
+(            views expressed are those of the author and do not necessarily reflect)S LF
+(            those of the Board of Governors or its staff.  The author thanks Steve)S LF
+(            Rhoades and Myron Kwast for helpful comments.  Any errors are the)S LF
+(            responsibility of the author.)S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S LF
+()S LF
+()S LF
+(            I.  )S Uon(Introduction)S Uoff ()S LF
+()S LF
+(                     Utilization of divestiture as an antitrust remedy in bank)S LF
+()S LF
+(            mergers grew out of the merger movement of the 1970s.  One of the more)S LF
+()S LF
+(            disturbing aspects of that merger movement, from the standpoint of the)S LF
+()S LF
+(            banking community, was the high degree of uncertainty regarding)S LF
+()S LF
+(            regulatory views as to which mergers would constitute antitrust)S LF
+()S LF
+(            violations.  During the early 1980's, the bank regulatory agencies)S LF
+()S LF
+(            began to take measures to eliminate the high degree of uncertainty)S LF
+()S LF
+(            regarding the acceptability of merger proposals under the antitrust)S LF
+()S LF
+(            laws.  The first step was adoption of the numerical merger guidelines)S LF
+()S LF
+(            published by the Department of Justice.  It thus became possible for)S LF
+()S LF
+(            applicants to identify mergers that would likely raise competitive)S LF
+()S LF
+(            issues or precipitate a lawsuit by the Department.)S LF
+()S LF
+(                     Once the banking community had attained the means to identify)S LF
+()S LF
+(            problematic mergers, some device more certain than the use of)S LF
+()S LF
+(            generally accepted mitigating factors was needed to reduce, if not)S LF
+()S LF
+(            eliminate, any uncertainty regarding approval of proposed mergers.  It)S LF
+()S LF
+(            soon became evident that relatively modest divestitures could, in most)S LF
+()S LF
+(            instances, be used to modify merger proposals so that the structural)S LF
+()S LF
+(            effects would conform with the levels specified in the guidelines.)S LF
+()S LF
+(            For well over a decade, bank regulatory agencies have accepted)S LF
+()S LF
+(            divestitures as an antitrust remedy.  In recent years, the Department)S LF
+()S LF
+(            of Justice has questioned the acceptability of certain divestitures)S LF
+()S LF
+(            proposed by acquiring firms, particularly in some of the so-called)S LF
+()S LF
+(            megamergers.  In some cases, the Department selected specific branches)S LF
+()S LF
+(            and specified other terms and conditions for divestitures.  There is,)S LF
+()S LF
+(            however, no evidence regarding the effectiveness of the divestiture)S LF
+()S LF
+(            remedy.)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              2)S LF
+()S LF
+()S LF
+(                     This study describes the evolution of the divestiture remedy,)S LF
+()S LF
+(            and provides some evidence regarding the efficacy of divestitures as a)S LF
+()S LF
+(            remedy for otherwise anticompetitive mergers.  The findings are based)S LF
+()S LF
+(            upon an examination of the post-divestiture survival and market shares)S LF
+()S LF
+(            of entities \(banks or offices as the case may be\) divested because of)S LF
+()S LF
+(            competitive concerns.  A statistical analysis is conducted to)S LF
+()S LF
+(            determine whether there is a relationship between market share)S LF
+()S LF
+(            performance and the size of buyers, the size of sellers, and whether)S LF
+()S LF
+(            the divested offices were owned by the acquiring or the acquired firm.)S LF
+()S LF
+(            Some evidence on the effectiveness of divestitures accepted by the)S LF
+()S LF
+(            Department of Justice )S Uon(vis)S Uoff ( )S Uon(a)S Uoff ( )S Uon(vis)S Uoff ( those accepted by the Federal Reserve)S LF
+()S LF
+(            is also presented.  The sample includes most of the mergers that were)S LF
+()S LF
+(            approved between 1985 and 1992 with the condition that certain)S LF
+()S LF
+(            divestitures be completed.)S LF
+()S LF
+()S LF
+()S LF
+(            II.  )S Uon(Background and Evolution of the Divestiture Device)S Uoff ()S LF
+()S LF
+(                     The merger movement of the 1970s was characterized by)S LF
+()S LF
+(            extensive intrastate acquisition activity by bank holding companies,)S LF
+()S LF
+(            especially in states such as Florida, Texas, and Colorado that had)S LF
+()S LF
+(            restrictive branching laws.  Following passage of the Bank Holding)S LF
+()S LF
+(            Company Act amendments of 1970, bank holding companies sought to)S LF
+()S LF
+(            expand intrastate via bank acquisitions and interstate through the)S LF
+()S LF
+(            acquisition of nonbanking firms.  The Federal Reserve Board, as)S LF
+()S LF
+(            regulator of bank holding companies, viewed this ambitious merger) S HalfLine
+()S LF
+(                                  )S 4 AtrOn()S 1 AtrOn(1)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            movement with caution.   Indeed, between 1972 and 1982, the Federal)S LF
+()S LF
+()S LF
+(            __________)S LF
+(               1. During this period of extensive acquisition activity by bank)S LF
+(            holding companies, the Federal Reserve Board was often concerned with)S LF
+(            factors such as the evolution of statewide structure.  For example, in)S LF
+(            1973, the Board denied the application of New England Merchants)S LF
+()S LF
+()S LF
+(            \(Footnote continues on next page\))S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              3)S LF
+()S LF
+()S LF
+(            Reserve Board denied over sixty-five bank acquisition proposals on)S LF
+()S LF
+(            strictly competitive grounds.  Some of the proposals that were denied)S LF
+()S LF
+(            were later determined by the courts to not constitute antitrust law)S LF
+()S LF
+(            violations.)S LF
+()S LF
+(                     Three court decisions in 1981 made it clear that bank)S LF
+()S LF
+(            regulatory agencies did not have the latitude to deny proposed mergers)S LF
+()S LF
+(            that did not result in antitrust violations.  First, the Eighth)S LF
+()S LF
+(            Circuit Court of Appeals \(St. Louis\) rendered an opinion similar to a)S LF
+()S LF
+(            1973 Ninth Circuit \(San Francisco\) decision that had curtailed the)S LF
+()S LF
+(            discretionary authority of the federal banking agencies to deny)S LF
+()S LF
+(            mergers.  That is, it required the agencies to apply standards) S HalfLine
+()S LF
+(                                                              )S 4 AtrOn()S 1 AtrOn(2)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            identical to those embodied in the antitrust laws.   Two other)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(            __________)S LF
+()S LF
+(            \(Footnote continued from previous page\))S LF
+(            Company, Inc., Boston, to acquire Hancock Bank and Trust Company,)S LF
+(            Quincy \(the latter had deposits of $66.7 million, and the market)S LF
+(            shares were 10.0 percent and 0.8 percent respectively\).  The Board)S LF
+(            reasoned that Hancock was of sufficient size to anchor an additional)S LF
+(            holding company capable of competing with the five dominant)S LF
+(            institutions in Massachusetts.  See )S Uon(Federal Reserve Bulletin)S Uoff (, vol. 59)S LF
+(            \(June 1973\), p. 459.  Even many market extension mergers involving)S LF
+(            sizable banks that operated in separate markets were denied on grounds)S LF
+(            that they would eliminate potential competition.  See, for example,)S LF
+(            First International, Dallas, to acquire Bank of Tyler, Federal Reserve)S LF
+(            Bulletin, vol. 60 \(January 1974\), p. 43; and First City)S LF
+(            Bancorporation, Houston, to acquire Lufkin National Bank, )S Uon(Federal)S Uoff ()S LF
+(            )S Uon(Reserve Bulletin)S Uoff (, vol. 60 \(June 1974\), p. 450.  A total of fifteen)S LF
+(            such proposals were denied by the Federal Reserve between 1973 and)S LF
+(            1980.)S LF
+()S LF
+(               2. The U.S. Court of Appeals for the Eighth Circuit \(St. Louis\))S LF
+(            invalidated the Federal Reserve Board's August 1979 order denying the)S LF
+(            application of County National Bancorp., St. Louis, to acquire TG)S LF
+(            Bancshares Company, St. Louis.  )S Uon(County National Bancorporation)S Uoff ( v.)S LF
+(            )S Uon(Federal Reserve Board)S Uoff (, 654 F.2d 1253 \(8th Cir. 1981\) \()S Uon(en)S Uoff ( )S Uon(banc)S Uoff (\).  The)S LF
+(            merger involved the sixth and tenth largest banking organizations in)S LF
+(            the St. Louis banking market.  The two firms, which had market shares)S LF
+(            of 3.2 and 2.3 percent respectively, held deposits of $333.7 million)S LF
+(            and $225.6 million respectively.  The Board reasoned that the two)S LF
+()S LF
+()S LF
+(            \(Footnote continues on next page\))S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              4)S LF
+()S LF
+()S LF
+(            court decisions in 1981 specified a demanding list of criteria that)S LF
+()S LF
+(            had to be met before regulators could deny merger proposals under the) S HalfLine
+()S LF
+(                                                            )S 4 AtrOn()S 1 AtrOn(3)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            controversial doctrine of potential competition.   Since 1982, no)S LF
+()S LF
+(            bank merger has been denied on grounds of potential competition)S LF
+()S LF
+(            despite the fact that mergers of steadily increasing size have)S LF
+()S LF
+(            occurred over the past fourteen years.)S LF
+()S LF
+(                     Following the important court decisions of 1981, the Federal)S LF
+()S LF
+(            Reserve Board took measures to provide the banking community with some)S LF
+()S LF
+(            guidance as to what constituted a breach of the antitrust laws.  Thus,)S LF
+()S LF
+(            in 1982, the Federal Reserve began to make frequent reference to the)S LF
+()S LF
+(            horizontal merger guidelines developed by the Department of) S HalfLine
+()S LF
+(                    )S 4 AtrOn()S 1 AtrOn(4)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            Justice.   Since that time, the routine use of the guidelines as a)S LF
+()S LF
+(            screening device has significantly reduced the uncertainty surrounding)S LF
+()S LF
+(            the outcome of horizontal merger proposals.  In 1986, the Federal)S LF
+()S LF
+(            Reserve further streamlined the merger applications process by)S LF
+()S LF
+(            revising its rules regarding delegation of authority to include the)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(            __________)S LF
+()S LF
+(            \(Footnote continued from previous page\))S LF
+(            organizations were direct competitors of similar orientation, both)S LF
+(            were of sufficient size to have achieved economies of scale, and both)S LF
+(            had capable management.)S LF
+(                  In the 1973 decision, the Ninth Circuit overturned an FDIC order)S LF
+(            denying a merger under the Bank Merger Act \(which contains a standard)S LF
+(            identical to that in the Bank Holding Company Act\) on grounds of)S LF
+(            anticompetitive effects that the FDIC conceded did not rise to the)S LF
+(            level of an antitrust violation.  )S Uon(Washington Mutual Savings Bank)S Uoff ( v.)S LF
+(            )S Uon(FDIC)S Uoff (, 482 F.2d 459 \(9th Cir. 1973\).)S LF
+()S LF
+(               3. The Fifth Circuit Court \(New Orleans\) vacated two Federal)S LF
+(            Reserve Board orders denying mergers among large bank holding)S LF
+(            companies in Texas.  See )S Uon(Mercantile Texas Corp.)S Uoff ( v. )S Uon(Board of Governors)S Uoff (,)S LF
+(            638 F2.d 1255 \(Fifth Circuit, 1981\), and )S Uon(Republic of Texas Corp.)S Uoff ( v.)S LF
+(            )S Uon(Board of Governors)S Uoff (, 649 F2.d 1026 \(Fifth Circuit, 1981\).)S LF
+()S LF
+(               4. These guidelines have been updated on a number of occasions)S LF
+(            since their original publication in 1968.  The Department of Justice)S LF
+(            and the Federal Trade Commission jointly issued 1992 horizontal merger)S LF
+(            guidelines that modified the department's 1982 and 1984 versions.)S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              5)S LF
+()S LF
+()S LF
+(            structural levels specified in the Department of Justice) S HalfLine
+()S LF
+(                       )S 4 AtrOn()S 1 AtrOn(5)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            guidelines.   Proposals that meet the specified delegation criteria)S LF
+()S LF
+(            are virtually assured approval and are expeditiously processed under)S LF
+()S LF
+(            authority delegated to the District Federal Reserve Banks.  Proposals)S LF
+()S LF
+(            that involve structural effects more serious than the levels specified)S LF
+()S LF
+(            in the delegation criteria are subjected to additional scrutiny by the)S LF
+()S LF
+(            Reserve Banks and the Federal Reserve Board as well.)S LF
+()S LF
+(                     Today, use of the merger guidelines, coupled with commitments)S LF
+()S LF
+(            to make appropriate divestitures, has enabled the banking community to)S LF
+()S LF
+(            eliminate virtually all uncertainty regarding the acceptability of)S LF
+()S LF
+(            proposed bank mergers under the antitrust laws.  \(Indeed, only five)S LF
+()S LF
+(            merger applications were denied on competition grounds by the Federal)S LF
+()S LF
+(            Reserve Board between 1987 and 1997.\))S LF
+()S LF
+(                     In recent years, divestitures have provided a vehicle for)S LF
+()S LF
+(            bankers to consummate mergers that otherwise might not have been)S LF
+()S LF
+(            feasible under the antitrust laws.  Many of the so-called mega-mergers)S LF
+()S LF
+(            of the early 1990s that only a few years ago would not have been)S LF
+()S LF
+(            contemplated, have become realities, in large part, because of the) S HalfLine
+()S LF
+(                               )S 4 AtrOn()S 1 AtrOn(6)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            divestiture device.   Although in most cases, the divested offices)S LF
+()S LF
+(            have comprised a relatively small percentage of the deposits of the)S LF
+()S LF
+(            merging entities, some of the very recent mega-mergers have involved)S LF
+()S LF
+(            rather substantial divestitures.  For example, the divested deposits)S LF
+()S LF
+()S LF
+(            __________)S LF
+(               5. Delegation rules specify criteria which, if met, allow merger)S LF
+(            applications to be delegated to a district Federal Reserve Bank for)S LF
+(            approval.)S LF
+()S LF
+(               6. Of course, other factors such as the explicit inclusion of)S LF
+(            thrift institution deposits in the calculation of structural indexes)S LF
+(            \(since 1985\) and the consideration of economic evidence beyond)S LF
+(            concentration and market shares \(such as potential competition\) have,)S LF
+(            for many years, also served to lessen antitrust concerns with bank)S LF
+(            mergers.  In analyzing any particular proposal, many mitigating)S LF
+(            factors may be considered, but the ultimate remedy, if needed, is)S LF
+(            divestiture.)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              6)S LF
+()S LF
+()S LF
+(            in the Society-AmeriTrust merger in 1992 amounted to approximately 13)S LF
+()S LF
+(            percent of the deposits that were acquired.  Because of the great deal)S LF
+()S LF
+(            of office overlap in California, Nevada, Arizona, and Washington, some)S LF
+()S LF
+(            $9 billion, or some 12 percent of the acquired deposits were divested)S LF
+()S LF
+(            by BankAmerica and Security Pacific in 1992.  In the 1996 acquisition)S LF
+()S LF
+(            of First Interstate by Wells Fargo, the required divestiture of $2.5)S LF
+()S LF
+(            billion in deposits was approximately 5 percent of the deposits)S LF
+()S LF
+(            acquired.  Similarly, the divestiture required in the 1997 acquisition)S LF
+()S LF
+(            of Barnett Banks by NationsBank amounted to some $3.1 billion, or 9)S LF
+()S LF
+(            percent of the deposits acquired.)S LF
+()S LF
+()S LF
+()S LF
+(            III.  )S Uon(Regulatory Views Regarding Divestitures)S Uoff ()S LF
+()S LF
+(                                    )S Uon(Federal Reserve Board)S Uoff ()S LF
+()S LF
+(                     The Federal Reserve Board's divestiture policy was formally)S LF
+()S LF
+(            articulated in the public statement approving the acquisition of First) S HalfLine
+()S LF
+(                                                                         )S 4 AtrOn()S 1 AtrOn(7)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            Marine Banks, Inc. by Barnett Banks of Florida, Inc. in 1982.   In)S LF
+()S LF
+(            subsequent Board orders, it was stated that the divestiture of a)S LF
+()S LF
+(            banking office in a highly concentrated market, prior to or concurrent)S LF
+()S LF
+(            with consummation of a proposal was an effective means of eliminating) S HalfLine
+()S LF
+(                                                                  )S 4 AtrOn()S 1 AtrOn(8)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            significantly adverse effects on existing competition.   In)S LF
+()S LF
+(            general, the Federal Reserve has not attempted to dictate specific)S LF
+()S LF
+()S LF
+(            __________)S LF
+(               7. )S Uon(Federal Reserve Bulletin)S Uoff (, vol. 68 \(March 1982\), p. 190.  Barnett)S LF
+(            was given up to nine months following consummation to complete the)S LF
+(            divestiture of nine branches which held 40 percent of Marine's assets.)S LF
+(            However, the order stated that:)S LF
+()S LF
+(                "The Board wishes to emphasize that a divestiture, such as the one)S LF
+(                proposed by Applicant, should be completed prior to or concurrent)S LF
+(                with consummation of the proposal so as to avoid the existence of)S LF
+(                significant anticompetitive effects for even a short period of)S LF
+(                time.  The Board expects that future bank holding company)S LF
+(                applicants will make every effort to arrange their proposals to)S LF
+(                comply with this policy.")S LF
+()S LF
+(               8. For example, see Pennbancorp to merge with First Seneca)S LF
+(            Corporation, )S Uon(Federal Reserve Bulletin)S Uoff (, vol. 69 \(July 1983\), p. 548.)S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              7)S LF
+()S LF
+()S LF
+(            terms or conditions relating to a divestiture and has not selected)S LF
+()S LF
+(            particular facilities or resources to be sold.)S LF
+()S LF
+(                     The Federal Reserve has generally viewed divestitures as)S LF
+()S LF
+(            sufficient if the assets and liabilities of viable full-service)S LF
+()S LF
+(            offices were sold.  It has been assumed that the divested branches)S LF
+()S LF
+(            would constitute a viable entity that would provide a full range of)S LF
+()S LF
+(            banking services to all customers in a particular vicinity.  In some)S LF
+()S LF
+(            instances, a "branch-offering" prospectus is made a part of the)S LF
+()S LF
+(            official record in merger applications to the Federal Reserve.)S LF
+()S LF
+(            Therein the seller may specify which assets and liabilities are)S LF
+()S LF
+(            expected to convey to the purchaser.  The sales price negotiated by)S LF
+()S LF
+(            the parties is presumably based upon some anticipated amount of "core)S LF
+()S LF
+(            deposits" that are expected to be retained by the buyer.  In some)S LF
+()S LF
+(            instances, it is agreed that deposit and loan relationships of)S LF
+()S LF
+(            specific customers will not convey to the buyer.  Other special)S LF
+()S LF
+(            conditions such as a seller's commitment not to solicit deposits or)S LF
+()S LF
+(            loan business of the offices being sold, and agreements not to)S LF
+()S LF
+(            establish new branches nearby for some specified time period may also)S LF
+()S LF
+(            be incorporated into agreements between buyers and sellers.)S LF
+()S LF
+(            Stipulations regarding the retention and future employment of various)S LF
+()S LF
+(            branch personnel may also be agreed upon by the buyer and seller.)S LF
+()S LF
+(                     Although the Federal Reserve recognizes that all deposit and)S LF
+()S LF
+(            loan relationships may not convey along with the physical structure)S LF
+()S LF
+(            and the employees, it is anticipated that divested branches will)S LF
+()S LF
+(            retain sufficient business to constitute a viable competitive entity)S LF
+()S LF
+(            in the market.  This expectation is based in large part on empirical)S LF
+()S LF
+(            evidence showing that location is a principal consideration of both)S LF
+()S LF
+(            individuals and small businesses in selecting convenient suppliers of)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              8)S LF
+() S HalfLine
+()S LF
+(                             )S 4 AtrOn()S 1 AtrOn(9)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            banking services.   The Federal Reserve has often expressed a)S LF
+()S LF
+(            preference for out-of-market buyers for divested offices, but has)S LF
+()S LF
+(            focused primarily upon the magnitude of the divestiture and its)S LF
+()S LF
+(            effects on structural indexes and resulting competitive conditions.)S LF
+()S LF
+(            Usually, terms and conditions, including specific offices to be) S HalfLine
+()S LF
+(                                                                       )S 4 AtrOn()S 1 AtrOn(10)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            divested, are left to the discretion of buyers and sellers.    In)S LF
+()S LF
+(            most instances, the divestiture involves offices of the firm being)S LF
+()S LF
+(            acquired, but it is not unusual for some branches of the applicant to)S LF
+()S LF
+(            be sold.)S LF
+()S LF
+(                                    )S Uon(Department of Justice)S Uoff ()S LF
+()S LF
+(                     Recent actions make it apparent that in the judgment of the)S LF
+()S LF
+(            Department of Justice, the terms and conditions incorporated into)S LF
+()S LF
+(            divestiture agreements cannot be left entirely to the discretion of)S LF
+()S LF
+(            applicants if viable competitors are to emerge from the divested)S LF
+()S LF
+(            entities.  This initially became evident following the Federal Reserve)S LF
+()S LF
+(            Board's approval of First Hawaiian Inc.'s acquisition of First) S HalfLine
+()S LF
+(                                         )S 4 AtrOn()S 1 AtrOn(11)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            Interstate of Hawaii in 1991.    The divestitures accepted by the)S LF
+()S LF
+(            Federal Reserve were considered by the Department to be insufficient)S LF
+()S LF
+(            to mitigate competitive concerns in certain business loan markets.)S LF
+()S LF
+(            The Department filed a lawsuit, and later agreed upon a settlement)S LF
+()S LF
+()S LF
+(            __________)S LF
+(               9. For example, see Gregory Elliehausen and John Wolken, "Banking)S LF
+(            Markets and the Use of Financial Services by Small and Medium-Sized)S LF
+(            Businesses" \(Staff Studies No. 160, Federal Reserve Board, 1990\);)S LF
+(            Timothy Hannan and Stephen A. Rhoades, "Future U.S. Banking Structure:)S LF
+(            1990 to 2010," )S Uon(The Antitrust Bulletin)S Uoff (, Fall 1992; and Myron L. Kwast,)S LF
+(            Martha Starr-McCluer, and John D. Wolken, "Market Definition and the)S LF
+(            Analysis of Antitrust in Banking," )S Uon(The Antitrust Bulletin)S Uoff (, Winter)S LF
+(            1997.)S LF
+()S LF
+(              10. One notable exception to this policy occurred in the recent)S LF
+(            Wells Fargo-First Interstate acquisition.  In the public statement, it)S LF
+(            was noted that the Board paid special attention to the size and)S LF
+(            )S Uon(quality)S Uoff ( of the proposed divestitures \()S Uon(Federal Reserve Bulletin)S Uoff (, vol.)S LF
+(            82 [May 1996], p. 445\).)S LF
+()S LF
+(              11. )S Uon(Federal Reserve Bulletin)S Uoff (, vol. 77 \(January 1991\), p. 52.)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              9)S LF
+()S LF
+()S LF
+(            which required that the parties divest one additional branch in the) S HalfLine
+()S LF
+(                                    )S 4 AtrOn()S 1 AtrOn(12)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            Honolulu banking market.    Stipulations were also made regarding)S LF
+()S LF
+(            the retention of certain personnel at the branches being sold.  In)S LF
+()S LF
+(            addition, specific buyers to whom the divested assets could be sold)S LF
+()S LF
+(            were selected.)S LF
+()S LF
+(                     In a second instance, after the Federal Reserve Board)S LF
+()S LF
+(            approved the 1991 merger of Fleet/Norstar and Bank of New England)S LF
+()S LF
+(            without requiring divestitures, the Department of Justice again filed) S HalfLine
+()S LF
+(                 )S 4 AtrOn()S 1 AtrOn(13)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            suit.    The consent decree ultimately reached by the parties)S LF
+()S LF
+(            required the divestiture of specific assets and branches which were) S HalfLine
+()S LF
+(                                       )S 4 AtrOn()S 1 AtrOn(14)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            selected by the Department.    There was another instance in 1992 in)S LF
+()S LF
+(            which the Department of Justice found that proposed divestitures that)S LF
+()S LF
+(            were acceptable to the Federal Reserve were insufficient to fully)S LF
+()S LF
+(            address competitive concerns.  After the Federal Reserve's approval of) S HalfLine
+()S LF
+(                                         )S 4 AtrOn()S 1 AtrOn(15)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            the Society-AmeriTrust merger  , the Department of Justice filed)S LF
+()S LF
+(            suit, stating that the divestitures proposed were insufficient in)S LF
+()S LF
+(            scope and did not appear to meet the test of introducing a viable) S HalfLine
+()S LF
+(                                                                              )S 4 AtrOn()S 1 AtrOn(16)S 1 AtrOff()S 4 AtrOff() S HalfLine
+(            supplier of banking services to the market's business enterprises.)S LF
+()S LF
+(                     Today, especially in large mergers, it is not uncommon for)S LF
+()S LF
+(            the Department of Justice to reach acceptable divestiture agreements)S LF
+()S LF
+(            with applicants prior to the time the application is filed with the)S LF
+()S LF
+()S LF
+()S LF
+(            __________)S LF
+(              12. )S Uon(United States)S Uoff ( v. )S Uon(First Hawaiian, Inc.)S Uoff (, Civil No. 90-00904 DAE)S LF
+(            \(D. Ha. filed March 7, 1991\).)S LF
+()S LF
+(              13. )S Uon(Federal Reserve Bulletin)S Uoff (, vol. 77 \(September 1991\), p. 750.)S LF
+()S LF
+(              14. Janusz A. Ordover and Margaret E. Guerin-Calvert, "Bank Merger)S LF
+(            Analysis and the New Merger Guidelines:  The View from the Department)S LF
+(            of Justice," in Proceedings of a Conference on Bank Structure and)S LF
+(            Competition \(Federal Reserve Bank of Chicago, 1992\), p. 5.)S LF
+()S LF
+(              15. )S Uon(Federal Reserve Bulletin)S Uoff (, vol. 78 \(April 1992\), p. 302.)S LF
+()S LF
+(              16. )S Uon(American Banker)S Uoff (, March 16, 1992, page 1.)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              10)S LF
+()S LF
+()S LF
+(            Federal Reserve.  The department reached such an agreement with)S LF
+()S LF
+(            BankAmerica prior to its filing of an application to acquire Security)S LF
+()S LF
+(            Pacific.  BankAmerica agreed to make divestitures beyond those that)S LF
+()S LF
+(            were originally proposed.  Similarly, the divestitures required in the)S LF
+()S LF
+(            Wells Fargo-First Interstate merger exceeded the amount originally)S LF
+()S LF
+(            proposed by the applicant.)S LF
+()S LF
+(                     The view of the Department of Justice regarding divestitures)S LF
+()S LF
+(            stems largely from a concern with the ability of a divested entity to)S LF
+()S LF
+(            provide services, especially loans, to small businesses.  The findings)S LF
+()S LF
+(            of this study do not directly address this concern, that is, no)S LF
+()S LF
+(            attempt is made to analyze specific components of the asset portfolios)S LF
+()S LF
+(            of, or the range of services provided by, divested entities.)S LF
+()S LF
+(            Nevertheless, the findings of this study are relevant to the small)S LF
+()S LF
+(            business issue if it is assumed that the divested entities continue,)S LF
+()S LF
+(            or have the capacity, to provide the full range of banking services)S LF
+()S LF
+(            for which there exists a demand in their local areas.  This assumption)S LF
+()S LF
+(            is, of course, inherent in the position taken by the Federal Reserve)S LF
+()S LF
+(            regarding divestitures, but is at odds with the position of the)S LF
+()S LF
+(            Department of Justice.)S LF
+()S LF
+()S LF
+()S LF
+(            IV.  )S Uon(Divestiture Sample and Data)S Uoff ()S LF
+()S LF
+(                     The sample examined here consists of most of the bank holding)S LF
+()S LF
+(            company acquisitions completed between 1985 and 1992 in which the)S LF
+()S LF
+(            divestiture of offices was required as a condition of approval.  Data)S LF
+()S LF
+(            were obtained for twenty-one mergers that involved divestitures of 210) S HalfLine
+()S LF
+(                                                           )S 4 AtrOn()S 1 AtrOn(17)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            offices in eighty-three local geographic areas.    The post-)S LF
+()S LF
+()S LF
+(            __________)S LF
+(              17. Branch data could not be obtained in instances where the buyers)S LF
+(            closed the divested branches or transferred some or all of their)S LF
+(            deposits to other market area branches or to other banks that they)S LF
+(            owned.)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              11)S LF
+()S LF
+()S LF
+(            divestiture "market share" of the divested offices in the eighty-three)S LF
+()S LF
+(            markets where divestitures occurred is the focal point of the)S LF
+()S LF
+(            analysis.  In forty-six of the eighty-three markets, a single office)S LF
+()S LF
+(            was divested.  The number of offices divested in the other thirty-)S LF
+()S LF
+(            seven markets ranged from two to twenty-six.  The divested facilities)S LF
+()S LF
+(            in all instances were treated as a single combined entity within each)S LF
+()S LF
+(            market where divestitures were made.  In most cases, the divested)S LF
+()S LF
+(            entities \(one or more offices\) were acquired by firms that were not)S LF
+()S LF
+(            previously represented in the market, as is usually preferred by the)S LF
+()S LF
+(            Federal Reserve and the Department of Justice.  In those instances)S LF
+()S LF
+(            where the buyers of divested branches were already represented in the)S LF
+()S LF
+(            market, any previous market shares of the old branches were not)S LF
+()S LF
+(            commingled with those of the divested branches being analyzed.)S LF
+()S LF
+(                     Almost all of the geographic markets in this study are non-)S LF
+()S LF
+(            metropolitan counties that are identical to the actual markets used in)S LF
+()S LF
+(            the competitive analysis of the mergers.  In a few instances, however,)S LF
+()S LF
+(            such as in the Cleveland, Ohio, and the Jacksonville, Florida, MSAs,)S LF
+()S LF
+(            the geographic areas used in this study are smaller than the market)S LF
+()S LF
+(            areas that were used by the Federal Reserve.  Even though prices of)S LF
+()S LF
+(            services may be transmitted throughout large metropolitan areas by)S LF
+()S LF
+(            factors such as commuting, suburban residents and small businesses)S LF
+()S LF
+(            generally use banking facilities to which they have convenient access)S LF
+()S LF
+(            in their immediate vicinities.  Moreover, in this particular study,)S LF
+()S LF
+(            where the focus is on the relative success of divested offices, other)S LF
+()S LF
+(            competitors in the immediate vicinity would be the ones most likely to)S LF
+()S LF
+(            take customers away from the divested offices.  Thus, in large)S LF
+()S LF
+(            metropolitan areas, a smaller geographic area is more appropriate for)S LF
+()S LF
+(            analyzing year-to-year changes in deposit shares held by the divested)S LF
+()S LF
+(            entities.  Therefore, in the few large MSAs in our sample, the)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              12)S LF
+()S LF
+()S LF
+(            component counties rather than multi-county areas are used to)S LF
+()S LF
+(            construct measures of post-divestiture market share changes.  Usually,)S LF
+()S LF
+(            these smaller areas were the ones used by the Department of Justice in)S LF
+()S LF
+(            their analysis of the mergers.)S LF
+()S LF
+(                     The percentage changes in deposits and market shares of the)S LF
+()S LF
+(            divested entities are traced annually \(using June 30 data\) from the)S LF
+()S LF
+(            year of sale to 1995.  The sample includes divestitures completed)S LF
+()S LF
+(            between 1985 and 1992.  Obviously, all of the firms that made)S LF
+()S LF
+(            divestitures had a substantial pre-merger presence in the market and,)S LF
+()S LF
+(            in all cases, retained a sizable post-divestiture share of the market.)S LF
+()S LF
+(            The post-divestiture percentage changes in market shares of the)S LF
+()S LF
+(            sellers of divested branches are also examined.  In addition, the)S LF
+()S LF
+(            changes in market shares of both the buyers and sellers a year after)S LF
+()S LF
+(            the divestiture are examined to provide information on deposit runoff)S LF
+()S LF
+(            from the divested entities.)S LF
+()S LF
+()S LF
+()S LF
+(            V.  )S Uon(Post-Merger Deposit Runoff at Divested Offices)S Uoff ()S LF
+()S LF
+(                     An implicit assumption made by regulators in accepting)S LF
+()S LF
+(            certain levels of divestiture is that all of the deposits will convey)S LF
+()S LF
+(            to the purchasers of divested offices.  However, it is reasonable to)S LF
+()S LF
+(            question whether the deposits of the divested entities will actually)S LF
+()S LF
+(            remain with the buyers, rather than revert to the sellers, during the)S LF
+()S LF
+(            period shortly following the sale.  One obvious reason for this is)S LF
+()S LF
+(            that the banking organizations that divest offices do so because they)S LF
+()S LF
+(            have or will have \(following the merger\), a sizable pro forma market)S LF
+()S LF
+(            share.  Furthermore, they will usually retain some offices that are)S LF
+()S LF
+(            within reasonable proximity to those being sold.  For any number of)S LF
+()S LF
+(            reasons, some customers may choose to retain their banking)S LF
+()S LF
+(            relationship with the organization from which they had previously been)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              13)S LF
+()S LF
+()S LF
+(            obtaining banking services.  Thus, deposits of such customers would)S LF
+()S LF
+(            likely flow from the divested branches to some of the market area)S LF
+()S LF
+(            branches retained by the sellers.)S LF
+()S LF
+(                     Bank regulatory and antitrust authorities would achieve very)S LF
+()S LF
+(            little from a public policy standpoint if sellers of divested offices)S LF
+()S LF
+(            regained most of their original market shares at the expense of the)S LF
+()S LF
+(            divested offices.  It may also be the case that buyers and sellers)S LF
+()S LF
+(            have negotiated specific terms and conditions that would have an)S LF
+()S LF
+(            impact upon the anticipated competitive viability of divested) S HalfLine
+()S LF
+(                     )S 4 AtrOn()S 1 AtrOn(18)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            entities.    Even if the buyers, for example, purchase the divested)S LF
+()S LF
+(            offices at a discount because it is known that there will be)S LF
+()S LF
+(            substantial deposit run-off, the buyers and sellers, through)S LF
+()S LF
+(            compensation, may reach a satisfactory agreement, but public policy)S LF
+()S LF
+(            goals of the divestiture may not be achieved.  Regulators, in most)S LF
+()S LF
+(            instances, have no knowledge of anticipated runoff, whereas the buyers)S LF
+()S LF
+(            and sellers may have reasonably accurate estimates.)S LF
+()S LF
+(                     Analysis of the data indicates that sixty, or 72.3 percent,)S LF
+()S LF
+(            of the eighty-three divested entities lost some market share during)S LF
+()S LF
+(            the first year after being purchased.  Because the sellers of the)S LF
+()S LF
+(            branches in these markets retained sizable market shares, it might be)S LF
+()S LF
+(            expected that a good deal of the runoff would flow back to the)S LF
+()S LF
+(            sellers.  Consequently, the sellers would be expected to gain market)S LF
+()S LF
+(            share during this same time period.  However, analysis indicates that)S LF
+()S LF
+(            gains in market share by the sellers occurred in only nineteen of the)S LF
+()S LF
+(            sixty markets where the divested entities lost market share.  In the)S LF
+()S LF
+(            other forty-one markets, both the buyers and the sellers lost market)S LF
+()S LF
+()S LF
+(            __________)S LF
+(              18. This process of negotiation by buyers and sellers is discussed)S LF
+(            in John J. Mingo and William F. Spinard, "Branch Divestitures:)S LF
+(            Valuation and Sales Strategies," )S Uon(Banking Expansion Reporter)S Uoff (, vol. 3,)S LF
+(            no. 2 \(January 16, 1984\).)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              14)S LF
+()S LF
+()S LF
+(            share, suggesting that runoff does not always flow back to the)S LF
+()S LF
+(            sellers, but may go to other banks in the market.  Another conclusion)S LF
+()S LF
+(            that can be reached is that not all, or not even the vast majority of)S LF
+()S LF
+(            divested entities experience significant deposit runoff.  Indeed)S LF
+()S LF
+(            twenty-three, or 27.7 percent, of the eighty-three divested entities)S LF
+()S LF
+(            gained market share in the first year after sale.)S LF
+()S LF
+()S LF
+()S LF
+(            VI.  )S Uon(Survival of Divested Branches)S Uoff ()S LF
+()S LF
+(                     From an antitrust or public policy standpoint, a question)S LF
+()S LF
+(            even more important than the degree of short-term deposit run-off)S LF
+()S LF
+(            experienced by divested offices is the longer-term competitive)S LF
+()S LF
+(            viability of these offices.  If, indeed, convenience is the most)S LF
+()S LF
+(            important consideration to users of retail banking services, the)S LF
+()S LF
+(            divested branches can be expected to retain most of the original)S LF
+()S LF
+(            customers and perhaps eventually gain new ones.  In the final)S LF
+()S LF
+(            analysis, the critical questions from an antitrust standpoint are)S LF
+()S LF
+(            first, whether divested branches continue to compete in their markets)S LF
+()S LF
+(            and second, whether they maintain their market shares.  This section)S LF
+()S LF
+(            examines the survival of the divested branches.)S LF
+()S LF
+(                     The sample includes 210 offices that were divested between)S LF
+()S LF
+(            1985 and 1992.  The analysis is focused on divested entities, that is,)S LF
+()S LF
+(            one or more offices located in a particular local market.  As shown in)S LF
+()S LF
+(            table 1, in forty-six instances, the divested entity was a single)S LF
+()S LF
+(            branch office and in twenty markets two offices were sold.  In)S LF
+()S LF
+(            seventeen other markets more than two branches were divested.)S LF
+()S LF
+(                     An impressive finding from a competitive standpoint is that)S LF
+()S LF
+(            virtually all of the divested offices continued to operate throughout)S LF
+()S LF
+(            the entire observation period.  Each of the forty-six single offices)S LF
+()S LF
+(            divested remained in operation over the entire period, which ranged)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              15)S LF
+()S LF
+()S LF
+(                                           Table 1)S LF
+()S LF
+(                      Number of Branches Divested and Number of Markets)S LF
+(            )S Uon(                                                                      )S Uoff ()S LF
+()S LF
+(                     Number of branches                           Total branches)S LF
+(                     )S Uon(in divested entity)S Uoff (     )S Uon(Number of markets)S Uoff (     )S Uon(   divested   )S Uoff ()S LF
+()S LF
+(                              1                    46                   46)S LF
+(                              2                    20                   40)S LF
+(                              3                     4                   12)S LF
+(                              4                     2                    8)S LF
+(                              5                     4                   20)S LF
+(                              6                     1                    6)S LF
+(                              8                     2                   16)S LF
+(                              9                     2                   18)S LF
+(                             18                     1                   18)S LF
+(                             26                     1                   26)S LF
+(                                                   )S Uon(  )S Uoff (                  )S Uon(   )S Uoff ()S LF
+(             Total                                 83                  210)S LF
+(            )S Uon(                                                                      )S Uoff ()S LF
+()S LF
+()S LF
+(            from three to ten years.  In those twenty markets where two branches)S LF
+()S LF
+(            were originally divested, only one of the forty branches was)S LF
+()S LF
+(            subsequently closed.  However, two additional branches were opened,)S LF
+()S LF
+(            resulting in a net increase of one branch in that group.  Overall,)S LF
+()S LF
+(            there were originally 210 branches divested in the)S LF
+()S LF
+(            eighty-three markets in the sample.  At the end of the period, there)S LF
+()S LF
+(            was a net increase of ten branches in operation by the buyers.  Branch)S LF
+()S LF
+(            closings occurred in only three of the eighty-three markets.  In)S LF
+()S LF
+(            addition to the market noted above where one of two divested branches)S LF
+()S LF
+(            was closed, three branches in a twenty-six branch divested entity were)S LF
+()S LF
+(            closed, and two branches in an eight branch divested entity were)S LF
+()S LF
+(            closed.  Thus, in all, sixteen new branches were opened and six were)S LF
+()S LF
+(            closed by the buyers of the 210 divested branches.)S LF
+()S LF
+(                     The evidence on branch survival strongly suggests that from)S LF
+()S LF
+(            an antitrust standpoint, divestitures have proven to be an effective)S LF
+()S LF
+(            device for dealing with the possible anticompetitive effects of bank)S LF
+()S LF
+(            mergers.  Even if sellers had disposed of the least desirable offices)S LF
+()S LF
+(            from their own standpoint, the divested offices apparently remain)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              16)S LF
+()S LF
+()S LF
+(            competitively viable.  In the next section, the competitive viability)S LF
+()S LF
+(            of the divested branches is further explored by examining their market)S LF
+()S LF
+(            share performance over the years following their purchase.)S LF
+()S LF
+()S LF
+()S LF
+(            VII.  )S Uon(Market Share Performance of Divested Entities)S Uoff ()S LF
+()S LF
+(                     In the final analysis, the critical questions from an)S LF
+()S LF
+(            antitrust standpoint are first, whether buyers of divested branches)S LF
+()S LF
+(            continue to compete in their markets and second, whether they tend to)S LF
+()S LF
+(            maintain their market shares.  The answer to the first question is)S LF
+()S LF
+(            very clear.  Only six, or 2.9 percent of the 210 divested branches)S LF
+()S LF
+(            were subsequently closed, and those few closings occurred in markets)S LF
+()S LF
+(            where the buyers continued to operate other branches.)S LF
+()S LF
+(                     In this section, we analyze market share performance as)S LF
+()S LF
+(            measured by the average annual post-divestiture change in market share) S HalfLine
+()S LF
+(                                                                        )S 4 AtrOn()S 1 AtrOn(19)S 1 AtrOff()S 4 AtrOff() S HalfLine
+(            as a percent of the market share at the time of divestiture.)S LF
+()S LF
+(            Analysis of the data revealed that, on average, the market shares of)S LF
+()S LF
+(            the eighty-three divested entities increased by 2.5 percent.  The)S LF
+()S LF
+(            percentage changes in market shares ranged from a negative 31.68)S LF
+()S LF
+(            percent to 111.76 percent.  Despite the positive average percentage)S LF
+()S LF
+(            change in market share, somewhat fewer than one-half \(35, or 42.2)S LF
+()S LF
+(            percent\) of the eighty-three divested entities gained market share)S LF
+()S LF
+(            over the period following the divestitures.  That is, there were)S LF
+()S LF
+(            thirty-five markets where the average post-divestiture market share of)S LF
+()S LF
+(            the divested entity was higher than the market share in the year of)S LF
+()S LF
+(            divestiture.  However, several of the negative percentage changes were)S LF
+()S LF
+()S LF
+()S LF
+(            __________)S LF
+(              19. Use of a firm's average post-purchase market share over a number)S LF
+(            of years more accurately reflects its longer-run competitive viability)S LF
+(            than would any single year's market share.  Market shares are somewhat)S LF
+(            volatile and can be affected by any number of events that result in)S LF
+(            year-to-year fluctuation of individual market shares.)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              17)S LF
+()S LF
+()S LF
+(            quite minimal.  For example, there were seven divested entities that)S LF
+()S LF
+(            had a negative percentage change in market share of less than 3) S HalfLine
+()S LF
+(                    )S 4 AtrOn()S 1 AtrOn(20)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            percent.    Such changes would usually not suggest that a material)S LF
+()S LF
+(            change in the competitive viability of the divested entities occurred.)S LF
+()S LF
+(            If these seven observations with effectively )S Uon(no)S Uoff ( change in share were)S LF
+()S LF
+(            added to the thirty-five with positive percentage changes, it could be)S LF
+()S LF
+(            concluded that in a majority of cases, divested entities either)S LF
+()S LF
+(            increased their market shares or there was essentially no change in)S LF
+()S LF
+(            their competitive position.  This is basically what one would expect)S LF
+()S LF
+(            to find with any randomly selected group of competitors.)S LF
+()S LF
+()S LF
+()S LF
+(            VIII.  )S Uon(Regression Model)S Uoff ()S LF
+()S LF
+(                     In this section, we conduct a simple statistical analysis to)S LF
+()S LF
+(            study the relationships between some characteristics of divestiture)S LF
+()S LF
+(            and the post-divestiture success of the divested entities.  The)S LF
+()S LF
+(            following equation is estimated using ordinary least squares \(OLS\))S LF
+()S LF
+(            regression analysis:)S LF
+()S LF
+(                                      %)S 4 AtrOn(D)S 4 AtrOff(MS = a + bX + e,)S LF
+()S LF
+(            where %)S 4 AtrOn(D)S 4 AtrOff(MS is the same variable as discussed in the previous section--)S LF
+()S LF
+(            the post-divestiture average annual change in market share as a)S LF
+()S LF
+(            percentage of the market share at the time of divestiture.)S LF
+()S LF
+(                     The vector X includes some of the independent variables which)S LF
+()S LF
+(            might have some influence on competitive success, and e is the error)S LF
+()S LF
+(            term.  The following independent variables are included in the)S LF
+()S LF
+(            analysis:)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(            __________)S LF
+(              20. Such a percentage change would mean that a firm which began with)S LF
+(            a 5 percent market share would lose 0.15 percent on average over the)S LF
+(            post-divestiture period.  Its average annual post-divestiture market)S LF
+(            share would thus be 4.85 percent.)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              18)S LF
+()S LF
+()S LF
+(            AM = Average market share of the divested entity over the post-)S LF
+(                 divestiture period.)S LF
+()S LF
+(            SB = State market share of the buyer of the divested branches.)S LF
+()S LF
+(            MS = The remaining market share of the seller of the divested)S LF
+(                 branches.)S LF
+()S LF
+(            AD = 1 if the divested branches were owned by the firm being acquired.)S LF
+()S LF
+(               = 0 if the divested branches were owned by the acquiring firm.)S LF
+()S LF
+(            DJ = 1 if the Department of Justice was involved in the selection of)S LF
+(                 branches to be divested.)S LF
+()S LF
+(               = 0 if the divested branches were those chosen by the applicant)S LF
+(                 without Department of Justice intervention.)S LF
+()S LF
+(                     The variable AM is included to control for the absolute size)S LF
+()S LF
+(            of the market share of the divested entity over the period under)S LF
+()S LF
+(            analysis.  This is done because there is a higher likelihood that a)S LF
+()S LF
+(            small banking office or one with a small market share will experience)S LF
+()S LF
+(            a greater percentage change in deposit growth than a larger)S LF
+()S LF
+(            institution.)S LF
+()S LF
+(                     It is logical to assume that branches acquired by large)S LF
+()S LF
+(            banking organizations may be in a position to receive more financial)S LF
+()S LF
+(            and managerial support from the parent institution than would branches)S LF
+()S LF
+(            acquired by a small organization.  Although there is generally a lack)S LF
+()S LF
+(            of empirical support for this notion in banking, it continues to)S LF
+()S LF
+(            receive the attention of the banking community and bank regulatory)S LF
+()S LF
+(            agencies.  Large banking organizations are generally considered to be)S LF
+()S LF
+(            more formidable competitors than small organizations.  To provide a)S LF
+()S LF
+(            test of this notion in the special case of divested entities, we)S LF
+()S LF
+(            include the variable, SB, which is the state market share of the buyer)S LF
+()S LF
+(            of the divested branches.)S LF
+()S LF
+(                     The variable MS, the remaining market share of the firm)S LF
+()S LF
+(            making the divestiture, is included to test whether the presence of)S LF
+()S LF
+(            the seller has a material effect on the success of the divested)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              19)S LF
+()S LF
+()S LF
+(            entities.  As noted previously, the sellers in this study usually)S LF
+()S LF
+(            retained a significant presence in the markets where they were)S LF
+()S LF
+(            required to divest offices because of antitrust concerns.  The)S LF
+()S LF
+(            magnitude of the seller's presence may be related to its ability to)S LF
+()S LF
+(            regain customers from the divested entities.)S LF
+()S LF
+(                     Although the regulatory agencies generally prefer that)S LF
+()S LF
+(            branches of the acquired firm be divested, applicants often choose to) S HalfLine
+()S LF
+(                                      )S 4 AtrOn()S 1 AtrOn(21)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            divest their own branches.    The dummy variable, AD, is included to)S LF
+()S LF
+(            test whether divested branches that were owned by the acquired firm)S LF
+()S LF
+(            experience greater success than divested branches that were owned by)S LF
+()S LF
+(            the applicant.  Since, unlike the acquired firm, the applicant always)S LF
+()S LF
+(            continues to operate in the market, it seems plausible that if its own)S LF
+()S LF
+(            offices are sold, some effort might be made to continue to service)S LF
+()S LF
+(            customers of the divested branches.  In addition, some of the)S LF
+()S LF
+(            customers themselves may prefer to continue dealing with the same bank)S LF
+()S LF
+(            if there is another branch within reasonable proximity.  Although)S LF
+()S LF
+(            there is no existing evidence regarding the performance of divested)S LF
+()S LF
+(            branches, the Department of Justice clearly prefers, and in some)S LF
+()S LF
+(            instances insists, that branches of the acquired or target firm,)S LF
+()S LF
+(            rather than those of the applicant, be divested.  As noted previously,)S LF
+()S LF
+(            the Federal Reserve usually leaves the matter of branch selection to)S LF
+()S LF
+(            the discretion of the applicants.  The dummy variable, DJ, is included)S LF
+()S LF
+(            to test whether branches selected by the DOJ have better post-)S LF
+()S LF
+(            divestiture deposit market share performance than those selected by)S LF
+()S LF
+(            applicants.)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(            __________)S LF
+(              21. In the sample examined in this study, fifty of the divested)S LF
+(            entities were those of the acquired firm and thirty-three were those)S LF
+(            owned by the applicant.)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              20)S LF
+()S LF
+()S LF
+(            IX.  )S Uon(Regression Results)S Uoff ()S LF
+()S LF
+(                     The following regression equation was estimated for the)S LF
+()S LF
+(            sample of eighty-three divested entities \(t statistics are in)S LF
+()S LF
+(            parentheses\).)S LF
+()S LF
+(                             %)S 4 AtrOn(D)S 4 AtrOff(MS = - 3.400 - 0.253 AM + 1.542 SB)S LF
+()S LF
+(                                            \(-0.92\)    \(3.63\)**)S LF
+()S LF
+()S LF
+()S LF
+(                                    + 0.264 MS + 11.470 AD - 25.091 DJ)S LF
+()S LF
+(                                      \(1.20\)     \(2.04\)*     \(-4.70\)**) S HalfLine
+()S LF
+(                     _) S HalfLine
+(                      2) S HalfLine
+(                     R  = .2482)S LF
+()S LF
+(                      *  statistically significant at the 5 percent level.)S LF
+()S LF
+(                     **  statistically significant at the 1 percent level.)S LF
+()S LF
+()S LF
+()S LF
+(                     The control variable for market share size, AM, has a)S LF
+()S LF
+(            negative coefficient as expected, but is not statistically)S LF
+()S LF
+(            significant.  Thus, entities with relatively large \(small\) market)S LF
+()S LF
+(            shares do not necessarily have smaller \(larger\) percentage changes in) S HalfLine
+()S LF
+(                                          )S 4 AtrOn()S 1 AtrOn(22)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            their market shares over time.)S LF
+()S LF
+(                     Apparently, the size of the organization purchasing the)S LF
+()S LF
+(            divested branches can have a material effect on the competitive)S LF
+()S LF
+(            success of those branches.  The SB variable, state market share of the)S LF
+()S LF
+(            buyer, has a positive and statistically significant coefficient.)S LF
+()S LF
+(            Regulatory agencies might thus consider the enhanced future prospects)S LF
+()S LF
+(            of branches sold to large firms as a mitigating factor when)S LF
+()S LF
+(            determining the magnitude of divestiture required.) S HalfLine
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(            __________)S LF
+(              22. There is substantial variation in the market shares of the)S LF
+(            divested entities.  The average market share divested was 10.24)S LF
+(            percent with a range from 1.21 to 48.56 percent and standard deviation)S LF
+(            of 9.14 percent.)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              21)S LF
+()S LF
+()S LF
+(                     The MS variable, the retained market share of the seller, has)S LF
+()S LF
+(            a positive coefficient which is not statistically significant.)S LF
+()S LF
+(            Apparently, sellers that retained large market positions are no more)S LF
+()S LF
+(            likely to successfully seek to gain back the customers of the divested)S LF
+()S LF
+(            branches than are firms with smaller retained market shares.  This)S LF
+()S LF
+(            finding is consistent with the importance of switching costs for)S LF
+()S LF
+(            retail customers and with the importance of branch locations and)S LF
+()S LF
+(            convenience when customers choose providers of banking services.)S LF
+()S LF
+(                     The findings also show that the divested entities experienced)S LF
+()S LF
+(            greater competitive success if they were branches of the target firm)S LF
+()S LF
+(            rather than if they were those of the applicant.  The AD variable was)S LF
+()S LF
+(            positive and statistically significant.  This is not surprising when)S LF
+()S LF
+(            one considers that, after a merger, the target firm no longer exists)S LF
+()S LF
+(            and thus customers of its branches would not be able to migrate to a)S LF
+()S LF
+(            branch of their former bank.  Such customers would have no real reason)S LF
+()S LF
+(            to switch branches unless they were very dissatisfied with the buyer)S LF
+()S LF
+(            of the branches because of the costs associated with switching, one of)S LF
+()S LF
+(            which would be some loss of convenience, which was probably a factor)S LF
+()S LF
+(            in the customers' original choice.  In contrast, if an applicant)S LF
+()S LF
+(            divests its own branches, there would appear to be at least some)S LF
+()S LF
+(            customers who would choose to continue the relationship with their)S LF
+()S LF
+(            bank and would switch to another branch of that bank.  This could be)S LF
+()S LF
+(            completely voluntary on the part of customer, or could be due to)S LF
+()S LF
+(            efforts made by the applicant.)S LF
+()S LF
+(                     The DJ variable, the dummy for divested entities in cases)S LF
+()S LF
+(            where the Department of Justice was involved in negotiating the)S LF
+()S LF
+(            divestiture agreement, is negative and statistically significant.)S LF
+()S LF
+(            This suggests that leaving the choice of branches to be divested to)S LF
+()S LF
+(            the discretion of applicants may be suitable from an antitrust)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              22)S LF
+() S HalfLine
+()S LF
+(                       )S 4 AtrOn()S 1 AtrOn(23)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            standpoint.    This finding may seem somewhat inconsistent with our)S LF
+()S LF
+(            earlier finding that divested target firm branches fared better than)S LF
+()S LF
+(            applicants' divested branches, given the DOJ preference for the)S LF
+()S LF
+(            former.  However, not all branches selected for divestiture by the DOJ)S LF
+()S LF
+(            belonged to the target firms, and many divested branches in cases)S LF
+()S LF
+(            where the DOJ did not become involved in negotiations, belonged to the) S HalfLine
+()S LF
+(                         )S 4 AtrOn()S 1 AtrOn(24)S 4 AtrOff()S 1 AtrOff() S HalfLine
+(            target firms.)S LF
+()S LF
+()S LF
+()S LF
+(            X.  )S Uon(Summary and Conclusions)S Uoff ()S LF
+()S LF
+(                     To reduce uncertainty regarding the acceptability of bank)S LF
+()S LF
+(            mergers under the antitrust laws, the Federal Reserve Board, in the)S LF
+()S LF
+(            early 1980s, adopted the Department of Justice merger guidelines as)S LF
+()S LF
+(            the basis for providing the banking community with a merger screening)S LF
+()S LF
+(            device.  After guidelines for identifying likely unacceptable mergers)S LF
+()S LF
+(            were established, the divestiture evolved as a mechanism through which)S LF
+()S LF
+(            denials of bank mergers based on competitive grounds could be)S LF
+()S LF
+(            virtually eliminated.  The purpose of this study is to examine)S LF
+()S LF
+(            whether, from a public policy standpoint, divestitures have)S LF
+()S LF
+(            constituted an effective antitrust remedy.  The analysis is based on a)S LF
+()S LF
+(            sample that includes most of the proposals approved subject to)S LF
+()S LF
+(            divestiture by the Federal Reserve between 1985 and 1992.)S LF
+()S LF
+(                     A number of findings emerge from the study.  First, the)S LF
+()S LF
+(            divested branches have a remarkable survival record.  Over 97 percent)S LF
+()S LF
+(            of the divested offices remained in operation over the entire period)S LF
+()S LF
+()S LF
+()S LF
+(            __________)S LF
+(              23. It is important to note, however, that deposits alone are not)S LF
+(            the primary concern of the DOJ, which focuses on the volume of)S LF
+(            services provided to small businesses.  Branch selection by the DOJ)S LF
+(            may well be preferable from the standpoint of small business services,)S LF
+(            but that issue is not explored in this study.)S LF
+()S LF
+(              24. Although the two variables, AD and DJ, are positively)S LF
+(            correlated, the correlation coefficient is only .441.)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S FormFeed TopBin
+()S LF
+()S LF
+()S LF
+()S LF
+(                                              23)S LF
+()S LF
+()S LF
+(            studied.  Moreover, some of the buyers of the divested branches opened)S LF
+()S LF
+(            additional offices in the same markets.  This alone suggests that)S LF
+()S LF
+(            divestitures have generally provided an effective public policy remedy)S LF
+()S LF
+(            with respect to bank mergers.)S LF
+()S LF
+(                     An examination of the post-divestiture changes in the market)S LF
+()S LF
+(            shares of divested offices provides further support for the view that)S LF
+()S LF
+(            divestitures are an effective antitrust remedy.  That is, the)S LF
+()S LF
+(            structural changes effected by divestitures tend to persist over time.)S LF
+()S LF
+(            Although many of the buyers did experience some deposit run-off during)S LF
+()S LF
+(            the first year following purchase, approximately one-half appeared to)S LF
+()S LF
+(            regain and maintain their market shares in subsequent years.  A)S LF
+()S LF
+(            statistical analysis also revealed that larger buyers of divested)S LF
+()S LF
+(            branches tended to improve their performance more than smaller buyers.)S LF
+()S LF
+(            It was also found that divestiture of the target institutions')S LF
+()S LF
+(            branches rather than those of applicants proved preferable from an)S LF
+()S LF
+(            antitrust standpoint.  Divested branches in cases where the Department)S LF
+()S LF
+(            of Justice was involved in the negotiation of branch sales were, on)S LF
+()S LF
+(            average, not as successful as other divested branches.  Thus, based on)S LF
+()S LF
+(            the retention of deposits, it appears that leaving most of the terms)S LF
+()S LF
+(            and conditions surrounding purchase agreements to the discretion of)S LF
+()S LF
+(            buyers and sellers has not impaired the competitive viability of)S LF
+()S LF
+(            divested entities.)S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+()S LF
+(             )S LastFF
+()pop 11 SetPitch()S CR
+()pop

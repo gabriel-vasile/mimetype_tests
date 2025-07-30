@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Introduction to the LTPP Information Management System (IMS)</title>
+<link href="../../../../fhwadoc.css"  rel="stylesheet" type="text/css">
+</head>
+<body>
+<table width="100%" cellpadding="4" cellspacing="0" border="0">
+<tr valign="middle"> 
+<td bgcolor="#000066"><a href="#content"><img src="../../../../images/clear.gif" width="1" height="7" alt="Skip to content" border="0"></a><img src="../../../../images/dotfhwa.gif" width=210 height=31 border=0 alt="United States Department of Transportation - Federal Highway Administration" usemap=""></td>
+<td bgcolor="#000066" align="right"><a href="http://www.tfhrc.gov"><img src="../../../../images/tfhrchome.gif" border="0" alt="Go to TFHRC home" width="94" height="18"></a><a href="http://www.fhwa.dot.gov"><img src="../../../../images/fhwahome.gif" border=0 alt="Go to FHWA website" width="90" height="17"></a><a href="../../../../feedbk/feedback.htm"><img src="../../../../images/feedback.gif" width=76 height=18 border=0 alt="Feedback"></a></td>
+</tr>
+</table>
+<div align="right"><a name="content"></a>
+<a href="index.htm">Return to Introduction to the LTPP Information Management System Home</a>
+</div>
+<h2>CHAPTER 2. INTRODUCTION TO THE PAVEMENT PERFORMANCE DATABASE</h2>
+<p>The pavement performance database was designed to store the majority of the data collected by the LTPP program for easy and convenient dissemination and use. The pavement performance database is a relational database originally implemented in Oracle&reg; 5 format. As of this writing, the production database is implemented in Oracle 9i. To harness the power of relational databases to manipulate large amounts of data at a reasonable cost , most users prefer to obtain data from the production database in an alternate database format. (See chapter 14 for data request procedures.) Currently, the LTPP program is using Microsoft&reg; Access&reg; 2000 as a standard format for data releases. This may change in the future. International data users, who do not have access to the English-language version of Microsoft Access 2000, may wish to request customized extractions in other formats.</p>
+<p>The overall structure of the database is based on the LTPP data collection and processing flow. LTPP data are collected and processed by four regional contractors. Each of these contractors is responsible for loading and processing the data for test sections in their region into regional databases. Each regional database contains data for the test sections in that region (the breakdown of States and Provinces by region is located in the REGIONS table of the database). Data from the regional databases are uploaded to the national database for consolidation and release to the public on a 6-month cycle.<a name="0201"></a></p>
+<h2>2.1 RELATIONAL DATABASES AND STRUCTURED QUERY LANGUAGE</h2>
+<p>The LTPP pavement performance database is a <em>relational</em>
+database, meaning that it is composed of separate, but related, tables of data. The importance of a relational database from a user's viewpoint is that all data are stored in a simple row/column format in tables (rows are sometimes referred to as records and columns are sometimes referred to as fields). Each row of data is uniquely identified by the values in a <em>primary key</em> column or a combination of columns (most of the tables in the LTPP database use multicolumn keys). In addition, relationships exist among the tables of the database that are represented by common data values stored in more than one table. For example, many data tables contain STATE_CODE and SHRP_ID columns, which are how test sections or projects are uniquely identified. These fields can be used to located data for a specific test section in many tables.</p>
+<p>One critical characteristic of relational databases is that they are self-describing. This means that information about the structure of the database is represented in the same row and column format as the data itself. The data dictionary, stored in the LTPPDD table, includes much of this information. Users unfamiliar with the database should examine LTPPDD and learn how to use it. Alternatively, the LTPP program developed the Table Navigator software that allows a user to browse the database structure as a three-tiered representation consisting of tables, fields, and codes. Currently, Table Navigator can be obtained as a program running on Microsoft Windows<sup>&reg;</sup> platforms. It is planned to migrate this software to an Internet Web platform. 
+</p> 
+<p>Structured Query Language (SQL) is the standard language for controlling and interacting with relational databases. It is supported by modern relational database management systems (RDBMS's). For data users, one of the most important features of SQL is its ability to retrieve and combine data elements stored in multiple tables based on conditions set by the user. SQL can be used to create new tables, called queries, which contain data elements of interest in a specific analytical objective. To harness the full power and convenience of the LTPP database, users should become familiar with SQL. Some example data extractions using some fundamental SQL commands are provided in appendix C of this document. The data extraction examples in appendix C require a basic knowledge of SQL.<a name="0202"></a></p>
+<h2>2.2 QUALITY CONTROL </h2>
+<p></p>
+<ul>
+<li>Level-C Checks: These are checks on required fields to identify critical fields that contain a null value. In some cases, these checks are supplanted by non-null restrictions placed on critical fields during the table design that prevent a record from being created if a value for that field is not entered. </li>
+<li>Level-D Checks: These are range checks on the validity and reasonableness of values entered in a field. For example, the range checks for deflection data from the center sensor on a falling-weight deflectometer (FWD) is 5 to 2032 micrometers ( mm). </li>
+<li> Level-E Checks: These checks are relational checks between data stored in other fields. This category contains a wide range of checks. The common property of these checks is that they compare the value in one field of a table to the value in another field that may or may not be in the same table. For example, a level-E check is used to see if pavement layer temperature gradient data exist for each FWD data set. In addition, level-E checks are used to enforce referential integrity between parent and child tables. </li>
+<li>These QC checks are performed sequentially. Level-D checks are applied only to records passing level-C checks, and level-E checks are applied only to records passing level-D checks. Record statuses of A and B are used for data that either have not undergone QC check processing or have not passed the level-C checks. If a record fails a check, its record status remains at the next lower status. For example, records failing a level-D check have a status of C. Alternatively, the record status can be manually upgraded if the record has been examined and has been found to be acceptable.</li>
+<li>Records have passed all of the data checks.</li>
+<li>Records may have failed some data checks; however, they have been manually upgraded after inspection and data editing.</li>
+<li>Records may contain errors that have not been detected by the current data review process.</li>
+</ul>
+<p>The QC checks applied to LTPP data are limited. It is not possible to inspect all of the data for all types of potential anomalies. As the program evolves and improvements are made to the data QC checks, level-E data included in previous releases may be reclassified. </p>
+<p>Records with a status of less than E can be interpreted as:</p>
+<ul>
+<li>Records have not completed the QC process. </li>
+<li>Records have completed the QC process, but were left at a lower level of record status because they contained a flaw. </li>
+<li> Records are not currently subjected to the QC process by policy. </li>
+</ul>
+<p>Note: As of this writing, QC checks are not performed on supplemental sections. Supplemental sections are sections on an SPS project that are not part of the national experiment, but have been designed by the owning agency for their own purposes. The LTPP program is currently in the process of developing checks on these very important data sets.</p>
+<p>LTPP data users assume the responsibility for conclusions based on interpretation of data collected by the LTPP program. Level-E data should not be considered as more reliable than non-level-E data. Likewise, non-level-E data should not be considered less reliable than level-E data. The record status for non-level-E data can be used as a relative indicator of potential issues that might exist for these data. As the LTPP program continues to evolve, users can expect changes to be made to LTPP data to improve their use in analyses.<a name="0203"></a></p>
+<h2>2.3 GPS AND SPS SECTION IDENTIFICATION</h2>
+<p>LTPP test sections fall into one of two categories: General Pavement Studies (GPS) or Specific Pavement Studies (SPS). From the database viewpoint, the critical difference between GPS and SPS sections stems from the fact that multiple SPS sections are co-located on a single project. This co-location allows these sections to share climatic, traffic, and some materials data. Sections co-located on an SPS project are identified as sharing a STATE_CODE and PROJECT_ID in the SPS_PROJECT_STATIONS table. The TEST_SECTION field in this table contains the actual SHRP_ID of the test section. The SPS_PROJECT_STATIONS field also includes information about the location of these test sections relative to each other. </p>
+<p>From a data user's viewpoint, another important difference between GPS and SPS test sections is that similar information is stored in different tables. Construction and general information for GPS test sections are stored in the INV tables. For example, the road designation and test section location coordinates for a GPS section are stored in the INV_ID table. For SPS sections classified in maintenance or rehabilitation experiments, location information is stored in the INV_ID tables using a project-level ID in the SHRP_ID field that applies to all test sections located on the project. Additionally, data about the pavement structure prior to treatment are stored in the INV module. Construction information for SPS test sections is stored in the SPS tables. Other general information for the new construction SPS experiments is also stored in the SPS tables. Location information for these experiments is in the SPS_ID table. </p> 
+<table border="1" cellspacing="0" cellpadding="2">
+<tr>
+<td width="121"  bgcolor="silver">
+<p><strong><em>LTPP Database Tip!</em></strong></p></td>
+<td width="529" valign="top">
+<p>The GPS_SPS field in the EXPERIMENT_SECTION table identifies whether a section is a GPS or SPS section. The SHRP_ID field for SPS sections is &quot;smart&quot;. The first character in SHRP_ID for SPS sections is always a 0 or a letter. The second character in SHRP_ID for SPS sections identifies the experiment number. Over time, some SPS test sections are reassigned to GPS because of a rehabilitation activity; however, they retain the original SHRP_ID. However, all sections with a SHRP_ID beginning with a 0 are not SPS. A GPS test section in Texas has a SHRP_ID of 0001. Always check the GPS_SPS field in EXPERIMENT_SECTION before assuming that a section is an SPS section because of its SHRP_ID.</p></td>
+</tr>
+</table>
+<a name="0204"></a>
+<h2>2.4 MODULES </h2>
+<p>The database is divided into <em>modules</em>
+containing similar sets of tables. With the exception of the tables in the Administration module, the first three letters of the table name identify the module to which a particular table belongs. The modules are as follows: </p> 
+<ul>
+<li><strong>Administration (ADM):</strong> This module contains tables that describe the structure of the database and the master test section control table. Key tables in this module are LTPPDD, which describes each field in each table; CODES, which describes codes used in the database; and EXPERIMENT_SECTION, which is the master control table for the test sections. The REGIONS table contains a mapping of States to LTPP operations administrative designations. </li>
+<li><strong>Automated Weather Station (AWS):</strong> This module contains data collected by the LTPP program from automated weather stations installed on some SPS projects. </li>
+<li><strong>Climate (CLM):</strong> This module contains data collected from offsite weather stations that are used to compute a simulated virtual weather station for LTPP test sections or project sites. Data in this module are updated at 5-year intervals. </li>
+<li><strong>Dynamic Load Response (DLR):</strong> This module contains dynamic load response instrumentation data from SPS test sections located in North Carolina and Ohio. </li>
+<li><strong>Inventory (INV):</strong> This module contains inventory information for all GPS test sections and for SPS sections originally classified in maintenance and rehabilitation experiments. Tables in this module contain information such as the location of the test section and structure information supplied by the owning State or Provincial agency. Since this structure information comes from agency project records and not necessarily from actual measurements taken at the test sections, the information is generally regarded as suspect for use in many types of pavement performance analyses requiring information on the actual dimensions of the test section pavement structure. </li>
+<li><strong>Maintenance (MNT):</strong> This module contains information on maintenance-type treatments reported by a highway agency that were applied to a test section. Treatments included in these tables are thin surface treatments, crack sealing , joint seal ing, and patching performed on in-service test sections.</li>
+<li><strong>Monitoring (MON):</strong> This module contains pavement performance monitoring data and it is the largest module in the database. It can be understood best as a collection of submodules by data type: 
+<ul>
+<li>Deflection (MON_DEFL): This submodule contains data from FWD tests. </li>
+<li>Distress (MON_DIS): This submodule contains distress survey data from both manual and film-based surveys. </li>
+<li> Friction (MON_FRICTION): This submodule contains friction measurements taken by participating highway agencies. </li>
+<li> Profile (MON_PROFILE): This submodule contains longitudinal profile data collected by an automated profiler or by manual dipstick measurements. </li>
+<li> Rut (MON_RUT): This submodule contains rutting data measured using a 1.2-m (4-ft) straightedge. These data tables are superseded by the rutting indices located within the Transverse Profile module. (Note: Straightedge rut measurements were not taken on all test sections.) </li>
+<li> Transverse Profile (MON_T_PROF): This submodule contains transverse profile data and computed transverse profile distortion indices (rut depth) from manual dipstick measurements or the optical Pavement Distress Analysis System (PADIAS) method. </li>
+</ul>
+</li>
+<li><strong>Rehabilitation (RHB):</strong> This module contains information on rehabilitation treatments. A key table in this module is RHB_IMP , which identifies the various applied treatments that result in changes to CONSTRUCTION_NO.</li>
+<li> <strong>Seasonal Monitoring Program (SMP)</strong>
+<strong>:</strong> This module contains SMP-specific data, such as the onsite air temperature and precipitation data, subsurface temperature and moisture content data, and frost-related measurements. </li>
+<li><strong>Specific Pavement Studies</strong>
+<strong> (SPS):</strong> This module contains SPS-specific general and construction information.</li>
+<li><strong>Traffic (TRF):</strong> This module contains traffic load, classification, and volume data. </li>
+<li><strong>Test (TST):</strong> This module contains field and laboratory materials testing data. A key table in this module is TST_L05B, which contains layer thickness and composition information based on measurements from the test section site. </li>
+</ul>
+<p>&nbsp;</p>
+<p align="center"><a href="01.htm"><strong>Previous</strong></a><strong> | <a href="index.htm#toc">Table of Contents</a> | <a href="03.htm">Next</a></strong></p>
+<p></p>
+<hr>
+<table width="100%" border="0" cellpadding="1">
+<tr>
+<td width="13%" valign="top"><img src="../../../../images/fhwatag.gif" width="76" height="18" align="left" alt="FHWA"></td>
+<td width="71%"><div align="center"><a href="../../../../index.html">TFHRC Home</a> | <a href="http://www.fhwa.dot.gov">FHWA Home</a> | <a href="/feedbk/feedback.htm">Feedback</a> <br>
+<br>
+United States Department of Transportation - Federal Highway Administration</div></td>
+<td width="16%">&nbsp;</td>
+</tr>
+</table>
+</body>
+</html>

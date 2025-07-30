@@ -1,0 +1,327 @@
+<HTML>
+<HEAD>
+
+<!-- Replace each of the header fields below with your
+     content.  Be sure to remove the "!--" to uncomment
+     those header fields that you fill in. -->
+<TITLE>
+Berkeley UPC users mailing list archive (upc-users AT lbl DOT gov): Re: a problem of &quot;unable to open any HCA ports&quot; when upcrun a program
+</TITLE>
+
+<!-- The following "exec" server side include generates the
+remaining common fields of the header and begins the body -->
+
+<link rel="stylesheet" type="text/css" media="screen,print" href="/css/main.css" />
+<link rel="stylesheet" type="text/css" media="screen,print" href="/css/nav.css" />
+<link rel="stylesheet" type="text/css" media="screen,print" href="/css/categories.css" />
+<link rel="alternate stylesheet" type="text/css" media="screen" href="/css/main_large.css" title="Large Text"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+</head>
+<body>
+
+
+<!-- Begin HTML page content following this line -->
+
+<h1>Re: a problem of &quot;unable to open any HCA ports&quot; when upcrun a program</h1>
+
+<!-- received="Wed Oct 29 12:29:21 2008" -->
+<!-- isoreceived="20081029202921" -->
+<!-- sent="Wed, 29 Oct 2008 13:25:50 -0700" -->
+<!-- isosent="20081029202550" -->
+<!-- name="Paul H. Hargrove" -->
+<!-- email="PHHargrove_at_lbl_dot_gov" -->
+<!-- subject="Re: a problem of &quot;unable to open any HCA ports&quot; when upcrun a program" -->
+<!-- id="4908C6CE.7090204@lbl.gov" -->
+<!-- charset="GB2312" -->
+<!-- inreplyto="200810291115.m9TBEcHL018607@mta1.lbl.gov" -->
+<!-- expires="-1" -->
+<div class="center">
+<table border="2" width="100%" class="links">
+<tr>
+<th><a href="index.html">Date view</a></th>
+<th><a href="thread.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+<th><a href="author.html">Author view</a></th>
+<th><a href="attachment.html">Attachment view</a></th>
+</tr>
+</table>
+</div>
+<p class="headers">
+<strong>From:</strong> Paul H. Hargrove (<em>PHHargrove_at_lbl_dot_gov</em>)<br>
+<strong>Date:</strong> Wed Oct 29 2008 - 12:25:50 PST
+</p>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0354.html">Â¬ÐË¾´: "RE: a problem of &quot;unable to open any HCA ports&quot; when upcrun a program"</a>
+<ul class="links">
+<li><strong>Previous message:</strong> <a href="0352.html">Â¬ÐË¾´: "a problem of &quot;unable to open any HCA ports&quot; when upcrun a program"</a>
+<li><strong>In reply to:</strong> <a href="0352.html">Â¬ÐË¾´: "a problem of &quot;unable to open any HCA ports&quot; when upcrun a program"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0354.html">Â¬ÐË¾´: "RE: a problem of &quot;unable to open any HCA ports&quot; when upcrun a program"</a>
+<!-- reply="end" -->
+</ul>
+<hr>
+<!-- body="start" -->
+<pre>
+This error indicates that one or more
+
+It is possible that the InfiniBand hardware and/or software has not been
+setup on one or more nodes. You should see the message you quote once
+for each failing attempt. If you see less than 32 instances, then it is
+possible that at least one node does have a working InfiniBand
+configuration.
+
+On each of the machines in you UPC_NODES, try running the &quot;vstat&quot;
+utility to see if it reports at least one &quot;PORT_ACTIVE&quot; line on each.
+
+It is also possible, that the InfiniBand libraries are present but there
+is no hardware at all.
+
+-Paul
+
+Â¬ÐË¾´ wrote:
+&gt;
+&gt; Hi,
+&gt;
+&gt; When I upcrun ¨Cn 4 hello, I encountered a problem as below:
+&gt;
+&gt; autopar@gnode5:~/lxj/test&gt; upcrun -N 4 -n 32 hello
+&gt;
+&gt; GASNet gasnetc_init returning an error code: GASNET_ERR_RESOURCE
+&gt; (Problem with requested resource)
+&gt;
+&gt; at
+&gt; /bwdata/autopar/berkeley_upc-2.6.0/gasnet/vapi-conduit/gasnet_core.c:986
+&gt;
+&gt; reason: unable to open any HCA ports
+&gt;
+&gt; -----------------------------------------------------------------------
+&gt;
+&gt; And when I install upc-infiniband version, all the other network such
+&gt; as mpi smp udp wsa disabled. The diagram below shows more information
+&gt;
+&gt; About my upc.
+&gt;
+&gt; And in my upc_infiniban.sh I set as follow:
+&gt;
+&gt; export UPC_NODES=&quot;12.11.11.5 node5 node6 node7 node8&quot;
+&gt;
+&gt; export GASNET_SSH_SERVERS=&quot;12.11.11.5 node8 node5 node7 node6&quot;
+&gt;
+&gt; export
+&gt; LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/autopar/mpich2/lib:/home/autopar/upc_infiniband/dbg/lib:/home/autopar/upc_infiniband/opt/lib
+&gt;
+&gt; export SSH_CMD=rsh
+&gt;
+&gt; export GASNET_VAPI_SPAWNER=ssh
+&gt;
+&gt; export
+&gt; PATH=/home/autopar/upc_infiniband/bin:/home/autopar/mpich2/bin:$PATH
+&gt;
+&gt; --------------------
+&gt;
+&gt; Wish your reply.
+&gt;
+&gt; This is upcc (the Berkeley Unified Parallel C compiler), v. 2.6.0
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+&gt; UPC Runtime | v. 2.6.0, built on Oct 29 2008 at 15:06:48
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+&gt; UPC-to-C translator | v. 2.6.0, built on Oct 20 2008 at 16:11:36
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+&gt; Translator location | /home/autopar/upc_translator/targ
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+&gt; networks supported | vapi
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+&gt; default network | vapi
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+&gt; pthreads support | available (if used, default is 2 pthreads per process)
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+&gt; Configured with | '--with-translator=<a href="http://upc-translator.lbl.gov/upcc-2">http://upc-translator.lbl.gov/upcc-2</a>
+&gt;
+&gt; | .6.0.cgi' 'CC=gcc' 'CXX=g++' '--without-mpi-cc'
+&gt;
+&gt; | '--disable-mpi' '--disable-udp' '--disable-smp'
+&gt;
+&gt; | '--prefix=/home/autopar/upc_infiniband/opt'
+&gt;
+&gt; | '--with-multiconf-magic=opt'
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+&gt; Configure features | berkeleyupc,upcr,gasnet,upc_collective,upc_io,
+&gt;
+&gt; | upc_memcpy_async,upc_ptradd,upc_thread_distance,
+&gt;
+&gt; | upc_tick,upc_sem,upc_dump_shared,upc_trace_printf,
+&gt;
+&gt; | upc_trace_mask,upc_local_to_shared,upc_atomics,pupc,
+&gt;
+&gt; | upc_memcpy_vis,nodebug,notrace,nostats,nogasp,
+&gt;
+&gt; | segment_fast,os_linux,cpu_x86_64,cpu_64,cc_gnu,
+&gt;
+&gt; | packedsptr
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+&gt; Configure id | gnode20 Wed Oct 29 14:36:24 CST 2008 autopar
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+&gt; Binary interface | 64-bit x86_64-unknown-linux-gnu
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+&gt; Runtime interface # | Runtime supports 3.0 -&gt; 3.9: Translator uses 3.6
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+&gt; | --- BACKEND SETTINGS (for vapi network) ---
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+&gt; C compiler | /usr/bin/gcc
+&gt;
+&gt; | GNU/3.3.3/3.3.3 (SuSE Linux)
+&gt;
+&gt; | gcc version 3.3.3 (SuSE Linux)
+&gt;
+&gt; | Reading specs from
+&gt;
+&gt; | /usr/lib64/gcc-lib/x86_64-suse-linux/3.3.3/specs
+&gt;
+&gt; | Configured with: ../configure --enable-threads=posix
+&gt;
+&gt; | --prefix=/usr --with-local-prefix=/usr/local
+&gt;
+&gt; | --infodir=/usr/share/info --mandir=/usr/share/man
+&gt;
+&gt; | --enable-languages=c,c++,f77,objc,java,ada
+&gt;
+&gt; | --disable-checking --libdir=/usr/lib64
+&gt;
+&gt; | --enable-libgcj
+&gt;
+&gt; | --with-gxx-include-dir=/usr/include/g++
+&gt;
+&gt; | --with-slibdir=/lib64 --with-system-zlib
+&gt;
+&gt; | --enable-shared --enable-__cxa_atexit
+&gt;
+&gt; | x86_64-suse-linux
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+&gt; C compiler flags | -O3 --param max-inline-insns-single=35000 --param
+&gt;
+&gt; | max-inline-insns=100000 --param
+&gt;
+&gt; | inline-unit-growth=10000 --param
+&gt;
+&gt; | large-function-growth=200000 -Winline
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+&gt; linker | /usr/bin/gcc
+&gt;
+&gt; | GNU/3.3.3/3.3.3 (SuSE Linux)
+&gt;
+&gt; | gcc version 3.3.3 (SuSE Linux)
+&gt;
+&gt; | Reading specs from
+&gt;
+&gt; | /usr/lib64/gcc-lib/x86_64-suse-linux/3.3.3/specs
+&gt;
+&gt; | Configured with: ../configure --enable-threads=posix
+&gt;
+&gt; | --prefix=/usr --with-local-prefix=/usr/local
+&gt;
+&gt; | --infodir=/usr/share/info --mandir=/usr/share/man
+&gt;
+&gt; | --enable-languages=c,c++,f77,objc,java,ada
+&gt;
+&gt; | --disable-checking --libdir=/usr/lib64
+&gt;
+&gt; | --enable-libgcj
+&gt;
+&gt; | --with-gxx-include-dir=/usr/include/g++
+&gt;
+&gt; | --with-slibdir=/lib64 --with-system-zlib
+&gt;
+&gt; | --enable-shared --enable-__cxa_atexit
+&gt;
+&gt; | x86_64-suse-linux
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+&gt; linker flags | -O3 --param max-inline-insns-single=35000 --param
+&gt;
+&gt; | max-inline-insns=100000 --param
+&gt;
+&gt; | inline-unit-growth=10000 --param
+&gt;
+&gt; | large-function-growth=200000 -Winline
+&gt;
+&gt; | -L/home/autopar/upc_infiniband/opt/lib -lupcr-vapi-seq
+&gt;
+&gt; | -lumalloc -L/home/autopar/upc_infiniband/opt/lib
+&gt;
+&gt; | -L/usr/local/ibgd/driver/infinihost/lib64
+&gt;
+&gt; | -lgasnet-vapi-seq -lvapi -lmtl_common -lmosal -lmpga
+&gt;
+&gt; | -lpthread -L/usr/lib64/gcc-lib/x86_64-suse-linux/3.3.3
+&gt;
+&gt; | -lgcc -lm
+&gt;
+&gt; ----------------------+---------------------------------------------------------
+&gt;
+
+
+-- 
+Paul H. Hargrove                          PHHargrove_at_lbl_dot_gov
+Future Technologies Group
+HPC Research Department                   Tel: +1-510-495-2352
+Lawrence Berkeley National Laboratory     Fax: +1-510-486-6900
+</pre>
+<!-- body="end" -->
+<hr>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0354.html">Â¬ÐË¾´: "RE: a problem of &quot;unable to open any HCA ports&quot; when upcrun a program"</a>
+<ul class="links">
+<li><strong>Previous message:</strong> <a href="0352.html">Â¬ÐË¾´: "a problem of &quot;unable to open any HCA ports&quot; when upcrun a program"</a>
+<li><strong>In reply to:</strong> <a href="0352.html">Â¬ÐË¾´: "a problem of &quot;unable to open any HCA ports&quot; when upcrun a program"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0354.html">Â¬ÐË¾´: "RE: a problem of &quot;unable to open any HCA ports&quot; when upcrun a program"</a>
+<!-- reply="end" -->
+</ul>
+<div class="center">
+<table border="2" width="100%" class="links">
+<tr>
+<th><a href="index.html">Date view</a></th>
+<th><a href="thread.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+<th><a href="author.html">Author view</a></th>
+<th><a href="attachment.html">Attachment view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+
+
+</body>
+
+

@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<!--
+This document was converted from RTF source: 
+By rtftohtml 4.17
+See http://www.sunpack.com/RTF
+Filename:WORD Ram Disk:RTL_Manual.rtf
+Application Directory:Data Disk:r2h4
+Subject:
+Author:Larry Bolef
+Operator:Larry Bolef
+Document Comments:
+Version Comments:
+Comments:
+Keywords:
+Translation Date:06/05/1999
+Translation Time:08:02:36
+Translation Platform:MacOS
+Number of Output files:59
+This File:WORD Ram Disk:RTL_Manual-2_8.html
+SplitDepth=2
+SkipNavPanel=0
+SkipLeadingToc=0
+SkipTrailingToc=1
+GenContents=1
+GenFrames=0
+GenIndex=0
+-->
+<HEAD lang="en"><META http-equiv="Content-Type" content="text/html; charset=utf-8">
+<TITLE>2.8	Portable TAE Command Language (TCL)</TITLE>
+</HEAD>
+
+<BODY ><DIV ALIGN="LEFT"><A HREF="RTL_Manual-Programm.html">Up</A> | 
+<A HREF="RTL_Manual-2_7.html">Previous</A> | 
+<A HREF="RTL_Manual-Image.html">Next</A> | 
+
+<A HREF="RTL_Manual.html">Title Page</A> | 
+<A HREF="RTL_Manual-Contents.html">Contents</A>
+</DIV>
+<HR>
+
+
+<a name="Heading51"></a><a name="_Toc425047513"></a><a name="_Toc425048068"></a><a name="_Toc425750592"></a><a name="_Toc453201404"></a><A NAME="Heading38"></A><H2 ALIGN="LEFT">
+2.8	Portable
+TAE Command Language (TCL)
+</H2>
+<BLOCKQUOTE>
+The
+dcl command allows you to put VMS DCL commands in your procedure, which are not
+portable. The corresponding command under UNIX is 
+<TT><FONT FACE="Courier">ush</FONT></TT>,
+which allows you to execute shell commands inside the procedure. 
+<BR>
+In
+order to use the 
+<TT><FONT FACE="Courier">dcl</FONT></TT>
+or 
+<TT><FONT FACE="Courier">ush</FONT></TT>
+commands, there has to be some way of determining which operating system you
+are on. A global variable called &#8220;$syschar&#8221; holds the type of
+operating system. Index 1 in this variable is either &#8220;UNIX&#8221; or
+&#8220;VAX_VMS&#8221;. For example:
+</BLOCKQUOTE>
+<PRE>procedure
+parm file string
+refgbl $syschar
+body
+if ($syschar(1) = "UNIX")
+  ush rm &amp;file
+else
+  dcl delete &amp;file
+end-if
+end-proc</PRE><BLOCKQUOTE>
+Unfortunately,
+there appears to be no straightforward way to determine the particular version
+of UNIX, so use common shell commands. 
+<BR>
+Another
+major trouble area for TCL is filenames. Filenames and path names look much
+different under VMS and UNIX. There is a lot of TCL code in VICAR that parses
+filenames, appends filenames to directories, etc. Many test scripts use
+hardcoded VMS directories and filenames to find test files. All of these will
+have to change. The same &#8220;$syschar&#8221; variable can be used to do
+different things with the filename, or pick different testfiles, based on which
+system you are using. 
+<BR>
+The
+&#8220;$syschar&#8221; variable may also be tested inside help files, help
+within a PDF, and menus via special conditional commands. These commands are
+part of TAE, but they are not documented by TAE. The conditionals test to see
+if the given string is in any element of the &#8220;$syschar&#8221; variable.
+Like other PDF/MDF directives, they should appear on a line by themselves with
+period &#8220;.&#8220; in the first column: 
+</BLOCKQUOTE><UL>
+<LI><FONT FACE="Symbol">	</FONT><B>.if
+<I>string</I></B>:
+Prints the following lines (up to .elseif or .ifend) if 
+<I>string
+</I>is
+in &#8221;$syschar&#8221;. 
+<LI><FONT FACE="Symbol">	</FONT><B>.ifn
+<I>string</I></B>:
+Prints the following lines (up to .elseif or .ifend) if 
+<I>string</I>
+is not in &#8221;$syschar&#8221;. 
+<LI><FONT FACE="Symbol">	</FONT><B>elseif
+<I>string</I></B>:
+Prints the following lines of text (up to .ifend or another .elseif) if the
+previous condition was not met, and
+<I>
+string
+</I>
+is in &#8220;$syschar&#8221;. 
+<LI><FONT FACE="Symbol">	</FONT><B>.ifend</B>:
+Ends a conditional clause. 
+<LI><FONT FACE="Symbol">	</FONT><B>.if1
+<I>string</I></B>:
+Single-line conditional. Just like .if, but only the next line is printed, and
+no .ifend is required. 
+<LI><FONT FACE="Symbol">	</FONT><B>.ifn1
+<I>string</I></B>:
+Single-line negative conditional. Just like .ifn, but only the next line is
+printed, and no .ifend is required. 
+</UL><BLOCKQUOTE>
+The
+following example is taken from the TAE command mode help file (commode.hlp): 
+</BLOCKQUOTE>
+<PRE>                CONT*INUE
+.if VAX_VMS
+                DCL              any-VMS/DCL-command
+                DCL-NOINTERRUPT  any-VMS/DCL-command
+.ifend
+                DEFC*MD COMMAND=command-name STRING=replacement-string
+
+...
+
+                T*UTOR-NOSCREEN PROC=proc-subcmd  parameters
+.if1 UNIX
+                USH any-UNIX/shell-command
+                WAIT-ASYNC JOB=job-name-list
+
+...
+
+                        RUNTYPE Command Qualifier (continued)
+
+           If the command qualifier is set to BATCH, the following TAE
+           message is displayed:
+
+.if VAX_VMS
+               Job (nnn) submitted to queue (que)
+
+           where "nnn" is the assigned job number and "que" is
+           the name of the queue the job was submitted to.
+
+.elseif UNIX
+                Batch job file "filename" submitted successfully.
+
+           where "filename" is the batch job file name, defined
+           as "proc".job.
+
+.ifend</PRE><P ALIGN="LEFT"><TT><FONT FACE="Courier">R</FONT></TT>efer
+to the TAE documentation if you have more questions on writing portable TCL. 
+</P>
+
+<HR>
+
+<DIV ALIGN="LEFT"><A HREF="RTL_Manual-Programm.html">Up</A> | 
+<A HREF="RTL_Manual-2_7.html">Previous</A> | 
+<A HREF="RTL_Manual-Image.html">Next</A> | 
+
+<A HREF="RTL_Manual.html">Title Page</A> | 
+<A HREF="RTL_Manual-Contents.html">Contents</A>
+</DIV>
+</BODY>
+
+</HTML>

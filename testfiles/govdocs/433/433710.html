@@ -1,0 +1,325 @@
+<html><head><title>RED (Random Early Detection) Queue Management</title></head><body>
+<hr>
+<br>
+This web page has moved.  The updated version is
+now maintained at
+"<a href="http://www.aciri.org/floyd/red.html">http://www.aciri.org/floyd/red.html</a>". <p>
+<hr>
+<H2>References on RED (Random Early Detection) Queue Management</h2>
+<ul>
+<li>
+Floyd, S., and Jacobson, V.,
+<b><a href="http://www-nrg.ee.lbl.gov/papers/red/red.html">
+Random Early Detection gateways for Congestion Avoidance</a>
+</b>
+V.1 N.4, August 1993, p. 397-413.
+<b><a href="abstracts.html#FJ93">Abstract</a>.</b>
+<br> This is the basic paper that describes RED gateways.
+<br><br>
+<li>
+B. Braden, D. Clark, J. Crowcroft, B. Davie, S. Deering, D. Estrin, S.
+Floyd, V. Jacobson, G. Minshall, C. Partridge, L. Peterson, K.
+Ramakrishnan, S. Shenker, J. Wroclawski, L. Zhang,
+<b>
+Recommendations on Queue Management and Congestion Avoidance in the 
+Internet</b>,
+April 1998.
+Available as <b>RFC 2309</b>
+(<a href="http://info.internet.isi.edu:80/in-notes/rfc/files/rfc2309.txt">
+text</a>) as an Informational RFC.
+<br><br>
+
+<li>Floyd, S., and Fall, K., papers about 
+<b>
+<a href="http://www.aciri.org/floyd/end2end-paper.html">
+Promoting the Use of End-to-End Congestion Control in the Internet</a></b>.
+<br><br>
+
+<li>Elloumi, O., and Afifi, H.,
+<b><a href="ftp://ftp.rennes.enst-bretagne.fr/pub/reseau/afifi/red-atm.ps">
+RED Algorithm in ATM Networks</a>.</b>
+Tech report, June 1997.
+<br><br>
+
+<li>Other papers related to RED can be found by
+searching for "Random Early Detection" on
+Henning Schulzrinne's
+<A HREF="http://www.cs.columbia.edu/~hgs/netbib/">
+Bibliography of Networking Research</A>.
+
+</ul>
+<h2>Proposed Modifications to RED</h2>
+<ul>
+
+<li>Dong Lin and Robert Morris,
+<b>
+<a href="http://www.acm.org/sigcomm/sigcomm97/advance-program.html#ab078">
+Dynamics of Random Early Detection</a>.</b>
+SIGCOMM 97.  This paper proposes FRED, a
+variant of RED, that uses per-active-connection
+accounting to make
+different dropping decisions for connections with
+different bandwidth usages.
+<p>
+
+<li> W. Feng, D. Kandlur, D. Saha, K. Shin, 
+<b><a href="http://www.eecs.umich.edu/~wuchang/ared/">
+Techniques for Eliminating Packet Loss in Congested TCP/IP Networks</a></b>,
+U. Michigan CSE-TR-349-97,  November 1997. <br>
+This paper proposes Adaptive RED, which adjusts the packet dropping
+probability "max_p" based on the past history of the average queue
+size.
+<p>
+
+<li>Van Jacobson,
+<b>
+Notes on using RED for Queue Management and Congestion
+Avoidance</b>,
+viewgraphs
+(<a href="ftp://ftp.ee.lbl.gov/talks/vj-nanog-red.pdf">PDF</a>,
+<a href="ftp://ftp.ee.lbl.gov/talks/vj-nanog-red.ps.gz">compressed Postscript</a>), 
+talk at NANOG 13, June 1998.
+<p>
+
+<li>V. Rosolen, O. Bonaventure, and G. Leduc, 
+<b>
+<a href="http://www.info.fundp.ac.be/~obo/biblio.html">
+A RED discard strategy for ATM networks and its performance evaluation with TCP/IP traffic</a></b>,
+under submission, and
+<b>
+<a href="http://www-run.montefiore.ulg.ac.be/publications/papers/abstract-PP98-0
+2.html">Impact of cell discard strategies on TCP/IP in ATM UBR networks</a></b>,
+Proc. of the 6th Workshop on Performance Modelling and Evaluation of ATM
+Networks (IFIP ATM'98) Ilkley, UK,
+July 98. <br>
+These papers investigate a modified version of RED with a smoothed
+packet-dropping probability that varies from "max_p" to 1 
+as the average queue size varies
+from "maxthresh" to twice "maxthresh".
+This variant of RED is then modified for an ATM switch.  Simulation
+results compare plain UBR with UBR with Early Packet Discard (EPD),
+Fair Buffer Allocation (FBA), and with RED.
+<p>
+
+</ul>
+<h2>Implementation Experiences</h2>
+<ul>
+
+<li>I have created a mailing list for discussions of issues related
+to software or hardware implementations of RED.  To join the list,
+send email to "red-impl-request@lbl.gov" with subject "subscribe".
+To unsubscribe, send email to "red-impl-request@lbl.gov" with subject 
+"unsubscribe".
+<a href="http://www.lbl.gov/icsd/cms/email/mail-lists-archives.html">
+Retrieving archived mail</a> might be limited to list members.
+<p>
+The initial "welcome" message was for the wrong
+mailing list.  This has been fixed...
+<p>
+
+<li>
+Cisco's RED implementations include
+<b>
+<a href="http://www.cisco.com/univercd/cc/td/doc/product/software/ios111/cc111/wred.htm">
+Distributed Weighted Random Early Detection</a></b>.
+More information about Cisco's RED implementations
+can be found on
+<b><a href="http://cco.cisco.com/">
+Cisco's web pages</a></b>
+by doing a search for
+"Random Early Detection" on their search engine.
+RED is implemented for the
+<a href=http://www.shlink.de/links/ioscd/data/doc/software/11_2/earlydel/141503.htm>
+Cisco AS5200, 4000, 4500, and 4700</a>.
+More information is available on Fred Baker's
+<b><a href="ftp://ftp-eng.cisco.com/fred/rsvp-eft/fred-cfg-interface-drop.html">
+web page on Random Early Detection Commands</a></b>.
+Cisco's Weighted RED 
+(<a href="http://www.cisco.com/warp/public/732/net_enabled/qos_wp.htm#HDR7">
+WRED</a>)
+preferentially drops lower-priority packets by
+setting different drop-probability functions for each
+priority level.
+<br><br>
+
+<li>Cho, K., an
+<b>
+<a href="http://www.csl.sony.co.jp/person/kjc/programs.html">
+beta release of RED for BSD Unix</a></b>.
+This is a beta release of Alternate Queueing for BSD Unix,
+with CBQ, WFQ, RED, and RSVP stubs for CBQ.
+<a href="http://www.csl.sony.co.jp/person/kjc/cbq/perf.html">
+Freliminary test results</a>.
+<br><br>
+
+<li>Doran, S.,
+<a href="http://adm.ebone.net/~smd/red-1.html">
+Data</a> from a deployment of Cisco's (DW) RED implementation
+by Ebone Inc.  For a discussion of this data, see the
+thread on "RED on a busy ISP-facing line" on the
+<a href="ftp://ftp.isi.edu/end2end/">
+end2end-interest mailing list</a>.
+<p>
+
+<li>
+<b><a href="http://www.eecs.harvard.edu/~gaynor/">
+Gaynor, M.</a></b>,
+<b><a href="http://www.eecs.harvard.edu/~gaynor/final.ps">
+Proactive Packet Dropping Methods for IP Gateways</a></b>.
+November 1996.  
+<b><a href="red-abstracts.html#G96">Abstract</a>,</b>
+<b><a href="red-abstracts.html#G96A">Comments from Sally</a>.</b>
+<br><br>
+
+<li>
+Michel, Scott,
+<b><a href="http://irl.cs.ucla.edu/RED.html">
+Distant Early Warning (UCLAdew)</a></b>.  
+Distant Early Warning is an implementation of RED for 
+Solaris 2.5 and Solaris 2.5.1. 
+This distribution includes the source code to the 
+STREAMS device driver which implements the RED algorithm.  
+<br><br>
+
+<li>Villamizar, C., and Song, C.,
+<b> <a href="ftp://engr.ans.net/pub/papers/tcp-performance.ps">
+High Performance TCP in ANSNET</a></b>.
+Computer Communications Review, V. 24 N. 5, October 1994, p. 45-60.
+<b><a href="red-abstracts.html#VS94">Abstract</a>.</b>
+<br><br>
+
+<li>
+Floyd, S.,
+<b><a href="ftp://ftp.ee.lbl.gov/email/red_atm.notes">
+Notes on Implementing RED with ATM</a></b>,
+October 1995.
+<br>
+Floyd, S.,
+<b> <a href="ftp://ftp.ee.lbl.gov/papers/redtesting">
+Notes on Testing RED Implementations</a></b>,
+October 1996.
+<br>
+Floyd, S.,
+<b> 
+<a href="http://www-nrg.ee.lbl.gov/floyd/REDaveraging.txt">
+RED: Discussions of Byte and Packet Modes</a></b>,
+March 1997.  With additional comments from January 1998.
+<br>
+Floyd, S.,
+<b>
+<a href="http://www-nrg.ee.lbl.gov/floyd/REDfunc.txt">
+RED:  Optimum functions for computing the drop probability?
+</a></b>,
+October 1997.
+<br>
+Floyd, S.,
+<b>
+<a href="http://www-nrg.ee.lbl.gov/floyd/REDdistributions.txt">
+RED: Distributions for intervals between marked packets.
+</a></b>,
+February 1998.
+<br>
+Floyd, S.,
+<b>
+<a href="http://www-nrg.ee.lbl.gov/floyd/REDparameters.txt">
+RED: Discussions of Setting Parameters</a></b>,
+November 1997.
+<br>
+Floyd, S.,
+<b>
+<a href="http://www-nrg.ee.lbl.gov/floyd/REDqueue.txt">
+RED: Average queue length vs. instantaneous queue length</a></b>,
+November 1997.
+<br>
+Floyd, S.,
+<b>
+<a href="ftp://ftp.ee.lbl.gov/email/sf.98mar11.txt">
+RED with Drop From Front</a></b>,
+March 1998.
+<br><br>
+
+</ul>
+<h2>Related Papers</h2>
+<ul>
+
+<p>
+
+<li>Floyd, S., 
+<b><a href="ftp://ftp.ee.lbl.gov/papers/tcp_ecn.4.ps.Z">
+TCP and Explicit Congestion Notification</a>.</b>
+ACM Computer Communication Review, V. 24 N. 5, October 1994, p. 10-23.
+[This issue of CCR incorrectly has "1995" on the cover instead of "1994".] 
+<b><a href="abstracts.html#F94">Abstract</a>.</b>
+<br><br>
+
+<li>Floyd, S., and Jacobson, V.,<b>
+<a href="ftp://ftp.ee.lbl.gov/papers/phase.ps.Z">
+On Traffic Phase Effects in Packet-Switched Gateways.</a></b>
+Internetworking: Research and Experience,
+V.3 N.3, September 1992, p.115-156.  
+<b><a href="abstracts.html#FJ92">Abstract</a>.</b>
+An earlier version of this paper
+appeared in Computer Communication Review, V.21 N.2, April 1991.
+<br><br>
+
+<li>Floyd, S.,<b>
+<a href="ftp://ftp.ee.lbl.gov/papers/gates1.ps.Z">
+Connections with Multiple Congested Gateways in Packet-Switched Networks 
+Part 1: One-way Traffic.</a></b> 
+Computer Communications Review, Vol.21, No.5, October 1991, p. 30-47.
+<b><a href="abstracts.html#F91">Abstract</a>.</b>
+<br><br>
+
+</ul>
+<h2>Our simulator</h2>
+<ul>
+
+<li>
+Floyd, S,
+<b>
+<a href="ftp://ftp.ee.lbl.gov/papers/redsims.ps.Z">
+Ns Simulator Tests for Random Early Detection (RED) Gateways</a></b>,
+Technical report, October 1996,
+contains simulator validation tests for the
+<b><a href="http://www-nrg.ee.lbl.gov/ns/">
+LBNL network simulator</a></b>. 
+
+</ul>
+<h2>Active Queue Management with Per-Flow Scheduling</h2>
+<ul>
+
+<li>
+Bernhard Suter, T. V. Lakshman, Dimitrios Stiliadis, and Abhijit Choudhury,
+<b>
+<a href="http://www.bell-labs.com/user/suter/perflow.ps">
+Efficient Active Queue Management for Internet Routers</a></b>,
+November 1997,
+to appear in Interop '98.
+
+<li><a href="http://www.cs.cmu.edu/~istoica/csfq">
+Core-Stateless Fair Queueing</a>.
+
+</ul>
+
+<h2>Email discussions regarding RED</h2>
+<ul>
+
+<li>the 
+<a href="http://www-nrg.ee.lbl.gov/diff-serv-arch/">
+DiffServ mailing list</a> archives (including a thread on
+<a href="http://www-nrg.ee.lbl.gov/diff-serv-arch/thrd48.html">
+AF: To RED or not to RED</a>),
+the 
+<a href="ftp://ftp.isi.edu/end2end">
+end2end-interest mailing list</a> archives.
+
+</ul>
+
+<p>
+Return to the
+[<a href="../nrg.html">
+Network Research Group</a>].  
+<address>To add items to this web page, contact floyd@ee.lbl.gov <br>
+Last modified:  January 1999</address>
+</body></html>
+

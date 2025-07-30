@@ -1,0 +1,89 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN" "http://www.w3.org/MarkUp/Wilbur/HTML32.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <meta name="GENERATOR" content="Quadralay WebWorks Publisher 2003 for FrameMaker 8.0.5.1556">
+    <meta name="RSISYM" content="False">
+    <meta name="TEMPLATEBASE" content="DynHTML">
+    <meta name="LASTUPDATED" content="03/06/07 15:40:08">
+    <title>Converting Existing Libraries </title>
+    <link rel="StyleSheet" href="document.css" type="text/css" />
+    <link rel="StyleSheet" href="catalog.css" type="text/css" />
+  </head>
+
+  <body text="#000000" bgcolor="#FFFFFF">
+
+<table border="0" cellpadding="0" cellspacing="0" width="98%" bgcolor="#E2E2E2" valign="bottom" >
+  <tr> 
+    <td width="10%">
+<a href="Advice_for_Library_Authors.html"><img src="images/prev.gif" border="0" alt="Previous"></a>    </td>
+    <td width="80%" align="center">
+<font size=-1><i>Application Programming</i>: <a href="Library_Authoring_.html">Library Authoring </a></font>    </td>
+    <td width="10%" align="right">
+<a href="Program_Control.html"><img src="images/next.gif" border="0" alt="Next"></a>    </td>
+  </tr>
+</table>
+
+<a name="wp770045"> </a><h2 class="pHeading1">
+Converting Existing Libraries 
+</h2>  
+
+<a name="wp770051"> </a><p class="pBody">
+Many libraries that already exist do not follow the naming guidelines provided in <a href="Advice_for_Library_Authors.html">Advice for Library Authors</a>. Such libraries are bound to experience an occasional conflict with new versions of IDL. The best solution to avoid conflicts is to perform a systematic one-time conversion to a prefixed naming scheme. 
+</p>  
+
+<a name="wp770054"> </a><p class="pBody">
+Any existing library is likely to already have users. Assuming that non-prefixed names were used in such libraries, it is not possible to simply change the names. Such conversions require time to carry out, and once that has happened, it takes time for users to adjust and alter their usage. However, the actual conversion can go very quickly, and with proper planning it is easy to offer a backwards compatibility option for your users. Use the following steps to convert an existing library:
+</p>  
+
+<div class="pSmartList1"><ol type="1" class="pSmartList1">
+
+
+<a name="wp770055"> </a><div class="pSmartList1"><li>Generate a list of all files containing routines to be renamed. </li></div>  
+
+<P class="Ignore">&nbsp;</P>
+<a name="wp770094"> </a><div class="pSmartList1"><li>Using this list, build an IDL batch file that uses .COMPILE on each file. </li></div>  
+
+<P class="Ignore">&nbsp;</P>
+<a name="wp770097"> </a><div class="pSmartList1"><li>Start a fresh IDL session, execute the batch file, and use HELP, /ROUTINES to get a complete list of all compiled routines. Only IDL user library routines (those <code class="cCode">.pro</code> files shipped with the IDL distribution) should not contain a prefix. </li></div>  
+
+<P class="Ignore">&nbsp;</P>
+<a name="wp770056"> </a><div class="pSmartList1"><li>As you rename each routine to its prefixed form, write a non-prefixed wrapper routine with the old name that calls the new version. Such wrappers are easy to write in IDL, using the _REF_EXTRA keyword to pass keywords through to the real routine. See <a href="Keyword_Inheritance.html">Keyword Inheritance</a> for details.</li></div>  
+
+<P class="Ignore">&nbsp;</P>
+<a name="wp770098"> </a><div class="pSmartList1"><li>Use the COMPILE_OPT OBSOLETE compilation directive in such wrappers so that IDL will recognize them as obsolete routines. See <a href="COMPILE_OPT.html">COMPILE_OPT</a> in the <i>IDL Reference Guide</i> for more information on COMPILE_OPT. These compatibility wrappers serve the following purposes: </li></div>  
+
+<div class="pSmartList2"><ul class="pSmartList2">
+
+
+<a name="wp770059"> </a><div class="pSmartList2"><li>You can use them to migrate your library to fully prefixed form over time, since the wrapper will be used any place you failed to change to calling the new name. This enhances the stability of the library and gives you time to do a careful job. </li></div>  
+
+<P class="Ignore">&nbsp;</P>
+<a name="wp770108"> </a><div class="pSmartList2"><li>Once you are finished, you can provide them to your customers as a bridge, so that their old code continues to work. </li></div>  
+
+<P class="Ignore">&nbsp;</P>
+<a name="wp770111"> </a><div class="pSmartList2"><li>As you change the names of routines, use grep (or a similar file searching tool) to locate uses of that name, and convert them to the new form as well. </li></div>  
+
+</ul></div>
+<P class="Ignore">&nbsp;</P>
+<a name="wp770117"> </a><div class="pSmartList1"><li>Iterate, using the batch file mentioned above to find any remaining non-prefixed uses of the library names. Since your wrappers specified the COMPILE_OPT OBSOLETE directive, you can set the !WARN system variable to help you pinpoint such uses. You are done when your batch file reveals no more unprefixed names. </li></div>  
+
+</ol></div>
+<a name="wp770064"> </a><p class="pBody">
+Once the conversion is done, you can use the compatibility wrappers to smoothly transition your users to the new names. You should keep the wrappers in a separate subdirectory, and even consider making them optional. Doing this raises the end user's awareness of the issue and may convince them to convert to using the new names sooner rather than later. 
+</p>  
+
+<a name="wp770065"> </a><p class="pBody">
+When you add new routines to your library, ensure that they use the proper prefix. Do not provide non-prefixed wrapper routines for new routines. There is no backward compatibility issue in this case, and they are not needed. 
+</p>  
+
+<a name="wp770066"> </a><p class="pBody">
+Although the one time hit of prefixing an existing library can consume some time and effort, there are benefits that accrue from doing it. When new versions of IDL are released, the odds of the library working with the new version without encountering any name clashes are extremely high. Use of a consistent prefix also raises the profile of the library to the end user, raising their level of understanding and appreciation for the work it does.
+</p>
+
+<P></P>
+<P></P>
+<P><FONT COLOR="gray" SIZE="-3">&nbsp;&nbsp;IDL Online Help (March 06, 2007)</FONT></P>
+  </body>
+</html>

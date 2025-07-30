@@ -1,0 +1,222 @@
+Subject:
+RE: comments on LCG persistency talk
+From:
+"Dirk Duellmann" <Dirk.Duellmann@cern.ch>
+Date:
+Tue, 21 May 2002 10:57:33 +0200
+To:
+"David Adams" <dladams@bnl.gov>
+CC:
+"Torre Wenaus" <wenaus@bnl.gov>, "David Malon" <malon@anl.gov>, "RD Schaffer" <R.D.Schaffer@cern.ch>, <project-lcg-peb-persistency@cern.ch>
+
+Hi David,
+
+thanks very much for your comments! I repost them also to the persistency list
+and added some initial comments/questions (indicated by DD and indentation).
+
+	Cheers, Dirk
+
+
+Comments on LCG persistency
+David Adams
+17may02 1200 EDT
+
+1. Self-describing data
+-----------------------
+
+I would like to distinguish gathering and storing data from
+processing data and require the latter be possible without
+reference to any catalog/database. Job processing has three steps:
+  1. Identifying input files (logical ID's), mapping these to
+     the appropriate physical files.
+  2. Processing the data, i.e. opening and reading input files
+     and creating and writing output files.
+  3. Registering the output in the persistent data store.
+
+I would like to be to step 2 without consulting any DB's.
+
+DD: I guess, many people agree on the goal of minimising the 
+    coupling to a (potentially) central service like the catalog.
+    It's just not trivial to have the knowledge about all files 
+    at the start of a job, without loosing the capability of 
+    transparent navigation from the user code. How would you 
+    discover a deref operation which would pull in yet another 
+    file? Should we forbid it / allow it in rare cases / use it
+    as the main data access mechanism?
+    
+
+This implies the files that files provide information about their
+contents (metadata). At the generic level (i.e. not just event data),
+all objects have unique identifiers and the file provides access
+to its objects via this identifier. Event data can be handled by
+including event header objects in the same or a different file. These
+headers which hold the identifiers for the objects in the event.
+
+DD: I got the impression, I have frequently confused people by using
+    the word "metadata" (and still frequently get confused by other people
+    using it  [;-)] . I think, I maybe should try to make it more explicit
+    what kind of data is meant - since "metadata" is kind of not-invariant
+    from the observer perspective.
+    I assume, with "metadata" you mean : which detector components / processing
+    steps are included in a particular file?
+    If that's the case, do you see this content description as common (being the 
+    the same for all experiments) or application specific?
+
+
+2. File identifiers
+-------------------
+
+Every logical file should have a unique identifier and all physical
+representations of this file (replicas) should carry this same
+identifier. I want to be able to hand someone a list of files which
+are sufficient for job input and I need a way to uniquely identify
+logical files. Grid sites can use this to estimate the effort
+required to gather the data for a job.
+
+DD: We agree on the basic requirement - now how do we generate unique id's
+    without introducing too much coupling? 
+
+    Using your three phase model of the job we could in phase 1 one of : 
+
+    a) use the catalog layer ensures the uniqueness of all newly
+       created lfn's (e.g. with the help a (location specific) creator prefix which 
+       allows the break the lfn space into manageable independent sub-spaces).
+       After the lfn has been added it is never changed and therefore can be
+       eg embedded in read-only streaming layer files. In this model there may be 
+       many separate catalogs (private ones, public one)  but they could all be 
+       merged at any time without changing the streaming data.
+
+    b) give up on file id uniqueness at creation time (CMS has argued, they could not
+       keep lfns unique) and possibly rename / alias files as a clash arises
+       when new files are added to a catalog. At any time the lfn needs to be 
+       at least unique in the scope of it's current catalog.
+       It's not quite clear to me how this integrates into the rest of the Grid tools which
+       may make assumptions about the stability of LFNs. Maybe assuming 
+      
+    c) navigation to objects in files is based on a immutable machine generated file ID
+       only this fid is used in streaming layer object references.
+       For convenience of the user a human readable description can be attached
+       to this file id eg by the RDBMS layer. Since this is not directly used in the navigation
+       it can freely be changed - result maybe a confused user (description is now different)
+       but stable navigation.
+
+     in short
+     a) globally unique and immutable lfn
+     b) locally unique and mutable lfn + non-trivial catalog attach 
+     c) lfn is only a human readable description attached to a machine generated file ID (eg GUID)
+
+
+3. Object replication
+---------------------
+
+I would like to see support for object replication. This is more
+than file replcation. It means taking objects from different files
+and replicating them in a single file. Refernces to these objects
+can then be satisfied using this new file or the original file.
+
+DD: This sounds similar as (part of) CMS's deep copy request to me.
+    Again, the basic requirement is: make logical object id work 
+    without getting into the scalability issues (big central by object
+    lookup table) they are know for. This will most likely mean
+    that we have to use some blending between just enough of a "logical ID"
+    to gain the flexibility move the objects around, but still physical
+    enough to get reasonable decoupling a scalability.
+    
+
+4. Multiple persistency technologies
+------------------------------------
+
+I assume we want to allow multiple persistence technolgies, i.e.
+not just ROOT. I am not objecting to the latter, but we should
+choose one path: either provide full support to plug in multiple
+technologies or simply adopt ROOT. In the following, I assume we
+want multiple technologies.
+
+DD: Yes, that's what the RTAG said in it's document, and that what
+    I'm assuming as well.
+
+
+5. Object references
+--------------------
+
+Object references should be handled at the LCG level. Every object should be 
+assigned a unique identifier and this identifier serves as the persistent 
+representation of the reference. The object identifier should probably include 
+the identifier of the file which owns the original copy of the object to aid 
+in navigation.
+
+DD: I agree, with the handling on LCG level - it's almost
+    a direct consequence from the requirement of multi-technology refs
+    which are not handled by any backend implementation.
+    Still the lcg ref could/would try to use back end refs in its 
+    implementation. I also agree that the OID should better be designed
+    such that it is easy to derive the lfn/file id from it, without having
+    to consult a lot of file/process description ("meta") data.
+    The problem is, this is currently not the case in root I/O refs and 
+    (maybe more important) it may clash with the request for a logical OID
+    (move an object between files - without changing it's id).
+
+
+6. Dictionary
+-------------
+
+Again, this should be implemented at the LCG method with a clear
+mechanism to support different technologies.
+
+DD: I agree, but still see again implementation questions 
+    that need to be clarified.
+
+
+7. Documentation
+----------------
+
+It appears from you talk that design is proceeding in a small group.
+This should be documented and shared with a larger community.
+Meetings are neccessary but far from sufficient to communicate the
+design or event the definitions of the terms. I read all messages
+on the LCG persistency mailing list hpoing to see reference to some
+sort of documenmtation.
+
+DD: I agree with all of this - yes we were less than 2FTE so far and
+    we are only just entering a real design phase in some areas. Also so far, 
+    even reading all the email on the persistency list did not help very much - as
+    this is the very first one  [:-)] 
+Anyway, I know that efficient communication will be one of the real
+    problems of this project, since most people are not at CERN or even
+    in the CERN time zone. I'm hoping that this mailing list will become
+    much more active and its web archive a useful starting point for new
+    people. I'd therefore invite everybody to copy
+
+    mailto:project-lcg-peb-persistency@cern.ch
+on any technical discussions of more general interest. 
+
+	
+
+	Cheers, Dirk
+
+
+
+
+> -----Original Message-----
+> From: David Adams [mailto:dladams@bnl.gov]
+> Sent: Friday, May 17, 2002 18:01
+> To: Dirk Duellmann
+> Cc: Torre Wenaus; David Malon; RD Schaffer; David Adams
+> Subject: comments on LCG persistency talk
+> 
+> 
+> Dirk:
+> 
+> I have posted some comments on today's talk at
+> 
+> http://www.usatlas.bnl.gov/~dladams/hybrid/comments/lcg/adams01.txt
+> 
+> da
+> 
+> -- 
+> David Adams                             desk: 631-344-6049
+> Brookhaven National Lab                 fax: 631-344-5078
+> PAS group, Building 510A                email: dladams@bnl.gov
+> Upton, NY 11973-5000                    http://www.usatlas.bnl.gov/~dladams
+> 
+

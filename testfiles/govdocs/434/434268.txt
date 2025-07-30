@@ -1,0 +1,174 @@
+MADIS Satellite Wind Variables
+------------------------------------------------------------------------------------------
+Code       Name                                    Units      Max     Notes      Database
+                                                           QC Level*            FSL  AWIPS
+------------------------------------------------------------------------------------------
+
+
+All Wind Products                                                       1        
+-----------------
+
+DD        wind direction                           deg          1       2        X     X
+FF        wind speed                               m/s          1       2        X     X
+U         u wind component                         m/s          1       2        X     X
+V         v wind component                         m/s          1       2        X     X
+HT        pressure altitude                        m            0       3        X     X
+RFF       CIMMS/NESDIS recursive filter flag                    0       4        X
+QINM      EUMETSAT quality indicator, no model                  0       4        X **
+QIWM      EUMETSAT quality indicator, with model                0       4        X **
+LSM       Land/sea mask                            code         0       5        X **  X
+LEVTYPE   level type                               code         0       6        X     X
+
+
+Infrared Cloud-Drift                                                    1        
+--------------------
+
+DDIR      wind direction                           deg          1       2        X     X
+FFIR      wind speed                               m/s          1       2        X     X
+UIR       u wind component                         m/s          1       2        X     X
+VIR       v wind component                         m/s          1       2        X     X
+HTIR      pressure altitude                        m            0       3        X     X
+RFFIR     CIMMS/NESDIS recursive filter flag                    0       4        X
+QINMIR    EUMETSAT quality indicator, no model                  0       4        X **
+QIWMIR    EUMETSAT quality indicator, with model                0       4        X **
+LSMIR     Land/sea mask                            code         0       5        X **  X
+
+
+Visible Cloud-Drift                                                     1        
+-------------------
+
+DDVIS     wind direction                           deg          1       2        X     X
+FFVIS     wind speed                               m/s          1       2        X     X
+UVIS      u wind component                         m/s          1       2        X     X
+VVIS      v wind component                         m/s          1       2        X     X
+HTVIS     pressure altitude                        m            0       3        X     X
+RFFVIS    CIMMS/NESDIS recursive filter flag                    0       4        X
+QINMVIS   EUMETSAT quality indicator, no model                  0       4        X **
+QIWMVIS   EUMETSAT quality indicator, with model                0       4        X **
+LSMVIS    Land/sea mask                            code         0       5        X **  X
+
+
+Water Vapor Motion                                                      1        
+------------------
+
+DDWV      wind direction                           deg          1       2        X     X
+FFWV      wind speed                               m/s          1       2        X     X
+UWV       u wind component                         m/s          1       2        X     X
+VWV       v wind component                         m/s          1       2        X     X
+HTWV      pressure altitude                        m            0       3        X     X
+RFFWV     CIMMS/NESDIS recursive filter flag                    0       4        X
+QINMWV    EUMETSAT quality indicator, no model                  0       4        X **
+QIWMWV    EUMETSAT quality indicator, with model                0       4        X **
+LSMWV     Land/sea mask                            code         0       5        X **  X
+
+
+Sounder Channel 10 (7.4 um) Water Vapor Motion                          1        
+----------------------------------------------
+
+DDS10     wind direction                           deg          1       2        X     X
+FFS10     wind speed                               m/s          1       2        X     X
+US10      u wind component                         m/s          1       2        X     X
+VS10      v wind component                         m/s          1       2        X     X
+HTS10     pressure altitude                        m            0       3        X     X
+RFFS10    CIMMS/NESDIS recursive filter flag                    0       4        X
+QINMS10   EUMETSAT quality indicator, no model                  0       4        X **
+QIWMS10   EUMETSAT quality indicator, with model                0       4        X **
+LSMS10    Land/sea mask                            code         0       5        X **  X
+
+
+Sounder Channel 11 (7.0 um) Water Vapor Motion                          1        
+----------------------------------------------
+
+DDS11     wind direction                           deg          1       2        X     X
+FFS11     wind speed                               m/s          1       2        X     X
+US11      u wind component                         m/s          1       2        X     X
+VS11      v wind component                         m/s          1       2        X     X
+HTS11     pressure altitude                        m            0       3        X     X
+RFFS11    CIMMS/NESDIS recursive filter flag                    0       4        X
+QINMS11   EUMETSAT quality indicator, no model                  0       4        X **
+QIWMS11   EUMETSAT quality indicator, with model                0       4        X **
+LSMS11    Land/sea mask                            code         0       5        X **  X
+
+
+Notes
+-----
+
+1.  The user can select the different wind product types individually (e.g.,
+    DDIR will retrieve only data for the infrared cloud-drift winds), or can
+    choose to get all wind product types with the same variable call (DD will 
+    get data for all available product types).
+
+    The availability of each product type, and the exact algorithms being used
+    to create them, are a function of the satellite data provider.  Currently,
+    MADIS supports two processing streams:  GOES operational products (3 hour
+    availability, all types), and GOES experimental products (1 hour availability,
+    no sounder channel products).  The GOES experimental products are only 
+    available in the FSL database.
+
+    For more information on GOES wind products, see:
+
+       Daniels, J.M., C. Velden, G.A. Dengel, D.R. Stettner, and W. Bresky, 2003:
+       Status and Development of GOES Wind Products at NOAA/NESDIS.  12th Conference
+       on Satellite Meteorology, Feb 9-13, 2003.
+
+       This paper is online at:  http://ams.confex.com/ams/pdfview.cgi?username=53647.         
+
+2.  Wind speed and direction are reported and stored in the database.  The user 
+    can optionally select u & v wind components and those will be calculated and 
+    returned.  The QC results from speed and direction will be used In either 
+    case, and if one of the map projections has been selected via the MSETDOM call, 
+    the winds will be rotated to match the projection.
+
+3.  Pressure is the vertical coordinate reported in the satellite wind products,
+    and is returned along with the horizontal coordinates (lat/lon) in the
+    MSATWNDSTA call.  If a height coordinate is desired, the user can select
+    the HT variable, and the MADIS API will use the U.S. Standard Atmosphere
+    calculation to return a pressure altitude.
+
+4.  The results of the automated quality control schemes used in the production
+    of the satellite winds at NESDIS are available via the MADIS API.  These
+    include the CIMMS/NESDIS recursive filter flag (RFF) and the EUMETSAT
+    quality indicator (QI).  There are two forms of the QI, the first provides
+    the QI results where no background model data has been used in its
+    determination, and the second gives the results where background model
+    data has been used.  RFF values range from 0 (worst) to 100 (best).  Winds 
+    having RFF values less than about 45 are filtered out of the dataset before
+    being output by NESDIS.  QI values range from 0 (worst) to 1 (best).  
+
+    For more information on the RFF processing see:  
+
+       Hayden, C.M. and R.J. Purser, 1995: Recursive filter objective analysis
+       of meteorological fields, applications to NESDIS operational processing.
+       J. Appl. Meteor., 34, 3-15.
+
+    For more information on the QI processing see:
+
+       Holmlund, K., 1998: The utilization of statistical properties of
+       satellite-derived atmospheric motion vectors to derive quality indicators.
+       Wea. Forecasting, 13, 1093-1104.
+
+5.  Land/sea mask codes:
+
+       Value      Meaning
+       -----      -------
+         0        Land
+         1        Sea
+         2        Coast
+
+6.  Level type codes:
+
+       Value      Meaning
+       -----      -------
+         1        Infrared cloud-drift
+         2        Visible cloud-drift
+         3        Water vapor motion
+         5        Sounder channel 11 (7.0 um) water vapor motion
+         7        Sounder channel 10 (7.4 um) water vapor motion
+
+
+* The QC information is only available with the FSL database.  
+
+** The QI's and the LSM (for the FSL database) aren't yet available (as of 10/03) 
+   in the data files.  These are expected to be added sometime in the next several
+   months.  When they are added, no MADIS API changes will be needed -- you will
+   just start seeing non-missing data when you ask for these variables.

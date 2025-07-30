@@ -1,0 +1,335 @@
+<%@LANGUAGE="JAVASCRIPT" CODEPAGE="65001"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/twocolumns.dwt" --><!-- DW6 -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<!-- #BeginEditable "doc_title" -->
+<title>NIST Speech Group Website</title>
+<!-- #EndEditable -->
+<link rel="stylesheet" href="http://www.nist.gov/speech/style.css">
+
+<script type="text/javascript">
+
+/***********************************************
+* AnyLink Drop Down Menu- © Dynamic Drive (www.dynamicdrive.com)
+* This notice MUST stay intact for legal use
+* Visit http://www.dynamicdrive.com/ for full source code
+***********************************************/
+
+//Contents for menu 1
+var menu1=new Array()
+menu1[0]='<a href="http://www.nist.gov/speech/tests/ace">Automatic Content Extraction (1999 - present)</a>'
+menu1[1]='<a href="http://www.nist.gov/speech/tests/clear">CLEAR (2006 - present)</a>'
+menu1[2]='<a href="http://www.nist.gov/speech/tests/gale">GALE Translation (2006 - present)</a>'
+menu1[3]='<a href="http://www.nist.gov/speech/tests/lre">Language Recognition (1996 - present)</a>'
+menu1[4]='<a href="http://www.nist.gov/speech/tests/mt">Machine Translation (2001 - present)</a>'
+menu1[5]='<a href="http://www.nist.gov/speech/tests/rt">Rich Transcription (2003 - present)</a>'
+menu1[6]='<a href="http://www.nist.gov/speech/tests/sre">Speaker Recognition (1996 - present)</a>'
+menu1[7]='<a href="http://www.nist.gov/speech/tests/std">Spoken Term Detection (2006 - present)</a>'
+menu1[8]='<a href="http://www.nist.gov/speech/tests/bnr">Broadcast News Recognition (1996 - 1999)</a>'
+menu1[9]='<a href="http://www.nist.gov/speech/tests/ctr">Conversational Telephone Recognition (1997 - 2001)</a>'
+menu1[10]='<a href="http://www.nist.gov/speech/tests/sdr">Spoken Document Retrieval (1997 - 2000)</a>'
+menu1[11]='<a href="http://www.nist.gov/speech/tests/tdt">Topic Detection and Tracking (1998 - 2004)</a>'
+
+//Contents for menu 2, and so on
+var menu2=new Array()
+menu2[0]='<a href="http://www.nist.gov/speech/publications/papers">Papers</a>'
+menu2[1]='<a href="http://www.nist.gov/speech/publications/presentations">Presentations</a>'
+menu2[2]='<a href="http://www.nist.gov/speech/publications/proceedings">Proceedings</a>'
+		
+var menuwidth='300px' //default menu width
+var menubgcolor='#ffffff'  //menu bgcolor
+var disappeardelay=80  //menu disappear speed onMouseout (in miliseconds)
+var hidemenu_onclick="yes" //hide menu when user clicks within menu?
+
+var additional_x_offset = 82
+var additional_y_offset = -10
+
+/////No further editting needed
+
+var ie4=document.all
+var ns6=document.getElementById&&!document.all
+
+if (ie4||ns6)
+	document.write('<div id="dropmenudiv" style="visibility:hidden;width:'+menuwidth+';background-color:'+menubgcolor+'" onMouseover="clearhidemenu()" onMouseout="dynamichide(event)"></div>')
+
+function getposOffset(what, offsettype){
+	var totaloffset=(offsettype=="left")? what.offsetLeft : what.offsetTop;
+	var parentEl=what.offsetParent;
+	while (parentEl!=null){
+		totaloffset=(offsettype=="left")? totaloffset+parentEl.offsetLeft : totaloffset+parentEl.offsetTop;
+		parentEl=parentEl.offsetParent;
+	}
+	return totaloffset;
+}
+
+function showhide(obj, e, visible, hidden, menuwidth){
+	if (ie4||ns6)
+		dropmenuobj.style.left=dropmenuobj.style.top="-500px"
+	if (menuwidth!=""){
+		dropmenuobj.widthobj=dropmenuobj.style
+		dropmenuobj.widthobj.width=menuwidth
+	}
+	if (e.type=="click" && obj.visibility==hidden || e.type=="mouseover")
+		obj.visibility=visible
+	else if (e.type=="click")
+		obj.visibility=hidden
+}
+
+function iecompattest(){
+	return (document.compatMode && document.compatMode!="BackCompat")? document.documentElement : document.body
+}
+
+function clearbrowseredge(obj, whichedge){
+	var edgeoffset=0
+	if (whichedge=="rightedge"){
+		var windowedge=ie4 && !window.opera? iecompattest().scrollLeft+iecompattest().clientWidth-15 : window.pageXOffset+window.innerWidth-15
+		dropmenuobj.contentmeasure=dropmenuobj.offsetWidth
+		if (windowedge-dropmenuobj.x < dropmenuobj.contentmeasure)
+			edgeoffset=dropmenuobj.contentmeasure-obj.offsetWidth
+	} else{
+		var topedge=ie4 && !window.opera? iecompattest().scrollTop : window.pageYOffset
+		var windowedge=ie4 && !window.opera? iecompattest().scrollTop+iecompattest().clientHeight-15 : window.pageYOffset+window.innerHeight-18
+		dropmenuobj.contentmeasure=dropmenuobj.offsetHeight
+		if (windowedge-dropmenuobj.y < dropmenuobj.contentmeasure){ //move up?
+			edgeoffset=dropmenuobj.contentmeasure+obj.offsetHeight
+			if ((dropmenuobj.y-topedge)<dropmenuobj.contentmeasure) //up no good either?
+				edgeoffset=dropmenuobj.y+obj.offsetHeight-topedge
+		}
+	}
+	return edgeoffset
+}
+
+function populatemenu(what){
+	if (ie4||ns6) dropmenuobj.innerHTML=what.join("")
+}
+
+function dropdownmenu(obj, e, menucontents, menuwidth){
+	if (window.event)
+		event.cancelBubble=true
+	else if (e.stopPropagation)
+		e.stopPropagation()
+	clearhidemenu()
+	dropmenuobj=document.getElementById? document.getElementById("dropmenudiv") : dropmenudiv
+	populatemenu(menucontents)
+
+	if (ie4||ns6){
+		showhide(dropmenuobj.style, e, "visible", "hidden", menuwidth)
+		dropmenuobj.x=getposOffset(obj, "left")+additional_x_offset
+		dropmenuobj.y=getposOffset(obj, "top")+additional_y_offset
+		dropmenuobj.style.left=dropmenuobj.x-clearbrowseredge(obj, "rightedge")+"px"
+		dropmenuobj.style.top=dropmenuobj.y-clearbrowseredge(obj, "bottomedge")+obj.offsetHeight+"px"
+	}
+
+	return clickreturnvalue()
+}
+
+function clickreturnvalue(){
+	if (ie4||ns6)
+		return false
+	else
+		return true
+}
+
+function contains_ns6(a, b) {
+	while (b.parentNode)
+		if ((b = b.parentNode) == a)
+			return true;
+	return false;
+}
+
+function dynamichide(e){
+	if (ie4&&!dropmenuobj.contains(e.toElement))
+		delayhidemenu()
+	else if (ns6&&e.currentTarget!= e.relatedTarget&& !contains_ns6(e.currentTarget, e.relatedTarget))
+		delayhidemenu()
+}
+
+function myhide(e){
+	var x = typeof e.target
+	hidemenu()
+	if (ie4 && e.srcElement.toString().substr(0,1)!='[')
+		window.location = e.srcElement
+	else if (e.target.toString().substr(0,1)!='[')
+		window.location = e.target
+}
+
+function hidemenu(e){
+	if (typeof dropmenuobj!="undefined"){
+		if (ie4||ns6)
+			dropmenuobj.style.visibility="hidden"
+	}
+}
+
+function delayhidemenu(){
+	if (ie4||ns6)
+		delayhide=setTimeout("hidemenu()",disappeardelay)
+}
+
+function clearhidemenu(){
+	if (typeof delayhide!="undefined")
+		clearTimeout(delayhide)
+}
+
+if (hidemenu_onclick=="yes")
+//document.onclick=hidemenu
+document.onclick=myhide
+
+</script>
+
+<style type="text/css">
+<!--
+body,td,th {
+	font-family: Arial, Helvetica, sans-serif;
+}
+.pt14 {
+	font-size: 14px
+}
+.pt12 {font-size: 12px}
+.blue {color: #0065CA}
+.lblue {color: #99CCFF}
+.white {color: #FFFFFF}
+-->
+</style></head>
+
+<body bgcolor="#FFFFFF">
+<div style="position: absolute; top:0; left:0;">
+
+<table  background="http://www.nist.gov/speech/images/squares_bg.jpg" width=100% border="0" cellspacing="0" cellpadding="0" vspace="0" hspace="0" summary="Main title bar">
+	<tr>
+    	<td align=left><img src="http://www.nist.gov/speech/images/itl_title.gif" border="0" width="450" height="70" alt="Information Technology Lab, Information Access Division"/>        </td>
+    	
+      <td align=right><img src="http://www.nist.gov/speech/images/nist_title.gif" border="0" height = "70" width = "177" alt="NIST: National Institute of Standards and Technology"/>        </td>
+  	</tr>
+</table>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="4" style="border-collapse:collapse" summary="Left title bar"> 
+	<tr valign="top"> 
+    	<td width="150" valign="top" bgcolor="#ededed"> 
+
+       	  <p></p>           
+        	<p></p></br>
+    <li><font size="-1" face="Arial, Helvetica, sans-serif"><a href="http://www.nist.gov/speech">Multimodal Information Group Home</a></font></li>
+<font face="Arial, Helvetica, sans-serif" size="-1"></p>
+        	<p><li><a href="http://www.nist.gov/speech/tests">Benchmark Tests</a></li> </p> 
+        	<p><li><a href="http://www.nist.gov/speech/tools">Tools</a></li></p>
+        	<p><li><a href="http://www.nist.gov/speech/test_beds">Test Beds</a></li></p>
+        	<p><li><a href="http://www.nist.gov/speech/publications">Publications</a></li>  </p>
+        	<p><li><a href="http://www.nist.gov/speech/links">Links</a></li> </p> 
+        	<p><li><a href="http://www.nist.gov/speech/staff">Contacts</a></li></font> </p>
+        </td>
+          
+	    <td valign="top"> 
+          	<center><h2><span class="blue"><!-- #BeginEditable "page_title" -->Topic Detection and Tracking Evaluation<!-- #EndEditable --></span></h2></center>
+	        <!-- #BeginEditable "main_content" -->
+		<div align="center"><img src="pictures/tdtgraph.gif" alt="Topic Detection and Tracking Logo" height="166" width="296" /><br />
+		  
+		    </div>
+		<p>Topic Detection and Tracking research was pursued under
+the <b>DARPA Translingual Information Detection,
+Extraction, and Summarization (TIDES) program</b>:</p>
+      <p>
+Topic Detection and Tracking is an integral part of the DARPA Translingual Information Detection, Extraction, and Summarization (TIDES) program. The goal of the TIDES program is to enable English-speaking users to access, correlate, and interpret multilingual sources of real-time information and to share the essence of this information with collaborators.</p>
+      <p>
+
+As a TIDES evaluation community, TDT provides a forum to discuss applications and techniques for detecting and tracking events that occur in real-time and the infrastructure to support common evaluations of component technologies. The TIDES project currently has one other evaluation community, The Text REtrieval Conference (TREC), and planning has begun for three new evaluations in the areas of Text Summarization, Question Answering and Quick Machine Translation. </p>
+      <p>
+
+The NIST TDT
+project has ended and will not be restarted in the near future.  
+The data remains available from the Linguistic Data Consortium and the
+evaluation resources on this site will remain available.<br />
+      </p>
+      <p>TDT research develops algorithms for discovering and threading
+together topically related material in streams of data such as newswire
+and broadcast news in both English and Mandarin Chinese. The overview
+paper &quot;<a href="Wayne-LREC2000.ps">Multilingual Topic
+Detection and Tracking: Successful Research Enabled by Corpora and
+Evaluation,</a>&quot; (Wayne LREC2000) describes in more detail the TDT
+program, the TDT corpora (collections of broadcast news recordings and
+transcripts), and the TDT technology evaluation paradigm.<br />
+      </p>
+      <p>TDT research started with a pilot study in 1997 and has
+continued with open evaluations in <a href="1998/">TDT 1998</a>,
+      <a href="1999/">TDT 1999</a>, <a href="2000/">TDT
+2000</a>, <a href="2001/">TDT 2001</a>, <a href="2002/">TDT 2002</a>, <a href="2003/">TDT
+2003</a>, and <a href="2004/">TDT 2004</a>. The <a href="1999/workshop.html">TDT 1999 Workshop</a>, <a href="2000/workshop.html">TDT2000 Workshop</a>, <a href="2003/workshop.html">TDT 2003 Workshop</a>, and <a href="2004/workshop.html">TDT 2004 Workshop</a> web pages contains
+detailed information about the most recent evaluations plus copies of
+virtually all the presentations and papers from the workshops. </p>
+
+      <p> The TDT research applications keep track of topics, (events
+of interest), in a constantly expanding collection of multimedia
+stories. </p>
+      <p>TDT applications either organize vast amounts of data or
+facilitate large scale collections of non-text media. There are 5
+research applications defined in the TDT Program. </p>
+      <ol>
+        <li> <a href="tasks/segment.html">Story Segmentation</a> -
+Detect changes between topically cohesive sections </li>
+        <li> <a href="tasks/track.html">Topic Tracking</a> - Keep track
+of stories similar to a set of example stories </li>
+
+        <li> <a href="tasks/detect.html">Topic Detection</a> - Build
+clusters of stories that discuss the same topic </li>
+        <li> <a href="tasks/fsd.html">First Story Detection</a> -
+Detect if a story is the first story of a new, unknown topic </li>
+        <li> <a href="tasks/lnk.html">Link Detection</a> - Detect
+whether or not two stories are topically linked </li>
+
+      </ol>
+      <p> <a href="resources.html">Shared resources</a>, such as TDT
+corpora, language resources and evaluation software, provide the
+necessary tools to build a TDT application. Arguably, the most valuable
+resource made available to the community is the TDT corpora. The TDT
+corpora consist of broadcast news and newswire texts sampled daily
+during most of 1998. The LDC exhaustively annotated the corpora by
+identifying which stories discuss a predefined set of topics. </p>
+      <p>Contact <a href="mailto:speech_webmaster@nist.gov">speech_webmaster[at]nist.gov</a> at NIST For information about joining the TDT evaluation
+community.</p>
+      <p>
+
+ <center> [ <a href="1998/">1998</a> ] [ <a href="1999/">1999</a> ] [ <a href="2000/">2000</a> ] [ <a href="2001/">2001</a> ] [ <a href="2002/">2002</a> ] [ <a href="2003/">2003</a> ] [ <a href="2004/">2004</a> ]</center><br />
+		</p>
+        <!-- #EndEditable -->
+	        <p>&nbsp;</p>
+	        <p>&nbsp;</p>     
+        	<center><p><span class="pt12">Page Created: <!-- #BeginEditable "page_created" -->August 21, 2007<!-- #EndEditable --></span><br/>
+        	    <span class="pt12">Last Updated: 
+        	    <!-- #BeginDate format:Am1 -->November 4, 2008<!-- #EndDate -->
+        	    </span></p>
+        	</center>    	</td>
+	</tr>
+</table>
+
+<table bgcolor="#384676" width=100% border="0" cellspacing="2" cellpadding="4" vspace="0" hspace="0" summary="bottom table">
+	<tr> 
+    	<td align="left" valign="top">  
+        	<span class="pt14">
+            <a href="http://www.nist.gov/speech"><span class="lblue">Multimodal Information Group</span></a>
+            <span class="white">is part of</span>
+            <a href="http://www.itl.nist.gov/iad"><span class="lblue">IAD</span></a>
+            <span class="white">and</span>
+            <a href="http://www.itl.nist.gov"><span class="lblue">ITL</span></a><br/>
+        	<a href="http://www.nist.gov"><span class="lblue">NIST</span></a>
+            <span class="white">is an agency of the</span>
+            <a href="http://www.doc.gov"><span class="lblue">U.S. Department of Commerce</span></a><br/>
+            </span>
+        </td>
+      
+      	<td align="right" valign="top"> <font face="arial" size="-1" color="#dedede"> 
+        	<a href="http://www.nist.gov/public_affairs/privacy.htm">
+            <font color="#99ccff">Privacy Policy</font></a> |
+            <a href="http://www.nist.gov/public_affairs/privacy.htm#secnot">
+            <font color="#99ccff">Security Notices</font></a>| <br/>
+        	<a href="http://www.nist.gov/public_affairs/privacy.htm#accessstate">
+            <font color="#99ccff">Accessibility Statement</font></a> |
+            <a href="http://www.nist.gov/public_affairs/disclaim.htm"> 
+        	<font color="#99ccff">Disclaimer</font></a> | 
+            <a href="http://www.nist.gov/admin/foia/foia.htm" > 
+        	<font color="#99ccff">FOIA</font></a> </font>
+      	</td>
+    </tr>
+</table>
+</div>
+</body>
+<!-- #EndTemplate --></html>

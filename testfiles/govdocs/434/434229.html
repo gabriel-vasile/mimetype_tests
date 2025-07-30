@@ -1,0 +1,2834 @@
+<HTML> <BODY BGCOLOR=#eeeeee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<A NAME='COMPACT_DIFFS'><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DIFFS' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='2'>
+<font color=#993300>module </font><font color=#cc0000>compact_diffs</font> <A href='../../call_to/COMPACT_DIFFS.html' TARGET='index'>10</A>,<A href='../../call_from/COMPACT_DIFFS.html' TARGET='index'>1</A><a name='3'>
+<font color=#447700>!$$$   module documentation block<a name='4'></font>
+<font color=#447700>!                .      .    .                                       .<a name='5'></font>
+<font color=#447700>! module:    compact_diffs   global compact diff derivative stuff<a name='6'></font>
+<font color=#447700>!   prgmmr: parrish          org: np22                date: 2005-01-21<a name='7'></font>
+<font color=#447700>!<a name='8'></font>
+<font color=#447700>! abstract: contains routines to initialize constants and compute <a name='9'></font>
+<font color=#447700>!             compact difference approximations to derivatives<a name='10'></font>
+<font color=#447700>!             in latitude and longitude on the sphere.<a name='11'></font>
+<font color=#447700>!<a name='12'></font>
+<font color=#447700>! program history log:<a name='13'></font>
+<font color=#447700>!   2005-01-21  parrish<a name='14'></font>
+<font color=#447700>!   2005-01-26  treadon - add init_compact_diffs<a name='15'></font>
+<font color=#447700>!<a name='16'></font>
+<font color=#447700>! subroutines included:<a name='17'></font>
+<font color=#447700>!   sub init_compact_diffs  - initialize parameters used by compact diffs<a name='18'></font>
+<font color=#447700>!   sub create_cdiff_coefs  - create arrays for global compact diffs<a name='19'></font>
+<font color=#447700>!   sub destroy_cdiff_coefs - remove arrays for global compact diffs<a name='20'></font>
+<font color=#447700>!   sub grdsphdp            - compute grad(scalar)<a name='21'></font>
+<font color=#447700>!   sub stvp2uv             - psi,chi --&gt; u,v<a name='22'></font>
+<font color=#447700>!   sub uv2vordiv           - u,v --&gt; vor,div<a name='23'></font>
+<font color=#447700>!   sub xdcirdp             - get x-derivatives on sphere<a name='24'></font>
+<font color=#447700>!   sub xmulbv              - multiply banded matrix by vector<a name='25'></font>
+<font color=#447700>!   sub xbacbv              - back substitution phase of banded matrix inversion<a name='26'></font>
+<font color=#447700>!   sub tstvp2uv            - adjoint of stvp2uv<a name='27'></font>
+<font color=#447700>!   sub ydsphdp             - compute y-derivatives on sphere<a name='28'></font>
+<font color=#447700>!   sub ymulbv              - multiply banded matrix by vector<a name='29'></font>
+<font color=#447700>!   sub ybacbv              - back substitution phase of banded matrix inversion<a name='30'></font>
+<font color=#447700>!   sub tydsphdp            - adjoint of ydspdp<a name='31'></font>
+<font color=#447700>!   sub ybacvb              - back substitution for banded matrix inversion<a name='32'></font>
+<font color=#447700>!   sub ymulvb              - multiply vector by banded matrix<a name='33'></font>
+<font color=#447700>!   sub inisph              - init coefs for compact differencing on sphere<a name='34'></font>
+<font color=#447700>!   sub cdcoef              - compute differencing coefficients<a name='35'></font>
+<font color=#447700>!   sub dfcd                - compute coefs for compact/lagrange schemes<a name='36'></font>
+<font color=#447700>!   sub aldub               - ldu decomposition<a name='37'></font>
+<font color=#447700>!   sub dlinvmm             - invert linear systems<a name='38'></font>
+<font color=#447700>!   sub dlufm               - perform l-u decomposition<a name='39'></font>
+<font color=#447700>!   sub dlubmm              - invert matrix<a name='40'></font>
+<font color=#447700>!<a name='41'></font>
+<font color=#447700>! Variable Definitions:<a name='42'></font>
+<font color=#447700>!   def noq       - 1/4 intended order of accuracy for stvp&lt;--&gt;uv routines<a name='43'></font>
+<font color=#447700>!   def coef      - an array containing high-order compact differencing<a name='44'></font>
+<font color=#447700>!                   coefficients<a name='45'></font>
+<font color=#447700>!<a name='46'></font>
+<font color=#447700>! attributes:<a name='47'></font>
+<font color=#447700>!   language: f90<a name='48'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='49'></font>
+<font color=#447700>!<a name='50'></font>
+<font color=#447700>!$$$ end documentation block<a name='51'></font>
+<a name='52'>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DIFFS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_31">, only: r_kind,i_kind<a name='53'>
+  implicit none<a name='54'>
+<a name='55'>
+  integer(i_kind) noq<a name='56'>
+  real(r_kind),allocatable,dimension(:):: coef<a name='57'>
+<a name='58'>
+<a name='59'>
+contains<a name='60'>
+<a name='61'>
+<A NAME='INIT_COMPACT_DIFFS'><A href='../../html_code/gsi/compact_diffs.f90.html#INIT_COMPACT_DIFFS' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='62'>
+  <font color=#993300>subroutine </font><font color=#cc0000>init_compact_diffs</font> <A href='../../call_to/INIT_COMPACT_DIFFS.html' TARGET='index'>1</A><a name='63'>
+<font color=#447700>!$$$  subprogram documentation block<a name='64'></font>
+<font color=#447700>!                .      .    .                                       .<a name='65'></font>
+<font color=#447700>! subprogram:    init_compact_diffs<a name='66'></font>
+<font color=#447700>!   prgmmr: treadon          org: np23               date:  2003-11-24<a name='67'></font>
+<font color=#447700>!<a name='68'></font>
+<font color=#447700>! abstract: initialize cost function variables to defaults<a name='69'></font>
+<font color=#447700>!<a name='70'></font>
+<font color=#447700>! program history log:<a name='71'></font>
+<font color=#447700>!   2005-01-26  treadon<a name='72'></font>
+<font color=#447700>!<a name='73'></font>
+<font color=#447700>!   input argument list:<a name='74'></font>
+<font color=#447700>!<a name='75'></font>
+<font color=#447700>!   output argument list:<a name='76'></font>
+<font color=#447700>!<a name='77'></font>
+<font color=#447700>! attributes:<a name='78'></font>
+<font color=#447700>!   language: f90<a name='79'></font>
+<font color=#447700>!   machine:  ibm rs/6000 sp<a name='80'></font>
+<font color=#447700>!<a name='81'></font>
+<font color=#447700>!$$$<a name='82'></font>
+    implicit none<a name='83'>
+    <a name='84'>
+    noq=3<a name='85'>
+    return<a name='86'>
+  end subroutine init_compact_diffs<a name='87'>
+<a name='88'>
+<A NAME='CREATE_CDIFF_COEFS'><A href='../../html_code/gsi/compact_diffs.f90.html#CREATE_CDIFF_COEFS' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='89'>
+  <font color=#993300>subroutine </font><font color=#cc0000>create_cdiff_coefs</font> <A href='../../call_to/CREATE_CDIFF_COEFS.html' TARGET='index'>1</A>,<A href='../../call_from/CREATE_CDIFF_COEFS.html' TARGET='index'>1</A><a name='90'>
+<font color=#447700>!$$$  subprogram documentation block<a name='91'></font>
+<font color=#447700>!                .      .    .                                       .<a name='92'></font>
+<font color=#447700>! subprogram:    create_cdiff_coefs    create arrays for global compact diffs<a name='93'></font>
+<font color=#447700>!   prgmmr: parrish          org: np22                date: 2005-01-21<a name='94'></font>
+<font color=#447700>!<a name='95'></font>
+<font color=#447700>! abstract: create coefs for global compact difference approximations to <a name='96'></font>
+<font color=#447700>!            derivatives in lat, lon<a name='97'></font>
+<font color=#447700>!<a name='98'></font>
+<font color=#447700>! program history log:<a name='99'></font>
+<font color=#447700>!   2005-01-21  parrish<a name='100'></font>
+<font color=#447700>!<a name='101'></font>
+<font color=#447700>!   input argument list:<a name='102'></font>
+<font color=#447700>!<a name='103'></font>
+<font color=#447700>!   output argument list:<a name='104'></font>
+<font color=#447700>!<a name='105'></font>
+<font color=#447700>! attributes:<a name='106'></font>
+<font color=#447700>!   language: f90<a name='107'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='108'></font>
+<font color=#447700>!<a name='109'></font>
+<font color=#447700>!$$$<a name='110'></font>
+  use <A href='../../html_code/gsi/gridmod.f90.html#GRIDMOD'>gridmod</A><A href='../../html_code/gsi/compact_diffs.f90.html#CREATE_CDIFF_COEFS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GRIDMOD_23">, only: nlat,nlon<a name='111'>
+  implicit none<a name='112'>
+<a name='113'>
+  allocate(coef(3*nlat+4*(2*(noq+5)+1)*(nlat+nlon/2)))<a name='114'>
+<a name='115'>
+<a name='116'>
+  return<a name='117'>
+  end subroutine create_cdiff_coefs<a name='118'>
+<a name='119'>
+<A NAME='DESTROY_CDIFF_COEFS'><A href='../../html_code/gsi/compact_diffs.f90.html#DESTROY_CDIFF_COEFS' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='120'>
+  <font color=#993300>subroutine </font><font color=#cc0000>destroy_cdiff_coefs</font> <A href='../../call_to/DESTROY_CDIFF_COEFS.html' TARGET='index'>1</A><a name='121'>
+<font color=#447700>!$$$  subprogram documentation block<a name='122'></font>
+<font color=#447700>!                .      .    .                                       .<a name='123'></font>
+<font color=#447700>! subprogram:    destroy_cdiff_coefs  deallocates array for global compact diffs<a name='124'></font>
+<font color=#447700>!   prgmmr: parrish          org: np22                date: 2005-01-21<a name='125'></font>
+<font color=#447700>!<a name='126'></font>
+<font color=#447700>! abstract: deallocates array for global compact diffs<a name='127'></font>
+<font color=#447700>!<a name='128'></font>
+<font color=#447700>! program history log:<a name='129'></font>
+<font color=#447700>!   2005-01-21  parrish<a name='130'></font>
+<font color=#447700>!   2005-03-03  treadon - add implicit none<a name='131'></font>
+<font color=#447700>!<a name='132'></font>
+<font color=#447700>!   input argument list:<a name='133'></font>
+<font color=#447700>!<a name='134'></font>
+<font color=#447700>!   output argument list:<a name='135'></font>
+<font color=#447700>!<a name='136'></font>
+<font color=#447700>! attributes:<a name='137'></font>
+<font color=#447700>!   language: f90<a name='138'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='139'></font>
+<font color=#447700>!<a name='140'></font>
+<font color=#447700>!$$$<a name='141'></font>
+    implicit none<a name='142'>
+    deallocate(coef)<a name='143'>
+<a name='144'>
+    return<a name='145'>
+  end subroutine destroy_cdiff_coefs<a name='146'>
+<a name='147'>
+<A NAME='GRDSPHDP'><A href='../../html_code/gsi/compact_diffs.f90.html#GRDSPHDP' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='148'>
+  <font color=#993300>subroutine </font><font color=#cc0000>grdsphdp</font>(a,dadx,dady),<A href='../../call_from/GRDSPHDP.html' TARGET='index'>5</A><a name='149'>
+<font color=#447700>!$$$  subprogram documentation block<a name='150'></font>
+<font color=#447700>!                .      .    .                                       .<a name='151'></font>
+<font color=#447700>! subprogram:    grdsphdp                         compute grad(scalar)<a name='152'></font>
+<font color=#447700>!   prgmmr: purser, r.j.     org: np20                date: 1994-01-01<a name='153'></font>
+<font color=#447700>!<a name='154'></font>
+<font color=#447700>! abstract:  This routine computes the gradient of a scalar field<a name='155'></font>
+<font color=#447700>!            using high-order compact differencing on a spherical <a name='156'></font>
+<font color=#447700>!            grid.  <a name='157'></font>
+<font color=#447700>!<a name='158'></font>
+<font color=#447700>! program history log:<a name='159'></font>
+<font color=#447700>!   1994-01-01  purser<a name='160'></font>
+<font color=#447700>!   1994-05-12  parrish - eliminate memory bank conflicts<a name='161'></font>
+<font color=#447700>!   2004-06-16  treadon - update documentation<a name='162'></font>
+<font color=#447700>!<a name='163'></font>
+<font color=#447700>!   input argument list:<a name='164'></font>
+<font color=#447700>!     "a"   - array containing the scalar field<a name='165'></font>
+<font color=#447700>!<a name='166'></font>
+<font color=#447700>!   output argument list:<a name='167'></font>
+<font color=#447700>!     dadx  - array containing the eastward component of gradient<a name='168'></font>
+<font color=#447700>!     dady  - array containing the northward component of gradient<a name='169'></font>
+<font color=#447700>!<a name='170'></font>
+<font color=#447700>! attributes:<a name='171'></font>
+<font color=#447700>!   language: f90<a name='172'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='173'></font>
+<font color=#447700>!<a name='174'></font>
+<font color=#447700>!$$$<a name='175'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#GRDSPHDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_32">, only: r_kind,i_kind<a name='176'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#GRDSPHDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_22">, only: zero<a name='177'>
+  use <A href='../../html_code/gsi/gridmod.f90.html#GRIDMOD'>gridmod</A><A href='../../html_code/gsi/compact_diffs.f90.html#GRDSPHDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GRIDMOD_24">, only: nlon, nlat<a name='178'>
+  implicit none<a name='179'>
+<a name='180'>
+  integer(i_kind) nx,ny,nxh,nbp,nya,nxa,lacox1,lbcox1,lacox2,lbcox2,lacoy1,lbcoy1<a name='181'>
+  integer(i_kind) lbcoy2,lacoy2,lcy,iy,ix,ni1,ni2,kk,i,j<a name='182'>
+  real(r_kind) cy<a name='183'>
+  real(r_kind),dimension(nlat,nlon):: a,dadx,dady<a name='184'>
+  real(r_kind),dimension(nlat-2,nlon):: work1,grid1,grid2<a name='185'>
+<a name='186'>
+<a name='187'>
+<font color=#447700>! Set parameters for calls to subsequent routines<a name='188'></font>
+  ny=nlat-2<a name='189'>
+  nxh=nlon/2<a name='190'>
+  nbp=2*noq+1<a name='191'>
+  nya=ny*nbp<a name='192'>
+  nxa=nxh*nbp<a name='193'>
+  <a name='194'>
+  lacox1=1<a name='195'>
+  lbcox1=lacox1+nxa<a name='196'>
+  lacox2=lbcox1+nxa<a name='197'>
+  lbcox2=lacox2+nxa<a name='198'>
+  lacoy1=lbcox2+nxa<a name='199'>
+  lbcoy1=lacoy1+nya<a name='200'>
+  lacoy2=lbcoy1+nya<a name='201'>
+  lbcoy2=lacoy2+nya<a name='202'>
+  lcy   =lbcoy2+nya-1<a name='203'>
+<a name='204'>
+<a name='205'>
+<font color=#447700>! Initialize output arrays to zero<a name='206'></font>
+  do j=1,nlon<a name='207'>
+     do i=1,nlat<a name='208'>
+        dadx(i,j)=zero<a name='209'>
+        dady(i,j)=zero<a name='210'>
+     end do<a name='211'>
+  end do<a name='212'>
+<a name='213'>
+<font color=#447700>! Transfer scalar input field to work array.<a name='214'></font>
+<font color=#447700>! Zero other work arrays.<a name='215'></font>
+  do j=1,nlon<a name='216'>
+     do i=1,ny<a name='217'>
+        work1(i,j) = a(i+1,j)<a name='218'>
+        grid1(i,j)=zero<a name='219'>
+        grid2(i,j)=zero<a name='220'>
+     end do<a name='221'>
+  end do<a name='222'>
+<a name='223'>
+<a name='224'>
+<font color=#447700>! Compute x (east-west) derivatives on sphere<a name='225'></font>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP'>xdcirdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#GRDSPHDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XDCIRDP_1">(work1,grid1, &amp;<a name='226'>
+       coef(lacox1),coef(lbcox1),coef(lacox2),coef(lbcox2),&amp;<a name='227'>
+       nlon,ny,noq,nxh)<a name='228'>
+<a name='229'>
+<a name='230'>
+<font color=#447700>! Compute y (south-north) derivatives on sphere<a name='231'></font>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#YDSPHDP'>ydsphdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#GRDSPHDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YDSPHDP_1">(work1,grid2, &amp;<a name='232'>
+       coef(lacoy1),coef(lbcoy1),coef(lacoy2),coef(lbcoy2),&amp;<a name='233'>
+       nlon,ny,noq)<a name='234'>
+<a name='235'>
+<a name='236'>
+<font color=#447700>! Make corrections for convergence of meridians:<a name='237'></font>
+  do ix=1,nlon<a name='238'>
+     do iy=1,ny<a name='239'>
+        grid1(iy,ix)=grid1(iy,ix)*coef(lcy+iy)<a name='240'>
+     end do<a name='241'>
+  end do<a name='242'>
+<a name='243'>
+<a name='244'>
+<font color=#447700>! Load results into ouptut arrays<a name='245'></font>
+  do j=1,nlon<a name='246'>
+     do i=1,ny<a name='247'>
+        dadx(i+1,j) = grid1(i,j)<a name='248'>
+        dady(i+1,j) = grid2(i,j)<a name='249'>
+     end do<a name='250'>
+  end do<a name='251'>
+  <a name='252'>
+  return<a name='253'>
+  end subroutine grdsphdp<a name='254'>
+<a name='255'>
+<A NAME='STVP2UV'><A href='../../html_code/gsi/compact_diffs.f90.html#STVP2UV' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='256'>
+  <font color=#993300>subroutine </font><font color=#cc0000>stvp2uv</font>(work1,work2) <A href='../../call_to/STVP2UV.html' TARGET='index'>1</A>,<A href='../../call_from/STVP2UV.html' TARGET='index'>7</A><a name='257'>
+<font color=#447700>!$$$  subprogram documentation block<a name='258'></font>
+<font color=#447700>!                .      .    .                                       .<a name='259'></font>
+<font color=#447700>! subprogram:    stvp2uv compute uv from streamfunction/velocity potential<a name='260'></font>
+<font color=#447700>!   prgmmr: purser           org: np20                 date: 1994-01-01<a name='261'></font>
+<font color=#447700>!<a name='262'></font>
+<font color=#447700>! abstract: computes uv from streamfunction/velocity potential by<a name='263'></font>
+<font color=#447700>!           calculating gradient of a scalar field using high-order<a name='264'></font>
+<font color=#447700>!           compact differencing on a spherical grid.<a name='265'></font>
+<font color=#447700>!<a name='266'></font>
+<font color=#447700>! program history log:<a name='267'></font>
+<font color=#447700>!   1994-05-15  parrish,d. elimanate memory bank conflicts<a name='268'></font>
+<font color=#447700>!   1994-05-17  parrish,d. reverse order of longitude and latitude<a name='269'></font>
+<font color=#447700>!   2004-07-27  treadon - add only on use declarations; add intent in/out<a name='270'></font>
+<font color=#447700>!   2004-10-26  kleist - fix sign error<a name='271'></font>
+<font color=#447700>!<a name='272'></font>
+<font color=#447700>!   input argument list:<a name='273'></font>
+<font color=#447700>!     work1  - array containing the streamfunction <a name='274'></font>
+<font color=#447700>!     work2  - array containing the velocity potential <a name='275'></font>
+<font color=#447700>!<a name='276'></font>
+<font color=#447700>!   output argument list:<a name='277'></font>
+<font color=#447700>!     work1  - array containing the u velocity <a name='278'></font>
+<font color=#447700>!     work2  - array containing the v velocity <a name='279'></font>
+<font color=#447700>!<a name='280'></font>
+<font color=#447700>! attributes:<a name='281'></font>
+<font color=#447700>!   language: f90<a name='282'></font>
+<font color=#447700>!   machine:  ibm rs/6000 sp<a name='283'></font>
+<font color=#447700>!$$$<a name='284'></font>
+<a name='285'>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#STVP2UV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_33">, only: r_kind,i_kind<a name='286'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#STVP2UV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_23">, only: zero<a name='287'>
+  use <A href='../../html_code/gsi/gridmod.f90.html#GRIDMOD'>gridmod</A><A href='../../html_code/gsi/compact_diffs.f90.html#STVP2UV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GRIDMOD_25">, only: iglobal,itotsub,ltosi,ltosj,ltosi_s,ltosj_s,&amp;<a name='288'>
+       nlon,nlat,sinlon,coslon<a name='289'>
+  implicit none<a name='290'>
+<a name='291'>
+<font color=#447700>! Declare passed variables<a name='292'></font>
+  real(r_kind),dimension(max(iglobal,itotsub)),intent(inout):: work1,work2<a name='293'>
+<a name='294'>
+<font color=#447700>! Declare local variables  <a name='295'></font>
+  integer(i_kind) lbcoy2,lcy,lbcoy1,lacoy1,lacoy2,kk,ix,iy,ni1,ni2,nbp,nya<a name='296'>
+  integer(i_kind) nxh,nxa,lacox2,lbcox2,lacox1,lbcox1,ny<a name='297'>
+  real(r_kind) polsu,polnu,polnv,polsv<a name='298'>
+  real(r_kind),dimension(nlon):: grid3n,grid3s,grid1n,grid1s<a name='299'>
+  real(r_kind),dimension(nlat-2,nlon):: a,b,grid1,grid2,grid3,grid4<a name='300'>
+<a name='301'>
+  ny=nlat-2<a name='302'>
+  nxh=nlon/2<a name='303'>
+  nbp=2*noq+1<a name='304'>
+  nya=ny*nbp<a name='305'>
+  nxa=nxh*nbp<a name='306'>
+<a name='307'>
+  lacox1=1<a name='308'>
+  lbcox1=lacox1+nxa<a name='309'>
+  lacox2=lbcox1+nxa<a name='310'>
+  lbcox2=lacox2+nxa<a name='311'>
+  lacoy1=lbcox2+nxa<a name='312'>
+  lbcoy1=lacoy1+nya<a name='313'>
+  lacoy2=lbcoy1+nya<a name='314'>
+  lbcoy2=lacoy2+nya<a name='315'>
+  lcy   =lbcoy2+nya-1<a name='316'>
+  <a name='317'>
+  do kk=1,iglobal<a name='318'>
+     ni1=ltosi(kk); ni2=ltosj(kk)<a name='319'>
+     <a name='320'>
+     if(ni1 /= 1 .and. ni1 /=nlat)then<a name='321'>
+        a(ni1-1,ni2)=work1(kk)<a name='322'>
+        b(ni1-1,ni2)=work2(kk)<a name='323'>
+     end if<a name='324'>
+  end do<a name='325'>
+  <a name='326'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP'>xdcirdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#STVP2UV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XDCIRDP_2">(a,grid1,coef(lacox1),coef(lbcox1),coef(lacox2),coef(lbcox2),&amp;<a name='327'>
+       nlon,ny,noq,nxh)<a name='328'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP'>xdcirdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#STVP2UV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XDCIRDP_3">(b,grid3,coef(lacox1),coef(lbcox1),coef(lacox2),coef(lbcox2),&amp;<a name='329'>
+       nlon,ny,noq,nxh)<a name='330'>
+  <a name='331'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#YDSPHDP'>ydsphdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#STVP2UV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YDSPHDP_2">(a,grid2,coef(lacoy1),coef(lbcoy1),coef(lacoy2),coef(lbcoy2),&amp;<a name='332'>
+       nlon,ny,noq)<a name='333'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#YDSPHDP'>ydsphdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#STVP2UV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YDSPHDP_3">(b,grid4,coef(lacoy1),coef(lbcoy1),coef(lacoy2),coef(lbcoy2),&amp;<a name='334'>
+       nlon,ny,noq)<a name='335'>
+<a name='336'>
+<font color=#447700>!  make corrections for convergence of meridians:<a name='337'></font>
+  do ix=1,nlon<a name='338'>
+     do iy=1,ny<a name='339'>
+        grid1(iy,ix)=grid1(iy,ix)*coef(lcy+iy)+grid4(iy,ix)<a name='340'>
+        grid3(iy,ix)=grid3(iy,ix)*coef(lcy+iy)-grid2(iy,ix)<a name='341'>
+     enddo<a name='342'>
+  enddo<a name='343'>
+  polnu=zero<a name='344'>
+  polnv=zero<a name='345'>
+  polsu=zero<a name='346'>
+  polsv=zero<a name='347'>
+  do ix=1,nlon<a name='348'>
+     polnu=polnu+grid3(ny,ix)*coslon(ix)-grid1(ny,ix)*sinlon(ix)<a name='349'>
+     polnv=polnv+grid3(ny,ix)*sinlon(ix)+grid1(ny,ix)*coslon(ix)<a name='350'>
+     polsu=polsu+grid3(1 ,ix)*coslon(ix)+grid1(1 ,ix)*sinlon(ix)<a name='351'>
+     polsv=polsv+grid3(1 ,ix)*sinlon(ix)+grid1(1 ,ix)*coslon(ix)<a name='352'>
+  end do<a name='353'>
+  polnu=polnu/float(nlon)<a name='354'>
+  polnv=polnv/float(nlon)<a name='355'>
+  polsu=polsu/float(nlon)<a name='356'>
+  polsv=polsv/float(nlon)<a name='357'>
+  do ix=1,nlon<a name='358'>
+     grid3n(ix)= polnu*coslon(ix)+polnv*sinlon(ix)<a name='359'>
+     grid1n(ix)=-polnu*sinlon(ix)+polnv*coslon(ix)<a name='360'>
+     grid3s(ix)= polsu*coslon(ix)+polsv*sinlon(ix)<a name='361'>
+     grid1s(ix)= polsu*sinlon(ix)+polsv*coslon(ix)<a name='362'>
+  end do<a name='363'>
+<font color=#447700>! work 1 is u, work2 is v<a name='364'></font>
+  do kk=1,itotsub<a name='365'>
+     ni1=ltosi_s(kk); ni2=ltosj_s(kk)<a name='366'>
+     if(ni1 /=1 .and. ni1 /=nlat)then<a name='367'>
+        work1(kk)=grid3(ni1-1,ni2)<a name='368'>
+        work2(kk)=grid1(ni1-1,ni2)<a name='369'>
+     else if(ni1 == 1)then<a name='370'>
+        work1(kk)=grid3s(ni2)<a name='371'>
+        work2(kk)=grid1s(ni2)<a name='372'>
+     else<a name='373'>
+        work1(kk)=grid3n(ni2)<a name='374'>
+        work2(kk)=grid1n(ni2)<a name='375'>
+     end if<a name='376'>
+  enddo<a name='377'>
+<a name='378'>
+  return<a name='379'>
+  end subroutine stvp2uv<a name='380'>
+<a name='381'>
+<A NAME='STVP2UV2'><A href='../../html_code/gsi/compact_diffs.f90.html#STVP2UV2' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='382'>
+  <font color=#993300>subroutine </font><font color=#cc0000>stvp2uv2</font>(work1,work2),<A href='../../call_from/STVP2UV2.html' TARGET='index'>7</A><a name='383'>
+<font color=#447700>!$$$  subprogram documentation block<a name='384'></font>
+<font color=#447700>!                .      .    .                                       .<a name='385'></font>
+<font color=#447700>! subprogram:    stvp2uv2 same as stvp2uv, but input,output in proper lat lon order<a name='386'></font>
+<font color=#447700>!   prgmmr: purser           org: np20                 date: 1994-01-01<a name='387'></font>
+<font color=#447700>!<a name='388'></font>
+<font color=#447700>! abstract: computes uv from streamfunction/velocity potential by<a name='389'></font>
+<font color=#447700>!           calculating gradient of a scalar field using high-order<a name='390'></font>
+<font color=#447700>!           compact differencing on a spherical grid.<a name='391'></font>
+<font color=#447700>!<a name='392'></font>
+<font color=#447700>! program history log:<a name='393'></font>
+<font color=#447700>!   1994-05-15  parrish,d. elimanate memory bank conflicts<a name='394'></font>
+<font color=#447700>!   1994-05-17  parrish,d. reverse order of longitude and latitude<a name='395'></font>
+<font color=#447700>!   2004-07-27  treadon - add only on use declarations; add intent in/out<a name='396'></font>
+<font color=#447700>!   2004-10-26  kleist - fix sign error<a name='397'></font>
+<font color=#447700>!<a name='398'></font>
+<font color=#447700>!   input argument list:<a name='399'></font>
+<font color=#447700>!     work1  - array containing the streamfunction <a name='400'></font>
+<font color=#447700>!     work2  - array containing the velocity potential <a name='401'></font>
+<font color=#447700>!<a name='402'></font>
+<font color=#447700>!   output argument list:<a name='403'></font>
+<font color=#447700>!     work1  - array containing the u velocity <a name='404'></font>
+<font color=#447700>!     work2  - array containing the v velocity <a name='405'></font>
+<font color=#447700>!<a name='406'></font>
+<font color=#447700>! attributes:<a name='407'></font>
+<font color=#447700>!   language: f90<a name='408'></font>
+<font color=#447700>!   machine:  ibm rs/6000 sp<a name='409'></font>
+<font color=#447700>!$$$<a name='410'></font>
+<a name='411'>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#STVP2UV2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_34">, only: r_kind,i_kind<a name='412'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#STVP2UV2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_24">, only: zero<a name='413'>
+  use <A href='../../html_code/gsi/gridmod.f90.html#GRIDMOD'>gridmod</A><A href='../../html_code/gsi/compact_diffs.f90.html#STVP2UV2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GRIDMOD_26">, only: nlon,nlat,sinlon,coslon<a name='414'>
+  implicit none<a name='415'>
+<a name='416'>
+<font color=#447700>! Declare passed variables<a name='417'></font>
+  real(r_kind),dimension(nlat,nlon),intent(inout):: work1,work2<a name='418'>
+<a name='419'>
+<font color=#447700>! Declare local variables  <a name='420'></font>
+  integer(i_kind) lbcoy2,lcy,lbcoy1,lacoy1,lacoy2,kk,ix,iy,ni1,ni2,nbp,nya<a name='421'>
+  integer(i_kind) i,j,nxh,nxa,lacox2,lbcox2,lacox1,lbcox1,ny<a name='422'>
+  real(r_kind) polsu,polnu,polnv,polsv<a name='423'>
+  real(r_kind),dimension(nlon):: grid3n,grid3s,grid1n,grid1s<a name='424'>
+  real(r_kind),dimension(nlat-2,nlon):: a,b,grid1,grid2,grid3,grid4<a name='425'>
+<a name='426'>
+  ny=nlat-2<a name='427'>
+  nxh=nlon/2<a name='428'>
+  nbp=2*noq+1<a name='429'>
+  nya=ny*nbp<a name='430'>
+  nxa=nxh*nbp<a name='431'>
+<a name='432'>
+  lacox1=1<a name='433'>
+  lbcox1=lacox1+nxa<a name='434'>
+  lacox2=lbcox1+nxa<a name='435'>
+  lbcox2=lacox2+nxa<a name='436'>
+  lacoy1=lbcox2+nxa<a name='437'>
+  lbcoy1=lacoy1+nya<a name='438'>
+  lacoy2=lbcoy1+nya<a name='439'>
+  lbcoy2=lacoy2+nya<a name='440'>
+  lcy   =lbcoy2+nya-1<a name='441'>
+  <a name='442'>
+  do j=1,nlon<a name='443'>
+    do i=1,ny<a name='444'>
+        a(i,j)=work1(i+1,j)<a name='445'>
+        b(i,j)=work2(i+1,j)<a name='446'>
+    end do<a name='447'>
+  end do<a name='448'>
+  <a name='449'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP'>xdcirdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#STVP2UV2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XDCIRDP_4">(a,grid1,coef(lacox1),coef(lbcox1),coef(lacox2),coef(lbcox2),&amp;<a name='450'>
+       nlon,ny,noq,nxh)<a name='451'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP'>xdcirdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#STVP2UV2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XDCIRDP_5">(b,grid3,coef(lacox1),coef(lbcox1),coef(lacox2),coef(lbcox2),&amp;<a name='452'>
+       nlon,ny,noq,nxh)<a name='453'>
+  <a name='454'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#YDSPHDP'>ydsphdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#STVP2UV2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YDSPHDP_4">(a,grid2,coef(lacoy1),coef(lbcoy1),coef(lacoy2),coef(lbcoy2),&amp;<a name='455'>
+       nlon,ny,noq)<a name='456'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#YDSPHDP'>ydsphdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#STVP2UV2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YDSPHDP_5">(b,grid4,coef(lacoy1),coef(lbcoy1),coef(lacoy2),coef(lbcoy2),&amp;<a name='457'>
+       nlon,ny,noq)<a name='458'>
+<a name='459'>
+<font color=#447700>!  make corrections for convergence of meridians:<a name='460'></font>
+  do ix=1,nlon<a name='461'>
+     do iy=1,ny<a name='462'>
+        grid1(iy,ix)=grid1(iy,ix)*coef(lcy+iy)+grid4(iy,ix)<a name='463'>
+        grid3(iy,ix)=grid3(iy,ix)*coef(lcy+iy)-grid2(iy,ix)<a name='464'>
+     enddo<a name='465'>
+  enddo<a name='466'>
+  polnu=zero<a name='467'>
+  polnv=zero<a name='468'>
+  polsu=zero<a name='469'>
+  polsv=zero<a name='470'>
+  do ix=1,nlon<a name='471'>
+     polnu=polnu+grid3(ny,ix)*coslon(ix)-grid1(ny,ix)*sinlon(ix)<a name='472'>
+     polnv=polnv+grid3(ny,ix)*sinlon(ix)+grid1(ny,ix)*coslon(ix)<a name='473'>
+     polsu=polsu+grid3(1 ,ix)*coslon(ix)+grid1(1 ,ix)*sinlon(ix)<a name='474'>
+     polsv=polsv+grid3(1 ,ix)*sinlon(ix)+grid1(1 ,ix)*coslon(ix)<a name='475'>
+  end do<a name='476'>
+  polnu=polnu/float(nlon)<a name='477'>
+  polnv=polnv/float(nlon)<a name='478'>
+  polsu=polsu/float(nlon)<a name='479'>
+  polsv=polsv/float(nlon)<a name='480'>
+  do ix=1,nlon<a name='481'>
+     grid3n(ix)= polnu*coslon(ix)+polnv*sinlon(ix)<a name='482'>
+     grid1n(ix)=-polnu*sinlon(ix)+polnv*coslon(ix)<a name='483'>
+     grid3s(ix)= polsu*coslon(ix)+polsv*sinlon(ix)<a name='484'>
+     grid1s(ix)= polsu*sinlon(ix)+polsv*coslon(ix)<a name='485'>
+  end do<a name='486'>
+<font color=#447700>! work 1 is u, work2 is v<a name='487'></font>
+  do j=1,nlon<a name='488'>
+    work1(1,j)=grid3s(j)<a name='489'>
+    work2(1,j)=grid1s(j)<a name='490'>
+    work1(nlat,j)=grid3n(j)<a name='491'>
+    work2(nlat,j)=grid1n(j)<a name='492'>
+    do i=1,ny<a name='493'>
+        work1(i+1,j)=grid3(i,j)<a name='494'>
+        work2(i+1,j)=grid1(i,j)<a name='495'>
+    end do<a name='496'>
+  end do<a name='497'>
+<a name='498'>
+  return<a name='499'>
+  end subroutine stvp2uv2<a name='500'>
+<a name='501'>
+<A NAME='UV2VORDIV'><A href='../../html_code/gsi/compact_diffs.f90.html#UV2VORDIV' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='502'>
+  <font color=#993300>subroutine </font><font color=#cc0000>uv2vordiv</font>(work1,work2) <A href='../../call_to/UV2VORDIV.html' TARGET='index'>1</A>,<A href='../../call_from/UV2VORDIV.html' TARGET='index'>7</A><a name='503'>
+<font color=#447700>!$$$  subprogram documentation block<a name='504'></font>
+<font color=#447700>!                .      .    .                                       .<a name='505'></font>
+<font color=#447700>! subprogram:    uv2vordiv compute vor/div from u/v<a name='506'></font>
+<font color=#447700>!   prgmmr: treadon          org: np23                date: 2005-03-21<a name='507'></font>
+<font color=#447700>!<a name='508'></font>
+<font color=#447700>! abstract: computes vorticity and divergence from u and v wind <a name='509'></font>
+<font color=#447700>!           components using high-order compact differencing on <a name='510'></font>
+<font color=#447700>!           a spherical grid.<a name='511'></font>
+<font color=#447700>!<a name='512'></font>
+<font color=#447700>! program history log:<a name='513'></font>
+<font color=#447700>!   2005-03-21  treadon<a name='514'></font>
+<font color=#447700>!   2006-02-02  derber  - modify code around poles (no difference)<a name='515'></font>
+<font color=#447700>!<a name='516'></font>
+<font color=#447700>!   input argument list:<a name='517'></font>
+<font color=#447700>!     work1  - array containing the u component<a name='518'></font>
+<font color=#447700>!     work2  - array containing the v component<a name='519'></font>
+<font color=#447700>!<a name='520'></font>
+<font color=#447700>!   output argument list:<a name='521'></font>
+<font color=#447700>!     work1  - array containing the vorticity<a name='522'></font>
+<font color=#447700>!     work2  - array containing the divergence<a name='523'></font>
+<font color=#447700>!<a name='524'></font>
+<font color=#447700>! attributes:<a name='525'></font>
+<font color=#447700>!   language: f90<a name='526'></font>
+<font color=#447700>!   machine:  ibm rs/6000 sp<a name='527'></font>
+<font color=#447700>!$$$<a name='528'></font>
+<a name='529'>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#UV2VORDIV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_35">, only: r_kind,i_kind<a name='530'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#UV2VORDIV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_25">, only: zero,one<a name='531'>
+  use <A href='../../html_code/gsi/gridmod.f90.html#GRIDMOD'>gridmod</A><A href='../../html_code/gsi/compact_diffs.f90.html#UV2VORDIV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GRIDMOD_27">, only: iglobal,itotsub,ltosi,ltosj,ltosi_s,ltosj_s,&amp;<a name='532'>
+       nlon,nlat<a name='533'>
+  implicit none<a name='534'>
+<a name='535'>
+<font color=#447700>! Declare passed variables<a name='536'></font>
+  real(r_kind),dimension(itotsub),intent(inout):: work1,work2<a name='537'>
+<a name='538'>
+<font color=#447700>! Declare local variables  <a name='539'></font>
+  integer(i_kind) kk,ni1,ni2,lacox1,nxa,lacox2,lbcox1,nxh,ny,nya<a name='540'>
+  integer(i_kind) nbp,lcy,lbcoy2,iy,ix,lacoy1,lbcox2,lacoy2,lbcoy1<a name='541'>
+  real(r_kind) rnlon,div_n,div_s,vor_n,vor_s<a name='542'>
+  real(r_kind),dimension(nlat-2,nlon):: u,v,&amp;<a name='543'>
+       grid_div,grid_vor,du_dlat,du_dlon,dv_dlat,dv_dlon<a name='544'>
+<a name='545'>
+  ny=nlat-2<a name='546'>
+  nxh=nlon/2<a name='547'>
+  nbp=2*noq+1<a name='548'>
+  nya=ny*nbp<a name='549'>
+  nxa=nxh*nbp<a name='550'>
+<a name='551'>
+  lacox1=1<a name='552'>
+  lbcox1=lacox1+nxa<a name='553'>
+  lacox2=lbcox1+nxa<a name='554'>
+  lbcox2=lacox2+nxa<a name='555'>
+  lacoy1=lbcox2+nxa<a name='556'>
+  lbcoy1=lacoy1+nya<a name='557'>
+  lacoy2=lbcoy1+nya<a name='558'>
+  lbcoy2=lacoy2+nya<a name='559'>
+  lcy   =lbcoy2+nya-1<a name='560'>
+<a name='561'>
+  do ix=1,nlon<a name='562'>
+     do iy=1,ny<a name='563'>
+        du_dlat(iy,ix)=zero<a name='564'>
+        du_dlon(iy,ix)=zero<a name='565'>
+        dv_dlat(iy,ix)=zero<a name='566'>
+        dv_dlon(iy,ix)=zero<a name='567'>
+        u(iy,ix)=zero<a name='568'>
+        v(iy,ix)=zero<a name='569'>
+        grid_div(iy,ix)=zero<a name='570'>
+        grid_vor(iy,ix)=zero<a name='571'>
+     end do<a name='572'>
+  end do<a name='573'>
+<a name='574'>
+<a name='575'>
+<font color=#447700>! Transfer u,v to local work arrays.  <a name='576'></font>
+  do kk=1,iglobal<a name='577'>
+     ni1=ltosi(kk); ni2=ltosj(kk)<a name='578'>
+     if(ni1 /= 1 .and. ni1 /=nlat)then<a name='579'>
+        u(ni1-1,ni2)=work1(kk)   <font color=#447700>! work1 contains u on input<a name='580'></font>
+        v(ni1-1,ni2)=work2(kk)   <font color=#447700>! work2 contains v on input<a name='581'></font>
+     end if<a name='582'>
+  end do<a name='583'>
+<a name='584'>
+<font color=#447700>! Compute x derivative of u:  du_dlon = du/dlon<a name='585'></font>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP'>xdcirdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#UV2VORDIV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XDCIRDP_6">(u,du_dlon,coef(lacox1),coef(lbcox1),coef(lacox2),coef(lbcox2),&amp;<a name='586'>
+       nlon,ny,noq,nxh)<a name='587'>
+<a name='588'>
+<font color=#447700>! Compute x derivative of v:  dv_dlon = dv/dlon<a name='589'></font>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP'>xdcirdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#UV2VORDIV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XDCIRDP_7">(v,dv_dlon,coef(lacox1),coef(lbcox1),coef(lacox2),coef(lbcox2),&amp;<a name='590'>
+       nlon,ny,noq,nxh)<a name='591'>
+<a name='592'>
+<font color=#447700>! Multiply u and v by cos(lat).  Note:  coef(lcy+iy) contains 1/cos(lat)<a name='593'></font>
+  do ix=1,nlon<a name='594'>
+     do iy=1,ny<a name='595'>
+        u(iy,ix)=u(iy,ix)/coef(lcy+iy)<a name='596'>
+        v(iy,ix)=v(iy,ix)/coef(lcy+iy)<a name='597'>
+     end do<a name='598'>
+  end do<a name='599'>
+  <a name='600'>
+<font color=#447700>! Compute y derivative of u:  du_dlat = du/dlat<a name='601'></font>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#YDSPHDP'>ydsphdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#UV2VORDIV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YDSPHDP_6">(u,du_dlat,coef(lacoy1),coef(lbcoy1),coef(lacoy2),coef(lbcoy2),&amp;<a name='602'>
+       nlon,ny,noq)<a name='603'>
+<a name='604'>
+<font color=#447700>! Compute y derivative of v:  dv_dlat = dv/dlat<a name='605'></font>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#YDSPHDP'>ydsphdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#UV2VORDIV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YDSPHDP_7">(v,dv_dlat,coef(lacoy1),coef(lbcoy1),coef(lacoy2),coef(lbcoy2),&amp;<a name='606'>
+       nlon,ny,noq)<a name='607'>
+<a name='608'>
+<font color=#447700>! Make corrections for convergence of meridians:<a name='609'></font>
+  do ix=1,nlon<a name='610'>
+     do iy=1,ny<a name='611'>
+        du_dlon(iy,ix)=du_dlon(iy,ix)*coef(lcy+iy)<a name='612'>
+        dv_dlon(iy,ix)=dv_dlon(iy,ix)*coef(lcy+iy)<a name='613'>
+        du_dlat(iy,ix)=du_dlat(iy,ix)*coef(lcy+iy)<a name='614'>
+        dv_dlat(iy,ix)=dv_dlat(iy,ix)*coef(lcy+iy)<a name='615'>
+     enddo<a name='616'>
+  enddo<a name='617'>
+<a name='618'>
+<font color=#447700>! Combine derivatives to obtain vorticity and divergence<a name='619'></font>
+  do ix=1,nlon<a name='620'>
+     do iy=1,ny<a name='621'>
+        grid_div(iy,ix) = du_dlon(iy,ix) + dv_dlat(iy,ix)<a name='622'>
+        grid_vor(iy,ix) = dv_dlon(iy,ix) - du_dlat(iy,ix)<a name='623'>
+     end do<a name='624'>
+  end do<a name='625'>
+<a name='626'>
+<font color=#447700>! Compute mean values to put in first and last row<a name='627'></font>
+  div_s=zero; div_n=zero<a name='628'>
+  vor_s=zero; vor_n=zero<a name='629'>
+  do ix=1,nlon<a name='630'>
+     div_s = div_s + grid_div( 1,ix)<a name='631'>
+     div_n = div_n + grid_div(ny,ix)<a name='632'>
+     vor_s = vor_s + grid_vor( 1,ix)<a name='633'>
+     vor_n = vor_n + grid_vor(ny,ix)<a name='634'>
+  end do<a name='635'>
+  rnlon = one/float(nlon)<a name='636'>
+  div_s = div_s*rnlon<a name='637'>
+  div_n = div_n*rnlon<a name='638'>
+  vor_s = vor_s*rnlon<a name='639'>
+  vor_n = vor_n*rnlon<a name='640'>
+  <a name='641'>
+<font color=#447700>! Transfer to output arrays<a name='642'></font>
+  do kk=1,itotsub<a name='643'>
+     ni1=ltosi_s(kk); ni2=ltosj_s(kk)<a name='644'>
+     if(ni1 /=1 .and. ni1 /=nlat)then<a name='645'>
+        work1(kk)=grid_vor(ni1-1,ni2)<a name='646'>
+        work2(kk)=grid_div(ni1-1,ni2)<a name='647'>
+     else if(ni1 == 1)then<a name='648'>
+        work1(kk)=vor_s<a name='649'>
+        work2(kk)=div_s<a name='650'>
+     else<a name='651'>
+        work1(kk)=vor_n<a name='652'>
+        work2(kk)=div_n<a name='653'>
+     end if<a name='654'>
+  enddo<a name='655'>
+<a name='656'>
+  return<a name='657'>
+end subroutine uv2vordiv<a name='658'>
+<a name='659'>
+<A NAME='XDCIRDP'><A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='660'>
+  <font color=#993300>subroutine </font><font color=#cc0000>xdcirdp</font>(p,q,aco1,bco1,aco2,bco2,nx,ny,noq,nxh) <A href='../../call_to/XDCIRDP.html' TARGET='index'>13</A>,<A href='../../call_from/XDCIRDP.html' TARGET='index'>5</A><a name='661'>
+<font color=#447700>!$$$  subprogram documentation block<a name='662'></font>
+<font color=#447700>!                .      .    .                                       .<a name='663'></font>
+<font color=#447700>! subprogram:    xdcirdp               compute x derivatives on sphere <a name='664'></font>
+<font color=#447700>!   prgmmr: purser           org: np20               date:  1994-01-01<a name='665'></font>
+<font color=#447700>!<a name='666'></font>
+<font color=#447700>! abstract:  compute the x-derivatives of data with circle topology <a name='667'></font>
+<font color=#447700>!            for rows using compact-differencing and add to existing<a name='668'></font>
+<font color=#447700>!            an field.		       <a name='669'></font>
+<font color=#447700>!									       <a name='670'></font>
+<font color=#447700>! program history log:<a name='671'></font>
+<font color=#447700>!   1994-05-12  parrish,d. elimanate memory bank conflicts<a name='672'></font>
+<font color=#447700>!   2004-07-27  treadon - add intent in/out<a name='673'></font>
+<font color=#447700>!<a name='674'></font>
+<font color=#447700>!   input argument list:<a name='675'></font>
+<font color=#447700>!     p      - array of input data					       <a name='676'></font>
+<font color=#447700>!     aco1   - array containing the "a-coefficients", in the format of    <a name='677'></font>
+<font color=#447700>!              a banded l-d-u factorization, for the antisymmetric portion of   <a name='678'></font>
+<font color=#447700>!              the field to be differenced (initialized in cdcoef) 	    <a name='679'></font>
+<font color=#447700>!     bco1   - corresponding band-matrix of "b-coefficients"	   <a name='680'></font>
+<font color=#447700>!     aco2   - like aco1, but for the symmetric portion of the data	  <a name='681'></font>
+<font color=#447700>!     bco2   - like bco1, but for the symmetric portion of the data	 <a name='682'></font>
+<font color=#447700>!     nx     - number of points in a cyclic-row (x-direction) 	<a name='683'></font>
+<font color=#447700>!     ny     - number of parallel rows				<a name='684'></font>
+<font color=#447700>!     noq    - quarter of the order of differencing (1 implies 4th-order)<a name='685'></font>
+<font color=#447700>!     nxh    - one half of nx				       <a name='686'></font>
+<font color=#447700>!<a name='687'></font>
+<font color=#447700>!   output argument list:<a name='688'></font>
+<font color=#447700>!     q      - array of derivatives are added		   	       <a name='689'></font>
+<font color=#447700>!<a name='690'></font>
+<font color=#447700>! attributes:<a name='691'></font>
+<font color=#447700>!   language: f90<a name='692'></font>
+<font color=#447700>!   machine:  ibm rs/6000 sp<a name='693'></font>
+<font color=#447700>!$$$<a name='694'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_36">, only: r_kind,i_kind<a name='695'>
+  implicit none<a name='696'>
+<a name='697'>
+<font color=#447700>! Declare passed variables<a name='698'></font>
+  integer(i_kind),intent(in):: nx,ny,noq,nxh<a name='699'>
+  real(r_kind),dimension(ny,nx),intent(in):: p<a name='700'>
+  real(r_kind),dimension(nxh,-noq:noq),intent(in):: aco1,bco1,aco2,bco2<a name='701'>
+  real(r_kind),dimension(ny,nx),intent(out):: q<a name='702'>
+<a name='703'>
+<font color=#447700>! Declare local variables<a name='704'></font>
+  integer(i_kind) nxhp,ix,iy,nxp,ix1,ix2<a name='705'>
+  real(r_kind),dimension(ny,nx):: v1,v2<a name='706'>
+<a name='707'>
+  nxhp=nxh+1<a name='708'>
+  nxp=nx+1<a name='709'>
+<a name='710'>
+<font color=#447700>!  treat odd-symmetry component of input:<a name='711'></font>
+  do ix=1,nxh<a name='712'>
+     ix1=nxh+ix<a name='713'>
+     ix2=nxp-ix<a name='714'>
+     do iy=1,ny<a name='715'>
+        v1(iy,ix1)=p(iy,ix)-p(iy,ix2)<a name='716'>
+        v2(iy,ix)=p(iy,ix)+p(iy,nxp-ix)<a name='717'>
+     enddo<a name='718'>
+  enddo<a name='719'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XMULBV'>xmulbv</A><A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XMULBV_1">(bco1,v1(1,nxhp),v1,nxh,nxh,noq,noq,ny,nxh,nx,nx)<a name='720'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XBACBV'>xbacbv</A><A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XBACBV_1">(aco1,v1,nxh,noq,noq,ny,nxh,nx)<a name='721'>
+<a name='722'>
+<font color=#447700>!  treat even-symmetry component of input:<a name='723'></font>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XMULBV'>xmulbv</A><A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XMULBV_2">(bco2,v2,v2(1,nxhp),nxh,nxh,noq,noq,ny,nxh,nx,nx)<a name='724'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XBACBV'>xbacbv</A><A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XBACBV_2">(aco2,v2(1,nxhp),nxh,noq,noq,ny,nxh,nx)<a name='725'>
+  do ix=1,nxh<a name='726'>
+     ix1=nxp-ix<a name='727'>
+     ix2=nxh+ix<a name='728'>
+     do iy=1,ny<a name='729'>
+        q(iy,ix) =v1(iy,ix)+v2(iy,ix2)<a name='730'>
+        q(iy,ix1)=v1(iy,ix)-v2(iy,ix2)<a name='731'>
+     enddo<a name='732'>
+  enddo<a name='733'>
+  return<a name='734'>
+  end subroutine xdcirdp<a name='735'>
+<a name='736'>
+<A NAME='XMULBV'><A href='../../html_code/gsi/compact_diffs.f90.html#XMULBV' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='737'>
+  <font color=#993300>subroutine </font><font color=#cc0000>xmulbv</font>(a,v1,v2,n1x,n2x,nbh1,nbh2,ny, na,nv1,nv2) <A href='../../call_to/XMULBV.html' TARGET='index'>2</A>,<A href='../../call_from/XMULBV.html' TARGET='index'>2</A><a name='738'>
+<font color=#447700>!$$$  subprogram documentation block<a name='739'></font>
+<font color=#447700>!                .      .    .                                       .<a name='740'></font>
+<font color=#447700>! subprogram:    xmulbv multiplication of a banded matrix times x vectors<a name='741'></font>
+<font color=#447700>!   prgmmr: purser           org: np20                date: 1994-01-01<a name='742'></font>
+<font color=#447700>!<a name='743'></font>
+<font color=#447700>! abstract:  multiplication of a banded matrix times parallel x vectors     <a name='744'></font>
+<font color=#447700>!									       <a name='745'></font>
+<font color=#447700>!<a name='746'></font>
+<font color=#447700>! program history log:<a name='747'></font>
+<font color=#447700>!   1994-05-12  parrish,d. elimanate memory bank conflicts<a name='748'></font>
+<font color=#447700>!   2004-07-27  treadon - add intent in/out<a name='749'></font>
+<font color=#447700>!<a name='750'></font>
+<font color=#447700>!   input argument list:<a name='751'></font>
+<font color=#447700>!     a      - matrix<a name='752'></font>
+<font color=#447700>!     v1     - array of input vectors<a name='753'></font>
+<font color=#447700>!     n1x    - number of rows assumed for a and for v2<a name='754'></font>
+<font color=#447700>!     n2x    - number of columns assumed for a and rows for v1<a name='755'></font>
+<font color=#447700>!     nbh1   - left half-bandwidth of fortran array a<a name='756'></font>
+<font color=#447700>!     nbh2   - right half-bandwidth of fortran array a<a name='757'></font>
+<font color=#447700>!     ny     - number of parallel x-vectors<a name='758'></font>
+<font color=#447700>!     na     - first fortran dimension of a<a name='759'></font>
+<font color=#447700>!     nv1    - first fortran dimension of v1<a name='760'></font>
+<font color=#447700>!     nv2    - first fortran dimension of v2<a name='761'></font>
+<font color=#447700>!<a name='762'></font>
+<font color=#447700>!   output argument list:<a name='763'></font>
+<font color=#447700>!     v2     - array of output vectors<a name='764'></font>
+<font color=#447700>!<a name='765'></font>
+<font color=#447700>! attributes:<a name='766'></font>
+<font color=#447700>!   language: f90<a name='767'></font>
+<font color=#447700>!   machine:  ibm rs/6000 sp<a name='768'></font>
+<font color=#447700>!$$$<a name='769'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#XMULBV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_37">, only: r_kind,i_kind<a name='770'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#XMULBV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_26">, only: zero<a name='771'>
+  implicit none<a name='772'>
+<a name='773'>
+<font color=#447700>! Declare passed variables<a name='774'></font>
+  integer(i_kind),intent(in):: n1x,n2x,nbh1,nbh2,ny,na,nv1,nv2<a name='775'>
+  real(r_kind),dimension(na,-nbh1:nbh2),intent(in):: a<a name='776'>
+  real(r_kind),dimension(ny,nv1),intent(in):: v1<a name='777'>
+  real(r_kind),dimension(ny,nv2),intent(out):: v2<a name='778'>
+<a name='779'>
+<font color=#447700>! Declare local variables<a name='780'></font>
+  logical odd<a name='781'>
+  integer(i_kind) ix,iy,jix,ix1,iy1<a name='782'>
+<a name='783'>
+  odd=mod(ny,2)==1<a name='784'>
+  do ix=1,n1x<a name='785'>
+     do iy=1,ny<a name='786'>
+        v2(iy,ix)=zero<a name='787'>
+     enddo<a name='788'>
+  enddo<a name='789'>
+  do jix=-nbh1,nbh2<a name='790'>
+     do ix=max(1,1-jix),min(n1x,n2x-jix)<a name='791'>
+        ix1=jix+ix<a name='792'>
+        do iy=1,ny-1,2<a name='793'>
+           iy1=iy+1<a name='794'>
+           v2(iy,ix)=v2(iy,ix)+a(ix,jix)*v1(iy,ix1)<a name='795'>
+           v2(iy1,ix)=v2(iy1,ix)+a(ix,jix)*v1(iy1,ix1)<a name='796'>
+        enddo<a name='797'>
+        if (odd) v2(ny,ix)=v2(ny,ix)+a(ix,jix)*v1(ny,ix1)<a name='798'>
+     enddo<a name='799'>
+  enddo<a name='800'>
+  return<a name='801'>
+  end subroutine xmulbv<a name='802'>
+<a name='803'>
+<A NAME='XBACBV'><A href='../../html_code/gsi/compact_diffs.f90.html#XBACBV' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='804'>
+  <font color=#993300>subroutine </font><font color=#cc0000>xbacbv</font>(a,v,nx,nbh1,nbh2,ny,na,nv) <A href='../../call_to/XBACBV.html' TARGET='index'>2</A>,<A href='../../call_from/XBACBV.html' TARGET='index'>1</A><a name='805'>
+<font color=#447700>!$$$  subprogram documentation block<a name='806'></font>
+<font color=#447700>!                .      .    .                                       .<a name='807'></font>
+<font color=#447700>! subprogram:    xbacbv back-substitution step of parallel linear inversion<a name='808'></font>
+<font color=#447700>!   prgmmr: purser           org: np20                date:  1994-01-01<a name='809'></font>
+<font color=#447700>!<a name='810'></font>
+<font color=#447700>! abstract:  back-substitution step of parallel linear <a name='811'></font>
+<font color=#447700>!            inversion involving banded matrix and x-vectors.<a name='812'></font>
+<font color=#447700>!<a name='813'></font>
+<font color=#447700>! program history log:<a name='814'></font>
+<font color=#447700>!   1994-05-12  parrish,d. elimanate memory bank conflicts<a name='815'></font>
+<font color=#447700>!   2004-07-27  treadon - add intent in/out<a name='816'></font>
+<font color=#447700>!<a name='817'></font>
+<font color=#447700>!   input argument list:<a name='818'></font>
+<font color=#447700>!     a      - encodes the (l)*(d**-1)*(u) factorization of the linear-system<a name='819'></font>
+<font color=#447700>!              matrix, as supplied by subroutine aldub or, if n=na, by ldub<a name='820'></font>
+<font color=#447700>!     v      - right-hand-side vectors<a name='821'></font>
+<font color=#447700>!     nx     - number of rows assumed for a and length of<a name='822'></font>
+<font color=#447700>!              x-vectors stored in v<a name='823'></font>
+<font color=#447700>!     nbh1   - left half-bandwidth of fortran array a<a name='824'></font>
+<font color=#447700>!     nbh2   - right half-bandwidth of fortran array a<a name='825'></font>
+<font color=#447700>!     ny     - number of parallel x-vectors inverted<a name='826'></font>
+<font color=#447700>!     na     - first fortran dimension of a<a name='827'></font>
+<font color=#447700>!     nv     - first (x-direction) fortran dimension of v<a name='828'></font>
+<font color=#447700>!<a name='829'></font>
+<font color=#447700>!   output argument list:<a name='830'></font>
+<font color=#447700>!     v      - solution vectors<a name='831'></font>
+<font color=#447700>!<a name='832'></font>
+<font color=#447700>! attributes:<a name='833'></font>
+<font color=#447700>!   language: f90<a name='834'></font>
+<font color=#447700>!   machine:  ibm rs/6000 sp<a name='835'></font>
+<font color=#447700>!$$$<a name='836'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#XBACBV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_38">, only: r_kind,i_kind<a name='837'>
+  implicit none<a name='838'>
+<a name='839'>
+<font color=#447700>! Declare passed variables<a name='840'></font>
+  integer(i_kind),intent(in):: nx,nbh1,nbh2,ny,na,nv<a name='841'>
+  real(r_kind),dimension(na,-nbh1:nbh2),intent(in):: a<a name='842'>
+  real(r_kind),dimension(ny,nv),intent(inout):: v<a name='843'>
+<a name='844'>
+<font color=#447700>! Declare local variables<a name='845'></font>
+  integer(i_kind) jx,ix,iy,ix1<a name='846'>
+  real(r_kind) aij<a name='847'>
+<a name='848'>
+  do jx=1,nx<a name='849'>
+     do ix=jx+1,min(nx,jx+nbh1)<a name='850'>
+        ix1=jx-ix<a name='851'>
+        do iy=1,ny<a name='852'>
+           v(iy,ix)=v(iy,ix)-a(ix,ix1)*v(iy,jx)<a name='853'>
+        enddo<a name='854'>
+     end do<a name='855'>
+     do iy=1,ny<a name='856'>
+        v(iy,jx)=a(jx,0)*v(iy,jx)<a name='857'>
+     end do<a name='858'>
+  end do<a name='859'>
+  do jx=nx,2,-1<a name='860'>
+     do ix=max(1,jx-nbh2),jx-1<a name='861'>
+        ix1=jx-ix<a name='862'>
+        do iy=1,ny<a name='863'>
+           v(iy,ix)=v(iy,ix)-a(ix,ix1)*v(iy,jx)<a name='864'>
+        enddo<a name='865'>
+     enddo<a name='866'>
+  end do<a name='867'>
+<a name='868'>
+  return<a name='869'>
+  end subroutine xbacbv<a name='870'>
+<a name='871'>
+<A NAME='TSTVP2UV'><A href='../../html_code/gsi/compact_diffs.f90.html#TSTVP2UV' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='872'>
+  <font color=#993300>subroutine </font><font color=#cc0000>tstvp2uv</font>(work1,work2) <A href='../../call_to/TSTVP2UV.html' TARGET='index'>1</A>,<A href='../../call_from/TSTVP2UV.html' TARGET='index'>7</A><a name='873'>
+<font color=#447700>!$$$  subprogram documentation block<a name='874'></font>
+<font color=#447700>!                .      .    .                                       .<a name='875'></font>
+<font color=#447700>! subprogram:    tstvp2uv                           adjoint of stvp2uv<a name='876'></font>
+<font color=#447700>!   prgmmr: purser           org: np20               date:  1994-01-01<a name='877'></font>
+<font color=#447700>!<a name='878'></font>
+<font color=#447700>! abstract:  adjoint of stvp2uv which computes uv from streamfunction/<a name='879'></font>
+<font color=#447700>!            velocity potential by calculating gradient of a scalar <a name='880'></font>
+<font color=#447700>!            field using high-order compact differencing on a <a name='881'></font>
+<font color=#447700>!            spherical grid.<a name='882'></font>
+<font color=#447700>!<a name='883'></font>
+<font color=#447700>! program history log:<a name='884'></font>
+<font color=#447700>!   1994-05-15  parrish,d. elimanate memory bank conflicts<a name='885'></font>
+<font color=#447700>!   1994-05-17  parrish,d. reverse order of longitude and latitude<a name='886'></font>
+<font color=#447700>!   2004-07-27  treadon - add only on use declarations; add intent in/out<a name='887'></font>
+<font color=#447700>!   2004-10-26  kleist - fix sign error<a name='888'></font>
+<font color=#447700>!<a name='889'></font>
+<font color=#447700>!   input argument list:<a name='890'></font>
+<font color=#447700>!     work1  - array containing the adjoint u velocity <a name='891'></font>
+<font color=#447700>!     work2  - array containing the adjoint v velocity<a name='892'></font>
+<font color=#447700>!<a name='893'></font>
+<font color=#447700>!   output argument list:<a name='894'></font>
+<font color=#447700>!     work1  - array containing the adjoint streamfunction <a name='895'></font>
+<font color=#447700>!     work2  - array containing the adjoint velocity potential <a name='896'></font>
+<font color=#447700>!<a name='897'></font>
+<font color=#447700>! attributes:<a name='898'></font>
+<font color=#447700>!   language: f90<a name='899'></font>
+<font color=#447700>!   machine:  ibm rs/6000 sp<a name='900'></font>
+<font color=#447700>!$$$<a name='901'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#TSTVP2UV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_39">, only: r_kind,i_kind<a name='902'>
+  use <A href='../../html_code/gsi/gridmod.f90.html#GRIDMOD'>gridmod</A><A href='../../html_code/gsi/compact_diffs.f90.html#TSTVP2UV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GRIDMOD_28">, only: sinlon,coslon,ltosj_s,ltosi_s,ltosj,ltosi,&amp;<a name='903'>
+       itotsub,iglobal,nlat,nlon<a name='904'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#TSTVP2UV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_27">, only: zero<a name='905'>
+  implicit none<a name='906'>
+<a name='907'>
+<font color=#447700>! Declare passed scalars, arrays<a name='908'></font>
+  real(r_kind),dimension(max(iglobal,itotsub)),intent(inout):: work1,work2<a name='909'>
+<a name='910'>
+<font color=#447700>! Declare local scalars,arrays<a name='911'></font>
+  integer(i_kind) nx,ny,nxh,nbp,nya,nxa,lacox1,lbcox1,lacox2,lbcox2,lacoy1,lbcoy1<a name='912'>
+  integer(i_kind) lacoy2,lbcoy2,lcy,iy,ix,ni1,ni2,kk<a name='913'>
+  real(r_kind) polsu,polsv,polnu,polnv<a name='914'>
+  real(r_kind),dimension(nlon):: grid3n,grid3s,grid1n,grid1s<a name='915'>
+  real(r_kind),dimension(nlat-2,nlon):: a,b,grid2,grid3,grid1,grid4<a name='916'>
+<a name='917'>
+<a name='918'>
+  ny=nlat-2<a name='919'>
+  nxh=nlon/2<a name='920'>
+  nbp=2*noq+1<a name='921'>
+  nya=ny*nbp<a name='922'>
+  nxa=nxh*nbp<a name='923'>
+  <a name='924'>
+  lacox1=1<a name='925'>
+  lbcox1=lacox1+nxa<a name='926'>
+  lacox2=lbcox1+nxa<a name='927'>
+  lbcox2=lacox2+nxa<a name='928'>
+  lacoy1=lbcox2+nxa<a name='929'>
+  lbcoy1=lacoy1+nya<a name='930'>
+  lacoy2=lbcoy1+nya<a name='931'>
+  lbcoy2=lacoy2+nya<a name='932'>
+  lcy   =lbcoy2+nya-1<a name='933'>
+  <a name='934'>
+  do kk=1,iglobal<a name='935'>
+     ni1=ltosi(kk); ni2=ltosj(kk)<a name='936'>
+     if(ni1 /= 1 .and. ni1 /=nlat)then<a name='937'>
+        grid3(ni1-1,ni2)=work1(kk)<a name='938'>
+        grid1(ni1-1,ni2)=work2(kk)<a name='939'>
+     else if(ni1 == 1)then<a name='940'>
+        grid3s(ni2)=work1(kk)<a name='941'>
+        grid1s(ni2)=work2(kk)<a name='942'>
+     else<a name='943'>
+        grid3n(ni2)=work1(kk)<a name='944'>
+        grid1n(ni2)=work2(kk)<a name='945'>
+     end if<a name='946'>
+  end do<a name='947'>
+  <a name='948'>
+  polnu=zero<a name='949'>
+  polsu=zero<a name='950'>
+  polnv=zero<a name='951'>
+  polsv=zero<a name='952'>
+  do ix=1,nlon<a name='953'>
+     polnu=polnu+grid3n(ix)*coslon(ix)-sinlon(ix)*grid1n(ix)<a name='954'>
+     polsu=polsu+grid3s(ix)*coslon(ix)+sinlon(ix)*grid1s(ix)<a name='955'>
+     polnv=polnv+grid3n(ix)*sinlon(ix)+coslon(ix)*grid1n(ix)<a name='956'>
+     polsv=polsv+grid3s(ix)*sinlon(ix)+coslon(ix)*grid1s(ix)<a name='957'>
+  end do<a name='958'>
+  polnu=polnu/float(nlon)<a name='959'>
+  polsu=polsu/float(nlon)<a name='960'>
+  polnv=polnv/float(nlon)<a name='961'>
+  polsv=polsv/float(nlon)<a name='962'>
+  <a name='963'>
+  do ix=1,nlon<a name='964'>
+     grid3(ny,ix)=grid3(ny,ix)+polnu*coslon(ix)+polnv*sinlon(ix)<a name='965'>
+     grid3(1,ix) =grid3(1,ix) +polsu*coslon(ix)+polsv*sinlon(ix)<a name='966'>
+     grid1(ny,ix)=grid1(ny,ix)-polnu*sinlon(ix)+polnv*coslon(ix)<a name='967'>
+     grid1(1,ix) =grid1(1,ix) +polsu*sinlon(ix)+polsv*coslon(ix)<a name='968'>
+  end do<a name='969'>
+  <a name='970'>
+  <a name='971'>
+<font color=#447700>!  make corrections for convergence of meridians:<a name='972'></font>
+  do ix=1,nlon<a name='973'>
+     do iy=1,ny<a name='974'>
+        grid4(iy,ix)=grid1(iy,ix)<a name='975'>
+        grid2(iy,ix)=-grid3(iy,ix)<a name='976'>
+        grid3(iy,ix)=grid3(iy,ix)*coef(lcy+iy)<a name='977'>
+        grid1(iy,ix)=grid1(iy,ix)*coef(lcy+iy)<a name='978'>
+     end do<a name='979'>
+  end do<a name='980'>
+<a name='981'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP'>xdcirdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#TSTVP2UV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XDCIRDP_8">(grid3,b, &amp;<a name='982'>
+       coef(lacox1),coef(lbcox1),coef(lacox2),coef(lbcox2), &amp;<a name='983'>
+       nlon,ny,noq,nxh)<a name='984'>
+<a name='985'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP'>xdcirdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#TSTVP2UV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XDCIRDP_9">(grid1,a, &amp;<a name='986'>
+       coef(lacox1),coef(lbcox1),coef(lacox2),coef(lbcox2), &amp;<a name='987'>
+       nlon,ny,noq,nxh)<a name='988'>
+<a name='989'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#TYDSPHDP'>tydsphdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#TSTVP2UV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TYDSPHDP_1">(a,grid2, &amp;<a name='990'>
+       coef(lacoy1),coef(lbcoy1),coef(lacoy2),coef(lbcoy2), &amp;<a name='991'>
+       nlon,ny,noq)<a name='992'>
+<a name='993'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#TYDSPHDP'>tydsphdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#TSTVP2UV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TYDSPHDP_2">(b,grid4, &amp;<a name='994'>
+       coef(lacoy1),coef(lbcoy1),coef(lacoy2),coef(lbcoy2), &amp;<a name='995'>
+       nlon,ny,noq)<a name='996'>
+<a name='997'>
+  do kk=1,itotsub<a name='998'>
+     ni1=ltosi_s(kk); ni2=ltosj_s(kk)<a name='999'>
+     if(ni1 /=1 .and. ni1 /=nlat)then<a name='1000'>
+<font color=#447700>!       NOTE:  Adjoint of first derivative is its negative<a name='1001'></font>
+        work1(kk)=-a(ni1-1,ni2)<a name='1002'>
+        work2(kk)=-b(ni1-1,ni2)<a name='1003'>
+     else<a name='1004'>
+        work2(kk)=zero<a name='1005'>
+        work1(kk)=zero<a name='1006'>
+     end if<a name='1007'>
+  end do<a name='1008'>
+  <a name='1009'>
+  return<a name='1010'>
+  end subroutine tstvp2uv<a name='1011'>
+<a name='1012'>
+<A NAME='TSTVP2UV2'><A href='../../html_code/gsi/compact_diffs.f90.html#TSTVP2UV2' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1013'>
+  <font color=#993300>subroutine </font><font color=#cc0000>tstvp2uv2</font>(work1,work2),<A href='../../call_from/TSTVP2UV2.html' TARGET='index'>7</A><a name='1014'>
+<font color=#447700>!$$$  subprogram documentation block<a name='1015'></font>
+<font color=#447700>!                .      .    .                                       .<a name='1016'></font>
+<font color=#447700>! subprogram:    tstvp2uv                           adjoint of stvp2uv<a name='1017'></font>
+<font color=#447700>!   prgmmr: purser           org: np20               date:  1994-01-01<a name='1018'></font>
+<font color=#447700>!<a name='1019'></font>
+<font color=#447700>! abstract:  adjoint of stvp2uv which computes uv from streamfunction/<a name='1020'></font>
+<font color=#447700>!            velocity potential by calculating gradient of a scalar <a name='1021'></font>
+<font color=#447700>!            field using high-order compact differencing on a <a name='1022'></font>
+<font color=#447700>!            spherical grid.<a name='1023'></font>
+<font color=#447700>!<a name='1024'></font>
+<font color=#447700>! program history log:<a name='1025'></font>
+<font color=#447700>!   1994-05-15  parrish,d. elimanate memory bank conflicts<a name='1026'></font>
+<font color=#447700>!   1994-05-17  parrish,d. reverse order of longitude and latitude<a name='1027'></font>
+<font color=#447700>!   2004-07-27  treadon - add only on use declarations; add intent in/out<a name='1028'></font>
+<font color=#447700>!   2004-10-26  kleist - fix sign error<a name='1029'></font>
+<font color=#447700>!<a name='1030'></font>
+<font color=#447700>!   input argument list:<a name='1031'></font>
+<font color=#447700>!     work1  - array containing the adjoint u velocity <a name='1032'></font>
+<font color=#447700>!     work2  - array containing the adjoint v velocity<a name='1033'></font>
+<font color=#447700>!<a name='1034'></font>
+<font color=#447700>!   output argument list:<a name='1035'></font>
+<font color=#447700>!     work1  - array containing the adjoint streamfunction <a name='1036'></font>
+<font color=#447700>!     work2  - array containing the adjoint velocity potential <a name='1037'></font>
+<font color=#447700>!<a name='1038'></font>
+<font color=#447700>! attributes:<a name='1039'></font>
+<font color=#447700>!   language: f90<a name='1040'></font>
+<font color=#447700>!   machine:  ibm rs/6000 sp<a name='1041'></font>
+<font color=#447700>!$$$<a name='1042'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#TSTVP2UV2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_40">, only: r_kind,i_kind<a name='1043'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#TSTVP2UV2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_28">, only: zero<a name='1044'>
+  use <A href='../../html_code/gsi/gridmod.f90.html#GRIDMOD'>gridmod</A><A href='../../html_code/gsi/compact_diffs.f90.html#TSTVP2UV2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GRIDMOD_29">, only: nlon,nlat,sinlon,coslon<a name='1045'>
+  implicit none<a name='1046'>
+<a name='1047'>
+<font color=#447700>! Declare passed scalars, arrays<a name='1048'></font>
+  real(r_kind),dimension(nlat,nlon),intent(inout):: work1,work2<a name='1049'>
+<a name='1050'>
+<font color=#447700>! Declare local scalars,arrays<a name='1051'></font>
+  integer(i_kind) nx,ny,nxh,nbp,nya,nxa,lacox1,lbcox1,lacox2,lbcox2,lacoy1,lbcoy1<a name='1052'>
+  integer(i_kind) lacoy2,lbcoy2,lcy,iy,ix,ni1,ni2,kk,i,j<a name='1053'>
+  real(r_kind) polsu,polsv,polnu,polnv<a name='1054'>
+  real(r_kind),dimension(nlon):: grid3n,grid3s,grid1n,grid1s<a name='1055'>
+  real(r_kind),dimension(nlat-2,nlon):: a,b,grid2,grid3,grid1,grid4<a name='1056'>
+<a name='1057'>
+<a name='1058'>
+  ny=nlat-2<a name='1059'>
+  nxh=nlon/2<a name='1060'>
+  nbp=2*noq+1<a name='1061'>
+  nya=ny*nbp<a name='1062'>
+  nxa=nxh*nbp<a name='1063'>
+  <a name='1064'>
+  lacox1=1<a name='1065'>
+  lbcox1=lacox1+nxa<a name='1066'>
+  lacox2=lbcox1+nxa<a name='1067'>
+  lbcox2=lacox2+nxa<a name='1068'>
+  lacoy1=lbcox2+nxa<a name='1069'>
+  lbcoy1=lacoy1+nya<a name='1070'>
+  lacoy2=lbcoy1+nya<a name='1071'>
+  lbcoy2=lacoy2+nya<a name='1072'>
+  lcy   =lbcoy2+nya-1<a name='1073'>
+  <a name='1074'>
+  do j=1,nlon<a name='1075'>
+    grid3s(j)=work1(1,j)<a name='1076'>
+    grid1s(j)=work2(1,j)<a name='1077'>
+    grid3n(j)=work1(nlat,j)<a name='1078'>
+    grid1n(j)=work2(nlat,j)<a name='1079'>
+    do i=1,ny<a name='1080'>
+        grid3(i,j)=work1(i+1,j)<a name='1081'>
+        grid1(i,j)=work2(i+1,j)<a name='1082'>
+    end do<a name='1083'>
+  end do<a name='1084'>
+  polnu=zero<a name='1085'>
+  polsu=zero<a name='1086'>
+  polnv=zero<a name='1087'>
+  polsv=zero<a name='1088'>
+  do ix=1,nlon<a name='1089'>
+     polnu=polnu+grid3n(ix)*coslon(ix)-sinlon(ix)*grid1n(ix)<a name='1090'>
+     polsu=polsu+grid3s(ix)*coslon(ix)+sinlon(ix)*grid1s(ix)<a name='1091'>
+     polnv=polnv+grid3n(ix)*sinlon(ix)+coslon(ix)*grid1n(ix)<a name='1092'>
+     polsv=polsv+grid3s(ix)*sinlon(ix)+coslon(ix)*grid1s(ix)<a name='1093'>
+  end do<a name='1094'>
+  polnu=polnu/float(nlon)<a name='1095'>
+  polsu=polsu/float(nlon)<a name='1096'>
+  polnv=polnv/float(nlon)<a name='1097'>
+  polsv=polsv/float(nlon)<a name='1098'>
+  <a name='1099'>
+  do ix=1,nlon<a name='1100'>
+     grid3(ny,ix)=grid3(ny,ix)+polnu*coslon(ix)+polnv*sinlon(ix)<a name='1101'>
+     grid3(1,ix) =grid3(1,ix) +polsu*coslon(ix)+polsv*sinlon(ix)<a name='1102'>
+     grid1(ny,ix)=grid1(ny,ix)-polnu*sinlon(ix)+polnv*coslon(ix)<a name='1103'>
+     grid1(1,ix) =grid1(1,ix) +polsu*sinlon(ix)+polsv*coslon(ix)<a name='1104'>
+  end do<a name='1105'>
+  <a name='1106'>
+  <a name='1107'>
+<font color=#447700>!  make corrections for convergence of meridians:<a name='1108'></font>
+  do ix=1,nlon<a name='1109'>
+     do iy=1,ny<a name='1110'>
+        grid4(iy,ix)=grid1(iy,ix)<a name='1111'>
+        grid2(iy,ix)=-grid3(iy,ix)<a name='1112'>
+        grid3(iy,ix)=grid3(iy,ix)*coef(lcy+iy)<a name='1113'>
+        grid1(iy,ix)=grid1(iy,ix)*coef(lcy+iy)<a name='1114'>
+     end do<a name='1115'>
+  end do<a name='1116'>
+<a name='1117'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP'>xdcirdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#TSTVP2UV2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XDCIRDP_10">(grid3,b, &amp;<a name='1118'>
+       coef(lacox1),coef(lbcox1),coef(lacox2),coef(lbcox2), &amp;<a name='1119'>
+       nlon,ny,noq,nxh)<a name='1120'>
+<a name='1121'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP'>xdcirdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#TSTVP2UV2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XDCIRDP_11">(grid1,a, &amp;<a name='1122'>
+       coef(lacox1),coef(lbcox1),coef(lacox2),coef(lbcox2), &amp;<a name='1123'>
+       nlon,ny,noq,nxh)<a name='1124'>
+<a name='1125'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#TYDSPHDP'>tydsphdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#TSTVP2UV2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TYDSPHDP_3">(a,grid2, &amp;<a name='1126'>
+       coef(lacoy1),coef(lbcoy1),coef(lacoy2),coef(lbcoy2), &amp;<a name='1127'>
+       nlon,ny,noq)<a name='1128'>
+<a name='1129'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#TYDSPHDP'>tydsphdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#TSTVP2UV2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TYDSPHDP_4">(b,grid4, &amp;<a name='1130'>
+       coef(lacoy1),coef(lbcoy1),coef(lacoy2),coef(lbcoy2), &amp;<a name='1131'>
+       nlon,ny,noq)<a name='1132'>
+<a name='1133'>
+  do j=1,nlon<a name='1134'>
+    work1(1,j)=zero<a name='1135'>
+    work2(1,j)=zero<a name='1136'>
+    work1(nlat,j)=zero<a name='1137'>
+    work2(nlat,j)=zero<a name='1138'>
+    do i=1,ny<a name='1139'>
+<font color=#447700>!       NOTE:  Adjoint of first derivative is its negative<a name='1140'></font>
+        work1(i+1,j)=-a(i,j)<a name='1141'>
+        work2(i+1,j)=-b(i,j)<a name='1142'>
+    end do<a name='1143'>
+  end do<a name='1144'>
+  <a name='1145'>
+  return<a name='1146'>
+  end subroutine tstvp2uv2<a name='1147'>
+<a name='1148'>
+<A NAME='YDSPHDP'><A href='../../html_code/gsi/compact_diffs.f90.html#YDSPHDP' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1149'>
+  <font color=#993300>subroutine </font><font color=#cc0000>ydsphdp</font>(p,q,aco1,bco1,aco2,bco2,nx,ny,noq) <A href='../../call_to/YDSPHDP.html' TARGET='index'>8</A>,<A href='../../call_from/YDSPHDP.html' TARGET='index'>5</A><a name='1150'>
+<font color=#447700>!$$$  subprogram documentation block<a name='1151'></font>
+<font color=#447700>!                .      .    .                                       .<a name='1152'></font>
+<font color=#447700>! subprogram:    ydsphdp               compute y derivatives on sphere<a name='1153'></font>
+<font color=#447700>!   prgmmr: purser           org: np20               date:  1994-01-01<a name='1154'></font>
+<font color=#447700>!<a name='1155'></font>
+<font color=#447700>! abstract:  compute the y-derivatives of data with spherical topology    <a name='1156'></font>
+<font color=#447700>!  using compact-differencing and add to an existing field		    <a name='1157'></font>
+<font color=#447700>!<a name='1158'></font>
+<font color=#447700>! program history log:<a name='1159'></font>
+<font color=#447700>!   1994-05-12  parrish,d. elimanate memory bank conflicts<a name='1160'></font>
+<font color=#447700>!   2004-07-27  treadon - add only on use declarations; add intent in/out<a name='1161'></font>
+<font color=#447700>!<a name='1162'></font>
+<font color=#447700>!   input argument list:<a name='1163'></font>
+<font color=#447700>!     p      - array of input data					  <a name='1164'></font>
+<font color=#447700>!     q      - array to which derivatives are added			   <a name='1165'></font>
+<font color=#447700>!     aco1   - array containing the "a-coefficients", in the format of <a name='1166'></font>
+<font color=#447700>!              a banded l-d-u factorization, for the antisymmetric portion of <a name='1167'></font>
+<font color=#447700>!              the field to be differenced (initialized in cdcoef) 	   <a name='1168'></font>
+<font color=#447700>!     bco1   - corresponding band-matrix of "b-coefficients"	  <a name='1169'></font>
+<font color=#447700>!     aco2   - like aco1, but for the symmetric portion of the data	 <a name='1170'></font>
+<font color=#447700>!     bco2   - like bco1, but for the symmetric portion of the data	<a name='1171'></font>
+<font color=#447700>!     nx     - number of longitudes (x-direction), an even number.	<a name='1172'></font>
+<font color=#447700>!     ny     - number of latitude points (y-direction)	<a name='1173'></font>
+<font color=#447700>!     noq    - quarter of the order of differencing (1 implies 4th-order) <a name='1174'></font>
+<font color=#447700>!<a name='1175'></font>
+<font color=#447700>!   output argument list:<a name='1176'></font>
+<font color=#447700>!     q      - array to which derivatives are added			   <a name='1177'></font>
+<font color=#447700>!<a name='1178'></font>
+<font color=#447700>! attributes:<a name='1179'></font>
+<font color=#447700>!   language: f90<a name='1180'></font>
+<font color=#447700>!   machine:  ibm rs/6000 sp<a name='1181'></font>
+<font color=#447700>!$$$<a name='1182'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#YDSPHDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_41">, only: r_kind,i_kind<a name='1183'>
+  implicit none<a name='1184'>
+<a name='1185'>
+<font color=#447700>! Declare passed variables<a name='1186'></font>
+  integer(i_kind),intent(in):: nx,ny,noq<a name='1187'>
+  real(r_kind),dimension(ny,-noq:noq),intent(in):: aco1,bco1,aco2,bco2<a name='1188'>
+  real(r_kind),dimension(ny,nx),intent(in):: p<a name='1189'>
+  real(r_kind),dimension(ny,nx),intent(out):: q<a name='1190'>
+<a name='1191'>
+<font color=#447700>! Declare local variables<a name='1192'></font>
+  integer(i_kind) nxh,nxhp,ix,iy,ix1<a name='1193'>
+  real(r_kind),dimension(ny,nx):: v1,v2<a name='1194'>
+<a name='1195'>
+  nxh=nx/2<a name='1196'>
+  nxhp=nxh+1<a name='1197'>
+<a name='1198'>
+<font color=#447700>!  treat odd-symmetry component of input:<a name='1199'></font>
+  do ix=1,nxh<a name='1200'>
+     ix1=nxh+ix<a name='1201'>
+     do iy=1,ny<a name='1202'>
+        v1(iy,ix1)=p(iy,ix)-p(iy,ix1)<a name='1203'>
+        v2(iy,ix)= p(iy,ix)+p(iy,ix1)<a name='1204'>
+     enddo<a name='1205'>
+  enddo<a name='1206'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#YMULBV'>ymulbv</A><A href='../../html_code/gsi/compact_diffs.f90.html#YDSPHDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YMULBV_1">(bco1,v1(1,nxhp),v1,ny,ny,noq,noq,nxh,ny,nx,nx)<a name='1207'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#YBACBV'>ybacbv</A><A href='../../html_code/gsi/compact_diffs.f90.html#YDSPHDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YBACBV_1">(aco1,v1,ny,noq,noq,nxh,ny,nx)<a name='1208'>
+<a name='1209'>
+<font color=#447700>!  treat even-symmetry component of input:<a name='1210'></font>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#YMULBV'>ymulbv</A><A href='../../html_code/gsi/compact_diffs.f90.html#YDSPHDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YMULBV_2">(bco2,v2,v2(1,nxhp),ny,ny,noq,noq,nxh,ny,nx,nx)<a name='1211'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#YBACBV'>ybacbv</A><A href='../../html_code/gsi/compact_diffs.f90.html#YDSPHDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YBACBV_2">(aco2,v2(1,nxhp),ny,noq,noq,nxh,ny,nx)<a name='1212'>
+  do ix=1,nxh<a name='1213'>
+     ix1=nxh+ix<a name='1214'>
+     do iy=1,ny<a name='1215'>
+        q(iy,ix)=v2(iy,ix1)+v1(iy,ix)<a name='1216'>
+        q(iy,ix1)=v2(iy,ix1)-v1(iy,ix)<a name='1217'>
+     enddo<a name='1218'>
+  enddo<a name='1219'>
+  return<a name='1220'>
+  end subroutine ydsphdp<a name='1221'>
+<a name='1222'>
+<A NAME='YMULBV'><A href='../../html_code/gsi/compact_diffs.f90.html#YMULBV' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1223'>
+  <font color=#993300>subroutine </font><font color=#cc0000>ymulbv</font>(a,v1,v2, n1y,n2y,nbh1,nbh2,nx, na,nv1,nv2) <A href='../../call_to/YMULBV.html' TARGET='index'>2</A>,<A href='../../call_from/YMULBV.html' TARGET='index'>2</A><a name='1224'>
+<font color=#447700>!$$$  subprogram documentation block<a name='1225'></font>
+<font color=#447700>!                .      .    .                                       .<a name='1226'></font>
+<font color=#447700>! subprogram:    ymulbv multiplication of a banded matrix times parallel y vects<a name='1227'></font>
+<font color=#447700>!   prgmmr: purser           org: np20               date:  1994-01-01<a name='1228'></font>
+<font color=#447700>!<a name='1229'></font>
+<font color=#447700>! abstract:  multiplication of a banded matrix times parallel y-vectors.<a name='1230'></font>
+<font color=#447700>!<a name='1231'></font>
+<font color=#447700>! program history log:<a name='1232'></font>
+<font color=#447700>!   1994-05-12  parrish,d. elimanate memory bank conflicts<a name='1233'></font>
+<font color=#447700>!   2004-07-27  treadon - add only on use declarations; add intent in/out<a name='1234'></font>
+<font color=#447700>!<a name='1235'></font>
+<font color=#447700>!   input argument list:<a name='1236'></font>
+<font color=#447700>!     a      - matrix<a name='1237'></font>
+<font color=#447700>!     v1     - array of input vectors<a name='1238'></font>
+<font color=#447700>!     n1y    - number of rows assumed for a and for v2<a name='1239'></font>
+<font color=#447700>!     n2y    - number of columns assumed for a and rows for v1<a name='1240'></font>
+<font color=#447700>!     nbh1   - left half-bandwidth of fortran array a<a name='1241'></font>
+<font color=#447700>!     nbh2   - right half-bandwidth of fortran array a<a name='1242'></font>
+<font color=#447700>!     nx     - length of each of the parallel y-vectors<a name='1243'></font>
+<font color=#447700>!     na     - first fortran dimension of a<a name='1244'></font>
+<font color=#447700>!     nv1    - first fortran dimension of v1<a name='1245'></font>
+<font color=#447700>!     nv2    - first fortran dimension of v2<a name='1246'></font>
+<font color=#447700>!<a name='1247'></font>
+<font color=#447700>!   output argument list:<a name='1248'></font>
+<font color=#447700>!     v2     - array of output vectors<a name='1249'></font>
+<font color=#447700>!<a name='1250'></font>
+<font color=#447700>! attributes:<a name='1251'></font>
+<font color=#447700>!   language: f90<a name='1252'></font>
+<font color=#447700>!   machine:  ibm rs/6000 sp<a name='1253'></font>
+<font color=#447700>!$$$<a name='1254'></font>
+<a name='1255'>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#YMULBV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_42">, only: r_kind,i_kind<a name='1256'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#YMULBV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_29">, only: zero<a name='1257'>
+  implicit none<a name='1258'>
+<a name='1259'>
+<font color=#447700>! Declare passed variables<a name='1260'></font>
+  integer(i_kind),intent(in):: n1y,n2y,nbh1,nbh2,nx,na,nv1,nv2<a name='1261'>
+  real(r_kind),dimension(na,-nbh1:nbh2),intent(in):: a<a name='1262'>
+  real(r_kind),dimension(n2y,nv1),intent(in):: v1<a name='1263'>
+  real(r_kind),dimension(n1y,nv2),intent(out):: v2<a name='1264'>
+<a name='1265'>
+<font color=#447700>! Declare local variables<a name='1266'></font>
+  integer(i_kind) ix,iy,jy,jiy<a name='1267'>
+  real(r_kind) aij<a name='1268'>
+<a name='1269'>
+  do ix=1,nx<a name='1270'>
+     do iy=1,n1y<a name='1271'>
+        v2(iy,ix)=zero<a name='1272'>
+     enddo<a name='1273'>
+  enddo<a name='1274'>
+  do ix=1,nx<a name='1275'>
+     do jiy=-nbh1,nbh2<a name='1276'>
+        do iy=max(1,1-jiy),min(n1y,n2y-jiy)<a name='1277'>
+           v2(iy,ix)=v2(iy,ix)+a(iy,jiy)*v1(jiy+iy,ix)<a name='1278'>
+        enddo<a name='1279'>
+     end do<a name='1280'>
+  end do<a name='1281'>
+  return<a name='1282'>
+  end subroutine ymulbv<a name='1283'>
+<a name='1284'>
+<A NAME='YBACBV'><A href='../../html_code/gsi/compact_diffs.f90.html#YBACBV' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1285'>
+  <font color=#993300>subroutine </font><font color=#cc0000>ybacbv</font>(a,v,ny,nbh1,nbh2,nx,na,nv) <A href='../../call_to/YBACBV.html' TARGET='index'>2</A>,<A href='../../call_from/YBACBV.html' TARGET='index'>1</A><a name='1286'>
+<font color=#447700>!$$$  subprogram documentation block<a name='1287'></font>
+<font color=#447700>!                .      .    .                                       .<a name='1288'></font>
+<font color=#447700>! subprogram:    ybacbv back-substitution step of parallel linear inversion<a name='1289'></font>
+<font color=#447700>!   prgmmr: purser           org: np20               date:  1994-01-01<a name='1290'></font>
+<font color=#447700>!<a name='1291'></font>
+<font color=#447700>! abstract:  back-substitution step of parallel linear inversion involving<a name='1292'></font>
+<font color=#447700>!  banded matrix and y-vectors.<a name='1293'></font>
+<font color=#447700>!<a name='1294'></font>
+<font color=#447700>! program history log:<a name='1295'></font>
+<font color=#447700>!   1994-05-12  parrish,d. elimanate memory bank conflicts<a name='1296'></font>
+<font color=#447700>!   2004-07-27  treadon - add intent in/out<a name='1297'></font>
+<font color=#447700>!<a name='1298'></font>
+<font color=#447700>!   input argument list:<a name='1299'></font>
+<font color=#447700>!     v      - right-hand-side vectors<a name='1300'></font>
+<font color=#447700>!     a      - encodes the (l)*(d**-1)*(u) factorization of the linear-system<a name='1301'></font>
+<font color=#447700>!              matrix, as supplied by subroutine aldub or, if n=na, by ldub<a name='1302'></font>
+<font color=#447700>!     ny     - number of rows assumed for a and length of<a name='1303'></font>
+<font color=#447700>!              y-vectors stored in v<a name='1304'></font>
+<font color=#447700>!     nbh1   - left half-bandwidth of fortran array a<a name='1305'></font>
+<font color=#447700>!     nbh2   - right half-bandwidth of fortran array a<a name='1306'></font>
+<font color=#447700>!     nx     - number of parallel y-vectors inverted<a name='1307'></font>
+<font color=#447700>!     na     - first fortran dimension of a<a name='1308'></font>
+<font color=#447700>!     nv     - first (x-direction) fortran dimension of v<a name='1309'></font>
+<font color=#447700>!<a name='1310'></font>
+<font color=#447700>!   output argument list:<a name='1311'></font>
+<font color=#447700>!     v      - solution vectors<a name='1312'></font>
+<font color=#447700>!<a name='1313'></font>
+<font color=#447700>! attributes:<a name='1314'></font>
+<font color=#447700>!   language: f90<a name='1315'></font>
+<font color=#447700>!   machine:  ibm rs/6000 sp<a name='1316'></font>
+<font color=#447700>!$$$<a name='1317'></font>
+<a name='1318'>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#YBACBV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_43">, only: r_kind,i_kind<a name='1319'>
+  implicit none<a name='1320'>
+<a name='1321'>
+<font color=#447700>! Declare passed variables<a name='1322'></font>
+  integer(i_kind),intent(in):: ny,nbh1,nbh2,nx,na,nv<a name='1323'>
+  real(r_kind),dimension(na,-nbh1:nbh2),intent(in):: a<a name='1324'>
+  real(r_kind),dimension(ny,nv),intent(inout):: v<a name='1325'>
+<a name='1326'>
+<font color=#447700>! Declare local variables<a name='1327'></font>
+  logical odd<a name='1328'>
+  integer(i_kind) jy,iy,ix,ix1<a name='1329'>
+  real(r_kind) aij<a name='1330'>
+<a name='1331'>
+  odd = mod(nx,2)==1<a name='1332'>
+  do ix=1,nx-1,2<a name='1333'>
+     ix1=ix+1<a name='1334'>
+     do jy=1,ny<a name='1335'>
+        do iy=jy+1,min(ny,jy+nbh1)<a name='1336'>
+           v(iy,ix) =v(iy,ix) -a(iy,jy-iy)*v(jy,ix)<a name='1337'>
+           v(iy,ix1)=v(iy,ix1)-a(iy,jy-iy)*v(jy,ix1)<a name='1338'>
+        enddo<a name='1339'>
+        v(jy,ix) =a(jy,0)*v(jy,ix)<a name='1340'>
+        v(jy,ix1)=a(jy,0)*v(jy,ix1)<a name='1341'>
+     end do<a name='1342'>
+     do jy=ny,2,-1<a name='1343'>
+        do iy=max(1,jy-nbh2),jy-1<a name='1344'>
+           v(iy,ix) =v(iy,ix) -a(iy,jy-iy)*v(jy,ix)<a name='1345'>
+           v(iy,ix1)=v(iy,ix1)-a(iy,jy-iy)*v(jy,ix1)<a name='1346'>
+        enddo<a name='1347'>
+     enddo<a name='1348'>
+  end do<a name='1349'>
+  if (odd) then<a name='1350'>
+     ix=nx<a name='1351'>
+     do jy=1,ny<a name='1352'>
+        do iy=jy+1,min(ny,jy+nbh1)<a name='1353'>
+           v(iy,ix)=v(iy,ix)-a(iy,jy-iy)*v(jy,ix)<a name='1354'>
+        enddo<a name='1355'>
+        v(jy,ix)=a(jy,0)*v(jy,ix)<a name='1356'>
+     end do<a name='1357'>
+     do jy=ny,2,-1<a name='1358'>
+        do iy=max(1,jy-nbh2),jy-1<a name='1359'>
+           v(iy,ix)=v(iy,ix)-a(iy,jy-iy)*v(jy,ix)<a name='1360'>
+        enddo<a name='1361'>
+     enddo<a name='1362'>
+  endif<a name='1363'>
+     <a name='1364'>
+  return<a name='1365'>
+  end subroutine ybacbv<a name='1366'>
+<a name='1367'>
+<A NAME='TYDSPHDP'><A href='../../html_code/gsi/compact_diffs.f90.html#TYDSPHDP' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1368'>
+  <font color=#993300>subroutine </font><font color=#cc0000>tydsphdp</font>(p,q,aco1,bco1,aco2,bco2,nx,ny,noq) <A href='../../call_to/TYDSPHDP.html' TARGET='index'>5</A>,<A href='../../call_from/TYDSPHDP.html' TARGET='index'>5</A><a name='1369'>
+<font color=#447700>!$$$  subprogram documentation block<a name='1370'></font>
+<font color=#447700>!                .      .    .                                       .<a name='1371'></font>
+<font color=#447700>! subprogram:    tydsphdp                           adjoint of ydsphdp<a name='1372'></font>
+<font color=#447700>!   prgmmr: purser           org: np20               date:  1994-01-01<a name='1373'></font>
+<font color=#447700>!<a name='1374'></font>
+<font color=#447700>! abstract:  adjoint of ydsphdp which computes the y-derivatives of<a name='1375'></font>
+<font color=#447700>!            data with spherical topology using compact-differencing<a name='1376'></font>
+<font color=#447700>!            and add to an existing field		    <a name='1377'></font>
+<font color=#447700>!<a name='1378'></font>
+<font color=#447700>! program history log:<a name='1379'></font>
+<font color=#447700>!   1994-05-12  parrish,d. elimanate memory bank conflicts<a name='1380'></font>
+<font color=#447700>!   2004-07-27  treadon - add intent in/out<a name='1381'></font>
+<font color=#447700>!<a name='1382'></font>
+<font color=#447700>!   input argument list:<a name='1383'></font>
+<font color=#447700>!     q      - array of input adjoint data  <a name='1384'></font>
+<font color=#447700>!     aco1   - array containing the "a-coefficients", in the format of <a name='1385'></font>
+<font color=#447700>!              a banded l-d-u factorization, for the antisymmetric portion of <a name='1386'></font>
+<font color=#447700>!              the field to be differenced (initialized in cdcoef) 	   <a name='1387'></font>
+<font color=#447700>!     bco1   - corresponding band-matrix of "b-coefficients"	  <a name='1388'></font>
+<font color=#447700>!     aco2   - like aco1, but for the symmetric portion of the data	 <a name='1389'></font>
+<font color=#447700>!     bco2   - like bco1, but for the symmetric portion of the data	<a name='1390'></font>
+<font color=#447700>!     nx     - number of longitudes (x-direction), an even number.	<a name='1391'></font>
+<font color=#447700>!     ny     - number of latitude points (y-direction)	<a name='1392'></font>
+<font color=#447700>!     noq    - quarter of the order of differencing (1 implies 4th-order) <a name='1393'></font>
+<font color=#447700>!<a name='1394'></font>
+<font color=#447700>!   output argument list:<a name='1395'></font>
+<font color=#447700>!     p      - array to which adjoint derivatives are added  <a name='1396'></font>
+<font color=#447700>!<a name='1397'></font>
+<font color=#447700>! attributes:<a name='1398'></font>
+<font color=#447700>!   language: f90<a name='1399'></font>
+<font color=#447700>!   machine:  ibm rs/6000 sp<a name='1400'></font>
+<font color=#447700>!$$$<a name='1401'></font>
+<a name='1402'>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#TYDSPHDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_44">, only: r_kind,i_kind<a name='1403'>
+  implicit none<a name='1404'>
+<a name='1405'>
+<font color=#447700>! Declare passed variables<a name='1406'></font>
+  integer(i_kind),intent(in):: nx,ny,noq<a name='1407'>
+  real(r_kind),dimension(ny,-noq:noq),intent(in):: aco1,bco1,aco2,bco2<a name='1408'>
+  real(r_kind),dimension(ny,nx),intent(in):: q<a name='1409'>
+  real(r_kind),dimension(ny,nx),intent(out):: p<a name='1410'>
+<a name='1411'>
+<font color=#447700>! Declare local variables<a name='1412'></font>
+  integer(i_kind) nxh,nxhp,ix,iy,ix1<a name='1413'>
+  real(r_kind),dimension(ny,nx):: v1,v2<a name='1414'>
+<a name='1415'>
+  nxh=nx/2<a name='1416'>
+  nxhp=nxh+1<a name='1417'>
+  do ix=1,nxh<a name='1418'>
+     ix1=nxh+ix<a name='1419'>
+     do iy=1,ny<a name='1420'>
+        v1(iy,ix1)=q(iy,ix)+q(iy,ix1)<a name='1421'>
+        v2(iy,ix)=q(iy,ix)-q(iy,ix1)<a name='1422'>
+     enddo<a name='1423'>
+  enddo<a name='1424'>
+  <a name='1425'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#YBACVB'>ybacvb</A><A href='../../html_code/gsi/compact_diffs.f90.html#TYDSPHDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YBACVB_1">(v1(1,nxhp),aco2,ny,noq,noq,nxh,nx,ny)<a name='1426'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#YMULVB'>ymulvb</A><A href='../../html_code/gsi/compact_diffs.f90.html#TYDSPHDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YMULVB_1">(v1(1,nxhp),bco2,v1,ny,ny,noq,noq,nxh,nx,ny,nx)<a name='1427'>
+  <a name='1428'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#YBACVB'>ybacvb</A><A href='../../html_code/gsi/compact_diffs.f90.html#TYDSPHDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YBACVB_2">(v2,aco1,ny,noq,noq,nxh,nx,ny)<a name='1429'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#YMULVB'>ymulvb</A><A href='../../html_code/gsi/compact_diffs.f90.html#TYDSPHDP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YMULVB_2">(v2,bco1,v2(1,nxhp),ny,ny,noq,noq,nxh,nx,ny,nx)<a name='1430'>
+  do ix=1,nxh<a name='1431'>
+     ix1=nxh+ix<a name='1432'>
+     do iy=1,ny<a name='1433'>
+        p(iy,ix)=p(iy,ix)-v1(iy,ix)-v2(iy,ix1)<a name='1434'>
+        p(iy,ix1)=p(iy,ix1)-v1(iy,ix)+v2(iy,ix1)<a name='1435'>
+     enddo<a name='1436'>
+  enddo<a name='1437'>
+  <a name='1438'>
+  return<a name='1439'>
+  end subroutine tydsphdp<a name='1440'>
+<a name='1441'>
+<A NAME='YBACVB'><A href='../../html_code/gsi/compact_diffs.f90.html#YBACVB' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1442'>
+  <font color=#993300>subroutine </font><font color=#cc0000>ybacvb</font>(v,a,ny,nbh1,nbh2,nx,nv,na) <A href='../../call_to/YBACVB.html' TARGET='index'>2</A>,<A href='../../call_from/YBACVB.html' TARGET='index'>1</A><a name='1443'>
+<font color=#447700>!$$$  subprogram documentation block<a name='1444'></font>
+<font color=#447700>!                .      .    .                                       .<a name='1445'></font>
+<font color=#447700>! subprogram:    ybacvb back-substitution step of parallel linear inversion<a name='1446'></font>
+<font color=#447700>!   prgmmr: purser           org: np20               date:  1994-01-01<a name='1447'></font>
+<font color=#447700>!<a name='1448'></font>
+<font color=#447700>! abstract:  back-substitution step of parallel linear inversion involving<a name='1449'></font>
+<font color=#447700>!            banded matrix and row-y-vectors.<a name='1450'></font>
+<font color=#447700>!<a name='1451'></font>
+<font color=#447700>! program history log:<a name='1452'></font>
+<font color=#447700>!   1994-05-12  parrish,d. elimanate memory bank conflicts<a name='1453'></font>
+<font color=#447700>!   2004-07-27  treadon - add intent in/out<a name='1454'></font>
+<font color=#447700>!<a name='1455'></font>
+<font color=#447700>!   input argument list:<a name='1456'></font>
+<font color=#447700>!     v      - right-hand-side vectors<a name='1457'></font>
+<font color=#447700>!     a      - encodes the (l)*(d**-1)*(u) factorization of the linear-system<a name='1458'></font>
+<font color=#447700>!              matrix, as supplied by subroutine aldub or, if n=na, by ldub<a name='1459'></font>
+<font color=#447700>!     ny     - number of rows assumed for a and length of<a name='1460'></font>
+<font color=#447700>!              y-vectors stored in v<a name='1461'></font>
+<font color=#447700>!     nbh1   - left half-bandwidth of fortran array a<a name='1462'></font>
+<font color=#447700>!     nbh2   - right half-bandwidth of fortran array a<a name='1463'></font>
+<font color=#447700>!     nx     - number of parallel y-vectors inverted<a name='1464'></font>
+<font color=#447700>!     na     - first fortran dimension of a<a name='1465'></font>
+<font color=#447700>!     nv     - first (x-direction) fortran dimension of v<a name='1466'></font>
+<font color=#447700>!<a name='1467'></font>
+<font color=#447700>!   output argument list:<a name='1468'></font>
+<font color=#447700>!     v      - solution vectors<a name='1469'></font>
+<font color=#447700>!<a name='1470'></font>
+<font color=#447700>! attributes:<a name='1471'></font>
+<font color=#447700>!   language: f90<a name='1472'></font>
+<font color=#447700>!   machine:  ibm rs/6000 sp<a name='1473'></font>
+<font color=#447700>!$$$<a name='1474'></font>
+<a name='1475'>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#YBACVB' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_45">, only: r_kind,i_kind<a name='1476'>
+  implicit none<a name='1477'>
+<a name='1478'>
+<font color=#447700>! Declare passed variables<a name='1479'></font>
+  integer(i_kind),intent(in):: ny,nbh1,nbh2,nx,nv,na<a name='1480'>
+  real(r_kind),dimension(na,-nbh1:nbh2),intent(in):: a<a name='1481'>
+  real(r_kind),dimension(ny,nv),intent(inout):: v<a name='1482'>
+<a name='1483'>
+<font color=#447700>! Declare local variables  <a name='1484'></font>
+  logical odd<a name='1485'>
+  integer(i_kind) iy,jy,ix,ix1<a name='1486'>
+  real(r_kind) aij<a name='1487'>
+<a name='1488'>
+  odd = mod(nx,2)==1<a name='1489'>
+<a name='1490'>
+  do ix=1,nx-1,2<a name='1491'>
+     ix1=ix+1<a name='1492'>
+     do iy=1,ny<a name='1493'>
+        do jy=iy+1,min(ny,iy+nbh2)<a name='1494'>
+           v(jy,ix) =v(jy,ix) -v(iy,ix) *a(iy,jy-iy)<a name='1495'>
+           v(jy,ix1)=v(jy,ix1)-v(iy,ix1)*a(iy,jy-iy)<a name='1496'>
+        enddo<a name='1497'>
+        v(iy,ix) =v(iy,ix) *a(iy,0)<a name='1498'>
+        v(iy,ix1)=v(iy,ix1)*a(iy,0)<a name='1499'>
+     enddo<a name='1500'>
+<a name='1501'>
+     do iy=ny,2,-1<a name='1502'>
+        do jy=max(1,iy-nbh1),iy-1<a name='1503'>
+           v(jy,ix) =v(jy,ix) -v(iy,ix) *a(iy,jy-iy)<a name='1504'>
+           v(jy,ix1)=v(jy,ix1)-v(iy,ix1)*a(iy,jy-iy)<a name='1505'>
+        enddo<a name='1506'>
+     enddo<a name='1507'>
+  end do<a name='1508'>
+<a name='1509'>
+  if (odd) then<a name='1510'>
+     ix=nx<a name='1511'>
+     do iy=1,ny<a name='1512'>
+        do jy=iy+1,min(ny,iy+nbh2)<a name='1513'>
+           v(jy,ix) =v(jy,ix) -v(iy,ix) *a(iy,jy-iy)<a name='1514'>
+        enddo<a name='1515'>
+        v(iy,ix) =v(iy,ix) *a(iy,0)<a name='1516'>
+     end do<a name='1517'>
+     do iy=ny,2,-1<a name='1518'>
+        do jy=max(1,iy-nbh1),iy-1<a name='1519'>
+           v(jy,ix) =v(jy,ix) -v(iy,ix) *a(iy,jy-iy)<a name='1520'>
+        enddo<a name='1521'>
+     end do<a name='1522'>
+  endif<a name='1523'>
+  return<a name='1524'>
+  end subroutine ybacvb<a name='1525'>
+<a name='1526'>
+<A NAME='YMULVB'><A href='../../html_code/gsi/compact_diffs.f90.html#YMULVB' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1527'>
+  <font color=#993300>subroutine </font><font color=#cc0000>ymulvb</font>(v1,a,v2,n1y,n2y,nbh1,nbh2,nx,nv1,na,nv2) <A href='../../call_to/YMULVB.html' TARGET='index'>2</A>,<A href='../../call_from/YMULVB.html' TARGET='index'>2</A><a name='1528'>
+<font color=#447700>!$$$  subprogram documentation block<a name='1529'></font>
+<font color=#447700>!                .      .    .                                       .<a name='1530'></font>
+<font color=#447700>! subprogram:    ymulvb multiplication of y-vectors times banded matrix <a name='1531'></font>
+<font color=#447700>!   prgmmr: purser           org: np20               date:  1994-01-01<a name='1532'></font>
+<font color=#447700>!<a name='1533'></font>
+<font color=#447700>! abstract:  multiplication of y-vectors times banded matrix <a name='1534'></font>
+<font color=#447700>!<a name='1535'></font>
+<font color=#447700>! program history log:<a name='1536'></font>
+<font color=#447700>!   1994-05-12  parrish,d. elimanate memory bank conflicts<a name='1537'></font>
+<font color=#447700>!   2004-07-27  treadon - add intent in/out<a name='1538'></font>
+<font color=#447700>!<a name='1539'></font>
+<font color=#447700>!   input argument list:<a name='1540'></font>
+<font color=#447700>!     a      - matrix<a name='1541'></font>
+<font color=#447700>!     v1     - array of input row-vectors<a name='1542'></font>
+<font color=#447700>!     n1y    - number of rows assumed for a and for v1<a name='1543'></font>
+<font color=#447700>!     n2y    - number of columns assumed for a and columns for v2<a name='1544'></font>
+<font color=#447700>!     nbh1   - left half-bandwidth of fortran array a<a name='1545'></font>
+<font color=#447700>!     nbh2   - right half-bandwidth of fortran array a<a name='1546'></font>
+<font color=#447700>!     nx     - length of each of the parallel y-vectors<a name='1547'></font>
+<font color=#447700>!     na     - first fortran dimension of a<a name='1548'></font>
+<font color=#447700>!     nv1    - first fortran dimension of v1<a name='1549'></font>
+<font color=#447700>!     nv2    - first fortran dimension of v2<a name='1550'></font>
+<font color=#447700>!<a name='1551'></font>
+<font color=#447700>!   output argument list:<a name='1552'></font>
+<font color=#447700>!     v2     - array of output vectors<a name='1553'></font>
+<font color=#447700>!<a name='1554'></font>
+<font color=#447700>! attributes:<a name='1555'></font>
+<font color=#447700>!   language: f90<a name='1556'></font>
+<font color=#447700>!   machine:  ibm rs/6000 sp<a name='1557'></font>
+<font color=#447700>!$$$<a name='1558'></font>
+<a name='1559'>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#YMULVB' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_46">, only: r_kind,i_kind<a name='1560'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#YMULVB' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_30">, only: zero<a name='1561'>
+  implicit none<a name='1562'>
+<a name='1563'>
+<font color=#447700>! Delcare passed variables<a name='1564'></font>
+  integer(i_kind),intent(in):: n1y,n2y,nbh1,nbh2,nx,na,nv1,nv2<a name='1565'>
+  real(r_kind),dimension(na,-nbh1:nbh2),intent(in):: a<a name='1566'>
+  real(r_kind),dimension(n1y,nv2),intent(in):: v1<a name='1567'>
+  real(r_kind),dimension(n2y,nv2),intent(out):: v2<a name='1568'>
+<a name='1569'>
+<font color=#447700>! Declare local variables<a name='1570'></font>
+  integer(i_kind) ix,iy,jiy,jy<a name='1571'>
+  real(r_kind) aij<a name='1572'>
+<a name='1573'>
+  do ix=1,nx<a name='1574'>
+     do iy=1,n2y<a name='1575'>
+        v2(iy,ix)=zero<a name='1576'>
+     enddo<a name='1577'>
+  enddo<a name='1578'>
+<a name='1579'>
+  do ix=1,nx<a name='1580'>
+     do jiy=-nbh1,nbh2<a name='1581'>
+        do iy=max(1,1-jiy),min(n1y,n2y-jiy)<a name='1582'>
+           jy=jiy+iy<a name='1583'>
+           aij=a(iy,jiy)<a name='1584'>
+           v2(jy,ix)=v2(jy,ix)+v1(iy,ix)*aij<a name='1585'>
+        enddo<a name='1586'>
+     enddo<a name='1587'>
+  end do<a name='1588'>
+  return<a name='1589'>
+  end subroutine ymulvb<a name='1590'>
+<a name='1591'>
+<A NAME='INISPH'><A href='../../html_code/gsi/compact_diffs.f90.html#INISPH' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1592'>
+  <font color=#993300>subroutine </font><font color=#cc0000>inisph</font>(r,yor,tau,nx,ny) <A href='../../call_to/INISPH.html' TARGET='index'>1</A>,<A href='../../call_from/INISPH.html' TARGET='index'>7</A><a name='1593'>
+<font color=#447700>!$$$  subprogram documentation block<a name='1594'></font>
+<font color=#447700>!                .      .    .                                       .<a name='1595'></font>
+<font color=#447700>! subprogram:    inisph          init coefs for compact diff on sphere<a name='1596'></font>
+<font color=#447700>!   prgmmr: purser, r.j.     org: np20                date: 1994-01-01<a name='1597'></font>
+<font color=#447700>!<a name='1598'></font>
+<font color=#447700>! abstract:  This routine initializes coefficients for high-order <a name='1599'></font>
+<font color=#447700>!            compact differencing on a spherical grid.<a name='1600'></font>
+<font color=#447700>!<a name='1601'></font>
+<font color=#447700>! program history log:<a name='1602'></font>
+<font color=#447700>!   1994-01-01 purser<a name='1603'></font>
+<font color=#447700>!   2004-06-21 treadon - update documentation<a name='1604'></font>
+<font color=#447700>!   2004-07-28  treadon - add only to module use, add intent in/out<a name='1605'></font>
+<font color=#447700>!<a name='1606'></font>
+<font color=#447700>!   input argument list:<a name='1607'></font>
+<font color=#447700>!     r   - radius of the sphere<a name='1608'></font>
+<font color=#447700>!     yor - array of the increasing grid latitudes in radians<a name='1609'></font>
+<font color=#447700>!     tau - array of quadrature weights associated with yor<a name='1610'></font>
+<font color=#447700>!     nx  - (even) number of grid longitudes<a name='1611'></font>
+<font color=#447700>!     ny  - number of grid latitudes<a name='1612'></font>
+<font color=#447700>!<a name='1613'></font>
+<font color=#447700>!   output argument list:<a name='1614'></font>
+<font color=#447700>!     none<a name='1615'></font>
+<font color=#447700>!<a name='1616'></font>
+<font color=#447700>!   Remarks:  <a name='1617'></font>
+<font color=#447700>!     This routine initializes array coef which is in module berror.<a name='1618'></font>
+<font color=#447700>!     coef is an array of size 3*ny+4*(2*noq+1)*(ny+nx/2) containing <a name='1619'></font>
+<font color=#447700>!     the coefficients for high-order compact differencing<a name='1620'></font>
+<font color=#447700>!<a name='1621'></font>
+<font color=#447700>! attributes:<a name='1622'></font>
+<font color=#447700>!   language: f90<a name='1623'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='1624'></font>
+<font color=#447700>!<a name='1625'></font>
+<font color=#447700>!$$$<a name='1626'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#INISPH' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_47">, only: r_kind,i_kind<a name='1627'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#INISPH' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_31">, only: zero,half,one,two,pi<a name='1628'>
+  use <A href='../../html_code/gsi/gridmod.f90.html#GRIDMOD'>gridmod</A><A href='../../html_code/gsi/compact_diffs.f90.html#INISPH' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GRIDMOD_30">, only: nlat<a name='1629'>
+  implicit none<a name='1630'>
+<a name='1631'>
+<font color=#447700>! Declare passed variables<a name='1632'></font>
+  integer(i_kind),intent(in):: nx,ny<a name='1633'>
+  real(r_kind),intent(in):: r<a name='1634'>
+  real(r_kind),dimension(nlat-1),intent(in):: tau,yor<a name='1635'>
+  <a name='1636'>
+<font color=#447700>! Declare local variables<a name='1637'></font>
+  integer(i_kind) nxh,nbp,nya,nxa,lbcox1,lacox1,ltaui,lbcox2<a name='1638'>
+  integer(i_kind) lacoy1,lacox2,lbcoy1,lcy,lacoy2,lbcoy2,i,ix,ltau,iy<a name='1639'>
+  real(r_kind) ir,pih,pi2onx,ri<a name='1640'>
+  real(r_kind),dimension(max(nx/2,ny+2)+16+52*(noq+5)+32*(noq+5)**2):: w<a name='1641'>
+<a name='1642'>
+<font color=#447700>! Set parameters for calls to subsequent routines  <a name='1643'></font>
+  nxh=nx/2<a name='1644'>
+  nbp=2*noq+1<a name='1645'>
+  nya=ny*nbp<a name='1646'>
+  nxa=nxh*nbp<a name='1647'>
+  lacox1=1<a name='1648'>
+  lbcox1=lacox1+nxa<a name='1649'>
+  lacox2=lbcox1+nxa<a name='1650'>
+  lbcox2=lacox2+nxa<a name='1651'>
+  lacoy1=lbcox2+nxa<a name='1652'>
+  lbcoy1=lacoy1+nya<a name='1653'>
+  lacoy2=lbcoy1+nya<a name='1654'>
+  lbcoy2=lacoy2+nya<a name='1655'>
+  lcy   =lbcoy2+nya-1<a name='1656'>
+  ltau  =lcy   +ny<a name='1657'>
+  ltaui =ltau  +ny<a name='1658'>
+  coef = zero<a name='1659'>
+<a name='1660'>
+<a name='1661'>
+<font color=#447700>! Check for error conditions.  If found, write message to standard<a name='1662'></font>
+<font color=#447700>! out and stop program execution.<a name='1663'></font>
+  if (2*nxh /= nx) then<a name='1664'>
+     write(6,*)'INISPH:  ***ERROR***'<a name='1665'>
+     write(6,'(" number of longitudes,'',i4,'' specified in ")') nx<a name='1666'>
+     write(6,'(" passed through parameter list of subroutine inisph")')<a name='1667'>
+     write(6,'(" is an odd number. Please use an EVEN number.")')<a name='1668'>
+     call <A href='../../html_code/gsi/stop1.f90.html#STOP2'>stop2</A><A href='../../html_code/gsi/compact_diffs.f90.html#INISPH' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="STOP2_4">(61)<a name='1669'>
+  endif<a name='1670'>
+  do iy=1,ny<a name='1671'>
+     if (yor(iy).le.(-pi) .or. yor(iy).ge.pi) then<a name='1672'>
+        write(6,*)'INISPH:  ***ERROR***'<a name='1673'>
+        write(6,'(" grid-latitude number ",i4," passed through")') iy<a name='1674'>
+        write(6,'(" parameter list of subroutine inisph lies outside")')<a name='1675'>
+        write(6,'(" the range of (-pi/2 , pi/2)")')<a name='1676'>
+        call <A href='../../html_code/gsi/stop1.f90.html#STOP2'>stop2</A><A href='../../html_code/gsi/compact_diffs.f90.html#INISPH' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="STOP2_5">(62)<a name='1677'>
+     endif<a name='1678'>
+  enddo<a name='1679'>
+<a name='1680'>
+<font color=#447700>! Load coefficient array<a name='1681'></font>
+  ri=one/r<a name='1682'>
+  pih=pi/two<a name='1683'>
+  pi2onx=pi/float(nxh)<a name='1684'>
+  do ix=1,nxh<a name='1685'>
+     coef(lacoy1+ix-1)=(float(ix)-half)*pi2onx<a name='1686'>
+  enddo<a name='1687'>
+<a name='1688'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#CDCOEF'>cdcoef</A><A href='../../html_code/gsi/compact_diffs.f90.html#INISPH' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CDCOEF_1">(nxh,noq,zero,pi,coef(lacoy1),w&amp;<a name='1689'>
+       ,coef(lacox1),coef(lbcox1),coef(lacox2),coef(lbcox2)&amp;<a name='1690'>
+       ,nxh,nxh,nxh,nxh)<a name='1691'>
+  do i=0,nxa-1<a name='1692'>
+     coef(lbcox1+i)=coef(lbcox1+i)*ri<a name='1693'>
+     coef(lbcox2+i)=coef(lbcox2+i)*ri<a name='1694'>
+  enddo<a name='1695'>
+  <a name='1696'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#CDCOEF'>cdcoef</A><A href='../../html_code/gsi/compact_diffs.f90.html#INISPH' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CDCOEF_2">(ny,noq,-pih,pih,yor,w&amp;<a name='1697'>
+       ,coef(lacoy1),coef(lbcoy1),coef(lacoy2),coef(lbcoy2)&amp;<a name='1698'>
+       ,ny,ny,ny,ny)<a name='1699'>
+  do i=0,nya-1<a name='1700'>
+     coef(lbcoy1+i)=coef(lbcoy1+i)*ri<a name='1701'>
+     coef(lbcoy2+i)=coef(lbcoy2+i)*ri<a name='1702'>
+  enddo<a name='1703'>
+  <a name='1704'>
+  do iy=1,ny<a name='1705'>
+     coef(lcy+iy)=one/cos(yor(iy))<a name='1706'>
+     coef(ltau+iy)=tau(iy)<a name='1707'>
+     coef(ltaui+iy)=one/tau(iy)<a name='1708'>
+  enddo<a name='1709'>
+<a name='1710'>
+  end subroutine inisph<a name='1711'>
+<a name='1712'>
+<A NAME='CDCOEF'><A href='../../html_code/gsi/compact_diffs.f90.html#CDCOEF' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1713'>
+  <font color=#993300>subroutine </font><font color=#cc0000>cdcoef</font>(nh,noq,zlim1,zlim2,z,work,aco1,bco1,aco2,bco2,na1,nb1,na2,nb2) <A href='../../call_to/CDCOEF.html' TARGET='index'>2</A>,<A href='../../call_from/CDCOEF.html' TARGET='index'>5</A><a name='1714'>
+<font color=#447700>!$$$  subprogram documentation block<a name='1715'></font>
+<font color=#447700>!                .      .    .                                       .<a name='1716'></font>
+<font color=#447700>! subprogram:    cdcoef              compute differencing coeffciients<a name='1717'></font>
+<font color=#447700>!   prgmmr: purser, r.j.     org: np20                date: 1994-01-01<a name='1718'></font>
+<font color=#447700>!<a name='1719'></font>
+<font color=#447700>! abstract:  This routine computes the coefficients, in band-matrix <a name='1720'></font>
+<font color=#447700>!            form, of a compact differencing operator for <a name='1721'></font>
+<font color=#447700>!            symmetrically arranged cyclic data.<a name='1722'></font>
+<font color=#447700>!<a name='1723'></font>
+<font color=#447700>! program history log:<a name='1724'></font>
+<font color=#447700>!   1994-01-01 purser<a name='1725'></font>
+<font color=#447700>!   2004-06-21 treadon - update documentation<a name='1726'></font>
+<font color=#447700>!   2004-07-28  treadon - add only to module use, add intent in/out<a name='1727'></font>
+<font color=#447700>!<a name='1728'></font>
+<font color=#447700>!   input argument list:<a name='1729'></font>
+<font color=#447700>!     nh    - number data in one of the symmetric halves of the cycle<a name='1730'></font>
+<font color=#447700>!     noq   - quarter of the intended order of accuracy<a name='1731'></font>
+<font color=#447700>!     zlim1 - coordinate of first reflection-point<a name='1732'></font>
+<font color=#447700>!     zlim2 - coordinate of the second reflection-point<a name='1733'></font>
+<font color=#447700>!     z     - array of coordinates, strictly in (zlim1,zlim2) for one<a name='1734'></font>
+<font color=#447700>!             symmetric half of the cycle. the coordinate of the point<a name='1735'></font>
+<font color=#447700>!             preceeding z(1) is 2*zlim1-z(1) etc., while the coordinate<a name='1736'></font>
+<font color=#447700>!             of the point succeeding z(nh) in the cycle is 2*zlim2-z(nh) etc.<a name='1737'></font>
+<font color=#447700>!     work  - work-space array of size 2*(8+nh+26*noq+16*noq**2)<a name='1738'></font>
+<font color=#447700>!     na1   - first dimension of aco1<a name='1739'></font>
+<font color=#447700>!     nb1   - first dimension of bco1<a name='1740'></font>
+<font color=#447700>!     na2   - first dimension of aco2<a name='1741'></font>
+<font color=#447700>!     nb2   - first dimension of bco2<a name='1742'></font>
+<font color=#447700>!<a name='1743'></font>
+<font color=#447700>!   output argument list:<a name='1744'></font>
+<font color=#447700>!     aco1 - array containing the "a-coefficients", in the format of<a name='1745'></font>
+<font color=#447700>!            a banded l-d-u factorization, for the antisymmetric portion<a name='1746'></font>
+<font color=#447700>!            of the field to be differenced<a name='1747'></font>
+<font color=#447700>!     bco1 - corresponding band-matrix of "b-coefficients"<a name='1748'></font>
+<font color=#447700>!     aco2 - like aco1, but for the symmetric portion of the data<a name='1749'></font>
+<font color=#447700>!     bco2 - like bco1, but for the symmetric portion of the data<a name='1750'></font>
+<font color=#447700>!<a name='1751'></font>
+<font color=#447700>! attributes:<a name='1752'></font>
+<font color=#447700>!   language: f90<a name='1753'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='1754'></font>
+<font color=#447700>!<a name='1755'></font>
+<font color=#447700>!$$$<a name='1756'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#CDCOEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_48">, only: r_kind,i_kind<a name='1757'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#CDCOEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_32">, only: zero,two<a name='1758'>
+  implicit none<a name='1759'>
+<a name='1760'>
+<font color=#447700>! Declare passed variables  <a name='1761'></font>
+  integer(i_kind),intent(in):: nh,noq,na1,nb1,na2,nb2<a name='1762'>
+  real(r_kind),intent(in):: zlim1,zlim2<a name='1763'>
+  real(r_kind),dimension(*),intent(in):: z<a name='1764'>
+  real(r_kind),dimension(1-noq:*):: work<a name='1765'>
+  real(r_kind),dimension(na1,-noq:noq),intent(out):: aco1<a name='1766'>
+  real(r_kind),dimension(nb1,-noq:noq),intent(out):: bco1<a name='1767'>
+  real(r_kind),dimension(na2,-noq:noq),intent(out):: aco2<a name='1768'>
+  real(r_kind),dimension(nb2,-noq:noq),intent(out):: bco2<a name='1769'>
+<a name='1770'>
+<font color=#447700>! Declare local variables<a name='1771'></font>
+  integer(i_kind) kw,kb,js,ir,i,n,j,ka,nohp<a name='1772'>
+<a name='1773'>
+<font color=#447700>! Initialize output arrays to zero  <a name='1774'></font>
+  n=nh*2<a name='1775'>
+  do i=1,nh<a name='1776'>
+     work(i)=z(i)<a name='1777'>
+     do j=-noq,noq<a name='1778'>
+        aco1(i,j)=zero<a name='1779'>
+        bco1(i,j)=zero<a name='1780'>
+        aco2(i,j)=zero<a name='1781'>
+        bco2(i,j)=zero<a name='1782'>
+     enddo<a name='1783'>
+  enddo<a name='1784'>
+<a name='1785'>
+<font color=#447700>! Load work array<a name='1786'></font>
+  do i=1,noq<a name='1787'>
+     work(1-i)=two*zlim1-work(i)<a name='1788'>
+     work(nh+i)=two*zlim2-work(nh+1-i)<a name='1789'>
+  enddo<a name='1790'>
+<a name='1791'>
+<font color=#447700>! Set local parameters<a name='1792'></font>
+  nohp=noq*2+1<a name='1793'>
+  ka=nh+noq+1<a name='1794'>
+  kb=ka+nohp<a name='1795'>
+  kw=kb+nohp<a name='1796'>
+<a name='1797'>
+<a name='1798'>
+<font color=#447700>! Compute coefficients<a name='1799'></font>
+  do i=1,nh<a name='1800'>
+     call <A href='../../html_code/gsi/compact_diffs.f90.html#DFCD'>dfcd</A><A href='../../html_code/gsi/compact_diffs.f90.html#CDCOEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DFCD_1">(work(i-noq),work(i-noq),work(i),nohp,nohp&amp;<a name='1801'>
+          ,work(ka),work(kb),work(kw))<a name='1802'>
+     do j=i-noq,i+noq<a name='1803'>
+        if(j.lt.1)then<a name='1804'>
+           ir=-1<a name='1805'>
+           js=1-j-i<a name='1806'>
+        elseif(j.gt.nh)then<a name='1807'>
+           js=n+1-j-i<a name='1808'>
+           ir=-1<a name='1809'>
+        else<a name='1810'>
+           js=j-i<a name='1811'>
+           ir=1<a name='1812'>
+        endif<a name='1813'>
+        aco1(i,js)=aco1(i,js)+	 work(ka+noq+j-i)<a name='1814'>
+        bco1(i,js)=bco1(i,js)+ir*work(kb+noq+j-i)/two<a name='1815'>
+        aco2(i,js)=aco2(i,js)+ir*work(ka+noq+j-i)<a name='1816'>
+        bco2(i,js)=bco2(i,js)+	 work(kb+noq+j-i)/two<a name='1817'>
+     enddo<a name='1818'>
+  enddo<a name='1819'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#ALDUB'>aldub</A><A href='../../html_code/gsi/compact_diffs.f90.html#CDCOEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ALDUB_1">(aco1,nh,noq,noq,na1)<a name='1820'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#ALDUB'>aldub</A><A href='../../html_code/gsi/compact_diffs.f90.html#CDCOEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ALDUB_2">(aco2,nh,noq,noq,na2)<a name='1821'>
+  return<a name='1822'>
+  end subroutine cdcoef<a name='1823'>
+<a name='1824'>
+<A NAME='DFCD'><A href='../../html_code/gsi/compact_diffs.f90.html#DFCD' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1825'>
+  <font color=#993300>subroutine </font><font color=#cc0000>dfcd</font>(za,zb,z0,na,nb,a,b,work) <A href='../../call_to/DFCD.html' TARGET='index'>1</A>,<A href='../../call_from/DFCD.html' TARGET='index'>3</A><a name='1826'>
+<font color=#447700>!$$$  subprogram documentation block<a name='1827'></font>
+<font color=#447700>!                .      .    .                                       .<a name='1828'></font>
+<font color=#447700>! subprogram:    dfcd        compute coefs for compact/lagrange schemes<a name='1829'></font>
+<font color=#447700>!                            for differencing or quadrature<a name='1830'></font>
+<font color=#447700>!   prgmmr: purser, r.j.     org: np20                date: 1994-01-01<a name='1831'></font>
+<font color=#447700>!<a name='1832'></font>
+<font color=#447700>! abstract:  This routine computes coefficients for compact or <a name='1833'></font>
+<font color=#447700>!            lagrange schemes for differencing or quadrature.  A <a name='1834'></font>
+<font color=#447700>!            description of the routine functionality for quadrature<a name='1835'></font>
+<font color=#447700>!            and differencing follows in the remarks section.<a name='1836'></font>
+<font color=#447700>!<a name='1837'></font>
+<font color=#447700>! program history log:<a name='1838'></font>
+<font color=#447700>!   1994-01-01 purser<a name='1839'></font>
+<font color=#447700>!   2004-06-21 treadon - update documentation<a name='1840'></font>
+<font color=#447700>!   2004-07-28  treadon - add only to module use, add intent in/out<a name='1841'></font>
+<font color=#447700>!<a name='1842'></font>
+<font color=#447700>!   input argument list:<a name='1843'></font>
+<font color=#447700>!      The meaning of arguments varies as described above based<a name='1844'></font>
+<font color=#447700>!      on the type of coefficients being computed.<a name='1845'></font>
+<font color=#447700>!<a name='1846'></font>
+<font color=#447700>!   output argument list:<a name='1847'></font>
+<font color=#447700>!      The meaning of arguments varies as described above based<a name='1848'></font>
+<font color=#447700>!      on the type of coefficients being computed.<a name='1849'></font>
+<font color=#447700>!<a name='1850'></font>
+<font color=#447700>! remarks:<a name='1851'></font>
+<font color=#447700>!<a name='1852'></font>
+<font color=#447700>!  Quadrature:<a name='1853'></font>
+<font color=#447700>!   Input:<a name='1854'></font>
+<font color=#447700>!     let Z0 be the coordinate of the nominated "target" point,<a name='1855'></font>
+<font color=#447700>!            (e.g., the midpoint of the target interval)<a name='1856'></font>
+<font color=#447700>!     ZA are the coordinates of the NA source template points.<a name='1857'></font>
+<font color=#447700>!     ZB are the coordinates of the NB target template points -<a name='1858'></font>
+<font color=#447700>!     NB=2 for a Lagrange scheme, otherwise NB&gt;2.<a name='1859'></font>
+<font color=#447700>!   Output:<a name='1860'></font>
+<font color=#447700>!     A is the vector of NA A-coefficients, A(1), .. A(NA)<a name='1861'></font>
+<font color=#447700>!     B is the vector of NB B-coefficients, B(1), ...B(NB)<a name='1862'></font>
+<font color=#447700>!     (For a Lagrange scheme B(1) = -B(2) = 1/("delta sigma".)<a name='1863'></font>
+<font color=#447700>!   <a name='1864'></font>
+<font color=#447700>!   WORK is an array of work-space used for the intermediate<a name='1865'></font>
+<font color=#447700>!   calculations - it contains nothing of interest on input or output.<a name='1866'></font>
+<font color=#447700>!   It must be given a size of at least 2*(NA+NB)*(NA+NB+1) in the<a name='1867'></font>
+<font color=#447700>!   routine that calls this one (it is the same as in DFCO except now<a name='1868'></font>
+<font color=#447700>!   using double precision)<a name='1869'></font>
+<font color=#447700>!<a name='1870'></font>
+<font color=#447700>!   Differencing:<a name='1871'></font>
+<font color=#447700>!   The only changes from the case of quadrature are that:<a name='1872'></font>
+<font color=#447700>!     Z0 is the coordinate of the particular target point, which is<a name='1873'></font>
+<font color=#447700>!        no longer arbitrary;<a name='1874'></font>
+<font color=#447700>!     ZA are coordinates of TARGET template point(s);<a name='1875'></font>
+<font color=#447700>!     ZB are coordinates of SOURCE template points;<a name='1876'></font>
+<font color=#447700>!     A is the vector of NA A-coefficients;<a name='1877'></font>
+<font color=#447700>!     B is the vector of NB (=ND) D-coefficients<a name='1878'></font>
+<font color=#447700>!     (For a Lagrange scheme NA=1 and, trivially, A(1) = 1. )<a name='1879'></font>
+<font color=#447700>!<a name='1880'></font>
+<font color=#447700>!<a name='1881'></font>
+<font color=#447700>! attributes:<a name='1882'></font>
+<font color=#447700>!   language: f90<a name='1883'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='1884'></font>
+<font color=#447700>!<a name='1885'></font>
+<font color=#447700>!$$$<a name='1886'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#DFCD' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_49">, only: r_kind,i_kind<a name='1887'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#DFCD' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_33">, only: zero,one<a name='1888'>
+  implicit none<a name='1889'>
+<a name='1890'>
+<font color=#447700>! Declare passed variables<a name='1891'></font>
+  integer(i_kind),intent(in):: na,nb<a name='1892'>
+  real(r_kind),intent(in):: z0<a name='1893'>
+  real(r_kind),dimension(*),intent(in):: za,zb<a name='1894'>
+  real(r_kind),dimension(*),intent(out):: work,a,b<a name='1895'>
+<a name='1896'>
+<font color=#447700>! Declare local variables  <a name='1897'></font>
+  integer(i_kind) nc,ncs,ncsp,j,iw,i<a name='1898'>
+  real(r_kind) p,z<a name='1899'>
+  <a name='1900'>
+  nc=na+nb<a name='1901'>
+  ncs=nc*nc<a name='1902'>
+  ncsp=ncs+1<a name='1903'>
+  do j=1,na<a name='1904'>
+     iw=1+(j-1)*nc<a name='1905'>
+     work(iw)=one<a name='1906'>
+     work(iw+1)=zero<a name='1907'>
+     work(iw+2)=one<a name='1908'>
+  enddo<a name='1909'>
+  do j=1,nb<a name='1910'>
+     iw=1+(j+na-1)*nc<a name='1911'>
+     work(iw)=zero<a name='1912'>
+     work(iw+1)=one<a name='1913'>
+  enddo<a name='1914'>
+  do j=1,na<a name='1915'>
+     z=za(j)-z0<a name='1916'>
+     p=one<a name='1917'>
+     do i=4,nc<a name='1918'>
+        p=p*z<a name='1919'>
+        work(i+(j-1)*nc)=p*(i-2)<a name='1920'>
+     enddo<a name='1921'>
+  enddo<a name='1922'>
+  do j=1,nb<a name='1923'>
+     z=zb(j)-z0<a name='1924'>
+     p=one<a name='1925'>
+     do i=3,nc<a name='1926'>
+        p=p*z<a name='1927'>
+        work(i+(j+na-1)*nc)=-p<a name='1928'>
+     enddo<a name='1929'>
+  enddo<a name='1930'>
+  work(ncsp)=one<a name='1931'>
+  do i=2,nc<a name='1932'>
+     work(ncs+i)=zero<a name='1933'>
+  enddo<a name='1934'>
+  <a name='1935'>
+<font color=#447700>! Find the following routine qlinvmv (a linear equation solver) amongst<a name='1936'></font>
+<font color=#447700>! all the other basic matrix routines (here, the double precision<a name='1937'></font>
+<font color=#447700>! version is used).<a name='1938'></font>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#DLINVMM'>dlinvmm</A><A href='../../html_code/gsi/compact_diffs.f90.html#DFCD' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DLINVMM_1">(work,work(ncsp),nc,1,nc,nc)<a name='1939'>
+  do i=1,na<a name='1940'>
+     a(i)=work(ncs+i)<a name='1941'>
+  enddo<a name='1942'>
+  do i=1,nb<a name='1943'>
+     b(i)=work(ncs+na+i)<a name='1944'>
+  enddo<a name='1945'>
+  return<a name='1946'>
+  end subroutine dfcd<a name='1947'>
+<a name='1948'>
+<A NAME='ALDUB'><A href='../../html_code/gsi/compact_diffs.f90.html#ALDUB' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1949'>
+  <font color=#993300>subroutine </font><font color=#cc0000>aldub</font>(a,n,nbh1,nbh2,na) <A href='../../call_to/ALDUB.html' TARGET='index'>2</A>,<A href='../../call_from/ALDUB.html' TARGET='index'>3</A><a name='1950'>
+<font color=#447700>!$$$  subprogram documentation block<a name='1951'></font>
+<font color=#447700>!                .      .    .                                       .<a name='1952'></font>
+<font color=#447700>! subprogram:    aldub                               ldu decomposition<a name='1953'></font>
+<font color=#447700>!   prgmmr: purser, r.j.     org: np20                date: 1994-01-01<a name='1954'></font>
+<font color=#447700>!<a name='1955'></font>
+<font color=#447700>! abstract:  This routine computes the (L)*(D**-1)*(U) decomposition <a name='1956'></font>
+<font color=#447700>!            of asymmetric band-matrix compact differencing on <a name='1957'></font>
+<font color=#447700>!            a spherical grid.<a name='1958'></font>
+<font color=#447700>!<a name='1959'></font>
+<font color=#447700>! program history log:<a name='1960'></font>
+<font color=#447700>!   1994-01-01 purser<a name='1961'></font>
+<font color=#447700>!   2004-06-21 treadon - update documentation<a name='1962'></font>
+<font color=#447700>!   2004-07-28  treadon - add only to module use, add intent in/out<a name='1963'></font>
+<font color=#447700>!<a name='1964'></font>
+<font color=#447700>!   input argument list:<a name='1965'></font>
+<font color=#447700>!     "a"   - asymmetric band matrix<a name='1966'></font>
+<font color=#447700>!      n    - number of rows assumed for A and for V<a name='1967'></font>
+<font color=#447700>!      nbh1 - left half-bandwidth of fortran array A<a name='1968'></font>
+<font color=#447700>!      nbh2 - right half-bandwidth of fortran array A<a name='1969'></font>
+<font color=#447700>!      na   - first fortran dimension of A<a name='1970'></font>
+<font color=#447700>!<a name='1971'></font>
+<font color=#447700>!   output argument list:<a name='1972'></font>
+<font color=#447700>!     "a"   - contains the (L)*(D**-1)*(U) factorization of the <a name='1973'></font>
+<font color=#447700>!             input matrix, where<a name='1974'></font>
+<font color=#447700>!             (L) is lower triangular with unit main diagonal<a name='1975'></font>
+<font color=#447700>!             (D) is a diagonal matrix<a name='1976'></font>
+<font color=#447700>!             (U) is upper triangular with unit main diagonal<a name='1977'></font>
+<font color=#447700>!<a name='1978'></font>
+<font color=#447700>! attributes:<a name='1979'></font>
+<font color=#447700>!   language: f90<a name='1980'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='1981'></font>
+<font color=#447700>!<a name='1982'></font>
+<font color=#447700>!$$$<a name='1983'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#ALDUB' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_50">, only: r_kind,i_kind<a name='1984'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#ALDUB' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_34">, only: zero,one<a name='1985'>
+  implicit none<a name='1986'>
+<a name='1987'>
+<font color=#447700>! Declare passed variables<a name='1988'></font>
+  integer(i_kind),intent(in):: n,nbh1,nbh2,na<a name='1989'>
+  real(r_kind),dimension(na,-nbh1:nbh2),intent(inout):: a<a name='1990'>
+<a name='1991'>
+<font color=#447700>! Declare local variables<a name='1992'></font>
+  integer(i_kind) j,jp,i,k,imost,jmost<a name='1993'>
+  real(r_kind) ajj,aij,ajji<a name='1994'>
+<a name='1995'>
+  do j=1,n<a name='1996'>
+     imost=min(n,j+nbh1)<a name='1997'>
+     jmost=min(n,j+nbh2)<a name='1998'>
+     jp=j+1<a name='1999'>
+     ajj=a(j,0)<a name='2000'>
+     if(ajj.eq.zero)then<a name='2001'>
+        write(6,*)'ALDUB:  ***ERROR***'<a name='2002'>
+        write(6,'("  FAILURE:  matrix requires pivoting or is singular")')<a name='2003'>
+        call <A href='../../html_code/gsi/stop1.f90.html#STOP2'>stop2</A><A href='../../html_code/gsi/compact_diffs.f90.html#ALDUB' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="STOP2_6">(63)<a name='2004'>
+     endif<a name='2005'>
+     ajji=one/ajj<a name='2006'>
+     a(j,0)=ajji<a name='2007'>
+     do i=jp,imost<a name='2008'>
+        aij=ajji*a(i,j-i)<a name='2009'>
+        a(i,j-i)=aij<a name='2010'>
+        do k=jp,jmost<a name='2011'>
+           a(i,k-i)=a(i,k-i)-aij*a(j,k-j)<a name='2012'>
+        enddo<a name='2013'>
+     enddo<a name='2014'>
+     do k=jp,jmost<a name='2015'>
+        a(j,k-j)=ajji*a(j,k-j)<a name='2016'>
+     enddo<a name='2017'>
+  enddo<a name='2018'>
+  return<a name='2019'>
+  end subroutine aldub<a name='2020'>
+<a name='2021'>
+<A NAME='DLINVMM'><A href='../../html_code/gsi/compact_diffs.f90.html#DLINVMM' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2022'>
+  <font color=#993300>subroutine </font><font color=#cc0000>dlinvmm</font>(a,b,m,mm,na,nb) <A href='../../call_to/DLINVMM.html' TARGET='index'>1</A>,<A href='../../call_from/DLINVMM.html' TARGET='index'>3</A><a name='2023'>
+<font color=#447700>!$$$  subprogram documentation block<a name='2024'></font>
+<font color=#447700>!                .      .    .                                       .<a name='2025'></font>
+<font color=#447700>! subprogram:    dlinvmm                         invert linear systems<a name='2026'></font>
+<font color=#447700>!   prgmmr: purser, r.j.     org: np20                date: 1993-01-01<a name='2027'></font>
+<font color=#447700>!<a name='2028'></font>
+<font color=#447700>! abstract:  This routine inverts linear systems sharing the same square<a name='2029'></font>
+<font color=#447700>!            system matrix in DOUBLE PRECISION.<a name='2030'></font>
+<font color=#447700>!<a name='2031'></font>
+<font color=#447700>! program history log:<a name='2032'></font>
+<font color=#447700>!   1993-01-01 purser<a name='2033'></font>
+<font color=#447700>!   2004-06-21 treadon - update documentation<a name='2034'></font>
+<font color=#447700>!   2004-07-28  treadon - add only to module use, add intent in/out<a name='2035'></font>
+<font color=#447700>!<a name='2036'></font>
+<font color=#447700>!   input argument list:<a name='2037'></font>
+<font color=#447700>!     "a"   - square system matrix<a name='2038'></font>
+<font color=#447700>!     "b"   - right-hands-sides<a name='2039'></font>
+<font color=#447700>!      m    - degree of (active part of) b and a<a name='2040'></font>
+<font color=#447700>!      mm   - number of right-hand-side vectors (active columns of b)<a name='2041'></font>
+<font color=#447700>!      na   - first fortran dimension of a<a name='2042'></font>
+<font color=#447700>!      nb   - first fortran dimension of b<a name='2043'></font>
+<font color=#447700>!<a name='2044'></font>
+<font color=#447700>!   output argument list:<a name='2045'></font>
+<font color=#447700>!     "a"   - L-D-U factorization of input matrix "a"<a name='2046'></font>
+<font color=#447700>!     "b"   - matrix solution of vectors<a name='2047'></font>
+<font color=#447700>!<a name='2048'></font>
+<font color=#447700>! attributes:<a name='2049'></font>
+<font color=#447700>!   language: f90<a name='2050'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='2051'></font>
+<font color=#447700>!<a name='2052'></font>
+<font color=#447700>!$$$<a name='2053'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#DLINVMM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_51">, only: r_kind,i_kind<a name='2054'>
+  implicit none<a name='2055'>
+<a name='2056'>
+<font color=#447700>! Declare passed variables<a name='2057'></font>
+  integer(i_kind),intent(in):: m,mm,na,nb<a name='2058'>
+  real(r_kind),dimension(na,*),intent(inout):: a<a name='2059'>
+  real(r_kind),dimension(nb,*),intent(inout):: b  <a name='2060'>
+<a name='2061'>
+<font color=#447700>! Declare local parameters<a name='2062'></font>
+  integer(i_kind),parameter:: nn = 500<a name='2063'>
+<a name='2064'>
+<font color=#447700>! Declare local variables<a name='2065'></font>
+  integer(i_kind),dimension(nn):: ipiv<a name='2066'>
+  real(r_kind) d<a name='2067'>
+<a name='2068'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#DLUFM'>dlufm</A><A href='../../html_code/gsi/compact_diffs.f90.html#DLINVMM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DLUFM_1">(a,ipiv,d,m,na)<a name='2069'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#DLUBMM'>dlubmm</A><A href='../../html_code/gsi/compact_diffs.f90.html#DLINVMM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DLUBMM_1">(a,b,ipiv,m,mm,na,nb)<a name='2070'>
+  return<a name='2071'>
+  end subroutine dlinvmm<a name='2072'>
+<a name='2073'>
+<A NAME='DLUFM'><A href='../../html_code/gsi/compact_diffs.f90.html#DLUFM' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2074'>
+  <font color=#993300>subroutine </font><font color=#cc0000>dlufm</font>(a,ipiv,d,m,na) <A href='../../call_to/DLUFM.html' TARGET='index'>1</A>,<A href='../../call_from/DLUFM.html' TARGET='index'>3</A><a name='2075'>
+<font color=#447700>!$$$  subprogram documentation block<a name='2076'></font>
+<font color=#447700>!                .      .    .                                       .<a name='2077'></font>
+<font color=#447700>! subprogram:    dlufm                       perform l-u decomposition<a name='2078'></font>
+<font color=#447700>!   prgmmr: purser, r.j.     org: np20                date: 1993-01-01<a name='2079'></font>
+<font color=#447700>!<a name='2080'></font>
+<font color=#447700>! abstract:  This routine performs l-u decomposition of square matrix<a name='2081'></font>
+<font color=#447700>!            "a" in place with partial pivoting in DOUBLE PRECISION.<a name='2082'></font>
+<font color=#447700>!<a name='2083'></font>
+<font color=#447700>! program history log:<a name='2084'></font>
+<font color=#447700>!   1993-01-01 purser<a name='2085'></font>
+<font color=#447700>!   2004-06-21 treadon - update documentation<a name='2086'></font>
+<font color=#447700>!   2004-07-28  treadon - add only to module use, add intent in/out<a name='2087'></font>
+<font color=#447700>!<a name='2088'></font>
+<font color=#447700>!   input argument list:<a name='2089'></font>
+<font color=#447700>!     "a"   - square matrix to be factorized<a name='2090'></font>
+<font color=#447700>!      m    - degree of (active part of) a<a name='2091'></font>
+<font color=#447700>!      na   - first fortran dimension of a<a name='2092'></font>
+<font color=#447700>!<a name='2093'></font>
+<font color=#447700>!   output argument list:<a name='2094'></font>
+<font color=#447700>!     "a"   - L-U factorization of input matrix "a"<a name='2095'></font>
+<font color=#447700>!     ipiv  - array encoding the pivoting sequence<a name='2096'></font>
+<font color=#447700>!     d     - indicator for possible sign change of determinant<a name='2097'></font>
+<font color=#447700>!<a name='2098'></font>
+<font color=#447700>! attributes:<a name='2099'></font>
+<font color=#447700>!   language: f90<a name='2100'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='2101'></font>
+<font color=#447700>!<a name='2102'></font>
+<font color=#447700>!$$$<a name='2103'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#DLUFM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_52">, only: r_kind,i_kind<a name='2104'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#DLUFM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_35">, only: zero,one<a name='2105'>
+  implicit none<a name='2106'>
+<a name='2107'>
+<font color=#447700>! Declare passed variables<a name='2108'></font>
+  integer(i_kind),intent(in):: m,na<a name='2109'>
+  integer(i_kind),dimension(*),intent(out):: ipiv<a name='2110'>
+  real(r_kind),intent(out):: d<a name='2111'>
+  real(r_kind),dimension(na,*),intent(inout):: a<a name='2112'>
+<a name='2113'>
+<font color=#447700>! Declare local variables<a name='2114'></font>
+  integer(i_kind) j,jp,ibig,jm,i,k<a name='2115'>
+  real(r_kind) ajj,aij,ajji,t,abig,aa<a name='2116'>
+<a name='2117'>
+  d=one<a name='2118'>
+  ipiv(m)=m<a name='2119'>
+  do j=1,m-1<a name='2120'>
+     jp=j+1<a name='2121'>
+     abig=abs(a(j,j))<a name='2122'>
+     ibig=j<a name='2123'>
+     do i=jp,m<a name='2124'>
+        aa=abs(a(i,j))<a name='2125'>
+        if(aa.gt.abig)then<a name='2126'>
+           ibig=i<a name='2127'>
+           abig=aa<a name='2128'>
+        endif<a name='2129'>
+     enddo<a name='2130'>
+<font color=#447700>!  swap rows, recording changed sign of determinant<a name='2131'></font>
+     ipiv(j)=ibig<a name='2132'>
+     if(ibig.ne.j)then<a name='2133'>
+        d=-d<a name='2134'>
+        do k=1,m<a name='2135'>
+           t=a(j,k)<a name='2136'>
+           a(j,k)=a(ibig,k)<a name='2137'>
+           a(ibig,k)=t<a name='2138'>
+        enddo<a name='2139'>
+     endif<a name='2140'>
+     ajj=a(j,j)<a name='2141'>
+     if(ajj.eq.zero)then<a name='2142'>
+        jm=j-1<a name='2143'>
+        write(6,*)'DLUFM:  ***ERROR***'<a name='2144'>
+        write(6,'("DLUFM:  failure due to singular matrix,r, rank=",i3)') jm<a name='2145'>
+        call <A href='../../html_code/gsi/stop1.f90.html#STOP2'>stop2</A><A href='../../html_code/gsi/compact_diffs.f90.html#DLUFM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="STOP2_7">(64)<a name='2146'>
+     endif<a name='2147'>
+     ajji=one/ajj<a name='2148'>
+     do i=jp,m<a name='2149'>
+        aij=ajji*a(i,j)<a name='2150'>
+        a(i,j)=aij<a name='2151'>
+        do k=jp,m<a name='2152'>
+           a(i,k)=a(i,k)-aij*a(j,k)<a name='2153'>
+        enddo<a name='2154'>
+     enddo<a name='2155'>
+  enddo<a name='2156'>
+  return<a name='2157'>
+  end subroutine dlufm<a name='2158'>
+<a name='2159'>
+<A NAME='DLUBMM'><A href='../../html_code/gsi/compact_diffs.f90.html#DLUBMM' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2160'>
+  <font color=#993300>subroutine </font><font color=#cc0000>dlubmm</font>(a,b,ipiv,m,mm,na,nb) <A href='../../call_to/DLUBMM.html' TARGET='index'>1</A>,<A href='../../call_from/DLUBMM.html' TARGET='index'>1</A><a name='2161'>
+<font color=#447700>!$$$  subprogram documentation block<a name='2162'></font>
+<font color=#447700>!                .      .    .                                       .<a name='2163'></font>
+<font color=#447700>! subprogram:    dlubmm                                  invert matrix<a name='2164'></font>
+<font color=#447700>!   prgmmr: purser, r.j.     org: np20                date: 1993-01-01<a name='2165'></font>
+<font color=#447700>!<a name='2166'></font>
+<font color=#447700>! abstract:  This routine inverts matrix "a"<a name='2167'></font>
+<font color=#447700>!<a name='2168'></font>
+<font color=#447700>! program history log:<a name='2169'></font>
+<font color=#447700>!   1993-01-01 purser<a name='2170'></font>
+<font color=#447700>!   2004-06-21 treadon - update documentation<a name='2171'></font>
+<font color=#447700>!   2004-07-28  treadon - add only to module use, add intent in/out<a name='2172'></font>
+<font color=#447700>!<a name='2173'></font>
+<font color=#447700>!   input argument list:<a name='2174'></font>
+<font color=#447700>!     "a"   - square matrix to be factorized<a name='2175'></font>
+<font color=#447700>!      m    - degree of (active part of) a<a name='2176'></font>
+<font color=#447700>!      mm   - number of columns (active part of) b<a name='2177'></font>
+<font color=#447700>!      na   - first fortran dimension of a<a name='2178'></font>
+<font color=#447700>!      nb   - first fortran dimension of b<a name='2179'></font>
+<font color=#447700>!     ipiv  - array encoding the pivoting sequence<a name='2180'></font>
+<font color=#447700>!<a name='2181'></font>
+<font color=#447700>!   output argument list:<a name='2182'></font>
+<font color=#447700>!     "b"   - matrix solution of vectors<a name='2183'></font>
+<font color=#447700>!<a name='2184'></font>
+<font color=#447700>! attributes:<a name='2185'></font>
+<font color=#447700>!   language: f90<a name='2186'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='2187'></font>
+<font color=#447700>!<a name='2188'></font>
+<font color=#447700>!$$$<a name='2189'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#DLUBMM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_53">, only: r_kind,i_kind<a name='2190'>
+  implicit none<a name='2191'>
+<a name='2192'>
+<font color=#447700>! Declare passed variables<a name='2193'></font>
+  integer(i_kind),intent(in):: m,mm,na,nb<a name='2194'>
+  integer(i_kind),dimension(*),intent(in):: ipiv<a name='2195'>
+  real(r_kind),dimension(na,*),intent(in):: a<a name='2196'>
+  real(r_kind),dimension(nb,*),intent(out):: b<a name='2197'>
+<a name='2198'>
+<font color=#447700>! Declare local variables  <a name='2199'></font>
+  integer(i_kind) k,i,l,j<a name='2200'>
+  real(r_kind) s<a name='2201'>
+<a name='2202'>
+  do k=1,mm <font color=#447700>!loop over columns of b<a name='2203'></font>
+     do i=1,m<a name='2204'>
+        l=ipiv(i)<a name='2205'>
+        s=b(l,k)<a name='2206'>
+        b(l,k)=b(i,k)<a name='2207'>
+        do j=1,i-1<a name='2208'>
+           s=s-a(i,j)*b(j,k)<a name='2209'>
+        enddo<a name='2210'>
+        b(i,k)=s<a name='2211'>
+     enddo<a name='2212'>
+     do i=m,1,-1<a name='2213'>
+        s=b(i,k)<a name='2214'>
+        do j=i+1,m<a name='2215'>
+           s=s-a(i,j)*b(j,k)<a name='2216'>
+        enddo<a name='2217'>
+        b(i,k)=s/a(i,i)<a name='2218'>
+     enddo<a name='2219'>
+  enddo<a name='2220'>
+  return<a name='2221'>
+  end subroutine dlubmm<a name='2222'>
+<a name='2223'>
+<A NAME='COMPACT_DLON'><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DLON' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2224'>
+  <font color=#993300>subroutine </font><font color=#cc0000>compact_dlon</font>(b,dbdx,vector) <A href='../../call_to/COMPACT_DLON.html' TARGET='index'>5</A>,<A href='../../call_from/COMPACT_DLON.html' TARGET='index'>4</A><a name='2225'>
+<font color=#447700>!$$$  subprogram documentation block<a name='2226'></font>
+<font color=#447700>!                .      .    .                                       .<a name='2227'></font>
+<font color=#447700>! subprogram:    compact_dlon   compact derivative in longitude<a name='2228'></font>
+<font color=#447700>!   prgmmr: parrish          org: np23                date: 2005-05-16<a name='2229'></font>
+<font color=#447700>!<a name='2230'></font>
+<font color=#447700>! abstract:  Use high-order compact differencing on a spherical grid<a name='2231'></font>
+<font color=#447700>!            to compute derivative in longitude.<a name='2232'></font>
+<font color=#447700>!<a name='2233'></font>
+<font color=#447700>! program history log:<a name='2234'></font>
+<font color=#447700>!   2005-05-16  parrish<a name='2235'></font>
+<font color=#447700>!<a name='2236'></font>
+<font color=#447700>!   input argument list:<a name='2237'></font>
+<font color=#447700>!     "b"    - array containing the scalar field<a name='2238'></font>
+<font color=#447700>!     vector - if true, then b is one component of a vector field and dbdx<a name='2239'></font>
+<font color=#447700>!                 is singular at poles, so output at poles set to zero.<a name='2240'></font>
+<font color=#447700>!<a name='2241'></font>
+<font color=#447700>!   output argument list:<a name='2242'></font>
+<font color=#447700>!     dbdx  - array containing the eastward component of (1/(a*cos(lat)))db/dlon<a name='2243'></font>
+<font color=#447700>!<a name='2244'></font>
+<font color=#447700>! attributes:<a name='2245'></font>
+<font color=#447700>!   language: f90<a name='2246'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='2247'></font>
+<font color=#447700>!<a name='2248'></font>
+<font color=#447700>!$$$<a name='2249'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DLON' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_54">, only: r_kind,i_kind<a name='2250'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DLON' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_36">, only: zero<a name='2251'>
+  use <A href='../../html_code/gsi/gridmod.f90.html#GRIDMOD'>gridmod</A><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DLON' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GRIDMOD_31">, only: nlon,nlat,sinlon,coslon<a name='2252'>
+  implicit none<a name='2253'>
+<a name='2254'>
+  logical vector<a name='2255'>
+  integer(i_kind) nx,ny,nxh,nbp,nya,nxa,lacox1,lbcox1,lacox2,lbcox2,lacoy1,lbcoy1<a name='2256'>
+  integer(i_kind) lbcoy2,lacoy2,iy,ix,kk,i,j,lcy<a name='2257'>
+  real(r_kind),dimension(nlat,nlon):: b,dbdx<a name='2258'>
+  real(r_kind),dimension(nlat-2,nlon):: work3,grid3<a name='2259'>
+  real(r_kind),dimension(nlon):: grid3n,grid3s<a name='2260'>
+  real(r_kind) polnu,polnv,polsu,polsv<a name='2261'>
+<a name='2262'>
+<a name='2263'>
+<font color=#447700>! Set parameters for calls to subsequent routines<a name='2264'></font>
+  ny=nlat-2<a name='2265'>
+  nxh=nlon/2<a name='2266'>
+  nbp=2*noq+1<a name='2267'>
+  nya=ny*nbp<a name='2268'>
+  nxa=nxh*nbp<a name='2269'>
+  <a name='2270'>
+  lacox1=1<a name='2271'>
+  lbcox1=lacox1+nxa<a name='2272'>
+  lacox2=lbcox1+nxa<a name='2273'>
+  lbcox2=lacox2+nxa<a name='2274'>
+  lacoy1=lbcox2+nxa<a name='2275'>
+  lbcoy1=lacoy1+nya<a name='2276'>
+  lacoy2=lbcoy1+nya<a name='2277'>
+  lbcoy2=lacoy2+nya<a name='2278'>
+  lcy   =lbcoy2+nya-1<a name='2279'>
+<a name='2280'>
+<a name='2281'>
+<font color=#447700>! Initialize output arrays to zero<a name='2282'></font>
+  do j=1,nlon<a name='2283'>
+     do i=1,nlat<a name='2284'>
+        dbdx(i,j)=zero<a name='2285'>
+     end do<a name='2286'>
+  end do<a name='2287'>
+<a name='2288'>
+<font color=#447700>! Transfer scalar input field to work array.<a name='2289'></font>
+<font color=#447700>! Zero other work arrays.<a name='2290'></font>
+  do j=1,nlon<a name='2291'>
+     do i=1,ny<a name='2292'>
+        work3(i,j) = b(i+1,j)<a name='2293'>
+        grid3(i,j)=zero<a name='2294'>
+     end do<a name='2295'>
+  end do<a name='2296'>
+<a name='2297'>
+<a name='2298'>
+<font color=#447700>! Compute x (east-west) derivatives on sphere<a name='2299'></font>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP'>xdcirdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DLON' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XDCIRDP_12">(work3,grid3, &amp;<a name='2300'>
+       coef(lacox1),coef(lbcox1),coef(lacox2),coef(lbcox2),&amp;<a name='2301'>
+       nlon,ny,noq,nxh)<a name='2302'>
+<a name='2303'>
+<font color=#447700>! Make corrections for convergence of meridians:<a name='2304'></font>
+  do ix=1,nlon<a name='2305'>
+     do iy=1,ny<a name='2306'>
+        grid3(iy,ix)=grid3(iy,ix)*coef(lcy+iy)<a name='2307'>
+     end do<a name='2308'>
+  end do<a name='2309'>
+<a name='2310'>
+  if(.not.vector) then<a name='2311'>
+    polnu=zero<a name='2312'>
+    polnv=zero<a name='2313'>
+    polsu=zero<a name='2314'>
+    polsv=zero<a name='2315'>
+    do ix=1,nlon<a name='2316'>
+       polnu=polnu+grid3(ny,ix)*coslon(ix)<a name='2317'>
+       polnv=polnv+grid3(ny,ix)*sinlon(ix)<a name='2318'>
+       polsu=polsu+grid3(1 ,ix)*coslon(ix)<a name='2319'>
+       polsv=polsv+grid3(1 ,ix)*sinlon(ix)<a name='2320'>
+    end do<a name='2321'>
+    polnu=polnu/float(nlon)<a name='2322'>
+    polnv=polnv/float(nlon)<a name='2323'>
+    polsu=polsu/float(nlon)<a name='2324'>
+    polsv=polsv/float(nlon)<a name='2325'>
+    do ix=1,nlon<a name='2326'>
+       grid3n(ix)= polnu*coslon(ix)+polnv*sinlon(ix)<a name='2327'>
+       grid3s(ix)= polsu*coslon(ix)+polsv*sinlon(ix)<a name='2328'>
+    end do<a name='2329'>
+  else<a name='2330'>
+    do ix=1,nlon<a name='2331'>
+       grid3n(ix)= zero<a name='2332'>
+       grid3s(ix)= zero<a name='2333'>
+    end do<a name='2334'>
+  end if<a name='2335'>
+<a name='2336'>
+<font color=#447700>! Load result into output array<a name='2337'></font>
+  do j=1,nlon<a name='2338'>
+     dbdx(1,j)=grid3s(j)<a name='2339'>
+     dbdx(nlat,j)=grid3n(j)<a name='2340'>
+     do i=1,ny<a name='2341'>
+        dbdx(i+1,j) = grid3(i,j)<a name='2342'>
+     end do<a name='2343'>
+  end do<a name='2344'>
+  <a name='2345'>
+  return<a name='2346'>
+  end subroutine compact_dlon<a name='2347'>
+<a name='2348'>
+<A NAME='TCOMPACT_DLON'><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DLON' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2349'>
+  <font color=#993300>subroutine </font><font color=#cc0000>tcompact_dlon</font>(b,dbdx,vector) <A href='../../call_to/TCOMPACT_DLON.html' TARGET='index'>4</A>,<A href='../../call_from/TCOMPACT_DLON.html' TARGET='index'>4</A><a name='2350'>
+<font color=#447700>!$$$  subprogram documentation block<a name='2351'></font>
+<font color=#447700>!                .      .    .                                       .<a name='2352'></font>
+<font color=#447700>! subprogram:    tcompact_dlon  adjoint of compact_dlon<a name='2353'></font>
+<font color=#447700>!   prgmmr: parrish          org: np23                date: 2005-05-16<a name='2354'></font>
+<font color=#447700>!<a name='2355'></font>
+<font color=#447700>! abstract:  adjoint of compact_dlon<a name='2356'></font>
+<font color=#447700>!<a name='2357'></font>
+<font color=#447700>! program history log:<a name='2358'></font>
+<font color=#447700>!   2005-05-16  parrish<a name='2359'></font>
+<font color=#447700>!   2005-07-01  kleist, bug fix<a name='2360'></font>
+<font color=#447700>!<a name='2361'></font>
+<font color=#447700>!   input argument list:<a name='2362'></font>
+<font color=#447700>!     "b"    - array containing existing contents to be accumulated to<a name='2363'></font>
+<font color=#447700>!     dbdx  - array containing the eastward component of (1/(a*cos(lat)))db/dlon<a name='2364'></font>
+<font color=#447700>!     vector - if true, then b is one component of a vector field and dbdx is<a name='2365'></font>
+<font color=#447700>!                undefined at poles.<a name='2366'></font>
+<font color=#447700>!<a name='2367'></font>
+<font color=#447700>!   output argument list:<a name='2368'></font>
+<font color=#447700>!     "b"    - array after adding contribution from adjoint of dbdx<a name='2369'></font>
+<font color=#447700>!<a name='2370'></font>
+<font color=#447700>! attributes:<a name='2371'></font>
+<font color=#447700>!   language: f90<a name='2372'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='2373'></font>
+<font color=#447700>!<a name='2374'></font>
+<font color=#447700>!$$$<a name='2375'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DLON' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_55">, only: r_kind,i_kind<a name='2376'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DLON' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_37">, only: zero<a name='2377'>
+  use <A href='../../html_code/gsi/gridmod.f90.html#GRIDMOD'>gridmod</A><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DLON' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GRIDMOD_32">, only: nlon,nlat,sinlon,coslon<a name='2378'>
+  implicit none<a name='2379'>
+<a name='2380'>
+  logical vector<a name='2381'>
+  integer(i_kind) nx,ny,nxh,nbp,nya,nxa,lacox1,lbcox1,lacox2,lbcox2,lacoy1,lbcoy1<a name='2382'>
+  integer(i_kind) lbcoy2,lacoy2,iy,ix,kk,i,j,lcy<a name='2383'>
+  real(r_kind),dimension(nlat,nlon):: b,dbdx<a name='2384'>
+  real(r_kind),dimension(nlat-2,nlon):: work3,grid3<a name='2385'>
+  real(r_kind),dimension(nlon):: grid3n,grid3s<a name='2386'>
+  real(r_kind) polnu,polnv,polsu,polsv<a name='2387'>
+<a name='2388'>
+<a name='2389'>
+<font color=#447700>! Set parameters for calls to subsequent routines<a name='2390'></font>
+  ny=nlat-2<a name='2391'>
+  nxh=nlon/2<a name='2392'>
+  nbp=2*noq+1<a name='2393'>
+  nya=ny*nbp<a name='2394'>
+  nxa=nxh*nbp<a name='2395'>
+  <a name='2396'>
+  lacox1=1<a name='2397'>
+  lbcox1=lacox1+nxa<a name='2398'>
+  lacox2=lbcox1+nxa<a name='2399'>
+  lbcox2=lacox2+nxa<a name='2400'>
+  lacoy1=lbcox2+nxa<a name='2401'>
+  lbcoy1=lacoy1+nya<a name='2402'>
+  lacoy2=lbcoy1+nya<a name='2403'>
+  lbcoy2=lacoy2+nya<a name='2404'>
+  lcy   =lbcoy2+nya-1<a name='2405'>
+<a name='2406'>
+  do j=1,nlon<a name='2407'>
+     grid3s(j)=dbdx(1,j)<a name='2408'>
+     grid3n(j)=dbdx(nlat,j)<a name='2409'>
+     do i=1,ny<a name='2410'>
+       grid3(i,j)=dbdx(i+1,j) <a name='2411'>
+     end do<a name='2412'>
+  end do<a name='2413'>
+  if(.not.vector) then<a name='2414'>
+    polnu=zero<a name='2415'>
+    polnv=zero<a name='2416'>
+    polsu=zero<a name='2417'>
+    polsv=zero<a name='2418'>
+    do ix=1,nlon<a name='2419'>
+       polnu=polnu+coslon(ix)*grid3n(ix)<a name='2420'>
+       polnv=polnv+sinlon(ix)*grid3n(ix)<a name='2421'>
+       polsu=polsu+coslon(ix)*grid3s(ix)<a name='2422'>
+       polsv=polsv+sinlon(ix)*grid3s(ix)<a name='2423'>
+    end do<a name='2424'>
+    polnu=polnu/float(nlon)<a name='2425'>
+    polnv=polnv/float(nlon)<a name='2426'>
+    polsu=polsu/float(nlon)<a name='2427'>
+    polsv=polsv/float(nlon)<a name='2428'>
+    do ix=1,nlon<a name='2429'>
+       grid3(ny,ix)=grid3(ny,ix)+coslon(ix)*polnu+sinlon(ix)*polnv<a name='2430'>
+       grid3(1 ,ix)=grid3(1 ,ix)+coslon(ix)*polsu+sinlon(ix)*polsv<a name='2431'>
+    end do<a name='2432'>
+  else<a name='2433'>
+    do ix=1,nlon<a name='2434'>
+       grid3n(ix)= zero<a name='2435'>
+       grid3s(ix)= zero<a name='2436'>
+    end do<a name='2437'>
+  end if<a name='2438'>
+<a name='2439'>
+<font color=#447700>! Make corrections for convergence of meridians:<a name='2440'></font>
+  do ix=1,nlon<a name='2441'>
+     do iy=1,ny<a name='2442'>
+        grid3(iy,ix)=grid3(iy,ix)*coef(lcy+iy)<a name='2443'>
+     end do<a name='2444'>
+  end do<a name='2445'>
+<a name='2446'>
+<font color=#447700>! adjoint of X (east-west) derivatives on sphere<a name='2447'></font>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#XDCIRDP'>xdcirdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DLON' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="XDCIRDP_13">(grid3,work3, &amp;<a name='2448'>
+       coef(lacox1),coef(lbcox1),coef(lacox2),coef(lbcox2),&amp;<a name='2449'>
+       nlon,ny,noq,nxh)<a name='2450'>
+<a name='2451'>
+<font color=#447700>! Transfer scalar input field to work array.<a name='2452'></font>
+<font color=#447700>! Zero other work arrays.<a name='2453'></font>
+  do j=1,nlon<a name='2454'>
+     do i=1,ny<a name='2455'>
+<font color=#447700>!       NOTE:  Adjoint of first derivative is its negative<a name='2456'></font>
+       b(i+1,j)=b(i+1,j)-work3(i,j)<a name='2457'>
+     end do<a name='2458'>
+  end do<a name='2459'>
+  <a name='2460'>
+  return<a name='2461'>
+  end subroutine tcompact_dlon<a name='2462'>
+<a name='2463'>
+<A NAME='COMPACT_DLAT'><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DLAT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2464'>
+  <font color=#993300>subroutine </font><font color=#cc0000>compact_dlat</font>(b,dbdy,vector) <A href='../../call_to/COMPACT_DLAT.html' TARGET='index'>5</A>,<A href='../../call_from/COMPACT_DLAT.html' TARGET='index'>4</A><a name='2465'>
+<font color=#447700>!$$$  subprogram documentation block<a name='2466'></font>
+<font color=#447700>!                .      .    .                                       .<a name='2467'></font>
+<font color=#447700>! subprogram:    compact_dlat   compact derivative in latitude<a name='2468'></font>
+<font color=#447700>!   prgmmr: parrish          org: np23                date: 2005-05-16<a name='2469'></font>
+<font color=#447700>!<a name='2470'></font>
+<font color=#447700>! abstract:  Use high-order compact differencing on a spherical grid<a name='2471'></font>
+<font color=#447700>!            to compute derivative in latitude.<a name='2472'></font>
+<font color=#447700>!<a name='2473'></font>
+<font color=#447700>! program history log:<a name='2474'></font>
+<font color=#447700>!   2005-05-16  parrish<a name='2475'></font>
+<font color=#447700>!   2005-07-01  kleist, bug fix<a name='2476'></font>
+<font color=#447700>!<a name='2477'></font>
+<font color=#447700>!   input argument list:<a name='2478'></font>
+<font color=#447700>!     "b"    - array containing the scalar field<a name='2479'></font>
+<font color=#447700>!     vector - if true, then b is one component of a vector field and dbdy<a name='2480'></font>
+<font color=#447700>!                 is singular at poles, so output at poles set to zero.<a name='2481'></font>
+<font color=#447700>!<a name='2482'></font>
+<font color=#447700>!   output argument list:<a name='2483'></font>
+<font color=#447700>!     dbdy  - if vector true, then =  (1/(a*cos(lat)))d(b*cos(lat))/dlat<a name='2484'></font>
+<font color=#447700>!           -      otherwise,      =  (1/a)(db/dlat)<a name='2485'></font>
+<font color=#447700>!<a name='2486'></font>
+<font color=#447700>! attributes:<a name='2487'></font>
+<font color=#447700>!   language: f90<a name='2488'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='2489'></font>
+<font color=#447700>!<a name='2490'></font>
+<font color=#447700>!$$$<a name='2491'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DLAT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_56">, only: r_kind,i_kind<a name='2492'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DLAT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_38">, only: zero<a name='2493'>
+  use <A href='../../html_code/gsi/gridmod.f90.html#GRIDMOD'>gridmod</A><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DLAT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GRIDMOD_33">, only: nlon,nlat,sinlon,coslon<a name='2494'>
+  implicit none<a name='2495'>
+<a name='2496'>
+  logical vector<a name='2497'>
+  integer(i_kind) nx,ny,nxh,nbp,nya,nxa,lacox1,lbcox1,lacox2,lbcox2,lacoy1,lbcoy1<a name='2498'>
+  integer(i_kind) lbcoy2,lacoy2,iy,ix,kk,i,j,lcy<a name='2499'>
+  real(r_kind),dimension(nlat,nlon):: b,dbdy<a name='2500'>
+  real(r_kind),dimension(nlat-2,nlon):: work2,grid4<a name='2501'>
+  real(r_kind),dimension(nlon)::grid4n,grid4s<a name='2502'>
+  real(r_kind) polnu,polnv,polsu,polsv<a name='2503'>
+<a name='2504'>
+<a name='2505'>
+<font color=#447700>! Set parameters for calls to subsequent routines<a name='2506'></font>
+  ny=nlat-2<a name='2507'>
+  nxh=nlon/2<a name='2508'>
+  nbp=2*noq+1<a name='2509'>
+  nya=ny*nbp<a name='2510'>
+  nxa=nxh*nbp<a name='2511'>
+  <a name='2512'>
+  lacox1=1<a name='2513'>
+  lbcox1=lacox1+nxa<a name='2514'>
+  lacox2=lbcox1+nxa<a name='2515'>
+  lbcox2=lacox2+nxa<a name='2516'>
+  lacoy1=lbcox2+nxa<a name='2517'>
+  lbcoy1=lacoy1+nya<a name='2518'>
+  lacoy2=lbcoy1+nya<a name='2519'>
+  lbcoy2=lacoy2+nya<a name='2520'>
+  lcy   =lbcoy2+nya-1<a name='2521'>
+<a name='2522'>
+<a name='2523'>
+<font color=#447700>! Initialize output arrays to zero<a name='2524'></font>
+  do j=1,nlon<a name='2525'>
+     do i=1,nlat<a name='2526'>
+        dbdy(i,j)=zero<a name='2527'>
+     end do<a name='2528'>
+  end do<a name='2529'>
+<a name='2530'>
+<font color=#447700>! Transfer scalar input field to work array.<a name='2531'></font>
+<font color=#447700>! Zero other work arrays.<a name='2532'></font>
+  do j=1,nlon<a name='2533'>
+     do i=1,ny<a name='2534'>
+        work2(i,j) = b(i+1,j)<a name='2535'>
+        grid4(i,j)=zero<a name='2536'>
+     end do<a name='2537'>
+  end do<a name='2538'>
+<a name='2539'>
+  if(vector) then<a name='2540'>
+<font color=#447700>!    multiply by cos(lat) ( 1/coef(lcy+iy) )<a name='2541'></font>
+    do ix=1,nlon<a name='2542'>
+       do iy=1,ny<a name='2543'>
+          work2(iy,ix)=work2(iy,ix)/coef(lcy+iy)<a name='2544'>
+       enddo<a name='2545'>
+    enddo<a name='2546'>
+  end if<a name='2547'>
+<a name='2548'>
+<font color=#447700>! Compute y (south-north) derivatives on sphere<a name='2549'></font>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#YDSPHDP'>ydsphdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DLAT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YDSPHDP_8">(work2,grid4, &amp;<a name='2550'>
+       coef(lacoy1),coef(lbcoy1),coef(lacoy2),coef(lbcoy2),&amp;<a name='2551'>
+       nlon,ny,noq)<a name='2552'>
+<a name='2553'>
+  if(vector) then<a name='2554'>
+<font color=#447700>!  divide by cos(lat)<a name='2555'></font>
+    do ix=1,nlon<a name='2556'>
+       do iy=1,ny<a name='2557'>
+          grid4(iy,ix)=grid4(iy,ix)*coef(lcy+iy)<a name='2558'>
+       enddo<a name='2559'>
+    enddo<a name='2560'>
+    do ix=1,nlon<a name='2561'>
+       grid4n(ix)= zero<a name='2562'>
+       grid4s(ix)= zero<a name='2563'>
+    end do<a name='2564'>
+  else<a name='2565'>
+    polnu=zero<a name='2566'>
+    polnv=zero<a name='2567'>
+    polsu=zero<a name='2568'>
+    polsv=zero<a name='2569'>
+    do ix=1,nlon<a name='2570'>
+       polnu=polnu-grid4(ny,ix)*sinlon(ix)<a name='2571'>
+       polnv=polnv+grid4(ny,ix)*coslon(ix)<a name='2572'>
+       polsu=polsu+grid4(1 ,ix)*sinlon(ix)<a name='2573'>
+       polsv=polsv+grid4(1 ,ix)*coslon(ix)<a name='2574'>
+    end do<a name='2575'>
+    polnu=polnu/float(nlon)<a name='2576'>
+    polnv=polnv/float(nlon)<a name='2577'>
+    polsu=polsu/float(nlon)<a name='2578'>
+    polsv=polsv/float(nlon)<a name='2579'>
+    do ix=1,nlon<a name='2580'>
+       grid4n(ix)=-polnu*sinlon(ix)+polnv*coslon(ix)<a name='2581'>
+       grid4s(ix)= polsu*sinlon(ix)+polsv*coslon(ix)<a name='2582'>
+    end do<a name='2583'>
+  end if<a name='2584'>
+<a name='2585'>
+<font color=#447700>! Load result into output array<a name='2586'></font>
+  do j=1,nlon<a name='2587'>
+     dbdy(1,j)=grid4s(j)<a name='2588'>
+     dbdy(nlat,j)=grid4n(j)<a name='2589'>
+     do i=1,ny<a name='2590'>
+        dbdy(i+1,j) = grid4(i,j)<a name='2591'>
+     end do<a name='2592'>
+  end do<a name='2593'>
+  <a name='2594'>
+  return<a name='2595'>
+  end subroutine compact_dlat<a name='2596'>
+<a name='2597'>
+<A NAME='TCOMPACT_DLAT'><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DLAT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2598'>
+  <font color=#993300>subroutine </font><font color=#cc0000>tcompact_dlat</font>(b,dbdy,vector) <A href='../../call_to/TCOMPACT_DLAT.html' TARGET='index'>4</A>,<A href='../../call_from/TCOMPACT_DLAT.html' TARGET='index'>4</A><a name='2599'>
+<font color=#447700>!$$$  subprogram documentation block<a name='2600'></font>
+<font color=#447700>!                .      .    .                                       .<a name='2601'></font>
+<font color=#447700>! subprogram:    tcompact_dlat   adjoint of compact_dlat<a name='2602'></font>
+<font color=#447700>!   prgmmr: parrish          org: np23                date: 2005-05-16<a name='2603'></font>
+<font color=#447700>!<a name='2604'></font>
+<font color=#447700>! abstract:  adjoint of compact_dlat<a name='2605'></font>
+<font color=#447700>!<a name='2606'></font>
+<font color=#447700>! program history log:<a name='2607'></font>
+<font color=#447700>!   2005-05-16  parrish<a name='2608'></font>
+<font color=#447700>!   2005-07-01  kleist, bug and sign fixes<a name='2609'></font>
+<font color=#447700>!<a name='2610'></font>
+<font color=#447700>!   input argument list:<a name='2611'></font>
+<font color=#447700>!     "b"    - array containing existing contents to be accumulated to<a name='2612'></font>
+<font color=#447700>!     dbdy  - if vector true, then =  (1/(a*cos(lat)))d(b*cos(lat))/dlat<a name='2613'></font>
+<font color=#447700>!           -      otherwise,      =  (1/a)(db/dlat)<a name='2614'></font>
+<font color=#447700>!     vector - if true, then b is one component of a vector field and dbdy is<a name='2615'></font>
+<font color=#447700>!                undefined at poles.<a name='2616'></font>
+<font color=#447700>!<a name='2617'></font>
+<font color=#447700>!   output argument list:<a name='2618'></font>
+<font color=#447700>!     "b"    - array after adding contribution from adjoint of dbdy<a name='2619'></font>
+<font color=#447700>!<a name='2620'></font>
+<font color=#447700>! attributes:<a name='2621'></font>
+<font color=#447700>!   language: f90<a name='2622'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='2623'></font>
+<font color=#447700>!<a name='2624'></font>
+<font color=#447700>!$$$<a name='2625'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DLAT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_57">, only: r_kind,i_kind<a name='2626'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DLAT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_39">, only: zero<a name='2627'>
+  use <A href='../../html_code/gsi/gridmod.f90.html#GRIDMOD'>gridmod</A><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DLAT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GRIDMOD_34">, only: nlon,nlat,sinlon,coslon<a name='2628'>
+  implicit none<a name='2629'>
+<a name='2630'>
+  logical vector<a name='2631'>
+  integer(i_kind) nx,ny,nxh,nbp,nya,nxa,lacox1,lbcox1,lacox2,lbcox2,lacoy1,lbcoy1<a name='2632'>
+  integer(i_kind) lbcoy2,lacoy2,iy,ix,kk,i,j,lcy<a name='2633'>
+  real(r_kind),dimension(nlat,nlon):: b,dbdy<a name='2634'>
+  real(r_kind),dimension(nlat-2,nlon):: work2,grid4<a name='2635'>
+  real(r_kind),dimension(nlon)::grid4n,grid4s<a name='2636'>
+  real(r_kind) polnu,polnv,polsu,polsv<a name='2637'>
+<a name='2638'>
+<a name='2639'>
+<font color=#447700>! Set parameters for calls to subsequent routines<a name='2640'></font>
+  ny=nlat-2<a name='2641'>
+  nxh=nlon/2<a name='2642'>
+  nbp=2*noq+1<a name='2643'>
+  nya=ny*nbp<a name='2644'>
+  nxa=nxh*nbp<a name='2645'>
+  <a name='2646'>
+  lacox1=1<a name='2647'>
+  lbcox1=lacox1+nxa<a name='2648'>
+  lacox2=lbcox1+nxa<a name='2649'>
+  lbcox2=lacox2+nxa<a name='2650'>
+  lacoy1=lbcox2+nxa<a name='2651'>
+  lbcoy1=lacoy1+nya<a name='2652'>
+  lacoy2=lbcoy1+nya<a name='2653'>
+  lbcoy2=lacoy2+nya<a name='2654'>
+  lcy   =lbcoy2+nya-1<a name='2655'>
+<a name='2656'>
+  do j=1,nlon<a name='2657'>
+     grid4s(j)=dbdy(1,j)<a name='2658'>
+     grid4n(j)=dbdy(nlat,j)<a name='2659'>
+     do i=1,ny<a name='2660'>
+       grid4(i,j)=dbdy(i+1,j) <a name='2661'>
+     end do<a name='2662'>
+  end do<a name='2663'>
+  if(vector) then<a name='2664'>
+    do ix=1,nlon<a name='2665'>
+       grid4n(ix)= zero<a name='2666'>
+       grid4s(ix)= zero<a name='2667'>
+    end do<a name='2668'>
+<font color=#447700>!  divide by cos(lat)<a name='2669'></font>
+    do ix=1,nlon<a name='2670'>
+       do iy=1,ny<a name='2671'>
+          grid4(iy,ix)=grid4(iy,ix)*coef(lcy+iy)<a name='2672'>
+       enddo<a name='2673'>
+    enddo<a name='2674'>
+  else<a name='2675'>
+    polnu=zero<a name='2676'>
+    polnv=zero<a name='2677'>
+    polsu=zero<a name='2678'>
+    polsv=zero<a name='2679'>
+    do ix=1,nlon<a name='2680'>
+       polnu=polnu-sinlon(ix)*grid4n(ix)<a name='2681'>
+       polnv=polnv+coslon(ix)*grid4n(ix)<a name='2682'>
+       polsu=polsu+sinlon(ix)*grid4s(ix)<a name='2683'>
+       polsv=polsv+coslon(ix)*grid4s(ix)<a name='2684'>
+    end do<a name='2685'>
+    polnu=polnu/float(nlon)<a name='2686'>
+    polnv=polnv/float(nlon)<a name='2687'>
+    polsu=polsu/float(nlon)<a name='2688'>
+    polsv=polsv/float(nlon)<a name='2689'>
+    do ix=1,nlon<a name='2690'>
+       grid4(ny,ix)=grid4(ny,ix)-sinlon(ix)*polnu+coslon(ix)*polnv<a name='2691'>
+       grid4(1 ,ix)=grid4(1 ,ix)+sinlon(ix)*polsu+coslon(ix)*polsv<a name='2692'>
+    end do<a name='2693'>
+  end if<a name='2694'>
+<a name='2695'>
+<font color=#447700>! adjoint of y derivative on sphere<a name='2696'></font>
+  work2=zero<a name='2697'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#TYDSPHDP'>tydsphdp</A><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DLAT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TYDSPHDP_5">(work2,grid4, &amp;<a name='2698'>
+       coef(lacoy1),coef(lbcoy1),coef(lacoy2),coef(lbcoy2),&amp;<a name='2699'>
+       nlon,ny,noq)<a name='2700'>
+<a name='2701'>
+  if(vector) then<a name='2702'>
+<font color=#447700>!    multiply by cos(lat) ( 1/coef(lcy+iy) )<a name='2703'></font>
+    do ix=1,nlon<a name='2704'>
+       do iy=1,ny<a name='2705'>
+          work2(iy,ix)=work2(iy,ix)/coef(lcy+iy)<a name='2706'>
+       enddo<a name='2707'>
+    enddo<a name='2708'>
+  end if<a name='2709'>
+<font color=#447700>! accumulate to output field<a name='2710'></font>
+<a name='2711'>
+  do j=1,nlon<a name='2712'>
+     do i=1,ny<a name='2713'>
+<font color=#447700>!       NOTE:  Adjoint of first derivative is its negative<a name='2714'></font>
+       b(i+1,j)=b(i+1,j)-work2(i,j)   <font color=#447700>!????/check this in particular<a name='2715'></font>
+     end do<a name='2716'>
+  end do<a name='2717'>
+  <a name='2718'>
+  return<a name='2719'>
+  end subroutine tcompact_dlat<a name='2720'>
+<a name='2721'>
+<A NAME='COMPACT_DELSQR'><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DELSQR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2722'>
+  <font color=#993300>subroutine </font><font color=#cc0000>compact_delsqr</font>(b,delsqrb) <A href='../../call_to/COMPACT_DELSQR.html' TARGET='index'>1</A>,<A href='../../call_from/COMPACT_DELSQR.html' TARGET='index'>6</A><a name='2723'>
+<font color=#447700>!$$$  subprogram documentation block<a name='2724'></font>
+<font color=#447700>!                .      .    .                                       .<a name='2725'></font>
+<font color=#447700>! subprogram:    compact_delsqr compact laplacian<a name='2726'></font>
+<font color=#447700>!   prgmmr: parrish          org: np23                date: 2006-02-13<a name='2727'></font>
+<font color=#447700>!<a name='2728'></font>
+<font color=#447700>! abstract:  Call high-order compact differencing routines to get<a name='2729'></font>
+<font color=#447700>!            laplacian of input field.<a name='2730'></font>
+<font color=#447700>!<a name='2731'></font>
+<font color=#447700>! program history log:<a name='2732'></font>
+<font color=#447700>!   2006-02-13  parrish<a name='2733'></font>
+<font color=#447700>!<a name='2734'></font>
+<font color=#447700>!   input argument list:<a name='2735'></font>
+<font color=#447700>!     "b"    - array containing the scalar field<a name='2736'></font>
+<font color=#447700>!<a name='2737'></font>
+<font color=#447700>!   output argument list:<a name='2738'></font>
+<font color=#447700>!     delsqrb  -  (1/(a*cos(lat)))*d((1/a)(db/dlat)*cos(lat))/dlat<a name='2739'></font>
+<font color=#447700>!                      + (1/((a*cos(lat))**2)*d(db/dlon)/dlon<a name='2740'></font>
+<font color=#447700>!<a name='2741'></font>
+<font color=#447700>! attributes:<a name='2742'></font>
+<font color=#447700>!   language: f90<a name='2743'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='2744'></font>
+<font color=#447700>!<a name='2745'></font>
+<font color=#447700>!$$$<a name='2746'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DELSQR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_58">, only: r_kind,i_kind<a name='2747'>
+  use <A href='../../html_code/gsi/gridmod.f90.html#GRIDMOD'>gridmod</A><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DELSQR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GRIDMOD_35">, only: nlon,nlat<a name='2748'>
+  implicit none<a name='2749'>
+<a name='2750'>
+  real(r_kind),dimension(nlat,nlon):: b,delsqrb<a name='2751'>
+<a name='2752'>
+  real(r_kind),dimension(nlat,nlon):: bx,by,bxx,byy<a name='2753'>
+  integer(i_kind) i,j<a name='2754'>
+<a name='2755'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DLON'>compact_dlon</A><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DELSQR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="COMPACT_DLON_1">(b,bx,.false.)<a name='2756'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DLON'>compact_dlon</A><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DELSQR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="COMPACT_DLON_2">(bx,bxx,.true.)<a name='2757'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DLAT'>compact_dlat</A><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DELSQR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="COMPACT_DLAT_1">(b,by,.false.)<a name='2758'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DLAT'>compact_dlat</A><A href='../../html_code/gsi/compact_diffs.f90.html#COMPACT_DELSQR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="COMPACT_DLAT_2">(by,byy,.true.)<a name='2759'>
+<a name='2760'>
+  do j=1,nlon<a name='2761'>
+    do i=1,nlat<a name='2762'>
+      delsqrb(i,j)=bxx(i,j)+byy(i,j)<a name='2763'>
+    end do<a name='2764'>
+  end do<a name='2765'>
+<a name='2766'>
+  return<a name='2767'>
+  end subroutine compact_delsqr<a name='2768'>
+<a name='2769'>
+<A NAME='TCOMPACT_DELSQR'><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DELSQR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2770'>
+  <font color=#993300>subroutine </font><font color=#cc0000>tcompact_delsqr</font>(b,delsqrb) <A href='../../call_to/TCOMPACT_DELSQR.html' TARGET='index'>1</A>,<A href='../../call_from/TCOMPACT_DELSQR.html' TARGET='index'>7</A><a name='2771'>
+<font color=#447700>!$$$  subprogram documentation block<a name='2772'></font>
+<font color=#447700>!                .      .    .                                       .<a name='2773'></font>
+<font color=#447700>! subprogram:    adjoint of compact_delsqr<a name='2774'></font>
+<font color=#447700>!   prgmmr: parrish          org: np23                date: 2006-02-13<a name='2775'></font>
+<font color=#447700>!<a name='2776'></font>
+<font color=#447700>! abstract:  Call high-order compact differencing routines to get<a name='2777'></font>
+<font color=#447700>!            laplacian of input field.<a name='2778'></font>
+<font color=#447700>!<a name='2779'></font>
+<font color=#447700>! program history log:<a name='2780'></font>
+<font color=#447700>!   2006-02-13  parrish<a name='2781'></font>
+<font color=#447700>!<a name='2782'></font>
+<font color=#447700>!   input argument list:<a name='2783'></font>
+<font color=#447700>!     delsqrb  -  (1/(a*cos(lat)))*d((1/a)(db/dlat)*cos(lat))/dlat<a name='2784'></font>
+<font color=#447700>!                      + (1/((a*cos(lat))**2)*d(db/dlon)/dlon<a name='2785'></font>
+<font color=#447700>!     b        -  contains previous contents that result of this routine<a name='2786'></font>
+<font color=#447700>!                   are added on to.<a name='2787'></font>
+<font color=#447700>!   output argument list:<a name='2788'></font>
+<font color=#447700>!     "b"    - array containing accumulated results<a name='2789'></font>
+<font color=#447700>!<a name='2790'></font>
+<font color=#447700>!  note:  b not initialized to zero here, because result is accumulated to<a name='2791'></font>
+<font color=#447700>!        previous contents of b<a name='2792'></font>
+<font color=#447700>!<a name='2793'></font>
+<font color=#447700>! attributes:<a name='2794'></font>
+<font color=#447700>!   language: f90<a name='2795'></font>
+<font color=#447700>!   machine:  ibm RS/6000 SP<a name='2796'></font>
+<font color=#447700>!<a name='2797'></font>
+<font color=#447700>!$$$<a name='2798'></font>
+  use <A href='../../html_code/gsi/kinds.f90.html#KINDS'>kinds</A><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DELSQR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KINDS_59">, only: r_kind,i_kind<a name='2799'>
+  use <A href='../../html_code/gsi/gridmod.f90.html#GRIDMOD'>gridmod</A><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DELSQR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GRIDMOD_36">, only: nlon,nlat<a name='2800'>
+  use <A href='../../html_code/gsi/constants.f90.html#CONSTANTS'>constants</A><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DELSQR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTANTS_40">, only: zero<a name='2801'>
+  implicit none<a name='2802'>
+<a name='2803'>
+  real(r_kind),dimension(nlat,nlon):: b,delsqrb<a name='2804'>
+<a name='2805'>
+  real(r_kind),dimension(nlat,nlon):: bx,by,bxx,byy<a name='2806'>
+<a name='2807'>
+  integer(i_kind) i,j<a name='2808'>
+<a name='2809'>
+<a name='2810'>
+  do j=1,nlon<a name='2811'>
+    do i=1,nlat<a name='2812'>
+      bxx(i,j)=zero<a name='2813'>
+      byy(i,j)=zero<a name='2814'>
+      bx(i,j)=zero<a name='2815'>
+      by(i,j)=zero<a name='2816'>
+    end do<a name='2817'>
+  end do<a name='2818'>
+  do j=1,nlon<a name='2819'>
+    do i=1,nlat<a name='2820'>
+      bxx(i,j)=bxx(i,j)+delsqrb(i,j)<a name='2821'>
+      byy(i,j)=byy(i,j)+delsqrb(i,j)<a name='2822'>
+    end do<a name='2823'>
+  end do<a name='2824'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DLAT'>tcompact_dlat</A><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DELSQR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TCOMPACT_DLAT_1">(by,byy,.true.)<a name='2825'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DLAT'>tcompact_dlat</A><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DELSQR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TCOMPACT_DLAT_2">(b,by,.false.)<a name='2826'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DLON'>tcompact_dlon</A><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DELSQR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TCOMPACT_DLON_1">(bx,bxx,.true.)<a name='2827'>
+  call <A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DLON'>tcompact_dlon</A><A href='../../html_code/gsi/compact_diffs.f90.html#TCOMPACT_DELSQR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TCOMPACT_DLON_2">(b,bx,.false.)<a name='2828'>
+<a name='2829'>
+  return<a name='2830'>
+  end subroutine tcompact_delsqr<a name='2831'>
+<a name='2832'>
+end module compact_diffs<a name='2833'>
+</pre></body></html>

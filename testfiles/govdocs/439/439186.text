@@ -1,0 +1,463 @@
+CCSD3ZF0000100000001CCSD3FF0000500000001CCSD3CS00004markeraa
+ADIDNAME = NSSD0059;
+CCSD$$MARKERmarkeraaNSSD3KS00020markerbb
+
+ADIDNAME = NSSD00059;
+REVISION_NUMBER = 0;
+SUBMISSION_DATE = 1992-01-30;
+REGISTRATION_DATE = 1991-07-01;
+REVISABLE = Y;  
+RELEASABLE = Y;
+EXPECTED_RELEASE_DATE =  1992-01-30;
+
+BRIEF_TITLE = "Dynamics Explorer (DE) Hawkeye 1";
+
+BRIEF_DESCRIPTION =  "DE Hawkeye 1 spacecraft science data formats";
+
+REVISION_COMMENT =   "Original";
+
+GROUP = REGISTRANT ;
+  TITLE =  "";
+  FIRST_NAME =  Bruce;
+  MIDDLE_NAME =  A.;
+  LAST_NAME =  Randall;
+  AFFILIATION = "University of Iowa";
+  GROUP = ADDRESS ;
+     ADDRESS_LINE =  "Department of Physics and Astronomy";
+     ADDRESS_LINE =  "University of Iowa";
+     ADDRESS_LINE =  "Van Allen Hall";
+     ADDRESS_LINE =  "Iowa City, IA 52242 USA";
+  END_GROUP ;
+ 
+  GROUP = EMAIL_ADDRESS;
+      NETWORK = NSI/DECNET;
+      NET_ADDRESS = "IOWASP::RANDALL";
+  END_GROUP ;
+  GROUP = EMAIL_ADDRESS;
+      NETWORK = INTERNET;
+      NET_ADDRESS = "RANDALL@IOWASP.PHYSICS.UIOWA.EDU";
+  END_GROUP ;
+
+    PHONE = 319-335-1939;
+END_GROUP ;
+
+
+GROUP = REVISOR  ;
+  TITLE =  "";
+  FIRST_NAME =  Bruce;
+  MIDDLE_NAME =  A.;
+  LAST_NAME =  Randall;
+  AFFILIATION = "University of Iowa";
+  GROUP = ADDRESS ;
+     ADDRESS_LINE =  "Department of Physics and Astronomy";
+     ADDRESS_LINE =  "University of Iowa";
+     ADDRESS_LINE =  "Van Allen Hall";
+     ADDRESS_LINE =  "Iowa City, IA 52242 USA";
+  END_GROUP ;
+ 
+  GROUP = EMAIL_ADDRESS;
+      NETWORK = NSI/DECNET;
+      NET_ADDRESS = "IOWASP::RANDALL";
+  END_GROUP ;
+  GROUP = EMAIL_ADDRESS;
+      NETWORK = INTERNET;
+      NET_ADDRESS = "RANDALL@IOWASP.PHYSICS.UIOWA.EDU";
+  END_GROUP ;
+
+    PHONE = 319-335-1939;
+END_GROUP ;
+
+REFERENCED_ADID = 0;
+
+PROJECT_NAME = ;
+MISSION_NAME = "Dynamics Explorer";
+INSTRUMENT_NAME = "Hawkeye 1"; 
+
+CCSD$$MARKERmarkerbbCCSD3DS00002markercc
+
+
+FILE_TYPE:                           BINARY
+RECORD_STRUCTURE:                    FIXED LENGTH, NO CONTROL FIELDS
+RECORD_LENGTH:                       1296 BYTES
+LABEL_RECORDS:                       = 0
+
+
+                       HAWKEYE/EXPLORER 52 FORMATS
+
+
+DATA FORMATS:
+
+             Fix length logical records of 1296 bytes consisting
+             of 32 bit Integer*4 and 64 bit Real*8 words in VAX
+             integer and floating point format.
+
+             Integer*4 format:
+
+             Integer values are stored in twos complement
+             representation with least significant byte first.
+
+             bits   31   30 - - - - - - - - - - 0
+                   | S | |   Binary number       |
+
+                    S = 0(+), 1(-)
+
+             Floating point format:  "Real*8"
+
+             bits   15 14 - - - -  7 6 - - - - - - 0   Byte #
+                     S |  Exponent | | Fraction    |   :A
+             bits   31  - - - - - - - - - - - - - 16
+                    |         Fraction             |   :A+2
+             bits   47  - - - - - - - - - - - - - 32
+                    |         Fraction             |   :A+4
+             bits   63  - - - - - - - - - - - - - 48
+                    |         Fraction             |   :A+6
+
+             S = sign bit  0(+), 1(-)
+
+RECORD FORMATS:
+
+        Item number       Data type         Function
+
+            1               Integer*4        Record number
+            2               Integer*4        Logical Record Length
+----------------------------------------------------------------------------
+PERIOD      3               Integer*4        Year of the data
+  OF        4               Integer*4        Day of the data
+ DATA       5               Integer*4        Hour
+            6               Integer*4        Minute
+            7               Integer*4        Seconds (to hundreds)
+            8               Integer*4        Month of data
+            9               Integer*4        Day of month
+           10               Integer*4        Not used
+           11   NOTE 1      Integer*4        Pass Number
+           12               Integer*4        Command status
+           13               Integer*4        Not used
+------------------------------------------------------------------------------
+PRODUCTION 14               Integer*4        Year*1000+Day HWKATD Date
+CONTROL    15               Integer*4        Year*1000+Day HWKMSF Date
+INFO       16               Integer*4        Operator Number for HWKATD
+           17               Integer*4        Operator Number for HWKMSF
+           18               Integer*4        Number of records this analog
+           19               Integer*4        Processing status
+                                             1 HWKATD  2 HWKMSF
+           20               Integer*4        Not used
+------------------------------------------------------------------------------
+ TIME      21               Integer*4        Hour from Word 5 of ATD tape
+CORRECTION 22               Integer*4        Minute from Word 6 of ATD
+DATA       23               Integer*4        Seconds from Word 7 of ATD
+           24               Integer*4        Seconds of correction
+-------------------------------------------------------------------------------
+DECODER    25               Integer*4        Number of Parity Errors
+AND        26               Integer*4        Pointer to last bit Decoded
+DATA       27               Integer*4        Maximum Depth of Search
+QUALITY    28               Integer*4        Running Threshold Value
+FLAGS      29               Integer*4        Branch Metric
+           30               Integer*4        Number of Computations
+           31               Integer*4        Time Switch
+------------------------------------------------------------------------------
+BUFFER SW  32               Integer*4        Status setting on data controller
+SETTINGS   33               Integer*4        at time of HWKATD
+------------------------------------------------------------------------------
+DECODER    34               Integer*4        Frame Sync
+DATA       35               Integer*4        Frame Sync
+RAW        36               Integer*4        Frame Sync
+FORM       37               Integer*4        3 Bit Frame Sync  1 Bit validity
+                                             5 Bit Clock (Most Significant)
+           38               Integer*4        S/C Clock (Least Significant)
+           39               Integer*4        VLF-1  SA-1
+           40               Integer*4        VLF-1  SA-2
+           41               Integer*4        VLF-1  SFR-1
+           42               Integer*4        VLF-1  SFR-2
+           43               Integer*4        VLF-A  V-DIFF
+           44               Integer*4        LEP-1
+           45               Integer*4        LEP-1
+           46               Integer*4        LEP-1
+           47               Integer*4        LEP-1
+           48               Integer*4        LEP-1
+           49               Integer*4        LEP-1
+           50               Integer*4        LEP-1
+           51               Integer*4        LEP-1
+           52               Integer*4        MAG-1  MAG-X
+           53               Integer*4        MAG-1  MAG-Y
+           54               Integer*4        MAG-1  MAG-Z
+           55               Integer*4        VLF-B  V-DIFF
+           56               Integer*4        OPTICAL ASPECT
+           57               Integer*4        OPTICAL ASPECT
+           58               Integer*4        ENGINEERING-1
+           59               Integer*4        ENGINEERING-2
+           60               Integer*4        LEP-2
+           61               Integer*4        LEP-2
+           62               Integer*4        LEP-2
+           63               Integer*4        LEP-2
+           64               Integer*4        LEP-2
+           65               Integer*4        LEP-2
+           66               Integer*4        LEP-2
+           67               Integer*4        LEP-2
+           68               Integer*4        VLF-2  SA-1
+           69               Integer*4        VLF-2  SA-2
+           70               Integer*4        VLF-2  SFR-1
+           71               Integer*4        VLF-2  SFR-2
+           72               Integer*4        VLF-C  V-DIFF
+           73               Integer*4        MAG-2  MAG-X
+           74               Integer*4        MAG-2  MAG-Y
+           75               Integer*4        MAG-2  MAG-Z
+           76               Integer*4        VLF-D  V-DIFF
+           77               Integer*4        LEP RAMP-15
+           78               Integer*4        LEP RAMP-14
+           79               Integer*4        LEP RAMP-13
+           80               Integer*4        LEP RAMP-12
+           81               Integer*4        LEP RAMP-11
+           82               Integer*4        LEP RAMP-10
+           83               Integer*4        LEP RAMP-9
+           84               Integer*4        LEP RAMP-8
+           85               Integer*4        LEP RAMP-7
+           86               Integer*4        LEP RAMP-6
+           87               Integer*4        LEP RAMP-5
+           88               Integer*4        LEP RAMP-4
+           89               Integer*4        LEP RAMP-3
+           90               Integer*4        LEP RAMP-2
+           91               Integer*4        LEP RAMP-1
+           92               Integer*4        LEP RAMP-0
+           93               Integer*4        VLF-E  V-DIFF
+           94               Integer*4        MAG-3  MAG-X
+           95               Integer*4        MAG-3  MAG-Y
+           96               Integer*4        MAG-3  MAG-Z
+           97               Integer*4        VLF-F  V-DIFF
+-------------------------------------------------------------------------------
+           98               Integer*4        Not Used
+           99               Integer*4        Not Used
+--------------------------------------------------------------------------------
+ENGINEER  100               Integer*4        Frame Number
+DATA      101               Integer*4        S/C Sequence Number
+          102               Real*8           Pseudo Sequence
+          103               Real*8           Engineering Word 24
+          104               Real*8           Engineering Word 25
+--------------------------------------------------------------------------------
+RAW       105               Integer*4        ID for Time 1
+ASPECT    106               Real*8           OA Time 1
+          107               Integer*4        ID for Time 2  ID=0 Sun
+          108               Real*8           OA Time 2         1 Earth 1
+          109               Integer*4        ID for Time 3     2 Earth 2
+          110               Real*8           OA Time 3         3 Earth 3
+          111               Integer*4        ID for Time 4     Times are
+          112               Real*8           OA Time 4         real values
+          113               Integer*4        ID for Time 5
+          114               Real*8           OA Time 5
+          115               Integer*4        ID for Time 6
+          116               Real*8           OA Time 6
+          117               Real*8           Sun Angle 1
+          118               Real*8           Sun Angle 2
+------------------------------------------------------------------------------
+CONVERTED 119               Real*8           Theta-1       | B in gamma
+MAG       120               Real*8           Phi-1         |
+DATA      121               Real*8           B-MAG-1       | Angles in
+          122               Real*8           Theta-2       |   degrees
+          123               Real*8           Phi-2         | Theta measured
+          124               Real*8           B-MAG-2       |  in XY plane
+          125               Real*8           Theta-3       | PHI measured
+          126               Real*8           Phi-3         |   from +Z
+          127               Real*8           B-MAG-3       |
+-------------------------------------------------------------------------------
+ATTITUDE  128               Real*8           Spin period in seconds
+          129               Real*8           Sun angle to spin axis (degrees)
+          130  NOTE 2       Real*8           Sun - X-axis angle
+          131               Real*8           Right ascension of spin axis
+          132               Real*8           Declination of spin axis
+--------------------------------------------------------------------------------
+CONVERTED 133               Real*8           LEP-1  GM-I
+LEP       134               Real*8           LEP-1  PROTONS-I
+DATA      135               Real*8           LEP-1  ELECTRONS-I
+          136               Real*8           LEP-2  GM-I+1
+          137               Real*8           LEP-2  PROTONS-I+1
+          138               Real*8           LEP-2  ELECTRONS-I+1
+          139               Real*8           LEP    ENGINEERING
+--------------------------------------------------------------------------------
+          140-143           Real*8           Not Used
+          144               Integer*4        Not Used
+--------------------------------------------------------------------------------
+ORBIT     145               Real*8           Fortran record size Orbit
+DATA      146               Real*8           Day of Year
+          147               Real*8           Milliseconds of Day
+          148   NOTE 3      Real*8           Longitude (deg) Sat in
+          149               Real*8           Latitude  (deg)  GCC
+          150   NOTE 4      Real*8           Longitude (deg) Sat in
+          151               Real*8           Latitude  (deg)  GMC
+          152               Real*8           R (earth radii)  GMC
+          153               Real*8           R (km) center of earth
+          154               Real*8           GSE-X   Sat Position
+          155   NOTE 5      Real*8           GSE-Y    in GSE
+          156               Real*8           GSE-Z     (km)
+          157   NOTE 6      Real*8           GSM-X   Sat Position
+          158               Real*8           GSM-Y    in GSM
+          159               Real*8           GSM-Z     (km)
+          160               Real*8           GSE-X   Moon Position
+          161               Real*8           GSE-Y    in GSE
+          162               Real*8           GSE-Z     (km)
+          163               Real*8           GSM-X   Moon Position
+          164               Real*8           GSM-Y    in GSM
+          165               Real*8           GSM-Z     (km)
+          166   NOTE 7      Real*8           GEI-X   Sat Position
+          167               Real*8           GEI-Y     in GEI
+          168               Real*8           GEI-Z     (km)
+          169               Real*8           GEI-X   Sun Position
+          170               Real*8           GEI-Y     in GEI
+          171               Real*8           GEI-Z     (A.U.)
+          172               Real*8           Longitude  Sub-solar point in
+          173               Real*8           Latitude   geomagnetic (deg)
+          174               Real*8           Distance from Sat to Moon (km)
+          175   NOTE 8      Real*8           Distance parallel Sat-Moon (km)
+          176               Real*8           (1,1)      !-------------------
+          177               Real*8           (1,2)      ! Geocentric Solar
+          178               Real*8           (1,3)      ! Ecliptic- to-
+          179               Real*8           (2,1)      ! Geocentric Solar
+          180               Real*8           (2,2)      ! Magnetospheric
+          181               Real*8           (2,3)      ! transformation
+          182               Real*8           (3,1)      ! matrix
+          183               Real*8           (3,2)      !
+          184               Real*8           (3,3)      !_________________
+          185               Real*8           (1,1)      (
+          186               Real*8           (1,2)      ( Geocentric Equa-
+          187               Real*8           (1,3)      ( torial Inertial-
+          188               Real*8           (2,1)      ( to- Geocentric
+          189               Real*8           (2,2)      ( Solar Ecliptic
+          190               Real*8           (2,3)      ( Transformation
+          191               Real*8           (3,1)      ( Matrix
+          192               Real*8           (3,2)      (
+          193               Real*8           (3,3)      (__________________
+          194               Real*8           Right Ascension   Sat Position
+          195               Real*8           Declination       in CI (deg)
+          196               Real*8           Right Ascension   Vel Vector
+          197               Real*8           Declination       in CI (deg)
+          198               Real*8           Mag Velocity  (km/sec)
+          199   NOTE 9      Real*8           L parameter (earth radii)
+          200   NOTE 9      Real*8           B Magnetic field (gamma)
+          201   NOTE 9      Real*8           B/Bo
+          202               Real*8           Sat-earth-sun angle (deg)
+          203               Real*8           Sat-earth-moon angle (deg)
+          204               Real*8           Right Ascension  Mag Vec
+          205               Real*8           Declination      in CI (deg)
+          206               Real*8           Longitude Sub-solar point
+          207               Real*8           Latitude   in (deg) Geographic
+          208               Real*8           GSE-X     Model Magnetic Field
+          209               Real*8           GSE-Y          in GSE
+          210               Real*8           GSE-Z          (gamma)
+          211   NOTE 10     Real*8           Type of data indicator
+          212               Real*8           Date of data (YR MO DA)
+          213               Real*8           Longitude  Geodetic satellite
+          214               Real*8           Latitude   position (deg)
+          215               Real*8           Height above spheroid (km)
+          216               Real*8           Ascending node (pass number)
+          217               Real*8           Year of data (YR)
+          218               Real*8           Not Used
+          219               Real*8           Not Used
+          220               Real*8           Not Used
+          221               Real*8           Check sum of data words
+          222               Real*8           Fortran record size indicator
+--------------------------------------------------------------------------------
+
+       NOTE 1:   Pass number changes at most southern latitude.
+
+       NOTE 2:   Angle between sun and x-axis at time given for frame.
+                 Tf time of frame start, Ts time of sun pulse, OA offset
+                 to the X axis (45 degrees)
+                 phi = (Tf- Ts)/(Spin Period) *360.-OA = angle between
+                 sun and X axis.
+
+       NOTE 3:   GCC = Geocentric coordinates
+
+       NOTE 4:   GMC = Geomagnetic coordinates
+
+       NOTE 5:   GSE = Geocentric Solar Ecliptic coordinates
+
+       NOTE 6:   GSM = Geocentric Solar Magnetospheric coordinates
+
+       NOTE 7:   GEI = Geocentric Equatorial Inertial coordinates
+
+       NOTE 8:   Distance parallel to the x-axis from the satellite
+                 to the moon (km). (GSE System)
+
+       NOTE 9:   Model magnetic field
+
+       NOTE 10:  Type of data indicator
+                  1 = regular satellite data item
+                  2 = ascending node crossing data item
+                  3 = north point data item
+                  4 = descending node data item
+                  5 = south point data item
+                  6 = sunlight entrance data item
+                  7 = sunlight exit data item
+                 99 = ?
+
+                ENGINEERING DATA SUBCOMMUTATOR FORMAT
+
+       FRAME    WORD 24                  FRAME   WORD 25
+        0       Solar Panel Voltage       0      Solar Panel Current
+        1       +12 Volt Buss Voltage     1      +12 Volt Bus Current
+        2       Battery Voltage           2      Battery Current
+        3       +28 Volt Bus Voltage      3      136 MHz Trans. Temp
+        4       Electric Antenna Pos.     4      400 MHz Trans. Temp
+        5       Command Receiver AGC      5      Command Decoder Temp
+        6       136 Mhz Trans. Temp       6      Mag. Sensor Temp
+        7       Mag. Sensor Temp          7      Mag. Experiment Temp
+        8       Arming Cmd Status         8      VLF Experiment Temp
+        9       Lepedea Temperature       9      Lepedea Temperature
+       10       Solar Panel Current      10      Upper Solar Panel Temp
+       11       +12 Volt Bus Current     11      Side Solar Panel Temp
+       12       Battery Heater Status    12      Lower Solar Panel Temp
+       13       Power Converter Temp     13      Power Converter Temp
+       14       Battery Temperature      14      Battery Temperature
+       15       4.0 Volt Calibrate       15      Encoder Temperature
+        0       Solar Panel Voltage      16      Solar Panel Current
+        1       +12 Volt Bus Voltage     17      +12 Volt Bus Current
+        2       Battery Voltage          18      Battery Current
+        3       +28 Volt Bus Voltage     19      Command Receiver Temp
+        4       Electric Antenna Pos.    20      Solar Panel Voltage
+        5       Command Receiver AGC     21      Boom Motor Temperature
+        6       136 MHz Trans. Temp      22      Battery Voltage
+        7       Mag Sensor Temperature   23      +28 Volt Bus Voltage
+        8       Arming Cmd Status        24      Electric Antenna Pos.
+        9       Lepedea Temperature      25      VLF Low Voltage Mon.
+       10       Solar Panel Current      26      VLF Power Supply Status
+       11       +12 Volt Bus Current     27      Electric Antenna Limit
+       12       Battery Heater Status    28      Telescopic Boom Limit
+       13       Power Converter Temp     29      0.0 Volt Calibrate
+       14       Battery Temperature      30      1.0 Volt Calibrate
+       15       4.0 Volt Calibrate       31      4.0 Volt Calibrate
+
+       Spacecraft A/D conversion to D/A conversion used for all data
+       is:  V = Raw * 0.00196 + 0.005.
+
+          All temperatures are determined by monitoring the voltage
+       across a parallel 15k precision resistor and thermistor. This
+       combination is in series with a 22.1k ohm resistor and is
+       connected to the 12.0 VDC bus. The resistance of the thermistor
+       is given by:   R = 331500 * V / ( 180 - 37.1 * V ).
+       The temperature in degrees C is given by:
+          T = 390.4016 / ( 6.2988 - SQRT ( 32.895 - LN (R) ) - 273.
+       Where SQRT = square root and  LN = logarithm base e.
+
+       Conversions:      Battery Voltage, +28 volts and all solar
+                         panel voltages are multiplied by 7.948.
+
+                       +12 voltage bus voltage is multiplied by 3.01.
+
+                         +12 volt bus current and solar panel currents
+                         are given by I = V * 0.4 - 0.000175 * ( T - 22)
+
+                         Battery current is given by
+                         I = ( V - 0.29675 ) * 0.4
+                             - 0.0005184 * ( T - 20.1 )
+
+                         The electric antenna tip-to tip length in meters
+                         is given by:
+                            L = -9.72729 + 17.07355 * V - 1.17740 * V * V
+                                 for V < 1.397
+                              = -8.85695 + 16.18192 * V - 0.98509 * V * V
+                                 for V > 1.397
+
+FILE FORMATS:
+
+   Each record contains 5.76 secones of data and each file contains data
+   from ten orbits of the earth.
+
+CCSD$$MARKERmarkercc

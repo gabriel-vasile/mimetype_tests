@@ -1,0 +1,2393 @@
+SAS User File for H26FF1 Data  
+
+This file contains information and sample SAS programs to create a permanent
+SAS dataset, for users who want to use SAS in processing the MEPS data
+provided in this PUF release.
+
+There are two ways to create a permanent SAS dataset, using either the SAS
+transport data file (H26FF1.SSP) or the ASCII data file (H26FF1.DAT)    
+supplied in this PUF release.  Section A provides a sample SAS program for the
+first alternative, which is to convert the SAS transport data file to a
+regular SAS dataset, using the SAS PROCedure: XCOPY.  Section B provides a
+sample SAS program for the second alternative, which is to read data from the
+ASCII data file, using a SAS DATA step with INFILE, INPUT, and LABEL
+statements.  Section C explains format-related SAS statements that a user may
+optionally use when working with the SAS dataset.  Examples of SAS programs
+(DATA step or PROC) are provided in all three sections, primarily for the
+benefit of inexperienced users.  Section D contains complete SAS statements
+that must be used in the programs described in Sections B and C.
+
+INCLUDED BELOW ARE NOTES APPLICABLE TO USERS OF SAS VERSION 8.
+
+******************************************************************************
+
+The sample SAS programs provided in Sections A and B show how to create a
+permanent SAS dataset from the data files provided in this PUF release.
+
+A.     A Sample SAS Program for Converting the SAS Transport File to a
+Permanent SAS Dataset 
+
+The SAS PROCedure XCOPY will read a SAS transport data file and convert the
+data to regular SAS format, storing the output in a permanent SAS dataset. 
+This permanent SAS dataset can then be used for all future processing and
+analyses.
+
+Below is a sample PC-SAS program that can be used to convert the SAS transport
+file to a permanent PC SAS dataset (in a Windows environment, with SAS V6.12). 
+ 
+     LIBNAME PUFLIB 'C:\MEPS';
+     FILENAME IN1 'C:\MEPS\H26FF1.SSP';  
+
+     PROC XCOPY IN=IN1 OUT=PUFLIB IMPORT;
+     RUN;
+
+If the user wants a list of variables and a few sample records in the
+permanent SAS dataset, following are the SAS statements to accomplish these.
+
+     PROC CONTENTS DATA=PUFLIB.H26FF1;  
+     TITLE "List of Variables in MEPS H26FF1 SAS Dataset";  
+     RUN;
+
+     PROC PRINT DATA=PUFLIB.H26FF1 (OBS=20);  
+     TITLE "First 20 Observations in MEPS H26FF1 SAS Dataset";  
+     RUN;
+
+The LIBNAME statement tells SAS the location (directory name) to store the
+permanent SAS dataset which is output by PROC XCOPY.  The FILENAME statement
+tells SAS the location (complete directory and file name) of the input SAS
+transport data file. 
+
+NOTES:
+
+     1)  The names used in the LIBNAME and FILENAME statements shown
+     above (i.e., PUFLIB, IN1) are arbitrary; they are only temporary
+     aliases.
+
+     2)  The directory and file names used in the LIBNAME and FILENAME
+     statements shown above are Windows syntax and may need to be
+     modified for other operating systems such as UNIX, MAC/OS, VMS, or
+     OS/2.
+
+     3)  H26FF1 is the internal SAS dataset name (also the PC file name,  
+     without the extension) prior to the creation of the SAS transport data
+     file.  After running PROC XCOPY, the output SAS dataset assumes the same
+     dataset name (or file name).  Hence, in the example above, a file named
+     H26FF1.SD2 will be created under the C:\MEPS directory when PROC  
+     XCOPY runs successfully.
+
+     4)  The SAS transport file H26FF1.SSP was created from a PC-SAS Version  
+     6.12 data file, using PROC COPY.  This file has been tested for use
+     with PC-SAS version 6.10 or higher, or with mainframe SAS version
+     6.08 or higher.  This file may work with earlier versions of SAS,
+     although it has not been tested with those versions. Users who are
+     unable to use this SAS Transport file should instead convert the ASCII
+     data file H26FF1.DAT to a SAS data set as described in Section B.  
+
+ADDITONAL NOTE TO USERS OF SAS VERSION 8:  One of the following procedures
+should be used to avoid a SAS error when using the downloaded SAS Transport
+file:
+
+     1) Add V8 to LIBNAME statement - e.g., 
+
+               LIBNAME PUFLIB V8 'C:\MEPS'; 
+      OR
+
+     2) Output the SAS data set to a different library than the one which
+     contains the downloaded SAS Transport file - e.g.,
+
+               LIBNAME PUFLIB 'C:\MEPS';
+               FILENAME IN1 'C:\DOWNLOAD\H26FF1.SSP';    
+
+               PROC XCOPY IN=IN1 OUT=PUFLIB IMPORT;
+               RUN;
+
+B.     A Sample SAS Program for Converting the ASCII Data File to a Permanent
+SAS Dataset
+
+The complete SAS statements (INPUT and LABEL) included in Section D are
+intended to save time for those users wishing to create a permanent SAS
+dataset from the H26FF1.DAT ASCII data  file.  These statements must be used  
+in combination with other SAS statements to create the appropriate SAS
+program, as shown below.  To use the statements provided in Section D to
+create a SAS program, you will need an ASCII text editor.  If you are using an
+interactive form of SAS (Windows, UNIX, OS2, etc.), use the editor provided as
+part of the SAS software.  
+
+Following is a sample SAS program that will convert the ASCII data file to SAS
+format.
+
+     LIBNAME PUFLIB 'C:\MEPS';
+     FILENAME IN1 'C:\MEPS\H26FF1.DAT';  
+
+     DATA PUFLIB.H26FF1;  
+     INFILE IN1 LRECL=370;  
+     INPUT .....; * to user: insert the complete INPUT statement that is
+provided in Section D;
+     LABEL .....; * to user: insert the complete LABEL statement that is
+provided in Section D;
+     RUN;
+
+Here is an explanation of the SAS statements used in the program above.
+
+LIBNAME statement: This tells SAS the location (directory name) of the
+permanent SAS dataset.
+
+FILENAME statement: This tells SAS the location of the input ASCII data file.
+
+DATA statement: This signifies the beginning of a SAS DATA step and specifies
+describes the output SAS dataset, referencing the LIBNAME entry (PUFLIB) and
+assigning an internal SAS dataset name (H26FF1).  In the example, after the  
+successful completion of the DATA step, a PC file named H26FF1.SD2 would have  
+been created in the C:\MEPS directory.
+
+INFILE statement: This tells SAS the location (directory and file name) of the
+input ASCII data file.  Also provided is the logical record length (370  
+bytes), with the default of RECFM=V implied when this parameter is omitted. 
+LRECL and RECFM are optional parameters in the INFILE statement.  With regard
+to these options, please note the following: the ASCII data file H26FF1.DAT  
+contains a 2-byte carriage return/line feed at the end of each record.  When
+converting to a PC-SAS file, the LRECL option should be used to specify the
+record length to avoid use of a default record length by PC-SAS.  If the
+RECFM=V option is used, the LRECL option must be specified as the logical
+record length (e.g., 370 for H26FF1.DAT).  If RECFM=F is used, then the    
+LRECL value must  be specified as the logical record length plus 2 (372 for  
+H26FF1.DAT).  Note that if the RECFM option is omitted, then the default  
+option of RECFM=V is automatically used, and LRECL should be specified as the
+logical record (370 for H26FF1.DAT).    
+
+INPUT statement: This specifies the input record layout, giving names and the
+beginning and ending column positions for data items (which become SAS
+variables) in the ASCII data file (H26FF1.DAT).  Variable type (numeric or  
+character) is also defined via the INPUT statement.
+
+LABEL statement: This associates descriptive names with the SAS variables.
+
+RUN statement: This tells SAS to execute all commands up to this point.
+
+ADDITONAL NOTE TO USERS OF SAS VERSION 8:  One of the following procedures
+should be used to avoid a SAS error when using the downloaded ASCII data file:
+
+     1) Add V8 to LIBNAME statement - e.g., 
+
+               LIBNAME PUFLIB V8 'C:\MEPS'; 
+      OR
+
+     2) Output the SAS data set to a different library than the one which
+     contains the downloaded ASCII data file - e.g.,
+
+               LIBNAME PUFLIB 'C:\MEPS';
+               FILENAME IN1 'C:\DOWNLOAD\H26FF1.DAT';    
+
+               DATA PUFLIB.H26FF1;  
+               INFILE IN1 LRECL=370;  
+
+C.     Optional Format-related SAS Statements
+
+If a user wants to use formats for the SAS variables, a SAS format library
+must first be created.  Below is a SAS program that will accomplish this.
+
+     LIBNAME PUFLIB 'C:\MEPS';
+     
+     PROC FORMAT LIBRARY=PUFLIB;
+     VALUE .....; * to user: insert the complete set of VALUE statements found
+in Section D;
+     VALUE .....;
+     .......... ;
+     RUN;
+
+
+Below is an example of how to use the SAS formats defined by the PROC FORMAT
+procedure.
+
+     LIBNAME PUFLIB 'C:\MEPS';
+     OPTIONS FMTSEARCH=(PUFLIB); 
+   
+     PROC FREQ DATA=PUFLIB.H26FF1;  
+     TABLES .... / LIST MISSING;
+     FORMAT varnam1 fmtnam1.  Varnam2 fmtnam2.  .... ;
+     * to user: substitute varnami and fmtnami with actual variable names and
+format names;
+     *     Insert the FORMAT statement provided in Section D, if you are using
+all the variables;
+     *     in the TABLES statement;
+     TITLE "Frequency Distributions ....";
+     RUN; 
+
+Here is an explanation of the SAS statements used above.
+
+LIBNAME statement: This tells SAS the location (directory name) of the SAS
+format library.  Please note that SAS datasets (file name extension is 'SD2')
+and format libraries (file name extension is 'SC2') can be stored under the
+same directory.
+
+OPTIONS FMTSEARCH=...: This specifies the SAS format library.
+
+PROC FORMAT statement: This identifies the SAS procedure that will make SAS
+formats according to VALUE statements.  Formats will be stored in a file named
+FORMATS.SC2.  Please note that the option 'LIBRARY=...' can be omitted, if the
+user does not want to create a permanent SAS format library.  When simply
+'PROC FORMAT;' is used, the formats are defined only for the duration of the
+batch SAS program or an interactive SAS session.
+
+VALUE statement: This gives a) names to formats; and b) descriptive labels for
+individual values, or range of values.  The format names can then be invoked
+using a FORMAT statement, if desired.
+
+PROC FREQ statement: This identifies the SAS procedure that will generate
+frequency distributions of variables specified in the TABLES statement,
+formatted if a FORMAT statement is used.  The input SAS dataset is specified
+in the 'DATA=' option.
+
+FORMAT statement: This associates existing formats with variables.  When using
+this statement, the formats must have already been created with a PROC FORMAT
+procedure. 
+
+RUN statement: This tells SAS to execute all commands up to this point.
+
+
+NOTES:
+
+     1)  Use of formats is entirely optional, and depends on the type
+     of analyses that you are doing.  It is recommended that you create
+     and use them as appropriate.
+
+     2)  The names used in the LIBNAME and FILENAME statements shown
+     above (i.e., PUFLIB, IN1) are arbitrary; they are only temporary
+     aliases.
+
+     3)  You only create the permanent SAS data set once.  Additional
+     analyses can be run using this permanent dataset.
+
+     4)  The file and directory specifications in the LIBNAME and
+     FILENAME statements are Windows syntax and may need to be modified
+     for other operating systems such as UNIX, MAC/OS, VMS, or OS/2.
+
+
+D.  SAS Statements
+
+This section contains SAS INPUT, LABEL, FORMAT and VALUE statements for use in
+converting the ASCII H26FF1.DAT file into a SAS data set, and for creating  
+SAS formats.
+
+* INPUT STATEMENTS;
+INFILE IN LRECL=370;
+
+INPUT @1      DUID      5.0
+      @6      PID       3.0
+      @9      DUPERSID $8.0
+      @17     EVNTIDX  $12.0
+      @29     EVENTRN   1.0
+      @30     FFEEIDX  $12.0
+      @42     MPCDATA   1.0
+      @43     OPDATEYR  4.0
+      @47     OPDATEMM  2.0
+      @49     OPDATEDD  2.0
+      @51     REFERDBY  2.0
+      @53     SEEDOC    2.0
+      @55     MEDPTYPE  2.0
+      @57     TIMESPNT  2.0
+      @59     VSTCTGRY  2.0
+      @61     VSTRELCN  2.0
+      @63     PHYSTH    2.0
+      @65     OCCUPTH   2.0
+      @67     SPEECHTH  2.0
+      @69     CHEMOTH   2.0
+      @71     RADIATTH  2.0
+      @73     KIDNEYD   2.0
+      @75     IVTHER    2.0
+      @77     DRUGTRT   2.0
+      @79     RCVSHOT   2.0
+      @81     PSYCHOTH  2.0
+      @83     LABTEST   2.0
+      @85     SONOGRAM  2.0
+      @87     XRAYS     2.0
+      @89     MAMMOG    2.0
+      @91     MRI       2.0
+      @93     EKG       2.0
+      @95     EEG       2.0
+      @97     RCVVAC    2.0
+      @99     ANESTH    2.0
+      @101    OTHSVCE   2.0
+      @103    SURGPROC  2.0
+      @105    SURGNAME  2.0
+      @107    MEDPRESC  2.0
+      @109    DOCOUTF   2.0
+      @111    VAPLACE   1.0
+      @112    OPICD1X  $3.0
+      @115    OPICD2X  $3.0
+      @118    OPICD3X  $3.0
+      @121    OPICD4X  $3.0
+      @124    OPPRO1X  $2.0
+      @126    OPCCC1X  $3.0
+      @129    OPCCC2X  $3.0
+      @132    OPCCC3X  $3.0
+      @135    OPCCC4X  $3.0
+      @138    FFOPTYPE  2.0
+      @140    FFBEF98   2.0
+      @142    FFTOT99   2.0
+      @144    OPXP98X   8.2
+      @152    OPTC98X   8.2
+      @160    OPFSF98X  7.2
+      @167    OPFMR98X  8.2
+      @175    OPFMD98X  7.2
+      @182    OPFPV98X  8.2
+      @190    OPFVA98X  7.2
+      @197    OPFCH98X  7.2
+      @204    OPFOF98X  8.2
+      @212    OPFSL98X  7.2
+      @219    OPFWC98X  7.2
+      @226    OPFOR98X  7.2
+      @233    OPFOU98X  7.2
+      @240    OPFOT98X  7.2
+      @247    OPFXP98X  8.2
+      @255    OPFTC98X  8.2
+      @263    OPDSF98X  7.2
+      @270    OPDMR98X  7.2
+      @277    OPDMD98X  7.2
+      @284    OPDPV98X  7.2
+      @291    OPDVA98X  6.2
+      @297    OPDCH98X  6.2
+      @303    OPDOF98X  5.2
+      @308    OPDSL98X  5.2
+      @313    OPDWC98X  7.2
+      @320    OPDOR98X  7.2
+      @327    OPDOU98X  6.2
+      @333    OPDOT98X  6.2
+      @339    OPDXP98X  7.2
+      @346    OPDTC98X  8.2
+      @354    WTDPER98  12.6
+      @366    VARPSU98  2.0
+      @368    VARSTR98  3.0
+;
+
+
+* FORMAT STATEMENTS;
+FORMAT DUID     VALIDID.
+       PID      VALIDID.
+       DUPERSID $VALIDID.
+       EVNTIDX  $VALIDID.
+       EVENTRN  EVENTRN.
+       FFEEIDX  $VALIDID.
+       MPCDATA  MPCDATA.
+       OPDATEYR OPDATEYR.
+       OPDATEMM OPDATEMM.
+       OPDATEDD OPDATEDD.
+       REFERDBY REFERDBY.
+       SEEDOC   SEEDOC.
+       MEDPTYPE MEDPTYPE.
+       TIMESPNT TIMESPNT.
+       VSTCTGRY VSTCTGRY.
+       VSTRELCN VSTRELCN.
+       PHYSTH   PHYSTH.
+       OCCUPTH  OCCUPTH.
+       SPEECHTH SPEECHTH.
+       CHEMOTH  CHEMOTH.
+       RADIATTH RADIATTH.
+       KIDNEYD  KIDNEYD.
+       IVTHER   IVTHER.
+       DRUGTRT  DRUGTRT.
+       RCVSHOT  RCVSHOT.
+       PSYCHOTH PSYCHOTH.
+       LABTEST  LABTEST.
+       SONOGRAM SONOGRAM.
+       XRAYS    XRAYS.
+       MAMMOG   MAMMOG.
+       MRI      MRI.
+       EKG      EKG.
+       EEG      EEG.
+       RCVVAC   RCVVAC.
+       ANESTH   ANESTH.
+       OTHSVCE  OTHSVCE.
+       SURGPROC SURGPROC.
+       SURGNAME SURGNAME.
+       MEDPRESC MEDPRESC.
+       DOCOUTF  DOCOUTF.
+       VAPLACE  VAPLACE.
+       OPICD1X  $ICD9COD.
+       OPICD2X  $ICD9COD.
+       OPICD3X  $ICD9COD.
+       OPICD4X  $ICD9COD.
+       OPPRO1X  $ICD9PRO.
+       OPCCC1X  $CCCODEX.
+       OPCCC2X  $CCCODEX.
+       OPCCC3X  $CCCODEX.
+       OPCCC4X  $CCCODEX.
+       FFOPTYPE FFOPTYPE.
+       FFBEF98  FFBEF.
+       FFTOT99  FFTOT.
+       OPXP98X  OPXP98X.
+       OPTC98X  OPTC98X.
+       OPFSF98X OPFSF98X.
+       OPFMR98X OPFMR98X.
+       OPFMD98X OPFMD98X.
+       OPFPV98X OPFPV98X.
+       OPFVA98X OPFVA98X.
+       OPFCH98X OPFCH98X.
+       OPFOF98X OPFOF98X.
+       OPFSL98X OPFSL98X.
+       OPFWC98X OPFWC98X.
+       OPFOR98X OPFOR98X.
+       OPFOU98X OPFOU98X.
+       OPFOT98X OPFOT98X.
+       OPFXP98X OPFXP98X.
+       OPFTC98X OPFTC98X.
+       OPDSF98X OPDSF98X.
+       OPDMR98X OPDMR98X.
+       OPDMD98X OPDMD98X.
+       OPDPV98X OPDPV98X.
+       OPDVA98X OPDVA98X.
+       OPDCH98X OPDCH98X.
+       OPDOF98X OPDOF98X.
+       OPDSL98X OPDSL98X.
+       OPDWC98X OPDWC98X.
+       OPDOR98X OPDOR98X.
+       OPDOU98X OPDOU98X.
+       OPDOT98X OPDOT98X.
+       OPDXP98X OPDXP98X.
+       OPDTC98X OPDTC98X.
+       WTDPER98 WTDPER.
+       VARPSU98 VARPSU.
+       VARSTR98 VARSTR.
+;
+
+
+* LABEL STATEMENTS;
+LABEL DUID    ='DWELLING UNIT ID'
+      PID     ='PERSON NUMBER'
+      DUPERSID='PERSON ID (DUID + PID)'
+      EVNTIDX ='EVENT ID'
+      EVENTRN ='EVENT ROUND NUMBER'
+      FFEEIDX ='FLAT FEE ID'
+      MPCDATA ='MPC DATA FLAG'
+      OPDATEYR='EVENT DATE - YEAR'
+      OPDATEMM='EVENT DATE - MONTH'
+      OPDATEDD='EVENT DATE - DAY'
+      REFERDBY='THIS VISIT REFERRED BY ANOTHER PHYSICIAN'
+      SEEDOC  ='DID P TALK TO MD THIS VISIT/PHONE CALL'
+      MEDPTYPE='TYPE OF MED PERSON P TALKED TO ON VST DT'
+      TIMESPNT='TIME P SPENT WITH DOCTOR/MEDICAL PERSON'
+      VSTCTGRY='BEST CATEGORY FOR CARE P RECV ON VST DT'
+      VSTRELCN='THIS VST/PHONE CALL RELATED TO SPEC COND'
+      PHYSTH  ='THIS VISIT DID P HAVE PHYSICAL THERAPY'
+      OCCUPTH ='THIS VISIT DID P HAVE OCCUPATIONAL THERA'
+      SPEECHTH='THIS VISIT DID P HAVE SPEECH THERAPY'
+      CHEMOTH ='THIS VISIT DID P HAVE CHEMOTHERAPY'
+      RADIATTH='THIS VISIT DID P HAVE RADIATION THERAPY'
+      KIDNEYD ='THIS VISIT DID P HAVE KIDNEY DIALYSIS'
+      IVTHER  ='THIS VISIT DID P HAVE IV THERAPY'
+      DRUGTRT ='THIS VIS DID P HAVE TRT FOR DRUG OR ALCH'
+      RCVSHOT ='THIS VISIT DID P RECEIVE AN ALLERGY SHOT'
+      PSYCHOTH='DID P HAVE PSYCHOTHERAPY/COUNSELING'
+      LABTEST ='THIS VISIT DID P HAVE LAB TEST'
+      SONOGRAM='THIS VISIT DID P HAVE SONOGRAM OR ULTRSD'
+      XRAYS   ='THIS VISIT DID P HAVE XRAYS'
+      MAMMOG  ='THIS VISIT DID P HAVE A MAMMOGRTAM'
+      MRI     ='THIS VISIT DID P HAVE AN MRI'
+      EKG     ='THIS VISIT DID P HAVE AN EKG OR ECG'
+      EEG     ='THIS VISIT DID P HAVE AN EEG'
+      RCVVAC  ='THIS VISIT DID P RECEIVE A VACCINATION'
+      ANESTH  ='DURING THIS VISIT P RECEIVE ANESTHESIA'
+      OTHSVCE ='DID P RECEIVE OTH DIAGNOSTIC TESTS/EXAMS'
+      SURGPROC='WAS SURG PROC PERFORMED ON P THIS VISIT'
+      SURGNAME='SURGICAL PROCEDURE NAME IN CATEGORIES'
+      MEDPRESC='ANY MEDICINES PRESCRIBED FOR P DUR VISIT'
+      DOCOUTF ='ANY DOC/SURG ALSO SEEN OUTSIDE PROVIDER'
+      VAPLACE ='VA FACILITY FLAG'
+      OPICD1X ='3 DIGIT ICD-9 CONDITION CODE'
+      OPICD2X ='3 DIGIT ICD-9 CONDITION CODE'
+      OPICD3X ='3 DIGIT ICD-9 CONDITION CODE'
+      OPICD4X ='3 DIGIT ICD-9 CONDITION CODE'
+      OPPRO1X ='2 DIGIT ICD-9 PROCEDURE CODE'
+      OPCCC1X ='MODIFIED CLINICAL CLASSIFICATION CODE'
+      OPCCC2X ='MODIFIED CLINICAL CLASSIFICATION CODE'
+      OPCCC3X ='MODIFIED CLINICAL CLASSIFICATION CODE'
+      OPCCC4X ='MODIFIED CLINICAL CLASSIFICATION CODE'
+      FFOPTYPE='FLAT FEE BUNDLE'
+      FFBEF98 ='TOTAL # OF VISITS IN FF BEFORE 1998'
+      FFTOT99 ='TOTAL # OF VISITS IN FF AFTER 1998'
+      OPXP98X ='TOT EXP FOR EVENT (OPFXP98X + OPDXP98X)'
+      OPTC98X ='TOT CHG FOR EVENT (OPFTC98X + OPDTC98X)'
+      OPFSF98X='FACILITY AMT PD, FAMILY (IMPUTED)'
+      OPFMR98X='FACILITY AMT PD, MEDICARE (IMPUTED)'
+      OPFMD98X='FACILITY AMT PD, MEDICAID (IMPUTED)'
+      OPFPV98X='FACILITY AMT PD, PRIV INSUR (IMPUTED)'
+      OPFVA98X='FACILITY AMT PD, VETERANS (IMPUTED)'
+      OPFCH98X='FACILITY AMT PD, CHAMP/CHAMPVA (IMPUTED)'
+      OPFOF98X='FACILITY AMT PD, OTH FEDERAL (IMPUTED)'
+      OPFSL98X='FACILITY AMT PD, STATE/LOC GOV (IMPUTED)'
+      OPFWC98X='FACILITY AMT PD, WORKERS COMP (IMPUTED)'
+      OPFOR98X='FACILITY AMT PD, OTH PRIV (IMPUTED)'
+      OPFOU98X='FACILITY AMT PD, OTH PUB (IMPUTED)'
+      OPFOT98X='FACILITY AMT PD, OTH INSUR (IMPUTED)'
+      OPFXP98X='FACILITY SUM PAYMENTS OPFSF98X-OPFOT98X'
+      OPFTC98X='TOTAL FACILITY CHARGE (IMPUTED)'
+      OPDSF98X='DOCTOR AMOUNT PAID, FAMILY (IMPUTED)'
+      OPDMR98X='DOCTOR AMOUNT PAID, MEDICARE (IMPUTED)'
+      OPDMD98X='DOCTOR AMOUNT PAID, MEDICAID (IMPUTED)'
+      OPDPV98X='DOCTOR AMOUNT PAID,PRIVATE INSURNCE(IMP)'
+      OPDVA98X='DOCTOR AMOUNT PAID, VETERANS (IMPUTED)'
+      OPDCH98X='DOCTOR AMOUNT PAID, CHAMP/CHAMPVA (IMP)'
+      OPDOF98X='DOCTOR AMOUNT PAID, OTHER FEDERAL (IMP)'
+      OPDSL98X='DOCTOR AMOUNT PAID,STATE/LOCAL GOVT(IMP)'
+      OPDWC98X='DOCTOR AMOUNT PAID, WORKER S COMP (IMP)'
+      OPDOR98X='DOCTOR AMOUNT PAID, OTHER PRIVATE (IMP)'
+      OPDOU98X='DOCTOR AMOUNT PAID, OTHER PUBLIC (IMP)'
+      OPDOT98X='DOCTOR AMOUNT PAID,OTHER INSURANCE (IMP)'
+      OPDXP98X='DOCTOR SUM PAYMENTS OPDSF98X-OPDOT98X'
+      OPDTC98X='TOTAL DOCTOR CHARGE (IMPUTED)'
+      WTDPER98='POVERTY/MORTALITY ADJ PERS LEVL WGT 98'
+      VARPSU98='VARIANCE ESTIMATION PSU,1998'
+      VARSTR98='VARIANCE ESTIMATION STRATUM,1998'
+;
+
+
+* VALUE STATEMENTS;
+VALUE ANESTH  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO SERVICES RECEIVED'
+  ;
+VALUE $CCCODEX  
+  '-1' = '-1 INAPPLICABLE'
+  '-2' = '-2 DETERMINED IN PREVIOUS ROUND'
+  '-3' = '-3 NO DATA IN ROUND'
+  '-7' = '-7 REFUSED'
+  '-8' = '-8 DK'
+  '-9' = '-9 NOT ASCERTAINED'
+  '001' - '260' = '001-260'
+  ;
+VALUE CHEMOTH  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO TREATMENT RECEIVED'
+  ;
+VALUE DOCOUTF  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  ;
+VALUE DRUGTRT  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO TREATMENT RECEIVED'
+  ;
+VALUE EEG  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO SERVICES RECEIVED'
+  ;
+VALUE EKG  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO SERVICES RECEIVED'
+  ;
+VALUE EVENTRN  
+  1 = '1 ROUND 1'
+  2 = '2 ROUND 2'
+  3 = '3 ROUND 3'
+  4 = '4 ROUND 4'
+  5 = '5 ROUND 5'
+  ;
+VALUE FFBEF  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  0 = '0'
+  1 - 9 = '1-9'
+  ;
+VALUE FFOPTYPE  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 FLAT FEE STEM'
+  2 = '2 FLAT FEE LEAF'
+  ;
+VALUE FFTOT  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  0 = '0'
+  1 - 6 = '1-6'
+  ;
+VALUE $ICD9COD  
+  '-1' = '-1 INAPPLICABLE'
+  '-2' = '-2 DETERMINED IN PREVIOUS ROUND'
+  '-3' = '-3 NO DATA IN ROUND'
+  '-7' = '-7 REFUSED'
+  '-8' = '-8 DK'
+  '-9' = '-9 NOT ASCERTAINED'
+  '001' - '139' = '001-139'
+  '140' - '239' = '140-239'
+  '240' - '279' = '240-279'
+  '280' - '289' = '280-289'
+  '290' - '319' = '290-319'
+  '320' - '389' = '320-389'
+  '390' - '459' = '390-459'
+  '460' - '519' = '460-519'
+  '520' - '579' = '520-579'
+  '580' - '629' = '580-629'
+  '630' - '677' = '630-677'
+  '680' - '709' = '680-709'
+  '710' - '739' = '710-739'
+  '740' - '759' = '740-759'
+  '760' - '779' = '760-779'
+  '780' - '799' = '780-799'
+  '800' - '999' = '800-999'
+  'V00' - 'V99' = 'V00-V99'
+  ;
+VALUE $ICD9PRO  
+  '-1' = '-1 INAPPLICABLE'
+  '-2' = '-2 DETERMINED IN PREVIOUS ROUND'
+  '-3' = '-3 NO DATA IN ROUND'
+  '-7' = '-7 REFUSED'
+  '-8' = '-8 DK'
+  '-9' = '-9 NOT ASCERTAINED'
+  '01' - '05' = '01-05'
+  '06' - '07' = '06-07'
+  '08' - '16' = '08-16'
+  '18' - '20' = '18-20'
+  '21' - '29' = '21-29'
+  '30' - '34' = '30-34'
+  '35' - '39' = '35-39'
+  '40' - '41' = '40-41'
+  '42' - '54' = '42-54'
+  '55' - '59' = '55-59'
+  '60' - '64' = '60-64'
+  '65' - '71' = '65-71'
+  '72' - '75' = '72-75'
+  '76' - '84' = '76-84'
+  '85' - '86' = '85-86'
+  '87' - '99' = '87-99'
+  ;
+VALUE IVTHER  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO TREATMENT RECEIVED'
+  ;
+VALUE KIDNEYD  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO TREATMENT RECEIVED'
+  ;
+VALUE LABTEST  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO SERVICES RECEIVED'
+  ;
+VALUE MAMMOG  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO SERVICES RECEIVED'
+  ;
+VALUE MEDPRESC  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  ;
+VALUE MEDPTYPE  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 CHIROPRACTOR'
+  2 = '2 DENTIST/DENTAL CARE PERSON'
+  3 = '3 MIDWIFE'
+  4 = '4 NURSE/NURSE PRACTITIONER'
+  5 = '5 OPTOMETRIST'
+  6 = '6 PODIATRIST'
+  7 = "7 PHYSICIAN'S ASSISTANT"
+  8 = '8 PHYSICAL THERAPIST'
+  9 = '9 OCCUPATIONAL THERAPIST'
+  10 = '10 PSYCHOLOGIST'
+  11 = '11 SOCIAL WORKER'
+  12 = '12 TECHNICIAN'
+  91 = '91 OTHER'
+  ;
+VALUE MPCDATA  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 HAS MPC DATA'
+  2 = '2 NO MPC DATA'
+  ;
+VALUE MRI  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO SERVICES RECEIVED'
+  ;
+VALUE OCCUPTH  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO TREATMENT RECEIVED'
+  ;
+VALUE OPDATEDD  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 - 31 = '1 - 31'
+  ;
+VALUE OPDATEMM  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 - 12 = '1 - 12'
+  ;
+VALUE OPDATEYR  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1998 = '1998'
+  ;
+VALUE OPDCH98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  6.64 - 14.12 = '$6.64 - $14.12'
+  14.12 < - 21.94 = '$14.13 - $21.94'
+  21.94 < - 48.595 = '$21.95 - $48.60'
+  48.595 < - 631.84 = '$48.61 - $631.84'
+  ;
+VALUE OPDMD98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  1.63 - 16.62 = '$1.63 - $16.62'
+  16.62 < - 31.43 = '$16.63 - $31.43'
+  31.43 < - 101.89 = '$31.44 - $101.89'
+  101.89 < - 1467.55 = '$101.90 - $1467.55'
+  ;
+VALUE OPDMR98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  6 - 30.49 = '$6.00 - $30.49'
+  30.49 < - 74.695 = '$30.50 - $74.70'
+  74.695 < - 203.8 = '$74.71 - $203.80'
+  203.8 < - 3433.55 = '$203.81 - $3433.55'
+  ;
+VALUE OPDOF98X  
+  0 = '0'
+  27 - 82.25 = '$27.00 - $82.25'
+  ;
+VALUE OPDOR98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  1.74 - 22 = '$1.74 - $22.00'
+  22 < - 72.145 = '$22.01 - $72.15'
+  72.145 < - 234.54 = '$72.16 - $234.54'
+  234.54 < - 5057.88 = '$234.55 - $5057.88'
+  ;
+VALUE OPDOT98X  
+  0 = '0'
+  26 - 914 = '$26.00 - $914.00'
+  ;
+VALUE OPDOU98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  8.18 - 21.5 = '$8.18 - $21.50'
+  21.5 < - 28 = '$21.51 - $28.00'
+  28 < - 85.48 = '$28.01 - $85.48'
+  85.48 < - 209.27 = '$85.49 - $209.27'
+  ;
+VALUE OPDPV98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  2.12 - 33.51 = '$2.12 - $33.51'
+  33.51 < - 100.59 = '$33.52 - $100.59'
+  100.59 < - 385 = '$100.60 - $385.00'
+  385 < - 7516.98 = '$385.01 - $7516.98'
+  ;
+VALUE OPDSF98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  0.36 - 10 = '$0.36 - $10.00'
+  10 < - 30 = '$10.01 - $30.00'
+  30 < - 105 = '$30.01 - $105.00'
+  105 < - 2039.96 = '$105.01 - $2039.96'
+  ;
+VALUE OPDSL98X  
+  0 = '0'
+  15 - 91.75 = '$15.00 - $91.75'
+  ;
+VALUE OPDTC98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  6 - 71 = '$6.00 - $71.00'
+  71 < - 196 = '$71.01 - $196.00'
+  196 < - 750 = '$196.01 - $750.00'
+  750 < - 12456 = '$750.01 - $12456.00'
+  ;
+VALUE OPDVA98X  
+  0 = '0'
+  11.66 - 766.56 = '$11.66 - $766.56'
+  ;
+VALUE OPDWC98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  17 - 196.43 = '$17.00 - $196.43'
+  196.43 < - 726 = '$196.44 - $726.00'
+  726 < - 1200 = '$726.01 - $1200.00'
+  1200 < - 3689 = '$1200.01 - $3689.00'
+  ;
+VALUE OPDXP98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  4.14 - 38 = '$4.14 - $38.00'
+  38 < - 118 = '$38.01 - $118.00'
+  118 < - 380.16 = '$118.01 - $380.16'
+  380.16 < - 7516.98 = '$380.17 - $7516.98'
+  ;
+VALUE OPFCH98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  4.26 - 42.75 = '$4.26 - $42.75'
+  42.75 < - 113 = '$42.76 - $113.00'
+  113 < - 462.4 = '$113.01 - $462.40'
+  462.4 < - 4378.71 = '$462.41 - $4378.71'
+  ;
+VALUE OPFMD98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  0.58 - 25.935 = '$0.58 - $25.94'
+  25.935 < - 79.85 = '$25.95 - $79.85'
+  79.85 < - 206.23 = '$79.86 - $206.23'
+  206.23 < - 5748.75 = '$206.24 - $5748.75'
+  ;
+VALUE OPFMR98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  1 - 22.94 = '$1.00 - $22.94'
+  22.94 < - 77.815 = '$22.95 - $77.82'
+  77.815 < - 166.68 = '$77.83 - $166.68'
+  166.68 < - 12294.75 = '$166.69 - $12294.75'
+  ;
+VALUE OPFOF98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  1.75 - 65 = '$1.75 - $65.00'
+  65 < - 96.8 = '$65.01 - $96.80'
+  96.8 < - 114.5 = '$96.81 - $114.50'
+  114.5 < - 12000 = '$114.51 - $12000.00'
+  ;
+VALUE OPFOR98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  0.98 - 18.02 = '$0.98 - $18.02'
+  18.02 < - 59.45 = '$18.03 - $59.45'
+  59.45 < - 140 = '$59.46 - $140.00'
+  140 < - 8611.72 = '$140.01 - $8611.72'
+  ;
+VALUE OPFOT98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  1.91 - 15.565 = '$1.91 - $15.57'
+  15.565 < - 86.16 = '$15.58 - $86.16'
+  86.16 < - 211.625 = '$86.17 - $211.63'
+  211.625 < - 3919.15 = '$211.64 - $3919.15'
+  ;
+VALUE OPFOU98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  1.57 - 17.77 = '$1.57 - $17.77'
+  17.77 < - 24 = '$17.78 - $24.00'
+  24 < - 75.81 = '$24.01 - $75.81'
+  75.81 < - 2927.27 = '$75.82 - $2927.27'
+  ;
+VALUE OPFPV98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  0.18 - 36.545 = '$0.18 - $36.55'
+  36.545 < - 90.25 = '$36.56 - $90.25'
+  90.25 < - 357.14 = '$90.26 - $357.14'
+  357.14 < - 15096.75 = '$357.15 - $15096.75'
+  ;
+VALUE OPFSF98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  0.11 - 10 = '$0.11 - $10.00'
+  10 < - 20 = '$10.01 - $20.00'
+  20 < - 50 = '$20.01 - $50.00'
+  50 < - 5000 = '$50.01 - $5000.00'
+  ;
+VALUE OPFSL98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  5.8 - 13.73 = '$5.80 - $13.73'
+  13.73 < - 44.955 = '$13.74 - $44.96'
+  44.955 < - 127.79 = '$44.97 - $127.79'
+  127.79 < - 1221.25 = '$127.80 - $1221.25'
+  ;
+VALUE OPFTC98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  3 - 79 = '$3.00 - $79.00'
+  79 < - 160 = '$79.01 - $160.00'
+  160 < - 485 = '$160.01 - $485.00'
+  485 < - 88461 = '$485.01 - $88461.00'
+  ;
+VALUE OPFVA98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  0.5 - 34.96 = '$0.50 - $34.96'
+  34.96 < - 70.5 = '$34.97 - $70.50'
+  70.5 < - 114.5 = '$70.51 - $114.50'
+  114.5 < - 3237.85 = '$114.51 - $3237.85'
+  ;
+VALUE OPFWC98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  4.89 - 67.64 = '$4.89 - $67.64'
+  67.64 < - 94.61 = '$67.65 - $94.61'
+  94.61 < - 258 = '$94.62 - $258.00'
+  258 < - 8636.03 = '$258.01 - $8636.03'
+  ;
+VALUE OPFXP98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  1 - 38.3 = '$1.00 - $38.30'
+  38.3 < - 96.74 = '$38.31 - $96.74'
+  96.74 < - 287.1 = '$96.75 - $287.10'
+  287.1 < - 15096.75 = '$287.11 - $15096.75'
+  ;
+VALUE OPTC98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  3.5 - 90 = '$3.50 - $90.00'
+  90 < - 189 = '$90.01 - $189.00'
+  189 < - 681.25 = '$189.01 - $681.25'
+  681.25 < - 88751 = '$681.26 - $88751.00'
+  ;
+VALUE OPXP98X  
+  -9 = '-9 NOT ASCERTAINED'
+  0 = '0'
+  1 - 46.55 = '$1.00 - $46.55'
+  46.55 < - 117 = '$46.56 - $117.00'
+  117 < - 397.14 = '$117.01 - $397.14'
+  397.14 < - 15096.75 = '$397.15 - $15096.75'
+  ;
+VALUE OTHSVCE  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO SERVICES RECEIVED'
+  ;
+VALUE PHYSTH  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO TREATMENT RECEIVED'
+  ;
+VALUE PSYCHOTH  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO TREATMENT RECEIVED'
+  ;
+VALUE RADIATTH  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO TREATMENT RECEIVED'
+  ;
+VALUE RCVSHOT  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO TREATMENT RECEIVED'
+  ;
+VALUE RCVVAC  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO SERVICES RECEIVED'
+  ;
+VALUE REFERDBY  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  ;
+VALUE SEEDOC  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  ;
+VALUE SONOGRAM  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO SERVICES RECEIVED'
+  ;
+VALUE SPEECHTH  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO TREATMENT RECEIVED'
+  ;
+VALUE SURGNAME  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 ARTHROSCOPIC SURGERY'
+  2 = '2 CATARACT SURGERY'
+  3 = '3 CLEANING/TREATM WOUND, INFECTION'
+  4 = '4 DILATION AND CURETTAGE (D AND C)'
+  5 = '5 STITCHES (WOUND SUTURE)'
+  6 = '6 TISSUE BIOPSY'
+  7 = '7 TONSILLECTOMY'
+  8 = '8 ADENOIDECTOMY'
+  9 = '9 CARDIAC CATHETERIZATION'
+  10 = '10 EAR TUBES (TYMPANOSTOMY TUBES)'
+  11 = '11 PACEMAKER INSERTION'
+  91 = '91 OTHER SURGICAL PROCEDURE'
+  ;
+VALUE SURGPROC  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  ;
+VALUE TIMESPNT  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 5 MINUTES OR LESS'
+  2 = '2 6-10 MINUTES'
+  3 = '3 11-15 MINUTES'
+  4 = '4 16-25 MINUTES'
+  5 = '5 26-40 MINUTES'
+  6 = '6 41 MINUTES OR MORE'
+  ;
+VALUE VALIDID  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  0 = '0'
+  0 < - HIGH = 'VALID ID'
+  ;
+VALUE $VALIDID  
+  '-1' = '-1 INAPPLICABLE'
+  '-3' = '-3 NO DATA IN ROUND'
+  '-7' = '-7 REFUSED'
+  '-8' = '-8 DK'
+  '-9' = '-9 NOT ASCERTAINED'
+  '0' = '0'
+  '0' < - HIGH = 'VALID ID'
+  ;
+VALUE VAPLACE  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  0 = '0 NO'
+  1 = '1 YES'
+  ;
+VALUE VARPSU  
+  1 - 56 = '1 - 56'
+  ;
+VALUE VARSTR  
+  1 - 100 = '1 - 100'
+  ;
+VALUE VSTCTGRY  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 GENERAL CHECKUP'
+  2 = '2 DIAGNOSIS OR TREATMENT'
+  3 = '3 EMERGENCY (E.G.,ACCIDENT OR JURY)'
+  4 = '4 PSYCHOTHERAPY OR MENTAL HEALTH COUNSELING'
+  5 = '5 FOLLOW-UP OR POST-OPERATIVE VISIT'
+  6 = '6 IMMUNIZATIONS OR SHOTS'
+  7 = '7 VISION EXAM'
+  8 = '8 MATERNITY CARE (PRE/POSTNATAL)'
+  9 = '9 WELL CHILD EXAM'
+  91 = '91 OTHER'
+  ;
+VALUE VSTRELCN  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  ;
+VALUE WTDPER  
+  0 = '0'
+  0 < - HIGH = '354.030272-75996.577148'
+  ;
+VALUE XRAYS  
+  -9 = '-9 NOT ASCERTAINED'
+  -8 = '-8 DK'
+  -7 = '-7 REFUSED'
+  -3 = '-3 NO DATA IN ROUND'
+  -2 = '-2 DETERMINED IN PREVIOUS ROUND'
+  -1 = '-1 INAPPLICABLE'
+  1 = '1 YES'
+  2 = '2 NO'
+  95 = '95 NO SERVICES RECEIVED'
+  ;
+
+* NOTE: FOR THE CONDITION VARIABLES ON THIS FILE;
+* (..ICDiX, ..PROiX AND ..CCCiX);
+* THE FOLLOWING VALUE STATEMENTS CAN BE USED TO CONSTRUCT;
+* FORMATS WHICH PROVIDE A LABEL FOR EACH VALUE;
+ 
+   VALUE $I9CONXB  
+    '-1' = '-1 INAPPLICABLE'
+    '-8' = '-8 DK'
+    '002' = '002 TYPHOID/PARATYPHOID FEV*'
+    '003' = '003 OTH SALMONELLA INFECTION*'
+    '004' = '004 SHIGELLOSIS*'
+    '005' = '005 OTHER FOOD POISONING*'
+    '006' = '006 AMEBIASIS*'
+    '007' = '007 OTH PROTOZOAL INTEST DIS*'
+    '008' = '008 INTESTINAL INFECTION NEC*'
+    '009' = '009 ILL-DEFINED INTEST INF*'
+    '011' = '011 PULMONARY TUBERCULOSIS*'
+    '017' = '017 TUBERCULOSIS NEC*'
+    '031' = '031 OTHER MYCOBACTERIAL DIS*'
+    '033' = '033 WHOOPING COUGH*'
+    '034' = '034 STREP THROAT/SCARLET FEV*'
+    '037' = '037 TETANUS'
+    '038' = '038 SEPTICEMIA*'
+    '040' = '040 OTHER BACTERIAL DISEASES*'
+    '041' = '041 BACT INF IN OTH DIS/NOS*'
+    '042' = '042 HUMAN IMMUNO VIRUS DIS'
+    '045' = '045 ACUTE POLIOMYELITIS*'
+    '047' = '047 ENTEROVIRAL MENINGITIS*'
+    '050' = '050 SMALLPOX*'
+    '052' = '052 CHICKENPOX*'
+    '053' = '053 HERPES ZOSTER*'
+    '054' = '054 HERPES SIMPLEX*'
+    '055' = '055 MEASLES*'
+    '057' = '057 OTHER VIRAL EXANTHEMATA*'
+    '066' = '066 OTHER ARTHROPOD VIRUS*'
+    '070' = '070 VIRAL HEPATITIS*'
+    '074' = '074 COXSACKIE VIRAL DISEASE*'
+    '075' = '075 INFECTIOUS MONONUCLEOSIS'
+    '077' = '077 OTH VIRAL CONJUNCTIVITIS*'
+    '078' = '078 OTHER VIRAL DISEASE*'
+    '079' = '079 VIRAL INF IN OTH DIS/NOS*'
+    '082' = '082 TICK-BORNE RICKETTSIOSES*'
+    '083' = '083 OTHER RICKETTSIOSES*'
+    '084' = '084 MALARIA*'
+    '088' = '088 OTH ARTHROPOD-BORNE DIS*'
+    '095' = '095 OTH LATE SYMPT SYPHILIS*'
+    '097' = '097 OTH & UNSPEC SYPHILIS*'
+    '098' = '098 GONOCOCCAL INFECTIONS*'
+    '099' = '099 OTHER VENEREAL DISEASE*'
+    '101' = "101 VINCENT'S ANGINA"
+    '110' = '110 DERMATOPHYTOSIS*'
+    '111' = '111 DERMATOMYCOSIS NEC/NOS*'
+    '112' = '112 CANDIDIASIS*'
+    '114' = '114 COCCIDIOIDOMYCOSIS*'
+    '115' = '115 HISTOPLASMOSIS*'
+    '117' = '117 OTHER MYCOSES*'
+    '120' = '120 SCHISTOSOMIASIS*'
+    '127' = '127 OTH INTEST HELMINTHIASES*'
+    '128' = '128 OTH AND UNSPECIFIED HELMINTHIASES*'
+    '129' = '129 INTESTIN PARASITISM NOS'
+    '130' = '130 TOXOPLASMOSIS*'
+    '131' = '131 TRICHOMONIASIS*'
+    '132' = '132 PEDICULOSIS AND PHTHIRUS*'
+    '133' = '133 ACARIASIS*'
+    '134' = '134 OTHER INFESTATION*'
+    '135' = '135 SARCOIDOSIS'
+    '136' = '136 INF/PARASITE DIS NEC/NOS*'
+    '138' = '138 LATE EFFECT ACUTE POLIO'
+    '140' = '140 MALIGNANT NEOPLASM LIP*'
+    '141' = '141 MALIG NEO TONGUE*'
+    '145' = '145 MALIG NEO MOUTH NEC/NOS*'
+    '149' = '149 OTH MALIG NEO OROPHARYNX*'
+    '150' = '150 MALIGNANT NEO ESOPHAGUS*'
+    '151' = '151 MALIGNANT NEO STOMACH*'
+    '152' = '152 MALIG NEO SMALL BOWEL*'
+    '153' = '153 MALIGNANT NEOPLASM COLON*'
+    '154' = '154 MALIG NEO RECTUM/ANUS*'
+    '155' = '155 MALIGNANT NEOPLASM LIVER*'
+    '156' = '156 MAL NEO GB/EXTRAHEPATIC*'
+    '157' = '157 MALIGNANT NEO PANCREAS*'
+    '159' = '159 OTH MALIG NEO GI/PERITON*'
+    '161' = '161 MALIGNANT NEO LARYNX*'
+    '162' = '162 MAL NEO TRACHEA/LUNG*'
+    '170' = '170 MAL NEO BONE/ARTIC CART*'
+    '171' = '171 MAL NEO SOFT TISSUE*'
+    '172' = '172 MALIGNANT MELANOMA SKIN*'
+    '173' = '173 OTHER MALIG NEOPL SKIN*'
+    '174' = '174 MALIG NEO FEMALE BREAST*'
+    '179' = '179 MALIG NEOPL UTERUS NOS'
+    '180' = '180 MALIG NEOPL CERVIX UTERI*'
+    '183' = '183 MAL NEO UTERINE ADNEXA*'
+    '184' = '184 MAL NEO FEM GEN NEC/NOS*'
+    '185' = '185 MALIGN NEOPL PROSTATE'
+    '186' = '186 MALIGN NEOPL TESTIS*'
+    '187' = '187 MAL NEO MALE GENITAL NEC*'
+    '188' = '188 MALIGN NEOPL BLADDER*'
+    '189' = '189 MAL NEO URINARY NEC/NOS*'
+    '190' = '190 MALIGNANT NEOPLASM EYE*'
+    '191' = '191 MALIGNANT NEOPLASM BRAIN*'
+    '193' = '193 MALIGN NEOPL THYROID'
+    '195' = '195 MAL NEO OTH/ILL-DEF SITE*'
+    '198' = '198 SEC MALIG NEO OTH SITES*'
+    '199' = '199 MALIGNANT NEOPLASM NOS*'
+    '201' = "201 HODGKIN'S DISEASE*"
+    '202' = '202 OTH MAL NEO LYMPH/HISTIO*'
+    '203' = '203 MULTIPLE MYELOMA ET AL*'
+    '204' = '204 LYMPHOID LEUKEMIA*'
+    '205' = '205 MYELOID LEUKEMIA*'
+    '207' = '207 OTHER SPECIFIED LEUKEMIA*'
+    '208' = '208 LEUKEMIA-UNSPECIF CELL*'
+    '211' = '211 OTH BENIGN NEOPLASM GI*'
+    '212' = '212 BEN NEO RESP SYST/THORAX*'
+    '214' = '214 LIPOMA*'
+    '215' = '215 OTH BEN NEO SOFT TISSUE*'
+    '216' = '216 BENIGN NEOPLASM OF SKIN*'
+    '217' = '217 BENIGN NEOPLASM BREAST'
+    '218' = '218 UTERINE LEIOMYOMA*'
+    '219' = '219 OTH BENIGN NEO UTERUS*'
+    '220' = '220 BENIGN NEOPLASM OVARY'
+    '222' = '222 BENIGN NEO MALE GENITAL*'
+    '224' = '224 BENIGN NEOPLASM OF EYE*'
+    '225' = '225 BENIGN NEO NERVOUS SYST*'
+    '226' = '226 BENIGN NEOPLASM THYROID'
+    '227' = '227 BEN NEO OTH ENDOCRINE*'
+    '228' = '228 HEMANGIOMA/LYMPHANGIOMA*'
+    '229' = '229 BENIGN NEOPLASM NEC/NOS*'
+    '233' = '233 CA IN SITU BREAST/GU*'
+    '234' = '234 CA IN SITU NEC/NOS*'
+    '235' = '235 UNC BEHAV NEO GI/RESP*'
+    '236' = '236 UNC BEHAV NEO GU*'
+    '237' = '237 UNCER NEO ENDOCRINE/NERV*'
+    '238' = '238 UNC BEHAV NEO NEC/NOS*'
+    '239' = '239 UNSPECIFIED NEOPLASM*'
+    '240' = '240 GOITER, SIMPLE/NOS*'
+    '241' = '241 NONTOXIC NODULAR GOITER*'
+    '242' = '242 THYROTOXICOSIS*'
+    '244' = '244 ACQUIRED HYPOTHYROIDISM*'
+    '245' = '245 THYROIDITIS*'
+    '246' = '246 OTH DISORDERS OF THYROID*'
+    '250' = '250 DIABETES MELLITUS*'
+    '251' = '251 OTH PANCREATIC DISORDER*'
+    '252' = '252 PARATHYROID DISORDER*'
+    '253' = '253 PITUITARY/HYPOTHALM DIS*'
+    '255' = '255 ADRENAL GLAND DISORDERS*'
+    '256' = '256 OVARIAN DYSFUNCTION*'
+    '257' = '257 TESTICULAR DYSFUNCTION*'
+    '259' = '259 OTH ENDORINE DISORDERS*'
+    '263' = '263 PROT-CAL MALNUTR NEC/NOS*'
+    '266' = '266 B-COMPLEX DEFICIENCIES*'
+    '268' = '268 VITAMIN D DEFICIENCY*'
+    '269' = '269 OTH NUTRITION DEFICIENCY*'
+    '271' = '271 DIS CARBOHYDRATE METABOL*'
+    '272' = '272 DIS OF LIPOID METABOLISM*'
+    '273' = '273 DIS PLASMA PROTEIN METAB*'
+    '274' = '274 GOUT*'
+    '275' = '275 DIS MINERAL METABOLISM*'
+    '276' = '276 FLUID/ELECTROLYTE DIS*'
+    '277' = '277 METABOLISM DIS NEC/NOS*'
+    '278' = '278 OBESITY/HYPERALIMENT*'
+    '279' = '279 DIS IMMUNE MECHANISM*'
+    '280' = '280 IRON DEFICIENCY ANEMIAS*'
+    '281' = '281 OTHER DEFICIENCY ANEMIA*'
+    '282' = '282 HEREDIT HEMOLYTIC ANEMIA*'
+    '285' = '285 ANEMIA NEC/NOS*'
+    '286' = '286 COAGULATION DEFECTS*'
+    '287' = '287 PURPURA & OTH HEMOR COND*'
+    '288' = '288 WBC DISORDERS*'
+    '289' = '289 OTHER BLOOD DISEASE*'
+    '290' = '290 SENILE/PRESENILE PSYCHOS*'
+    '291' = '291 ALCOHOLIC PSYCHOSES*'
+    '292' = '292 DRUG PSYCHOSES*'
+    '293' = '293 TRANSIENT ORG MENTAL DIS*'
+    '294' = '294 OTHER ORGANIC PSYCH COND*'
+    '295' = '295 SCHIZOPHRENIC DISORDERS*'
+    '296' = '296 AFFECTIVE PSYCHOSES*'
+    '297' = '297 PARANOID STATES*'
+    '298' = '298 OTH NONORGANIC PSYCHOSES*'
+    '299' = '299 PSYCHOSES OF CHILDHOOD*'
+    '300' = '300 NEUROTIC DISORDERS*'
+    '301' = '301 PERSONALITY DISORDERS*'
+    '302' = '302 SEXUAL DISORDERS*'
+    '303' = '303 ALCOHOL DEPENDENCE SYNDR*'
+    '304' = '304 DRUG DEPENDENCE*'
+    '305' = '305 NONDEPENDENT DRUG ABUSE*'
+    '306' = '306 PSYCHOPHYSIOLOGIC DIS*'
+    '307' = '307 SPECIAL SYMPTOM NEC*'
+    '308' = '308 ACUTE REACTION TO STRESS*'
+    '309' = '309 ADJUSTMENT REACTION*'
+    '310' = '310 NONPSYCHOTIC BRAIN SYND*'
+    '311' = '311 DEPRESSIVE DISORDER NEC'
+    '312' = '312 CONDUCT DISTURBANCE NEC*'
+    '313' = '313 EMOTIONAL DIS CHILD/ADOL*'
+    '314' = '314 HYPERKINETIC SYNDROME*'
+    '315' = '315 SPECIFIC DEVELOP DELAYS*'
+    '317' = '317 MILD MENTAL RETARDATION'
+    '319' = '319 MENTAL RETARDATION NOS'
+    '320' = '320 BACTERIAL MENINGITIS*'
+    '322' = '322 MENINGITIS, UNSPECIFIED*'
+    '323' = '323 ENCEPHALOMYELITIS*'
+    '331' = '331 CEREBRAL DEGENERATION*'
+    '332' = "332 PARKINSON'S DISEASE*"
+    '333' = '333 EXTRAPYRAMIDAL DIS NEC*'
+    '334' = '334 SPINOCEREBELLAR DISEASE*'
+    '335' = '335 ANT HORN CELL DISEASE*'
+    '336' = '336 SPINAL CORD DISEASE NEC*'
+    '337' = '337 AUTONOMIC NERVE DISORDER*'
+    '340' = '340 MULTIPLE SCLEROSIS'
+    '341' = '341 OTHER CNS DEMYELINATION*'
+    '342' = '342 HEMIPLEGIA*'
+    '343' = '343 INFANTILE CEREBRAL PALSY*'
+    '344' = '344 OTH PARALYTIC SYNDROMES*'
+    '345' = '345 EPILEPSY*'
+    '346' = '346 MIGRAINE*'
+    '347' = '347 CATAPLEXY AND NARCOLEPSY'
+    '348' = '348 OTHER BRAIN CONDITIONS*'
+    '349' = '349 CNS DISORDER NEC/NOS*'
+    '350' = '350 TRIGEMINAL NERV DISORDER*'
+    '351' = '351 FACIAL NERVE DISORDERS*'
+    '352' = '352 DISORDER CRAN NERVE NEC*'
+    '353' = '353 NERVE ROOT/PLEXUS DIS*'
+    '354' = '354 MONONEURITIS UPPER LIMB*'
+    '355' = '355 MONONEURITIS LEG*'
+    '356' = '356 HERED PERIPH NEUROPATHY*'
+    '357' = '357 INFLAM/TOXIC NEUROPATHY*'
+    '358' = '358 MYONEURAL DISORDERS*'
+    '359' = '359 MUSCULAR DYSTROPHIES*'
+    '360' = '360 DISORDERS OF THE GLOBE*'
+    '361' = '361 RETINAL DETACHMENT*'
+    '362' = '362 RETINAL DISORDERS NEC*'
+    '363' = '363 CHOROIDAL DISORDERS*'
+    '364' = '364 IRIS/CILIARY BODY DIS*'
+    '365' = '365 GLAUCOMA*'
+    '366' = '366 CATARACT*'
+    '367' = '367 DISORDERS OF REFRACTION*'
+    '368' = '368 VISUAL DISTURBANCES*'
+    '369' = '369 BLINDNESS AND LOW VISION*'
+    '370' = '370 KERATITIS*'
+    '371' = '371 CORNEAL OPACITY/DISORDER*'
+    '372' = '372 DISORDERS OF CONJUNCTIVA*'
+    '373' = '373 INFLAMMATION OF EYELIDS*'
+    '374' = '374 DISORDERS OF EYELIDS NEC*'
+    '375' = '375 LACRIMAL SYSTEM DISORDER*'
+    '376' = '376 DISORDERS OF THE ORBIT*'
+    '377' = '377 DISORDERS OF OPTIC NERVE*'
+    '378' = '378 STRABISMUS*'
+    '379' = '379 EYE DISORDERS NEC*'
+    '380' = '380 DISORDER OF EXTERNAL EAR*'
+    '381' = '381 NONSUPPUR OTITIS MEDIA*'
+    '382' = '382 OTITIS MEDIA, SUPPUR/NOS*'
+    '383' = '383 MASTOIDITIS ET AL*'
+    '384' = '384 DISORD TYMPANIC MEMB NEC*'
+    '385' = '385 DIS MID EAR/MASTOID NEC*'
+    '386' = '386 VERTIGINOUS SYNDROMES*'
+    '387' = '387 OTOSCLEROSIS*'
+    '388' = '388 DISORDERS OF EAR NEC*'
+    '389' = '389 HEARING LOSS*'
+    '390' = '390 RHEUM FEV W/O HRT INVOLV'
+    '391' = '391 RHEUM FEV W HEART INVOLV*'
+    '394' = '394 DISEASES OF MITRAL VALVE*'
+    '398' = '398 OTH RHEUMATIC HEART DIS*'
+    '401' = '401 ESSENTIAL HYPERTENSION*'
+    '402' = '402 HYPERTENSIVE HEART DIS*'
+    '410' = '410 ACUTE MYOCARDIAL INFARCT*'
+    '411' = '411 OTH AC ISCHEMIC HRT DIS*'
+    '412' = '412 OLD MYOCARDIAL INFARCT'
+    '413' = '413 ANGINA PECTORIS*'
+    '414' = '414 OTH CHR ISCHEMIC HRT DIS*'
+    '415' = '415 ACUTE PULMONARY HRT DIS*'
+    '416' = '416 CHR PULMONARY HEART DIS*'
+    '423' = '423 OTH PERICARDIAL DISEASE*'
+    '424' = '424 OTH ENDOCARDIAL DISEASE*'
+    '425' = '425 CARDIOMYOPATHY*'
+    '426' = '426 CONDUCTION DISORDERS*'
+    '427' = '427 CARDIAC DYSRHYTHMIAS*'
+    '428' = '428 HEART FAILURE*'
+    '429' = '429 ILL-DEFINED HEART DIS*'
+    '430' = '430 SUBARACHNOID HEMORRHAGE'
+    '431' = '431 INTRACEREBRAL HEMORRHAGE'
+    '432' = '432 INTRACRANIAL HEM NEC/NOS*'
+    '433' = '433 PRECEREBRAL OCCLUSION*'
+    '434' = '434 CEREBRAL ARTERY OCCLUS*'
+    '435' = '435 TRANSIENT CEREB ISCHEMIA*'
+    '436' = '436 CVA'
+    '437' = '437 OTH CEREBROVASC DISEASE*'
+    '438' = '438 LATE EFF CEREBROVASC DIS*'
+    '440' = '440 ATHEROSCLEROSIS*'
+    '441' = '441 AORTIC ANEURYSM*'
+    '442' = '442 OTHER ANEURYSM*'
+    '443' = '443 OTH PERIPH VASCULAR DIS*'
+    '444' = '444 ARTERIAL EMBOLISM*'
+    '446' = '446 POLYARTERIT NODOSA ET AL*'
+    '447' = '447 OTHER ARTERIAL DISEASE*'
+    '448' = '448 DISEASE OF CAPILLARIES*'
+    '451' = '451 THROMBOPHLEBITIS*'
+    '453' = '453 OTH VENOUS THROMBOSIS*'
+    '454' = '454 VARICOSE VEINS, LEG*'
+    '455' = '455 HEMORRHOIDS*'
+    '456' = '456 VARICOSE VEINS NEC*'
+    '457' = '457 NONINFECT LYMPHATIC DIS*'
+    '458' = '458 HYPOTENSION NEC'
+    '459' = '459 OTH CIRCULATORY DISEASE*'
+    '460' = '460 ACUTE NASOPHARYNGITIS'
+    '461' = '461 ACUTE SINUSITIS*'
+    '462' = '462 ACUTE PHARYNGITIS'
+    '463' = '463 ACUTE TONSILLITIS'
+    '464' = '464 AC LARYNGITIS/TRACHEITIS*'
+    '465' = '465 AC URI MULT SITES/NOS*'
+    '466' = '466 AC BRONCHITIS/BRONCHIOL*'
+    '470' = '470 DEVIATED NASAL SEPTUM'
+    '471' = '471 NASAL POLYPS*'
+    '472' = '472 CHR PHARYNG/NASOPHARYNG*'
+    '473' = '473 CHRONIC SINUSITIS*'
+    '474' = '474 CHR T & A DIS*'
+    '475' = '475 PERITONSILLAR ABSCESS'
+    '477' = '477 ALLERGIC RHINITIS*'
+    '478' = '478 OTH UPPR RESPIRATORY DIS*'
+    '480' = '480 VIRAL PNEUMONIA*'
+    '482' = '482 OTH BACTERIAL PNEUMONIA*'
+    '485' = '485 BRONCHOPNEUMONIA ORG NOS'
+    '486' = '486 PNEUMONIA, ORGANISM NOS'
+    '487' = '487 INFLUENZA*'
+    '490' = '490 BRONCHITIS NOS'
+    '491' = '491 CHRONIC BRONCHITIS*'
+    '492' = '492 EMPHYSEMA*'
+    '493' = '493 ASTHMA*'
+    '494' = '494 BRONCHIECTASIS*'
+    '496' = '496 CHR AIRWAY OBSTRUCT NEC'
+    '500' = "500 COAL WORKERS' PNEUMOCON"
+    '501' = '501 ASBESTOSIS'
+    '502' = '502 SILICA PNEUMOCON NEC'
+    '505' = '505 PNEUMOCONIOSIS NOS'
+    '507' = '507 SOLID/LIQ PNEUMONITIS*'
+    '510' = '510 EMPYEMA*'
+    '511' = '511 PLEURISY*'
+    '512' = '512 PNEUMOTHORAX*'
+    '514' = '514 PULM CONGEST/HYPOSTASIS'
+    '515' = '515 POSTINFLAM PULM FIBROSIS'
+    '518' = '518 OTHER LUNG DISEASES*'
+    '519' = '519 OTH RESP SYSTEM DISEASES*'
+    '520' = '520 TOOTH DEVELOP/ERUPT DIS*'
+    '521' = '521 HARD TISSUE DIS OF TEETH*'
+    '522' = '522 PULP & PERIAPICAL DIS*'
+    '523' = '523 GINGIVAL/PERIODONTAL DIS*'
+    '524' = '524 DENTOFACIAL ANOMALIES*'
+    '525' = '525 OTHER DENTAL DISORDER*'
+    '526' = '526 JAW DISEASES*'
+    '527' = '527 SALIVARY GLAND DISEASES*'
+    '528' = '528 ORAL SOFT TISSUE DISEASE*'
+    '529' = '529 TONGUE DISORDERS*'
+    '530' = '530 DISEASES OF ESOPHAGUS*'
+    '531' = '531 GASTRIC ULCER*'
+    '532' = '532 DUODENAL ULCER*'
+    '533' = '533 PEPTIC ULCER, SITE NOS*'
+    '535' = '535 GASTRITIS AND DUODENITIS*'
+    '536' = '536 STOMACH FUNCTION DISORD*'
+    '537' = '537 OTH GASTRODUODENAL DIS*'
+    '540' = '540 ACUTE APPENDICITIS*'
+    '541' = '541 APPENDICITIS NOS'
+    '543' = '543 OTH DISEASES OF APPENDIX*'
+    '550' = '550 INGUINAL HERNIA*'
+    '552' = '552 OTH ABDOM HERNIA W OBSTR*'
+    '553' = '553 OTHER ABDOMINAL HERNIA*'
+    '555' = '555 REGIONAL ENTERITIS*'
+    '556' = '556 IDIOPATHIC PROCTOCOLITIS*'
+    '557' = '557 VASC INSUFF INTESTINE*'
+    '558' = '558 OTH NONINF GASTROENTERIT*'
+    '560' = '560 INTESTINAL OBSTRUCTION*'
+    '562' = '562 DIVERTICULA OF INTESTINE*'
+    '564' = '564 FUNCT DIGESTIVE DIS NEC*'
+    '565' = '565 ANAL FISSURE & FISTULA*'
+    '566' = '566 ANAL & RECTAL ABSCESS'
+    '567' = '567 PERITONITIS*'
+    '568' = '568 OTH PERITONEAL DISORDERS*'
+    '569' = '569 OTH INTESTINAL DISORDERS*'
+    '571' = '571 CHR LIVER DIS/CIRRHOSIS*'
+    '573' = '573 OTH LIVER DISORDERS*'
+    '574' = '574 CHOLELITHIASIS*'
+    '575' = '575 OTH GALLBLADDER DISORDER*'
+    '576' = '576 OTH DIS OF BILIARY TRACT*'
+    '577' = '577 DISEASES OF PANCREAS*'
+    '578' = '578 GASTROINTESTINAL HEMORR*'
+    '579' = '579 INTESTINAL MALABSORPTION*'
+    '581' = '581 NEPHROTIC SYNDROME*'
+    '583' = '583 NEPHRITIS NOS*'
+    '584' = '584 ACUTE RENAL FAILURE*'
+    '585' = '585 CHRONIC RENAL FAILURE'
+    '586' = '586 RENAL FAILURE NOS'
+    '587' = '587 RENAL SCLEROSIS NOS'
+    '588' = '588 IMPAIRED RENAL FUNCTION*'
+    '590' = '590 KIDNEY INFECTION*'
+    '592' = '592 RENAL/URETERAL CALCULUS*'
+    '593' = '593 OTH RENAL & URETERAL DIS*'
+    '594' = '594 LOWER URIN TRACT CALCUL*'
+    '595' = '595 CYSTITIS*'
+    '596' = '596 OTHER BLADDER DISORDERS*'
+    '597' = '597 URETHRITIS/URETHRAL SYND*'
+    '598' = '598 URETHRAL STRICTURE*'
+    '599' = '599 OTH URINARY TRACT DISOR*'
+    '600' = '600 HYPERPLASIA OF PROSTATE*'
+    '601' = '601 PROSTATIC INFLAMMATION*'
+    '602' = '602 OTH PROSTATIC DISORDERS*'
+    '603' = '603 HYDROCELE*'
+    '604' = '604 ORCHITIS & EPIDIDYMITIS*'
+    '606' = '606 MALE INFERTILITY*'
+    '607' = '607 DISORDERS OF PENIS*'
+    '608' = '608 MALE GENITAL DIS NEC*'
+    '610' = '610 BENIGN MAMMARY DYSPLASIA*'
+    '611' = '611 OTHER BREAST DISORDERS*'
+    '614' = '614 FEMALE PELVIC INFLAM DIS*'
+    '615' = '615 UTERINE INFLAMMATORY DIS*'
+    '616' = '616 OTH FEMALE GEN INFLAM*'
+    '617' = '617 ENDOMETRIOSIS*'
+    '618' = '618 GENITAL PROLAPSE*'
+    '620' = '620 NONINFLAM DIS OVAR/ADNEX*'
+    '621' = '621 DISORDERS OF UTERUS NEC*'
+    '622' = '622 NONINFLAMM DIS CERVIX*'
+    '623' = '623 NONINFLAMM DIS VAGINA*'
+    '624' = '624 NONINFLAMM DIS VULVA*'
+    '625' = '625 FEMALE GENITAL SYMPTOMS*'
+    '626' = '626 DISORDER OF MENSTRUATION*'
+    '627' = '627 MENOPAUSAL DISORDERS*'
+    '628' = '628 FEMALE INFERTILITY*'
+    '629' = '629 OTH FEMALE GENITAL DIS*'
+    '633' = '633 ECTOPIC PREGNANCY*'
+    '634' = '634 SPONTANEOUS ABORTION*'
+    '637' = '637 UNSPECIFIED ABORTION*'
+    '639' = '639 COMPL FOLLOWING ABORTION*'
+    '640' = '640 HEMORRHAGE IN EARLY PREG*'
+    '641' = '641 ANTEPART HEM & PLAC PREV*'
+    '642' = '642 HYPERTENSION COMPL PREG*'
+    '643' = '643 EXCESS VOMITING IN PREG*'
+    '644' = '644 EARLY/THREATENED LABOR*'
+    '646' = '646 OTHER COMPL OF PREGNANCY*'
+    '648' = '648 OTH CURRENT COND IN PREG*'
+    '650' = '650 NORMAL DELIVERY'
+    '656' = '656 OTH FETAL PROB AFF MOTH*'
+    '658' = '658 OTH AMNIOTIC CAVITY PROB*'
+    '665' = '665 OTHER OBSTETRICAL TRAUMA*'
+    '666' = '666 POSTPARTUM HEMORRHAGE*'
+    '669' = '669 OTH COMPL LABOR/DELIVERY*'
+    '674' = '674 PUERPERAL COMPL NEC/NOS*'
+    '676' = '676 OTH BREAST/LACT DIS PREG*'
+    '680' = '680 CARBUNCLE AND FURUNCLE*'
+    '681' = '681 CELLULITIS, FINGER/TOE*'
+    '682' = '682 OTHER CELLULITIS/ABSCESS*'
+    '683' = '683 ACUTE LYMPHADENITIS'
+    '684' = '684 IMPETIGO'
+    '685' = '685 PILONIDAL CYST*'
+    '686' = '686 OTH LOCAL SKIN INFECTION*'
+    '690' = '690 ERYTHEMATOSQUAMOUS DERM*'
+    '691' = '691 ATOPIC DERMATITIS*'
+    '692' = '692 CONTACT DERMATITIS*'
+    '693' = '693 DERMAT D/T INTERN AGENT*'
+    '694' = '694 BULLOUS DERMATOSES*'
+    '695' = '695 ERYTHEMATOUS CONDITIONS*'
+    '696' = '696 PSORIASIS/LIKE DISORDERS*'
+    '697' = '697 LICHEN*'
+    '698' = '698 PRURITUS & LIKE COND*'
+    '700' = '700 CORNS AND CALLOSITIES'
+    '701' = '701 OTH SKIN HYPERTRO/ATROPH*'
+    '702' = '702 OTHER DERMATOSES*'
+    '703' = '703 DISEASES OF NAIL*'
+    '704' = '704 HAIR & FOLLICLE DISEASE*'
+    '705' = '705 DISORDERS OF SWEAT GLAND*'
+    '706' = '706 SEBACEOUS GLAND DISEASE*'
+    '707' = '707 CHRONIC ULCER OF SKIN*'
+    '708' = '708 URTICARIA*'
+    '709' = '709 OTHER SKIN DISORDERS*'
+    '710' = '710 DIFF CONNECTIVE TISS DIS*'
+    '711' = '711 ARTHROPATHY W INFECTION*'
+    '712' = '712 CRYSTAL ARTHROPATHIES*'
+    '713' = '713 ARTHROPATH IN OTHER DIS*'
+    '714' = '714 OTH INFLAMM POLYARTHROP*'
+    '715' = '715 OSTEOARTHROSIS ET AL*'
+    '716' = '716 ARTHROPATHIES NEC/NOS*'
+    '717' = '717 INTERNAL DERANGEMNT KNEE*'
+    '718' = '718 OTHER JOINT DERANGEMENT*'
+    '719' = '719 JOINT DISORDER NEC & NOS*'
+    '720' = '720 INFLAM SPONDYLOPATHIES*'
+    '721' = '721 SPONDYLOSIS ET AL*'
+    '722' = '722 INTERVERTEBRAL DISC DIS*'
+    '723' = '723 OTHER CERVICAL SPINE DIS*'
+    '724' = '724 BACK DISORDER NEC & NOS*'
+    '725' = '725 POLYMYALGIA RHEUMATICA'
+    '726' = '726 PERIPH ENTHESOPATHIES*'
+    '727' = '727 OTH DIS SYNOV/TEND/BURSA*'
+    '728' = '728 DIS OF MUSCLE/LIG/FASCIA*'
+    '729' = '729 OTHER SOFT TISSUE DIS*'
+    '730' = '730 OSTEOMYELITIS*'
+    '731' = '731 OSTEITIS DEFORMANS*'
+    '732' = '732 OSTEOCHONDROPATHIES*'
+    '733' = '733 OTH BONE & CARTILAGE DIS*'
+    '734' = '734 FLAT FOOT'
+    '735' = '735 ACQ DEFORMITIES OF TOE*'
+    '736' = '736 OTH ACQ LIMB DEFORMITIES*'
+    '737' = '737 CURVATURE OF SPINE*'
+    '738' = '738 OTHER ACQUIRED DEFORMITY*'
+    '739' = '739 SOMATIC DYSFUNCTION*'
+    '740' = '740 ANENCEPHALUS/SIMIL ANOM*'
+    '741' = '741 SPINA BIFIDA*'
+    '742' = '742 OTH NERVOUS SYSTEM ANOM*'
+    '743' = '743 CONGENITAL EYE ANOMALY*'
+    '744' = '744 CONG ANOM EAR/FACE/NECK*'
+    '745' = '745 CARDIAC SEPTAL CLOS ANOM*'
+    '746' = '746 OTHER CONGEN HEART ANOM*'
+    '747' = '747 OTH CONG CIRC SYST ANOM*'
+    '748' = '748 RESPIRATORY SYST ANOMALY*'
+    '749' = '749 CLEFT PALATE & CLEFT LIP*'
+    '750' = '750 OTHER UPPER GI ANOMALY*'
+    '751' = '751 OTH ANOM DIGESTIVE SYST*'
+    '752' = '752 GENITAL ORGAN ANOMALIES*'
+    '753' = '753 URINARY SYSTEM ANOMALIES*'
+    '754' = '754 CONG MUSCULOSKEL DEFORM*'
+    '755' = '755 OTH CONGEN LIMB ANOMALY*'
+    '756' = '756 OTH MUSCULOSKELET ANOMAL*'
+    '757' = '757 CONGEN SKIN ANOMALIES*'
+    '758' = '758 CHROMOSOMAL ANOMALIES*'
+    '759' = '759 CONGEN ANOMALIES NEC/NOS*'
+    '760' = '760 MATERN COND AFF FETUS/NB*'
+    '762' = '762 COMPL PLACEN/CORD AFF NB*'
+    '765' = '765 EXTREME IMMATURITY*'
+    '767' = '767 BIRTH TRAUMA*'
+    '768' = '768 INTRAUTERINE ASPHYXIA*'
+    '770' = '770 OTH NB RESPIRATORY COND*'
+    '771' = '771 PERINATAL INFECTION*'
+    '774' = '774 OTHER PERINATAL JAUNDICE*'
+    '780' = '780 GENERAL SYMPTOMS*'
+    '781' = '781 NERV/MUSCULSKEL SYS SYMP*'
+    '782' = '782 SKIN/OTH INTEGUMENT SYMP*'
+    '783' = '783 NUTRIT/METAB/DEVEL SYMP*'
+    '784' = '784 SYMPTOMS INVOL HEAD/NECK*'
+    '785' = '785 CARDIOVASCULAR SYS SYMP*'
+    '786' = '786 RESP SYS/OTH CHEST SYMP*'
+    '787' = '787 GI SYSTEM SYMPTOMS*'
+    '788' = '788 URINARY SYSTEM SYMPTOMS*'
+    '789' = '789 OTH ABDOMEN/PELVIS SYMP*'
+    '790' = '790 ABNORMAL BLOOD FINDINGS*'
+    '791' = '791 ABNORMAL URINE FINDINGS*'
+    '792' = '792 ABN FIND-OTH BODY SUBST*'
+    '793' = '793 ABN FIND-BODY STRUCT NOS*'
+    '794' = '794 ABNORMAL FUNCTION STUDY*'
+    '795' = '795 ABN HISTOLOG/IMMUNO FIND*'
+    '796' = '796 OTHER ABNORMAL FINDINGS*'
+    '797' = '797 SENILITY W/O PSYCHOSIS'
+    '799' = '799 OTH ILL-DEF MORBID/MORTL*'
+    '802' = '802 FRACTURE OF FACE BONES*'
+    '803' = '803 OTHER SKULL FRACTURE*'
+    '804' = '804 MULT FX SKULL W OTH BONE*'
+    '805' = '805 VERTEBRL FX W/O CORD INJ*'
+    '806' = '806 VERTEBRAL FX W CORD INJ*'
+    '807' = '807 FX RIB/STERN/LARYN/TRACH*'
+    '808' = '808 PELVIC FRACTURE*'
+    '809' = '809 FRACTURE OF TRUNK BONES*'
+    '810' = '810 CLAVICLE FRACTURE*'
+    '811' = '811 SCAPULA FRACTURE*'
+    '812' = '812 HUMERUS FRACTURE*'
+    '813' = '813 RADIUS & ULNA FRACTURE*'
+    '814' = '814 CARPAL FRACTURE*'
+    '815' = '815 METACARPAL FRACTURE*'
+    '816' = '816 FRACTURE PHALANGES, HAND*'
+    '817' = '817 MULTIPLE HAND FRACTURES*'
+    '818' = '818 FRACTURE ARM MULT/NOS*'
+    '819' = '819 FX ARMS W RIB/STERNUM*'
+    '820' = '820 FRACTURE NECK OF FEMUR*'
+    '821' = '821 OTHER FEMORAL FRACTURE*'
+    '822' = '822 PATELLA FRACTURE*'
+    '823' = '823 TIBIA & FIBULA FRACTURE*'
+    '824' = '824 ANKLE FRACTURE*'
+    '825' = '825 FX OF TARSAL/METATARSAL*'
+    '826' = '826 FRACTURE PHALANGES, FOOT*'
+    '827' = '827 LOWER LIMB FRACTURE NEC*'
+    '828' = '828 FX LEGS W ARM/RIB*'
+    '829' = '829 FRACTURE NOS*'
+    '830' = '830 JAW DISLOCATION*'
+    '831' = '831 SHOULDER DISLOCATION*'
+    '832' = '832 ELBOW DISLOCATION*'
+    '833' = '833 WRIST DISLOCATION*'
+    '834' = '834 DISLOCATION OF FINGER*'
+    '835' = '835 DISLOCATION OF HIP*'
+    '836' = '836 DISLOCATION OF KNEE*'
+    '837' = '837 DISLOCATION OF ANKLE*'
+    '838' = '838 DISLOCATION OF FOOT*'
+    '839' = '839 DISLOCATION NEC*'
+    '840' = '840 SPRAIN SHOULDER & ARM*'
+    '841' = '841 SPRAIN ELBOW & FOREARM*'
+    '842' = '842 SPRAIN WRIST & HAND*'
+    '843' = '843 SPRAIN OF HIP & THIGH*'
+    '844' = '844 SPRAIN OF KNEE & LEG*'
+    '845' = '845 SPRAIN OF ANKLE & FOOT*'
+    '846' = '846 SPRAIN SACROILIAC REGION*'
+    '847' = '847 SPRAIN OF BACK NEC/NOS*'
+    '848' = '848 SPRAIN NEC*'
+    '850' = '850 CONCUSSION*'
+    '854' = '854 OTHER BRAIN INJURY*'
+    '861' = '861 HEART & LUNG INJURY*'
+    '862' = '862 INTRATHORACIC INJURY NEC*'
+    '863' = '863 GI TRACT INJURY*'
+    '866' = '866 KIDNEY INJURY*'
+    '867' = '867 PELVIC ORGAN INJURY*'
+    '869' = '869 INTERNAL INJURY NOS*'
+    '870' = '870 OCULAR ADNEXA OPEN WOUND*'
+    '871' = '871 EYEBALL OPEN WOUND*'
+    '872' = '872 OPEN WOUND OF EAR*'
+    '873' = '873 OTHER OPEN WOUND OF HEAD*'
+    '874' = '874 OPEN WOUND OF NECK*'
+    '875' = '875 OPEN WOUND OF CHEST*'
+    '876' = '876 OPEN WOUND OF BACK*'
+    '877' = '877 OPEN WOUND OF BUTTOCK*'
+    '878' = '878 OPEN WOUND GENITAL ORGAN*'
+    '879' = '879 OPEN WOUND SITE NEC*'
+    '880' = '880 OPN WND SHOULDR/UPPR ARM*'
+    '881' = '881 OPEN WOUND OF LOWER ARM*'
+    '882' = '882 OPEN WOUND OF HAND*'
+    '883' = '883 OPEN WOUND OF FINGER*'
+    '884' = '884 OPEN WOUND ARM MULT/NOS*'
+    '886' = '886 TRAUM AMPUTATION FINGER*'
+    '887' = '887 TRAUMATIC AMPUT ARM/HAND*'
+    '890' = '890 OPEN WOUND OF HIP/THIGH*'
+    '891' = '891 OPEN WND KNEE/LEG/ANKLE*'
+    '892' = '892 OPEN WOUND OF FOOT*'
+    '893' = '893 OPEN WOUND OF TOE*'
+    '894' = '894 OPEN WOUND OF LEG NEC*'
+    '897' = '897 TRAUMATIC AMPUTATION LEG*'
+    '900' = '900 HEAD/NECK VESSEL INJURY*'
+    '903' = '903 ARM BLOOD VESSEL INJURY*'
+    '904' = '904 BLOOD VESSEL INJURY NEC*'
+    '908' = '908 LATE EFF INJURY NEC/NOS*'
+    '910' = '910 SUPERFICIAL INJURY HEAD*'
+    '911' = '911 SUPERFICIAL INJURY TRUNK*'
+    '912' = '912 SUPERFIC INJ SHOULDR/ARM*'
+    '913' = '913 SUPERFICIAL INJ FOREARM*'
+    '914' = '914 SUPERFICIAL INJ OF HAND*'
+    '915' = '915 SUPERFICIAL INJ FINGER*'
+    '916' = '916 SUPERFICIAL INJ HIP/LEG*'
+    '917' = '917 SUPERFICIAL INJ FOOT/TOE*'
+    '918' = '918 SUPERFIC INJ EYE/ADNEXA*'
+    '919' = '919 SUPERFICIAL INJ OTH SITE*'
+    '920' = '920 CONTUSION FACE/SCALP/NCK'
+    '921' = '921 CONTUSION EYE & ADNEXA*'
+    '922' = '922 CONTUSION OF TRUNK*'
+    '923' = '923 CONTUSION OF UPPER LIMB*'
+    '924' = '924 CONTUSION LEG & OTH SITE*'
+    '927' = '927 CRUSHING INJ UPPER LIMB*'
+    '928' = '928 CRUSHING INJURY OF LEG*'
+    '929' = '929 CRUSH INJ MULT/UNSP SITE*'
+    '930' = '930 FOREIGN BODY EXTERN EYE*'
+    '931' = '931 FOREIGN BODY IN EAR'
+    '932' = '932 FOREIGN BODY IN NOSE'
+    '933' = '933 FB PHARYNX & LARYNX*'
+    '934' = '934 FB TRACHEA/BRONCHUS/LUNG*'
+    '935' = '935 FB MOUTH/ESOPHAG/STOMACH*'
+    '938' = '938 FOREIGN BODY GI NOS'
+    '940' = '940 BURN OF EYE & ADNEXA*'
+    '941' = '941 BURN OF HEAD/FACE/NECK*'
+    '942' = '942 BURN OF TRUNK*'
+    '943' = '943 BURN OF ARM*'
+    '944' = '944 BURN OF HAND & WRIST*'
+    '945' = '945 BURN OF LEG*'
+    '946' = '946 BURN OF MULTIPLE SITE*'
+    '947' = '947 BURN OF INTERNAL ORGANS*'
+    '949' = '949 BURN UNSPECIFIED*'
+    '952' = '952 SPINAL CORD INJ W/O FX*'
+    '954' = '954 INJURY OTH TRUNK NERVE*'
+    '955' = '955 INJ PERIPH NERV SHLD/ARM*'
+    '957' = '957 INJURY TO NERVE NEC/NOS*'
+    '958' = '958 EARLY COMPLIC OF TRAUMA*'
+    '959' = '959 INJURY NEC/NOS*'
+    '962' = '962 POISONING BY HORMONES*'
+    '963' = '963 POISONING-SYSTEMIC AGENT*'
+    '965' = '965 POIS-ANALGESIC/ANTIPYRET*'
+    '966' = '966 POISON-ANTICONVULSANTS*'
+    '974' = '974 POIS-WATER/MIN/METAB AGT*'
+    '977' = '977 POIS-MEDICINAL NEC/NOS*'
+    '980' = '980 ALCOHOL TOXICITY*'
+    '983' = '983 TOXIC EFFECT CAUSTICS*'
+    '984' = '984 TOXIC EFF LEAD & COMPND*'
+    '985' = '985 TOXIC EFFECT OTH METALS*'
+    '986' = '986 TOX EFF CARBON MONOXIDE'
+    '987' = '987 TOXIDE EFF GAS/VAPOR NEC*'
+    '988' = '988 TOXIC EFF NOXIOUS FOOD*'
+    '989' = '989 TOX EFF OTH NONMED SUBST*'
+    '990' = '990 EFFECTS RADIATION NOS'
+    '991' = '991 EFF REDUCED TEMPERATURE*'
+    '992' = '992 EFFECT OF HEAT/LIGHT*'
+    '993' = '993 EFFECTS OF AIR PRESSURE*'
+    '994' = '994 EFFECT EXTERNAL CAUS NEC*'
+    '995' = '995 CERTAIN ADVERSE EFF NEC*'
+    '996' = '996 REPLACE & GRAFT COMPLIC*'
+    '997' = '997 SURG COMPL-BODY SYST NEC*'
+    '998' = '998 OTH SURGICAL COMPL NEC*'
+    '999' = '999 COMPLIC MEDICAL CARE NEC*'
+    'V01' = 'V01 COMMUNICABLE DIS CONTACT*'
+    'V02' = 'V02 INFECTIOUS DIS CARRIER*'
+    'V03' = 'V03 VACCIN FOR BACTERIAL DIS*'
+    'V04' = 'V04 VACCIN FOR VIRAL DISEASE*'
+    'V05' = 'V05 OTH VACCIN FOR SINGL DIS*'
+    'V06' = 'V06 VAC FOR DIS COMBINATION*'
+    'V07' = 'V07 PROPHYLACTIC MEASURES*'
+    'V08' = 'V08 ASYMP HIV INFECTN STATUS'
+    'V10' = 'V10 HX OF MALIGNANT NEOPLASM*'
+    'V12' = 'V12 HX OF DISEASE NEC*'
+    'V13' = 'V13 HX OF OTHER DISEASES*'
+    'V15' = 'V15 OTH HX OF HEALTH HAZARDS*'
+    'V16' = 'V16 FAMILY HX-MALIGNANCY*'
+    'V17' = 'V17 FAM HX-CHR DISABLING DIS*'
+    'V18' = 'V18 FAM HX-OTH SPECIF COND*'
+    'V20' = 'V20 HEALTH SUPERVISION CHILD*'
+    'V21' = 'V21 CONSTITUT STATE IN DEVEL*'
+    'V22' = 'V22 NORMAL PREGNANCY*'
+    'V23' = 'V23 SUPERVIS HIGH-RISK PREG*'
+    'V24' = 'V24 POSTPARTUM CARE/EXAM*'
+    'V25' = 'V25 CONTRACEPTIVE MANAGEMENT*'
+    'V26' = 'V26 PROCREATIVE MANAGEMENT*'
+    'V28' = 'V28 ANTENATAL SCREENING*'
+    'V30' = 'V30 SINGLE LIVEBORN*'
+    'V40' = 'V40 MENTAL/BEHAVIORAL PROB*'
+    'V41' = 'V41 PROB W SPECIAL FUNCTIONS*'
+    'V42' = 'V42 ORGAN TRANSPLANT STATUS*'
+    'V43' = 'V43 ORGAN REPLACEMENT NEC*'
+    'V45' = 'V45 OTH POSTSURGICAL STATES*'
+    'V47' = 'V47 OTH PROBL W INTERNAL ORG*'
+    'V48' = 'V48 HEAD/NECK/TRUNK PROBLEMS*'
+    'V49' = 'V49 LIMB PROBLEM/PROBLEM NEC*'
+    'V50' = 'V50 OTHER ELECTIVE SURGERY*'
+    'V51' = 'V51 AFTERCARE W PLASTIC SURG'
+    'V52' = 'V52 FITTING OF PROSTHESIS*'
+    'V53' = 'V53 ADJUSTMENT OF OTH DEVICE*'
+    'V54' = 'V54 OTH ORTHOPEDIC AFTERCARE*'
+    'V55' = 'V55 ATTEN TO ARTIFICIAL OPEN*'
+    'V56' = 'V56 DIALYSIS ENCOUNTER*'
+    'V57' = 'V57 REHABILITATION PROCEDURE*'
+    'V58' = 'V58 ENCOUNTR PROC/AFTRCR NEC*'
+    'V59' = 'V59 DONOR*'
+    'V60' = 'V60 HOUSEHOLD CIRCUMSTANCES*'
+    'V61' = 'V61 OTH FAMILY CIRCUMSTANCES*'
+    'V62' = 'V62 OTH PSYCHOSOCIAL CIRCUM*'
+    'V63' = 'V63 NO MED FACILITY FOR CARE*'
+    'V65' = 'V65 OTHER REASON FOR CONSULT*'
+    'V66' = 'V66 CONVALESCENCE*'
+    'V67' = 'V67 FOLLOW-UP EXAMINATION*'
+    'V68' = 'V68 ADMINISTRATIVE ENCOUNTER*'
+    'V69' = 'V69 LACK OF PHYSICAL EXERCSE'
+    'V70' = 'V70 GENERAL MEDICAL EXAM*'
+    'V71' = 'V71 OBSERVATION-SUSPECT COND*'
+    'V72' = 'V72 SPECIAL EXAMINATIONS*'
+    'V74' = 'V74 SCREENING-BACTERIAL DIS*'
+    'V75' = 'V75 SCREEN-OTH INFECTIVE DIS*'
+    'V76' = 'V76 SCREENING-MALIG NEOPLASM*'
+    'V77' = 'V77 SCREEN-ENDO/NUTR/METAB*'
+    'V78' = 'V78 SCREENING FOR BLOOD DIS*'
+    'V80' = 'V80 SCREEN-NEURO/EYE/EAR DIS*'
+    'V82' = 'V82 SCREEN-OTHER CONDITIONS*'
+    ;
+ 
+  VALUE $I9PROXB  
+    '-1' = '-1 INAPPLICABLE'
+    '01' = '01 INCISE-EXCIS BRAIN/SKULL*'
+    '02' = '02 OTHER SKULL/BRAIN OPS*'
+    '03' = '03 SPINAL CORD & CANAL OPS*'
+    '04' = '04 CRAN & PERIPH NERVE OPS*'
+    '06' = '06 THYROID/PARATHYROID OPS*'
+    '07' = '07 OTH ENDOCRINE GLND OPS*'
+    '08' = '08 EYELID OPERATIONS*'
+    '09' = '09 LACRIMAL SYSTEM OP*'
+    '11' = '11 OPERATIONS ON CORNEA*'
+    '12' = '12 ANTERIOR SEGMENT OPS*'
+    '13' = '13 OPERATIONS ON LENS*'
+    '14' = '14 POSTERIOR SEGMENT OPS*'
+    '15' = '15 EXTRAOCULAR MUSCLE OPS*'
+    '16' = '16 ORBIT/EYEBALL OPS*'
+    '18' = '18 EXTERNAL EAR OPERATIONS*'
+    '19' = '19 MIDDLE EAR RECONSTRUCT*'
+    '20' = '20 OTHER MID & INNER EAR OP*'
+    '21' = '21 OPERATIONS ON NOSE*'
+    '22' = '22 NASAL SINUS OPERATIONS*'
+    '23' = '23 TOOTH REMOVAL & RESTORAT*'
+    '24' = '24 OTH OPS ON TEETH & GUMS*'
+    '25' = '25 OPERATIONS ON TONGUE*'
+    '27' = '27 OTHER MOUTH & FACE OPS*'
+    '28' = '28 TONSIL & ADENOID OPS*'
+    '29' = '29 OPERATIONS ON PHARYNX*'
+    '31' = '31 LARYNX TRACHEA OPS NEC*'
+    '32' = '32 LUNG & BRONCHUS EXCISION*'
+    '33' = '33 OTHER BRONCHIAL/LUNG OPS*'
+    '34' = '34 THORAX OPS EXCEPT LUNG*'
+    '35' = '35 HEART VALVES & SEPTA OPS*'
+    '36' = '36 OPS ON HEART VESSELS*'
+    '37' = '37 OTHER HEART/PERICARD OPS*'
+    '38' = '38 VESSEL INC/EXCIS/OCCLUS*'
+    '39' = '39 OTHER OPS ON VESSELS*'
+    '40' = '40 LYMPHATIC SYSTEM OPS*'
+    '41' = '41 BONE MARROW & SPLEEN OPS*'
+    '42' = '42 OPERATIONS ON ESOPHAGUS*'
+    '43' = '43 GASTRIC INCISION/EXCIS*'
+    '44' = '44 OTHER GASTRIC OPERATIONS*'
+    '45' = '45 INTEST INCIS/EXCIS/ANAST*'
+    '46' = '46 OTHER INTESTINAL OPS*'
+    '47' = '47 OPERATIONS ON APPENDIX*'
+    '48' = '48 RECTAL & PERIRECTAL OPS*'
+    '49' = '49 OPERATIONS ON ANUS*'
+    '50' = '50 OPERATIONS ON LIVER*'
+    '51' = '51 BILIARY TRACT OPERATION*'
+    '52' = '52 OPERATIONS ON PANCREAS*'
+    '53' = '53 REPAIR OF HERNIA*'
+    '54' = '54 OTHER ABDOMEN REGION OPS*'
+    '55' = '55 OPERATIONS ON KIDNEY*'
+    '56' = '56 OPERATIONS ON URETER*'
+    '57' = '57 URINARY BLADDER OPS*'
+    '60' = '60 PROSTATE & SEMIN VES OPS*'
+    '62' = '62 OPERATIONS ON TESTES*'
+    '63' = '63 SPERM CORD/EPID/VAS OPS*'
+    '64' = '64 OPERATIONS ON PENIS*'
+    '65' = '65 OPERATIONS ON OVARY*'
+    '66' = '66 FALLOPIAN TUBE OPERATION*'
+    '67' = '67 OPERATIONS ON CERVIX*'
+    '68' = '68 OTHER UTERINE INCIS/EXC*'
+    '69' = '69 OTHER UTERUS/SUPPORT OPS*'
+    '70' = '70 VAGINA & CUL-DE-SAC OPS*'
+    '71' = '71 VULVAR & PERINEAL OPS*'
+    '73' = '73 ASSIST/INDUCE DELIV NEC*'
+    '74' = '74 C-SECTION/REMOVAL FETUS*'
+    '75' = '75 OTHER OBSTETRIC OPS*'
+    '76' = '76 FACIAL BONE & JOINT OPS*'
+    '77' = '77 INCIS/EXCIS/DIV BONE NEC*'
+    '78' = '78 OTH BONE OPS EXCPT FACE*'
+    '79' = '79 REDUCTION FX/DISLOCATION*'
+    '80' = '80 INCISION/EXCISION JOINT*'
+    '81' = '81 JOINT REPAIR*'
+    '82' = '82 HAND MUSCL/TEND/FASC OPS*'
+    '83' = '83 OTHER MUS/TEN/FAS/BUR OP*'
+    '84' = '84 OTHER MUSCULOSKELET PROC*'
+    '85' = '85 OPERATIONS ON THE BREAST*'
+    '86' = '86 SKIN & SUBQ OPERATIONS*'
+    '87' = '87 DIAGNOSTIC RADIOLOGY*'
+    '88' = '88 OTHER DX RADIOLOGY*'
+    '89' = '89 INTERVIEW/CONSULT/EXAM*'
+    '90' = '90 MICROSCOPIC EXAM--I*'
+    '91' = '91 MICROSCOPIC EXAM--II*'
+    '92' = '92 NUCLEAR MEDICINE*'
+    '93' = '93 PT, REHAB & RELATED PROC*'
+    '94' = '94 PSYCHE RELATED PROCEDURE*'
+    '95' = '95 EYE & EAR DX/TREATMENT*'
+    '96' = '96 NON-OP INTUBAT & IRRIGAT*'
+    '97' = '97 REPLACE & REMOV DEVICES*'
+    '98' = '98 NONOP REMOVE FOREIGN BOD*'
+    '99' = '99 OTHER NONOPERATIVE PROC*'
+    ;
+
+ VALUE $CCCODXB  
+    '-1' = '-1 INAPPLICABLE'
+    '-8' = '-8 DK'
+    '001' = '001 TUBERCULOSIS'
+    '002' = '002 SEPTICEMIA (EXCEPT IN LABOR)'
+    '003' = '003 BACTERIAL INFECTION, UNSPECIFIED SIT'
+    '004' = '004 MYCOSES'
+    '005' = '005 HIV INFECTION'
+    '006' = '006 HEPATITIS'
+    '007' = '007 VIRAL INFECTION'
+    '008' = '008 OTHER INFECTIONS, INCLUDING PARASITI'
+    '009' = '009 SEXUALLY TRANSMITTED INFECTIONS (NOT'
+    '010' = '010 IMMUNIZATIONS AND SCREENING FOR INFE'
+    '011' = '011 CANCER OF HEAD AND NECK'
+    '012' = '012 CANCER OF ESOPHAGUS'
+    '013' = '013 CANCER OF STOMACH'
+    '014' = '014 CANCER OF COLON'
+    '015' = '015 CANCER OF RECTUM AND ANUS'
+    '016' = '016 CANCER OF LIVER AND INTRAHEPATIC BIL'
+    '017' = '017 CANCER OF PANCREAS'
+    '018' = '018 CANCER OF OTHER GI ORGANS, PERITONEU'
+    '019' = '019 CANCER OF BRONCHUS, LUNG'
+    '021' = '021 CANCER OF BONE AND CONNECTIVE TISSUE'
+    '022' = '022 MELANOMAS OF SKIN'
+    '023' = '023 OTHER NON-EPITHELIAL CANCER OF SKIN'
+    '024' = '024 CANCER OF BREAST'
+    '025' = '025 CANCER OF UTERUS'
+    '026' = '026 CANCER OF CERVIX'
+    '027' = '027 CANCER OF OVARY'
+    '028' = '028 CANCER OF OTHER FEMALE GENITAL ORGAN'
+    '029' = '029 CANCER OF PROSTATE'
+    '030' = '030 CANCER OF TESTIS'
+    '031' = '031 CANCER OF OTHER MALE GENITAL ORGANS'
+    '032' = '032 CANCER OF BLADDER'
+    '033' = '033 CANCER OF KIDNEY AND RENAL PELVIS'
+    '034' = '034 CANCER OF OTHER URINARY ORGANS'
+    '035' = '035 CANCER OF BRAIN AND NERVOUS SYSTEM'
+    '036' = '036 CANCER OF THYROID'
+    '037' = "037 HODGKIN'S DISEASE"
+    '038' = "038 NON-HODGKIN'S LYMPHOMA"
+    '039' = '039 LEUKEMIAS'
+    '040' = '040 MULTIPLE MYELOMA'
+    '041' = '041 CANCER, OTHER AND UNSPECIFIED PRIMAR'
+    '042' = '042 SECONDARY MALIGNANCIES'
+    '043' = '043 MALIGNANT NEOPLASM WITHOUT SPECIFICA'
+    '044' = '044 NEOPLASMS OF UNSPECIFIED NATURE OR U'
+    '045' = '045 MAINTENANCE CHEMOTHERAPY, RADIOTHERA'
+    '046' = '046 BENIGN NEOPLASM OF UTERUS'
+    '047' = '047 OTHER AND UNSPECIFIED BENIGN NEOPLAS'
+    '048' = '048 THYROID DISORDERS'
+    '049' = '049 DIABETES MELLITUS WITHOUT COMPLICATI'
+    '050' = '050 DIABETES MELLITUS WITH COMPLICATIONS'
+    '051' = '051 OTHER ENDOCRINE DISORDERS'
+    '052' = '052 NUTRITIONAL DEFICIENCIES'
+    '053' = '053 DISORDERS OF LIPID METABOLISM'
+    '054' = '054 GOUT AND OTHER CRYSTAL ARTHROPATHIES'
+    '055' = '055 FLUID AND ELECTROLYTE DISORDERS'
+    '056' = '056 CYSTIC FIBROSIS'
+    '057' = '057 IMMUNITY DISORDERS'
+    '058' = '058 OTHER NUTRITIONAL, ENDOCRINE, AND ME'
+    '059' = '059 DEFICIENCY AND OTHER ANEMIA'
+    '060' = '060 ACUTE POSTHEMORRHAGIC ANEMIA'
+    '061' = '061 SICKLE CELL ANEMIA'
+    '062' = '062 COAGULATION AND HEMORRHAGIC DISORDER'
+    '063' = '063 DISEASES OF WHITE BLOOD CELLS'
+    '064' = '064 OTHER HEMATOLOGIC CONDITIONS'
+    '065' = '065 MENTAL RETARDATION'
+    '066' = '066 ALCOHOL-RELATED MENTAL DISORDERS'
+    '067' = '067 SUBSTANCE-RELATED MENTAL DISORDERS'
+    '068' = '068 SENILITY AND ORGANIC MENTAL DISORDER'
+    '069' = '069 AFFECTIVE DISORDERS'
+    '070' = '070 SCHIZOPHRENIA AND RELATED DISORDERS'
+    '071' = '071 OTHER PSYCHOSES'
+    '072' = '072 ANXIETY, SOMATOFORM, DISSOCIATIVE, A'
+    '073' = '073 PREADULT DISORDERS'
+    '074' = '074 OTHER MENTAL CONDITIONS'
+    '075' = '075 PERSONAL HISTORY OF MENTAL DISORDER,'
+    '076' = '076 MENINGITIS (EXCEPT THAT CAUSED BY TU'
+    '077' = '077 ENCEPHALITIS (EXCEPT THAT CAUSED BY'
+    '078' = '078 OTHER CNS INFECTION AND POLIOMYELITI'
+    '079' = "079 PARKINSON'S DISEASE"
+    '080' = '080 MULTIPLE SCLEROSIS'
+    '081' = '081 OTHER HEREDITARY AND DEGENERATIVE NE'
+    '082' = '082 PARALYSIS'
+    '083' = '083 EPILEPSY, CONVULSIONS'
+    '084' = '084 HEADACHE, INCLUDING MIGRAINE'
+    '085' = '085 COMA, STUPOR, AND BRAIN DAMAGE'
+    '086' = '086 CATARACT'
+    '087' = '087 RETINAL DETACHMENTS, DEFECTS, VASCUL'
+    '088' = '088 GLAUCOMA'
+    '089' = '089 BLINDNESS AND VISION DEFECTS'
+    '090' = '090 INFLAMMATION, INFECTION OF EYE (EXCE'
+    '091' = '091 OTHER EYE DISORDERS'
+    '092' = '092 OTITIS MEDIA AND RELATED CONDITIONS'
+    '093' = '093 CONDITIONS ASSOCIATED WITH DIZZINESS'
+    '094' = '094 OTHER EAR AND SENSE ORGAN DISORDERS'
+    '095' = '095 OTHER NERVOUS SYSTEM DISORDERS'
+    '096' = '096 HEART VALVE DISORDERS'
+    '097' = '097 PERI-, ENDO-, AND MYOCARDITIS, CARDI'
+    '098' = '098 ESSENTIAL HYPERTENSION'
+    '099' = '099 HYPERTENSION WITH COMPLICATIONS AND'
+    '100' = '100 ACUTE MYOCARDIAL INFARCTION'
+    '101' = '101 CORONARY ATHEROSCLEROSIS AND OTHER H'
+    '102' = '102 NONSPECIFIC CHEST PAIN'
+    '103' = '103 PULMONARY HEART DISEASE'
+    '104' = '104 OTHER AND ILL-DEFINED HEART DISEASE'
+    '105' = '105 CONDUCTION DISORDERS'
+    '106' = '106 CARDIAC DYSRHYTHMIAS'
+    '107' = '107 CARDIAC ARREST AND VENTRICULAR FIBRI'
+    '108' = '108 CONGESTIVE HEART FAILURE, NONHYPERTE'
+    '109' = '109 ACUTE CEREBROVASCULAR DISEASE'
+    '110' = '110 OCCLUSION OR STENOSIS OF PRECEREBRAL'
+    '111' = '111 OTHER AND ILL-DEFINED CEREBROVASCULA'
+    '112' = '112 TRANSIENT CEREBRAL ISCHEMIA'
+    '113' = '113 LATE EFFECTS OF CEREBROVASCULAR DISE'
+    '114' = '114 PERIPHERAL AND VISCERAL ATHEROSCLERO'
+    '115' = '115 AORTIC, PERIPHERAL, AND VISCERAL ART'
+    '116' = '116 AORTIC AND PERIPHERAL ARTERIAL EMBOL'
+    '117' = '117 OTHER CIRCULATORY DISEASE'
+    '118' = '118 PHLEBITIS, THROMBOPHLEBITIS AND THRO'
+    '119' = '119 VARICOSE VEINS OF LOWER EXTREMITY'
+    '120' = '120 HEMORRHOIDS'
+    '121' = '121 OTHER DISEASES OF VEINS AND LYMPHATI'
+    '122' = '122 PNEUMONIA (EXCEPT THAT CAUSED BY TUB'
+    '123' = '123 INFLUENZA'
+    '124' = '124 ACUTE AND CHRONIC TONSILLITIS'
+    '125' = '125 ACUTE BRONCHITIS'
+    '126' = '126 OTHER UPPER RESPIRATORY INFECTIONS'
+    '127' = '127 CHRONIC OBSTRUCTIVE PULMONARY DISEAS'
+    '128' = '128 ASTHMA'
+    '129' = '129 ASPIRATION PNEUMONITIS, FOOD/VOMITUS'
+    '130' = '130 PLEURISY, PNEUMOTHORAX, PULMONARY CO'
+    '131' = '131 RESPIRATORY FAILURE, INSUFFICIENCY,'
+    '132' = '132 LUNG DISEASE DUE TO EXTERNAL AGENTS'
+    '133' = '133 OTHER LOWER RESPIRATORY DISEASE'
+    '134' = '134 OTHER UPPER RESPIRATORY DISEASE'
+    '135' = '135 INTESTINAL INFECTION'
+    '136' = '136 DISORDERS OF TEETH AND JAW'
+    '137' = '137 DISEASES OF MOUTH, EXCLUDING DENTAL'
+    '138' = '138 ESOPHAGEAL DISORDERS'
+    '139' = '139 GASTRODUODENAL ULCER (EXCEPT HEMORRH'
+    '140' = '140 GASTRITIS AND DUODENITIS'
+    '141' = '141 OTHER DISORDERS OF STOMACH AND DUODE'
+    '142' = '142 APPENDICITIS AND OTHER APPENDICEAL C'
+    '143' = '143 ABDOMINAL HERNIA'
+    '144' = '144 REGIONAL ENTERITIS AND ULCERATIVE CO'
+    '145' = '145 INTESTINAL OBSTRUCTION WITHOUT HERNI'
+    '146' = '146 DIVERTICULOSIS AND DIVERTICULITIS'
+    '147' = '147 ANAL AND RECTAL CONDITIONS'
+    '148' = '148 PERITONITIS AND INTESTINAL ABSCESS'
+    '149' = '149 BILIARY TRACT DISEASE'
+    '151' = '151 OTHER LIVER DISEASES'
+    '152' = '152 PANCREATIC DISORDERS (NOT DIABETES)'
+    '153' = '153 GASTROINTESTINAL HEMORRHAGE'
+    '154' = '154 NONINFECTIOUS GASTROENTERITIS'
+    '155' = '155 OTHER GASTROINTESTINAL DISORDERS'
+    '156' = '156 NEPHRITIS, NEPHROSIS, RENAL SCLEROSI'
+    '157' = '157 ACUTE AND UNSPECIFIED RENAL FAILURE'
+    '158' = '158 CHRONIC RENAL FAILURE'
+    '159' = '159 URINARY TRACT INFECTIONS'
+    '160' = '160 CALCULUS OF URINARY TRACT'
+    '161' = '161 OTHER DISEASES OF KIDNEY AND URETERS'
+    '162' = '162 OTHER DISEASES OF BLADDER AND URETHR'
+    '163' = '163 GENITOURINARY SYMPTOMS AND ILL-DEFIN'
+    '164' = '164 HYPERPLASIA OF PROSTATE'
+    '165' = '165 INFLAMMATORY CONDITIONS OF MALE GENI'
+    '166' = '166 OTHER MALE GENITAL DISORDERS'
+    '167' = '167 NONMALIGNANT BREAST CONDITIONS'
+    '168' = '168 INFLAMMATORY DISEASES OF FEMALE PELV'
+    '169' = '169 ENDOMETRIOSIS'
+    '170' = '170 PROLAPSE OF FEMALE GENITAL ORGANS'
+    '171' = '171 MENSTRUAL DISORDERS'
+    '172' = '172 OVARIAN CYST'
+    '173' = '173 MENOPAUSAL DISORDERS'
+    '174' = '174 FEMALE INFERTILITY'
+    '175' = '175 OTHER FEMALE GENITAL DISORDERS'
+    '176' = '176 CONTRACEPTIVE AND PROCREATIVE MANAGE'
+    '177' = '177 SPONTANEOUS ABORTION'
+    '178' = '178 INDUCED ABORTION'
+    '179' = '179 POSTABORTION COMPLICATIONS'
+    '180' = '180 ECTOPIC PREGNANCY'
+    '181' = '181 OTHER COMPLICATIONS OF PREGNANCY'
+    '182' = '182 HEMORRHAGE DURING PREGNANCY, ABRUPTI'
+    '183' = '183 HYPERTENSION COMPLICATING PREGNANCY,'
+    '184' = '184 EARLY OR THREATENED LABOR'
+    '186' = '186 DIABETES OR ABNORMAL GLUCOSE TOLERAN'
+    '191' = '191 POLYHYDRAMNIOS AND OTHER PROBLEMS OF'
+    '195' = '195 OTHER COMPLICATIONS OF BIRTH, PUERPE'
+    '196' = '196 NORMAL PREGNANCY AND/OR DELIVERY'
+    '197' = '197 SKIN AND SUBCUTANEOUS TISSUE INFECTI'
+    '198' = '198 OTHER INFLAMMATORY CONDITION OF SKIN'
+    '199' = '199 CHRONIC ULCER OF SKIN'
+    '200' = '200 OTHER SKIN DISORDERS'
+    '201' = '201 INFECTIVE ARTHRITIS AND OSTEOMYELITI'
+    '202' = '202 RHEUMATOID ARTHRITIS AND RELATED DIS'
+    '203' = '203 OSTEOARTHRITIS'
+    '204' = '204 OTHER NON-TRAUMATIC JOINT DISORDERS'
+    '205' = '205 SPONDYLOSIS, INTERVERTEBRAL DISC DIS'
+    '206' = '206 OSTEOPOROSIS'
+    '207' = '207 PATHOLOGICAL FRACTURE'
+    '208' = '208 ACQUIRED FOOT DEFORMITIES'
+    '209' = '209 OTHER ACQUIRED DEFORMITIES'
+    '210' = '210 SYSTEMIC LUPUS ERYTHEMATOSUS AND CON'
+    '211' = '211 OTHER CONNECTIVE TISSUE DISEASE'
+    '212' = '212 OTHER BONE DISEASE AND MUSCULOSKELET'
+    '213' = '213 CARDIAC AND CIRCULATORY CONGENITAL A'
+    '214' = '214 DIGESTIVE CONGENITAL ANOMALIES'
+    '215' = '215 GENITOURINARY CONGENITAL ANOMALIES'
+    '216' = '216 NERVOUS SYSTEM CONGENITAL ANOMALIES'
+    '217' = '217 OTHER CONGENITAL ANOMALIES'
+    '218' = '218 LIVEBORN'
+    '219' = '219 SHORT GESTATION, LOW BIRTH WEIGHT, A'
+    '220' = '220 INTRAUTERINE HYPOXIA AND BIRTH ASPHY'
+    '222' = '222 HEMOLYTIC JAUNDICE AND PERINATAL JAU'
+    '223' = '223 BIRTH TRAUMA'
+    '224' = '224 OTHER PERINATAL CONDITIONS'
+    '225' = '225 JOINT DISORDERS AND DISLOCATIONS, TR'
+    '226' = '226 FRACTURE OF NECK OF FEMUR (HIP)'
+    '227' = '227 SPINAL CORD INJURY'
+    '228' = '228 SKULL AND FACE FRACTURES'
+    '229' = '229 FRACTURE OF UPPER LIMB'
+    '230' = '230 FRACTURE OF LOWER LIMB'
+    '231' = '231 OTHER FRACTURES'
+    '232' = '232 SPRAINS AND STRAINS'
+    '233' = '233 INTRACRANIAL INJURY'
+    '234' = '234 CRUSHING INJURY OR INTERNAL INJURY'
+    '235' = '235 OPEN WOUNDS OF HEAD, NECK, AND TRUNK'
+    '236' = '236 OPEN WOUNDS OF EXTREMITIES'
+    '237' = '237 COMPLICATION OF DEVICE, IMPLANT OR G'
+    '238' = '238 COMPLICATIONS OF SURGICAL PROCEDURES'
+    '239' = '239 SUPERFICIAL INJURY, CONTUSION'
+    '240' = '240 BURNS'
+    '242' = '242 POISONING BY OTHER MEDICATIONS AND D'
+    '243' = '243 POISONING BY NONMEDICINAL SUBSTANCES'
+    '244' = '244 OTHER INJURIES AND CONDITIONS DUE TO'
+    '245' = '245 SYNCOPE'
+    '246' = '246 FEVER OF UNKNOWN ORIGIN'
+    '247' = '247 LYMPHADENITIS'
+    '248' = '248 GANGRENE'
+    '249' = '249 SHOCK'
+    '250' = '250 NAUSEA AND VOMITING'
+    '251' = '251 ABDOMINAL PAIN'
+    '252' = '252 MALAISE AND FATIGUE'
+    '253' = '253 ALLERGIC REACTIONS'
+    '254' = '254 REHABILITATION CARE, FITTING OF PROS'
+    '255' = '255 ADMINISTRATIVE/SOCIAL ADMISSION'
+    '256' = '256 MEDICAL EXAMINATION/EVALUATION'
+    '257' = '257 OTHER AFTERCARE'
+    '258' = '258 OTHER SCREENING FOR SUSPECTED CONDIT'
+    '259' = '259 RESIDUAL CODES, UNCLASSIFIED'
+    ;

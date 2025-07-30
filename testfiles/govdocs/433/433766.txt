@@ -1,0 +1,177 @@
+Title: Monitoring RetrieveDocuments                                Page 1 of  
+Date Prepared: October 16, 1995         
+	       April 3, 1996
+
+Priority: Routine
+Document Affected:  Design (1.52)
+Paragraphs Affected:   
+
+References:  RFC for Detection Thresholds
+	      (also modifies RetrieveDocuments() operation on DCI)
+
+Change Required:
+---------------
+	Modify the RetrieveDocuments operation to allow users to:
+		1.  Receive updates on the progress of their query.
+		2.  Discontinue the search initiated by their query.
+
+
+Specific Recommendation:
+-----------------------
+			      
+(new object) Section 7.1;
+
+	Class Monitor
+	Components
+	    StatusType:  one of {NumDocs (number of documents processed),
+			         Time (estimated time completed - in seconds)
+			         Percent (% of documents processed)
+			        }
+	    IntervalType: one of {NumDocs (number of documents processed),
+			          Time (interval in seconds between status reports),
+			          Percent (% of documents processed)
+			         }
+	    Interval:  integer
+	    ClientData: set of string
+
+	Operations
+	    CreateMonitor(StatusType :one of{NumDocs,Time, Percent},
+			  IntervalType : one of {NumDocs,Time, Percent}
+			  Interval : integer, 
+			  ClientData : set of String): Monitor
+
+	    MonitorProgress(Monitor, 
+			    DCIName: String, 
+			    Status: integer,
+		    	    MaxStatus: integer, 
+		   	    Type: one of{NumDocs, Time, Percent}) : boolean
+
+	The Monitor object is intended as an advisory object in the
+	TIPSTER Architecture.  If no Monitor object is provided,
+	no monitoring or interruption of the RetrieveDocuments
+	operations is possible.  The RetrieveDocuments operation will
+	not fail due solely to the absence of a nil Monitor argument.
+
+Title: Monitoring RetrieveDocuments 				Page 2 of  
+
+
+	If a user wishes to monitor the progress of their requests to
+	a TIPSTER Detection System, they must have a Monitor object
+	implementation.  The Monitor object will be passed as an
+	argument to the RetrieveDocuments operation, to indicate the
+	preferred progress monitoring options. 
+
+	The StatusType component indicates the type of progress report
+	requested by the user.  If the Detection System does not
+	support the requested type, the Detection System shall provide
+	a reasonable default type and indicate the provided type via
+	input to the MonitorProgress operation.
+
+	The IntervalType component indicates the desired type of
+	interval for receiving progress updates.  The IntervalType may
+	differ from the StatusType.
+
+	The Interval component indicates the frequency with which the
+	Detection System shall provide progress status information.
+	The Interval shall be an integer value and shall correlate to 
+	the IntervalType requested.   For example, if the IntervalType 
+	is "Percent" and the Interval is 5, the Detection system will
+	provide progress reports on the search operation every time it
+	processes an additional 5% of the database's Documents.
+
+	The ClientData component is provided to allow users to pass
+	their own information into the MonitorProgress operation via
+	the Monitor object.  This data is not accessed or expected by
+	the Detection System.
+
+	The MonitorProgress operation is called by the TIPSTER search
+	engine to convey the search status information to the
+	interface in an appropriate manner.  The search status is
+	represented by the parameters to MonitorProgress operation.
+
+	    The "DCIName" is the name of the DocumentCollectionIndex
+	    for which the status information is being provided.
+
+	    The "Status" parameter represents the current status in a
+	    manner consistent with the indicated "Type".    
+
+	    The "MaxStatus" parameter indicates the maximum possible
+	    "Status" value may have for "DCIName".  
+
+	    The function's "Type" parameter represents the type of
+	    progress update provided to the function.  
+
+	The MonitorProgress operation returns a boolean value to the
+	TIPSTER search engine.  If MonitorProgress returns FALSE, the
+	search operation will be terminated.  If MonitorProgress
+	returns TRUE, the search operation will continue.
+
+
+Title: Monitoring RetrieveDocuments                                Page 3 of  
+
+
+(modify operation) Section 7
+     DocumentCollectionIndex 
+      ...
+
+     RetrieveDocuments(sequence of DocumentCollectionIndex, 
+		       RetrievalQuery,  
+		       NumberToRetrieve : integer,
+		       Monitor or nil) : Collection or nil
+		       
+	Returns a collection of Documents (of maximal length
+	NumberToRetrieve) which are most closely related to the
+	DetectionNeed from which the RetrievalQuery is derived.
+
+	The DocumentCollectionIndex will provide progress updates as
+	requested by the Monitor object during the query evaluation
+	process.  If the DocumentCollectionIndex is unable to provide
+	progress updates in strict accordance with the Monitor object,
+	reasonable defaults will be applied by the
+	DocumentCollectionIndex. 
+ 
+	A nil Monitor argument indicates no progress monitoring or
+	interruption is requested for the operation.
+
+	If the operation is cancelled via the Monitor object's
+	MonitorProgress operation, a Collection of the currently
+	accumulated Documents will be returned to the caller.  The
+	resultant Collection may be empty or nil dependent depending
+	on the underlying search engine and/or the amount of progress
+	made.
+
+
+Reason for Proposed Change:
+--------------------------
+
+     A DocumentCollectionIndex can be used to query a set of
+     Collections for Documents relevant to an information need
+     (DetectionNeed).  For large DocumentCollectionIndexes, the
+     function RetrieveDocuments may take a long time to complete.
+
+     It would be useful to provide users with some intermediate
+     progress updates representing how much of the query evaluation
+     process has completed.  This functionality serves 3 purposes:
+
+	1.  It informs the user that useful work is still being done
+	    by the Detection system.
+
+	2.  It gives the user a gauge to determine whether to wait for
+	    the reply, or return for the response at some future time.
+
+	3.  It allows the user the option to discontinue the search
+	    for relevant documents.
+    
+     There is no mechanism outside the TIPSTER Architecture which
+     would allow TIPSTER system to provide this type of progress
+     monitoring ane interruption to  users. 
+
+Title: Monitoring RetrieveDocuments                                Page 4 of  
+
+Applications Affected:
+
+Change Requested By:
+    Organization: 		University of Massachusetts
+    Name:  			Kathleen S. DiBella
+    Phone Number:   		(413)545-9781
+    Date:	 

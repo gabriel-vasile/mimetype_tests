@@ -1,0 +1,1656 @@
+Filename=akdata.ans
+                              
+                              
+             Organic Geochemistry Data of Alaska
+                   Database Documentation
+
+       By Charles N. Threlkeld1 and Raymond C. Obuch2
+                              
+              1USGS Central Region Energy Team
+                      Box 25034, MS 977
+                      Denver, CO 80225
+                  http://energy.cr.usgs.gov
+                     cthrelkeld@usgs.gov
+                              
+              2USGS Central Region Energy Team
+                      Box 25034, MS 939
+                      Denver, CO 80225
+                       obuch@usgs.gov
+
+
+Any  use  of trade, product or firm names in this publication  is
+for  descriptive purposes only and does not imply endorsement  by
+the U. S. Government.
+
+                          CONTENTS
+                              
+
+
+Overview and Background
+Relational Database Tables, Structures and Definitions
+Index and Encoding Schemes
+Appendix A -- Definitions of Some Commonly Used Terms
+Appendix B -- Manufacturers of Products and Services Mentioned
+
+                   OVERVIEW AND BACKGROUND
+                              
+
+    The  U.S.  Geological Survey (USGS) Central Energy  Resources
+Team’s  Organic Geochemistry Laboratory (CERTOGL) is  a  research
+laboratory  devoted  to  the  investigation  of  the  origin  and
+occurrence of fossil fuels. One such study involved the petroleum
+potential of the National Petroleum Reserve in Alaska (1988).  In
+order  to  archive geochemical results of this  study,  the  USGS
+developed an Alaskan Organic Geochemical Database (AOGDB) in 1978
+to  house  the data generated from USGS laboratories and  various
+sub-contracted laboratories.  The accumulated data resided  in  a
+flat  text  file entitled “PGS” and was originally maintained  by
+Petroleum Information Corporation.  The information herein  is  a
+breakout  and creation of tables from the master flat  file  form
+into  a relational database format.  No electronic data, such  as
+chromatograms,  are  available for  this  data  file.  Additional
+information  about  “PGS”  and  Alaska  geochemistry   data   and
+interpretation can be obtained in Geology and Exploration of  the
+National   Petroleum   Reserve   in   Alaska,   1974-1982,   USGS
+Professional Paper 1399 (see the sections by Claypool and  Magoon,
+p. 451-481, and Magoon and Claypool, p. 519-549.)
+
+    The  database  management software  originally  used  in  the
+creation of the AOGDB is MicroRim Corporation's RBase for DOS,  a
+database  package designed for use on IBM XT or AT or  equivalent
+computers  with MS-DOS or equivalent disk operating systems.  The
+AOGDB  consists  of  Rbase tables, which have  subsequently  been
+converted  to  Microsoft Access 97 tables and ASCII tables.  Each
+table  consists  of  vertical  columns  and  horizontal  rows  of
+information where each row represents one sample and the  columns
+within  each row represent specific information about the sample.
+There  is  only  one  driving table: HEADER_PGS,  which  contains
+generic  sample information and permits a relational  pathway  to
+the  data  tables  via the primary key: WMO (derived  from  World
+Meteorological Organization and the American Petroleum Institute;
+see below.)
+
+    There  can  be  any  number  of data  tables,  one  for  each
+analytical  technique that produces data in some numeric  format.
+The  USGS  AOGDB  has 19 data tables and one  legend  table  that
+attempts  to  correlate tabular information back to the  original
+PGS  notations.  Additionally, five other tables exist from which
+a  number  of  elements were transferred to  form  parts  of  the
+HEADER_PGS table.  The tables below are the breakout products  of
+the PGS flat file.
+
+
+HDSP_13c_40_PGS          13C, D, and 34S stable isotopes of
+                         headspace gas.
+WHLOIL_13C_65_PGS        13C stable isotopes of whole oils.
+SAT_ARO_13C_39_PGS       13C stable isotopes of saturate and
+                         aromatic fractions.
+COMMENTS_PGS             Sample/analytical comments.
+ELEM_36_PGS              Weight percent carbon, nitrogen,
+                         hydrogen and ash.
+ELEM_37_PGS              Weight percent oxygen, sulfur, and ash.
+FRAC_2930_PGS            Weight percent saturates, aromatics, and
+                         non-hydrocarbon fractions.
+CANGAS_8081_PGS          Chemical analyses of canned
+                         headspace gas.
+GASRNG_23_PGS            C5–C8 gasoline range components by gas
+                         chromatography.
+GC_3162_PGS              C7-C35 paraffin range components by gas
+                         chromatography.
+HEADER_PGS               Location, lithology, age, and rock unit
+                         information.
+ISOT_38_PGS              34S, 15N Stable isotopes of saturates
+                         and ashpaltenes.
+LEGEND_PGS               Correlates to PGS analytical tables
+                         (contained herein).
+MASTER_PGS               Every code in the data file and the
+                         COMMENTS_PGS comments field.
+RKEV_41_PGS              Standard Rock-Eval pyrolysis data.
+SPGR_60_PGS              Specific gravity of oils.
+TAI_35_PGS               Thermal alteration index of
+                         macerals.
+TC_TOC_2728_PGS          Weight percent total carbon and total
+                         organic carbon values.
+TEAFID_26_PGS            Percent volatiles, tmax, and hydrocarbon
+                         yield (thermal evolution analysis).
+VISKER_34_PGS            Visual kerogen analysis.
+VITREF_33_PGS            Vitrinite reflectance analysis.
+
+
+   Please note that throughout the text part of this document
+UNDERLINED words are actual table names and BOLD words are table
+elements (field/column titles).
+
+   The data tables are structured such that the first four
+columns of each data table are identical in structure and provide
+a linking "key" to the HEADER_PGS table. Note that the column
+entitled RC_* is not present in the HEADER_PGS table but exists
+in all the Data tables.  The internal "key" for the AOGDB is the
+WMO reference number.
+   The WMO number is a concatenation of four basic components:
+WSC UNIQ HCST and SEQ and is derived by combining the World
+Meteorological Organization’s global quadrant naming convention
+with the American Petroleum Institute’s naming convention for
+wells.  Please also note that the API number for wells lies
+between the second and fifteenth position of the WMO number. The
+following explains the formation of the WMO number: (note: these
+are not table elements)
+
+   1. WSC (World, State, County).  Text field formed by the World
+State County combined codes of the WMO number. Samples collected
+within the U.S.A (including Alaska, Hawaii, and its Exclusive
+Economic Zones (EEZ)) are identified by the world quadrant number
+of “9,” then a two digit state code followed by a three digit
+county code. In instances of samples received outside the U.S.A
+or the EEZ, the State and county codes become pseudo State and
+county codes by substituting two digits of latitude for the State
+code and three digits of longitude for the county code. The six
+digits in the WSC are the first 6 digits in the WMO number.
+   2. UNIQ (unique well number).  The unique part of an API well
+number.  In the case of outcrops, the UNIQ value becomes a serial
+five-digit number greater than 94999.  The UNIQ part of the WMO
+number contains five digits beginning at the 7th position of the
+WMO number.
+   3. HCST (hole change side track).  Side Track and Hole Change.
+The HCST field consists of four digits and begins at the 12th
+position of the WMO number.  It is normally “0000.”
+   4. SEQ (sequence).  The last four digits of the WMO number.
+Provides for multiple (9999) samples from one location.  This
+part begins at the 16th position of the WMO number.
+
+
+The data types used in the following tables are:
+
+   Type             Character length
+
+   Text             0-255
+   Integer          1-9
+   Real             1-9
+   Double           1-16
+
+
+   RELATIONAL DATABASE TABLES, STRUCTURES, AND DEFINITIONS
+
+
+To minimize the database size, many text fields are encoded.
+Refer to the section Encoding Schemes on page 30 for more
+information.
+
+
+   Table HEADER_PGS contains information about the sample
+including latitude, longitude, location, elevation, depth, other
+location information, sample identification, sample type(s),
+lithology, formation names and ages, well and outcrop (surface)
+samples, and any additional information.  All of these data
+elements are contained in the HEADER_PGS table.  In addition, the
+table contains other information that may be used in data
+retrieval for specialized reports, charts, and maps.  HEADER_PGS
+contains information from a number of the original tables in the
+original PGS flat file.
+
+Table HEADER_PGS column definitions (Record Count: 22,326)
+
+#  Field Name       Data Type      Field Length (Characters)
+1  WMO              Text                20
+2  API              Text                14
+3  LABNO            Text                8
+4  DI_B001          Text                6
+5  M1               Text                1
+6  TOP              Number (Double)     8
+7  BOT              Number (Double)     8
+8  STY              Text                2
+9  CONTAINER        Text                6
+10 ADDNL            Text                17
+11 SAMPID           Text                40
+12 ELEV             Text                10
+13 TLD              Text                7
+14 WELCLAS          Text                2
+15 SRT              Text                10
+16 LAT              Number (Double)     8
+17 LONG             Number (Double)     8
+18 FAGE             Text                4
+19 FUNIT            Text                4
+20 LC_R020          Text                4
+21 LITHO1           Text                20
+22 P1               Text                4
+23 LITHO2           Text                20
+24 P2               Text                4
+25 LITHO3           Text                20
+26 P3               Text                4
+27 LITHO4           Text                20
+28 P4               Text                4
+29 CONTAM1          Text                20
+30 CP1              Text                4
+31 CONTAM2          Text                20
+32 CP2              Text                4
+33 POR              Text                1
+34 SHO              Text                1
+35 SWT              Text                4
+
+Description of elements:
+
+1  WMO         Modified form of the API number.
+2  API         Unique American Petroleum Institute Well Number.
+3  LABNO       Prime Contractor’s (USGS) Lab number.
+4  DI_B001     Date sample entered into system.  A login date.
+5  M1          Metric or English indicator units (depths, etc.)
+6  TOP         Top depth of sampled interval (if from a well).
+7  BOT         Bottom depth of sampled interval (or blank if spot
+               sample).
+8  STY         Sample source or type code (core, cuttings,
+               gas, etc.)
+9  CONTAINER   External/Internal condition (ec, ic, ad codes) of
+               container.
+10 ADDNL       Additional comments, fieldnames, special ID’s.
+11 SAMPID      Sample identification: either a well number and
+               name (if from a well database), or the submitter's field
+               sample name [if an outcrop (surface) sample.]
+12 ELEV        Elevation of well or outcrop (units as in M1).
+13 TLD         Total depth (if from a well).
+14 WELCLAS     Well Class (unknown encoding scheme).
+15 SRT         For samples within the U.S., the Township direction
+               (D), Township (NNN), Range direction, Range, and
+               section number in the following format:
+               DNNNDNNNNN.
+16 LAT         Latitude, 5 decimals.
+17 LONG        Longitude, 5 decimals.
+18 FAGE        Formation age code.
+19 FUNIT       Formation name code.
+20 LC_R020     Lab Code Notation in PGS.
+21 LITHO1      Gross lithology #1 Encoded text field.
+22 P1          Percent of lithology #1.
+23 LITHO2      Gross lithology #2 Encoded text field.
+24 P2          Percent of lithology #2.
+25 LITHO3      Gross lithology #3 Encoded text field.
+26 P3          Percent of lithology #3.
+27 LITHO4      Gross lithology #4 Encoded text field.
+28 P4          Percent of lithology #4
+29 CONTAM1     Contaminant  #1 Encoded text field.
+30 CP1         Percent of contaminant #1.
+31 CONTAM2     Contaminant  #2 Encoded text field.
+32 CP2         Percent of contaminant #2.
+33 POR         Gross porosity code.
+34 SHO         Gross SHOW code.
+35 SWT         Sample Weight.
+
+   The HEADER_PGS table contains one row per sample, each row
+comprised of all 35 columns as defined above.
+
+
+   The table HDSP_13C_40_PGS contains data on the stable carbon
+isotopic signature (13C) of headspace gas.  The number “40” in
+the table references the old PGS code of 040 for this analysis.
+The leading 7 characters of the HDSP_13C_40_PGS table attempt to
+convey that this table consists of stable carbon isotopic values
+on headspace (HDSP) gas.
+
+Table HDSP_13C_40_PGS column definitions (Record Count: 548)
+
+#  Field Name       Data Type      Field Length (Characters)
+1  WMO              TEXT                    20
+2  RC_R040          TEXT                     7
+3  LC_R040          TEXT                     4
+4  DO_R040          TEXT                     6
+5  C13_HDSP         TEXT                     8
+
+Description of the Elements:
+
+1  WMO         Modified form of the API number.
+2  RC_R040     The old PGS record code for this analysis.  Note
+               that the lower case “r” originally implied that the
+               original sample fraction received into the lab was
+               a rock sample.  In this instance, even though a
+               gas sample was analyzed, it originated from the
+               desorption of a canned core (rock) sample.
+3  LC_R040     A code depicting the subcontracting laboratory in
+               which the sample was analyzed.
+4  DO_R040     Assumed to be the date of completion of the
+               analysis or the date the data was encoded into the file.
+5  C13_HDSP    Parts per thousand  from the international
+               standard(PeeDee Belemnite) PDB.  Note: Several isotope
+               values were reported without the negative (“-“)
+               notation.  These values were, in all likelihood,
+               improperly keypunched into the system.  This
+               observer thinks that in fact, no positive values
+               exist in this data set.  No attempt has been made
+               here to remedy this oversight.
+
+
+The Table WHLOIL_13C_65_PGS contains information on the Stable
+Carbon Isotopes of Whole Oils.  The last six digits of the table
+name relate to the old PGS analytical code of 065 for this
+analysis.
+
+Table WHLOIL_13C_65_PGS column definitions (Record Count: 112)
+
+#  Field Name       Data Type      Field Length (Characters)
+1  WMO              TEXT                20
+2  RC_o065          TEXT                7
+3  LC_o065          TEXT                4
+4  DO_o065          TEXT                6
+5  13CWHOIL         TEXT                8
+
+Description of the Elements:
+  
+1  WMO       Modified form of the API number.
+2  RC_o065   Old PGS record code for this analysis.  Note that
+             the lower case “o” implied that the original
+             sample fraction received into the lab was an oil
+             sample.
+3  LC_o065   A code depicting the subcontracting laboratory in
+             which the sample was analyzed.
+4  DO_o065   Assumed to be the date of completion of the
+             analysis or the date the data was encoded into the file.
+5  13CWHLOIL Delta stable carbon isotopic value in parts
+             per thousand  variance from that of the international
+             standard: PDB.
+           
+
+   The table SAT_ARO_13C_39_PGS contains information on the
+Stable Carbon Isotopes of the C15+ saturate and C15+ aromatic
+hydrocarbon fractions of oils and rock extracts. This table is a
+combination of the old PGS r039 and o039 data tables.
+
+Table SAT_ARO_13C_39_PGS column definitions (Record Count: 805)
+
+#  Field Name       Data Type      Field Length (Characters)
+1  WMO              TEXT                20
+2  RC_039           TEXT                7
+3  LC_039           TEXT                4
+4  DO_039           TEXT                6
+5  C13_S15          TEXT                8
+6  C13_A15          TEXT                8
+
+Description of the Elements:
+
+1  WMO       Modified form of the API number.
+2  RC_039    The old PGS record code for this analysis.  Note
+             that there exists no lower-case designation for (r)ock
+             samples or (o)il samples as in other tables.
+3  LC_039    A code depicting the subcontracting laboratory in
+             which the sample was analyzed.
+4  DO_039    Assumed to be the date of completion of the
+             analysis or the date the data was encoded into the file.
+5  C13_S15   The delta 13C stable isotopic value in parts per
+             thousand variance from that of the international
+             standard: PDB of the C15+ saturate fraction.
+6  C13_A15   The delta 13C stable isotopic value in parts per
+             thousand variance from that of the international
+             standard: PDB of the C15+ aromatic fraction.
+           
+
+The table COMMENTS_PGS is a forum for the contracting lab to make
+statements regarding the sample condition, analytical technique,
+or to list problems encountered with the sample. Preserved in the
+table are the original API values before they were modified to
+WMO numbers. NOTE: The comment field of this table has been
+transferred to the MASTER_PGS table to facilitate the use of the
+comments field in data table lookups to insure the sample
+integrity.
+
+Table COMMENTS_PGS column definitions (Record Count: 2,698)
+
+#  Field Name       Data Type      Field Length (Characters)
+1  WMO              TEXT                20
+2  API              TEXT                14
+3  SQ               TEXT                4
+4  RECNO            TEXT                7
+5  COMMENT          TEXT                40
+6  FILDTE           TEXT                6
+
+Description of the Elements:
+
+1  WMO         Modified form of the API number.
+2  API         The original API designation of the sample in PGS.
+3  SQ          The Original sequence number in PGS.
+4  RECNO       The original record number in PGS.
+5  COMMENT     Any Comment regarding the sample.
+6  FILDTE      Filing date of the comment.
+
+The table ELEM_36_PGS contains information on the elemental
+composition of a sample including carbon, hydrogen, nitrogen, and
+ash.
+
+Table ELEM_36_PGS column definitions (Record Count: 1,813)
+
+#  Field Name       Data Type      Field Length (Characters)
+1  WMO              Text                20
+2  RC_R036          Text                7
+3  LC_R036          Text                4
+4  DO_R036          Text                6
+5  WPCT_C           Number (Double)     8
+6  WPCT_H           Number (Double)     8
+7  WPCT_N           Number (Double)     8
+8  WPCT_ASH         Number (Double)     8
+
+Description of the Elements:
+
+1  WMO         Modified form of the API number.
+2  RC_R036     The old PGS record code for this analysis.
+3  LC_R036     A code depicting the subcontracting laboratory in
+               which the sample was analyzed.
+4  DO_R036     Assumed to be the date of completion of the
+               analysis or the date the data was encoded into the file.
+5  WPCT_C      Weight Percent carbon.
+6  WPCT_H      Weight Percent hydrogen.
+7  WPCT_N      Weight Percent nitrogen.
+8  WPCT_ASH    Weight Percent ash.
+
+
+The table: ELEM_37_PGS contains information on the elemental
+composition of the sample including sulfur and oxygen.
+
+
+Table ELEM_37_PGS column definitions (Record Count: 910)
+
+#  Field Name       Data Type      Field Length (Characters)
+1  WMO              Text                20
+2  RC_R037          Text                7
+3  LC_R037          Text                4
+4  DO_R037          Text                6
+5  WPCT_O           Number (Double)     8
+6  WPCT_S           Number (Double)     8
+7  ASH_WPCT         Number (Double)     8
+
+Description of the elements:
+
+1  WMO          Modified form of the API number.
+2  RC_R036      The old PGS record code for this analysis.
+3  LC_R036    A code depicting the subcontracting laboratory in
+             which the sample was analyzed.
+4  DO_R036    Assumed to be the date of completion of the
+   analysis
+             or the date the data was encoded into the file.
+5  WPCT_O       Weight percent oxygen.
+6  WPCT_S       Weight percent sulfur.
+7  ASH_WPCT     Weight percent ash.
+
+
+The table FRAC_2930_PGS is a combination of two PGS tables and
+includes data on the fractional composition of rock extracts or
+oils.
+
+
+Table FRAC_2930_PGS column definitions (Record Count: 1,534)
+
+#  Field Name       Data Type      Field Length (Characters)
+1  WMO              Text                20
+2  RC_R029          Text                7
+3  LC_R029          Text                4
+4  DO_R029          Text                6
+5  GM_RK_WT         Number (Double)     8
+6  PPM_BIT          Number (Double)     8
+7  RC_030           Text                7
+8  LC_R030          Text                4
+9  DO_R030          Text                6
+10 PCT_SATS         Number (Double)     8
+11 PCT_AROM         Number (Double)     8
+12 PCT_N_HC         Number (Double)     8
+13 PCT_RECV         Number (Double)     8
+
+Description of the elements:
+    
+1  WMO              Modified form of the API number.
+2  RC_029           The old PGS record code for this analysis.
+3  LC_R029          A code depicting the subcontracting
+                    laboratory in which the sample was analyzed.
+4  DO_R029          Assumed to be the date of completion of the
+                    analysis or the date the data was encoded
+                    into the file.
+5  GM_RK_WT         Weight in grams of rock.
+6  PPM_BIT          Parts per million (ppm) of bitumen.
+7  RC_030           The old PGS record code for this analysis.
+8  LC_R030          A code depicting the subcontracting
+                    laboratory in which the sample was analyzed.
+9  DO_R030          Assumed to be the date of completion of the
+                    analysis or the date the data was
+                    encoded into the file.
+10 PCT_SATS         Percentage of saturated
+                    components in the sample.
+11 PCT_AROM         Percentage of aromatic components in the
+                    sample.
+12 PCT_N_HC         Percentage of non-hydrocarbon components in
+                    the sample.
+13 PCT_RECV         Percent of sample recovered.
+
+The CANGAS_8081_PGS table is again a combination of two PGS
+tables. This table contains chemical composition data as well as
+stable carbon isotopic data for the methane and CO2 compounds in
+the headspace part of canned samples.
+
+
+Table CANGAS_8081_PGS column definitions (Record Count: 75)
+
+#  Field Name       Data Type      Field Length (Characters)
+1  WMO              Text                20
+2  RC_G080          Text                7
+3  LC_G080          Text                4
+4  DO_G080          Text                6
+5  AIR              Number (Double)     8
+6  METHANE          Number (Double)     8
+7  CO2              Number (Double)     8
+8  ETHANE           Number (Double)     8
+9  H2S              Number (Double)     8
+10 PROPANE          Number (Double)     8
+11 IBUTANE          Number (Double)     8
+12 NBUTANE          Number (Double)     8
+13 IPENTANE         Number (Double)     8
+14 NPENTANE         Number (Double)     8
+15 HEXANES          Number (Double)     8
+16 RC_G081          Text                7
+17 LC_G081          Text                4
+18 DO_R081          Text                6
+19 13C_C1           Text                8
+20 13C_CO2          Text                8
+21 COMMENT          Text                40
+
+Description of the elements:
+
+1  WMO         Modified form of the API number.
+2  RC_G080     The old PGS record code for this analysis.
+3  LC_G080     A code depicting the subcontracting laboratory in
+               which the sample was analyzed.
+4  DO_G080     Assumed to be the date of completion of the
+               analysis or the date the data was encoded into the file.
+5  AIR         Mole percentage of both air and nitrogen in
+               the sample.
+6  METHANE     Mole percentage of methane in the sample.
+7  CO2         Mole Percentage of carbon dioxide in the sample.
+8  ETHANE      Mole Percentage of ethane in the sample.
+9  H2S         Mole Percentage of hydrogen sulfide in the sample.
+10 PROPANE     Mole Percentage of propane in the sample.
+11 IBUTANE     Mole Percentage of iso-butane in the sample.
+12 NBUTANE     Mole Percentage of normal butane in the sample.
+13 IPENTANE    Mole Percentage of iso-pentane in the sample.
+14 NPENTANE    Mole Percentage of normal pentane in the sample.
+15 HEXANES     Estimated mole percentage of hexanes+ in the
+               sample.
+16 RC_G081     The old record code from PGS for this analysis.
+17 LC_G081     A code depicting the subcontracting laboratory in
+               which the sample was analyzed.
+18 DO_R081     Assumed to be the date of completion of analysis or
+               the date the data was encoded into the file.
+19 13C_C1      Stable carbon 13C isotope of the methane homolog as
+               compared to the international standard, PDB.
+20 13C_CO2     Stable carbon 13C isotope of the carbon dioxide
+               peak as compared to the international standard, PDB.
+21 COMMENT     Analytical comments regarding the sample. NOTE:
+               this comment field is not the same as the comment
+               field in the COMMENTS_PGS or MASTER_PGS tables.
+               
+               
+The GASRNG_23_PGS table summarizes the content of most of the
+more commonly found peaks in the C5-C8 chromatogram.
+
+Table GASRNG_23_PGS column definitions (Record Count: 1,296)
+
+#  Field Name       Data Type      Field Length (Characters)
+1  WMO              Text                20
+2  RC_023           Text                7
+3  LC_RO23          Text                4
+4  DO_R023          Text                6
+5  IC4              Number (Double)     8
+6  NC4              Number (Double)     8
+7  NEO_C5           Number (Double)     8
+8  IC5              Number (Double)     8
+9  NC5              Number (Double)     8
+10 22DM_C4          Number (Double)     8
+11 CYC_C5           Number (Double)     8
+12 23DM_C4          Number (Double)     8
+13 2M_C5            Number (Double)     8
+14 3M_C5            Number (Double)     8
+15 N_HEX            Number (Double)     8
+16 M_CYC_C5         Number (Double)     8
+17 22_DM_C5         Number (Double)     8
+18 BENZENE          Number (Double)     8
+19 24_DM_C5         Number (Double)     8
+20 223_TMC4         Number (Double)     8
+21 CYC_HEX          Number (Double)     8
+22 33_DM_C5         Number (Double)     8
+23 11DMCYC5         Number (Double)     8
+24 2_M_HEX          Number (Double)     8
+25 23_DM_C5         Number (Double)     8
+26 1C3DMCC5         Number (Double)     8
+27 3_M_HEX          Number (Double)     8
+28 1T3DMCC5         Number (Double)     8
+29 1T2DMCC5         Number (Double)     8
+30 3_ETH_C5         Number (Double)     8
+31 224TM_C5         Number (Double)     8
+32 N_HEP            Number (Double)     8
+33 1C2DMCC5         Number (Double)     8
+34 M_CYC_C6         Number (Double)     8
+35 113TMCC5         Number (Double)     8
+36 22DM_C6          Number (Double)     8
+37 E_CYC_C5         Number (Double)     8
+38 TOLUENE          Number (Double)     8
+39 C4_C8PPM         Number (Double)     8
+
+Description of the elements:
+
+1  WMO         Modified form of the API number.
+2  RC_023      The old PGS record code for this analysis.
+3  LC_RO23     A code depicting the subcontracting laboratory in
+               which the sample was analyzed.
+4  DO_R023     Assumed to be the date of completion of the
+               analysis or the date the data was encoded into the file.
+5  IC4         Weight percent iso-butane.
+6  NC4         Weight percent normal butane.
+7  NEO_C5      Weight percent neo-pentane.
+8  IC5         Weight percent iso-pentane.
+9  NC5         Weight percent normal pentane.
+10 22DM_C4     Weight percent 2,2, dimethyl butane.
+11 CYC_C5      Weight percent cyclo pentane.
+12 23DM_C4     Weight percent 2,3, dimethyl butane.
+13 2M_C5       Weight percent 2 methyl pentane.
+14 3M_C5       Weight percent 3 methyl Pentane.
+15 N_HEX       Weight percent normal hexane.
+16 M_CYC_C5    Weight percent methyl cyclo pentane.
+17 22_DM_C5    Weight percent 2,2, dimethyl pentane.
+18 BENZENE     Weight percent benzene.
+19 24_DM_C5    Weight percent 2,4, dimethyl pentane.
+20 223_TMC4    Weight percent 2,2,3 tri methyl butane.
+21 CYC_HEX     Weight percent cyclo hexane.
+22 33_DM_C5    Weight percent 3,3 dimethyl pentane.
+23 11DMCYC5    Weight percent 1,1 dimethyl cyclo pentane.
+24 2_M_HEX     Weight percent 2 methyl hexane.
+25 23_DM_C5    Weight percent 2,3 dimethyl pentane.
+26 1C3DMCC5    Weight percent 1-cis-3 dimethyl cyclo pentane.
+27 3_M_HEX     Weight percent 3 methyl hexane.
+28 1T3DMCC5    Weight percent 1-trans-3 dimethyl cyclo pentane.
+29 1T2DMCC5    Weight percent 1-trans-2 dimethyl cyclo pentane.
+30 3_ETH_C5    Weight percent 3 ethyl pentane.
+31 224TM_C5    Weight percent 2,2,4 trimethyl pentane.
+32 N_HEP       Weight percent normal heptane.
+33 1C2DMCC5    Weight percent 1-cis-2 dimethyl cyclo pentane.
+34 M_CYC_C6    Weight percent methyl cyclo hexane.
+35 113TMCC5    Weight percent 1,1,3 trimethyl cyclo pentane.
+36 22DM_C6     Weight percent 2,2, dimethyl hexane.
+37 E_CYC_C5    Weight percent ethyl cyclo pentane.
+38 TOLUENE     Weight percent toluene.
+39 C4_C8PPM    Parts Per Million (ppm) all C4-C8 compounds.
+
+
+The GC_3162_PGS table contains information on the C7-C35 normal
+alkanes within the saturate fraction of the sample.
+
+Table GC_3162_PGS column definitions (Record Count: 1,061)
+
+#  Field Name       Data Type      Field Length
+1  WMO              Text                20
+2  RC_031           Text                7
+3  LC_031           Text                4
+4  DO_031           Text                6
+5  N_C7             Number (Double)     8
+6  N_C8             Number (Double)     8
+7  N_C9             Number (Double)     8
+8  N_C10            Number (Double)     8
+9  N_C11            Number (Double)     8
+10 N_C12            Number (Double)     8
+11 N_C13            Number (Double)     8
+12 N_C14            Number (Double)     8
+13 N_C15            Number (Double)     8
+14 N_C16            Number (Double)     8
+15 N_C17            Number (Double)     8
+16 PRIST            Number (Double)     8
+17 N_C18            Number (Double)     8
+18 PHYT             Number (Double)     8
+19 N_C19            Number (Double)     8
+20 N_C20            Number (Double)     8
+21 N_C21            Number (Double)     8
+22 N_C22            Number (Double)     8
+23 N_C23            Number (Double)     8
+24 N_C24            Number (Double)     8
+25 N_C25            Number (Double)     8
+26 N_C26            Number (Double)     8
+27 N_C27            Number (Double)     8
+28 N_C28            Number (Double)     8
+29 N_C29            Number (Double)     8
+30 N_C30            Number (Double)     8
+31 N_C31            Number (Double)     8
+32 N_C32            Number (Double)     8
+33 N_C33            Number (Double)     8
+34 N_C34            Number (Double)     8
+35 N_C35            Number (Double)     8
+36 PCT_RESL         Number (Double)     8
+37 CPI              Number (Double)     8
+38 PR_PH            Number (Double)     8
+
+Description of the elements:
+
+1  WMO         Modified form of the API number.
+2  RC_031      The old PGS record code for this analysis.
+3  LC_031      A code depicting the subcontracting
+               laboratory in  which the sample was analyzed.
+4  DO_031      Assumed to be the date of completion of
+               the analysis or the date the data was encoded into
+               the file.
+5  N_C7        Weight percent normal C7.
+6  N_C8        Weight percent normal C8.
+7  N_C9        Weight percent normal C9.
+8  N_C10       Weight percent normal C10.
+9  N_C11       Weight percent normal C11.
+10 N_C12       Weight percent normal C12.
+11 N_C13       Weight percent normal C13.
+12 N_C14       Weight percent normal C14.
+13 N_C15       Weight percent normal C15.
+14 N_C16       Weight percent normal C16.
+15 N_C17       Weight percent normal C17.
+16 PRIST       Weight percent pristine.
+17 N_C18       Weight percent normal C18.
+18 PHYT        Weight percent phytane.
+19 N_C19       Weight percent normal C19.
+20 N_C20       Weight percent normal C20.
+21 N_C21       Weight percent normal C21.
+22 N_C22       Weight percent normal C22.
+23 N_C23       Weight percent normal C23.
+24 N_C24       Weight percent normal C24.
+25 N_C25       Weight percent normal C25.
+26 N_C26       Weight percent normal C26.
+27 N_C27       Weight percent normal C27.
+28 N_C28       Weight percent normal C28.
+29 N_C29       Weight percent normal C29.
+30 N_C30       Weight percent normal C30.
+31 N_C31       Weight percent normal C31
+32 N_C32       Weight percent normal C32.
+33 N_C33       Weight percent normal C33.
+34 N_C34       Weight percent normal C34.
+35 N_C35       Weight percent normal C35.
+36 PCT_RESL    Percent resolved peaks.
+37 CPI         Carbon preference index.
+38 PR_PH       Ratio pristane/phytane.
+
+
+The ISOT_38_PGS table contains information on the asphaltene
+fraction of the sample.
+
+Table ISOT_38_PGS column definitions (Record Count: 103)
+
+#  Field Name       Data Type      Field Length (Characters)
+1  WMO              Text                20
+2  RC_O038          Text                7
+3  LC_O038          Text                4
+4  DO_O038          Text                6
+5  WPCT_S           Number (Double)     8
+6  34S_ASPH         Text                8
+7  WPCT_N           Number (Double)     8
+8  15N_ASPH         Text                8
+
+Description of the elements:
+
+1  WMO         Modified form of the API number.
+2  RC_O038     The old PGS record code for this analysis.
+3  LC_O038     A code depicting the subcontracting laboratory in
+               which the sample was analyzed.
+4  DO_O038     Assumed to be the date of completion of the
+               analysis or the date the data was encoded into the
+               file.
+5  WPCT_S      Weight percent sulfur.
+6  34S_ASPH    34S of asphaltenes.
+7  WPCT_N      Weight percent nitrogen.
+8  15N_ASPH    15N of asphaltenes.
+
+
+The LEGEND_PGS table is a tool to document the original table
+names and contents into the present day scheme.
+
+Table LEGEND_PGS column definitions (Record Count: 24)
+
+#  Field Name       Data Type      Field Length (Characters)
+1  TABN             Text                8
+2  NUMCOLS          Number (Double)     8
+3  NUMROWS          Number (Double)     8
+4  ORIGPGS1         Text                8
+5  ORIGPGS2         Text                8
+6  ORIGPGS3         Text                8
+7  ORIGPGS4         Text                8
+8  COMMENT          Text                40
+
+Description of the elements:
+
+1  TABN        Table ID.
+2  NUMCOLS     Number of columns.
+3  NUMROWS     Number of rows.
+4  ORIGPGS1    Original PGS table ID of 1st table.
+5  ORIGPGS2    Original PGS ID of 2nd table.
+6  ORIGPGS3    Original PGS ID of 3rd Table.
+7  ORIGPGS4    Original PGS ID of 4th Table.
+8  COMMENT     Comments on naming convention.
+
+
+The RKEV_41_PGS table contains information on Rock-Eval
+(pyrolysis) samples.
+
+Table RKEV_41_PGS column definitions (Record Count: 7,534)
+
+#  Field Name       Data Type      Field Length (Characters)
+1  WMO              Text                20
+2  RC_R041          Text                8
+3  LC_R041          Text                8
+4  DO_R041          Text                8
+5  TMAX             Number (Double)     8
+6  S1               Number (Double)     8
+7  S2               Number (Double)     8
+8  S3               Number (Double)     8
+9  PI               Number (Double)     8
+10 S2S3             Number (Double)     8
+11 PC               Number (Double)     8
+12 OC               Number (Double)     8
+13 HI               Number (Double)     8
+14 OI               Number (Double)     8
+
+Description of the elements:
+
+1  WMO         Modified form of the API number.
+2  RC_R041     The old PGS record code for this analysis.
+3  LC_R041     A code depicting the subcontracting laboratory in
+               which the sample was analyzed.
+4  DO_R041     Assumed to be the date of completion of the
+               analysis or the date the data was encoded into the file.
+5  TMAX        Tmax (maximum temperature) of S2 peak (°C)
+6  S1          Amount of volatile hydrocarbons(hc) (S1, milligrams rock)
+               (hc/gram rock).
+7  S2          Amount of pyrolyzable hydrocarbons # (hc) (S2, milligrams rock)
+               (hg/gram rock).
+8  S3          Amount of CO2 released during pyrolysis (milligrams CO2/gram rock).
+9  PI          Rock-Eval Production Index (S1/S1+S2).
+10 S2S3        S2/S3 Ratio of pyrolyzable hydrocarbons to CO2.
+11 PC          Total pyrolyzable organic carbon (in weight
+               percent of rock).
+12 TOC         Total organic Carbon (in weight percent of rock).
+13 HI          Rock-Eval Hydrogen Index (mg hc/gram organic carbon).
+14 OI          Rock-Eval Oxygen Index (mg CO2 /gram organic carbon).
+
+
+The SPGR_60_PGS table contains information on the Specific
+Gravity of crude oils.
+
+Table SPGR_60_PGS column definitions (Record Count: 84)
+
+#  Field Name       Data Type      Field Length
+1  WMO              Text                20
+2  RC_O060          Text                7
+3  LC_O060          Text                4
+4  DO_O060          Text                6
+5  SPGR             Number (Double)     8
+
+Description of the elements:
+
+1  WMO         Modified form of the API number.
+2  RC_O060     The old PGS record code for this analysis.
+3  LC_O060     A code depicting the subcontracting laboratory in
+               which the sample was analyzed.
+4  DO_O060     Assumed to be the date of completion of the
+               analysis or the date the data was encoded into the file.
+5  SPGR        API gravity (crude oils only).
+
+
+The TAI_35_PGS table contains information on the Thermal
+Alteration Index of the sample.
+
+Table TAI_35_PGS column definitions (Record Count: 3,846)
+
+#  Field Name       Data Type      Field Length
+1  WMO              Text                20
+2  RC_R035          Text                7
+3  LC_R035          Text                4
+4  DO_R035          Text                6
+5  TAI              Number (Double)     8
+
+Description of the elements:
+
+1  WMO         Modified form of the API number.
+2  RC_R035     The old PGS record code for this analysis.
+3  LC_R035     A code depicting the subcontracting laboratory in
+               which the sample was analyzed.
+4  DO_R035     Assumed to be the date of completion of the analysis or 
+               the date the data was encoded into the file.
+5  TAI         Thermal Alteration Index.
+
+
+The TC_TOC_2728_PGS combined table contains information on the
+total carbon and total organic carbon concentrations of rock
+samples.
+
+Table TC_TOC_2728_PGS column definitions (Record Count: 18,493)
+
+#  Field Name       Data Type      Field Length (Characters)
+1  WMO              Text                20
+2  RC_R027          Text                4
+3  LC_R027          Text                4
+4  DO_R027          Text                6
+5  TOC_WTPC         Number (Double)     8
+6  LC_R028          Text                4
+7  DO_R028          Text                6
+8  TC_WTPCT         Number (Double)     8
+
+Description of the elements:
+
+1  WMO         Modified form of the API number.
+2  RC_R027     The old PGS record code for this analysis.
+3  LC_R027     A code depicting the subcontracting laboratory in
+               which the sample was analyzed.
+4  DO_R027     Assumed to be the date of completion of the analysis 
+               or the date the data was encoded into the file.
+5  TOC_WTPC    Weight percent total organic carbon.
+6  LC_R028     A code depicting the subcontracting laboratory in
+               which the sample was analyzed.
+7  DO_R028     Assumed to be the date of completion of the analysis
+               or the date the data was encoded into the file.
+8  TC_WTPCT    Weight percent total carbon.
+
+
+The TEAFID_26_PGS table contains information on the pyrolysis of
+rock samples via thermal evolution analysis (TEA).
+
+Table TEAFID_26_PGS column definitions (Record Count: 6338)
+
+#  Field Name       Data Type      Field Length
+1  WMO              Text                20
+2  RC_R026          Text                7
+3  LC_R026          Text                4
+4  DO_R026          Text                6
+5  HC_YIELD         Number (Double)     8
+6  VOLATILE         Number (Double)     8
+7  TEA_MAX          Number (Double)     8
+
+Description of the elements:
+
+1  WMO         Modified form of the API number.
+2  RC_R026     The old PGS record code for this analysis.
+3  LC_R026     A code depicting the subcontracting laboratory in
+               which the sample was analyzed.
+4  DO_R026     Assumed to be the date of completion of the analysis
+               or the date the data was encoded into the file.
+5  HC_YIELD    Weight PCT hydrocarbon yield.
+6  VOLATILE    Parts per million volatile Hydrocarbons <300o C.
+7  TEA_MAX     Maximum temp of Hydrocarbon yield by TEA.
+
+
+The VISKER_34_PGS table contains information on the visual
+kerogen types.
+
+Table VISKER_34_PGS column definitions (Record Count: 4,538)
+
+#  Field Name       Data Type      Field Length
+1  WMO              Text                20
+2  RC_R034          Text                7
+3  LC_R034          Text                4
+4  DO_R034          Text                6
+5  AMORP            Number (Double)     8
+6  HERBA            Number (Double)     8
+7  WOODY            Number (Double)     8
+8  INERT            Number (Double)     8
+
+Description of the elements:
+
+1  WMO         Modified form of the API number.
+2  RC_R034     The old PGS record code for this analysis.
+3  LC_R034     A code depicting the subcontracting laboratory in
+               which the sample was analyzed.
+4  DO_R034     Assumed to be the date of completion of the analysis 
+               or the date the data was encoded into the file.
+5  AMORP       Normalized percent amorphous kerogen.
+6  HERBA       Normalized percent herbaceous kerogen.
+7  WOODY       Normalized percent woody kerogen.
+8  INERT       Normalized percent inert kerogen.
+
+
+The VITREF_33_PGS table contains information on the vitrinite
+reflectance of samples.
+
+Table VITREF_33_PGS column definitions (Record Count: 4,830)
+
+#  Field Name       Data Type      Field Length
+1  WMO              Text                20
+2  RC_R033          Text                7
+3  LC_R033          Text                4
+4  DO_R033          Text                6
+5  P_QUAL           Text                8
+6  EASE_CY1         Text                8
+7  RO_MEAN          Number (Double)     8
+8  MODAL            Number (Double)     8
+9  PYRITE           Text                8
+10 ROS              Text                8
+
+Description of the elements:
+
+1  WMO         Modified form of the API number.
+2  RC_R033     The old PGS record code for this analysis.
+3  LC_R033     A code depicting the subcontracting laboratory in
+               which the sample was analyzed.
+4  DO_R033     Assumed to be the date of completion of the analysis
+               or the date the data was encoded into the file.
+5  P_QUAL      Quality of the polish.
+6  EASE_CY1    Ease of selecting the first cycle.
+7  RO_MEAN     Mean value of all reflectance measurements.
+8  MODAL       Median reflectance value
+9  PYRITE      Abundance of pyrite.
+10 ROS         Individual reflectance measurements.
+
+
+Other tables in the Alaskan database are designed to be used as
+reference tables or lookup tables.  These tables are included but
+are not intended to be used as stand-alone data tables (see
+LEGEND_PGS table for explanations.)
+
+The R_UNIT_PGS table contains data that is included in the
+HEADER_PGS table.  This table is useful to obtain English
+conversion of the many rock unit codes used in the HEADER_PGS
+table.
+
+Table R_UNIT_PGS column definitions (Record Count: 742)
+
+#  Field Name       Data Type      Field Length
+1  FAGE             Text                4
+2  FUNIT            Text                4
+3  FM               Text                43
+4  ERA              Text                40
+
+Description of the elements:
+
+1  FAGE        Formation age code.
+2  FUNIT       Formation unit code.
+3  FM          English formation name.
+4  ERA         Major geologic Era.
+
+
+The POINTS_PGS table contains outcrop location information
+included in the HEADER_PGS table.
+
+Table POINTS_PGS column definitions (Record Count: 2,933)
+
+#  Field Name       Data Type      Field Length
+1  WMO              Text                19
+2  ID               Text                20
+3  UNKN1            Text                20
+4  LATTIT           Number (Double)     8
+5  LO               Number (Double)     8
+6  ELE              Text                10
+7  FAGE             Text                4
+8  FUNIT            Text                4
+
+Description of the elements:
+
+1  WMO         Modified form of the API number.
+2  ID          Sample identification.
+3  UNKN1       unknown field.
+4  LATTIT      Latitude.
+5  LO          Longitude.
+6  ELE         Elevation.
+7  FAGE        Formation age code.
+8  FUNIT       Formation unit code.
+
+
+The MASTER_PGS table contains information on the correlation
+between WMO numbers and their associated records. It also
+includes the comment field from COMMENTS_PGS.
+
+Table MASTER_PGS column definitions (Record Count: 131,459)
+
+#  Field Name       Data Type      Field Length
+1  WMO              Text                20
+2  CODES            Text                7
+3  COMMENT          TEXT                40
+
+Description of the elements:
+
+1  WMO         Modified form of the API number.
+2  CODES       Record codes.
+3  COMMENT     Analytical comments regarding the analysis from the
+               contracting lab.
+  
+
+The A001_WELLS_PGS table contains information on the wells
+sampled. This information is contained in the HEADER_PGS table.
+
+Table A001_WELLS_PGS column definitions (Record Count: 19,103)
+
+#  Field Name       Data Type      Field Length
+1  WMO              Text                20
+2  API              Text                14
+3  X                Text                4
+4  RC_A001          Text                7
+5  WELLN            Text                40
+6  ELEV             Text                10
+7  TLD              Text                7
+8  WELCLAS          Text                2
+9  SRT              Text                10
+10 FD_A001          Text                6
+
+Description of the elements:
+
+1  WMO         Modified form of the API number.
+2  API         Unique American Petroleum Institute well number.
+3  X           Unknown field.
+4  RC_A001     The old PGS record code for this analysis.
+5  WELLN       Well name.
+6  ELEV        Elevation.
+7  TLD         Total depth.
+8  WELCLAS     Well class.
+9  SRT         Location of Well in DTTTDRRRSS notation.
+10 FD_A001     File date.
+
+
+The B001_OUTCROPS_PGS table contains data on the outcrops sampled
+in the study.  This information resides in the HEADER_PGS table.
+
+Table B001_OUTCROPS_PGS column definitions (Record Count: 21,941)
+
+#  Field Name       Data Type      Field Length
+1  WMO              Text                20
+2  API              Text                14
+3  SQ               Text                4
+4  RC_B001          Text                7
+5  LC_B001          Text                4
+6  LABNO            Text                8
+7  DI_B001          Text                6
+8  M1               Text                1
+9  TOP              Number (Double)     8
+10 BOT              Number (Double)     8
+11 STY              Text                2
+12 ADDNL            Text                17
+13 FD_B001          Text                6
+
+Description of the elements:
+
+1  WMO         Modified form of the API number.
+2  API         Unique American Petroleum Institute well number.
+3  SQ          Sequence number.
+4  RC_B001     The old PGS record code for this analysis.
+5  LC_B001     A code depicting the subcontracting laboratory in
+               which the sample was analyzed.
+6  LABNO       Laboratory ID number.
+7  DI_B001     Date sample entered into laboratory.
+8  M1          Measurement in (F)eet or (M)eters.
+9  TOP         Top depth.
+10 BOT         Bottom depth.
+11 STY         Sample type.
+12 ADDNL       Additional comments.
+13 FD_B001     File date.
+
+
+
+
+
+
+
+
+                    INDEX AND ENCODING SCHEMES
+
+
+ADDNL       Submitter's Additional Description (free format ASCII)
+
+API         Modified American Petroleum Institute number
+            (assigned for all samples from within the United States and the U.S.
+            Exclusive Economic Zone [USA/EEZ]);  or see WMO.
+
+BD          Bottom Depth sampled in units specified by M1
+            (8 bytes, integer or floating point number).
+
+CONTAINER   A code formed by the concatenation of the container
+            type (CT), 1 character + the external condition of
+            the container (EC), 2 characters + the internal condition of
+            the container (IC), 1 character + any additional information
+            on the sample within the container (AD) 2 characters. Below
+            is a breakout of these fields:
+
+   CT container type code (1 byte maximum):
+     Code:     Container type:
+      B        Pressure cylinder (bomb)
+      C        Can
+      E        Paper or plastic envelope or bag
+      G        Glass bottle
+      P        Plastic bottle
+      U        None (or unknown)
+
+
+   EC     Container external condition code (2 bytes maximum):
+     Code:     External condition:
+      AT       Tightly sealed, no holes or tears (air-tight)
+      NT       Not tightly sealed, damaged
+      UK       Unknown
+
+   IC     Container internal condition code (1 bytes maximum)
+     Code:     Internal condition:
+     -0-       (null) not applicable
+      A        Sample absent
+      D        Dry
+      M        Wet
+      U        Unwashed
+      Q        Unknown
+
+   AD     Known additional information on the sample
+          within the container. A 2-byte (maximum) code is used
+          here to describe the following:
+      Code:     Additional information:
+
+      CL       Control sample
+      CO       Coal
+      CS       Composite
+      DT       Drill stem test
+      OS       Oil-stained rock
+      UK       Unknown
+      RS       Research sample (not applicable directly to mapping)
+
+CONTAM    (Possible or probable) Contaminant codes, usually
+          provided by submitter or sample prep lab technician.
+          Modeled after PI PGS "Catalog of contaminants" 6 byte
+          code, first 3 bytes = contaminant code, last 3 bytes =
+          % abundance
+     Code:     Contaminant:
+
+     -0-       (null) = no observable contaminants (default)
+     B01       Unknown contaminant
+     B02       Varied organic contaminants
+     B03       Varied inorganic contaminants
+     B04       Carvings (from borehole)
+     B05       Casing cement
+     B06       Drilling mud
+     B07       Mud additives
+     B08       Walnut shells
+     B09       Straw
+     B10       Mica
+     B11       Rubber
+     B12       Oil base drilling mud
+     B13       Pipe dope
+     B14       Gilsonite
+     B15       Asphalt
+     B19       No contaminants
+     B21       Diesel oil
+     B22       Crude oil
+     B23       Lignosulfonate
+     B25       Sample package contaminant (core box wax)
+% Abundance = 000 through 100%; 001 implies 1% or less estimated
+abundance of suspect contaminant; default 000 implies no
+contaminants or not applicable.
+
+ELEV  Elevation of well or surface sample in units
+      specified by M1 (8 bytes, integer or floating-point
+      number).
+
+FAGE  Formation age code (3 decimal digits):
+      The FAGE and FUNIT codes are the concept of Petroleum
+      Information Corp. (PI) and the FAGE code is a combination
+      of two fields: the first two digits for encoding the
+      geologic time table SYSTEM, and the last digit for
+      encoding the geologic time table EPOCH or (series). Please
+      note that the Fage and Funit elements do not necessarily
+      conform to accepted USGS naming conventions or standards
+      in appropriate naming of lithological sections.
+
+     Code, SYSTEM:            Code, Series:
+
+
+     00 Unknown                    0 Unknown
+
+
+
+     70 Quaternary            9 Undifferentiated
+                              2 Holocene
+                              1 Pleistocene
+     66 Quaternary            9 -Tertiary (boundary)
+     65 Tertiary              9 Undifferentiated
+                              5 Pliocene
+                              4 Miocene
+                              3 Oligocene
+                              2 Eocene
+                              1 Paleocene
+     61 Tertiary              9 Cretaceous (boundary)
+     60 Cretaceous            9 Undifferentiated
+                              5 Gulfian
+                              4 Montanan
+                              3 Coloradoan
+                              2 Comanchean
+                              1 Coahuilan
+     56 Jurassic              9 -Cretaceous (boundary)
+     55 Jurassic              9 Undifferentiated
+                              3 Upper
+                              2 Middle
+                              1 Lower
+     51 Triassic              9 -Jurassic (boundary)
+     50 Triassic              9 Undifferentiated
+                              3 Upper
+                              2 Middle
+                              1 Lower
+     46 Permo                 9 -Triassic (boundary)
+     45 Permian               9 Undifferentiated
+                              4 Ochoan
+                              3 Guadalupian
+                              2 Leonardian
+                              1 Wolfcampian
+     41 Permo                 9 -Pennsylvanian (boundary)
+
+     40 Pennsylvanian         9 Undifferentiated
+                              6 Virgilian or Cisco or Monogahelan
+                              5 Missourian or Canyon or Conemaughan
+                              4 Desmoinesian or Strawn or Alleghenian
+                              3 Atokan or Bend or Pottsvillian
+                              2 Morrowan
+                              1 Springeran
+     36 Mississippian         9 -Pennsylvanian (boundary)
+     35 Mississippian         9 Undifferentiated
+                              4 Chesterian
+                              3 Meramecian
+                              2 Osagean
+                              1 Kinderhookian
+    31 Mississippian          9 -Devonian (boundary)
+    30 Devonian               9 Undifferentiated
+                              6 Upper
+                              5 Bradfordian
+                              4 Chautauquan
+                              3 Senecan
+                              2 Erian or Middle
+                              1 Ulsterian or Lower
+     26 Silurian              9 -Devonian (boundary)
+
+     25 Silurian              9 Undifferentiated
+                              3 Cayugan
+                              2 Niagaran
+                              1 Albion or Alexandrian
+     21 Silurian              9 -Ordovician (boundary)
+     20 Ordovician            9 Undifferentiated
+                              3 Cincinnatian
+                              2 Champlainian
+                              1 Canadian
+     16 Cambro                9 -Ordovician (boundary)
+     15 Cambrian              9 Undifferentiated
+                              3 Croixian
+                              2 Albertan
+                              1 Waucoban
+     11 Precambrian           9 -Cambrian (boundary)
+     10 Precambrian           9 Undifferentiated
+
+FUNIT Formation name code (as many as 5 bytes, alphabetic)
+      The FUNIT code is an abbreviation of localized naming of
+      the sample collection zone. The codes are 4 - 5 characters
+      in length and for this data set can be found in the table
+      entitled: R_UNIT_PGS. See comments on FAGE above.
+
+HCST  Side-track/hole-change part of API number.
+      (4 numeric digits)
+
+LAT   Sampling location latitude (a +/- real value to 5 decimal
+      places).
+
+LC_*  A code depicting the subcontracting laboratory in which the
+      sample was analyzed. The first 2 alpha characters of the 4
+      character code is the contractor code (CC):
+
+   AK     Alaska Div of Oil & Gas
+   CL     Core Labs, Inc.
+   CS     Canadian Geological Survey
+   GC     Geochem Research
+   GS     USGS Organic Geochem Lab, Denver, CO
+   MO     Mobil Oil Co.
+   NA     Not Available/unknown
+   SH     Shell Oil Co.
+   TE     Tenneco Oil Co.
+   UN     Unical Oil Co.
+   WH     Woods Hole
+
+
+The next two characters in the LC_* codes are the laboratory
+codes for the analytical lab performing the analyses (LC):
+
+   BR     Brown & Ruth Labs
+   CL     Core Labs, Inc.
+   CS     Canadian Geological Survey
+   GC     Geochem Research
+   GG     Global Geochemistry Corp.
+   GS     USGS Organic Geochem Lab, Denver, CO
+   NA     Not Available/unknown
+   SH     Shell Oil Co.
+   TE     Tenneco Oil Co.
+   UN     Union Oil Co.
+   WH     Woods Hole
+
+LITHO Lithology codes as many as 4 alphabetic characters for
+      the actual lithology, then 3 decimal digits expressing the
+      approximate percentage of the lithology, as determined by
+      the submitter or laboratory technician. (The sum of all
+      LITHO and CONTAM percentages should be 100.)
+
+     Code:     Lithology:
+
+     XXXX      Not available or not determined
+     ANHY      Anhydrite
+     CCRN      Concretion
+     CHRT      Chert
+     COAL      Coal
+     DOLL      Limey dolomite
+     DOLO      Dolomite
+     FLMD      Mudstone
+     FLSH      Shale
+     FMCY      Claystone
+     LSAR      Argillaceous limestone
+     LSCH      Cherty limestone
+     LSDL      Limey dolomite
+     LSFL      Laminated limestone
+     LSND      Limestone
+     MICR      Micrite
+     SALT      Salt
+     SHBT      Bituminous shale
+     SILT      Siltstone
+     SSBT      Tar or solid bitumens
+     SSLS      Limey sandstone
+     SSND      Sandstone
+     TUFF      Volcanic tuff
+
+LONG Sampling location longitude (a +/- real value to 5 decimal
+     places)
+
+M1   English or Metric units indicator (one character, either
+     F for depths and elevations in feet, or
+     M for depths and elevations in meters).
+
+POR  Porosity code (one numeric digit), supplied by the
+     submitter; estimated (not measured, see below).
+
+     Code:     Porosity:
+
+      0        Unknown (default)
+      1        Tight
+      2        Very poor
+      3        Poor
+      4        Fair
+      5        Good
+      6        Excellent
+
+
+SQ   (as many as 4 ASCII characters, but usually integer numbers)
+     The last 4 digits of the WMO number designed to provide
+     unique WMO numbers for down-hole samples.
+
+SHO  Included for compatibility with PI PGS (Oil) "SHOW" code
+     supplied by the submitter. This element contains one numeric
+     digit.
+
+     Code:     Quality of oil show:
+
+      0        Unknown (default)
+      1        No show
+      2        Very poor
+      3        Poor
+      4        Fair
+      5        Good
+      6        Excellent
+
+SRT   For samples within US/EEZ, by Township, Range and Section:
+      (10 alphanumeric characters)
+
+   Character
+   Position:         Definition:
+
+     1              Township direction (N or S)
+     2-4            Township number (right justified, leading blanks)
+     5              Range direction (E or W)
+     6-8            Range number (right justified, leading blanks)
+     9-10           Section number (right justified, leading blanks)
+
+STY   Sample source code, 2 alpha characters:
+
+     Code:     Sample source:
+
+     CO        Core
+     CT        Cuttings
+     EN        Emulsion
+     GC        Suspected contaminant
+     GS        Natural gas
+     IG        Inorganic
+     LO        Generic liquid
+     MD        Drilling mud
+     OL        Crude oil or natural gas condensates
+     OT        Outcrop
+     SO        Generic solid
+     SW        Side wall core
+     UK        Unknown
+     WT        Water
+
+SW   Sample weight in grams (0 to 9999, right justified)
+
+TD   Top Depth sampled in units specified by M1
+     (8 bytes, integer or floating-point number)
+
+TLD   Total depth of well in units specified by M1
+     (8 bytes, integer or floating-point number)
+
+UNIQ  Unique well code part of API (digits 6-11 of the API
+      number);  compare with API encoding scheme.
+
+WMO   A modified World Meteorological Organization number
+      (assigned for all samples outside the USA/EEZ. The total
+      number of digits in the modified API (or WMO) number is
+      19, defined thus:
+
+ 1    World code based on 4 quadrants relative to the
+      Equator and the Greenwich Meridian:
+
+
+      Digit
+      Position:     Definition:
+
+     1              = northeast quadrant
+     3              = southeast quadrant
+     5              = southwest quadrant
+     7              = northwest quadrant
+     9              = USA/EEZ
+
+ 2-3  Two-digit State or latitude code:
+      (a) State code as defined by API for USA/EEZ (World = 9)
+      (b) Latitude of location truncated to the nearest degree
+          (World = 1, 3, 5, or 7)
+
+ 4-6  Three-digit county or longitude code:
+      (a) County code as defined by API for USA/EEZ (World = 9)
+      (b) Longitude of location truncated to the nearest degree
+          (World = 1, 3, 5, or 7)
+
+ 7-11 Five-digit unique well code:
+      (a) 0000-64999 assigned by API for USA/EEZ (World = 9)
+      (b) 10000-94999 assigned by USGS WAPI for wells outside
+          the USA/EEZ (World = 1, 3, 5, or 7)
+      (c) 65000-94999 used for wells for which API has
+          not assigned a number (World = 9) assigned by USGS WAPI
+      (d) 95000-99999 assigned by USGS WAPI for non-
+          well samples (surface, outcrops, speleological,
+          mines, seeps, etc.)(World = 1, 3, 5, 7, or 9)
+
+12-13 Two-digit side track code assigned by API (World = 9)
+
+14-15 Two-digit hole change code assigned by API (World = 9)
+
+16-19 Four-digit sample sequence number assigned by USGS WAPI
+
+Note: digits 2-15 of the USGS WMO number are identical to the
+fourteen-digit unique API number for all wells within USA/EEZ
+(World = 9). The expanded API/WMO number was developed to assign
+unique numbers to specific samples collected worldwide.
+
+WSC   World/State/County or World/Lat/Long part of API (digits
+     1-6 of the API number);  compare with API encoding scheme.
+
+                         Appendix A
+
+           DEFINITIONS OF SOME COMMONLY USED TERMS
+
+
+ASCII--American Standard Code for Information Interchange;
+     usually refers to the characters, numbers, and punctuation
+     marks found on a typewriter or computer keyboard.
+
+CHROMATOGRAPHY--A method of separating complex mixtures into
+      individual chemical compounds or classes of chemical
+      compounds by differences in their chemical behavior.
+
+EXTRACTION--The process of dissolution of particular chemical
+      compounds from a solid matrix (that is, rock) into a liquid
+      solution (that is, bitumen or rock extract).
+
+FRACTION--A group of chemical compounds with similar chemical and
+      physical properties (i.e., saturated hydrocarbons, aromatic
+      hydrocarbons, resins, asphaltenes, kerogen).
+
+GLOBAL--Applicable to all users.
+
+LOCAL --Applicable to a small group of users (not global).
+
+PYROLYSIS--The heating of a sample in the absence of air;
+      followed by subsequent analysis of the products obtained in
+      order to determine quantities of products and/or reaction
+      kinetic factors. Hydrous pyrolysis is done in the presence
+      of an overabundance of water; anhydrous pyrolysis is done on
+      the dry sample.
+
+ROCK-EVAL--A rapid anhydrous pyrolysis technique used to semi-
+      quantitatively determine the type and quantity of petroleum
+      that could be generated from an oil or gas source rock. A
+      less rapid Rock-Eval technique can also determine kinetic
+      factors.
+
+
+VITRINITE--A maceral derived from wood or coaly material that
+      exhibits higher optical reflectivity with increasing
+      exposure to higher temperatures; a thermal maturity
+      indicator.
+                         Appendix B
+                              
+                              
+      MANUFACTURERS OF PRODUCTS AND SERVICES MENTIONED
+
+
+American Petroleum Institute
+Production Department
+211 N. Ervay, suite 1700
+Dallas, TX 75201 USA
+
+MicroRim
+3925 159th Ave NE
+PO Box 97022
+Redmond, WA 98073-9722 USA
+
+MicroSoft Corporation
+16011 NE 36th Way
+PO Box 97017
+Redmond, WA 98073-9717 USA
+
+Perkin-Elmer/Nelson Chromatography
+10061 Bubb Road
+Cupertino, CA 95014 USA
+
+Petroleum Information Corporation
+4100 E. Dry Creek Road
+Littleton, CO 80122 USA
+
+Rock-Eval pyrolysis instrument
+Contact:
+Delsi Inc.
+600 Kenrick, Suite D-7
+Houston, TX 77060 USA
+
+World Meteorological Organization numbering system
+Contact:
+National Oceanographic Data Center
+National Oceanographic and Atmospheric Administration
+Washington, DC USA
+
+

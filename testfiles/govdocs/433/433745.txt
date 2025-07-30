@@ -1,0 +1,839 @@
+.page. gsave 216 54 translate 65 rotate /Times-Roman findfont 216
+scalefont setfont 0 0 moveto 0.95 setgray (DRAFT) show grestore
+.page. gsave 216 54 translate 65 rotate /Times-Roman findfont 216
+scalefont setfont 0 0 moveto 0.95 setgray (DRAFT) show grestore
+.page. gsave 216 54 translate 65 rotate /Times-Roman findfont 216
+scalefont setfont 0 0 moveto 0.95 setgray (DRAFT) show grestore
+
+2
+
+                                
+                                
+                                
+                                
+                                
+               SVX II Upgrade Readout Electronics
+                                
+                  Fast Control, Timing, Data &
+                     Resynchronization Links
+                                &
+                         Aborts, Resets,
+                     Errors, Error Detection
+                        & System Recovery
+                                
+                                
+                                
+                 Ed Barsotti & Sergio Zimmerman
+                                
+                         August 17, 1995
+                                
+                          Version  0.0
+                                
+                    Document # ESE-SVX-950805
+                                
+                                
+                         DRAFT DOCUMENT
+                                
+
+
+
+
+
+                        Table Of Contents
+
+1. INTRODUCTION                                                 1
+2. FAST CONTROLS (TRIGGER SYSTEM INTERFACE) & TIMING (MASTER
+CLOCK) LINKS                                                    1
+2.1. FAST CONTROLS (TRIGGER SYSTEM INTERFACE) LINK              1
+ 2.1.1. FIBER OPTIC SERIAL COMMAND LINK TO THE SILICON READOUT
+ CONTROLLER (SRC)                                              1
+   2.1.1.1. SIGNAL DEFINITIONS                                 2
+   2.1.1.2. CONNECTORS & CABLES                                2
+   2.1.1.3. EXAMPLES OF LINK USE                               2
+   2.1.1.4. ERROR DETECTION & SYSTEM RECOVERY                  3
+ 2.1.2. COAX CONTROL SIGNALS TO THE TRIGGER SYSTEM INTERFACE   3
+   2.1.2.1. SIGNAL DEFINITIONS                                 3
+   2.1.2.2. CONNECTORS & CABLES                                3
+   2.1.2.3. EXAMPLES OF LINK USE                               3
+   2.1.2.4. ERROR DETECTION & SYSTEM RECOVERY                  3
+2.2. MASTER CLOCK INTERFACE LINK                                3
+ 2.2.1. SIGNAL DEFINITIONS & LEVELS                            3
+ 2.2.2. CONNECTORS & CABLES                                    4
+ 2.2.3. TERMINATIONS (IF ANY)                                  4
+ 2.2.4. EXAMPLES OF LINK USE                                   4
+ 2.2.5. ERROR DETECTION & SYSTEM RECOVERY                      4
+2.3. SRC TO/FROM SRC FANOUT LINKS                               4
+ 2.3.1. FAST CONTROL SIGNALS FROM THE SRC MODULE               5
+   2.3.1.1. SIGNAL DEFINITIONS & LEVELS                        5
+   2.3.1.2. CONNECTORS & CABLES                                5
+   2.3.1.3. TERMINATIONS (IF ANY)                              5
+   2.3.1.4. EXAMPLES OF LINK USE                               5
+   2.3.1.5. ERROR DETECTION & SYSTEM RECOVERY                  5
+ 2.3.2. FAST CONTROL SIGNALS TO THE SRC MODULE                 5
+   2.3.2.1. SIGNAL DEFINITION & LEVEL                          5
+   2.3.2.2. CONNECTORS & CABLES                                5
+   2.3.2.3. TERMINATIONS (IF ANY)                              5
+   2.3.2.4. EXAMPLES OF LINK USE                               5
+   2.3.2.5. ERROR DETECTION & SYSTEM RECOVERY                  5
+2.4. VRB CRATE (FAST CONTROL) BACKPLANE LINK                    5
+ 2.4.1. FAST CONTROL SIGNALS FROM THE SRC FANOUT MODULE        5
+   2.4.1.1. SIGNAL DEFINITIONS & LEVELS                        5
+   2.4.1.2. BACKPLANE CONNECTOR PIN ASSIGNMENTS                6
+   2.4.1.3. BACKPLANE SIGNAL DC BIAS & TERMINATION NETWORKS    6
+   2.4.1.4. EXAMPLES OF LINK USE                               7
+   2.4.1.5. ERROR DETECTION & SYSTEM RECOVERY                  7
+ 2.4.2. FAST CONTROL SIGNALS TO THE SRC FANOUT MODULE          7
+   2.4.2.1. SIGNAL DEFINITION & LEVEL                          7
+   2.4.2.2. CONNECTORS & CABLES                                7
+   2.4.2.3. TERMINATIONS (IF ANY)                              7
+   2.4.2.4. EXAMPLES OF LINK USE                               7
+   2.4.2.5. ERROR DETECTION & SYSTEM RECOVERY                  7
+2.5. VRB CRATE J1 (SLOW CONTROL) BACKPLANE (SERIAL) LINK        7
+ 2.5.1. SIGNAL DEFINITIONS & LEVELS                            7
+ 2.5.2. CONNECTORS & CABLES                                    7
+ 2.5.3. TERMINATIONS (IF ANY)                                  7
+ 2.5.4. EXAMPLES OF LINK USE                                   7
+ 2.5.5. ERROR DETECTION & SYSTEM RECOVERY                      7
+2.6. SRC TO FIB CRATE (FAST CONTROL & TIMING) LINKS             7
+ 2.6.1. SIGNAL DEFINITIONS                                     8
+ 2.6.2. LINK TRANSMISSION FORMAT                               9
+ 2.6.3. CONNECTORS & CABLES                                   10
+ 2.6.4. EXAMPLES OF LINK USE                                  10
+ 2.6.5. ERROR DETECTION & SYSTEM RECOVERY                     10
+2.7. FIB CRATE (FAST CONTROL & TIMING) BACKPLANE LINK          10
+ 2.7.1. SIGNAL DEFINITIONS & LEVELS                           10
+ 2.7.2. BACKPLANE CONNECTOR PIN ASSIGNMENTS                   10
+ 2.7.3. BACKPLANE SIGNAL DC BIAS & TERMINATION NETWORKS       10
+ 2.7.4. EXAMPLES OF LINK USE                                  10
+ 2.7.5. ERROR DETECTION & SYSTEM RECOVERY                     10
+2.8. FIB TO PC (FAST CONTROL & TIMING) LINK                    10
+ 2.8.1. SIGNAL DEFINITIONS & LEVELS                           11
+ 2.8.2. CONNECTORS & CABLES                                   11
+ 2.8.3. TERMINATIONS (IF ANY)                                 11
+ 2.8.4. EXAMPLES OF LINK USE                                  11
+ 2.8.5. ERROR DETECTION & SYSTEM RECOVERY                     11
+3. SVX 3 IC EVENT DATA/CONTROL LINK                            11
+3.1. SIGNAL DEFINITIONS & LEVELS                               11
+3.2. CONNECTORS & CABLES                                       11
+3.3. TERMINATIONS (IF ANY)                                     11
+3.4. EXAMPLES OF LINK USE                                      11
+3.5. ERROR DETECTION & SYSTEM RECOVERY                         11
+4. ADDITIONAL EVENT DATA LINKS                                 11
+4.1. PC TO FIB EVENT DATA LINK                                 11
+ 4.1.1. SIGNAL DEFINITIONS & LEVELS                           11
+ 4.1.2. CONNECTORS & CABLES                                   11
+ 4.1.3. TERMINATIONS (IF ANY)                                 11
+ 4.1.4. EXAMPLES OF LINK USE                                  11
+ 4.1.5. ERROR DETECTION & SYSTEM RECOVERY                     11
+4.2. FIB TO OPTICAL DISTRIBUTION BOX (SPLITTER) EVENT DATA LINK11
+ 4.2.1. SIGNAL DEFINITIONS & LEVELS                           11
+ 4.2.2. CONNECTORS & CABLES                                   11
+ 4.2.3. TERMINATIONS (IF ANY)                                 11
+ 4.2.4. EXAMPLES OF LINK USE                                  11
+ 4.2.5. ERROR DETECTION & SYSTEM RECOVERY                     11
+4.3. OPTICAL DISTRIBUTION BOX TO ERB MODULE EVENT DATA LINK    12
+ 4.3.1. SIGNAL DEFINITIONS & LEVELS                           12
+ 4.3.2. CONNECTORS & CABLES                                   12
+ 4.3.3. TERMINATIONS (IF ANY)                                 12
+ 4.3.4. EXAMPLES OF LINK USE                                  12
+ 4.3.5. ERROR DETECTION & SYSTEM RECOVERY                     12
+4.4. OPTICAL DISTRIBUTION BOX TO SVT TRIGGER EVENT DATA LINK   12
+ 4.4.1. SIGNAL DEFINITIONS & LEVELS                           12
+ 4.4.2. CONNECTORS & CABLES                                   12
+ 4.4.3. TERMINATIONS (IF ANY)                                 12
+ 4.4.4. EXAMPLES OF LINK USE                                  12
+ 4.4.5. ERROR DETECTION & SYSTEM RECOVERY                     12
+5. (EVENT DATA) RESYNCHRONIZATION LINK                         12
+5.1. SIGNAL DEFINITIONS & LEVELS                               12
+5.2. CONNECTORS & CABLES                                       12
+5.3. TERMINATIONS (IF ANY)                                     12
+5.4. EXAMPLES OF LINK USE                                      12
+5.5. ERROR DETECTION & SYSTEM RECOVERY                         12
+6. ABORTING SVX READOUT & SYSTEM RECOVERY                      12
+
+1.   Introduction
+
+This  document  gives details of all fast control, timing,  event
+data & resynchronization links used in the SVX II Upgrade readout
+electronics project.  The intention of this document  is  not  to
+include all implementation details for each link but to provide a
+single  document containing information for each link  such  that
+proper    integrated   systems   engineering   is   more   easily
+accomplished.  For example, this document can be used as a  guide
+for  studying how the system is initialized, readout is  aborted,
+event  data  links  are resynchronized, link  errors  and  system
+recovery techniques, etc.
+
+
+2.   Fast  Controls  (Trigger System Interface) & Timing  (Master
+     Clock) Links
+  
+  2.1. Fast Controls (Trigger System Interface) Link
+
+The  Ôfast  controlsÕ link between the Trigger  System  Interface
+(TSI)  and  the  SRC module consists of one 175 MHz  fiber  optic
+ÔTaxiÕ   command  link  from  the  TSI  to  the  Silicon  Readout
+Controller (SRC) and three copper coax control signals  from  the
+SRC to the TSI.
+
+For  a  more complete definition of these command link words  and
+control  signals and an explanation of their use in  a  front-end
+readout  system such as SVX, refer to the February 8,  1995  Yale
+Trigger  Note  #1  ÒConceptual  Design  of  the  Trigger   System
+Interface  for  the Run II UpgradeÓ and a subsequent  August  14,
+1995  CDF  Group/Yale  University draft note ÒTrigger  Supervisor
+Protocols for Run IIÓ.
+
+     
+     2.1.1.    Fiber Optic Serial Command Link To The Silicon Readout
+          Controller (SRC)
+
+There are four different types of control ÔwordsÕ sent by the TSI
+to the SRC as given in the following four tables:
+
+  Bit    Definition
+   0     C0 (Always 0 for Level 1
+         word)
+   1     C1 (Always 0 for Level 1
+         word)
+   2     L1A (1 for Level 1 Accept)
+   3     L1RO (1 for Level 1 Reject)
+   4     L1B0 (Buffer address for
+         L1A, LSB)
+   5     L1B1 (Buffer address for
+         L1A, MSB)
+   6     RSRV1 (Reserved)
+ 7, 8    Spare
+                             Table 1
+                          Level 1 Word
+                                
+Level 1 Accepts (L1A) are passed on by the SRC to all on-detector
+FIB crates whereas Level 1 Rejects are not used by the SVX
+readout electronics.  L1B0 & L1B1 along with gated RSRV1 are
+passed through SVX Fanout Modules to all VME Readout Buffer (VRB)
+modules as the three least significant bits of Store Buffer ID
+(see Table 7).
+
+Question 1:     What  does  D0 need passed to VRB  modules  as  a
+          result of L1As or L1Rs?
+
+If  the  SRC received two or more Level 1 Accepts in a row (e.g.,
+two  consecutive bunch crossings result in Level 1 Accepts),  the
+SRC  always  immediately forwards the L1A to the FIB  crates  but
+does  not send the ÒRead pipeline/digitize/readoutÓ command  (see
+Table 10) for the second L1A and subsequent L1As until data  from
+the previous L1A has been sent to VRB modules (SVX_DONE signal in
+the SRC returned to logic Ô1Õ {see Section 2.3.2}).
+
+Question 2:    Can D0 operate in an identical manner?
+Question 3:     Assuming  the SRC keeps statistics  of  available
+          buffers in the VRB modules, what should the SRC  do  if
+          it  is  told by the TSI of a L1A and given a Ônot-freeÕ
+          buffer  to  use  for that L1AÕs event  data  fragments?
+          Should  ERROR  be  sent to the TSI and  this  condition
+          logges  by  the  SRC for later VME monitoring  readout?
+          Should  WAIT  be sent to the TSI (for how long?)  until
+          the  buffer becomes free?  How does D0 (or calorimetry,
+          etc.) want to handle this situation?
+
+  Bit    Definition
+   0     C0 (Always 0 for SES word)
+   1     C1 (Always 1 for SES word)
+   2     SESB0  (Buffer  Address   for
+         SES, LSB)
+   3     SESB1  (Buffer  Address   for
+         SES, MSB)
+   4     RSRV2 (Reserved)
+   5     EVID0 (Bit 0 of DAQ Event ID,
+         LSB)
+   6     EVID1 (Bit 1 of DAQ Event ID,
+         LSB)
+   7     EVID2 (Bit 2 of DAQ Event ID,
+         LSB)
+   8     EVID3 (Bit 3 of DAQ Event ID,
+         LSB)
+                             Table 2
+                      Start Event Scan Word
+
+Why  did D0 want to send buffer ID through J3?  because their VBD
+canÕt  do it over VME.  EVID passed through J3 backplane to  VRB.
+Who checks this SVT, VRB  ... or FIB.
+
+Abort  of Readout ... how?  Who decides there should be an abort?
+How is this accomplished?  Maybe we need another line from SVT to
+SRC  for  Abort.  FIB sends an artificial EOR after ABORT command
+from SRC.  SVT does not send L2A.
+
+  Bit    Name        Definition
+   0         C0      Always  1 for  CALIBEN
+                     word
+   1         C1      Always  0 for  CALIBEN
+                     word
+  2-4      CALIB0-   Currently  defined  as
+           CALIB2    follows:
+                     000 Scope trigger
+                     001 Charge injection
+                     010 Laser
+                     111 No action
+  5-8       Spare    
+                             Table 3
+                     Calibration Enable Word
+
+
+  Bit      Name     Definition
+   0        C0      Always 1 for Control word
+   1        C1      Always 1 for Control word
+   2       HALT     Stop Input to Level 1 buffer
+   3       RESET    Reset  of  pipeline buffers, pointers,
+                    etc.
+   4       TEST     For testing TSI to SRC link as
+                    follows:
+                    Upon receipt of first TEST=1, SRC sets
+                    DONE=0 and ERROR & WAIT=1.  Upon
+                    receipt of the second TEST=1, SRC sets
+                    DONE=1 and ERROR & WAIT=0.
+   5        RUN     Start input to Level 1 pipeline upon
+                    receipt of next Bunch Zero
+  6-8    SCN0-SCN2  Scan  list bits; determines which scan
+                    list the SRC should use
+                    For  the Scan List to change,  bits  2
+                    through 5 must be zero.
+                    The  Scan Lists currently defined  are
+                    as follows:
+                    000 Default
+                    001 YMON
+                    010 Plug Calorimeter
+                    011 Trigger Dump
+                             Table 4
+                          Control Word
+                                
+Bunch Zero is received from the Master Clock System less than or
+equal to 21 microseconds after the SRC received Run from the
+Trigger System Interface.  When Bunch Zero is received, the Level
+1 pipeline in the SVX 3 ICs can start to be filled and be waiting
+for Level 1 Accepts.
+
+Question 4:     What  do  we  (CDF SVX) do with  all  these  bits
+          especially  SCN0-SCN2?   For  example,  do   we   reset
+          pipeline capacitor to zero when RESET is received?
+Question 5:      When  the  TSI  goes  through  a  HALT-RESET-RUN
+          sequence,  how do we operate?  There is talk  of  using
+          DONE  or WAIT in another capacity during this sequence.
+          When  RESET is received, DONE possible would be set  to
+          logic zero until the SVX system is reset whereupon DONE
+          would  be set to logic one.  Do we disable sending  any
+          signals  (e.g.,  SYNCs)  to the  detector  during  this
+          sequence?  How does D0 operate when resetting  and  are
+          there any features needed in the VRB to accomodate  D0s
+          ÔHALT-RESET-RUNÕ sequence?
+          
+          2.1.1.1.  Signal Definitions
+2.1.1.2.  Connectors & Cables
+2.1.1.3.  Examples Of Link Use
+
+          
+          2.1.1.4.  Error Detection & System Recovery
+     
+     2.1.2.    Coax Control Signals To The Trigger System Interface
+
+Fast  controls link control signals returned by the  SRC  to  the
+Trigger  System  Interface (TSI) consists  of  three  coax  cable
+signals as given in the following table:
+
+ Name    Definition
+ DONE    Deasserted  at  receipt of Start  Event  Scan  word  &
+         reasserted  when  internal (Level 2) buffer  is  again
+         EMPTY
+ ERROR   Asserted  if  a  Fatal Error is detected  in  the  SVX
+         system
+ WAIT    Asserted if a potential busy condition is detected  in
+         the SVX system
+                             Table 5
+                   Control Signals To The TSI
+
+Question 6:     Does  DONE only come from the SRC or is  there  a
+          DONE from each VRB module?
+Question 7:     Should  ERROR or WAIT be asserted when  Ôloss  of
+          synchronizationÕ in either an event data  link  or  the
+          SRC_Fanout is detected?
+Note 1:   It    was   decided   that   ERROR   used.    Loss   of
+          synchronization should be a rare error.
+Question 8:     Should  there be one DONE line for the whole  SVX
+          system?  Power on sets DONE.  VME command set and reset
+          DONE.
+
+          
+          2.1.2.1.  Signal Definitions
+2.1.2.2.  Connectors & Cables
+2.1.2.3.  Examples Of Link Use
+2.1.2.4.  Error Detection & System Recovery
+  
+  2.2. Master Clock Interface Link
+
+The  Master  Clock System is designed to provide signals  of  any
+frequency or wave shape based on the acceleratorÕs 53 MHz  clock.
+The   frequency,   wave  shape  and  phase,   relative   to   the
+acceleratorÕs  53  MHz clock, of each signal is controllable  via
+VME.   Phase  adjustments are in one nanosecond increments.   The
+signals are transmitted using differential PECL logic levels.
+
+     
+     2.2.1.    Signal Definitions & Levels
+
+The  following four signals are transmitted by the  Master  Clock
+System to the SRC module:
+
+    Name     Definition
+ SVX Clock   53   MHz   clock   signal  synchronized   to   the
+             accelerator 53 MHz clock
+    SYNC     Signal  synchronized  to the  accelerator  53  MHz
+             clock,  one SVX Clock period in duration, centered
+             at  the  low  to  high transition  of  SVX  Clock,
+             occuring   once   every   132   nanoseconds    and
+             indicating  the  possible presense  of  a  proton-
+             antiproton bunch crossing
+   Bunch     Signal  synchronized  to the  accelerator  53  MHz
+  Crossing   clock,  one SVX Clock period in duration, centered
+             at  the  low  to  high transition  of  SVX  Clock,
+             occuring  whenever  there is  a  proton-antiproton
+             bunch   crossing  (excluding  beam   gaps,   Bunch
+             Crossings  occur  every  132  or  396  nanoseconds
+             depending  upon the current accelerator  operation
+             mode)
+ Bunch Zero  Signal  synchronized  to the  accelerator  53  MHz
+             clock,  one SVX Clock period in duration, centered
+             at  the  low  to  high transition  of  SVX  Clock,
+             occuring  once  every revolution of  beam  in  the
+             accelerator main ring at ???? time
+                             Table 6
+                 Master Clock Signals To The SRC
+
+Question 9:    Should ÔSVX ClockÕ be changed to ÔCDF ClockÕ?
+Question 10:     What  is  the  CDF_CLK  described  in  the   CDF
+          Synchronization proposal?
+Question 11:    Is the SRC the only SVX device with a 8-bit Bunch
+          Counter?   If  so, how is global checking accomplished?
+          Also  since  all data has to be tagged with  the  Bunch
+          Crossing number unless the SVT has a Bunch Counter, the
+          FIBs have to send the Bunch Counter number to the SVT.
+Question 12:    Should the FIB or the SVT and VRBs tag data  with
+          the Bunch Crossing number?
+Question 13:    Is  it  the  Bunch Crossing or the Beam  Crossing
+          signal?
+Note  2:   The Bunch Counter counting should not be gated by  the
+Bunch Crossing signal.
+
+Abort gaps ... preamp reset during big abort gaps ... ³ two syncs
+          without bunch crossing
+
+     
+     2.2.2.    Connectors & Cables
+2.2.3.    Terminations (If Any)
+2.2.4.    Examples Of Link Use
+2.2.5.    Error Detection & System Recovery
+  
+  2.3. SRC To/From SRC Fanout Links
+
+     
+     2.3.1.    Fast Control Signals From The SRC Module
+          
+          2.3.1.1.  Signal Definitions & Levels
+2.3.1.2.  Connectors & Cables
+2.3.1.3.  Terminations (If Any)
+2.3.1.4.  Examples Of Link Use
+2.3.1.5.  Error Detection & System Recovery
+     
+     2.3.2.    Fast Control Signals To The SRC Module
+
+SVX_DONE,  SYNC_ERROR, (other errors?), WAIT?  (calorimeter  BUSY
+instead of it being from on-detector crate?)
+
+          
+          2.3.2.1.  Signal Definition & Level
+2.3.2.2.  Connectors & Cables
+2.3.2.3.  Terminations (If Any)
+2.3.2.4.  Examples Of Link Use
+2.3.2.5.  Error Detection & System Recovery
+  
+  2.4. VRB Crate (Fast Control) Backplane Link
+
+The following sections describe Fast Control signals sent between
+a  VME Readout Buffer (VRB) crateÕs SRC Fanout module and its VME
+Readout Buffer modules.
+
+     
+     2.4.1.    Fast Control Signals From The SRC Fanout Module
+          
+          2.4.1.1.  Signal Definitions & Levels
+
+The  following  two  tables list signals,  signal  definitions  &
+signal levels on the VRB Crate (Fast Control) J3 Backplane Link:
+
+Signal Name     Signal Definition                   Signal Level
+Store Buffer    Buffer  in  which  to  store  next  Differential
+ID (3:0)        received   event  data   fragments  RS-485
+                (Level 1 accepted event data)
+Store Buffer    Signal  used to load Store  Buffer  Differential
+ID Strobe       ID (3:0)                            RS-485
+Read Buffer ID  Buffer  from  which to  read  next  Differential
+(3:0) {Note 2}  event data fragments                RS-485
+Read Buffer ID  Signal used to load Read Buffer ID  Differential
+Strobe          (3:0)                               RS-485
+Bunch Counter   CDF system-wide beam bunch counter  Differential
+Number (7:0)                                        RS-485
+{Note 3}
+Bunch Counter   Signal  used to load Bunch Counter  Differential
+Strobe          (7:0)                               RS-485
+                             Table 7
+          Signals From SRC Module To SRC Fanout Module
+               & VME Readout Buffer (VRB) Modules
+
+Note 3:   Read  Buffer  ID (3:0) is only needed if  the  VME  bus
+          cannot be used by the system to specify the buffer from
+          which to read next event data fragments.
+Question 14:    Is  Read buffer ID (3:0) required because of  the
+          capabilities of the D0 readout controller?
+Note 4:   Only  needed  if  VRB modules check  that  FIB  modules
+          correctly append Bunch Counter to event data fragments.
+          If  this  data integrity check is done, what  is  being
+          checked at the VRB modules is the correct Bunch Counter
+          data  transmission from the SRC to the FIB Crate Fanout
+          modules,  from the Fanout modules to the  FIB  modules,
+          FIB  appending of the Bunch Counter to their event data
+          fragments,  and data transmission from the FIB  modules
+          to the VRB modules.
+Note 5:   Store  Buffer  ID, Read Buffer ID (if needed)  &  Bunch
+          Counter  could  be  sent on shared  lines  via  encoded
+          commands with a common strobe ... to reduce signal line
+          count.
+
+Signal      Signal Definition                  Signal Level
+Name
+SYNC_ERR    Loss   of  G-link  synchronization Differential  RS-
+            detected in VRB module             485 {Note 3}
+BC_ERR      Bunch   crossing  data   integrity Differential  RS-
+            error detected in VRB module       485 {Note 4}
+                             Table 8
+   Signals From VRB Modules To SRC Fanout Module To SRC Module
+
+Note 6:   SYNC_ERR  RS-485 lines biased such that  SYNC_ERR  =  0
+          when all VBR module SYNC_ERR RS-485 drivers are in tri-
+          state  mode.  VRB module only puts its SYNC_ERR  RS-485
+          driver in non tri-state mode when it drives SYCN_ERR  =
+          1.   SYNC_ERR  remains asserted until  loss  of  G-link
+          synchronization  is  no  longer  detected  by  the  VRB
+          module.
+Note 7:   BC_ERR  RS-485 lines biased such that BC_ERR =  0  when
+          all  VBR  module BC_ERR RS-485 drivers are in tri-state
+          mode.   VRB module only puts its SYNC_ERR RS-485 driver
+          in  non tri-state mode when it drives BC_ERR = 1.  Only
+          needed  if VRB modules check that FIB modules correctly
+          append Bunch Counter to event data fragments.  See Note
+          3 above.
+Question 15:   How long is BC_ERR asserted and how is it reset?
+
+          
+          2.4.1.2.  Backplane Connector Pin Assignments
+
+******** 160-pin DIN for J3 connector ********
+
+          
+          2.4.1.3.  Backplane Signal DC Bias & Termination Networks
+
+In  order  to ensure that backplane signals are both  at  a  pre-
+defined  state when not driven and are not unduly susceptible  to
+noise,  all  VRB Crate differential RS-485 backplane signals  are
+terminated at one end with a DC bias network and at the other end
+with a resistor termination as follows:
+
+DC  Bias Network:
+
+Each differential RS-485 pair has a DC bias network consisting of
+a  120  ohm resistor connected at one end to +5 volts and at  its
+other end to a 240 ohm resistor.  The opposite end of the 240 ohm
+resistor is connected to ground through another 120 ohm resistor.
+Each  differential  RS-485  pair  connects  across  the  240  ohm
+resistor.  Receivers are connected such that logic 0 is  received
+at  the output of receivers when the RS-485 pair is not driven by
+a driver.  If the receivers contain internal bias circuitry, they
+are  connected such that the DC bias network aids this  circuitry
+to  produce a specific logic level at the output of the receivers
+when  a  differential  RS-485 pair is not  driven.   Drivers  are
+connected such that they are logically consistant with the above.
+
+For  signals driven by the SRC Fanout module, the DC bias network
+is  at  the  opposite end of the backplane from  the  SRC  Fanout
+module.   For signals received by the SRC Fanout module,  the  DC
+bias network is nearest the SRC Fanout module.
+
+Termination Network:
+
+The  termination network consists of a 120 ohm resistor connected
+across each differential RS-485 pair.
+
+For  signals  driven  by the SRC Fanout module,  the  termination
+network is at the end nearest the SRC Fanout module.  For signals
+received by the SRC Fanout module, the termination network is  at
+the opposite end of the backplane from the SRC Fanout module.
+
+          
+          2.4.1.4.  Examples Of Link Use
+2.4.1.5.  Error Detection & System Recovery
+     
+     2.4.2.    Fast Control Signals To The SRC Fanout Module
+          
+          2.4.2.1.  Signal Definition & Level
+2.4.2.2.  Connectors & Cables
+2.4.2.3.  Terminations (If Any)
+2.4.2.4.  Examples Of Link Use
+2.4.2.5.  Error Detection & System Recovery
+
+2.5. VRB Crate J1 (Slow Control) Backplane (Serial) Link
+     
+     2.5.1.    Signal Definitions & Levels
+2.5.2.    Connectors & Cables
+2.5.3.    Terminations (If Any)
+2.5.4.    Examples Of Link Use
+2.5.5.    Error Detection & System Recovery
+  
+  2.6. SRC To FIB Crate (Fast Control & Timing) Links
+
+The SRC To FIB Crate Link transmits both Fast Control information
+from the Trigger System Interface (and the SRC module) and Timing
+information  from  the  Master Clock over a 1.06  Gigabits/second
+fiber  optic link inmpemented with HP 2nd generation G-link  ICs.
+Multiple  outputs  on the SRC module are used  to  transmit  fast
+control  and timing information from the SRC module to  each  FIB
+Crate  Fanout module.   The following sections gives  details  of
+these links.
+     
+     2.6.1.    Signal Definitions
+
+The  following  table lists all Fast Control signals  and  Timing
+signals  transmitted from the SRC module to each FIB crates  over
+the SRC To FIB Crate links:
+
+#  Signal Name         Signal Definition
+1  SVX Clock           (See Table 6)
+2  SYNC                (See Table 6)
+3  Pipeline Capacitor  6-bit (0 - 41) SVX 3 IC pipeline
+   Number (5:0)        capacitor number from ???
+4  Bunch Crossing      8-bit accelerator bunch crossing number
+   Number (7:0)        from ???
+5  Advance Pipeline    ??? from ???
+6  Level 1 Trigger     Indication from the Trigger System
+   Accept              Interface of an accepted Level 1 trigger
+7  Command (4:0)       ??? from Trigger System Interface and/or
+                       SRC module
+                             Table 9
+         SRC To FIB Crate Fast Control & Timing Signals
+
+Question 16:   Should the Bunch Crossing Number be included?  See
+          Table 7 and Note 3.
+
+Who checks for P Cap # integrity and how is error indicated?  SRC
+          has  the  Bunch Crossing # and sends it to  FIBs  where
+          FIBs  append it to data.  Bunch crossing COULD be  sent
+          to  VRBs  but ...  Pipeline Cap # sent only  after  SRC
+          sends digitize & readout after sending L1A.  After
+Advance Pipeline ... SRC always sending SYNC pulses.  If 132  ns,
+          acquisition  and  readout EVERY time  if  396  ns,  1/3
+          times.
+
+Definitions  of the Command (4:0) signals listed in Table  9  are
+given in Table 10.
+
+  Command (4:0)     Command
+                    Definition
+   00000 (0x00)     No operation
+   00001 (0x01)     No operation
+   00010 (0x02)     Preamplifier  stop
+                    reset
+   00011 (0x03)     Enter  into   data
+                    sampling mode
+   00100 (0x04)     Preamplifier
+                    start reset
+   00101 (0x05)     Read
+                    pipeline/digitize
+                    /readout
+   00110 (0x06)     No operation
+   00111 (0x07)     No operation
+   01000 (0x08)     Stop          data
+                    sampling clocks
+   01001 (0x09)     Calibration
+                    inject
+  01010 (0x0A) -    No operation
+   10000 (0x10)
+   10001 (0x11)     Latch status
+   10010 (0x12)     Reset SVX 3 ICs
+   10011 (0x13)     Reset FIB module
+   10100 (0x14)     Reset  Port   Card
+                    controller
+   10101 (0x15)     Send  Fill  Frames
+                    on all G-links
+  10110 (0x16) -    No operation
+   11111 (0x1F)
+                            Table 10
+                    SRC To FIB Crate Commands
+
+Question 17:    Does  Table 10 contain correct and  all  commands
+          needed in production components?
+Note 8:   Wherever  information  is from another  document/source
+          (e.g.,  Table  10),  add  complete  reference  to  that
+          document/source.
+
+Note 9:   The  53  MHz  SVX  Clock is derived at each  FIB  Crate
+          Fanout  module  from the receipt of each Control/Timing
+          Word  and  its G-link receiver phase-locked-loop.   The
+          signalÕs  duty cycle is 50% also because of the  phase-
+          locked-loop.
+
+Control  of  the phase of the 53 MHz SVX Clock and  SYCN  signals
+relative  to  the master accelerator clock signal is accomplished
+within   the  Master Clock System.  Phase of each signal  can  be
+individually varied in one nanosecond increments.
+
+SYNC  is  true  for  one  SVX Clock cycle  whenever  there  is  a
+potential   p-pbar   collision.   Depending  upon   the   running
+conditions of the accelerator, this signal will occur  in  bursts
+each separated by either 132 or 396 nanoseconds.
+
+Pipeline Capacitor Number is generated within the SRC module  and
+is  sent  towards the detector as a global SVX system check  that
+each  SVX 3 IC is using the same Ôpipeline capacitor numberÕ  and
+that this number is the same as that generated by the SRC module.
+Each SVX 3 IC containing one or more hits transmits its Ôpipeline
+capacitor numberÕ used to attain the transmitted data.
+
+Bunch Crossing Number ????
+
+Advance Pipeline ????
+
+Level  1  Trigger Accept is received by the SRC from the  Trigger
+System  Interface whenever the Level 1 Trigger System detects  an
+accepted Level 1 trigger.
+
+Command  is a five-bit word sent by the Trigger System Interface.
+????
+
+     
+     2.6.2.    Link Transmission Format
+
+******  Include link speed and word transmission rate information
+as well ******
+
+The  G-link ICs used in this link are configured to send a 16-bit
+data  word  every 18.9 nanoseconds (1 / 53 MHz).   Possible  word
+configurations are given in Table 11.
+
+  Control/Timing Word   1 1  1 1  1 1  9 8  7 6  5 4  3 2 1  0
+       Bit # -->        5 4  3 2  1 0
+ Control/Timing Word 3  1 1  S L  A                C  C C C  C
+                             Y 1  D                M  M M M  M
+                             N A  V                D  D D D  D
+                             C    P                4  3 2 1  0
+ Control/Timing Word 2  1 0  S L  A         B B  B B  B B B  B
+                             Y 1  D         C C  C C  C C C  C
+                             N A  V         N N  N N  N N N  N
+                             C    P         7 6  5 4  3 2 1  0
+ Control/Timing Word 1  0 1  S L  A                P  P P P  P
+                             Y 1  D                C  C C C  C
+                             N A  V                N  N N N  N
+                             C    P                4  3 2 1  0
+ Control/Timing Word 0  0 0                                  
+    (No Operation)
+                            Table 11
+             SRC To FIB Crate Control & Timing Words
+                                
+Question 18:    Table 11 gives only possible Control/Timing words
+          and  their  bit maps.  Is this the flexibility  desired
+          and/or required?  Is there a simpler implementation?
+
+     
+     2.6.3.    Connectors & Cables
+2.6.4.    Examples Of Link Use
+2.6.5.    Error Detection & System Recovery
+  
+  2.7. FIB Crate (Fast Control & Timing) Backplane Link
+
+******  Same  signals  as  Table 9 but probably  with  AT&T  PECL
+drivers & signal levels ******
+     
+     2.7.1.    Signal Definitions & Levels
+2.7.2.    Backplane Connector Pin Assignments
+2.7.3.    Backplane Signal DC Bias & Termination Networks
+2.7.4.    Examples Of Link Use
+2.7.5.    Error Detection & System Recovery
+  
+  2.8. FIB To PC (Fast Control & Timing) Link
+
+Test  Port  Card  will be on WWW by Wednesday  (see  page  8  for
+commands)
+Enter  initialization  mode, reset pre-amp, perform  digitization
+and readout.
+
+SM_CLK ... to send serial commands to PC
+SR_CMD
+SVX_FE_CLK ... analog acquisition
+SVX_BE_CLK ... digital readout
+
+     
+     2.8.1.    Signal Definitions & Levels
+2.8.2.    Connectors & Cables
+2.8.3.    Terminations (If Any)
+2.8.4.    Examples Of Link Use
+2.8.5.    Error Detection & System Recovery
+
+3.   SVX 3 IC Event Data/Control Link
+  
+  3.1. Signal Definitions & Levels
+3.2. Connectors & Cables
+3.3. Terminations (If Any)
+3.4. Examples Of Link Use
+3.5. Error Detection & System Recovery
+
+4.   Additional Event Data Links
+  
+  4.1. PC To FIB Event Data Link
+     
+     4.1.1.    Signal Definitions & Levels
+4.1.2.    Connectors & Cables
+4.1.3.    Terminations (If Any)
+4.1.4.    Examples Of Link Use
+4.1.5.    Error Detection & System Recovery
+  
+  4.2. FIB to Optical Distribution Box (Splitter) Event Data Link
+     
+     4.2.1.    Signal Definitions & Levels
+4.2.2.    Connectors & Cables
+4.2.3.    Terminations (If Any)
+4.2.4.    Examples Of Link Use
+4.2.5.    Error Detection & System Recovery
+  
+  4.3. Optical Distribution Box To ERB Module Event Data Link
+     
+     4.3.1.    Signal Definitions & Levels
+4.3.2.    Connectors & Cables
+4.3.3.    Terminations (If Any)
+4.3.4.    Examples Of Link Use
+4.3.5.    Error Detection & System Recovery
+  
+  4.4. Optical Distribution Box To SVT Trigger Event Data Link
+     
+     4.4.1.    Signal Definitions & Levels
+4.4.2.    Connectors & Cables
+4.4.3.    Terminations (If Any)
+4.4.4.    Examples Of Link Use
+4.4.5.    Error Detection & System Recovery
+
+5.   (Event Data) Resynchronization Link
+  
+  5.1. Signal Definitions & Levels
+5.2. Connectors & Cables
+5.3. Terminations (If Any)
+5.4. Examples Of Link Use
+5.5. Error Detection & System Recovery
+
+6.   Aborting SVX Readout & System Recovery
+
+

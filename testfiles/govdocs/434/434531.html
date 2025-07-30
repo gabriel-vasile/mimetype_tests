@@ -1,0 +1,1118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+           "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<meta name="GENERATOR" content="TtH 3.13">
+ <style type="text/css"><!--
+ td div.comp { margin-top: -0.6ex; margin-bottom: -1ex;}
+ td div.comb { margin-top: -0.6ex; margin-bottom: -.6ex;}
+ td div.hrcomp { line-height: 0.9; margin-top: -0.8ex; margin-bottom: -1ex;}
+ td div.norm {line-height:normal;}
+ span.roman {font-family: serif; font-style: normal; font-weight: normal;} 
+ span.overacc2 {position: relative;  left: .8em; top: -1.2ex;}
+ span.overacc1 {position: relative;  left: .6em; top: -1.2ex;} --></style>
+
+                                                                                  
+<title>OGIP Memo OGIP/95-008</title>
+
+OGIP Memo OGIP/95-008
+<br /><br />
+
+<center>
+
+<p>
+<font size="+4"><b>The MATHPHA User's Guide</b>
+
+<p>
+<font size="+0"><a href="/docs/bios/imgeorge.html">Ian M George</a>
+<font size="-1">
+<br />
+Code 668, <br />
+NASA/GSFC, <br />
+Greenbelt, MD20771
+
+<p>
+<font size="+0">Version: 1995 Aug 23<br />
+MATHPHA v4.0.0
+</font></font></font></font></center>
+
+<p>
+<br /><br /><br /><br /><br />
+<h2>SUMMARY</h2>
+
+<p>
+<table border="0"><tr><td></td><td><table border="0"><tr><td></td><td width="513">
+
+<tt>MATHPHA</tt> 
+is a task within the
+<a href="/docs/software/ftools/heasarc.html">HEASARC sub-package</a>
+
+<p>
+of
+<a href="/docs/software/ftools/ftools_menu.html">FTOOLS</a>
+which allows users to perform mathematical operations on PHA datasets.
+Here we describe in detail the
+required user inputs, available commands &amp; current limitations of
+the task. A number of examples are also provided for illustration.
+
+</td></tr></table><!--vbox-->
+</td><td></td></tr></table><!--hboxt-->
+<h2>LOG OF SIGNIFICANT CHANGES</h2>
+
+
+<p>
+
+<p>
+<a name="tth_tAb1">
+</a> <center><a name="tab:changes_log">
+</a>
+<table border="1">
+<tr><td colspan="1" align="center"><b>Release</b> </td><td colspan="1" align="center"><b>Sections Changed</b> </td><td colspan="1" align="center"><b>Brief Notes</b></td></tr>
+<tr><td colspan="1" align="center"><b>Date</b> </td><td></td><td></td></tr>
+<tr><td align="right"></td><td></td><td></td></tr>
+<tr><td align="right">1995 Mar 30 </td><td></td><td>Original Version</td></tr>
+<tr><td align="right">1995 Apr 14 </td><td>All
+		</td><td>Update for <tt>MATHPHAv3.5.0</tt> </td></tr>
+<tr><td align="right">1995 Aug 23 </td><td><a href="#Sec:errors">3</a>, <a href="#Sec:parameters">8</a>        
+		</td><td>Update for <tt>MATHPHAv4.0.0</tt> </td></tr>
+<tr><td align="right"></td><td></td><td></td></tr></table>
+
+</center>
+<p>
+<font size="+0">
+<p>
+ <h2><a name="tth_sEc1">
+1</a>&nbsp;&nbsp;INTRODUCTION</h2>
+
+<p>
+<tt>MATHPHA</tt> takes  a  user-defined  input  expression  representing    
+mathematical  operations  to  be  performed  on  (one  or  more) PHA    
+datasets. The input  expression  is  thus  allowed  to  contain  PHA    
+filenames  (and  optionally,  an  extension  number),  a  number  of    
+mathematical  operators,  integers,  reals,  and  pairs  of   curved    
+brackets  ("("  &amp; ")"). Assuming the expression is able to be parsed (and
+a number of  other  criteria  are  satisfied),  the  operations specified 
+are  performed  on the PHA dataset, the errors propagated 
+(see Section&nbsp;<a href="#Sec:errors">3</a>), 
+and a new file containing the resultant PHA dataset is written.
+
+<p>
+The units in which the algebra is performed is controlled        
+by a parameter (<tt>units</tt>; see Section&nbsp;<a href="#Sec:units">2</a>), 
+the default of which is COUNTS        
+(as  opposed  to  COUNTS  PER  SECOND). This is true 
+<b>IRRESPECTIVE</b> of        
+whether the original PHA data themselves are  stored  as  counts  or        
+counts  per  second.  The  exposure  time  written  for  the new PHA        
+dataset is controlled by a user-defined parameter (<tt>exposure</tt>;  
+see Section&nbsp;<a href="#Sec:exposure">4</a>). Users also have the option of specifying 
+the values written to the o/p file of several other mandatory keywords
+(see Section&nbsp;<a href="#Sec:auxfiles">6</a>).
+
+<p>
+<b>Users should note</b> that <tt>MATHPHA</tt> is  a  moderately  powerful tool,
+and thus  open  to confusion/abuse. Users are strongly urged  to  read  &amp; 
+attempt  to fully  understand  the  deatils of the task.
+In  particular,  users  should understand the implied units for any
+integers/reals which form  part of  the  input expression, the details of the
+error propagation, and options available to calculate the exposure time
+written to the  o/p file.  Both  of  these  issues  are  discussed  in detail
+below. Any remaining   confusion/uncertainties/strange   results   should   
+be reported to the author.
+
+<p>
+At  the  current  time,  only  a  modest  number  of  mathematical        
+operations are possible (as listed 
+in Section&nbsp;<a href="#Sec:supported">2.1</a>), though it is  anticipated        
+that  they  will serve the vast majority of users' needs. These will        
+be added to as dictated by demand. In addition, due to the  relative        
+crudeness  of the expression parser, there are number of rules which        
+users must conform to when constructing their input expression 
+(Section&nbsp;<a href="#Sec:units">2</a>).   
+Violation   of   these  rules  will  result  in  the  task        
+(hopefully)  stopping,  (possibly)  crashing,  or   (maybe   even)        
+producing incorrect results.                                                
+
+<p>
+Only  the the OGIP recognised PHA file formats described in 
+<a href="/docs/heasarc/ofwg/docs/spectra/ogip_92_007/ogip_92_007.html">OGIP/92-007</a>
+
+<p>
+(see also Arnaud etal 1992)
+and its appendix  provided  in  OGIP  memo        
+<a href="/docs/heasarc/ofwg/docs/spectra/ogip_92_007a/ogip_92_007a.html">OGIP/92-007a</a>
+are supported for both the input and output files.             
+
+<p>
+ <h2><a name="tth_sEc2">
+2</a>&nbsp;&nbsp;RULES GOVERNING THE CONSTRUCTION OF THE INPUT EXPRESSION</h2>
+<a name="Sec:units">
+</a>
+
+<p>
+The  input  expression  is  a  character  string (currently with a        
+maximum length  of  1024  characters)  which  forms  a  mathematical        
+expression consisting of:                                                   
+
+<p>
+
+<ul>
+<li>    PHA filenames<br />
+            Only  the  &#246;bvious"  restrictions  are  currently placed on        
+        filenames, namely that the path must be specified, and that  the        
+        parser  must  not  be  able  to interpret the path/filename as a        
+        mathematical operation, an  integer/real,  or  some  combination        
+        thereof  (this  currently  poses a problem under unix &amp; ultrix -
+        see below). A specific extension of the  input  file  containing        
+        the  PHA dataset to be operated on can be specified by including        
+        the integer extension number in  square  (<tt>[</tt>extn#<tt>]</tt>)  
+	brackets        
+        after  the  filename.  If such a specification is not used, then        
+        the entire PHA file will be searched for  extensions  likely  to        
+        contain  a PHA dataset. In such cases, if the input file is then        
+        found to consist of more than one PHA  dataset,  then  the  task        
+        will warn the user and stop.                                            
+	
+<ul>
+<li>		At  the  current  time,  up to 10 filenames can be specified        
+        within the input expression (within the constraint of the  total        
+        number   of   characters  specified  above).  Within  the  above        
+        limitation on the number of filenames, a given i/p filename  can        
+        feature any number of times within the input expression.<p></li>
+</ul><p></li>
+
+<li>    Allowed mathematical operations<br />
+            The  mathematical  operators  currently  allowed  are listed        
+        in Section&nbsp;<a href="#Sec:supported">2.1</a>. 
+	Any character which is not in this list, is not a  curved        
+        bracket,  and  which  cannot  be  interpreted  as  (part  of) an        
+        integer/real,  will  be  interpreted  as  a  filename,  or  part        
+        thereof.                                                                
+	
+<ul>
+<li>	Users  should  adhere  to  standard mathematical conventions        
+        when  constructing  the  input   expression   to   ensure   that        
+        operations  are  carried  out in the desired order. It should be        
+        noted that in the case of a  'sub-expression'  consisting  of  a        
+        series   of   multiplication   and/or   division  operations  on        
+        filenames   and/or   numerical   constants   (ie    where    the        
+        sub-expression  does  not  contain  either  
+	<tt>+</tt>, <tt>-</tt>, <tt>(</tt> or <tt>)</tt>        
+        characters), these operations will be carried out  working  from        
+        left-to-right.  Thus the sub-expression 
+	<tt>4/2*6</tt> will result in a        
+        value of <tt>12</tt>.<p></li>
+
+<li>
+            At the current time, the input expression  can  include  any        
+        number  of mathematical operations (within the constraint of the        
+        total number of characters specified above).<p></li>
+
+<li>
+            <b>NOTE</b> currently,  a  mathematical  operator  is  
+	<b>NOT</b>
+        allowed  to  immediately  follow a <tt>(</tt> 
+	character, or immediately        
+        preceed a <tt>)</tt> character in the input expression.<p></li>
+</ul><p></li>
+
+<li>    Numerical constants (reals and/or integers)<br />
+            Numerical  constants  consist  of  a  combination  of  ASCII        
+        characters  in  the  range  <tt>0</tt>  to  <tt>9</tt> along with 
+	an optional,        
+        single decimal point (<tt>.</tt>). For internal  purposes,  the  
+	parser        
+        interprets  all  integers as reals, thus the inclusion/exclusion        
+        of the decimal point for whole numbers is of no consequence.            
+	
+<ul>
+<li>		It is <b>IMPERATIVE</b> 
+	that users remember that the units  of  any        
+        numerical  constants  added  to or subtracted from a PHA dataset        
+        assumed to be in the units specified by  the  parameter  
+	<tt>units</tt>        
+        (the  default  of  which  is COUNTS; see Section&nbsp;<a href="#Sec:parameters">8</a>),
+	<b>IRRESPECTIVE</b> of        
+        whether the original PHA data themselves are  stored  as  counts        
+        or counts per second.<p></li>
+
+<li>
+	At  the  current  time, the input expression can include any        
+        number of numerical constants  (within  the  constraint  of  the        
+        total number of characters specified above).<p></li>
+
+<li>
+            <b>NOTE</b>  at  the  current  time  numerals of the form        
+        <tt>1E04</tt> or <tt>1E-04</tt> are <b>NOT</b> 
+	supported (and will be interpreted  as        
+        input  filenames).  This shortfall will be addressed in the near        
+        future.<p></li>
+</ul><p></li>
+
+<li>    Matching pairs of curved brackets (parentheses)<br />
+            Curved brackets should be used in the standard  mathematical        
+        mannor  to denote the priority in which various calculations are        
+        performed. For safety, the task  will  stop  if  the  number  of        
+        open-brackets    (<tt>(</tt>)    does   not   equal   the   number   
+	of        
+        close-brackets(<tt>)</tt>). 
+	The only  limitations  currently  in  place        
+        are  that  neither  the  first  nor  last entry within a pair of        
+        brackets is a mathematical operator,  in  which  case  the  task        
+        <i>SHOULD</i> stop.
+	
+<ul>
+<li>            At  the  current  time,  up  to  10 pairs of brackets may be        
+        included within the input expression.<p></li>
+</ul><p></li>
+</ul>
+
+<p>
+Within the constraint of the total number  of  characters  specified        
+above, any number of spaces can be added to the input expression.           
+
+<p>
+                                                                                     <h3><a name="tth_sEc2.1">
+2.1</a>&nbsp;&nbsp;Currently Supported Mathematical Operations</h3>
+<a name="Sec:supported">
+</a>
+
+<p>
+The following mathematical operations are currently supported:
+
+<ul>
+<li>    addition (<tt>+</tt>)<p></li>
+
+<li>    subtraction (<tt>-</tt>)<p></li>
+
+<li>    multiplication (<tt>*</tt>)<p></li>
+
+<li>    division (<tt>/</tt>)<p></li>
+</ul>
+
+<p>
+It  should be noted that the parser will interpret all characters        
+besides   those   listed   above   and   the    open/close    curved        
+brackets/parentheses  characters  (ie  <tt>(</tt>  and  <tt>)</tt>)  
+as (parts of) input PHA filenames.
+
+<p>
+ <h2><a name="tth_sEc3">
+3</a>&nbsp;&nbsp;CALCULATION &amp; PROGATION OF ERRORS</h2>
+<a name="Sec:errors">
+</a> 
+
+<p>
+   There several options open to users regarding the calculation or
+propagation of errors, controlled by the parameters <tt>errmeth</tt> and 
+<tt>properr</tt>.
+
+<p>
+   The (hidden) parameter <tt>errmeth</tt> controls which prescription is used to
+calculate errors, should the task need to do so. The value of this keyword
+is therefore important if the errors are to be propagated 
+(ie <tt>properr='yes'</tt>)
+and one or more of the i/p files contain the FITS
+keyword <tt>POISERR = T</tt> indicating Poissonian statistics should be used to
+calculate the statistical errors, or if errors are not to be propagated
+(ie <tt>properr='no'</tt>) and the algebra is performed in counts/sec 
+(ie <tt>units='Rate'</tt>).
+
+<p>
+Currently, the following prescriptions are available (where <tt>N</tt> 
+is the number of counts observed in a given PHA channel):
+
+<ul>
+<li>	<tt>errmeth = 'Gauss'</tt><br />
+	whereby the errors are calculated using 
+	<tt>error</tt> = &#8730;{<tt>N</tt>}.<p></li>
+
+<li>	<tt>errmeth = 'POISS-1'</tt><br />
+	(the default) whereby the algorithm of Gehrels (1986 ApJ, 303, 336)
+	eqn 7 with S=1 is used
+	(<tt>error</tt> = 1.0 + &#8730;{<tt>N</tt> + 0.75}).
+	The value is statistically that of the (larger) +ve error of a 
+	Poissonian distribution, but within this task this value is 
+	assigned to both the +ve and -ve error on the counts in that channel. 
+	For small <tt>N</tt>, the errors created using this prescription is 
+	significantly <b>GREATER</b> (and hence more conservative) than
+	both the true -ve error, and that obtained by simply using 
+	&#8730;{<tt>N</tt>}. Thus, this prescription is recommended unless a 
+	user fully understands the implications of using a different 
+	prescription. Both differences quickly reduce as one moves to 
+	larger <tt>N</tt> (and the Poissonian distribution becomes more
+	symmetric/Gaussian).<p></li>
+
+<li>	<tt>errmeth = 'POISS-2'</tt><br />
+	whereby the algorithm of Gehrels (1986 ApJ, 303, 336) eqn 11,
+	with S=1 is used
+	(<tt>error</tt> = &#8730;{<tt>N</tt> &#8722; 0.25}).
+	The value is statistically that of the (smaller) -ve error of a 
+	Poissonian distribution, but within this task this value is 
+	assigned to both the +ve and -ve error on the counts in that channel. 
+	This error prescription <b>UNDERESTIMATES</b> the true error for small 
+	<tt>N</tt>.<p></li>
+
+<li>	<tt>errmeth = 'POISS-3'</tt><br />
+	whereby the mean of the errors given by <tt>POISS-1</tt> and 
+	<tt>POISS-2</tt> above is used.<p></li>
+</ul>
+Caution is urged, particularly when using <tt>errmeth = 'Gauss'</tt>, as 
+unexpected and/or misleading results can be produced. 
+
+<p>
+The following tables enables direct comparisons to be made between these
+approximations:
+
+<p>
+<a name="tth_tAb1">
+</a> <center><a name="tab:1">
+</a>
+<table border="1">
+<tr><td colspan="1" align="center"><tt>N</tt> </td><td colspan="2" align="center"><b>true 1-sigma</b> </td><td colspan="2" align="center"><b>errors calcd using</b> </td><td colspan="2" align="center"><b>errors calcd</b> </td></tr>
+<tr><td align="right"></td><td colspan="2" align="center"><b>Poisson errors</b> </td><td colspan="2" align="center"><b>Gehrels approx</b> </td><td colspan="2" align="center"><b>using &#8730;{<tt>N</tt>}</b> </td></tr>
+<tr><td align="right"></td><td align="right"></td><td align="right"></td><td align="right"></td><td align="right"></td><td align="right"></td><td align="right"></td></tr>
+<tr><td align="right">0  </td><td align="right">+1.84   </td><td align="right">-0.00       </td><td align="right">+1.87   </td><td align="right">-0.00        </td><td align="right">+0.00    </td><td align="right">-0.00</td></tr>
+<tr><td align="right">1  </td><td align="right">+2.30   </td><td align="right">-0.83       </td><td align="right">+2.32   </td><td align="right">-0.67        </td><td align="right">+1.00    </td><td align="right">-1.00</td></tr>
+<tr><td align="right">2  </td><td align="right">+2.63   </td><td align="right">-1.92       </td><td align="right">+2.66   </td><td align="right">-1.33        </td><td align="right">+1.41    </td><td align="right">-1.41</td></tr>
+<tr><td align="right">3  </td><td align="right">+2.92   </td><td align="right">-1.63       </td><td align="right">+2.94   </td><td align="right">-1.66        </td><td align="right">+1.73    </td><td align="right">-1.73</td></tr>
+<tr><td align="right">4  </td><td align="right">+3.16   </td><td align="right">-1.91       </td><td align="right">+3.18   </td><td align="right">-1.94        </td><td align="right">+2.00    </td><td align="right">-2.00</td></tr>
+<tr><td align="right">5  </td><td align="right">+3.38   </td><td align="right">-2.16       </td><td align="right">+3.40   </td><td align="right">-2.18        </td><td align="right">+2.24    </td><td align="right">-2.24</td></tr>
+<tr><td align="right">10  </td><td align="right">+4.27   </td><td align="right">-3.11       </td><td align="right">+4.28   </td><td align="right">-3.12        </td><td align="right">+3.16    </td><td align="right">-3.16</td></tr>
+<tr><td align="right">50  </td><td align="right">+8.12   </td><td align="right">-7.05       </td><td align="right">+8.12   </td><td align="right">-7.05        </td><td align="right">+7.07    </td><td align="right">-7.07</td></tr>
+<tr><td align="right">100 </td><td align="right">+11.00   </td><td align="right">-9.98      </td><td align="right">+11.00   </td><td align="right">-9.99       </td><td align="right">+10.00   </td><td align="right">-10.00</td></tr>
+<tr><td align="right"></td><td align="right"></td><td align="right"></td><td align="right"></td><td align="right"></td><td align="right"></td><td align="right"></td></tr></table>
+
+</center>
+<p>
+<font size="+0">   The (hidden) parameter <tt>properr</tt> controls whether the errors are to be
+propagated during the algebra or (if <tt>properr='no'</tt>) whether the errors are
+simply calculated from the resultant PHA dataset. In the former case,
+the errors are propagated in the normal manner
+(e<sub>3</sub> = &#8730;{[e<sub>1</sub><sup>2</sup> + e<sub>2</sub><sup>2</sup>]}). 
+This is an approximation when in the Poissonian regime (ie for low <tt>N</tt>). 
+Whilst it
+is true that the variances of the Poissonian distribution are combined in
+this normal way, confidence limit error bars are not simply related to the
+variance like they are for Gaussian statistics.
+
+<p>
+HOWEVER, these approximations work well for all but the smallest <tt>N</tt>, 
+and is certainly superior to either assuming 
+&#8730;{<tt>N</tt>} errors, or neglecting
+errors altogther:
+
+<ul>
+<li>	For example, adding two PHA datasets each with 
+	<tt>N=5</tt> counts in a              
+    given channel will give a value of <tt>10</tt>, and errors of:<br />
+   	<tt>+4.24   -4.24</tt>   (using <tt>errmeth='POISS-1'</tt>)
+   	<tt>+3.08   -3.08</tt>   (using <tt>errmeth='POISS-2'</tt>)
+   	<tt>+3.95   -3.95</tt>   (using <tt>errmeth='POISS-3'</tt>)
+    compared to:<br />
+       <tt>+4.27   -3.11</tt>  (statistically correct values)<br />
+       <tt>+3.16   -3.16</tt>   (propagating 'Gaussian' errors)<p></li>
+</ul>
+
+<p>
+   Severely misleading and/or incorrect results are possible if the errors
+are not propagated (ie if <tt>properr=no</tt>). Turning off error propagation
+is only reccomended when one is adding non-background-subtracted datasets,
+and one fully understands the risks.
+
+<p>
+ <h2><a name="tth_sEc4">
+4</a>&nbsp;&nbsp;CALCULATION OF THE EXPOSURE TIME IN THE O/P PHA DATASET</h2>
+<a name="Sec:exposure">
+</a> 
+
+<p>
+The  value  written  as the exposure time in the o/p PHA dataset is        
+indicated  by  a  user-defined  flag  (<tt>exposure</tt>).  
+This   facility        
+provides  added  flexibility  to  users,  but  with  a  risk of some        
+confusion. It should be remembered however,  that  if  desired,  the        
+exposure  time given for a PHA dataset can always be reset using the        
+<tt>chkey</tt>  command  within  the  ftools/heasarc  task  
+<tt>GRPPHA</tt>. 
+The following options are currently available:
+
+<ul>
+<li>	<tt>exposure = 'NULL'</tt><br />
+            where  an  exposure  time  of 1 second is written to the o/p        
+        dataset.<p></li>
+
+<li>    <tt>exposure = </tt><i>i/p filename</i><br />
+            whereby the exposure time read from the specified  i/p  file        
+        is written to the o/p dataset.<p></li>
+
+<li>    <tt>exposure = </tt><i>real</i><br />
+            where  the  entered  value  (assuming  it can be parsed as a        
+        real), is written to the o/p dataset. The value will be  assumed        
+        to  be in units of seconds. At the current time, numerals of the        
+        form  <tt>1E04</tt>  or  <tt>1E-04</tt>  are  <b>NOT</b>  supported  
+	(and   will   be        
+        interpreted as i/p filenames).<p></li>
+
+<li>    <tt>exposure = 'CALC'</tt><br />
+            where   the   exposure  time  is  calculated  from  the  i/p        
+        expression by sustituting each filename with its exposure  time,        
+        and performing the specified calculation.<p></li>
+</ul>
+
+<p>
+ <h2><a name="tth_sEc5">
+5</a>&nbsp;&nbsp;CALCULATION OF THE &#196;REA SCALING FACTOR" FOR THE O/P PHA DATASET</h2>
+<a name="Sec:areascal">
+</a> 
+
+<p>
+      The  area  scaling  factor  is  a numerical constant stored in the        
+    OGIP-mandatory FITS keyword <tt>AREASCAL</tt> in the 
+	<tt>SPECTRUM</tt> extension of  a        
+    PHA  file.  Details  of  its  use  (and  misuse)  are too varied and        
+    complex to be fully described here, but most often  it  is  used  to        
+    renormalize  the  response  matrix  associated  with  that  PHA file        
+    within <tt>XSPEC</tt>. 
+	As such the value of the  <tt>AREASCAL</tt>  keyword  is  often        
+    unity,  but  (particularly  in  the case of older response matrices)        
+    can have values of the order of the effective area (in cm<sup>2</sup>) of  
+	the telescope/instrument. 
+
+<p>
+ The value written as the <tt>AREASCAL</tt> keyword in the o/p PHA dataset is
+determined by a hidden parameter, <tt>areascal</tt>. 
+The following options are currently available:
+
+<ul>
+<li>	<tt>areascal = 'NULL'</tt><br />
+    	where an <tt>AREASCAL</tt> of 1.0 is written to the o/p dataset.<p></li>
+
+<li>	<tt>areascal =</tt> <i>i/p filename</i><br />
+    	whereby the <tt>AREASCAL</tt> read from the specified i/p file is written
+	to the o/p dataset.<p></li>
+
+<li>	<tt>areascal =</tt> <i>real</i><br />
+    	where the entered value (assuming it can be parsed as a real), is
+	written to the o/p dataset. At the current time, numerals of the 
+        form  <tt>1E04</tt>  or  <tt>1E-04</tt>  are  <b>NOT</b>  supported  
+	(and   will   be interpreted as i/p filenames).<p></li>
+
+<li>	<tt>areascal = '%'</tt><br />
+	 (the default setting) where <tt>MATHPHA</tt> 
+	employs the following logic:
+
+<ul>
+<li>	if the values of the AREASCAL keywords in the all the i/p files:
+	
+<ul>
+<li>	AGREE to within 1%<br />
+         this value (actually the straight mean) will be written to the         
+        o/p file.<p></li>
+
+<li>	DISAGREE by more than 1%<br />
+         the user is informed of the various values encounted in the            
+        i/p files,  an <tt>AREASCAL</tt> of unity is written to the o/p file,
+        and the user invited  to determine and change the value of this         
+        keyword outside of <tt>MATHPHA</tt>.<p></li>
+</ul><p></li>
+</ul>
+In both cases, the user is informed of the value written to the o/p         
+file.                                                                       
+Essentially, if you dont see warning messages regarding <tt>AREASCAL</tt>
+during execution, don't worry about it. If you do, and the values           
+on the various i/p files vary dramatically and you dont understand          
+why, then you should check whether the input expression was really          
+that which you intended.<p></li>
+</ul>                                                                                
+
+<p>
+ <h2><a name="tth_sEc6">
+6</a>&nbsp;&nbsp;DETERMINATION OF THE AUXILIARY FILES FOR THE O/P PHA DATASET</h2>
+<a name="Sec:auxfiles">
+</a>
+
+<p>
+There are a number of mandatory keywords required to be present in the 
+header of extension containing the resultant PHA dataset in the o/p file.
+A number of these are crucial for the correct interpretation of the 
+o/p dataset. 
+The prime example is the value of the <tt>EXPOSURE</tt> keyword, and 
+as described in Section&nbsp;<a href="#Sec:exposure">4</a>, <tt>MATHPHA</tt> has a 
+parameter <tt>exposure</tt> which controls how the value to be written to 
+the o/p file is determined.
+Similarly <tt>MATHPHA</tt> compares the values of the <tt>AREASCAL</tt> 
+keywords found in the i/p files, and attempts to determine the most 
+appropriate value to be written to the o/p file
+(Section&nbsp;<a href="#Sec:areascal">5</a>). 
+<tt>MATHPHA</tt> 
+also checks the 
+values of the <tt>TELESCOP</tt>, <tt>INSTRUME</tt>, <tt>DETNAM</tt>,
+<tt>FILTER</tt> &amp; <tt>CHANTYPE</tt> keywords. If there are 
+discrepancies with any of these keywords, <tt>MATHPHA</tt> 
+will warn the user and writes the appropriate null/default value to
+the o/p file.
+
+<p>
+However, there are a number of mandatory keywords associated with 
+'auxiliary' files, for which <tt>MATHPHA</tt> is in general unable to 
+calculate 'appropriate' values (since it largely depends upon what 
+the user is attempting to do via the input expression).
+These keywords are:
+
+<ul>
+<li>	<tt>BACKFILE</tt> - the name of the corresponding PHA file containing
+	the appropriate background spectrum (if any)<p></li>
+
+<li>	<tt>BACKSCAL</tt> - the numerical scaling which should be applied 
+	to the background spectrum (as specified by the <tt>BACKFILE</tt>
+	keyword) before background-subtraction.<p></li>
+
+<li>	<tt>CORRFILE</tt> - the name of the corresponding PHA file containing
+	the appropriate correction spectrum (if any)<p></li>
+
+<li>	<tt>CORRSCAL</tt> - the numerical scaling which should be applied 
+	to the correction spectrum (as specified by the <tt>CORRFILE</tt>
+	keyword).<p></li>
+
+<li>	<tt>RESPFILE</tt> - the name of the redistribution matrix 
+	(aka RMF) appropriate to the PHA dataset<p></li>
+
+<li>	<tt>ANCRFILE</tt> - the name of the ancillary response dataset
+	(aka ARF) appropriate to the PHA dataset, to be use in conjuction 
+	with the redistribution matrix given by the 
+	 <tt>RESPFILE</tt> keyword.<p></li>
+</ul>
+(see also 
+<a href="/docs/heasarc/ofwg/docs/spectra/ogip_92_007/ogip_92_007.html">OGIP/92-007).</a>
+
+<p>
+However, for convenience <tt>MATHPHA</tt> does provide users some
+opportunity to specify the values to be written to the o/p
+file via the hidden parameters
+<tt>auxfiles</tt>, <tt>backfile</tt>, <tt>backscal</tt>, <tt>corrfile</tt>,
+<tt>corrscal</tt>, <tt>arfile</tt> and <tt>rmfile</tt>
+(see also Section&nbsp;<a href="#Sec:parameters">8</a>).
+The internal logic for <tt>MATHPHA</tt> regarding these parameters is as
+follows:
+
+<ol type="1">
+<li>	If the <tt>auxfiles</tt>, <tt>backfile</tt>, <tt>backscal</tt>, 
+	<tt>corrfile</tt>,
+	<tt>corrscal</tt>, <tt>arfile</tt> &amp; <tt>rmfile</tt> parameters 
+	all have their 
+	default value (<tt>'NONE'</tt>), then the null/default values of 
+	the <tt>BACKFILE</tt>, <tt>BACKSCAL</tt>, <tt>CORRFILE</tt>, <tt>CORRSCAL</tt>, 
+	<tt>RESPFILE</tt> and <tt>ANCRFILE</tt> keywords will be written to 
+	the o/p file. The o/p file will thus have the same values for these 
+	keywords as obtained using versions of <tt>MATHPHA</tt> earlier than 
+	<tt>v3.5.0</tt>.<p></li>
+
+<li>	If the <tt>auxfiles</tt> parameter is set to one of the files 
+	in the i/p expression, then values of 
+	the <tt>BACKFILE</tt>, <tt>BACKSCAL</tt>, <tt>CORRFILE</tt>, <tt>CORRSCAL</tt>,
+        <tt>RESPFILE</tt> and <tt>ANCRFILE</tt> keywords written to the o/p 
+	file will be taken (<i>ie</i> copied) from the specified i/p file
+	(or set to their null/default values if there is a problem).
+	It should be noted that setting the <tt>auxfiles</tt> parameter 
+	overrides any values specified via the 
+	<tt>backfile</tt>, <tt>backscal</tt>, <tt>corrfile</tt>,
+        <tt>corrscal</tt>, <tt>arfile</tt> &amp; <tt>rmfile</tt> parameters
+	such that any values will be ignored.<p></li>
+
+<li>	If the <tt>auxfiles</tt> parameter is not set (has a value <tt>'NONE'</tt>),
+	then if any/all the parmeters 
+	<tt>backfile</tt>, <tt>backscal</tt>, <tt>corrfile</tt>,
+        <tt>corrscal</tt>, <tt>arfile</tt> &amp; <tt>rmfile</tt> 
+	are set to any of the files in the i/p expression, then values of
+	the corresponding keyword(s) written to the o/p file 
+	will be taken (<i>ie</i> <b>COPIED</b>) from the specified i/p file
+        (or set to their null/default values if there is a problem).
+	At the current time, unfortuantely one <b>CANNOT</b> specify 
+	the name of (say) the response matrix to be written as the 
+	value of the <tt>RESPFILE</tt> keyword via the parameter 
+	<tt>rmfile</tt> - one can only specify the i/p PHA from which 
+	the <tt>RESPFILE</tt> is to copied to the o/p file.<p></li>
+</ol>
+
+<p>
+                                                                                 <h2><a name="tth_sEc7">
+7</a>&nbsp;&nbsp;WARNINGS ON USAGE</h2>
+
+<p>
+The parser is written in FORTRAN (!), and converts the                    
+user-supplied expression to &#207;MG" Reverse Polish (a little-known            
+dialect thought to be understood by but one person on the planet).          
+The parser attempts to identify the various elements of the input           
+expression, and order the mathematical operations and the reading           
+of PHA datasets appropriately. The parser attempts to work out from         
+the last-entered (innermost) bracket-pair.  The mathematical                
+expression contained therewithin is evaluated and the answer                
+stored. The parser then moves to the 2nd-to-last bracket-pair. The          
+mathematical expression contained therewithin is evaluated                  
+(including the results already calculated, if appropriate), and the         
+answer again stored.  This process thus continues until the full            
+expression has been evaluated, and this is the result which is              
+finally written as the output PHA dataset.                                  
+
+<p>
+     <h3><a name="tth_sEc7.1">
+7.1</a>&nbsp;&nbsp;Common Mistakes/Limitations</h3>
+
+<p>
+Users should keep in mind the following constraints/behaviour:            
+
+<ul>
+<li> 	At the current time, unix/ultrix users will to encounter severe
+	problems if they attempt to specify the path to PHA datasets (not
+	in the current directory): namely that the parser will interpret an
+	input expression of the form:<br />
+	<tt>expr = directory1/directory2/filename</tt><br />
+	 to divide the  PHA  file        
+	    called  <tt>'directory1'</tt>  by  PHA  file  <tt>'directory2'</tt>,  
+	then  divide the        
+	result by PHA file <tt>'filename'</tt>. 
+	This problem may be  addressed  in  a        
+	future  release of the task, however can be overcome in the 
+	meantime        
+	by copying the necessary input PHA file(s) to  the  current  
+	working directory.<p></li>
+
+<li>
+<b>BUG:</b>
+    Due to the current lack of a unit-string parser, the  units  of  the        
+    output  file  will  always  be  either <tt>'count'</tt> or 
+	<tt>'count/s'</tt>. This is        
+    true   even   in   cases   such    as 
+	<tt>"expr='file1/file2'"</tt>,    or        
+    <tt>"expr='file1*file2'"</tt>.  
+	This is a bug which can lead to confusion, and a parser is        
+    being worked on.<p></li>
+
+<li>    At the current time numerals of the form <tt>1E04</tt> or 
+	<tt>1E-04</tt> are <b>NOT</b>          
+        supported (and will be interpreted as input filenames).<p></li>
+
+<li>    When a PHA dataset be either multiplied or divided by a numerical
+        constant,  the  errors  are  calculated  such  as  to  keep  the        
+        fractional error in the derived dataset equal  to  that  in  the        
+        i/p dataset.<p></li>
+</ul> 
+
+<p>
+The task will <b>STOP</b> (hopefully with an appropriate error message)        
+if:                                                                         
+
+<ul>
+<li>    The output file has an illegal name. For safety, under no
+        circumstances can the o/p filename be the same  as  one  of  the        
+        i/p  filenames.  Under unix/ultrix, the task will also stop if a        
+        file of the same name already exists in the  current  directory,        
+        and the output file is NOT preceeded by <tt>"!"</tt> (see below).<p></li>
+
+<li>	All the PHA files in the i/p expression do not have the 
+	same number of raw detector channels (as specified by the 
+	<tt>DETCHANS</tt> keyword in the i/p files).<p></li>
+
+<li> 	This  task  is not designed to replace pocket/on-line calculators,
+	and (currently) will stop if the parser is unable to find something
+	resembling a potential PHA filename within the entire input
+	expression.<p></li>
+</ul> 
+
+<p>
+Users  who  encounter/suspect problems with the task are urged to        
+contact  the  author,  but  also  to  experiment  with   the   input        
+expression   (by   increasing/moving   pairs   of  brackets,  and/or        
+performing the required calculation with two or more passes  through        
+<tt>MATHPHA</tt>).
+
+<p>
+                                                                                The author, USRA, the OGIP &amp; NASA  assume  no  responsibility  for        
+errors  resulting  from  either  bugs,  or  the misuse of this task.        
+However, please report any comments/problems or bugs to Ian M George        
+(<tt>george@lheavx.gsfc.nasa.gov</tt>).
+
+<p>
+                                                                                 <h2><a name="tth_sEc8">
+8</a>&nbsp;&nbsp;INPUT PARAMETERS</h2>
+<a name="Sec:parameters">
+</a>        
+
+<p>
+
+<ul>
+<li>    <tt>expr [character string]</tt><br />
+         The  i/p  expression  to  be  evaluated.  This must represent a        
+        series of mathematical operations to be  performed  on  (one  or        
+        more)  PHA  datasets.  The  expression is allowed to contain PHA        
+        filenames  (and   optionally,   an   extension    number),   the        
+        mathematical   operators  listed  above,  integers,  reals,  and        
+        pairs  of curved  brackets  (<tt>(</tt>  &amp;  <tt>)</tt>).  
+	A  number  of  other        
+        criteria, as specified  above <b>MUST</b> also be satisfied.<p></li>
+
+<li>	<tt>units [character string]</tt><br />
+         A  flag  indicating  the  physical units in which the algebraic        
+        expression is  to be evaluated (and the units in which  the  o/p        
+        file  will  be  written).    The  allowed  values  are  <tt>'C'</tt>  
+	(ie 'COUNTS' - the default), and <tt>'R'</tt>  (ie  'RATE'),   
+	implying  that        
+        the  algebra  will  be  performed  in  'COUNTS'  and 'COUNTS PER        
+         SECOND' space respectively. The algebra will  be  performed  in        
+        this  space   irrespective  of  whether  the input files contain        
+        data  stored  in  counts  or   in  counts  per  second  (ie,  if        
+        <tt>units=C</tt>,  then  i/p PHA histograms stored  in counts/s 
+	will be        
+        converted to counts prior to any mathematical operations   being        
+        performed).  Similarly, this flag gives the implied units of any        
+         numerical  constants  within  the  input  expression.  A  third        
+        option  value  is   also  allowed, <tt>units=F</tt> (ie 'FILE') 
+	whereby        
+        the algebra is performed in  which ever units most of the  files        
+        are  stored  in  ('COUNTS'  in  the  event  of   a tie). Extreme        
+        caution is urged using this final option.<p></li>
+
+<li>	<tt>outfil [character string]</tt><br />
+         The name of the o/p file to be written containing  the  derived        
+        PHA  dataset.    For  safety, the name of the o/p file <b>CANNOT</b> 
+	be        
+        the same as one of the i/p files, and  the  task  will  stop  if        
+        this  is  the case. Under unix/ultrix, an o/p filename identical        
+        to a file which  already  exists  on  disk  is  also  considered        
+        illegal,  and the task will stop. However, the existing file can        
+        be automatically removed, and the new file written  if  the  o/p        
+        filename is preceeded by <tt>"!"</tt> at the <tt>outfil</tt> prompt.<p></li>
+
+<li>	<tt>exposure [character string]</tt><br />
+         A  flag indicating how the exposure time in the o/p PHA dataset        
+        is  calculated/written.  The  following  options  are  currently        
+        available:  <tt>NULL</tt>,  <tt>CALC</tt>,  
+	a real number (giving the exposure        
+        in seconds), or an i/p filename (see Section&nbsp;<a href="#Sec:exposure">4</a>).<p></li>
+
+<li>	<tt>(areascal = '%')[character string]</tt><br />
+ 	A flag indicating how the <tt>AREASCAL</tt> 
+	keyword in the o/p PHA dataset is determined. 
+	The following options are currently available:
+	<tt>'NULL'</tt>, <tt>'%'</tt>, a real number, 
+	or an i/p filename (see Section&nbsp;<a href="#Sec:areascal">5</a>).<p></li>
+
+<li>	<tt>(properr='yes') [character string]</tt><br />
+ 	A flag whether the errors are to propagated during the algebra 
+	(the default), or (if <tt>properr='no'</tt>) whether the errors are 
+	simply calculated from the resultant PHA dataset. 
+	The latter can be dangerous -  see Section&nbsp;<a href="#Sec:errors">3</a><p></li>
+
+<li>	<tt>(errmeth='POISS-1') [character string]</tt><br />
+ 	A flag indicating what error presciption is to be used should errors need to
+	calculated by the task at any stage. The following values are currently allowed:
+	
+<ul>
+<li>	<tt>errmeth = 'Gauss'</tt><br />
+		whereby the errors are calculated using &#8730;{<tt>N</tt>}.<p></li>
+
+<li>	<tt>errmeth = 'POISS-1'</tt><br />
+		(the default) whereby the algorithm of 
+		Gehrels (1986 ApJ, 303, 336) eqn 7 (+ve error) is used.<p></li>
+
+<li>	<tt>errmeth = 'POISS-2'</tt><br />
+		whereby the algorithm of Gehrels (1986 ApJ, 303, 336) eqn 11 
+		(-ve error) is used.<p></li>
+
+<li>	<tt>errmeth = 'POISS-3'</tt><br />
+		whereby 0.5 &times; (<tt>POISS-1</tt> + <tt>POISS-2</tt>) is used<p></li>
+</ul>
+	Caution is urged, particularly when using 
+	<tt>errmeth = 'Gauss'</tt>, as unexpected
+	and/or misleading results can be produced (see Section&nbsp;<a href="#Sec:errors">3</a>).<p></li>
+
+<li>	<tt>ncomments [integer]</tt><br />
+        The number of 70 character comment strings (up to a  maximum  of        
+        4)  to  be added by the user. <tt>ncomments = 0</tt> 
+	is allowed for users        
+        not wishing to add their own notes. The default value is 1.<p></li>
+
+<li>	<tt>commentn [character string]</tt><br />
+        The i/p parameters, including the expression,  will  be  written        
+        as  <tt>COMMENTS</tt> to the o/p file; 
+	these additional comments provide        
+        users the facility to add their own notes. Each string  will  be        
+        truncated beyond the 70th character.<p></li>
+
+<li>	<tt>(auxfiles = 'NONE') [character string]</tt><br />
+	A flag indicating whether the values of <b>ALL</b> the 
+	auxiliary file keywords 
+	(<tt>BACKFILE</tt>, <tt>BACKSCAL</tt>, <tt>CORRFILE</tt>, <tt>CORRSCAL</tt>,
+        <tt>RESPFILE</tt> &amp; <tt>ANCRFILE</tt>) written to the o/p 
+	file are to be copied from a user-specified i/p file.
+	The default value (<tt>'NONE'</tt>) indicates this is not the 
+	case, and will result in these keywords being written with 
+	their null/default values in the o/p file
+	(see Section&nbsp;<a href="#Sec:auxfiles">6</a>).
+	It should be remembered that setting the <tt>auxfiles</tt> parameter 
+	overrides any values specified via the 
+	<tt>backfile</tt>, <tt>backscal</tt>, <tt>corrfile</tt>,
+        <tt>corrscal</tt>, <tt>arfile</tt> &amp; <tt>rmfile</tt> parameters
+	(below) such that any values will be ignored.<p></li>
+
+<li>	<tt>(backfile = 'NONE') [character string]</tt><br />	
+ 	A flag indicating how the <tt>BACKFILE</tt> 
+	keyword written in the o/p PHA dataset is
+	determined. The following options are currently available:
+	
+<ul>
+<li>	<tt>backfile='NONE'</tt><br />
+ 		The default value (<tt>NONE</tt>) 
+		for this keyword will be written in the o/p file<p></li>
+
+<li>	<tt>backfile='%'</tt><br />
+	 	The task will check whether all the i/p PHA files have the same
+ 		value of the <tt>BACKFILE</tt> keyword. 
+		If this is the case, then that value
+ 		will be written to o/p file. 
+		Otherwise, the default value will be written to the o/p file.<p></li>
+
+<li>	<tt>backfile=</tt><i>i/p filename</i><br />
+ 		The value of the <tt>BACKFILE</tt> keyword from the specified
+		 i/p file will be copied to the  o/p file.<p></li>
+</ul>
+	In the latter two cases, any problems will be reported by the task, and
+	the default value written to the o/p file.<p></li>
+
+<li>	<tt>(backscal = 'NONE') [character string]</tt><br />
+ 	A flag indicating how the <tt>BACKSCAL</tt> keyword written in the 
+	o/p PHA dataset is determined. 
+	The following options are currently available:
+	
+<ul>
+<li>	<tt>backscal='NONE'</tt><br />
+ 		The default value (<tt>1.0</tt>) 
+		for this keyword will be written in the o/p file<p></li>
+
+<li>	<tt>backscal='%'</tt><br />
+ 		The task will check whether all the i/p PHA files 
+		have the same value of the <tt>BACKSCAL</tt> keyword. 
+		If this is the case (to within 1%), then
+ 		that value will be written to o/p file. 
+		Otherwise, the default value will be written to the o/p file.<p></li>
+
+<li>	<tt>backscal=</tt><i>i/p filename</i><br />
+ 		The value of the <tt>BACKSCAL</tt> keyword from the specified
+ 		i/p file will be copied to the  o/p file.<p></li>
+</ul>
+	In the latter two cases, any problems will be reported by the task, and
+	the default value written to the o/p file.<p></li>
+
+<li>	<tt>(corrfile = 'NONE') [character string]</tt><br />
+ 	A flag indicating how the <tt>CORRFILE</tt> keyword written in the 
+	o/p PHA dataset is determined. The following options are currently 
+	available:
+	
+<ul>
+<li>	<tt>corrfile='NONE'</tt><br />
+ 		The default value (<tt>NONE</tt>) for this keyword will 
+		be written in the o/p file<p></li>
+
+<li>	<tt>corrfile='%'</tt><br />
+ 		The task will check whether all the i/p PHA files have the same
+ 		value of the <tt>CORRFILE</tt> keyword. If this is the case, 
+		then that value will be written to o/p file. 
+		Otherwise, the default value will be written to the o/p file.<p></li>
+
+<li>	<tt>corrfile=</tt><i>i/p filename</i><br />
+ 		The value of the <tt>CORRFILE</tt> keyword from the specified
+ 		i/p file will be copied to the  o/p file.<p></li>
+</ul>
+	In the latter two cases, any problems will be reported by the task, and
+	the default value written to the o/p file.<p></li>
+
+<li>	<tt>(corrscal = 'NONE') [character string]</tt><br />
+ 	A flag indicating how the <tt>CORRSCAL</tt> keyword written in 
+	the o/p PHA dataset is determined. The following options are 
+	currently available:
+	
+<ul>
+<li>	<tt>corrscal='NONE'</tt><br />
+ 		The default value (<tt>1.0</tt>) for this keyword will be 
+		written in the o/p file<p></li>
+
+<li>	<tt>corrfile='%'</tt><br />
+ 		The task will check whether all the i/p PHA files have the same
+ 		value of the <tt>CORRSCAL</tt> keyword. If this is the case 
+		(to within 1%), then that value will be written to o/p file. 
+		Otherwise, the default value will be written to the o/p file.<p></li>
+
+<li>	<tt>corrfile=</tt><i>i/p filename</i><br />
+ 		The value of the <tt>CORRSCAL</tt> keyword from the specified
+ 		i/p file will be copied to the  o/p file.<p></li>
+</ul>
+	In the latter two cases, any problems will be reported by the task, and
+	the default value written to the o/p file.<p></li>
+
+<li>	<tt>(arfile = 'NONE') [character string]</tt><br />
+ 	A flag indicating how the <tt>ANCRFILE</tt> keyword written in the 
+	o/p PHA dataset is determined. The following options are currently 
+	available:
+	
+<ul>
+<li>	<tt>arfile='NONE'</tt><br />
+ 		The default value (<tt>NONE</tt>) for this keyword will 
+		be written in the o/p file<p></li>
+
+<li>	<tt>arfile='%'</tt><br />
+ 		The task will check whether all the i/p PHA files have the same
+ 		value of the <tt>ANCRFILE</tt> keyword. If this is the case, 
+		then that value will be written to o/p file. 
+		Otherwise, the default value will be  written to the o/p file.<p></li>
+
+<li>	<tt>arfile=</tt><i>i/p filename</i><br />
+ 		The value of the <tt>ANCRFILE</tt> keyword from the specified
+ 		i/p file will be copied to the  o/p file.<p></li>
+</ul>
+	In the latter two cases, any problems will be reported by the task, and
+	the default value written to the o/p file.<p></li>
+
+<li>	<tt>(rmfile = 'NONE') [character string]</tt><br />
+ 	A flag indicating how the <tt>RESPFILE</tt> keyword written in the 
+	o/p PHA dataset is determined. The following options are 
+	currently available:
+	
+<ul>
+<li>	<tt>rmfile='NONE'</tt><br />
+ 		The default value (<tt>NONE</tt>) for this 
+		keyword will be written in the o/p file<p></li>
+
+<li>	<tt>rmfile='%'</tt><br />
+ 		The task will check whether all the i/p PHA files have the same
+ 		value of the <tt>RESPFILE</tt> keyword. If this is the case, 
+		then that value will be written to o/p file. 
+		Otherwise, the default value will be  written to the o/p file.<p></li>
+
+<li>	<tt>rmfile=</tt><i>i/p filename</i><br />
+ 		The value of the <tt>RESPFILE</tt> keyword from the specified
+ 		i/p file will be copied to the  o/p file.<p></li>
+</ul>
+	In the latter two cases, any problems will be reported by the task, and
+	the default value written to the o/p file.<p></li>
+
+<li>	<tt>(phaversn = '1.1.0') [character string]</tt><br />
+         The  OGIP FITS format version for PHA datasets in which the o/p        
+        FITS file is  to be written.  The  default  is  
+	<tt>PHAVERS1='1.1.0'</tt>        
+        (also  known  as known as  <tt>PHAVERSN = '1992a'</tt>), 
+	and is currently        
+        to only format allowed.<p></li>
+
+<li>	<tt>(divzero = -99) [real]</tt><br />
+         A real to be written into the  o/p  PHA  dataset  for  channels        
+        which  suffer a  divide-by-zero during the evaluation of the i/p        
+        expression. The default  value is <tt>-99</tt>.<p></li>
+
+<li>	<tt>(chatter = 9) [integer]</tt><br />
+         Flag to indicate how chatty the task is at execution.  A  value        
+        of  <tt>9</tt>  is  the   default,  with  lower/higher  values  
+	producing        
+        quieter/verbose output  respectively.<p></li>
+
+<li>	<tt>(clobber = false) [boolean]</tt><br />
+         Flag specifying whether or not a  pre-existing  file  with  the        
+        same  name  as that  requested as the output file from this task        
+        will be overwritten. This parameter is required to be present 
+        by the FTOOLS group and NASA/GSFC and provides the same functionality 
+        as that described above whereby the o/p filename can be preceeded 
+	by <tt>"!"</tt> at the <tt>outfil</tt> prompt. It should be noted that 
+	the <tt>"!"</tt><i>filename</i> syntax will overwrite any existing 
+	files irrespective of the value of the <tt>clobber</tt> parameter.<p></li>
+</ul>
+
+<p>
+ <h2><a name="tth_sEc9">
+9</a>&nbsp;&nbsp;KNOWN BUGS</h2>
+
+<p>
+Unfortunately, the following bugs are known to exist in the 
+current version of the task:
+
+<ul>
+<li>    Due to the current lack of a unit-string parser, the  units  of  the        
+    output  file  will  always  be  either <tt>'count'</tt> or 
+	<tt>'count/s'</tt>. This is        
+    true   even   in   cases   such    as 
+	<tt>"expr='file1/file2'"</tt>,    or        
+    <tt>"expr='file1*file2'"</tt>.  
+	This  can  lead to confusion, and a parser is        
+    being worked in.<p></li>
+</ul>
+
+<p>
+                                                                                                                                                                 <h2><a name="tth_sEc10">
+10</a>&nbsp;&nbsp;WORKED EXAMPLES</h2>
+
+<p>
+<i>Section incomplete</i>
+
+<p>
+
+<h2>REFERENCES</h2>
+
+<p>
+Information regarding on-line versions of any of the following references
+with an OGIP Memo number (<i>ie</i> documents starting <tt>OGIP/..</tt> or
+<tt>CAL/..</tt>) can most easily be found via the WorldWide Web by following
+the links from the URL:<br />
+<tt>/docs/heasarc/caldb/caldb_docs_index.html</tt>
+
+<p>
+Most OGIP Calibration Memos of general community interest will eventually
+appear as articles in <i>Legacy</i>, but are also available on request
+from The Office of Guest Investigator Programs, Code 668,
+NASA/GSFC, Greenbelt, MD&nbsp;20771, USA.
+
+
+<p>
+Arnaud, K.A., George, I.M., Tennant, A.F.,
+        1992, <i>Legacy</i>, <b>2</b>, 65.<br />
+(early, published version of <a href="/docs/heasarc/ofwg/docs/spectra/ogip_92_007/ogip_92_007.html">OGIP/92-007)</a>
+
+<p>
+George, I.M., Arnaud, K.A. 
+	1992.<br />
+<a href="/docs/heasarc/ofwg/docs/spectra/ogip_92_007a/ogip_92_007a.html">(OGIP/92-007a</a>
+
+<p>
+addendum to 
+<a href="/docs/heasarc/ofwg/docs/spectra/ogip_92_007/ogip_92_007.html">OGIP/92-007)</a>
+
+<p>
+Gehrels, N., 1986, ApJ, 303, 336
+
+<p>
+                                                                                
+<h2>USEFUL LINKS TO OTHER HTML PAGES</h2>
+
+<p>
+The following useful links are available (in the HTML version of this
+document only):
+
+<ul>
+<li>
+<a href="http://heasarc.gsfc.nasa.gov/">
+	The HEASARC Home Page</a>
+<li>
+<a href="/docs/software/ftools/ftools_menu.html">
+	The FTOOLS Home Page</a>
+<li>
+<a href="/docs/heasarc/caldb/caldb_intro.html">
+	The OGIP Calibration Database Home Page</a>
+</ul>
+
+
+
+<p>
+</font></font>
+<br /><br /><hr /><small>File translated from
+T<sub><font size="-1">E</font></sub>X
+by <a href="http://hutchinson.belmont.ma.us/tth/">
+T<sub><font size="-1">T</font></sub>H</a>,
+version 3.13.<br />On  4 May 2004, 12:37.</small>
+</html>

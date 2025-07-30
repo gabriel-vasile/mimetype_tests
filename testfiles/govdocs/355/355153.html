@@ -1,0 +1,191 @@
+<HTML>
+<HEAD>
+  <META NAME="GENERATOR" CONTENT="Adobe PageMill 3.0 Win">
+  <TITLE>LAS FAQ: relational database access</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+
+<P><A HREF="index.html">Return to LAS FAQ</A> <HR ALIGN=LEFT><p></P>
+
+<H1><CENTER>
+    Relational database access 
+  </CENTER></H1>
+
+<P><CENTER><HR></CENTER><p></P>
+
+<H2>Question:</H2>
+
+<P><font size="-1" face="Courier New">How can LAS access data stored in a relational 
+  database? </font></P>
+
+<H2>Explanation:</H2>
+
+<P>Many types of non-gridded data are stored in relational database management 
+  systems (RDBMS). Examples would include oceanographic and atmospheric bottle 
+  data and profiles. Often, individual data records are stored as individual records 
+  (rows) in a table in the RDBMS. To be recoverable a record must include at least 
+  longitude, latitude, time, depth/height (where necessary) and columns for each 
+  variable measured. LAS code exists that makes it easier to communicate with 
+  the RDBMS, extract and reformat data so that it can be delivered with LAS. This 
+  FAQ describes the process.</P>
+<P><b>Note 1:</b> Other strategies might involve storing entire profiles in a 
+  single record rather than individual data points. The code provided with LAS 
+  is written to handle records consisting of individual data points but should 
+  prove a good starting point for writing your own code to deal with other data 
+  management strategies. </P>
+<P><b>Note 2:</b> The code provided is written to use the perl DBI.pm module that 
+  should allow you to use a wide variety of DBMS. The TMAPDBI.pm module assumes 
+  the MySQL DBMS. Another module is available that show how this module was extended 
+  to access the Joint Global Ocean Flux Study DBMS.</P>
+<P><b>Note 3:</b> This code is still experimental as of June 30, 2003l. Significant 
+  changes should be expected.</P>
+<H2>Solution:</H2>
+
+<P>To get LAS working with your RDBMS you'll have to install some custom code 
+  distributed with LAS but not installed by default. Here's the installation process:</P>
+<p>1) Perform the initial configuration of your LAS and say 'yes' to questions 
+  about a 'custom' directory:</p>
+<pre>   Use custom directory? [no] yes &lt;CR&gt;
+   Name of custom directory: [custom] &lt;CR&gt;
+   Created custom directory server/custom 
+</pre>
+<p>2) Test the resulting default LAS installation.</p>
+<p>3) Install the 'in-situ' code:</p>
+<pre>   cd las/contrib/insitu
+   make install</pre>
+<p> The following files are included in the in-situ support code:</p>
+<pre>insitu:<br>CVS/  Makefile*  server/</pre>
+<pre>insitu/CVs:
+   Entries Repository Root Tag</pre>
+<pre>insitu/server:
+   custom/ CVs/ insitu_operations.xml insitu_options.xml insitu_ui.xml</pre>
+<pre>insitu/server/custom:
+   abort_no_data.jnl             insitu_poly_xt.jnl
+   abort_single_profile.jnl      insitu_poly_xy.jnl
+   abort_too_big.jnl             insitu_poly_yt.jnl
+   custom.pl                     insitu_poly_zt.jnl
+   custom_standalone.pl*         insitu_property_depth_.jnl
+   CVs/                          insitu_property_.jnl
+   insitu_gaussian_xy.jnl        insitu_property_setup.jnl
+   insitu_gaussian_xz.jnl        insitu_refmap.jnl
+   insitu_gaussian_yz.jnl        insitu_setup.jnl
+   insitu_list_1_text.jnl        insitu_setup_stations.jnl
+   insitu_list_cdf.jnl           insitu_std_gif.tmpl
+   insitu_list_text.jnl          insitu_std_list.jnl
+   insitu_meta_xz.jnl            insitu_waterfall_key.jnl
+   insitu_meta_yz.jnl            insitu_waterfall_xz.jnl
+   insitu_pie_key.jnl            insitu_waterfall_yz.jnl
+   insitu_pie_station_depth.jnl  insitu_waterfall_zt.jnl
+   insitu_pie_xt.jnl             TMAPDate.pm
+   insitu_pie_xy.jnl             TMAPDBConfig.pl
+   insitu_pie_xz.jnl             TMAPDBI.pm
+   insitu_pie_yt.jnl             TMAPJGOFS.pm
+   insitu_pie_yz.jnl             TMAPWODB.pm
+   insitu_pie_zt.jnl</pre>
+<p>4) Modify the las/server/custom/TMAPDBConfig.pl to reflect your database configuration. 
+  During the (ongoing) initial development of LAS-RDBMS functionality, this configuration 
+  file is merely a perl hash. This may change in the future. You will need to 
+  specify at least one named 'DBDataset' and the configuration information associated 
+  with it. The examples in the TMAPDBConfig.pl file should be enough to get you 
+  started.</p>
+<p>5) Copy las/server/custom/custom_standalone.pl up one level into the las/server/custom 
+  directory. This is the directory from which LAS will try to access your RDBMS. 
+  Inside of custom_standalone.pl you will need to modify the following section:</p>
+<pre># The following information should be changed to match
+# your database:</pre>
+<pre>my $dsetname = &quot;Arabian_Sea/bottle_arabian&quot;;
+my @regArgs = (54, 71, 8, 26, 0, 300, &quot;01-jan-1995&quot;, &quot;31-dec-1995&quot;);
+my $output_file = &quot;database_test.nc&quot;;
+my @variable = (&quot;sal_bot&quot;,&quot;salinity&quot;,&quot;mol/L&quot;);</pre>
+<ul>
+  <li>The $dsetname must match one of the DBDatasets identified in TMAPDBConfig.pl.</li>
+  <li>The @regArgs array corresponds to the X, Y, Z, T ranges that will be requested.</li>
+  <li>The $output_file can be left alone.</li>
+  <li>The @variable array specifies the actual name of the requested variable 
+    in the RDBMS, it's title and units. Only the actual name is required.</li>
+</ul>
+<p>6) Try to access your RDBMS by running custom_standalone.pl. If successful, 
+  you are ready to configure LAS to present your in-situ data.</p>
+<p>7) You will have to construct the dataset configuration file by hand, describing 
+  a default grid that matches the domain of the data. A simple dataset configuration 
+  file for a surface only, in-situ dataset might look like this:</p>
+<pre>&lt;datasets&gt;
+ &lt;obs_surface
+   name=&quot;Surface Observations&quot;
+   url=&quot;obs/surface&quot;
+   doc=&quot;&quot;&gt;
+   &lt;institution name=&quot;USGODAE&quot; url=&quot;http://usjgofs.whoi.edu/&quot;/&gt;
+   &lt;properties&gt;
+   &lt;ui&gt;
+   &lt;default&gt;file:ui.xml#insituSurface&lt;/default&gt;
+   &lt;/ui&gt;
+   &lt;/properties&gt;</pre>
+<pre>  &lt;variables&gt;
+   &lt;sst units=&quot;deg C&quot; name=&quot;SST&quot;&gt;
+    &lt;link match=&quot;/lasdata/grids/obs_surface_grid&quot;/&gt;
+   &lt;/sst&gt;
+  &lt;/variables&gt;
+
+ &lt;/obs_surface&gt;
+&lt;/datasets&gt;</pre>
+<pre>&lt;grids&gt;
+ &lt;obs_surface_grid&gt;
+  &lt;link match=&quot;/lasdata/axes/obs_surface_X&quot;/&gt;
+  &lt;link match=&quot;/lasdata/axes/obs_surface_Y&quot;/&gt;
+  &lt;link match=&quot;/lasdata/axes/obs_surface_T&quot;/&gt;
+ &lt;/obs_surface_grid&gt;
+&lt;/grids&gt;</pre>
+<pre>&lt;axes&gt;
+ &lt;obs_surface_X units=&quot;degrees_east&quot; type=&quot;x&quot;&gt;
+  &lt;arange start=&quot;-180&quot; step=&quot;1&quot; size=&quot;360&quot;/&gt;
+ &lt;/obs_surface_X&gt;
+ &lt;obs_surface_Y units=&quot;degrees_north&quot; type=&quot;y&quot;&gt;
+  &lt;arange start=&quot;-90&quot; step=&quot;1&quot; size=&quot;180&quot;/&gt;
+ &lt;/obs_surface_Y&gt;
+ &lt;obs_surface_T units=&quot;day&quot; type=&quot;t&quot;&gt;
+  &lt;arange start=&quot;2002-05-15&quot; step=&quot;1&quot; size=&quot;90&quot;/&gt;
+ &lt;/obs_surface_T&gt;
+&lt;/axes&gt;
+</pre>
+<p>8) The las.xml file will need to be modified to include this dataset configuration 
+  file as will as the other in-situ specific configuration information copied 
+  from las/contrib. Here is an example las.xml file with changes hilighted in 
+  red.</p>
+<pre>&lt;?xml version='1.0' ?&gt;
+&lt;!DOCTYPE spec SYSTEM &quot;spec.dtd&quot; [</pre>
+<pre>&lt;!ENTITY StdOperations SYSTEM &quot;operations.xml&quot;&gt;
+<font color="#FF0000">&lt;!ENTITY insitu_operations SYSTEM &quot;insitu_operations.xml&quot;&gt;</font></pre>
+<pre><font color="#FF0000">&lt;!ENTITY obs_surface SYSTEM &quot;obs_surface.xml&quot;&gt;</font></pre>
+<pre>]&gt;</pre>
+<pre>&lt;lasdata&gt;
+   &lt;institution name=&quot;Pacific Marine Environmental Lab&quot;
+                url=&quot;http://www.pmel.noaa.gov&quot;/&gt;
+   &lt;!-- Define properties --&gt;
+   &lt;properties&gt;
+   &lt;ferret&gt;
+   &lt;land_type&gt;shade
+   &lt;/land_type&gt;
+   &lt;fill_type&gt;fill
+   &lt;/fill_type&gt;
+   &lt;view_centered&gt;no
+   &lt;/view_centered&gt;
+   &lt;fill_levels/&gt;
+   &lt;format&gt;netcdf
+   &lt;/format&gt;
+   &lt;/ferret&gt;
+   &lt;/properties&gt;</pre>
+<pre> &lt;operations url=&quot;http://stout.pmel.noaa.gov/las-bin/LASserver.pl&quot;&gt;
+   &amp;StdOperations;
+   <font color="#FF0000">&amp;insitu_operations;</font>
+ &lt;/operations&gt;</pre>
+<pre><font color="#FF0000">&amp;obs_surface;</font></pre>
+<pre>&lt;/lasdata&gt;  </pre>
+<p>9) Rebuild the las interface with CD las/server; make' and you should be able 
+  to access your data.</p>
+<HR ALIGN=LEFT><p></P>
+
+<P><FONT SIZE="-1">Jonathan Callahan: <A HREF="mailto:Jonathan.S.Callahan@noaa.gov">Jonathan.S.Callahan@noaa.gov</A><BR>
+  Last modified:June 30, 2003</FONT> 
+</BODY>
+</HTML>
+<!--#include virtual="/footer.txt" -->

@@ -1,0 +1,121 @@
+***** File ATTCPGIO.DOC                                                       
+                                                                              
+Giotto Cruise Phase Attitude History File                                     
+-----------------------------------------                                     
+                                                                              
+1. Introduction                                                               
+                                                                              
+   This note provides details on the Giotto cruise phase attitude             
+history file (GEXCPAHF). The full file was provided to the experimenters      
+via a standard magnetic tape. The file format of GEXCPAHF is given in         
+section 2.1. A printout of the attitude history file, covering the            
+period 5 - 17 March 1986 is given in section 2.2.                             
+                                                                              
+2.1 File Details                                                              
+                                                                              
+   The experimenter cruise phase attitude history file contains records       
+according to the content and format described in the Giotto Software          
+Design Document, Annex C. It was intended that records would be provided      
+only between two consecutive manoeuvres. However, it was decided to           
+include additional records corresponding to fine attitude determination       
+using the Giotto star mapper operating in star mode. Thus, in any period      
+between two manoeuvres there could in general be more than one record         
+containing the attitude details during free drift. Hence the GEXCPAHF         
+provides a more finely sampled representation of the attitude history         
+of Giotto.                                                                    
+                                                                              
+   The updated record format is given in Fig. 2.1                             
+                                                                              
+Notes:                                                                        
+                                                                              
+1) The start and stop times are UTC ground receive time.                      
+                                                                              
+2) The attitude is provided with respect to the spacecraft -z axis            
+   (+ve spin-axis) in the mean equatorial system of B1950.                    
+                                                                              
+3) In any single given record the attitude refers to the attitude at          
+   the start time specified in that record. Similarly, the spin-rate          
+   provided also corresponds to the record start time.                        
+                                                                              
+4) It may be assumed that if the delta-V is exactly zero, and if              
+   indicator flags F2 and F3 are both set to zero, then the attitude          
+   etc. provided for that record corresponds to a period of free              
+   drift, i.e. no manoeuvres have occurred.                                   
+                                                                              
+5) Default values of indicator flags F1, F2, F3 are zero.                     
+                                                                              
+6) During 5 - 17 March 1986, Giotto's geocentric distance increased           
+   from about 139 million km to about 145 million km. The one-way             
+   light time correspondingly increased from 7 mins 44 secs to                
+   8 mins 04 secs. The event time on-board can be calculated by               
+   subtracting the one-way light time from the ground receive time.           
+   The spacecraft's geocentric distance, and hence light time, is             
+   easily calculated from the orbital data.                                   
+                                                                              
+Fig 2.1  Format of the attitude records                                       
+                                                                              
+ !---------!------------!----------------------------------------------------!
+ !   BYTE  !   FORMAT   !             DESCRIPTION                            !
+ !---------!------------!----------------------------------------------------!
+ !         !            !                                                    !
+ !  1 -  3 !   I2,1X    !  YEAR                   START                      !
+ !  4 -  7 !   I3,1X    !  DAY IN YEAR            TIME                       !
+ !  8 - 10 !   I2,1X    !  HOUR                   OF                         !
+ ! 11 - 13 !   I2,1X    !  MIN                    VALIDITY.                  !
+ ! 14 - 16 !   I2,1X    !  SEC                                               !
+ ! 17 - 20 !    4X      !  BLANK SPACE PADDING                               !
+ ! 21 - 23 !   I2,1X    !  YEAR                   STOP                       !
+ ! 24 - 27 !   I3,1X    !  DAY IN YEAR            TIME                       !
+ ! 28 - 30 !   I2,1X    !  HOUR                   OF                         !
+ ! 31 - 33 !   I2,1X    !  MIN                    VALIDITY.                  !
+ ! 34 - 36 !   I2,1X    !  SEC                                               !
+ ! 37 - 40 !    4X      !  BLANK SPACE PADDING                               !
+ ! 41 - 48 ! F6.2,2X    !  ATTITUDE RIGHT ASCENSION (DEG)                    !
+ ! 49 - 56 ! F6.2,2X    !  ATTITUDE DECLINATION (DEG)                        !
+ ! 57 - 63 ! F6.3,1X    !  INSTANTANEOUS SPIN RATE (RPM)                     !
+ ! 64 - 66 !    3X      !  BLANK SPACE PADDING                               !
+ ! 67 - 74 ! F7.4,1X    !  VELOCITY INCREMENT/ DELTA-V (DV) (M/S)            !
+ ! 75 - 76 !    2X      !  BLANK SPACE PADDING                               !
+ ! 77      !    I1      !  INDICATOR FLAG F1 : F1=1 IF ATT.IS A PREDICTION   !
+ ! 78      !    I1      !  INDICATOR FLAG F2 : F2=1 IF DV IS INACCURATE      !
+ ! 79      !    I1      !  INDICATOR FLAG F3 : F3=1 IF DV NOT PROVIDED       !
+ ! 80      !    1X      !  BLANK SPACE PADDING.                              !
+ !         !            !                                                    !
+ !---------!------------!----------------------------------------------------!
+                                                                              
+N.B. The delta-V applies to a manoeuvre starting at the stop time of          
+     validity and ending at the start time of the next record.                
+                                                                              
+2.2 Printout of GEXCPAHF                                                      
+                                                                              
+    A printout of GEXCPAHF is appended. Note the following:-                  
+                                                                              
+   1) At the encounter, i.e. over days 072/073, the Giotto attitude was       
+      lost (due to loss of useful star mapper datation no attitude            
+      determination was possible) shortly before the point of closest         
+      approach to the comet and not recovered until several hours past        
+      this point. The GEXCPAHF therefore contains the determined              
+      attitude shortly before closest approach and then when the              
+      spacecraft attitude was re-determinable.                                
+                                                                              
+   2) For further information during days 072/073, refer to the other         
+      files provided dealing specifically with the encounter period.          
+                                                                              
+86 064 00 00 00    86 064 05 34 19     325.34    5.71  14.991     0.0254   000
+86 064 05 35 15    86 065 03 03 06     326.60    5.62  14.991     0.0254   000
+86 065 03 04 11    86 066 05 02 51     327.83    5.49  14.991     0.0254   000
+86 066 05 03 55    86 067 02 40 09     329.03    5.22  14.991     0.0254   000
+86 067 02 41 05    86 068 04 22 15     330.26    5.10  14.991     0.0273   000
+86 068 04 23 19    86 069 05 16 16     331.56    4.84  14.992     0.0254   000
+86 069 05 17 12    86 070 05 06 22     332.78    4.70  14.992     0.0273   000
+86 070 05 07 26    86 071 01 09 24     334.06    4.41  14.993     2.4709   000
+86 071 01 42 46    86 071 03 19 29     334.53    4.36  14.622     0.0030   000
+86 071 03 19 40    86 071 04 48 30     334.52    4.36  15.007     0.0175   000
+86 071 04 49 11    86 072 04 36 50     335.36    4.15  15.008     0.0755   000
+86 072 04 39 38    86 072 19 15 00     338.19    1.92  15.008     0.0000   000
+86 072 19 15 00    86 072 23 30 00     338.18    1.95  15.008     0.0000   000
+86 073 05 40 00    86 073 18 45 00     338.95    2.73  14.958     0.0000   000
+86 073 18 45 00    86 074 04 36 58     338.94    2.75  14.958     0.0158   000
+86 074 04 37 38    86 075 03 11 05     339.56    3.19  14.960     0.1055   000
+86 075 03 15 01    86 075 11 17 31     336.68    7.55  14.960     0.0176   000
+86 075 11 18 19    86 076 00 00 00     337.34    8.13  14.960     0.0000   000

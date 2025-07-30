@@ -1,0 +1,1575 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en-US">
+<head>
+<meta name="Page" content="DefaultSingle">
+<meta name="Title" content=" Applying an Object Model to Relational Data">
+<title>Applying an Object Model to Relational Data</title>
+<link rel="home" href="../../index.htm" title="Library">
+<link rel="toc" href="toc.htm" title="Contents">
+<link rel="index" href="index.htm" title="Index">
+<link rel="copyright" href="../../dcommon/html/cpyr.htm" title="Copyright">
+<link rel="up" href="toc.htm" title="Up">
+<link rel="next" href="adobjadv.htm" title="Next">
+<link rel="previous" href="adobjmng.htm" title="Previous">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../dcommon/css/doccd.css" rel="stylesheet" title="Default" type="text/css">
+</head>
+<body bgcolor="white">
+<a name="top"></a> <a href="#BEGIN">Skip Headers</a><br>
+<br>
+<table summary="" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td align="left" valign="top"><font color="#330099" face="Helvetica, Arial, sans-serif"><strong>Oracle9<i>i</i> Application Developer's Guide - Object-Relational Features<br>
+Release 2 (9.2)</strong><br>
+Part Number A96594-01</font></td>
+<td valign="bottom" align="right" width="144">
+<table summary="" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td align="center" valign="top" width="16%"><a href="../../index.htm"><img src="../../dcommon/gifs/prodicon.gif" alt="Go To Documentation Library" border="0"><br>
+<font size="-2">Home</font></a></td>
+<td align="center" valign="top" width="17%"><a href="../../nav/docindex.htm"><img src="../../dcommon/gifs/bookicon.gif" alt="Go To Product List" border="0"><br>
+<font size="-2">Book List</font></a></td>
+<td align="center" valign="top" width="17%"><a href="toc.htm"><img src="../../dcommon/gifs/conticon.gif" alt="Go To Table Of Contents" border="0"><br>
+<font size="-2">Contents</font></a></td>
+<td align="center" valign="top" width="20%"><a href="index.htm"><img src="../../dcommon/gifs/indxicon.gif" alt="Go To Index" border="0"><br>
+<font size="-2">Index</font></a></td>
+<!--  mix  -->
+<td align="center" valign="top" width="17%"><a href="../../mix.920/a96625/toc.htm"><img src="../../dcommon/gifs/mix.gif" alt="" border="0"><br>
+<font size="-2">Master Index</font></a></td>
+<!--  fdbk  -->
+<td align="center" valign="top" width="17%"><a href="../../dcommon/html/feedback.htm"><img src="../../dcommon/gifs/feedback.gif" alt="" border="0"><br>
+<font size="-2">Feedback</font></a></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+
+<hr>
+<p><a href="adobjmng.htm"><img src="../../dcommon/gifs/larrow.gif" alt="Go to previous page" border="0"></a> <a href="adobjadv.htm"><img src="../../dcommon/gifs/rarrow.gif" alt="Go to next page" border="0"></a> <a name="BEGIN"></a></p>
+
+<div class="IND"><!-- End Header -->
+<a name="433584"></a> <!--TOC=Title-"433584"-->
+<h1 class="Title"><font face="Arial, Helvetica, sans-serif" color="#330099">5<br>
+ <a name="ADOBJ005">Applying an Object Model to Relational Data</a></font></h1>
+
+<!--/TOC=Title-->
+<a name="435399"></a> 
+
+<p class="BP">This chapter shows how to write object-oriented applications without changing the underlying structure of your relational data.</p>
+
+<a name="436869"></a> 
+
+<p class="BP">The chapter contains these topics:</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="430702"></a><a href="adobjvew.htm#435542">Why to Use Object Views</a></li>
+
+<li class="LB1" type="disc"><a name="435724"></a><a href="adobjvew.htm#435559">Defining Object Views</a></li>
+
+<li class="LB1" type="disc"><a name="435728"></a><a href="adobjvew.htm#435614">Using Object Views in Applications</a></li>
+
+<li class="LB1" type="disc"><a name="436194"></a><a href="adobjvew.htm#433756">Nesting Objects in Object Views</a></li>
+
+<li class="LB1" type="disc"><a name="436195"></a><a href="adobjvew.htm#433787">Identifying Null Objects in Object Views</a></li>
+
+<li class="LB1" type="disc"><a name="436196"></a><a href="adobjvew.htm#433796">Using Nested Tables and Varrays in Object Views</a></li>
+
+<li class="LB1" type="disc"><a name="436197"></a><a href="adobjvew.htm#433832">Specifying Object Identifiers for Object Views</a></li>
+
+<li class="LB1" type="disc"><a name="436216"></a><a href="adobjvew.htm#433861">Creating References to View Objects</a></li>
+
+<li class="LB1" type="disc"><a name="436217"></a><a href="adobjvew.htm#433893">Modelling Inverse Relationships with Object Views</a></li>
+
+<li class="LB1" type="disc"><a name="435732"></a><a href="adobjvew.htm#436105">Updating Object Views</a></li>
+
+<li class="LB1" type="disc"><a name="434881"></a><a href="adobjvew.htm#434311">Applying the Object Model to Remote Tables</a></li>
+
+<li class="LB1" type="disc"><a name="436191"></a><a href="adobjvew.htm#435277">Defining Complex Relationships in Object Views</a></li>
+
+<li class="LB1" type="disc"><a name="436885"></a><a href="adobjvew.htm#436646">Object View Hierarchies</a></li>
+</ul>
+
+<a name="435542"></a> <!--TOC=h1-"435542"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Why to Use Object Views</font></h2>
+
+<!--/TOC=h1-->
+<a name="435544"></a> 
+
+<p class="BP">Just as a view is a virtual table, an <em class="Italic">object view</em> is a virtual object table. Each row in the view is an object: you can call its methods, access its attributes using the dot notation, and create a REF that points to it.</p>
+
+<a name="435754"></a> 
+
+<p class="BP">Object views are useful in prototyping or transitioning to object-oriented applications because the data in the view can be taken from relational tables and accessed as if the table were defined as an object table. You can run object-oriented applications without converting existing tables to a different physical structure.</p>
+
+<a name="436466"></a> 
+
+<p class="BP">Object views can be used like relational views to present only the data that you want users to see. For example, you might create an object view that presents selected data from an employee table but omits sensitive data about salaries.</p>
+
+<a name="435553"></a> 
+
+<p class="BP">Using object views can lead to better performance. Relational data that make up a row of an object view traverse the network as a unit, potentially saving many round trips.</p>
+
+<a name="435554"></a> 
+
+<p class="BP">You can fetch relational data into the client-side object cache and map it into C structs or C++ or Java classes, so 3GL applications can manipulate it just like native classes. You can also use object-oriented features like complex object retrieval with relational data.</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="436085"></a>By synthesizing objects from relational data, you can query the data in new ways. You can view data from multiple tables by using object de-referencing instead of writing complex joins with multiple tables.</li>
+
+<li class="LB1" type="disc"><a name="436086"></a>Since the objects in the view are processed within the server, not on the client, this can result in significantly fewer SQL statements and much less network traffic.</li>
+
+<li class="LB1" type="disc"><a name="436087"></a>The object data from object views can be pinned and used in the client side object cache. When you retrieve these synthesized objects in the object cache by means of specialized object-retrieval mechanisms, you reduce network traffic.</li>
+
+<li class="LB1" type="disc"><a name="436088"></a>You gain great flexibility when you create an object model within a view in that you can continue to develop the model. If you need to alter an object type, you can simply replace the invalidated views with a new definition.</li>
+
+<li class="LB1" type="disc"><a name="436089"></a>Using objects in views does not place any restrictions on the characteristics of the underlying storage mechanisms. By the same token, you are not limited by the restrictions of current technology. For example, you can synthesize objects from relational tables which are parallelized and partitioned.</li>
+
+<li class="LB1" type="disc"><a name="436090"></a>You can create different complex data models from the same underlying data. 
+
+<p><a name="436804"></a></p>
+
+<div align="center">
+<table class="NoteAlso" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="NoteAlso">
+<td class="NoteAlso"><a name="436808"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="436809"></a> 
+
+<ul class="TLB">
+<li class="TLB" type="disc"><a name="436817"></a><em class="Italic"><a href="../../server.920/a96540/toc.htm">Oracle9i SQL Reference</a></em> for a complete description of SQL syntax and usage.</li>
+
+<li class="TLB" type="disc"><a name="436825"></a><em class="Italic"><a href="../../appdev.920/a96624/toc.htm"></a><a href="../../appdev.920/a96624/toc.htm">PL/SQL User's Guide and Reference</a></em> for a complete discussion of PL/SQL capabilities</li>
+
+<li class="TLB" type="disc"><a name="436833"></a><em class="Italic"><a href="../../java.920/a96659/toc.htm"></a><a href="../../java.920/a96659/toc.htm">Oracle9i Java Stored Procedures Developer's Guide</a></em> for a complete discussion of Java.</li>
+
+<li class="TLB" type="disc"><a name="436841"></a><em class="Italic"><a href="../../appdev.920/a96584/toc.htm"></a><a href="../../appdev.920/a96584/toc.htm">Oracle Call Interface Programmer's Guide</a></em> for a complete discussion of those facilities.</li>
+</ul>
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ul>
+
+<a name="435559"></a> <!--TOC=h1-"435559"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Defining Object Views</font></h2>
+
+<!--/TOC=h1-->
+<a name="435561"></a> 
+
+<p class="BP">The procedure for defining an object view is:</p>
+
+<ol class="LN1" type="1">
+<li class="LN1" type="1" value="1"><a name="435562"></a>Define an object type, where each attribute of the type corresponds to an existing column in a relational table.</li>
+
+<li class="LN1" type="1" value="2"><a name="435778"></a>Write a query that specifies how to extract the data from relational tables. Specify the columns in the same order as the attributes in the object type.</li>
+
+<li class="LN1" type="1" value="3"><a name="435566"></a>Specify a unique value, based on attributes of the underlying data, to serve as an object identifier, which enables you to create pointers (REFs) to the objects in the view. You can often use an existing primary key.</li>
+</ol>
+
+<a name="435570"></a> 
+
+<p class="BP">If you want to be able to update an object view, you may have to take another step, if the attributes of the object type do not correspond exactly to columns in existing tables:</p>
+
+<ol class="LN1" type="1">
+<li class="LN1" type="1" value="4"><a name="435576"></a>Write an <code>INSTEAD OF</code> trigger procedure (see <a href="adobjvew.htm#436105">"Updating Object Views"</a><a href="adobjvew.htm#436105"></a>) for Oracle to execute whenever an application program tries to update data in the object view.</li>
+</ol>
+
+<a name="435578"></a> 
+
+<p class="BP">After these steps, you can use an object view just like an object table.</p>
+
+<a name="435579"></a> 
+
+<p class="BP">For example, the following SQL statements define an object view, where each row in the view is an object of type <code>employee_t</code>:</p>
+
+<pre class="CE">
+<a name="435580"></a>CREATE TABLE emp_table  (
+<a name="435581"></a>    empnum   NUMBER (5),
+<a name="435582"></a>    ename    VARCHAR2 (20),
+<a name="435583"></a>    salary   NUMBER (9, 2),
+<a name="435584"></a>    job      VARCHAR2 (20) );
+<a name="435585"></a>
+<a name="435587"></a>CREATE TYPE employee_t  (
+<a name="435588"></a>    empno    NUMBER (5),
+<a name="435589"></a>    ename    VARCHAR2 (20),
+<a name="435590"></a>    salary   NUMBER (9, 2),
+<a name="435591"></a>    job      VARCHAR2 (20) );
+<a name="435592"></a>
+<a name="435594"></a>CREATE VIEW emp_view1 <strong class="Bold">OF employee_t
+</strong><a name="435597"></a>    <strong class="Bold">WITH OBJECT IDENTIFIER (empno)</strong> AS
+<a name="435598"></a>        SELECT   e.empnum, e.ename, e.salary, e.job
+<a name="435599"></a>            FROM     emp_table e
+<a name="435600"></a>            WHERE    job = 'Developer';
+<a name="435601"></a>
+</pre>
+
+<a name="435605"></a> 
+
+<p class="BP">To access the data from the <code>empnum</code> column of the relational table, you would access the <code>empno</code> attribute of the object type.</p>
+
+<a name="435614"></a> <!--TOC=h1-"435614"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Using Object Views in Applications</font></h2>
+
+<!--/TOC=h1-->
+<a name="435615"></a> 
+
+<p class="BP">Data in the rows of an object view may come from more than one table, but the object still traverses the network in one operation. The instance appears in the client side object cache as a C or C++ structure or as a PL/SQL object variable. You can manipulate it like any other native structure.</p>
+
+<a name="435620"></a> 
+
+<p class="BP">You can refer to object views in SQL statements in the same way you refer to an object table. For example, object views can appear in a <code>SELECT</code> list, in an <code>UPDATE-SET</code> clause, or in a <code>WHERE</code> clause.</p>
+
+<a name="435621"></a> 
+
+<p class="BP">You can also define object views on object views.</p>
+
+<a name="435622"></a> 
+
+<p class="BP">You can access object view data on the client side using the same OCI calls you use for objects from object tables. For example, you can use <em class="Italic">LNOCIObjectPin()</em> for pinning a REF and <em class="Italic">LNOCIObjectFlush()</em> for flushing an object to the server. When you update or flush to the server an object in an object view, Oracle updates the object view.</p>
+
+<a name="435635"></a> 
+
+<div align="center">
+<table class="NoteAlso" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="NoteAlso">
+<td class="NoteAlso"><a name="435628"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">Additional Information:</strong></font> <a name="435632"></a> 
+
+<p class="NB">See <em class="Italic"><a href="../../appdev.920/a96584/toc.htm">Oracle Call Interface Programmer's Guide</a></em> for more information about OCI calls.</p>
+</td>
+</tr>
+</table>
+</div>
+
+<!--AnN_AnchorNote will not be supported in future releases -->
+<a name="432322"></a> <a name="433756"></a> <!--TOC=h1-"433756"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Nesting Objects in Object Views</font></h2>
+
+<!--/TOC=h1-->
+<a name="433757"></a> 
+
+<p class="BP">An object type can have other object types nested in it as attributes.</p>
+
+<a name="437710"></a> 
+
+<p class="BP">If the object type on which an object view is based has an attribute that itself is an object type, then you must provide column objects for this attribute as part of the process of creating the object view. If column objects of the attribute type already exist in a relational table, you can simply select them; otherwise, you must synthesize the object instances from underlying relational data just as you synthesize the principal object instances of the view. You "synthesize" or create these objects by calling the respective object type's constructor method to create the object instances, and you populate their attributes with data from relational columns that you specify in the constructor.</p>
+
+<a name="433758"></a> 
+
+<p class="BP">For example, consider the department table dept:</p>
+
+<pre class="CE">
+<a name="433759"></a>CREATE TABLE dept
+<a name="433760"></a>(
+<a name="433761"></a>    deptno       NUMBER PRIMARY KEY,
+<a name="433762"></a>    deptname     VARCHAR2(20),
+<a name="433763"></a>    deptstreet   VARCHAR2(20),
+<a name="433764"></a>    deptcity     VARCHAR2(10),
+<a name="433765"></a>    deptstate    CHAR(2),
+<a name="433766"></a>    deptzip      VARCHAR2(10)
+<a name="433767"></a> );
+<a name="433768"></a>
+</pre>
+
+<a name="433769"></a> 
+
+<p class="BP">You might want to create an object view where the addresses are objects inside the department objects. That would allow you to define reusable methods for address objects, and use them for all kinds of addresses.</p>
+
+<ol class="LN1" type="1">
+<li class="LN1" type="1" value="1"><a name="433770"></a>Create the type for the address object: 
+
+<pre class="CE">
+<a name="433771"></a>CREATE TYPE address_t <strong class="Bold">AS OBJECT</strong> 
+<a name="433772"></a>(
+<a name="433773"></a>   street   VARCHAR2(20),
+<a name="433774"></a>    city    VARCHAR2(10),
+<a name="433775"></a>    state   CHAR(2),
+<a name="433776"></a>    zip     VARCHAR2(10)
+<a name="433777"></a>);
+<a name="433778"></a>
+</pre>
+</li>
+
+<li class="LN1" type="1" value="2"><a name="436365"></a>Create the type for the department object: 
+
+<pre class="CE">
+<a name="436369"></a>CREATE TYPE dept_t AS OBJECT
+<a name="436370"></a>(
+<a name="436371"></a>   deptno     NUMBER,
+<a name="436372"></a>   deptname   VARHCAR2(20),
+<a name="436373"></a>   address    address_t
+<a name="436374"></a>);
+<a name="436366"></a>
+</pre>
+</li>
+
+<li class="LN1" type="1" value="3"><a name="433780"></a>Create the view containing the department number, name and address. The <code>address</code> objects are constructed from columns of the relational table. 
+
+<pre class="CE">
+<a name="437725"></a>CREATE VIEW dept_view OF dept_t WITH OBJECT IDENTIFIER (deptno) AS
+<a name="437726"></a>    SELECT d.deptno, d.deptname,
+<a name="437727"></a>           address_t(d.deptstreet,d.deptcity,d.deptstate,d.deptzip) AS 
+<a name="437728"></a>      deptaddr
+<a name="436384"></a>      FROM dept d;
+<a name="433781"></a>
+</pre>
+</li>
+</ol>
+
+<a name="433787"></a> <!--TOC=h1-"433787"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Identifying Null Objects in Object Views</font></h2>
+
+<!--/TOC=h1-->
+<a name="433788"></a> 
+
+<p class="BP">Because the constructor for an object never returns a null, none of the address objects in the preceding view can ever be null, even if the city, street, and so on columns in the relational table are all null. The relational table has no column that specifies whether the department address is null. If we define a convention so that a null deptstreet column indicates that the whole address is null, then we can capture the logic using the <code>DECODE</code> function, or some other function, to return either a null or the constructed object:</p>
+
+<pre class="CE">
+<a name="433789"></a>CREATE VIEW dept_view AS
+<a name="433790"></a>  SELECT d.deptno, d.deptname,
+<a name="433791"></a>        <strong class="Bold">DECODE(d.deptstreet, NULL, NULL, 
+</strong><a name="433792"></a> <strong class="Bold">      address_t(d.deptstreet, d.deptcity, d.deptstate, d.deptzip)</strong>) AS 
+deptaddr
+<a name="433793"></a>  FROM dept d;
+<a name="433794"></a>
+</pre>
+
+<a name="433795"></a> 
+
+<p class="BP">Using such a technique makes it impossible to directly update the department address through the view, because it does not correspond directly to a column in the relational table. Instead, we would define an <code>INSTEAD OF</code> trigger over the view to handle updates to this column.</p>
+
+<a name="433796"></a> <!--TOC=h1-"433796"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Using Nested Tables and Varrays in Object Views</font></h2>
+
+<!--/TOC=h1-->
+<a name="433797"></a> 
+
+<p class="BP">Collections, both nested tables and <code>VARRAY</code>s, can be columns in views. You can select these collections from underlying collection columns or you can synthesize them using subqueries. The <code>CAST-MULTISET</code> operator provides a way of synthesizing such collections.</p>
+
+<a name="436582"></a> <!--TOC=h2-"436582"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Single-Level Collections in Object Views</font></h3>
+
+<!--/TOC=h2-->
+<a name="433798"></a> 
+
+<p class="BP">Taking the previous example as our starting point, we represent each employee in an emp relational table that has the following structure:</p>
+
+<pre class="CE">
+<a name="433799"></a>CREATE TABLE emp
+<a name="433800"></a>(
+<a name="433801"></a>   empno    NUMBER PRIMARY KEY,
+<a name="433802"></a>   empname  VARCHAR2(20),
+<a name="433803"></a>   salary   NUMBER,
+<a name="433804"></a>   deptno   NUMBER REFERENCES dept(deptno)
+<a name="433805"></a>);
+<a name="433806"></a>
+</pre>
+
+<a name="433807"></a> 
+
+<p class="BP">Using this relational table, we can construct a dept_view with the department number, name, address and a collection of employees belonging to the department.</p>
+
+<ol class="LN1" type="1">
+<li class="LN1" type="1" value="1"><a name="433808"></a>Define an employee type and a nested table type for the employee type: 
+
+<pre class="CE">
+<a name="433809"></a>CREATE TYPE employee_t AS OBJECT
+<a name="433810"></a>(
+<a name="433811"></a>  eno NUMBER,
+<a name="433812"></a>  ename VARCHAR2(20),
+<a name="433813"></a>  salary  NUMBER
+<a name="433814"></a>);
+<a name="433815"></a>
+<a name="436393"></a>CREATE TYPE employee_list_t <strong class="Bold">AS TABLE OF employee_t</strong>;
+<a name="436394"></a>
+</pre>
+</li>
+
+<li class="LN1" type="1" value="2"><a name="436414"></a>Define a department type having a department number, name, address, and a nested table of employees: 
+
+<pre class="CE">
+<a name="436402"></a>CREATE TYPE dept_t AS OBJECT
+<a name="436403"></a>(   deptno     NUMBER,
+<a name="436404"></a>    deptname   VARHCAR2(20),
+<a name="436405"></a>    address    address_t,
+<a name="436406"></a>    emp_list   employee_list_t
+<a name="436407"></a>);
+<a name="436400"></a>
+</pre>
+</li>
+
+<li class="LN1" type="1" value="3"><a name="436395"></a>Define the object view <code>dept_view</code>: 
+
+<pre class="CE">
+<a name="436438"></a>CREATE VIEW dept_view OF dept_t WITH OBJECT IDENTIFIER (deptno) AS
+<a name="436439"></a>    SELECT d.deptno, d.deptname,
+<a name="436440"></a>        address_t(d.deptstreet,d.deptcity,d.deptstate,d.deptzip) AS deptaddr,
+<a name="433822"></a>            <strong class="Bold">CAST( MULTISET (
+</strong><a name="433823"></a>                           SELECT e.empno, e.empname, e.salary
+<a name="433824"></a>                           FROM emp e 
+<a name="433825"></a>                           WHERE e.deptno = d.deptno) 
+<a name="433826"></a>                        AS employee_list_t)
+<a name="433827"></a>                   AS emp_list
+<a name="433828"></a>   FROM   dept d;
+<a name="436281"></a>
+</pre>
+</li>
+</ol>
+
+<a name="433830"></a> 
+
+<p class="BP">The <code>SELECT</code> subquery inside the <code>CAST-MULTISET</code> block selects the list of employees that belong to the current department. The <code>MULTISET</code> keyword indicates that this is a list as opposed to a singleton value. The <code>CAST</code> operator casts the result set into the appropriate type, in this case to the <code>employee_list_t</code> nested table type.</p>
+
+<a name="433831"></a> 
+
+<p class="BP">A query on this view could give us the list of departments, with each department row containing the department number, name, the address object and a collection of employees belonging to the department.</p>
+
+<a name="436510"></a> <!--TOC=h2-"436510"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Multilevel Collections in Object Views</font></h3>
+
+<!--/TOC=h2-->
+<a name="436599"></a> 
+
+<p class="BP">Multilevel collections and single-level collections are created and used in object views in the same way. The only difference is that, for a multilevel collection, you must create an additional level of collections.</p>
+
+<a name="436605"></a> 
+
+<p class="BP">The following example builds an object view containing a multilevel collection. The view is based on flat relational tables (that contain no collections). As a preliminary to building the object view, the example creates the object and collection types it uses. An object type (for example, <code>emp_t</code>) is defined to correspond to each relational table, with attributes whose types correspond to the types of the respective table columns. In addition, the employee type has a nested table (attribute) of projects, and the department type has a nested table (attribute) of employees. The latter nested table is a multilevel collection. The <code>CAST-MULTISET</code> operator is used in the <code>CREATE VIEW</code> statement to build the collections.</p>
+
+<a name="436513"></a> 
+
+<p class="BP">These are the underlying relational tables:</p>
+
+<pre class="CE">
+<a name="436514"></a>CREATE TABLE depts
+<a name="436515"></a>  ( deptno     NUMBER
+<a name="436516"></a>  , deptname   VARHCAR2(20));
+<a name="436517"></a>
+<a name="436518"></a>CREATE TABLE emp
+<a name="436519"></a>  ( ename VARCHAR2(20),
+<a name="436520"></a>  , salary     NUMBER
+<a name="436521"></a>  , deptname   VARHCAR2(20));
+<a name="436522"></a>
+<a name="436523"></a>CREATE TABLE projects
+<a name="436524"></a>  ( projname   VARHCAR2(20)
+<a name="436525"></a>  , mgr        VARHCAR2(20));
+<a name="436574"></a>
+</pre>
+
+<a name="436527"></a> 
+
+<p class="BP">These are the object and collection types the view will use:</p>
+
+<pre class="CE">
+<a name="436529"></a>CREATE TYPE project_t AS OBJECT
+<a name="436530"></a>  ( projname   VARHCAR2(20)
+<a name="436531"></a>  , mgr        VARHCAR2(20));
+<a name="436532"></a>   
+<a name="436533"></a>CREATE TYPE nt_project_t AS TABLE OF project_t;
+<a name="436534"></a>
+<a name="436535"></a>CREATE TYPE emp_t AS OBJECT
+<a name="436536"></a>  ( ename      VARCHAR2(20)
+<a name="436537"></a>  , salary     NUMBER
+<a name="436538"></a>  , deptname   VARHCAR2(20)
+<a name="436539"></a>  , projects   nt_project_t);
+<a name="436540"></a>
+<a name="436541"></a>CREATE TYPE nt_emp_t AS TABLE OF emp_t;
+<a name="436542"></a>
+<a name="436543"></a>CREATE TYPE dept_t AS OBJECT
+<a name="436544"></a>  ( deptno     NUMBER
+<a name="436545"></a>  , deptname   VARHCAR2(20)
+<a name="436546"></a>  , emps       nt_emp_t);
+<a name="436579"></a>
+</pre>
+
+<a name="436548"></a> 
+
+<p class="BP">The following statement creates the object view:</p>
+
+<pre class="CE">
+<a name="436550"></a>CREATE VIEW v_depts OF dept_t AS
+<a name="436551"></a>  SELECT d.deptno, d.deptname, 
+<a name="436552"></a>    CAST(MULTISET(SELECT e.ename, e.salary, e.deptname,
+<a name="436553"></a>        CAST(MULTISET(SELECT p.projname, p.mgr
+<a name="436554"></a>          FROM projects
+<a name="436555"></a>          WHERE p.mgr = e.ename)
+<a name="436556"></a>        AS nt_project_t)
+<a name="436557"></a>      FROM emp
+<a name="436558"></a>      WHERE e.deptname = d.deptname)
+<a name="436559"></a>    AS nt_emp_t)
+<a name="436511"></a>  FROM depts d;
+<a name="436571"></a>
+</pre>
+
+<a name="433832"></a> <!--TOC=h1-"433832"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Specifying Object Identifiers for Object Views</font></h2>
+
+<!--/TOC=h1-->
+<a name="433833"></a> 
+
+<p class="BP">You can construct pointers (REFs) to the row objects in an object view. Since the view data is not stored persistently, you must specify a set of distinct values to be used as object identifiers. The notion of object identifiers allows the objects in object views to be referenced and pinned in the object cache.</p>
+
+<a name="433834"></a> 
+
+<p class="BP">If the view is based on an object table or an object view, then there is already an object identifier associated with each row and you can reuse them. Either omit the <code>WITH</code> <code>OBJECT</code> <code>IDENTIFIER</code> clause, or specify <code>WITH</code> <code>OBJECT</code> <code>IDENTIFIER</code> <code>DEFAULT</code>.</p>
+
+<a name="436013"></a> 
+
+<p class="BP">However, if the row object is synthesized from relational data, you must choose some other set of values.</p>
+
+<a name="433835"></a> 
+
+<p class="BP">Oracle lets you specify object identifiers based on the primary key. The set of unique keys that identify the row object is turned into an identifier for the object. These values must be unique within the rows selected out of the view, since duplicates would lead to problems during navigation through object references.</p>
+
+<a name="436027"></a> 
+
+<p class="BP">The object view created with the <code>WITH</code> <code>OBJECT</code> <code>IDENTIFIER</code> clause has an object identifier derived from the primary key. If the <code>WITH</code> <code>OBJECT</code> <code>IDENTIFIER</code> <code>DEFAULT</code> clause is specified, the object identifier is either system generated or primary key based, depending on the underlying table or view definition.</p>
+
+<a name="433837"></a> 
+
+<p class="BP">Continuing with our department example, we can create a <code>dept_view</code> object view that uses the department number as the object identifier:</p>
+
+<a name="433838"></a> 
+
+<p class="BP">Define the object type for the row, in this case the dept_t department type:</p>
+
+<pre class="CE">
+<a name="433839"></a>CREATE TYPE dept_t AS OBJECT
+<a name="433840"></a>(
+<a name="433841"></a>  <strong class="Bold">dno        NUMBER</strong>,
+<a name="433842"></a>  dname      VARCHAR2(20),
+<a name="433843"></a>  deptaddr   address_t,
+<a name="433844"></a>  emplist    employee_list_t
+<a name="433845"></a>);
+<a name="433846"></a>
+</pre>
+
+<a name="433848"></a> 
+
+<p class="BP">Because the underlying relational table has <code>deptno</code> as the primary key, each department row has a unique department number. In the view, the <code>deptno</code> column becomes the <code>dno</code> attribute of the object type. Once we know that <code>dno</code> is unique within the view objects, we can specify it as the object identier:</p>
+
+<pre class="CE">
+<a name="433849"></a>CREATE VIEW dept_view OF dept_t <strong class="Bold">WITH OBJECT IDENTIFIER(dno)</strong> 
+<a name="433850"></a>   AS SELECT d.deptno, d.deptname, 
+<a name="433851"></a>                address_t(d.deptstreet,d.deptcity,d.deptstate,d.deptzip),
+<a name="433852"></a>                CAST( MULTISET (
+<a name="433853"></a>                           SELECT e.empno, e.empname, e.salary
+<a name="433854"></a>                           FROM emp e 
+<a name="433855"></a>                           WHERE e.deptno = d.deptno) 
+<a name="433856"></a>                      AS employee_list_t)
+<a name="433857"></a>   FROM   dept d;
+<a name="436283"></a>
+</pre>
+
+<a name="436295"></a> 
+
+<div align="center">
+<table class="NoteAlso" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="NoteAlso">
+<td class="NoteAlso"><a name="436288"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="436289"></a> 
+
+<p class="NB"><em class="Italic"><a href="../../server.920/a96540/toc.htm"></a></em><a href="adobjadv.htm#1002759">Object Identifiers</a><a href="adobjadv.htm#1002759"></a></p>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="436284"></a> <a name="433861"></a> <!--TOC=h1-"433861"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Creating References to View Objects</font></h2>
+
+<!--/TOC=h1-->
+<a name="433862"></a> 
+
+<p class="BP">In the example we have been developing, each object selected out of the <code>dept_view</code> view has a unique object identifier derived from the department number value. In the relational case, the foreign key <code>deptno</code> in the emp employee table matches the <code>deptno</code> primary key value in the <code>dept</code> department table. We used the primary key value for creating the object identifier in the <code>dept_view</code>. This allows us to use the foreign key value in the <code>emp_view</code> in creating a reference to the primary key value in dept_view.</p>
+
+<a name="433863"></a> 
+
+<p class="BP">We accomplish this by using <code>MAKE_REF</code> operator to synthesize a primary key object reference. This takes the view or table name to which the reference points and a list of foreign key values to create the object identifier portion of the reference that will match with a particular object in the referenced view.</p>
+
+<a name="433864"></a> 
+
+<p class="BP">In order to create an <code>emp_view</code> view which has the employee's number, name, salary and a reference to the department in which she works, we need first to create the employee type <code>emp_t</code> and then the view based on that type</p>
+
+<pre class="CE">
+<a name="433865"></a>CREATE TYPE emp_t AS OBJECT
+<a name="433866"></a>(
+<a name="433867"></a>  eno      NUMBER,
+<a name="433868"></a>  ename    VARCHAR2(20),
+<a name="433869"></a>  salary   NUMBER,
+<a name="433870"></a>  <strong class="Bold">deptref  REF dept_t
+</strong><a name="433871"></a>);
+<a name="433873"></a>
+<a name="433874"></a>CREATE VIEW emp_view OF emp_t WITH OBJECT IDENTIFIER(eno)
+<a name="433875"></a>   AS SELECT e.empno, e.empname, e.salary, 
+<a name="433876"></a>                      <strong class="Bold">MAKE_REF(dept_view, e.deptno)</strong> 
+<a name="433877"></a>         FROM emp e;
+<a name="433878"></a>
+</pre>
+
+<a name="433879"></a> 
+
+<p class="BP">The <code>deptref</code> column in the view holds the department reference. We write the following simple query to determine all employees whose department is located in the city of San Francisco:</p>
+
+<pre class="CE">
+<a name="433880"></a>SELECT e.eno, e.salary, e.deptref.dno
+<a name="433881"></a>FROM emp_view e
+<a name="433882"></a>WHERE <strong class="Bold">e.deptref.deptaddr.city</strong> = `San Francisco';
+<a name="433883"></a>
+</pre>
+
+<a name="433884"></a> 
+
+<p class="BP">Note that we could also have used the <code>REF</code> modifier to get the reference to the <code>dept_view</code> objects:</p>
+
+<pre class="CE">
+<a name="433885"></a>CREATE VIEW emp_view OF emp_t WITH OBJECT IDENTIFIER(eno)
+<a name="433886"></a>   AS SELECT e.empno, e.empname, e.salary, <strong class="Bold">REF(d)
+</strong><a name="433887"></a>         FROM emp e, dept_view d
+<a name="433888"></a>          WHERE e.deptno = d.dno;
+<a name="433889"></a>
+</pre>
+
+<a name="433890"></a> 
+
+<p class="BP">In this case we join the <code>dept_view</code> and the emp table on the <code>deptno</code> key. The advantage of using <code>MAKE_REF</code> operator instead of the <code>REF</code> modifier is that in using the former, we can create circular references. For example, we can create employee view to have a reference to the department in which she works, and the department view can have a list of references to the employees who work in that department.</p>
+
+<a name="433891"></a> 
+
+<p class="BP">Note that if the object view has a primary key based object identifier, the reference to such a view is primary key based. On the other hand, a reference to a view with system generated object identifier will be a system generated object reference. This difference is only relevant when you create object instances in the OCI object cache and need to get the reference to the newly created objects. This is explained in a later section.</p>
+
+<a name="433892"></a> 
+
+<p class="BP">As with synthesized objects, we can also select persistently stored references as view columns and use them seamlessly in queries. However, the object references to view objects cannot be stored persistently.</p>
+
+<a name="433893"></a> <!--TOC=h1-"433893"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Modelling Inverse Relationships with Object Views</font></h2>
+
+<!--/TOC=h1-->
+<a name="433894"></a> 
+
+<p class="BP">Views with objects can be used to model inverse relationships.</p>
+
+<a name="433895"></a> 
+
+<h4 class="SH1"><font face="Arial, Helvetica, sans-serif">One-to-One Relationships</font></h4>
+
+<a name="433896"></a> 
+
+<p class="BP">One-to-one relationships can be modeled with inverse object references. For example, let us say that each employee has a particular computer on her desk, and that the computer belongs to that employee only. A relational model would capture this using foreign keys either from the computer table to the employee table, or in the reverse direction. Using views, we can model the objects so that we have an object reference from the employee to the computer object and also have a reference from the computer object to the employee.</p>
+
+<a name="433897"></a> 
+
+<h4 class="SH1"><font face="Arial, Helvetica, sans-serif">One-to-Many and Many-to-One Relationships</font></h4>
+
+<a name="433898"></a> 
+
+<p class="BP">One-to-many relationships (or many-to-many relationships) can be modeled either by using object references or by embedding the objects. One-to-many relationship can be modeled by having a collection of objects or object references. The many-to-one side of the relationship can be modeled using object references.</p>
+
+<a name="436098"></a> 
+
+<p class="BP">Consider the department-employee case. In the underlying relational model, we have the foreign key in the employee table. Using collections in views, we can model the relationship between departments and employees. The department view can have a collection of employees, and the employee view can have a reference to the department (or inline the department values). This gives us both the forward relation (from employee to department) and the inverse relation (department to list of employees). The department view can also have a collection of references to employee objects instead of embedding the employee objects.</p>
+
+<a name="436105"></a> <!--TOC=h1-"436105"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Updating Object Views</font></h2>
+
+<!--/TOC=h1-->
+<a name="436108"></a> 
+
+<p class="BP">You can update, insert, and delete data in an object view using the same SQL DML you use for object tables. Oracle updates the base tables of the object view if there is no ambiguity.</p>
+
+<a name="436110"></a> 
+
+<p class="BP">A view is not directly updatable if its view query contains joins, set operators, aggregate functions, or <code>GROUP BY</code> or <code>DISTINCT</code> clauses. Also, individual columns of a view are not directly updatable if they are based on pseudocolumns or expression in the view query.</p>
+
+<a name="437067"></a> 
+
+<p class="BP">If a view is not directly updatable, you can still update it indirectly using <code>INSTEAD&nbsp;OF</code> triggers. To do so, you define an <code>INSTEAD OF</code> trigger for each kind of DML statement you want to execute on the view. In the <code>INSTEAD OF</code> trigger, you code the operations that must take place on the underlying tables of the view to accomplish the desired change in the view. Then, when you issue a DML statement for which you have defined an <code>INSTEAD OF</code> trigger, Oracle transparently runs the associated trigger.</p>
+
+<a name="437079"></a> 
+
+<div align="center">
+<table class="NoteAlso" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="NoteAlso">
+<td class="NoteAlso"><a name="437071"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="437074"></a> 
+
+<p class="NB"><a href="adobjvew.htm#436100">"Using INSTEAD OF Triggers to Control Mutating and Validation"</a><a href="adobjvew.htm#436100"></a> for an example of an <code>INSTEAD OF</code> trigger</p>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="437103"></a> 
+
+<p class="BP">Something you want to be careful of: In an object view hierarchy, <code>UPDATE</code> and <code>DELETE</code> statements operate polymorphically just as <code>SELECT</code> statements do: the set of rows picked out by an <code>UPDATE</code> or <code>DELETE</code> statement on a view implicitly includes qualifying rows in any subviews of the specified view as well.</p>
+
+<a name="437085"></a> 
+
+<p class="BP">For example, the following statement, which deletes all persons from <code>Person_v</code>, also deletes all students from <code>Student_v</code> and all employees from the <code>Employee_v</code> view.</p>
+
+<pre class="CE">
+<a name="437086"></a>DELETE FROM Person_v;
+<a name="437106"></a>
+</pre>
+
+<a name="437087"></a> 
+
+<p class="BP">To exclude subviews and restrict the affected rows just to those in the view actually specified, use the <code>ONLY</code> keyword. For example, the following statement updates only persons and not employees or students.</p>
+
+<pre class="CE">
+<a name="437088"></a>UPDATE ONLY(Person_v) SET address = ...
+<a name="437107"></a>
+</pre>
+
+<a name="436115"></a> <!--TOC=h2-"436115"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Updating Nested Table Columns in Views</font></h3>
+
+<!--/TOC=h2-->
+<a name="436120"></a> 
+
+<p class="BP">A nested table can be modified by inserting new elements and updating or deleting existing elements. Nested table columns that are virtual or synthesized, as in a view, are not usually updatable. To overcome this, Oracle allows <code>INSTEAD&nbsp;OF</code> triggers to be created on these columns.</p>
+
+<a name="436121"></a> 
+
+<p class="BP">The <code>INSTEAD OF</code> trigger defined on a nested table column (of a view) is fired when the column is modified. Note that if the entire collection is replaced (by an update of the parent row), the <code>INSTEAD&nbsp;OF</code> trigger on the nested table column is not fired.</p>
+
+<a name="436100"></a> <!--TOC=h2-"436100"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Using INSTEAD OF Triggers to Control Mutating and Validation</font></h3>
+
+<!--/TOC=h2-->
+<a name="433901"></a> 
+
+<p class="BP"><code>INSTEAD OF</code> triggers provide a way of updating complex views that otherwise could not be updated. They can also be used to enforce constraints, check privileges and validate the DML. Using these triggers, you can control mutation of the objects created though an object view that might be caused by inserting, updating and deleting.</p>
+
+<a name="433902"></a> 
+
+<p class="BP">For instance, suppose we wanted to enforce the condition that the number of employees in a department cannot exceed 10. To enforce this, we can write an <code>INSTEAD OF</code> trigger for the employee view. The trigger is not needed for doing the DML since the view can be updated, but we need it to enforce the constraint.</p>
+
+<a name="435160"></a> 
+
+<p class="BP">We implement the trigger by means of the following code:</p>
+
+<pre class="CE">
+<a name="435171"></a>CREATE TRIGGER emp_instr <strong class="Bold">INSTEAD OF INSERT</strong> on emp_view 
+<a name="435172"></a>FOR EACH ROW
+<a name="435173"></a>DECLARE
+<a name="435174"></a>  <strong class="Bold">dept_var dept_t</strong>;
+<a name="435175"></a>  emp_count integer;
+<a name="435176"></a>BEGIN
+<a name="435177"></a> <em class="Italic">-- Enforce the constraint..!
+</em><a name="435178"></a> <em class="Italic">-- First get the department number from the reference
+</em><a name="435179"></a>  <strong class="Bold">UTL_REF.SELECT_OBJECT(:NEW.deptref,dept_var);
+</strong><a name="435180"></a>
+<a name="435181"></a>  SELECT COUNT(*) INTO emp_count
+<a name="435182"></a>  FROM emp
+<a name="435183"></a>  WHERE deptno = <strong class="Bold">dept_var.dno</strong>;
+<a name="435184"></a>
+<a name="435185"></a>  IF emp_count &lt; 9 THEN
+<a name="435186"></a> <em class="Italic"> -- let us do the insert
+</em><a name="435187"></a>      <strong class="Bold">INSERT INTO emp VALUES (:NEW.eno,:NEW.ename,:NEW.salary,dept_var.dno);
+</strong><a name="435188"></a>  END IF;
+<a name="435189"></a>END;
+<a name="435197"></a>
+</pre>
+
+<a name="434311"></a> <!--TOC=h1-"434311"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Applying the Object Model to Remote Tables</font></h2>
+
+<!--/TOC=h1-->
+<a name="434312"></a> 
+
+<p class="BP">Although you cannot directly access remote tables as object tables, object views let you access remote tables as if they were object tables.</p>
+
+<a name="434313"></a> 
+
+<p class="BP">Consider a company with two branches -- one in Washington D.C., and another in Chicago. Each site has an employee table. The headquarters in Washington has a department table with the list of all the departments. To get a total view of the entire organization, we can create views over the individual remote tables and then a overall view of the organization.</p>
+
+<a name="435263"></a> 
+
+<p class="BP">First, we create an object view for each employee table:</p>
+
+<pre class="CE">
+<a name="434314"></a>CREATE VIEW emp_washington_view (eno,ename,salary)
+<a name="434315"></a>   AS SELECT e.empno, e.empname, e.salary
+<a name="434316"></a>          FROM   emp@washington_link e;
+<a name="434317"></a>
+<a name="434318"></a>CREATE VIEW emp_chicago_view
+<a name="434319"></a>   AS SELECT e.eno, e.name, e.salary
+<a name="434320"></a>          FROM   emp_tab@chicago_link e;
+<a name="434325"></a>
+</pre>
+
+<a name="434326"></a> 
+
+<p class="BP">We can now create the global view:</p>
+
+<pre class="CE">
+<a name="434327"></a>CREATE VIEW orgnzn_view  OF dept_t WITH OBJECT IDENTIFIER  (dno) 
+<a name="434328"></a>    AS SELECT d.deptno, d.deptname,
+<a name="434329"></a>              address_t(d.deptstreet,d.deptcity,d.deptstate,d.deptzip),
+<a name="434330"></a>              CAST( MULTISET (
+<a name="434331"></a>                      SELECT e.eno, e.ename, e.salary
+<a name="434332"></a>                      FROM emp_washington_view e) 
+<a name="434333"></a>                   AS employee_list_t) 
+<a name="434334"></a>       FROM   dept d
+<a name="434335"></a>       WHERE d.deptcity = `Washington'
+<a name="434336"></a>   UNION ALL
+<a name="434337"></a>       SELECT d.deptno, d.deptname,
+<a name="434338"></a>              address_t(d.deptstreet,d.deptcity,d.deptstate,d.deptzip),
+<a name="434339"></a>              CAST( MULTISET (
+<a name="434340"></a>                       SELECT e.eno, e.name, e.salary
+<a name="434341"></a>                       FROM emp_chicago_view e) 
+<a name="434342"></a>                    AS employee_list_t)
+<a name="434343"></a>       FROM   dept d
+<a name="434344"></a>       WHERE d.deptcity = `Chicago';
+<a name="434345"></a> 
+<a name="434354"></a>
+</pre>
+
+<a name="434355"></a> 
+
+<p class="BP">This view has the list of all employees for each department. We use <code>UNION</code> <code>ALL</code> since we cannot have two employees working in more than one department. If we had to deal with that eventuality, we could use a <code>UNION</code> of the rows. However, one caveat in using the <code>UNION</code> operator is that we need to introduce an <code>ORDER</code> <code>BY</code> operator within the <code>CAST-MULTISET</code> expressions so that the comparison of two collections is performed properly.</p>
+
+<a name="435277"></a> <!--TOC=h1-"435277"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Defining Complex Relationships in Object Views</font></h2>
+
+<!--/TOC=h1-->
+<a name="434364"></a> 
+
+<p class="BP">You can define circular references in object views using the <code>MAKE_REF</code> operator: <code>view_A</code> can refer to <code>view_B</code> which in turn can refer to <code>view_A</code>. This allows an object view to synthesize a complex structure such as a graph from relational data.</p>
+
+<a name="434365"></a> 
+
+<p class="BP">For example, in the case of the department and employee, the department object currently includes a list of employees. To conserve space, we may want to put references to the employee objects inside the department object, instead of materializing all the employees within the department object. We can construct ("pin") the references to employee objects, and later follow the references using the dot notation to extract employee information.</p>
+
+<a name="434366"></a> 
+
+<p class="BP">Because the employee object already has a reference to the department in which the employee works, an object view over this model contains circular references between the department view and the employee view.</p>
+
+<a name="434368"></a> 
+
+<p class="BP">You can create circular references between object views in two different ways.</p>
+
+<a name="434369"></a> 
+
+<h4 class="SH1"><font face="Arial, Helvetica, sans-serif">Method 1: Re-create First View After Creating Second View</font></h4>
+
+<ol class="LN1" type="1">
+<li class="LN1" type="1" value="1"><a name="434370"></a>Create view A without any reference to view B.</li>
+
+<li class="LN1" type="1" value="2"><a name="434371"></a>Create view B, which includes a reference to view A.</li>
+
+<li class="LN1" type="1" value="3"><a name="434372"></a>Replace view A with a new definition that includes the reference to view B.</li>
+</ol>
+
+<a name="434373"></a> 
+
+<h4 class="SH1"><font face="Arial, Helvetica, sans-serif">Method 2: Create First View Using FORCE Keyword</font></h4>
+
+<ol class="LN1" type="1">
+<li class="LN1" type="1" value="1"><a name="434374"></a>Create view A with the reference to view B using the <code>FORCE</code> keyword.</li>
+
+<li class="LN1" type="1" value="2"><a name="434375"></a>Create view B with reference to view A. When view A is used, it is validated and re-compiled.</li>
+</ol>
+
+<a name="434376"></a> 
+
+<p class="BP">Method 2 has fewer steps, but the <code>FORCE</code> keyword may hide errors in the view creation. You need to query the <code>USER_ERRORS</code> catalog view to see if there were any errors during the view creation. Use this method only if you are sure that there are no errors in the view creation statement.</p>
+
+<a name="435280"></a> 
+
+<p class="BP">Also, if errors prevent the views from being recompiled upon use, you must recompile them manually using the ALTER VIEW COMPILE command.</p>
+
+<a name="434377"></a> 
+
+<p class="BP">We will see the implementation for both the methods.</p>
+
+<a name="434378"></a> <!--TOC=h2-"434378"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Tables and Types to Demonstrate Circular View References</font></h3>
+
+<!--/TOC=h2-->
+<a name="434379"></a> 
+
+<p class="BP">First, we set up some relational tables and associated object types. Although the tables contain some objects, they are not object tables. To access the data objects, we will create object views later.</p>
+
+<a name="435911"></a> 
+
+<p class="BP">The <code>emp</code> table stores the employee information:</p>
+
+<pre class="CE">
+<a name="434380"></a>CREATE TABLE emp
+<a name="434381"></a>(
+<a name="434382"></a>   empno    NUMBER PRIMARY KEY,
+<a name="434383"></a>   empname  VARCHAR2(20),
+<a name="434384"></a>   salary   NUMBER,
+<a name="434385"></a>   deptno   NUMBER
+<a name="434386"></a>);
+<a name="434387"></a>
+</pre>
+
+<a name="434388"></a> 
+
+<p class="BP">The emp_t type contains a reference to the department. We need a dummy department type so that the emp_t type creation succeeds.</p>
+
+<pre class="CE">
+<a name="434390"></a>CREATE TYPE dept_t;
+<a name="434391"></a>/
+<a name="435901"></a>
+</pre>
+
+<a name="434392"></a> 
+
+<p class="BP">The employee type includes a reference to the department:</p>
+
+<pre class="CE">
+<a name="434394"></a>CREATE TYPE emp_t AS OBJECT
+<a name="434395"></a>(
+<a name="434396"></a>  eno NUMBER,
+<a name="434397"></a>  ename VARCHAR2(20),
+<a name="434398"></a>  salary  NUMBER,
+<a name="434399"></a>  deptref REF dept_t
+<a name="434400"></a>);
+<a name="434401"></a>/
+<a name="435906"></a>
+</pre>
+
+<a name="434402"></a> 
+
+<p class="BP">We represent the list of references to employees as a nested table:</p>
+
+<pre class="CE">
+<a name="434404"></a>CREATE TYPE employee_list_ref_t AS TABLE OF REF emp_t;
+<a name="434405"></a>/
+<a name="435907"></a>
+</pre>
+
+<a name="434406"></a> 
+
+<p class="BP">The department table is a typical relational table:</p>
+
+<pre class="CE">
+<a name="434408"></a>CREATE TABLE dept
+<a name="434409"></a>(
+<a name="434410"></a>    deptno        NUMBER PRIMARY KEY,
+<a name="434411"></a>    deptname      VARCHAR2(20),
+<a name="434412"></a>    deptstreet    VARCHAR2(20),
+<a name="434413"></a>    deptcity      VARCHAR2(10),
+<a name="434414"></a>    deptstate     CHAR(2),
+<a name="434415"></a>    deptzip       VARCHAR2(10)
+<a name="434416"></a> );
+<a name="434417"></a>
+</pre>
+
+<a name="434418"></a> 
+
+<p class="BP">To create object views, we need object types that map to columns from the relational tables:</p>
+
+<pre class="CE">
+<a name="434420"></a>CREATE TYPE address_t AS OBJECT 
+<a name="434421"></a>(
+<a name="434422"></a>   street        VARCHAR2(20),
+<a name="434423"></a>    city         VARCHAR2(10),
+<a name="434424"></a>    state        CHAR(2),
+<a name="434425"></a>    zip          VARCHAR2(10)
+<a name="434426"></a>);
+<a name="434427"></a>/
+<a name="435910"></a>
+</pre>
+
+<a name="435917"></a> 
+
+<p class="BP">We earlier created an incomplete type; now we fill in its definition:</p>
+
+<pre class="CE">
+<a name="435914"></a>CREATE OR REPLACE TYPE dept_t AS OBJECT
+<a name="434431"></a>(
+<a name="434432"></a>  dno           NUMBER,
+<a name="434433"></a>  dname         VARCHAR2(20),
+<a name="434434"></a>  deptaddr      address_t,
+<a name="434435"></a>  empreflist    employee_list_ref_t
+<a name="434436"></a>);
+<a name="434437"></a>/
+</pre>
+
+<a name="434439"></a> <!--TOC=h2-"434439"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Creating Object Views with Circular References</font></h3>
+
+<!--/TOC=h2-->
+<a name="435922"></a> 
+
+<p class="BP">Now that we have the underlying relational table definitions, we create the object views on top of them.</p>
+
+<a name="436459"></a> 
+
+<h4 class="SH1"><font face="Arial, Helvetica, sans-serif">Method 1: Re-create First View After Creating Second View</font></h4>
+
+<a name="435937"></a> 
+
+<p class="BP">We first create the employee view with a null in the deptref column. Later, we will turn that column into a reference.</p>
+
+<pre class="CE">
+<a name="434443"></a>CREATE VIEW emp_view OF emp_t WITH OBJECT IDENTIFIER(eno)
+<a name="434444"></a>   AS SELECT e.empno, e.empname, e.salary, 
+<a name="434445"></a>                       NULL
+<a name="434446"></a>         FROM emp e;
+<a name="434447"></a>
+<a name="434448"></a>
+</pre>
+
+<a name="434449"></a> 
+
+<p class="BP">Next, we create the department view, which includes references to the employee objects.</p>
+
+<pre class="CE">
+<a name="434450"></a>
+<a name="434451"></a>CREATE VIEW dept_view OF dept_t WITH OBJECT IDENTIFIER(dno) 
+<a name="434452"></a>   AS SELECT d.deptno, d.deptname, 
+<a name="434453"></a>                address_t(d.deptstreet,d.deptcity,d.deptstate,d.deptzip),
+<a name="434454"></a>                CAST( MULTISET (
+<a name="434455"></a>                           SELECT MAKE_REF(emp_view, e.empno)
+<a name="434456"></a>                           FROM emp e 
+<a name="434457"></a>                           WHERE e.deptno = d.deptno) 
+<a name="434458"></a>                        AS employee_list_ref_t)
+<a name="434459"></a>   FROM   dept d; 
+<a name="434460"></a>
+</pre>
+
+<a name="434461"></a> 
+
+<p class="BP">We create a list of references to employee objects, instead of including the entire employee object. We now re-create the employee view with the reference to the department view.</p>
+
+<pre class="CE">
+<a name="434462"></a>CREATE OR REPLACE VIEW emp_view OF emp_t WITH OBJECT IDENTIFIER(eno)
+<a name="434463"></a>   AS SELECT e.empno, e.empname, e.salary, 
+<a name="434464"></a>                       MAKE_REF(dept_view, e.deptno)
+<a name="434465"></a>         FROM emp e;
+<a name="434466"></a>
+</pre>
+
+<a name="434467"></a> 
+
+<p class="BP">This creates the views.</p>
+
+<a name="436463"></a> 
+
+<h4 class="SH1"><font face="Arial, Helvetica, sans-serif">Method 2: Create First View Using FORCE Keyword</font></h4>
+
+<a name="434469"></a> 
+
+<p class="BP">If we are sure that the view creation statement has no syntax errors, we can use the <code>FORCE</code> keyword to force the creation of the first view without the other view being present.</p>
+
+<a name="434470"></a> 
+
+<p class="BP">First, we create an employee view that includes a reference to the department view, which does not exist at this point. This view cannot be queried until the department view is created properly.</p>
+
+<pre class="CE">
+<a name="434471"></a>CREATE FORCE VIEW emp_view OF emp_t WITH OBJECT IDENTIFIER(eno)
+<a name="434472"></a>   AS SELECT e.empno, e.empname, e.salary, 
+<a name="434473"></a>                       MAKE_REF(dept_view, e.deptno)
+<a name="434474"></a>         FROM emp e;
+<a name="434475"></a>
+</pre>
+
+<a name="434476"></a> 
+
+<p class="BP">Next, we create a department view that includes references to the employee objects. We do not have to use the <code>FORCE</code> keyword here, since <code>emp_view</code> already exists.</p>
+
+<pre class="CE">
+<a name="434477"></a>CREATE VIEW dept_view OF dept_t WITH OBJECT IDENTIFIER(dno) 
+<a name="434478"></a>   AS SELECT d.deptno, d.deptname, 
+<a name="434479"></a>                address_t(d.deptstreet,d.deptcity,d.deptstate,d.deptzip),
+<a name="434480"></a>                CAST( MULTISET (
+<a name="434481"></a>                           SELECT MAKE_REF(emp_view, e.empno)
+<a name="434482"></a>                           FROM emp e 
+<a name="434483"></a>                           WHERE e.deptno = d.deptno) 
+<a name="434484"></a>                        AS employee_list_ref_t)
+<a name="434485"></a>   FROM   dept d; 
+<a name="434486"></a>
+</pre>
+
+<a name="434487"></a> 
+
+<p class="BP">This allows us to query the department view, getting the employee object by de-referencing the employee reference from the nested table empreflist:</p>
+
+<pre class="CE">
+<a name="434489"></a>SELECT DEREF(e.COLUMN_VALUE)
+<a name="434490"></a>FROM TABLE( SELECT e.empreflist FROM dept_view e WHERE e.dno = 100) e;
+<a name="434491"></a>
+</pre>
+
+<a name="434492"></a> 
+
+<p class="BP"><code>COLUMN_VALUE</code> is a special name that represents the scalar value in a scalar nested table. In this case, <code>COLUMN_VALUE</code> denotes the reference to the employee objects in the nested table <code>empreflist</code>.</p>
+
+<a name="434493"></a> 
+
+<p class="BP">We can also access only the employee number of all those employees whose name begins with "John".</p>
+
+<pre class="CE">
+<a name="434494"></a>SELECT e.COLUMN_VALUE.eno
+<a name="434495"></a>FROM TABLE(SELECT e.empreflist FROM dept_view e WHERE e.dno = 100) e
+<a name="434496"></a>WHERE e.COLUMN_VALUE.ename like `John%';
+<a name="434497"></a>
+</pre>
+
+<a name="434498"></a> 
+
+<p class="BP">To get a tabular output, unnest the list of references by joining the department table with the items in its nested table:</p>
+
+<pre class="CE">
+<a name="434499"></a>SELECT d.dno, e.COLUMN_VALUE.eno, e.COLUMN_VALUE.ename
+<a name="434500"></a>FROM dept_view d, TABLE(d.empreflist) e
+<a name="434501"></a>WHERE e.COLUMN_VALUE.ename like `John%' 
+<a name="434502"></a> AND   d.dno = 100;
+<a name="434503"></a>
+</pre>
+
+<a name="434504"></a> 
+
+<p class="BP">Finally, we can rewrite the preceding query to use the <code>emp_view</code> instead of the <code>dept_view</code> to show how you can navigate from one view to the other:</p>
+
+<pre class="CE">
+<a name="434505"></a>SELECT e.deptref.dno, DEREF(f.COLUMN_VALUE)
+<a name="434506"></a>FROM emp_view e, TABLE(e.deptref.empreflist) f
+<a name="434507"></a>WHERE e.deptref.dno = 100 
+<a name="434508"></a>AND f.COLUMN_VALUE.ename like `John%';
+<a name="436319"></a>
+</pre>
+
+<a name="436646"></a> <!--TOC=h1-"436646"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Object View Hierarchies</font></h2>
+
+<!--/TOC=h1-->
+<a name="436647"></a> 
+
+<p class="BP">An object view hierarchy is a set of object views each of which is based on a different type in a type hierarchy. Subviews in a view hierarchy are created <em class="Italic">under</em> a superview, analogously to the way subtypes in a type hierarchy are created under a supertype.</p>
+
+<a name="436648"></a> 
+
+<p class="BP">Each object view in a view hierarchy is populated with objects of a single type, but queries on a given view implicitly address its subviews as well. Thus an object view hierarchy gives you a simple way to frame queries that can return a polymorphic set of objects of a given level of specialization or greater.</p>
+
+<a name="436649"></a> 
+
+<p class="BP">For example, suppose you have the following type hierarchy, with <code>Person_typ</code> as the root:</p>
+
+<a name="436653"><img src="adobj028.gif" alt="Text description of adobj028.gif follows"></a><a href="img_text/adobj028.htm"><br>
+Text description of the illustration adobj028.gif</a><br>
+<br>
+ <a name="436654"></a> 
+
+<p class="BP">If you have created an object view hierarchy based on this type hierarchy, with an object view built on each type, you can query the object view that corresponds to the level of specialization you are interested in. For instance, you can query the view of <code>Student_typ</code> to get a result set that contains only students, including part-time students.</p>
+
+<a name="436655"></a> 
+
+<p class="BP">You can base the root view of an object view hierarchy on any type in a type hierarchy: you do not need to start the object view hierarchy at the root type. Nor do you need to extend an object view hierarchy to every leaf of a type hierarchy or cover every branch. However, you cannot skip intervening subtypes in the line of descent. Any subview must be based on a direct subtype of the type of its direct superview.</p>
+
+<a name="436656"></a> 
+
+<p class="BP">Just as a type can have multiple sibling subtypes, an object view can have multiple sibling subviews. But a subview based on a given type can participate in only one object view hierarchy: two different object view hierarchies cannot each have a subview based on the same subtype.</p>
+
+<a name="436657"></a> 
+
+<p class="BP">A subview inherits the object identifier (OID) from its superview. An OID cannot be explicitly specified in any subview.</p>
+
+<a name="436658"></a> 
+
+<p class="BP">A root view can explicitly specify an object identifier using the <code>WITH OBJECT ID</code> clause. If the OID is system-generated or the clause is not specified in the root view, then subviews can be created only if the root view is based on a table or view that also uses a system generated OID.</p>
+
+<a name="436659"></a> 
+
+<p class="BP">The query underlying a view determines whether the view is updatable. For a view to be updatable, its query must contain no joins, set operators, aggregate functions, <code>GROUP BY</code>, <code>DISTINCT</code>, pseudocolumns, or expressions. The same applies to subviews.</p>
+
+<a name="436660"></a> 
+
+<p class="BP">If a view is not updatable, you can define <code>INSTEAD OF</code> triggers to perform appropriate DML actions. Note that <code>INSTEAD OF</code> triggers are not inherited by subviews.</p>
+
+<a name="436661"></a> 
+
+<p class="BP">All views in a view hierarchy must be in the same schema.</p>
+
+<a name="436889"></a> 
+
+<div align="center">
+<table class="Note" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="Note">
+<td class="Note">
+<hr>
+<a name="436893"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">Note:</strong></font> <a name="436894"></a> 
+
+<p class="NB">In Oracle9<em class="Italic">i</em> you can create views of types that are non-instantiable. <a name="436908"></a></p>
+
+<p class="NB">A non-instantiable type cannot have instances, so ordinarily there would be no point in creating an object view of such a type. However, a non-instantiable type can have subtypes that <em class="Italic">are</em> instantiable. The ability to create object views of non-instantiable types enables you to base an object view hierarchy on a type hierarchy that contains a non-instantiable type.</p>
+
+<hr>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="436662"></a> <!--TOC=h2-"436662"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Creating an Object View Hierarchy</font></h3>
+
+<!--/TOC=h2-->
+<a name="437270"></a> 
+
+<p class="BP">You build an object view hierarchy by creating subviews under a root view. You do this by using the <code>UNDER</code> keyword in the <code>CREATE VIEW</code> statement.</p>
+
+<pre class="CE">
+<a name="437505"></a>CREATE VIEW Student_v OF Student_typ <strong class="Bold">UNDER</strong> Person_v
+<a name="437506"></a>  AS 
+<a name="437507"></a>  SELECT ssn, name, address, deptid, major
+<a name="437508"></a>  FROM AllPersons
+<a name="437509"></a>  WHERE typeid = 2;
+<a name="437510"></a>
+</pre>
+
+<a name="437241"></a> 
+
+<p class="BP">The same object view hierarchy can be based on different underlying storage models. In other words, a variety of layouts or designs of underlying tables can produce the same object view hierarchy. The design of the underlying storage model has implications for the performance and updatability of the object view hierarchy.</p>
+
+<a name="437517"></a> 
+
+<p class="BP">The following examples show three possible storage models. In the first, "flat" model, all views in the object view hierarchy are based on the same table. In the second, "horizontal" model, each view has a one-to-one correspondence with a different table. And in the third, "vertical" model, the views are constructed using joins.</p>
+
+<a name="436664"></a> <!--TOC=h3-"436664"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">The Flat Model</font></h4>
+
+<!--/TOC=h3-->
+<a name="436665"></a> 
+
+<p class="BP">In the "flat" model, all the views in the hierarchy are based on the same table. In the following example, the single table <code>AllPersons</code> contains columns for all the attributes of <code>Person_typ</code>, <code>Student_typ</code>, or <code>Employee_typ</code>.</p>
+
+<a name="437536"></a> 
+
+<h4 class="FT"><font face="Arial, Helvetica, sans-serif"><em>Figure 5-1 Flat Storage Model for Object View Hierarchy</em></font></h4>
+
+<a name="437537"><img src="adobj030.gif" alt="Text description of adobj030.gif follows"></a><a href="img_text/adobj030.htm"><br>
+Text description of the illustration adobj030.gif</a><br>
+<br>
+ 
+
+<pre class="CE">
+<a name="436666"></a>CREATE TABLE AllPersons
+<a name="436667"></a>( typeid NUMBER(1), 
+<a name="436668"></a>  ssn NUMBER, 
+<a name="436669"></a>  name VARCHAR2(30), 
+<a name="436670"></a>  address VARCHAR2(100),
+<a name="436671"></a>  deptid NUMBER,
+<a name="436672"></a>  major VARCHAR2(30),
+<a name="436673"></a>  empid NUMBER, 
+<a name="436674"></a>  mgr VARCHAR2(30));
+<a name="436675"></a>  
+</pre>
+
+<a name="436676"></a> 
+
+<p class="BP">The <code>typeid</code> column identifies the type of each row. Possible values are:</p>
+
+<pre class="CE">
+<a name="436677"></a>1 = Person_typ
+<a name="436678"></a>2 = Student_typ
+<a name="436679"></a>3 = Employee_typ
+<a name="436680"></a>
+</pre>
+
+<a name="436681"></a> 
+
+<p class="BP">The following statements create the views that make up the object view hierarchy:</p>
+
+<pre class="CE">
+<a name="436682"></a>CREATE VIEW Person_v OF Person_typ
+<a name="436683"></a>  WITH OBJECT OID(ssn) AS
+<a name="436684"></a>  SELECT ssn, name, address 
+<a name="436685"></a>  FROM AllPersons 
+<a name="436686"></a>  WHERE typeid = 1;
+<a name="436687"></a>
+<a name="436688"></a>CREATE VIEW Student_v OF Student_typ <strong class="Bold">UNDER</strong> Person_v
+<a name="436689"></a>  AS 
+<a name="436690"></a>  SELECT ssn, name, address, deptid, major
+<a name="436691"></a>  FROM AllPersons
+<a name="436692"></a>  WHERE typeid = 2;
+<a name="436693"></a>
+<a name="436694"></a>CREATE VIEW Employee_v OF Employee_typ <strong class="Bold">UNDER</strong> Person_v
+<a name="436695"></a>  AS
+<a name="436696"></a>  SELECT ssn, name, address, empid, mgr
+<a name="436697"></a>  FROM AllPersons
+<a name="436698"></a>  WHERE typeid = 3;
+<a name="436699"></a>
+</pre>
+
+<a name="437329"></a> 
+
+<p class="BP">The flat model has the advantage of simplicity and poses no obstacles to supporting indexes and constraints. Its drawbacks are:</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="437336"></a>A single table cannot contain more than 1000 columns, so the flat model imposes a 1000-column limit on the total number of columns that the object view hierarchy can contain.</li>
+
+<li class="LB1" type="disc"><a name="437341"></a>Each row of the table will have NULLs for all the attributes not belonging to its type. Such non-trailing NULLs can adversely affect performance.</li>
+</ul>
+
+<a name="436700"></a> <!--TOC=h3-"436700"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">The Horizontal Model</font></h4>
+
+<!--/TOC=h3-->
+<a name="436701"></a> 
+
+<p class="BP">On the horizontal model, each view or subview is based on a different table. (In the example, the tables are relational, but they could just as well be object tables for which column substitutability is turned off.)</p>
+
+<a name="437588"></a> 
+
+<h4 class="FTW"><font face="Arial, Helvetica, sans-serif"><em>Figure 5-2 Horizontal Storage Model for Object View Hierarchy</em></font></h4>
+
+<a name="437589"><img src="adobj031.gif" alt="Text description of adobj031.gif follows"></a><a href="img_text/adobj031.htm"><br>
+Text description of the illustration adobj031.gif</a><br>
+<br>
+ 
+
+<pre class="CE">
+<a name="437590"></a>CREATE TABLE only_persons
+<a name="436703"></a>( ssn NUMBER,
+<a name="436704"></a>  name VARCHAR2(30),
+<a name="436705"></a>  address VARCHAR2(100));
+<a name="436706"></a>
+<a name="436707"></a>CREATE TABLE only_students
+<a name="436708"></a>( ssn NUMBER, 
+<a name="436709"></a>  name VARCHAR2(30),
+<a name="436710"></a>  address VARCHAR2(100), 
+<a name="436711"></a>  deptid NUMBER,  
+<a name="436712"></a>  major VARCHAR2(30));
+<a name="436713"></a>
+<a name="436714"></a>CREATE TABLE only_employees
+<a name="436715"></a>( ssn NUMBER, 
+<a name="436716"></a>  name VARCHAR2(30),
+<a name="436717"></a>  address VARCHAR2(100), 
+<a name="436718"></a>  empid NUMBER, 
+<a name="436719"></a>  mgr VARCHAR2(30));
+<a name="436720"></a>
+</pre>
+
+<a name="436721"></a> 
+
+<p class="BP">These are the views:</p>
+
+<pre class="CE">
+<a name="436722"></a>CREATE VIEW Person_v OF Person_typ
+<a name="436723"></a>  WITH OBJECT OID(ssn) AS
+<a name="436724"></a>  SELECT * 
+<a name="436725"></a>  FROM only_persons 
+<a name="436726"></a>
+<a name="436727"></a>CREATE VIEW Student_v OF Student_typ UNDER Person_v
+<a name="436728"></a>  AS 
+<a name="436729"></a>  SELECT *
+<a name="436730"></a>  FROM only_students;
+<a name="436731"></a>
+<a name="436732"></a>CREATE VIEW Employee_v OF Employee_typ UNDER Person_v
+<a name="436733"></a>  AS
+<a name="436734"></a>  SELECT * 
+<a name="436735"></a>  FROM only_employees;
+<a name="436736"></a>
+</pre>
+
+<a name="437385"></a> 
+
+<p class="BP">The horizontal model is very efficient at processing queries of the form:</p>
+
+<pre class="CE">
+<a name="437632"></a>SELECT VALUE(p) FROM Person_v p
+<a name="437629"></a>WHERE VALUE(p) IS OF (ONLY Student_typ);
+<a name="437640"></a>
+</pre>
+
+<a name="437630"></a> 
+
+<p class="BP">Such queries need access only a single physical table to get all the objects of the specific type. The drawbacks of this model are that queries of the sort <code>SELECT * FROM</code> <em class="Italic">view</em> require performing a <code>UNION</code> over all the underlying tables and projecting the rows over just the columns in the specified view. (See <a href="adobjvew.htm#436737">"Querying a View in a Hierarchy"</a><a href="adobjvew.htm#436737"></a>.) Also, indexes on attributes (and unique constraints) must span multiple tables, and support for this does not currently exist.</p>
+
+<a name="437377"></a> <!--TOC=h3-"437377"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">The Vertical Model</font></h4>
+
+<!--/TOC=h3-->
+<a name="437406"></a> 
+
+<p class="BP">In the vertical model, there is a physical table corresponding to each view in the hierarchy, but each physical table stores only those attributes that are unique to its corresponding subtype.</p>
+
+<a name="437556"></a> 
+
+<h4 class="FTW"><font face="Arial, Helvetica, sans-serif"><em>Figure 5-3 Vertical Storage Model for Object View Hierarchy</em></font></h4>
+
+<a name="437557"><img src="adobj032.gif" alt="Text description of adobj032.gif follows"></a><a href="img_text/adobj032.htm"><br>
+Text description of the illustration adobj032.gif</a><br>
+<br>
+ 
+
+<pre class="CE">
+<a name="437421"></a>CREATE TABLE all_personattrs 
+<a name="437422"></a>( typeid NUMBER,
+<a name="437423"></a>  ssn NUMBER,  
+<a name="437424"></a>  name VARCHAR2(30),
+<a name="437425"></a>  address VARCHAR2(100));
+<a name="437426"></a>
+<a name="437427"></a>CREATE TABLE all_studentattrs
+<a name="437428"></a>( ssn NUMBER, 
+<a name="437429"></a>  deptid NUMBER, 
+<a name="437430"></a>  major VARCHAR2(30));
+<a name="437431"></a>
+<a name="437432"></a>CREATE TABLE all_employeeattrs
+<a name="437433"></a>( ssn NUMBER,
+<a name="437434"></a>  empid NUMBER, 
+<a name="437435"></a>  mgr VARCHAR2(30));
+<a name="437436"></a>
+<a name="437437"></a>CREATE VIEW Person_v OF Person_t 
+<a name="437438"></a>WITH OBJECT OID(ssn) AS
+<a name="437439"></a>  SELECT ssn, name, address 
+<a name="437440"></a>  FROM all_personattrs 
+<a name="437441"></a>  WHERE typeid = 1;
+<a name="437442"></a>
+<a name="437443"></a>CREATE VIEW Student_v OF Student_t UNDER Person_v
+<a name="437444"></a>  AS 
+<a name="437445"></a>  SELECT x.ssn, x.name, x.address, y.deptid, y.major
+<a name="437446"></a>  FROM all_personattrs x, all_studentattrs y
+<a name="437447"></a>  WHERE x.typeid = 2 AND x.ssn = y.ssn;
+<a name="437448"></a>
+<a name="437449"></a>CREATE VIEW Employee_v OF Employee_t UNDER Person_v
+<a name="437450"></a>  AS
+<a name="437451"></a>  SELECT x.ssn, x.name, x.address, y.empid, y.mgr
+<a name="437452"></a>  FROM all_personattrs x, all_studentattrs y
+<a name="437453"></a>  WHERE x.typeid = 3 AND x.ssn = y.ssn;
+<a name="437461"></a>
+</pre>
+
+<a name="437469"></a> 
+
+<p class="BP">The vertical model can efficiently process queries of the kind <code>SELECT * FROM</code> <em class="Italic">root_view</em>, and it is possible to index individual attributes and impose unique contraints on them. However, to re-create an instance of a type, a join over OIDs must be performed for each level that the type is removed from the root in the hierarchy.</p>
+
+<a name="436737"></a> <!--TOC=h2-"436737"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Querying a View in a Hierarchy</font></h3>
+
+<!--/TOC=h2-->
+<a name="436738"></a> 
+
+<p class="BP">You can query any view or subview in an object view hierarchy; rows are returned for the declared type of the view that you query and for any of that type's subtypes. So, for instance, in an object view hierarchy based on the <code>Person_typ</code> type hierarchy, you can query the view of <code>Person_typ</code> to get a result set that contains all persons, including students and employees; or you can query the view of <code>Student_typ</code> to get a result set that contains only students, including part-time students.</p>
+
+<a name="436739"></a> 
+
+<p class="BP">In the <code>SELECT</code> list of a query, you can include either functions such as <code>REF()</code> and <code>VALUE()</code> that return an object instance, or you can specify object attributes of the view's declared type, such as the <code>name</code> and <code>ssn</code> attributes of <code>Person_typ</code>.</p>
+
+<a name="436740"></a> 
+
+<p class="BP">If you specify functions, to return object instances, the query returns a polymorphic result set: that is, it returns instances of both the view's declared type and any subtypes of that type.</p>
+
+<a name="436945"></a> 
+
+<p class="BP">For example, the following query returns instances of persons, employees, and students of all types, as well as <code>REF</code>s to those instances.</p>
+
+<pre class="CE">
+<a name="436741"></a>SELECT REF(p), VALUE(p) FROM Person_v p;
+<a name="436742"></a>
+</pre>
+
+<a name="436743"></a> 
+
+<p class="BP">If you specify individual attributes of the view's declared type in the <code>SELECT</code> list or do a <code>SELECT *</code> , again the query returns rows for the view's declared type and any subtypes of that type, but these rows are projected over columns for the attributes of the view's declared type, and only those columns are used. In other words, the subtypes are represented only with respect to the attributes they inherit from and share with the view's declared type.</p>
+
+<a name="436744"></a> 
+
+<p class="BP">So, for example, the following query returns rows for all persons and rows for employees and students of all types, but the result uses only the columns for the attributes of <code>Person_typ</code>--namely, <code>name</code>, <code>ssn</code>, and <code>address</code>. It does not show rows for attributes added in the subtypes, such as the <code>deptid</code> attribute of <code>Student_typ</code>.</p>
+
+<pre class="CE">
+<a name="436745"></a>SELECT * FROM Person_v;
+<a name="436746"></a>
+</pre>
+
+<a name="436975"></a> 
+
+<p class="BP">To exclude subviews from the result, use the <code>ONLY</code> keyword. The <code>ONLY</code> keyword confines the selection to the declared type of the view that you are querying:</p>
+
+<pre class="CE">
+<a name="436959"></a>SELECT VALUE(p) FROM ONLY(Person_v) p;
+<a name="436955"></a>
+</pre>
+
+<a name="437113"></a> <!--TOC=h2-"437113"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Privileges for Operations on View Hierarchies</font></h3>
+
+<!--/TOC=h2-->
+<a name="437114"></a> 
+
+<p class="BP">Generally, a query on a view with subviews requires only the <code>SELECT</code> privilege on the view being referenced and does not require any explicit privileges on subviews. For example, the following query requires only <code>SELECT</code> privileges on <code>Person_v</code> but not on any of its subviews.</p>
+
+<pre class="CE">
+<a name="437115"></a>SELECT * FROM Person_v;
+<a name="437137"></a>
+</pre>
+
+<a name="437116"></a> 
+
+<p class="BP">However, a query that selects for any attributes added in subtypes but not used by the root type requires the <code>SELECT</code> privilege on all subviews as well. Such subtype attributes may hold sensitive information that should reasonably require additional privileges to access.</p>
+
+<a name="437147"></a> 
+
+<p class="BP">The following query, for example, requires <code>SELECT</code> privileges on <code>Person_v</code> and also on <code>Student_v</code>, <code>Employee_v</code> (and on any other subview of <code>Person_v</code>) because the query selects object instances and thus gets all the attributes of the subtypes.</p>
+
+<pre class="CE">
+<a name="437117"></a>SELECT VALUE(p) FROM Person_v p;
+<a name="437159"></a>
+</pre>
+
+<a name="437160"></a> 
+
+<p class="BP">To simplify the process of granting <code>SELECT</code> privileges on an entire view hierarchy, you can use the <code>HIERARCHY</code> option. Specifying the <code>HIERARCHY</code> option when granting a user <code>SELECT</code> privileges on a view implicitly grants <code>SELECT</code> privileges on all current and future subviews of the view as well. For example:</p>
+
+<pre class="CE">
+<a name="437119"></a>GRANT SELECT ON Person_v TO scott WITH HIERARCHY OPTION;
+<a name="437163"></a>
+</pre>
+
+<a name="437208"></a> 
+
+<p class="BP">A query that excludes rows belonging to subviews also requires <code>SELECT</code> privileges on all subviews. The reason is that information about which rows belong exclusively to the most specific type of an instance may be sensitive, so the system requires <code>SELECT</code> privileges on subviews for queries (such as the following one) that exclude all rows from subviews.</p>
+
+<pre class="CE">
+<a name="437209"></a>SELECT * FROM ONLY(Person_v);
+<a name="436956"></a>
+</pre>
+
+<a name="437213"></a> <!-- Start Footer -->
+</div>
+
+<div class="OUTD">
+<hr>
+<table summary="" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td valign="bottom" width="33%">
+<table summary="" cellspacing="0" cellpadding="0">
+<tr>
+<td align="center"><a href="adobjmng.htm"><img src="../../dcommon/gifs/larrow.gif" alt="Go to previous page" border="0"></a></td>
+<td align="center"><a href="adobjadv.htm"><img src="../../dcommon/gifs/rarrow.gif" alt="Go to next page" border="0"></a></td>
+</tr>
+</table>
+</td>
+<td align="center" width="34%"><a href="../../dcommon/html/cpyr.htm"><img src="../../dcommon/gifs/oracle.gif" alt="Oracle" border="0"><br>
+<font size="-2">Copyright &copy; 1996, 2002 Oracle Corporation.</font></a><br>
+<font size="-2">All Rights Reserved.</font></td>
+<td valign="bottom" align="right" width="33%">
+<table summary="" cellspacing="0" cellpadding="0" width="144">
+<tr>
+<td align="center" valign="top" width="16%"><a href="../../index.htm"><img src="../../dcommon/gifs/prodicon.gif" alt="Go To Documentation Library" border="0"><br>
+<font size="-2">Home</font></a></td>
+<td align="center" valign="top" width="17%"><a href="../../nav/docindex.htm"><img src="../../dcommon/gifs/bookicon.gif" alt="Go To Product List" border="0"><br>
+<font size="-2">Book List</font></a></td>
+<td align="center" valign="top" width="17%"><a href="toc.htm"><img src="../../dcommon/gifs/conticon.gif" alt="Go To Table Of Contents" border="0"><br>
+<font size="-2">Contents</font></a></td>
+<td align="center" valign="top" width="20%"><a href="index.htm"><img src="../../dcommon/gifs/indxicon.gif" alt="Go To Index" border="0"><br>
+<font size="-2">Index</font></a></td>
+<!--  mix  -->
+<td align="center" valign="top" width="17%"><a href="../../mix.920/a96625/toc.htm"><img src="../../dcommon/gifs/mix.gif" alt="" border="0"><br>
+<font size="-2">Master Index</font></a></td>
+<!--  fdbk  -->
+<td align="center" valign="top" width="17%"><a href="../../dcommon/html/feedback.htm"><img src="../../dcommon/gifs/feedback.gif" alt="" border="0"><br>
+<font size="-2">Feedback</font></a></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</div>
+</body>
+</html>
+

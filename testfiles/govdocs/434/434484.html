@@ -1,0 +1,1534 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+  <HEAD>
+    
+    <style type="text/css">
+      a { text-decoration: none; }
+	.bordergc {background-color: #6699CC;}
+	.bordergd {background-color: #B6C7E5;}
+	.borderge {background-color: #EEF3FB;}
+	.bordergf {background-color: #FFFFFF;}
+	.bordergg {background-color: #CCCCCC;}
+      .small8b { font-size:8pt;
+                font-family: ariel,helvetica,sans-serif;
+                color:#6633cc;
+              }
+      .small8db { font-size:8pt;
+                font-family: ariel,helvetica,sans-serif;
+                color:#4411aa;
+              }
+
+    </style>
+    <META http-equiv="Content-Type"
+      content="text/html; charset=UTF-8">
+    <META name="keywords"
+      CONTENT="NCBI GEO Gene Expression Omnibus microarray oligonucleotide array SAGE">
+    <META name="description"
+      content="NCBI's Gene Expression Omnibus (GEO) is a public archive and resource for gene expression data.">
+    <SCRIPT LANGUAGE="JavaScript" src="/projects/geo/gds/gds_browse.js" type="text/javascript">
+    </SCRIPT>
+
+    <TITLE>
+    GEO Accession viewer
+    </TITLE>
+    <link rel="stylesheet"
+      href="http://www.ncbi.nlm.nih.gov/corehtml/ncbi.css">
+    <!-- GEO_SCRIPT -->
+
+<SCRIPT LANGUAGE="JavaScript1.2"
+SRC="http://www.ncbi.nlm.nih.gov/coreweb/javascript/imagemouseover.js"></SCRIPT>
+
+<SCRIPT LANGUAGE="JavaScript1.2"
+SRC="http://www.ncbi.nlm.nih.gov/coreweb/javascript/show_message.js"></SCRIPT>
+
+<script type="text/javascript" src="http://www.ncbi.nlm.nih.gov/corehtml/jsutils/utils.1.js"></script>
+
+<script type="text/javascript" src="http://www.ncbi.nlm.nih.gov/corehtml/jsutils/remote_data_provider.1.js"></script>
+
+<SCRIPT LANGUAGE="JavaScript1.2"
+SRC="../templates/help_def_messages.js"></SCRIPT>
+
+
+
+<LINK  rel = STYLESHEET href = "http://www.ncbi.nlm.nih.gov/geo/info/geo_style.css" Type  = "text/css" >
+  <script language="Javascript">
+
+  function OnFormFieldChange()
+  {
+    var view = document.getElementById("view");
+
+    if(document.getElementById("ViewOptions").form.value == 'html')
+    {
+        view.remove(3);
+        view.remove(2);
+    }
+    else
+    {
+        var NewOption = document.createElement("OPTION");
+
+        NewOption.text = "Full";
+        NewOption.value = "full";
+
+        try
+        {
+            view.add(NewOption, null);
+        }
+        catch(ex)
+        {
+            view.add(NewOption);
+        }
+
+        NewOption = document.createElement("OPTION");
+
+        NewOption.text = "Data";
+        NewOption.value = "data";
+
+        try
+        {
+            view.add(NewOption, null);
+        }
+        catch(ex)
+        {
+            view.add(NewOption);
+        }
+    }
+  }
+
+  function SubmitViewOptionsForm()
+  {
+    if(document.getElementById("ViewOptions").form.value == 'html')
+    {
+        document.forms.ViewOptions.submit();
+    }
+    else
+    {
+        window.open("acc.cgi?acc=" + document.forms.ViewOptions.acc.value + "&targ=" + document.forms.ViewOptions.targ.value +
+                  "&form=" + document.forms.ViewOptions.form.value + "&view=" + document.forms.ViewOptions.view.value +
+                  ((document.getElementById("token") == undefined || document.forms.ViewOptions.token.value.length == 0) ? "" :
+                  "&token=" + document.forms.ViewOptions.token.value), "_self");
+    }
+
+    return false;
+  }
+
+  function OpenFTP(url)
+  {
+    window.open(url, '_blank');
+  }
+
+  function OpenLink(url, where)
+  {
+    window.open(url, where);
+  }
+
+  utils.addEvent(window, "load", OnFormFieldChange)
+  </script>
+
+</head>
+<body background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/bg_main3.gif" topmargin="20" marginheight="20">
+
+<table width="680" border="0" cellspacing="0" cellpadding="0" align="center" >
+    <tr>
+        <td>
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+                <tr>
+                    <td><a href="http://www.ncbi.nlm.nih.gov"><img src="/projects/geo/img/ncbi_logo.gif" width="145" height="66" alt="" border="0"></a></td>
+                    <td width="100%" align="center" valign="middle" nowrap background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top_bg_white.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/pixel.gif" width="550" height="1" alt="" border="0"><br>
+                        <a href="/projects/geo/"><img src="/projects/geo/img/geo_main.gif" alt="" border="0"></a>
+                    </td>
+                    <td align="right" background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top_bg_white.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top_right.gif" alt="" width="5" height="66" border="0"></td>
+                </tr>
+            </table>
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+                <tr>
+                    <td><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top2_left.gif" width="601" height="2" alt="" border="0"></td>
+                    <td width="100%" background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top2_mid_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/pixel.gif" width="1" height="1" alt="" border="0"></td>
+                    <td align="right"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top2_right.gif" alt="" width="14" height="2" border="0"></td>
+                </tr>
+            </table>
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+                <tr>
+                    <td><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_ulm_no_a.gif" width="145" height="16" alt="" border="0" usemap="#unlmenu" name="unl_menu_pix"></td>
+                    <td background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_mid_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_left.gif" width="3" height="16" alt="" border="0"></td>
+                    <td width="100%" valign="middle" nowrap background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_mid_bg.gif">
+                        <table border="0" cellspacing="0" cellpadding="0" align="right">
+                            <tr>
+                                <td align="right"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_vertical_line.gif" width="1" height="16" alt="" border="0"></td>
+                                <td nowrap align="right"><a href="http://www.ncbi.nlm.nih.gov/projects/geo/info/GEOHandoutFinal.pdf" class="MainMenuFont">&nbsp; Handout &nbsp;</font></a></td>
+                                <td align="right"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_vertical_line.gif" width="1" height="16" alt="" border="0"></td>
+                                <td nowrap align="right"><a href="http://nar.oupjournals.org/cgi/content/full/gkl887?ijkey=ysG9Li2nfUYJvdZ&keytype=ref" class="MainMenuFont">&nbsp; NAR 2006 Paper &nbsp;</font></a></td>
+                                <td align="right"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_vertical_line.gif" width="1" height="16" alt="" border="0"></td>
+                                <td nowrap align="right"><a href="http://nar.oupjournals.org/cgi/content/full/30/1/207?ijkey=oxMPOWseARs7o&keytype=ref&siteid=nar" class="MainMenuFont">&nbsp; NAR 2002 Paper &nbsp;</font></a></td>
+                                <td align="right"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_vertical_line.gif" width="1" height="16" alt="" border="0"></td>
+                                <td nowrap align="right"><a href="/projects/geo/info/faq.html" class="MainMenuFont">&nbsp; FAQ &nbsp;</font></a></td>
+                                <td align="right"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_vertical_line.gif" width="1" height="16" alt="" border="0"></td>
+                                <td nowrap align="right"><a href="/projects/geo/info/MIAME.html" class="MainMenuFont">&nbsp; MIAME &nbsp;</font>
+                                </a></td>
+                                
+                                <td  align="right"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_vertical_line.gif" width="1" height="16" alt="" border="0"></td>
+                                <td nowrap align="right"><a href="mailto:geo@ncbi.nlm.nih.gov" class="MainMenuFont">&nbsp; Email GEO &nbsp;</a></td>
+                                
+                            </tr>
+                        </table>
+                    </td>
+                    <td background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_mid_bg.gif" align="right"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top3_mainmenu_right.gif" width="5" height="16" alt="" border="0"></td>
+                </tr>
+            </table>
+        
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+                <tr>
+                    <td><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top4_ulm_left.gif" width="145" height="4" alt="" border="0"></td>
+                    <td width="100%" background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top4_mid_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/pixel.gif" width="1" height="1" alt="" border="0"></td>
+                    <td align="right" background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top4_mid_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/top4_ulm_right.gif" width="5" height="4" alt="" border="0"></td>
+                </tr>
+            </table>
+    
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+                <tr>
+                    <td width=1 background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_left_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_left_bg.gif" alt="" width="4" height="3" border="0"></td>
+                    <td width="10000" bgcolor="#F0F8FF">
+                        <table cellpadding="0" cellspacing="0" width="100%"><tr><td><font class="Top_Navigation_text" color="#2F6E87" face="Verdana" size="+1">&nbsp;&nbsp;&nbsp;<a href="http://www.ncbi.nlm.nih.gov">NCBI</a> &gt; <a href="../index.cgi"><font color="">GEO</font></a> &gt; <a href="acc.cgi"><b>Accession Display</b></a><a href="javascript:RPopUpWindow_Set(geologinbar_location,260,120,'','','#E1EAE6','','#538AA9','MessageBox2');" onmouseout="RPopUpWindow_Stop()"><img height="11" src="http://www.ncbi.nlm.nih.gov/coreweb/images/long_help4.gif" style="border: none" width="19"></a></font></td>
+<td align="right">Not logged in | <a href="../submission/geosubmi.cgi?rix=1&amp;ix=0z1UUhgso7Amm5deiQqn">Login</a><a href="javascript:RPopUpWindow_Set(geologinbar_login,260,200,'','','#E1EAE6','','#538AA9','MessageBox2');" onmouseout="RPopUpWindow_Stop()"><img height="11" src="http://www.ncbi.nlm.nih.gov/coreweb/images/long_help4.gif" style="border: none" width="19"></a></td>
+</tr></table>
+                    </td>
+                    <td width=1 background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_right_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_right_bg.gif" width="4" height="3" alt="" border="0"></td>
+                </tr>
+                <tr>
+                    <td background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_left_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_left_bg.gif" width="4" height="1" alt="" border="0"></td>
+                    <td width="10000" bgcolor="#E0EEEE"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/pixel.gif" width="1" height="1" alt="" border="0"></td>
+                    <td align="right" background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_right_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_right_bg.gif" alt="" width="4" height="1" border="0"></td>
+                </tr>
+
+                <tr>
+                    <td background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_left_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_left_bg.gif" width="4" height="3" alt="" border="0"></td>
+                    <td width="100%" bgcolor="White">
+                        <table width="98%" border="0" align="center">
+                            <tr>
+                                <td>
+                                    <table border="0" cellspacing="0" cellpadding="0" align="right" width="100%">
+                                        <tr>
+                                            <td>
+
+    <font color="red"></font>
+    <font color="blue"></font>
+<table cellpadding="0" cellspacing="0" style="border: 1px solid #C0F8FF"><tr><td><img height="35" src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/pixel.gif" width="1"></td>
+<td bgcolor="#F0F8FF" width="100%"><font color="#0066CC" face="Arial" size="1"><div id="HelpMessage" style="font: 11px/11px arial, sans-serif"><strong>GEO help:</strong> Mouse over screen elements for information.</div></font></td>
+</tr></table>
+<form action="acc.cgi" enctype="application/x-www-form-urlencoded" id="ViewOptions" method="POST" name="ViewOptions" target="_self"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td></td>
+<td bgcolor="#CCCCCC" nowrap valign="middle" width="100%"><table align="left" border="0" cellpadding="0" cellspacing="0"><tr><td nowrap><table border="0" cellpadding="0" cellspacing="0"><tr><td valign="middle">Scope:&nbsp;<select name="targ" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_scope)" style="font-size: 10px"><option selected value="self">Self</option>
+<option value="gpl">Platform</option>
+<option value="gsm">Samples</option>
+<option value="gse">Series</option>
+<option value="all">Family</option>
+</select>
+&nbsp;&nbsp;Format:&nbsp;<select id="form" name="form" onchange="OnFormFieldChange()" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_format)" style="font-size: 10px"><option value="html">HTML</option>
+<option value="text">SOFT</option>
+<option value="xml">MINiML</option>
+</select>
+&nbsp;&nbsp;Amount:&nbsp;<select id="view" name="view" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_amount)" style="font-size: 10px"><option value="brief">Brief</option>
+<option selected value="quick">Quick</option>
+</select>
+&nbsp;GEO&nbsp;accession:&nbsp;<input name="acc" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_acc)" style="font-size: 10px" type="text" value="GSM322710">&nbsp;&nbsp;</td>
+<td valign="middle"><img alt="Go" border="0" onclick="SubmitViewOptionsForm()" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_go)" src="http://www.ncbi.nlm.nih.gov/projects/geo/img/buttons/go_button.gif"></td>
+</tr></table></td></tr></table></td>
+</tr></table></form>
+    <table><tr><td><table cellpadding="2" cellspacing="0" width="600"><tr bgcolor="#cccccc" valign="top"><td colspan="2"><table width="600"><tr><td><strong><a href="acc.cgi?acc=GSM322710" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_recenter)">Sample GSM322710</a></strong></td>
+<td></td>
+<td align="right" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_gds)"><a href="http://www.ncbi.nlm.nih.gov/sites/entrez?db=gds&amp;term=GSM322710[Accession]&amp;cmd=search">Query DataSets for GSM322710</a></td>
+</tr></table></td></tr>
+<tr valign="top"><td>Status</td>
+<td>Public on Sep 23, 2008</td>
+</tr>
+<tr valign="top"><td nowrap>Title</td>
+<td style="text-align: justify">RRE2_14028s(delpreAB)pBAD18preA_14028s(delpreAB)pBAD18_LB10mMAra_OD0.74_6D069_1</td>
+</tr>
+<tr valign="top"><td nowrap>Sample type</td>
+<td>RNA</td>
+</tr>
+<tr valign="top"><td nowrap>&nbsp;</td>
+<td></td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" colspan="2">Channel 1</td></tr>
+<tr valign="top"><td nowrap>Source Name</td>
+<td style="text-align: justify">RNA_14028s(delpreAB)pBAD18preA<br></td>
+</tr>
+<tr valign="top"><td>Organism(s)</td>
+<td><a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&amp;id=90371" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_organismus)">Salmonella enterica subsp. enterica serovar Typhimurium</a></td>
+</tr>
+<tr valign="top"><td nowrap>Characteristics</td>
+<td style="text-align: justify">Salmonella enterica subsp. enterica serovar Typhimurium 14028s<br>Salmonella typhimurium 14028s-preAB mutant complemented with pBAD18+preA grown in LB+10mM Ara at OD0.74<br></td>
+</tr>
+<tr valign="top"><td nowrap>Extracted molecule</td>
+<td>total RNA</td>
+</tr>
+<tr valign="top"><td nowrap>Extraction protocol</td>
+<td style="text-align: justify">Promega SV RNA isolation kit<br></td>
+</tr>
+<tr valign="top"><td nowrap>Label</td>
+<td style="text-align: justify">Cy3<br></td>
+</tr>
+<tr valign="top"><td nowrap>Label protocol</td>
+<td style="text-align: justify">incorporation of Cy3-dCTP with Reverse Transcriptase<br></td>
+</tr>
+<tr valign="top"><td nowrap>&nbsp;</td>
+<td></td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" colspan="2">Channel 2</td></tr>
+<tr valign="top"><td nowrap>Source Name</td>
+<td style="text-align: justify">RNA_14028s(delpreAB)pBAD18<br></td>
+</tr>
+<tr valign="top"><td>Organism(s)</td>
+<td><a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&amp;id=90371" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_organismus)">Salmonella enterica subsp. enterica serovar Typhimurium</a></td>
+</tr>
+<tr valign="top"><td nowrap>Characteristics</td>
+<td style="text-align: justify">Salmonella enterica subsp. enterica serovar Typhimurium 14028s<br>Salmonella typhimurium 14028s-preAB mutant complemented with pBAD18 (vector control) grown in LB+10mM Ara at OD0.74<br></td>
+</tr>
+<tr valign="top"><td nowrap>Extracted molecule</td>
+<td>total RNA</td>
+</tr>
+<tr valign="top"><td nowrap>Extraction protocol</td>
+<td style="text-align: justify">Promega SV RNA isolation kit<br></td>
+</tr>
+<tr valign="top"><td nowrap>Label</td>
+<td style="text-align: justify">Cy5<br></td>
+</tr>
+<tr valign="top"><td nowrap>Label protocol</td>
+<td style="text-align: justify">incorporation of Cy5-dCTP with Reverse Transcriptase<br></td>
+</tr>
+<tr valign="top"><td nowrap>&nbsp;</td>
+<td></td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" colspan="2">&nbsp;</td></tr>
+<tr valign="top"><td nowrap>Hybridization protocol</td>
+<td style="text-align: justify">overnight hyb on Corning UltraGAPS slides at 42°C in 25% formamide / 5xSSC / 0.1% BSA<br></td>
+</tr>
+<tr valign="top"><td nowrap>Scan protocol</td>
+<td style="text-align: justify">Perkin Elmer ScanArray 5000 scanner, image acquisition with ScanArray Express 3.0.1 software, spot quantification using Quantarray 3.0 software, adaptive quantification, protocol STv6_01_050607<br></td>
+</tr>
+<tr valign="top"><td nowrap>Description</td>
+<td style="text-align: justify">biological replicate, Date_of_Scan = Fri Nov 04 09:50:46 2005<br></td>
+</tr>
+<tr valign="top"><td nowrap>Data processing</td>
+<td style="text-align: justify">normalized based on total signal for each channel, background subtracted VALUE data obtained from log of normalized background subtracted ch1/ch2 signal.<br></td>
+</tr>
+<tr valign="top"><td nowrap>&nbsp;</td>
+<td></td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td>Submission date</td>
+<td>Sep 19, 2008</td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td>Contact name</td>
+<td>Michael McClelland</td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>E-mail(s)</td>
+<td><a href="mailto:mcclelland.michael@gmail.com">mcclelland.michael@gmail.com</a><br></td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>Phone</td>
+<td style="text-align: justify">858-450-5990<br></td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>Fax</td>
+<td style="text-align: justify">858-550-3998<br></td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>Organization name</td>
+<td style="text-align: justify">Sidney Kimmel Cancer Center<br></td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>Department</td>
+<td style="text-align: justify"> <br></td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>Street address</td>
+<td style="text-align: justify">10835 Road to the Cure<br></td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>City</td>
+<td style="text-align: justify">San Diego</td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>State/province</td>
+<td style="text-align: justify">CA</td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>ZIP/Postal code</td>
+<td style="text-align: justify">92121</td>
+</tr>
+<tr bgcolor="#eeeeee" valign="top"><td nowrap>Country</td>
+<td style="text-align: justify">USA</td>
+</tr>
+<tr valign="top"><td nowrap>&nbsp;</td>
+<td></td>
+</tr>
+<tr valign="top"><td>Platform ID</td>
+<td><a href="acc.cgi?acc=GPL3788">GPL3788</a></td>
+</tr>
+<tr valign="top"><td>Series (1)</td>
+<td onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_recenter)"><table cellpadding="3" style="position:relative;top:-5px;left:-5px"><tr><td valign="top"><a href="acc.cgi?acc=GSE12866" onmouseout="onLinkOut('HelpMessage' , geo_empty_help)" onmouseover="onLinkOver('HelpMessage' , geoaxema_recenter)">GSE12866</a></td>
+<td valign="top">PreA overexpression in Salmonella typhimurium</td>
+</tr></table></td>
+</tr>
+</table>
+<br><table cellspacing="3" width="600"><tr bgcolor="#eeeeee" valign="top"><td colspan="2"><strong>Data table header descriptions</strong></td></tr>
+<tr valign="top"><td><strong>ID_REF</strong></td>
+<td>Number</td>
+</tr>
+<tr valign="top"><td><strong>X_LOCATION</strong></td>
+<td>X-coordinate of spot</td>
+</tr>
+<tr valign="top"><td><strong>Y_LOCATION</strong></td>
+<td>Y-coordinate of spot</td>
+</tr>
+<tr valign="top"><td><strong>CH1_MEAN</strong></td>
+<td>Channel 1 mean</td>
+</tr>
+<tr valign="top"><td><strong>CH1_BKD_MEAN</strong></td>
+<td>Channel 1 mean background</td>
+</tr>
+<tr valign="top"><td><strong>CH1_SD</strong></td>
+<td>Channel 1 standard deviation</td>
+</tr>
+<tr valign="top"><td><strong>CH1_BKD_SD</strong></td>
+<td>Channel 1 background standard deviation</td>
+</tr>
+<tr valign="top"><td><strong>CH1_DIAMETER</strong></td>
+<td>Channel 1 diameter</td>
+</tr>
+<tr valign="top"><td><strong>CH1_AREA</strong></td>
+<td>Channel 1 area</td>
+</tr>
+<tr valign="top"><td><strong>CH1_FOOTPRINT</strong></td>
+<td>Channel 1 footprint</td>
+</tr>
+<tr valign="top"><td><strong>CH1_CIRCULARITY</strong></td>
+<td>Channel 1 circularity</td>
+</tr>
+<tr valign="top"><td><strong>CH1_SPOT_UNIFORMITY</strong></td>
+<td>Channel 1 spot uniformity</td>
+</tr>
+<tr valign="top"><td><strong>CH1_BKD_UNIFORMITY</strong></td>
+<td>Channel 1 background uniformity</td>
+</tr>
+<tr valign="top"><td><strong>CH1_SIGNAL_NOISE_RATIO</strong></td>
+<td>Channel 1 signal to noise ratio</td>
+</tr>
+<tr valign="top"><td><strong>CH1_CONFIDENCE</strong></td>
+<td>Channel 1 confidence</td>
+</tr>
+<tr valign="top"><td><strong>CH2_MEAN</strong></td>
+<td>Channel 2 mean</td>
+</tr>
+<tr valign="top"><td><strong>CH2_BKD_MEAN</strong></td>
+<td>Channel 2 mean background</td>
+</tr>
+<tr valign="top"><td><strong>CH2_SD</strong></td>
+<td>Channel 2 standard deviation</td>
+</tr>
+<tr valign="top"><td><strong>CH2_BKD_SD</strong></td>
+<td>Channel 2 background standard deviation</td>
+</tr>
+<tr valign="top"><td><strong>CH2_DIAMETER</strong></td>
+<td>Channel 2 diameter</td>
+</tr>
+<tr valign="top"><td><strong>CH2_AREA</strong></td>
+<td>Channel 2 area</td>
+</tr>
+<tr valign="top"><td><strong>CH2_FOOTPRINT</strong></td>
+<td>Channel 2 footprint</td>
+</tr>
+<tr valign="top"><td><strong>CH2_CIRCULARITY</strong></td>
+<td>Channel 2 circularity</td>
+</tr>
+<tr valign="top"><td><strong>CH2_SPOT_UNIFORMITY</strong></td>
+<td>Channel 2 spot uniformity</td>
+</tr>
+<tr valign="top"><td><strong>CH2_BKD_UNIFORMITY</strong></td>
+<td>Channel 2 background uniformity</td>
+</tr>
+<tr valign="top"><td><strong>CH2_SIGNAL_NOISE_RATIO</strong></td>
+<td>Channel 2 signal to noise ratio</td>
+</tr>
+<tr valign="top"><td><strong>CH2_CONFIDENCE</strong></td>
+<td>Channel 2 confidence</td>
+</tr>
+<tr valign="top"><td><strong>CH1_DIAMETER_FILTER</strong></td>
+<td>Channel 1 diameter filter</td>
+</tr>
+<tr valign="top"><td><strong>CH1_AREA_FILTER</strong></td>
+<td>Channel 1 area filter</td>
+</tr>
+<tr valign="top"><td><strong>CH1_CIRCULARITY_FILTER</strong></td>
+<td>Channel 1 circularity filter</td>
+</tr>
+<tr valign="top"><td><strong>CH1_SPOT_UNIFORMITY_FILTER</strong></td>
+<td>Channel 1 spot uniformity filter</td>
+</tr>
+<tr valign="top"><td><strong>CH1_BKD_UNIFORMITY_FILTER</strong></td>
+<td>Channel 1 background uniformity filter</td>
+</tr>
+<tr valign="top"><td><strong>CH1_SIGNAL_NOISE_RATIO_FILTER</strong></td>
+<td>Channel 1 signal to noise ratio filter</td>
+</tr>
+<tr valign="top"><td><strong>CH2_DIAMETER_FILTER</strong></td>
+<td>Channel 2 diameter filter</td>
+</tr>
+<tr valign="top"><td><strong>CH2_AREA_FILTER</strong></td>
+<td>Channel 2 area filter</td>
+</tr>
+<tr valign="top"><td><strong>CH2_CIRCULARITY_FILTER</strong></td>
+<td>Channel 2 circularity filter</td>
+</tr>
+<tr valign="top"><td><strong>CH2_SPOT_UNIFORMITY_FILTER</strong></td>
+<td>Channel 2 spot uniformity filter</td>
+</tr>
+<tr valign="top"><td><strong>CH2_BKD_UNIFORMITY_FILTER</strong></td>
+<td>Channel 2 background uniformity filter</td>
+</tr>
+<tr valign="top"><td><strong>CH2_SIGNAL_NOISE_RATIO_FILTER</strong></td>
+<td>Channel 2 signal to noise ratio filter</td>
+</tr>
+<tr valign="top"><td><strong>IGNORE_FILTER</strong></td>
+<td>Ignore filter</td>
+</tr>
+<tr valign="top"><td><strong>CH1_BKD_CORR</strong></td>
+<td>Channel 1 background correlation</td>
+</tr>
+<tr valign="top"><td><strong>CH2_BKD_CORR</strong></td>
+<td>Channel 2 background correlation</td>
+</tr>
+<tr valign="top"><td><strong>CH1%_OF_TOTAL</strong></td>
+<td>Channel 1 % of total</td>
+</tr>
+<tr valign="top"><td><strong>CH2%_OF_TOTAL</strong></td>
+<td>Channel 2 % of total</td>
+</tr>
+<tr valign="top"><td><strong>PRE-VALUE</strong></td>
+<td>ch1 % of total / ch2 % of total</td>
+</tr>
+<tr valign="top"><td><strong>VALUE</strong></td>
+<td>log of ch1 % of total / ch2 % of total</td>
+</tr>
+</table>
+<br><div style="overflow:auto;width:950px;height:450px"><table cellpadding="2" cellspacing="2" width="950"><tr bgcolor="#eeeeee" valign="top"><td colspan="46"><strong>Data table</strong></td></tr>
+<tr valign="top"><td bgcolor="#EEEEEE"><strong>ID_REF</strong></td>
+<td bgcolor="#DEEBDC"><strong>X_LOCATION</strong></td>
+<td bgcolor="#EEEEEE"><strong>Y_LOCATION</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH1_MEAN</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH1_BKD_MEAN</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH1_SD</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH1_BKD_SD</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH1_DIAMETER</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH1_AREA</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH1_FOOTPRINT</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH1_CIRCULARITY</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH1_SPOT_UNIFORMITY</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH1_BKD_UNIFORMITY</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH1_SIGNAL_NOISE_RATIO</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH1_CONFIDENCE</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH2_MEAN</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH2_BKD_MEAN</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH2_SD</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH2_BKD_SD</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH2_DIAMETER</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH2_AREA</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH2_FOOTPRINT</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH2_CIRCULARITY</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH2_SPOT_UNIFORMITY</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH2_BKD_UNIFORMITY</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH2_SIGNAL_NOISE_RATIO</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH2_CONFIDENCE</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH1_DIAMETER_FILTER</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH1_AREA_FILTER</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH1_CIRCULARITY_FILTER</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH1_SPOT_UNIFORMITY_FILTER</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH1_BKD_UNIFORMITY_FILTER</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH1_SIGNAL_NOISE_RATIO_FILTER</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH2_DIAMETER_FILTER</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH2_AREA_FILTER</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH2_CIRCULARITY_FILTER</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH2_SPOT_UNIFORMITY_FILTER</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH2_BKD_UNIFORMITY_FILTER</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH2_SIGNAL_NOISE_RATIO_FILTER</strong></td>
+<td bgcolor="#DEEBDC"><strong>IGNORE_FILTER</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH1_BKD_CORR</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH2_BKD_CORR</strong></td>
+<td bgcolor="#EEEEEE"><strong>CH1%_OF_TOTAL</strong></td>
+<td bgcolor="#DEEBDC"><strong>CH2%_OF_TOTAL</strong></td>
+<td bgcolor="#EEEEEE"><strong>PRE-VALUE</strong></td>
+<td bgcolor="#DEEBDC"><strong>VALUE</strong></td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>2270</td>
+<td bgcolor="#EEEEEE" nowrap>3950</td>
+<td bgcolor="#DEEBDC" nowrap>3338</td>
+<td bgcolor="#EEEEEE" nowrap>290</td>
+<td bgcolor="#DEEBDC" nowrap>1222.977661</td>
+<td bgcolor="#EEEEEE" nowrap>86.940102</td>
+<td bgcolor="#DEEBDC" nowrap>97.066856</td>
+<td bgcolor="#EEEEEE" nowrap>8100</td>
+<td bgcolor="#DEEBDC" nowrap>27.211893</td>
+<td bgcolor="#EEEEEE" nowrap>0.97046</td>
+<td bgcolor="#DEEBDC" nowrap>0.945953</td>
+<td bgcolor="#EEEEEE" nowrap>0.997452</td>
+<td bgcolor="#DEEBDC" nowrap>38.39425</td>
+<td bgcolor="#EEEEEE" nowrap>0.963969</td>
+<td bgcolor="#DEEBDC" nowrap>988</td>
+<td bgcolor="#EEEEEE" nowrap>140</td>
+<td bgcolor="#DEEBDC" nowrap>204.973892</td>
+<td bgcolor="#EEEEEE" nowrap>53.977264</td>
+<td bgcolor="#DEEBDC" nowrap>94.406982</td>
+<td bgcolor="#EEEEEE" nowrap>7900</td>
+<td bgcolor="#DEEBDC" nowrap>27.211893</td>
+<td bgcolor="#EEEEEE" nowrap>0.943981</td>
+<td bgcolor="#DEEBDC" nowrap>0.991867</td>
+<td bgcolor="#EEEEEE" nowrap>0.99826</td>
+<td bgcolor="#DEEBDC" nowrap>18.304003</td>
+<td bgcolor="#EEEEEE" nowrap>0.950749</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>3048</td>
+<td bgcolor="#DEEBDC" nowrap>848</td>
+<td bgcolor="#EEEEEE" nowrap>0.072159962</td>
+<td bgcolor="#DEEBDC" nowrap>0.022780053</td>
+<td bgcolor="#EEEEEE" nowrap>3.167681933</td>
+<td bgcolor="#DEEBDC" nowrap>0.500741568</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>2</td>
+<td bgcolor="#DEEBDC" nowrap>2500</td>
+<td bgcolor="#EEEEEE" nowrap>3950</td>
+<td bgcolor="#DEEBDC" nowrap>1438</td>
+<td bgcolor="#EEEEEE" nowrap>304</td>
+<td bgcolor="#DEEBDC" nowrap>261.443726</td>
+<td bgcolor="#EEEEEE" nowrap>65.544899</td>
+<td bgcolor="#DEEBDC" nowrap>93.730225</td>
+<td bgcolor="#EEEEEE" nowrap>7800</td>
+<td bgcolor="#DEEBDC" nowrap>23.079479</td>
+<td bgcolor="#EEEEEE" nowrap>0.955854</td>
+<td bgcolor="#DEEBDC" nowrap>0.991562</td>
+<td bgcolor="#EEEEEE" nowrap>0.998123</td>
+<td bgcolor="#DEEBDC" nowrap>21.93916</td>
+<td bgcolor="#EEEEEE" nowrap>0.958227</td>
+<td bgcolor="#DEEBDC" nowrap>950</td>
+<td bgcolor="#EEEEEE" nowrap>122</td>
+<td bgcolor="#DEEBDC" nowrap>232.592377</td>
+<td bgcolor="#EEEEEE" nowrap>44.957214</td>
+<td bgcolor="#DEEBDC" nowrap>97.066856</td>
+<td bgcolor="#EEEEEE" nowrap>8100</td>
+<td bgcolor="#DEEBDC" nowrap>23.079479</td>
+<td bgcolor="#EEEEEE" nowrap>0.97046</td>
+<td bgcolor="#DEEBDC" nowrap>0.991302</td>
+<td bgcolor="#EEEEEE" nowrap>0.998596</td>
+<td bgcolor="#DEEBDC" nowrap>21.131202</td>
+<td bgcolor="#EEEEEE" nowrap>0.956768</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1134</td>
+<td bgcolor="#DEEBDC" nowrap>828</td>
+<td bgcolor="#EEEEEE" nowrap>0.026846915</td>
+<td bgcolor="#DEEBDC" nowrap>0.022242788</td>
+<td bgcolor="#EEEEEE" nowrap>1.206994177</td>
+<td bgcolor="#DEEBDC" nowrap>0.081705175</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>3</td>
+<td bgcolor="#DEEBDC" nowrap>2740</td>
+<td bgcolor="#EEEEEE" nowrap>3950</td>
+<td bgcolor="#DEEBDC" nowrap>494</td>
+<td bgcolor="#EEEEEE" nowrap>334</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>79.92868</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>100</td>
+<td bgcolor="#DEEBDC" nowrap>27.211893</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>0.997437</td>
+<td bgcolor="#DEEBDC" nowrap>6.18051</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>308</td>
+<td bgcolor="#EEEEEE" nowrap>120</td>
+<td bgcolor="#DEEBDC" nowrap>19.24877</td>
+<td bgcolor="#EEEEEE" nowrap>77.499535</td>
+<td bgcolor="#DEEBDC" nowrap>60.765083</td>
+<td bgcolor="#EEEEEE" nowrap>1200</td>
+<td bgcolor="#DEEBDC" nowrap>27.211893</td>
+<td bgcolor="#EEEEEE" nowrap>0.692244</td>
+<td bgcolor="#DEEBDC" nowrap>0.999573</td>
+<td bgcolor="#EEEEEE" nowrap>0.997345</td>
+<td bgcolor="#DEEBDC" nowrap>3.974217</td>
+<td bgcolor="#EEEEEE" nowrap>0.774077</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>160</td>
+<td bgcolor="#DEEBDC" nowrap>188</td>
+<td bgcolor="#EEEEEE" nowrap>0.003787925</td>
+<td bgcolor="#DEEBDC" nowrap>0.005050295</td>
+<td bgcolor="#EEEEEE" nowrap>0.750040286</td>
+<td bgcolor="#DEEBDC" nowrap>-0.124915409</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>4</td>
+<td bgcolor="#DEEBDC" nowrap>2970</td>
+<td bgcolor="#EEEEEE" nowrap>3950</td>
+<td bgcolor="#DEEBDC" nowrap>522</td>
+<td bgcolor="#EEEEEE" nowrap>344</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>60.721523</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>100</td>
+<td bgcolor="#DEEBDC" nowrap>23.079479</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>0.997986</td>
+<td bgcolor="#DEEBDC" nowrap>8.596622</td>
+<td bgcolor="#EEEEEE" nowrap>0.5</td>
+<td bgcolor="#DEEBDC" nowrap>346</td>
+<td bgcolor="#EEEEEE" nowrap>130</td>
+<td bgcolor="#DEEBDC" nowrap>45.617977</td>
+<td bgcolor="#EEEEEE" nowrap>67.351936</td>
+<td bgcolor="#DEEBDC" nowrap>30.901939</td>
+<td bgcolor="#EEEEEE" nowrap>400</td>
+<td bgcolor="#DEEBDC" nowrap>23.079479</td>
+<td bgcolor="#EEEEEE" nowrap>0.285492</td>
+<td bgcolor="#DEEBDC" nowrap>0.999222</td>
+<td bgcolor="#EEEEEE" nowrap>0.997787</td>
+<td bgcolor="#DEEBDC" nowrap>5.137195</td>
+<td bgcolor="#EEEEEE" nowrap>0.326276</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>178</td>
+<td bgcolor="#DEEBDC" nowrap>216</td>
+<td bgcolor="#EEEEEE" nowrap>0.004214066</td>
+<td bgcolor="#DEEBDC" nowrap>0.005802466</td>
+<td bgcolor="#EEEEEE" nowrap>0.726254286</td>
+<td bgcolor="#DEEBDC" nowrap>-0.138911292</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>5</td>
+<td bgcolor="#DEEBDC" nowrap>3210</td>
+<td bgcolor="#EEEEEE" nowrap>3950</td>
+<td bgcolor="#DEEBDC" nowrap>474</td>
+<td bgcolor="#EEEEEE" nowrap>318</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>51.665909</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>100</td>
+<td bgcolor="#DEEBDC" nowrap>27.211893</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>0.998352</td>
+<td bgcolor="#DEEBDC" nowrap>9.174328</td>
+<td bgcolor="#EEEEEE" nowrap>0.5</td>
+<td bgcolor="#DEEBDC" nowrap>258</td>
+<td bgcolor="#EEEEEE" nowrap>110</td>
+<td bgcolor="#DEEBDC" nowrap>12.165525</td>
+<td bgcolor="#EEEEEE" nowrap>48.347176</td>
+<td bgcolor="#DEEBDC" nowrap>47.873077</td>
+<td bgcolor="#EEEEEE" nowrap>300</td>
+<td bgcolor="#DEEBDC" nowrap>27.211893</td>
+<td bgcolor="#EEEEEE" nowrap>0.586099</td>
+<td bgcolor="#DEEBDC" nowrap>0.999832</td>
+<td bgcolor="#EEEEEE" nowrap>0.998032</td>
+<td bgcolor="#DEEBDC" nowrap>5.336403</td>
+<td bgcolor="#EEEEEE" nowrap>0.669827</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>156</td>
+<td bgcolor="#DEEBDC" nowrap>148</td>
+<td bgcolor="#EEEEEE" nowrap>0.003693226</td>
+<td bgcolor="#DEEBDC" nowrap>0.003975764</td>
+<td bgcolor="#EEEEEE" nowrap>0.92893503</td>
+<td bgcolor="#DEEBDC" nowrap>-0.03201466</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>6</td>
+<td bgcolor="#DEEBDC" nowrap>3440</td>
+<td bgcolor="#EEEEEE" nowrap>3950</td>
+<td bgcolor="#DEEBDC" nowrap>574</td>
+<td bgcolor="#EEEEEE" nowrap>348</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>74.496864</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>100</td>
+<td bgcolor="#DEEBDC" nowrap>23.079479</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>0.997604</td>
+<td bgcolor="#DEEBDC" nowrap>7.705022</td>
+<td bgcolor="#EEEEEE" nowrap>0.5</td>
+<td bgcolor="#DEEBDC" nowrap>268</td>
+<td bgcolor="#EEEEEE" nowrap>106</td>
+<td bgcolor="#DEEBDC" nowrap>58.854519</td>
+<td bgcolor="#EEEEEE" nowrap>51.762951</td>
+<td bgcolor="#DEEBDC" nowrap>51.089546</td>
+<td bgcolor="#EEEEEE" nowrap>1100</td>
+<td bgcolor="#DEEBDC" nowrap>23.079479</td>
+<td bgcolor="#EEEEEE" nowrap>0.672824</td>
+<td bgcolor="#DEEBDC" nowrap>0.998413</td>
+<td bgcolor="#EEEEEE" nowrap>0.99823</td>
+<td bgcolor="#DEEBDC" nowrap>5.177448</td>
+<td bgcolor="#EEEEEE" nowrap>0.755448</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>226</td>
+<td bgcolor="#DEEBDC" nowrap>162</td>
+<td bgcolor="#EEEEEE" nowrap>0.005350443</td>
+<td bgcolor="#DEEBDC" nowrap>0.00435185</td>
+<td bgcolor="#EEEEEE" nowrap>1.229464184</td>
+<td bgcolor="#DEEBDC" nowrap>0.089715882</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>7</td>
+<td bgcolor="#DEEBDC" nowrap>3680</td>
+<td bgcolor="#EEEEEE" nowrap>3950</td>
+<td bgcolor="#DEEBDC" nowrap>598</td>
+<td bgcolor="#EEEEEE" nowrap>346</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>57.425816</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>100</td>
+<td bgcolor="#DEEBDC" nowrap>27.211893</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>0.997894</td>
+<td bgcolor="#DEEBDC" nowrap>10.413435</td>
+<td bgcolor="#EEEEEE" nowrap>0.5</td>
+<td bgcolor="#DEEBDC" nowrap>442</td>
+<td bgcolor="#EEEEEE" nowrap>112</td>
+<td bgcolor="#DEEBDC" nowrap>124.903412</td>
+<td bgcolor="#EEEEEE" nowrap>46.373867</td>
+<td bgcolor="#DEEBDC" nowrap>97.066856</td>
+<td bgcolor="#EEEEEE" nowrap>7800</td>
+<td bgcolor="#DEEBDC" nowrap>27.211893</td>
+<td bgcolor="#EEEEEE" nowrap>0.97046</td>
+<td bgcolor="#DEEBDC" nowrap>0.996597</td>
+<td bgcolor="#EEEEEE" nowrap>0.998611</td>
+<td bgcolor="#DEEBDC" nowrap>9.53123</td>
+<td bgcolor="#EEEEEE" nowrap>0.913279</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>252</td>
+<td bgcolor="#DEEBDC" nowrap>330</td>
+<td bgcolor="#EEEEEE" nowrap>0.005965981</td>
+<td bgcolor="#DEEBDC" nowrap>0.008864879</td>
+<td bgcolor="#EEEEEE" nowrap>0.672990693</td>
+<td bgcolor="#DEEBDC" nowrap>-0.171990942</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>8</td>
+<td bgcolor="#DEEBDC" nowrap>3910</td>
+<td bgcolor="#EEEEEE" nowrap>3950</td>
+<td bgcolor="#DEEBDC" nowrap>922</td>
+<td bgcolor="#EEEEEE" nowrap>366</td>
+<td bgcolor="#DEEBDC" nowrap>166.008026</td>
+<td bgcolor="#EEEEEE" nowrap>73.031456</td>
+<td bgcolor="#DEEBDC" nowrap>28.768141</td>
+<td bgcolor="#EEEEEE" nowrap>400</td>
+<td bgcolor="#DEEBDC" nowrap>23.079479</td>
+<td bgcolor="#EEEEEE" nowrap>0.451103</td>
+<td bgcolor="#DEEBDC" nowrap>0.997086</td>
+<td bgcolor="#EEEEEE" nowrap>0.997482</td>
+<td bgcolor="#DEEBDC" nowrap>12.624697</td>
+<td bgcolor="#EEEEEE" nowrap>0.515547</td>
+<td bgcolor="#DEEBDC" nowrap>586</td>
+<td bgcolor="#EEEEEE" nowrap>154</td>
+<td bgcolor="#DEEBDC" nowrap>134.257401</td>
+<td bgcolor="#EEEEEE" nowrap>69.94976</td>
+<td bgcolor="#DEEBDC" nowrap>94.406982</td>
+<td bgcolor="#EEEEEE" nowrap>7700</td>
+<td bgcolor="#DEEBDC" nowrap>23.079479</td>
+<td bgcolor="#EEEEEE" nowrap>0.943981</td>
+<td bgcolor="#DEEBDC" nowrap>0.996399</td>
+<td bgcolor="#EEEEEE" nowrap>0.997757</td>
+<td bgcolor="#DEEBDC" nowrap>8.377441</td>
+<td bgcolor="#EEEEEE" nowrap>0.903637</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>556</td>
+<td bgcolor="#DEEBDC" nowrap>432</td>
+<td bgcolor="#EEEEEE" nowrap>0.013163038</td>
+<td bgcolor="#DEEBDC" nowrap>0.011604933</td>
+<td bgcolor="#EEEEEE" nowrap>1.134262312</td>
+<td bgcolor="#DEEBDC" nowrap>0.054713502</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>9</td>
+<td bgcolor="#DEEBDC" nowrap>4150</td>
+<td bgcolor="#EEEEEE" nowrap>3960</td>
+<td bgcolor="#DEEBDC" nowrap>796</td>
+<td bgcolor="#EEEEEE" nowrap>354</td>
+<td bgcolor="#DEEBDC" nowrap>19.681391</td>
+<td bgcolor="#EEEEEE" nowrap>58.125858</td>
+<td bgcolor="#DEEBDC" nowrap>44.424335</td>
+<td bgcolor="#EEEEEE" nowrap>800</td>
+<td bgcolor="#DEEBDC" nowrap>33.49934</td>
+<td bgcolor="#EEEEEE" nowrap>0.651595</td>
+<td bgcolor="#DEEBDC" nowrap>0.999588</td>
+<td bgcolor="#EEEEEE" nowrap>0.997971</td>
+<td bgcolor="#DEEBDC" nowrap>13.694421</td>
+<td bgcolor="#EEEEEE" nowrap>0.722122</td>
+<td bgcolor="#DEEBDC" nowrap>514</td>
+<td bgcolor="#EEEEEE" nowrap>124</td>
+<td bgcolor="#DEEBDC" nowrap>120.345642</td>
+<td bgcolor="#EEEEEE" nowrap>53.408978</td>
+<td bgcolor="#DEEBDC" nowrap>93.048538</td>
+<td bgcolor="#EEEEEE" nowrap>7800</td>
+<td bgcolor="#DEEBDC" nowrap>33.49934</td>
+<td bgcolor="#EEEEEE" nowrap>0.930384</td>
+<td bgcolor="#DEEBDC" nowrap>0.996521</td>
+<td bgcolor="#EEEEEE" nowrap>0.998444</td>
+<td bgcolor="#DEEBDC" nowrap>9.62385</td>
+<td bgcolor="#EEEEEE" nowrap>0.91397</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>442</td>
+<td bgcolor="#DEEBDC" nowrap>390</td>
+<td bgcolor="#EEEEEE" nowrap>0.010464141</td>
+<td bgcolor="#DEEBDC" nowrap>0.010476675</td>
+<td bgcolor="#EEEEEE" nowrap>0.998803647</td>
+<td bgcolor="#DEEBDC" nowrap>-0.00051988</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>10</td>
+<td bgcolor="#DEEBDC" nowrap>4380</td>
+<td bgcolor="#EEEEEE" nowrap>3960</td>
+<td bgcolor="#DEEBDC" nowrap>1122</td>
+<td bgcolor="#EEEEEE" nowrap>340</td>
+<td bgcolor="#DEEBDC" nowrap>156.376114</td>
+<td bgcolor="#EEEEEE" nowrap>53.40971</td>
+<td bgcolor="#DEEBDC" nowrap>82.918602</td>
+<td bgcolor="#EEEEEE" nowrap>6500</td>
+<td bgcolor="#DEEBDC" nowrap>30.238735</td>
+<td bgcolor="#EEEEEE" nowrap>0.944094</td>
+<td bgcolor="#DEEBDC" nowrap>0.995422</td>
+<td bgcolor="#EEEEEE" nowrap>0.998215</td>
+<td bgcolor="#DEEBDC" nowrap>21.007416</td>
+<td bgcolor="#EEEEEE" nowrap>0.914593</td>
+<td bgcolor="#DEEBDC" nowrap>882</td>
+<td bgcolor="#EEEEEE" nowrap>108</td>
+<td bgcolor="#DEEBDC" nowrap>275.081604</td>
+<td bgcolor="#EEEEEE" nowrap>61.796597</td>
+<td bgcolor="#DEEBDC" nowrap>94.069214</td>
+<td bgcolor="#EEEEEE" nowrap>7700</td>
+<td bgcolor="#DEEBDC" nowrap>30.238735</td>
+<td bgcolor="#EEEEEE" nowrap>0.948274</td>
+<td bgcolor="#DEEBDC" nowrap>0.99147</td>
+<td bgcolor="#EEEEEE" nowrap>0.997635</td>
+<td bgcolor="#DEEBDC" nowrap>14.272631</td>
+<td bgcolor="#EEEEEE" nowrap>0.938547</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>782</td>
+<td bgcolor="#DEEBDC" nowrap>774</td>
+<td bgcolor="#EEEEEE" nowrap>0.018513481</td>
+<td bgcolor="#DEEBDC" nowrap>0.020792171</td>
+<td bgcolor="#EEEEEE" nowrap>0.890406352</td>
+<td bgcolor="#DEEBDC" nowrap>-0.05041175</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>11</td>
+<td bgcolor="#DEEBDC" nowrap>4620</td>
+<td bgcolor="#EEEEEE" nowrap>3960</td>
+<td bgcolor="#DEEBDC" nowrap>570</td>
+<td bgcolor="#EEEEEE" nowrap>332</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>64.263672</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>100</td>
+<td bgcolor="#DEEBDC" nowrap>33.49934</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>0.997604</td>
+<td bgcolor="#DEEBDC" nowrap>8.869708</td>
+<td bgcolor="#EEEEEE" nowrap>0.5</td>
+<td bgcolor="#DEEBDC" nowrap>300</td>
+<td bgcolor="#EEEEEE" nowrap>118</td>
+<td bgcolor="#DEEBDC" nowrap>73.367317</td>
+<td bgcolor="#EEEEEE" nowrap>49.581993</td>
+<td bgcolor="#DEEBDC" nowrap>41.459301</td>
+<td bgcolor="#EEEEEE" nowrap>1100</td>
+<td bgcolor="#DEEBDC" nowrap>33.49934</td>
+<td bgcolor="#EEEEEE" nowrap>0.731691</td>
+<td bgcolor="#DEEBDC" nowrap>0.997971</td>
+<td bgcolor="#EEEEEE" nowrap>0.998276</td>
+<td bgcolor="#DEEBDC" nowrap>6.050584</td>
+<td bgcolor="#EEEEEE" nowrap>0.707296</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>238</td>
+<td bgcolor="#DEEBDC" nowrap>182</td>
+<td bgcolor="#EEEEEE" nowrap>0.005634538</td>
+<td bgcolor="#DEEBDC" nowrap>0.004889115</td>
+<td bgcolor="#EEEEEE" nowrap>1.152465747</td>
+<td bgcolor="#DEEBDC" nowrap>0.061628026</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>12</td>
+<td bgcolor="#DEEBDC" nowrap>4850</td>
+<td bgcolor="#EEEEEE" nowrap>3960</td>
+<td bgcolor="#DEEBDC" nowrap>652</td>
+<td bgcolor="#EEEEEE" nowrap>366</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>145.18187</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>100</td>
+<td bgcolor="#DEEBDC" nowrap>30.238735</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>0.994659</td>
+<td bgcolor="#DEEBDC" nowrap>4.490919</td>
+<td bgcolor="#EEEEEE" nowrap>0.5</td>
+<td bgcolor="#DEEBDC" nowrap>352</td>
+<td bgcolor="#EEEEEE" nowrap>124</td>
+<td bgcolor="#DEEBDC" nowrap>55.856697</td>
+<td bgcolor="#EEEEEE" nowrap>70.08699</td>
+<td bgcolor="#DEEBDC" nowrap>53.523727</td>
+<td bgcolor="#EEEEEE" nowrap>1700</td>
+<td bgcolor="#DEEBDC" nowrap>30.238735</td>
+<td bgcolor="#EEEEEE" nowrap>0.730366</td>
+<td bgcolor="#DEEBDC" nowrap>0.998505</td>
+<td bgcolor="#EEEEEE" nowrap>0.99765</td>
+<td bgcolor="#DEEBDC" nowrap>5.02233</td>
+<td bgcolor="#EEEEEE" nowrap>0.767619</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>286</td>
+<td bgcolor="#DEEBDC" nowrap>228</td>
+<td bgcolor="#EEEEEE" nowrap>0.006770915</td>
+<td bgcolor="#DEEBDC" nowrap>0.006124826</td>
+<td bgcolor="#EEEEEE" nowrap>1.105487009</td>
+<td bgcolor="#DEEBDC" nowrap>0.043553643</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>13</td>
+<td bgcolor="#DEEBDC" nowrap>5090</td>
+<td bgcolor="#EEEEEE" nowrap>3960</td>
+<td bgcolor="#DEEBDC" nowrap>562</td>
+<td bgcolor="#EEEEEE" nowrap>364</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>60.529041</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>100</td>
+<td bgcolor="#DEEBDC" nowrap>33.49934</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>0.997971</td>
+<td bgcolor="#DEEBDC" nowrap>9.284799</td>
+<td bgcolor="#EEEEEE" nowrap>0.5</td>
+<td bgcolor="#DEEBDC" nowrap>372</td>
+<td bgcolor="#EEEEEE" nowrap>138</td>
+<td bgcolor="#DEEBDC" nowrap>61.736782</td>
+<td bgcolor="#EEEEEE" nowrap>55.773869</td>
+<td bgcolor="#DEEBDC" nowrap>84.44017</td>
+<td bgcolor="#EEEEEE" nowrap>2700</td>
+<td bgcolor="#DEEBDC" nowrap>33.49934</td>
+<td bgcolor="#EEEEEE" nowrap>0.859473</td>
+<td bgcolor="#DEEBDC" nowrap>0.998383</td>
+<td bgcolor="#EEEEEE" nowrap>0.998306</td>
+<td bgcolor="#DEEBDC" nowrap>6.66979</td>
+<td bgcolor="#EEEEEE" nowrap>0.825007</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>198</td>
+<td bgcolor="#DEEBDC" nowrap>234</td>
+<td bgcolor="#EEEEEE" nowrap>0.004687557</td>
+<td bgcolor="#DEEBDC" nowrap>0.006286005</td>
+<td bgcolor="#EEEEEE" nowrap>0.74571313</td>
+<td bgcolor="#DEEBDC" nowrap>-0.12742821</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>14</td>
+<td bgcolor="#DEEBDC" nowrap>5320</td>
+<td bgcolor="#EEEEEE" nowrap>3960</td>
+<td bgcolor="#DEEBDC" nowrap>842</td>
+<td bgcolor="#EEEEEE" nowrap>352</td>
+<td bgcolor="#DEEBDC" nowrap>43.092922</td>
+<td bgcolor="#EEEEEE" nowrap>60.048584</td>
+<td bgcolor="#DEEBDC" nowrap>15.957693</td>
+<td bgcolor="#EEEEEE" nowrap>400</td>
+<td bgcolor="#DEEBDC" nowrap>30.238735</td>
+<td bgcolor="#EEEEEE" nowrap>0.238639</td>
+<td bgcolor="#DEEBDC" nowrap>0.999283</td>
+<td bgcolor="#EEEEEE" nowrap>0.998108</td>
+<td bgcolor="#DEEBDC" nowrap>14.021979</td>
+<td bgcolor="#EEEEEE" nowrap>0.27273</td>
+<td bgcolor="#DEEBDC" nowrap>380</td>
+<td bgcolor="#EEEEEE" nowrap>118</td>
+<td bgcolor="#DEEBDC" nowrap>99.095848</td>
+<td bgcolor="#EEEEEE" nowrap>46.963158</td>
+<td bgcolor="#DEEBDC" nowrap>88.848671</td>
+<td bgcolor="#EEEEEE" nowrap>6500</td>
+<td bgcolor="#DEEBDC" nowrap>30.238735</td>
+<td bgcolor="#EEEEEE" nowrap>0.919773</td>
+<td bgcolor="#DEEBDC" nowrap>0.997284</td>
+<td bgcolor="#EEEEEE" nowrap>0.998535</td>
+<td bgcolor="#DEEBDC" nowrap>8.091449</td>
+<td bgcolor="#EEEEEE" nowrap>0.900906</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>490</td>
+<td bgcolor="#DEEBDC" nowrap>262</td>
+<td bgcolor="#EEEEEE" nowrap>0.011600519</td>
+<td bgcolor="#DEEBDC" nowrap>0.007038177</td>
+<td bgcolor="#EEEEEE" nowrap>1.648227842</td>
+<td bgcolor="#DEEBDC" nowrap>0.217017246</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>15</td>
+<td bgcolor="#DEEBDC" nowrap>5560</td>
+<td bgcolor="#EEEEEE" nowrap>3960</td>
+<td bgcolor="#DEEBDC" nowrap>1070</td>
+<td bgcolor="#EEEEEE" nowrap>354</td>
+<td bgcolor="#DEEBDC" nowrap>133.671646</td>
+<td bgcolor="#EEEEEE" nowrap>58.806</td>
+<td bgcolor="#DEEBDC" nowrap>90.972847</td>
+<td bgcolor="#EEEEEE" nowrap>7000</td>
+<td bgcolor="#DEEBDC" nowrap>33.49934</td>
+<td bgcolor="#EEEEEE" nowrap>0.931855</td>
+<td bgcolor="#DEEBDC" nowrap>0.995575</td>
+<td bgcolor="#EEEEEE" nowrap>0.997757</td>
+<td bgcolor="#DEEBDC" nowrap>18.195422</td>
+<td bgcolor="#EEEEEE" nowrap>0.950484</td>
+<td bgcolor="#DEEBDC" nowrap>372</td>
+<td bgcolor="#EEEEEE" nowrap>144</td>
+<td bgcolor="#DEEBDC" nowrap>76.604668</td>
+<td bgcolor="#EEEEEE" nowrap>52.78561</td>
+<td bgcolor="#DEEBDC" nowrap>79.788467</td>
+<td bgcolor="#EEEEEE" nowrap>2800</td>
+<td bgcolor="#DEEBDC" nowrap>33.49934</td>
+<td bgcolor="#EEEEEE" nowrap>0.824282</td>
+<td bgcolor="#DEEBDC" nowrap>0.997513</td>
+<td bgcolor="#EEEEEE" nowrap>0.998474</td>
+<td bgcolor="#DEEBDC" nowrap>7.047375</td>
+<td bgcolor="#EEEEEE" nowrap>0.828402</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>716</td>
+<td bgcolor="#DEEBDC" nowrap>228</td>
+<td bgcolor="#EEEEEE" nowrap>0.016950962</td>
+<td bgcolor="#DEEBDC" nowrap>0.006124826</td>
+<td bgcolor="#EEEEEE" nowrap>2.767582861</td>
+<td bgcolor="#DEEBDC" nowrap>0.442100633</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>16</td>
+<td bgcolor="#DEEBDC" nowrap>5790</td>
+<td bgcolor="#EEEEEE" nowrap>3960</td>
+<td bgcolor="#DEEBDC" nowrap>680</td>
+<td bgcolor="#EEEEEE" nowrap>334</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>60.376431</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>100</td>
+<td bgcolor="#DEEBDC" nowrap>30.238735</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>0.998047</td>
+<td bgcolor="#DEEBDC" nowrap>11.262673</td>
+<td bgcolor="#EEEEEE" nowrap>0.5</td>
+<td bgcolor="#DEEBDC" nowrap>292</td>
+<td bgcolor="#EEEEEE" nowrap>126</td>
+<td bgcolor="#DEEBDC" nowrap>25.53429</td>
+<td bgcolor="#EEEEEE" nowrap>57.73217</td>
+<td bgcolor="#DEEBDC" nowrap>35.682487</td>
+<td bgcolor="#EEEEEE" nowrap>300</td>
+<td bgcolor="#DEEBDC" nowrap>30.238735</td>
+<td bgcolor="#EEEEEE" nowrap>0.470992</td>
+<td bgcolor="#DEEBDC" nowrap>0.999619</td>
+<td bgcolor="#EEEEEE" nowrap>0.998154</td>
+<td bgcolor="#DEEBDC" nowrap>5.057839</td>
+<td bgcolor="#EEEEEE" nowrap>0.538277</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>346</td>
+<td bgcolor="#DEEBDC" nowrap>166</td>
+<td bgcolor="#EEEEEE" nowrap>0.008191387</td>
+<td bgcolor="#DEEBDC" nowrap>0.004459303</td>
+<td bgcolor="#EEEEEE" nowrap>1.836920953</td>
+<td bgcolor="#DEEBDC" nowrap>0.264090468</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>17</td>
+<td bgcolor="#DEEBDC" nowrap>6030</td>
+<td bgcolor="#EEEEEE" nowrap>3960</td>
+<td bgcolor="#DEEBDC" nowrap>1384</td>
+<td bgcolor="#EEEEEE" nowrap>390</td>
+<td bgcolor="#DEEBDC" nowrap>353.057922</td>
+<td bgcolor="#EEEEEE" nowrap>209.272217</td>
+<td bgcolor="#DEEBDC" nowrap>47.873077</td>
+<td bgcolor="#EEEEEE" nowrap>2400</td>
+<td bgcolor="#DEEBDC" nowrap>33.49934</td>
+<td bgcolor="#EEEEEE" nowrap>0.89731</td>
+<td bgcolor="#DEEBDC" nowrap>0.991028</td>
+<td bgcolor="#EEEEEE" nowrap>0.993454</td>
+<td bgcolor="#DEEBDC" nowrap>6.613396</td>
+<td bgcolor="#EEEEEE" nowrap>0.739365</td>
+<td bgcolor="#DEEBDC" nowrap>366</td>
+<td bgcolor="#EEEEEE" nowrap>132</td>
+<td bgcolor="#DEEBDC" nowrap>70.872566</td>
+<td bgcolor="#EEEEEE" nowrap>47.020321</td>
+<td bgcolor="#DEEBDC" nowrap>69.098839</td>
+<td bgcolor="#EEEEEE" nowrap>3900</td>
+<td bgcolor="#DEEBDC" nowrap>33.49934</td>
+<td bgcolor="#EEEEEE" nowrap>0.834184</td>
+<td bgcolor="#DEEBDC" nowrap>0.99826</td>
+<td bgcolor="#EEEEEE" nowrap>0.998337</td>
+<td bgcolor="#DEEBDC" nowrap>7.783869</td>
+<td bgcolor="#EEEEEE" nowrap>0.845494</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>994</td>
+<td bgcolor="#DEEBDC" nowrap>234</td>
+<td bgcolor="#EEEEEE" nowrap>0.023532481</td>
+<td bgcolor="#DEEBDC" nowrap>0.006286005</td>
+<td bgcolor="#EEEEEE" nowrap>3.743630563</td>
+<td bgcolor="#DEEBDC" nowrap>0.573292984</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>18</td>
+<td bgcolor="#DEEBDC" nowrap>6260</td>
+<td bgcolor="#EEEEEE" nowrap>3960</td>
+<td bgcolor="#DEEBDC" nowrap>588</td>
+<td bgcolor="#EEEEEE" nowrap>332</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>68.800301</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>100</td>
+<td bgcolor="#DEEBDC" nowrap>30.238735</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>0.997726</td>
+<td bgcolor="#DEEBDC" nowrap>8.546474</td>
+<td bgcolor="#EEEEEE" nowrap>0.5</td>
+<td bgcolor="#DEEBDC" nowrap>296</td>
+<td bgcolor="#EEEEEE" nowrap>120</td>
+<td bgcolor="#DEEBDC" nowrap>9.865766</td>
+<td bgcolor="#EEEEEE" nowrap>49.455826</td>
+<td bgcolor="#DEEBDC" nowrap>7.978847</td>
+<td bgcolor="#EEEEEE" nowrap>300</td>
+<td bgcolor="#DEEBDC" nowrap>30.238735</td>
+<td bgcolor="#EEEEEE" nowrap>0.539012</td>
+<td bgcolor="#DEEBDC" nowrap>0.999863</td>
+<td bgcolor="#EEEEEE" nowrap>0.998505</td>
+<td bgcolor="#DEEBDC" nowrap>5.985139</td>
+<td bgcolor="#EEEEEE" nowrap>0.539894</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>256</td>
+<td bgcolor="#DEEBDC" nowrap>176</td>
+<td bgcolor="#EEEEEE" nowrap>0.006060679</td>
+<td bgcolor="#DEEBDC" nowrap>0.004727936</td>
+<td bgcolor="#EEEEEE" nowrap>1.281887034</td>
+<td bgcolor="#DEEBDC" nowrap>0.107849755</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>19</td>
+<td bgcolor="#DEEBDC" nowrap>6500</td>
+<td bgcolor="#EEEEEE" nowrap>3960</td>
+<td bgcolor="#DEEBDC" nowrap>738</td>
+<td bgcolor="#EEEEEE" nowrap>310</td>
+<td bgcolor="#DEEBDC" nowrap>44.822338</td>
+<td bgcolor="#EEEEEE" nowrap>61.513283</td>
+<td bgcolor="#DEEBDC" nowrap>77.357788</td>
+<td bgcolor="#EEEEEE" nowrap>2000</td>
+<td bgcolor="#DEEBDC" nowrap>33.49934</td>
+<td bgcolor="#EEEEEE" nowrap>0.870803</td>
+<td bgcolor="#DEEBDC" nowrap>0.99852</td>
+<td bgcolor="#EEEEEE" nowrap>0.997879</td>
+<td bgcolor="#DEEBDC" nowrap>11.997409</td>
+<td bgcolor="#EEEEEE" nowrap>0.80124</td>
+<td bgcolor="#DEEBDC" nowrap>514</td>
+<td bgcolor="#EEEEEE" nowrap>118</td>
+<td bgcolor="#DEEBDC" nowrap>110.387497</td>
+<td bgcolor="#EEEEEE" nowrap>59.495655</td>
+<td bgcolor="#DEEBDC" nowrap>97.066856</td>
+<td bgcolor="#EEEEEE" nowrap>8100</td>
+<td bgcolor="#DEEBDC" nowrap>33.49934</td>
+<td bgcolor="#EEEEEE" nowrap>0.97046</td>
+<td bgcolor="#DEEBDC" nowrap>0.995712</td>
+<td bgcolor="#EEEEEE" nowrap>0.998352</td>
+<td bgcolor="#DEEBDC" nowrap>8.639286</td>
+<td bgcolor="#EEEEEE" nowrap>0.906009</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>428</td>
+<td bgcolor="#DEEBDC" nowrap>396</td>
+<td bgcolor="#EEEEEE" nowrap>0.010132698</td>
+<td bgcolor="#DEEBDC" nowrap>0.010637855</td>
+<td bgcolor="#EEEEEE" nowrap>0.952513282</td>
+<td bgcolor="#DEEBDC" nowrap>-0.02112896</td>
+</tr>
+<tr valign="top"><td bgcolor="#EEEEEE" nowrap>20</td>
+<td bgcolor="#DEEBDC" nowrap>2250</td>
+<td bgcolor="#EEEEEE" nowrap>4190</td>
+<td bgcolor="#DEEBDC" nowrap>568</td>
+<td bgcolor="#EEEEEE" nowrap>320</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>69.660385</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>100</td>
+<td bgcolor="#DEEBDC" nowrap>19.366146</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>0.997742</td>
+<td bgcolor="#DEEBDC" nowrap>8.153845</td>
+<td bgcolor="#EEEEEE" nowrap>0.5</td>
+<td bgcolor="#DEEBDC" nowrap>336</td>
+<td bgcolor="#EEEEEE" nowrap>134</td>
+<td bgcolor="#DEEBDC" nowrap>26.098106</td>
+<td bgcolor="#EEEEEE" nowrap>82.455276</td>
+<td bgcolor="#DEEBDC" nowrap>41.459301</td>
+<td bgcolor="#EEEEEE" nowrap>900</td>
+<td bgcolor="#DEEBDC" nowrap>19.366146</td>
+<td bgcolor="#EEEEEE" nowrap>0.638269</td>
+<td bgcolor="#DEEBDC" nowrap>0.99939</td>
+<td bgcolor="#EEEEEE" nowrap>0.997864</td>
+<td bgcolor="#DEEBDC" nowrap>4.074936</td>
+<td bgcolor="#EEEEEE" nowrap>0.707296</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>0</td>
+<td bgcolor="#DEEBDC" nowrap>0</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>1</td>
+<td bgcolor="#DEEBDC" nowrap>1</td>
+<td bgcolor="#EEEEEE" nowrap>248</td>
+<td bgcolor="#DEEBDC" nowrap>202</td>
+<td bgcolor="#EEEEEE" nowrap>0.005871283</td>
+<td bgcolor="#DEEBDC" nowrap>0.005426381</td>
+<td bgcolor="#EEEEEE" nowrap>1.081988808</td>
+<td bgcolor="#DEEBDC" nowrap>0.034222769</td>
+</tr>
+</table></div>
+<br>Total number of rows: <strong>5776</strong><br><br>Table truncated, full table size <strong>1494 Kbytes</strong>.<br><br><input name="fulltable" onclick="window.open('acc.cgi?view=data&amp;acc=GSM322710&amp;id=1856&amp;db=GeoDb_blob28', '_blank')" type="submit" value="View full table..."><br><br><br><table cellspacing="3" width="600"><tr bgcolor="#eeeeee"><td align="left"><strong>Supplementary data files not provided</strong></td></tr>
+<tr><td>Raw data included within Sample table</td></tr>
+<tr><td>Processed data included within Sample table</td></tr>
+</table>
+<br></td></tr></table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_right_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/main_right_bg.gif" width="4" height="3" alt="" border="0"></td>
+    </tr>
+    <tr>
+        <td background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/but_left.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/but_left.gif" width="4" height="4" alt="" border="0"></td>
+        <td width="10000" bgcolor="#FFFFFF" background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/but_mid_bg.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/pixel.gif" width="1" height="1" alt="" border="0"></td>
+        <td align="right" background="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/but_right.gif"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/but_right.gif" alt="" width="4" height="4" border="0"></td>
+    </tr>
+</table>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+	<tr>
+        <td width="99%"><img src="http://www.ncbi.nlm.nih.gov/coreweb/template1/pix/pixel.gif" width="1" height="1" alt="" border="0"></td><td valign="top" align="right"  nowrap>
+	        <span class="HELPBAR">|<A HREF="http://www.nlm.nih.gov"> NLM </A>|<A HREF="http://www.nih.gov" CLASS="HELPBAR"> NIH </A>|<A HREF="mailto:geo@ncbi.nlm.nih.gov" CLASS="HELPBAR"> GEO Help </A>|<A HREF="/projects/geo/info/disclaimer.html" CLASS="HELPBAR"> Disclaimer </A>|<a href="http://www.ncbi.nlm.nih.gov/About/accessibility.html" class="HELPBAR"> Section 508 </a>|</span><br>
+        </td>
+	</tr>
+</table>
+
+
+
+
+
+</body>
+</html>
+<map name="unlmenu">
+<area alt="NCBI Home" coords="2,0,39,15" href="http://www.ncbi.nlm.nih.gov" onMouseOver="changpics(unl_menu_pix, unl_menu_home_a)" onMouseOut="changpics(unl_menu_pix, unl_menu_noa)">
+<area alt="NCBI Search" coords="40,0,91,15" href="http://www.ncbi.nlm.nih.gov/sites/entrez?db=ncbisearch" onMouseOver="changpics(unl_menu_pix, unl_menu_search_a)" onMouseOut="changpics(unl_menu_pix, unl_menu_noa)">
+<area alt="NCBI SiteMap" coords="92,0,143,15" href="http://www.ncbi.nlm.nih.gov/Sitemap/" onMouseOver="changpics(unl_menu_pix, unl_menu_sitemap_a)" onMouseOut="changpics(unl_menu_pix, unl_menu_noa)">
+</map>
+

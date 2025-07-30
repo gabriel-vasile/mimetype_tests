@@ -1,0 +1,2230 @@
+<html xmlns:html="http://www.w3.org/TR/REC-html40">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   
+      <title>N0546 - WD 19757-5 DTLL - ISO/IEC JTC 1/SC 34</title>
+   </head>
+   <body>
+      <h2 align="RIGHT">ISO/IEC JTC 1/SC 34<font size="+4">N0546</font></h2><img height="56" src="isoiec.gif" alt="ISO/IEC logo" width="130" border="0"><h2>ISO/IEC JTC 1/SC 34</h2>
+      <h2>Information Technology --<br>Document Description and Processing Languages
+      </h2>
+      <table>
+         <tr>
+            <td valign="TOP"><b>TITLE:</b></td>
+            <td>ISO/IEC WD 19757-5: Document Schema Definition Languages (DSDL) &#150; Part 5: Datatype Library Language (DTLL)</td>
+         </tr>
+         <tr>
+            <td valign="TOP"><b>SOURCE:</b></td>
+            <td>Jeni Tennison</td>
+         </tr>
+         <tr>
+            <td valign="TOP"><b>PROJECT:</b></td>
+            <td>WD 19757-5: Document Schema Definition Language (DSDL) Part 5 - Datatypes</td>
+         </tr>
+         <tr>
+            <td valign="TOP"><b>PROJECT EDITOR:</b></td>
+            <td>Mr. Martin Bryan</td>
+         </tr>
+         <tr>
+            <td valign="TOP"><b>STATUS:</b></td>
+            <td>Working Draft</td>
+         </tr>
+         <tr>
+            <td valign="TOP"><b>ACTION:</b></td>
+            <td>For review and comments by national standards bodies prior to discussion at the November 2004 meeting of SC34 WG1</td>
+         </tr>
+         <tr>
+            <td valign="TOP"><b>DATE:</b></td>
+            <td>2004-09-19</td>
+         </tr>
+         <tr>
+            <td valign="TOP"><b>DISTRIBUTION:</b></td>
+            <td>JTC1, SC34 and Liaisons</td>
+         </tr>
+         <tr>
+            <td valign="TOP"><b>REFER TO:</b></td>
+            <td><a href="http://www.jtc1sc34.org/document/secretariat_temp.html#doc-546a1">N0546a1 - 2004-09-19 - Datatypes in XML</a></td>
+         </tr>
+         <tr>
+            <td valign="TOP"><b>REPLY TO:</b></td>
+            <td>
+               
+               <p>Dr. James David Mason<br>
+                  (ISO/IEC JTC 1/SC 34 Chairman)<br>
+                  Y-12 National Security Complex<br>
+                  Bldg. 9113, M.S. 8208<br>
+                  Oak Ridge, TN 37831-8208 U.S.A.<br>
+                  Telephone: +1 865 574-6973<br>
+                  Facsimile: +1 865 574-1896<br>
+                  Network: <a href="mailto:masonjd@y12.doe.gov">masonjd@y12.doe.gov</a><br>
+                  <a href="http://www.y12.doe.gov/sgml/sc34/">http://www.y12.doe.gov/sgml/sc34/</a> <br>
+                  <a href="ftp://ftp.y12.doe.gov/pub/sgml/sc34/">ftp://ftp.y12.doe.gov/pub/sgml/sc34/</a> <br>
+                  
+                  <p></p>
+                  Mr. G. Ken Holman<br>
+                  (ISO/IEC JTC 1/SC 34 Secretariat - Standards Council of Canada)<br>
+                  Crane Softwrights Ltd.<br>
+                  Box 266,<br>
+                  Kars, ON K0A-2E0 CANADA<br>
+                  Telephone: +1 613 489-0999<br>
+                  Facsimile: +1 613 489-0995<br>
+                  Network: <a href="mailto:jtc1sc34@scc.ca">jtc1sc34@scc.ca</a><br>
+                  <a href="http://www.jtc1sc34.org">http://www.jtc1sc34.org</a></p>
+                   
+            </td>
+         </tr>
+      </table><br><hr>
+<P CLASS="msonormal" ALIGN=CENTER STYLE="margin-left: 0.67in; margin-top: 0.26in; margin-bottom: 0in">
+<B><SPAN LANG="en-US"><FONT SIZE=6 STYLE="font-size: 24pt"><FONT FACE="Arial">Datatype</FONT></FONT></SPAN></B>
+<B><SPAN LANG="en-US"><FONT SIZE=6 STYLE="font-size: 24pt"><FONT FACE="Arial">Library
+Language (DTLL)</FONT></FONT></SPAN></B></P>
+<P CLASS="msonormal" ALIGN=CENTER STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<B><SPAN LANG="en-US"><FONT SIZE=5 STYLE="font-size: 17pt"><FONT FACE="Arial">Jeni</FONT></FONT></SPAN></B>
+<B><SPAN LANG="en-US"><FONT SIZE=5 STYLE="font-size: 17pt"><FONT FACE="Arial">Tennison</FONT></FONT></SPAN></B></P>
+<H2 LANG="en-US" STYLE="margin-top: 0.18in; line-height: 0.31in; page-break-after: avoid">
+<FONT FACE="Arial"><FONT SIZE=5 STYLE="font-size: 17pt"><B>Introduction</B></FONT></FONT></H2>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.12in; margin-bottom: 0in">
+Unlike XML Schema, RELAX NG doesn't provide a mechanism for users to
+define their own types. If they're not satisfied with the two
+built-in types of string and token, RELAX NG users have to create a
+datatype library, which they then refer to from the schema.</P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+Most RELAX NG validators provide built-in support for the XML Schema
+datatype library. Many also support an interface that allows you to
+plug in datatype modules, written in the programming language of your
+choice, to define extra datatypes. But the fact that these datatype
+libraries have to be programmed means that ordinary users find them
+hard to construct.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">One option would be for RELAX NG validators to
+support datatype definition via XML Schema - using <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;xs:simpleType&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">elements to create new atomic types. However,
+there are several problems with this:</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.81in; margin-top: 0.07in; margin-bottom: 0in">
+&bull;&nbsp;&nbsp; <SPAN LANG="en-US">It wouldn't be particularly
+easy for implementations to support the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;xs:simpleType&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">elements in isolation, but RELAX NG validators
+don't want to have to be able to understand XML Schema schemas.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.81in; margin-top: 0.07in; margin-bottom: 0in">
+&bull;&nbsp;&nbsp; <SPAN LANG="en-US">It wouldn't be particularly
+easy for RELAX NG users to switch to using the very different style
+employed by XML Schema, and again RELAX NG users don't want to have
+to be able to write XML Schema schemas.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.81in; margin-top: 0.07in; margin-bottom: 0in">
+&bull;&nbsp;&nbsp; <SPAN LANG="en-US">Creating user-defined datatypes
+based on the XML Schema datatypes means incorporating all the
+built-in types, including types that are unlikely be required for a
+particular schema.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.81in; margin-top: 0.07in; margin-bottom: 0in">
+&bull;&nbsp;&nbsp; <SPAN LANG="en-US">In general, the XML Schema type
+system goes against RELAX NG's open philosophy, for example by
+dictating the required format for numbers and dates when different
+markup languages might reasonably use different formats (for
+internationalisation reasons, for example).</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+So the first motivation for putting together a language for datatype
+libraries is to enable RELAX NG users to construct their own
+datatypes without having to resort to a procedural programming
+language or having to learn how to use XML Schema, which might not be
+suited for their needs.</P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+The second motivation is to provide a mechanism for defining the
+datatypes that can be used in XPath 2.0, again without recourse to
+XML Schema. The noteworthy point here is that, as a processing
+language rather than a validation language, XPath 2.0 has slightly
+different requirements from a datatype library language than RELAX NG
+validators.</P>
+<H2 LANG="en-US" STYLE="margin-top: 0.18in; line-height: 0.31in; page-break-after: avoid">
+<FONT FACE="Arial"><FONT SIZE=5 STYLE="font-size: 17pt"><B>Overview</B></FONT></FONT></H2>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatypes</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">xs
+= &quot;http://www.w3.org/2001/XMLSchema-datatypes&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">default</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">namespace
+dt = &quot;http://www.jenitennison.com/datatypes&quot;</FONT></FONT></SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">namespace
+local = &quot;&quot;</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">start</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+\datatypes</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;datatypes&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">is the document element.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">version</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute holds the version of the datatype
+library language. The current version is 0.3.</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+If a DTLL version 0.3 processor encounters a datatype library with a
+version higher than 0.3, it must treat any attributes or elements
+that it doesn't understand (that are not part of DTLL 0.3) in the
+same way as it would treat extension attributes or elements found in
+the same location.</P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">\datatypes
+= element datatypes {</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">attribute
+version { &quot;0.3&quot; },</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">ns?,
+</FONT></FONT></SPAN>
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">top-level-element*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<H2 LANG="en-US" STYLE="margin-top: 0.18in; line-height: 0.31in; page-break-after: avoid">
+<FONT FACE="Arial"><FONT SIZE=5 STYLE="font-size: 17pt"><B>Top-Level
+Elements</B></FONT></FONT></H2>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">top-level-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+named-datatype</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">top-level-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+top-level-map</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">top-level-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+\include</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">top-level-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+\div</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">top-level-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+extension-top-level-element</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;include&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">elements include datatype libraries from
+elsewhere. It is as if the content of the included document (the
+children of the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;datatypes&gt;</FONT></FONT>element)
+is inserted into the datatype library in place of the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;include&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element.</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">\include
+= element include {</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">attribute
+href { xs:anyURI },</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;div&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">elements are simply used to partition a datatype
+library and to provide a scope for <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">ns</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attributes.</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">\div =
+element div {</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">ns?,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">top-level-element*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+Extension top-level elements can be used to hold data that is used
+within the datatype library (such as value elements for
+enumerations), documentation, or information that is used by
+implementations. For example, an extension top-level element can be
+used by an implementation to define extension functions (using XSLT,
+for example) that can be used in the XPath expressions used within
+the datatype library.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-top-level-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+extension-element</FONT></FONT></SPAN></P>
+<H2 STYLE="margin-top: 0.18in; line-height: 0.31in; page-break-after: avoid">
+<SPAN LANG="en-US"><FONT SIZE=5 STYLE="font-size: 17pt"><FONT FACE="Arial">Datatype</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=5 STYLE="font-size: 17pt"><FONT FACE="Arial">Definitions</FONT></FONT></SPAN></H2>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.12in; margin-bottom: 0in">
+<SPAN LANG="en-US">Named datatypes are given at the top level of the
+datatype library using <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;datatype&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">elements. Each named datatype has a qualified name
+that can be used to refer to it.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">The name of the datatype is given in the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">name</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute. If this is unprefixed, the nearest
+ancestor <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">ns</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute (including one on the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;datatype&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element itself) is used to provide the namespace
+for the datatype.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">named-datatype</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element datatype {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">attribute
+name { xs:QName }, ns?,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatype-definition-element*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+Anonymous datatypes are used to provide the datatype for a parameter,
+property or variable if that parameter, property or variable's type
+can't be referred to by name.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">anonymous-datatype</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element datatype { </FONT></FONT></SPAN>
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatype-definition-element*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">Datatypes</SPAN> <SPAN LANG="en-US">are referenced
+using qualified names. If the qualified name hasn't got a prefix, the
+nearest ancestor <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">ns</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute (including one on the element that's
+referring to the datatype) is used to resolve the name.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatype-reference</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+xs:QName</FONT></FONT></SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+A datatype definition consists of parameters and constraints, value
+definition, maps to other types, and a collation.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatype-definition-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+paramDef</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatype-definition-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+constraint</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatype-definition-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+property</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatype-definition-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+parse</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatype-definition-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+condition</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatype-definition-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+except</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatype-definition-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+variable</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatype-definition-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+local-map</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatype-definition-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+super</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatype-definition-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+sub</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatype-definition-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+collate</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatype-definition-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+extension-definition-element</FONT></FONT></SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+Extension definition elements can be used at any point within a
+datatype definition. If a processor doesn't recognise an extension
+definition element, it must ignore it and behave as if the value
+passed whatever test the extension definition element represented.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<B><SPAN LANG="en-US">Example 1.</SPAN></B> <B><SPAN LANG="en-US">Using
+Extension Definition Elements for Documentation</SPAN></B></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">Extension definition elements can be used to hold
+documentation about the datatype. For example, an <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;eg:example&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element might be used to provide example legal
+values of the datatype:</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">&lt;datatype
+name=&quot;RRGGBBColour&quot;&gt;</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;eg:example&gt;#FFFFFF&lt;/eg:example&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;eg:example&gt;#123456&lt;/eg:example&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;parse
+name=&quot;RRGGBB&quot;&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;regex&gt;#(?[RR][0-9A-F]{2})(?[GG][0-9A-F]{2})(?[BB][0-9A-F]{2})&lt;/regex&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;/parse&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">...</FONT></FONT></SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">&lt;/datatype&gt;</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-definition-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+extension-element</FONT></FONT></SPAN></P>
+<H3 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=4><B>Except</B></FONT></FONT></H3>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.1in; margin-bottom: 0in">
+<SPAN LANG="en-US">Certain aspects of a datatype definition can be
+negated by being placed in an <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;except&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element. A value is only valid if it <I>isn't</I>
+valid according to any of the datatype definition elements held
+within an <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;except&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">except</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element except {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">negative-test+</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">negative-test</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+condition</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">negative-test</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+constraint</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">negative-test</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+variable</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">negative-test</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+parse</FONT></FONT></SPAN></P>
+<H2 LANG="en-US" STYLE="margin-top: 0.18in; line-height: 0.31in; page-break-after: avoid">
+<FONT FACE="Arial"><FONT SIZE=5 STYLE="font-size: 17pt"><B>Parsing</B></FONT></FONT></H2>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.12in; margin-bottom: 0in">
+Parsing can perform two functions: it tests whether a value adheres
+to a particular format, and can assign a tree value to a variable to
+enable pieces of the string value to be extracted, tested, assigned
+to properties and so on.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;parse&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element holds any number of parsing methods, one
+or more of which must be satisfied in order for the value to be
+considered valid. The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">name</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute, if present, specifies the name of the
+variable to which the tree resulting from the parse is assigned. The
+first successful parse is used to give the value of this variable
+(thus the processor does not have to attempt to perform any parses
+once one has been successful).</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">A datatype can specify as many <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;parse&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">elements as it wishes. All must be satisfied by a
+value for that value to be a legal value of the datatype. A datatype
+that doesn't specify a <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;parse&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element (either itself or by inheritance from a
+supertype) is an abstract datatype.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">parse</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element parse {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">name?,
+preprocess*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">parsing-method+</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<H3 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=4><B>Preprocessing</B></FONT></FONT></H3>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.1in; margin-bottom: 0in">
+<SPAN LANG="en-US">Before a value is parsed by a <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;parse&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element, it can be preprocessed. This does not
+change the string value, but it may simplify the specification of the
+parsing method that's used.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">The only built-in form of preprocessing is
+whitespace processing. The whitespace can be preserved (<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">'preserve'</FONT></FONT>),
+whitespace characters replaced by space characters (<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">'replace'</FONT></FONT>),
+or leading and trailing whitespace stripped and sequences of
+whitespace characters replaced by spaces (<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">'collapse'</FONT></FONT>,
+the default).</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">preprocess</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+attribute whitespace {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;preserve&quot;
+| &quot;replace&quot; | &quot;collapse&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<H3 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=4><B>Parsing Methods</B></FONT></FONT></H3>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.1in; margin-bottom: 0in">
+There are three core methods of parsing: via a regular expression, by
+enumerating legal values, and by specifying a list. This set of
+methods can be supplemented by extension parsing elements.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">parsing-method</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+regex</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">parsing-method</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+enumeration</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">parsing-method</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+\list</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">parsing-method</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+extension-parsing-element</FONT></FONT></SPAN></P>
+<H4 STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT FACE="Arial">Regex</FONT></SPAN> <SPAN LANG="en-US"><FONT FACE="Arial">Parsing</FONT></SPAN></H4>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.08in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;regex&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element specifies parsing via an extended regular
+expression. To be a legal value, the entire string value must be
+matched by the regular expression. (Although it's legal to use <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">^</FONT></FONT></SPAN>
+<SPAN LANG="en-US">and <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">$</FONT></FONT></SPAN>
+<SPAN LANG="en-US">to mark the beginning and end of the matched
+string, it's not necessary.)</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+The tree value generated by parsing consists of a root (document)
+node with text node and element children. The string value of the
+root (document) node is the string value itself. There is one element
+for each named subexpression. The element's name being the name of
+the subexpression with the namespace indicated by the prefix
+indicated in the name. If no prefix is used, the element is in no
+namespace. The string value of each of these elements is the matched
+part of the string value as a whole.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<B><SPAN LANG="en-US">Example 2.</SPAN></B> <B><SPAN LANG="en-US">Regular
+Expression Parsing</SPAN></B></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+For example, the regex:</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">(?[year]-?[0-9]{4})-(?[month][0-9]{2})-(?[day][0-9]{2})</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">parsing</SPAN> <SPAN LANG="en-US">the value:</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">2003-12-19</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">generates</SPAN> <SPAN LANG="en-US">the tree:</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">(root)</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">+-
+year</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|&nbsp;&nbsp;
++- &quot;2003&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">+-
+&quot;-&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">+-
+month</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|&nbsp;&nbsp;
++- &quot;12&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">+-
+&quot;-&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">+-
+day</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">+-
+&quot;19&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">regex</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element regex {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">regex-flags*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extended-regular-expression</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<H5 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=2><I>Regular Expression Flags</I></FONT></FONT></H5>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+Four attributes modify the way in which regular expressions are
+applied. These are equivalent to the flags available within XPath
+2.0.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">By default, the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;.&quot;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">meta-character matches all characters except the
+newline (<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">#xA</FONT></FONT>)
+character. If <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">dot-all=&quot;true&quot;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">then <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;.&quot;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">matches all characters, including the newline
+character.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">regex-flags</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+attribute dot-all { boolean }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">By default, <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">^</FONT></FONT></SPAN>
+<SPAN LANG="en-US">matches the beginning of the entire string and <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">$</FONT></FONT></SPAN>
+<SPAN LANG="en-US">the end of the entire string. If <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">multi-line=&quot;true&quot;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">then <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">^</FONT></FONT></SPAN>
+<SPAN LANG="en-US">matches the beginning of each line as well as the
+beginning of the string, and <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">$</FONT></FONT></SPAN>
+<SPAN LANG="en-US">matches the end of each line as well as the end of
+the string. Lines are delimited by newline (<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">#xA</FONT></FONT>)
+characters.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">regex-flags</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+attribute multi-line { xs:boolean }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">By default, the regular expression is case
+sensitive. If <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">case-insensitive=&quot;true&quot;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">then the matching is case-insensitive, which means
+that the regular expression <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;a&quot;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">will match the string <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;A&quot;</FONT></FONT>.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">regex-flags</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+attribute case-insensitive { xs:boolean }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">By default, whitespace within the regular
+expression matches whitespace in the string. If
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">ignore-whitespace=&quot;true&quot;</FONT></FONT>,
+whitespace in the regular expression is removed prior to matching,
+and you need to use <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;\s&quot;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">to match whitespace. This can be used to create
+more readable regular expressions.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<B><SPAN LANG="en-US">Example 3.</SPAN></B> <B><SPAN LANG="en-US">Ignoring
+Whitespace in Regular Expressions</SPAN></B></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">&lt;regex
+ignore-whitespace=&quot;true&quot;&gt;</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">(?[year][0-9]{4})-</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">(?[month][0-9]{2})-</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">(?[day][0-9]{2})</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;/regex&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Arial"><B>Note:
+</B>This is not the same as </FONT></FONT><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&lt;parse
+whitespace=&quot;collapse&quot;&gt;...&lt;/parse&gt;</FONT></FONT><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Arial">,
+which preprocesses the string value itself.</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">regex-flags</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+attribute ignore-whitespace { xs:boolean }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">Boolean values are <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">'true'</FONT></FONT></SPAN>
+<SPAN LANG="en-US">or <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">'false'</FONT></FONT>,
+with optional leading and trailing whitespace.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">boolean</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+xs:boolean { pattern = &quot;true|false&quot; }</FONT></FONT></SPAN></P>
+<H4 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<FONT FACE="Arial"><B>Enumerated Values</B></FONT></H4>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.08in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;enumeration&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element specifies parsing against a list of
+allowed values. Allowed values are represented by value elements (see
+below). The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">code</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute holds an XPath expression. A string
+value is legal if there is a value element such that when the value
+element is used as the context node for evaluating the expression
+held in the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">code</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute, the result is the string value.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<B><SPAN LANG="en-US">Example 4.</SPAN></B> <B><SPAN LANG="en-US">Enumerated
+Values</SPAN></B></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">For example, the following allows the string
+values <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">'Jan'</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">'Feb'</FONT></FONT></SPAN>
+<SPAN LANG="en-US">and so on:</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">&lt;enumeration
+name=&quot;month&quot; code=&quot;@abbr&quot;&gt;</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;my:month
+abbr=&quot;Jan&quot;&gt;January&lt;/my:month&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;my:month
+abbr=&quot;Feb&quot;&gt;February&lt;/my:month&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">...</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;/enumeration&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">The value assigned to the variable declared by the
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;parse&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element (if there is one; that is, if the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">name</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute is given) is a node-set of those value
+elements for which the result of evaluating the expression held in
+the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">code</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute is the string value. Note that the
+node-set holds the original value elements and it is therefore
+possible to go up the tree to access information about their
+ancestors.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">If the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">code</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute is missing, the default is <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;string(.)&quot;</FONT></FONT>.
+In other words, the default is that the legal enumerated values are
+the string values of the value elements.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">enumeration</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element enumeration {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">attribute
+code { XPath }?,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">values</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<H5 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=2><I>Value Elements</I></FONT></FONT></H5>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">There are two methods of specifying value elements
+when creating an enumerated list of legal values: through a <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">values</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute or using the element children of the
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;enumeration&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">values</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute holds an XPath that evaluates to a set
+of value elements. This is particularly useful for referencing lists
+of legal values that are stored externally.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<B><SPAN LANG="en-US">Example 5.</SPAN></B> <B><SPAN LANG="en-US">Referencing
+External Code Lists</SPAN></B></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">&lt;enumeration
+values=&quot;document('languages.xml')/languages/language&quot;</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">code=&quot;@two-letter-abbr&quot;
+/&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">values</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+attribute values { XPath }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">The second way of listing the legal values in an
+enumeration is via a list of element children of the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;enumeration&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element. These can be elements in any namespace
+other than <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;http://www.jenitennison.com/datatypes&quot;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">or <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;value&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">elements. This method can be used for simple
+enumerations that are not worth listing externally.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">For the purpose of the node-set held by the
+variable declared via the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;enumeration&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element, the children of the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;enumeration&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element are considered to be the only children of
+a new document node.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<B><SPAN LANG="en-US">Example 6.</SPAN></B> <B><SPAN LANG="en-US">Parsing
+Using Enumerations</SPAN></B></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+For example, given:</P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">&lt;enumeration
+name=&quot;whitespace-treatment&quot;&gt;</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;value&gt;preserve&lt;/value&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;value&gt;replace&lt;/value&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;value&gt;collapse&lt;/value&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;/enumeration&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">if</SPAN> <SPAN LANG="en-US">the string value is
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">'replace'</FONT></FONT></SPAN>
+<SPAN LANG="en-US">then the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">$this.whitespace-treatment</FONT></FONT></SPAN>
+<SPAN LANG="en-US">variable is set to the second <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;value&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element in the tree:</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">root</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">+-
+value</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|&nbsp;&nbsp;
++- &quot;preserve&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">+-
+value</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|&nbsp;&nbsp;
++- &quot;replace&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">+-
+value</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">+-
+&quot;collapse&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">values</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+value-element+</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">value-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+element value { anything }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">value-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+extension-value-element</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-value-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+extension-element</FONT></FONT></SPAN></P>
+<H4 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<FONT FACE="Arial"><B>Lists</B></FONT></H4>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.08in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;list&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element specifies parsing of the string value into
+a list of values. This uses the same method as that used in RELAX NG,
+except that a <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">separator</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute is used to provide a regular expression
+that is used to break up the list into items.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">The result of parsing the string value based on
+the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;list&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element is a node-set of sibling elements, each of
+whose string value is of the item type. The names of the item
+elements are implementation-defined.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<B><SPAN LANG="en-US">Example 7.</SPAN></B> <B><SPAN LANG="en-US">Parsing
+Lists</SPAN></B></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+For example, if you have:</P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">&lt;list
+separator=&quot;\s*,\s*&quot;&gt;</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;oneOrMore&gt;&lt;data
+type=&quot;integer&quot; /&gt;&lt;/oneOrMore&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;/list&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">and</SPAN> <SPAN LANG="en-US">the string value:</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">1, 2, 3,
+45</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">then</SPAN> <SPAN LANG="en-US">the variable is set
+to the elements in the tree:</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">root</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">+-
+item</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|&nbsp;&nbsp;
++- &quot;1&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">+-
+item</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|&nbsp;&nbsp;
++- &quot;2&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">+-
+item</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|&nbsp;&nbsp;
++- &quot;3&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">+-
+item</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">+-
+&quot;45&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">These elements need not be named <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">'item'</FONT></FONT>.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">separator</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute specifies a regular expression that
+matches the separators in the list. The default is <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;\s+&quot;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">(one or more whitespace characters). It is an
+error if the regular expression matches an empty string (i.e. if it
+matches <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;&quot;</FONT></FONT>).</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">\list =
+element list {</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">attribute
+separator { regular-expression }?,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">item-pattern+</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<H5 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=2><I>Item Patterns</I></FONT></FONT></H5>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+Item patterns follow the same syntax as that used in RELAX NG, except
+that datatypes are referenced via a slightly different syntax.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">item-pattern</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+group</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">item-pattern</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+choice</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">item-pattern</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+optional</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">item-pattern</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+zeroOrMore</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">item-pattern</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+oneOrMore</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">item-pattern</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+\list</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">item-pattern</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+item-datatype</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">item-pattern</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+item-value</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">group</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element group { extension-attribute*, item-pattern+ }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">choice</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element choice { extension-attribute*, item-pattern+ }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">optional</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element optional { extension-attribute*, item-pattern+ }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">zeroOrMore</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element zeroOrMore { extension-attribute*, item-pattern+ }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">oneOrMore</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element oneOrMore { extension-attribute*, item-pattern+ }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">item-datatype</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+element data {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">type,
+param*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">item-datatype</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+anonymous-datatype</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">item-value</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element value {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">type?,
+text</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<H4 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<FONT FACE="Arial"><B>Extension Parsing Elements</B></FONT></H4>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.08in; margin-bottom: 0in">
+Extension parsing elements can be used to parse elements using
+methods other than the core methods explained above. Extension
+parsing elements can be used, for example, to parse a value using
+EBNF or PEGs.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">If the extension parsing element isn't recognised,
+the value is considered to fail the parse. If the extension parsing
+element occurs in a <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;parse&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element without any alternative parsing methods,
+this means no value can match the datatype, and the implementation
+must issue a warning. Usually, an extension parsing element will be
+used alongside a built-in parsing method.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<B><SPAN LANG="en-US">Example 8.</SPAN></B> <B><SPAN LANG="en-US">Using
+Extension Parsing Elements</SPAN></B></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">&lt;parse
+name=&quot;path&quot;&gt;</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="de-DE"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;ext:ebnf
+ref=&quot;http://www.w3.org/1999/xpath&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;regex
+dot-all=&quot;true&quot;&gt;.*&lt;/regex&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;/parse&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-parsing-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+extension-element</FONT></FONT></SPAN></P>
+<H2 LANG="en-US" STYLE="margin-top: 0.18in; line-height: 0.31in; page-break-after: avoid">
+<FONT FACE="Arial"><FONT SIZE=5 STYLE="font-size: 17pt"><B>Testing</B></FONT></FONT></H2>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.12in; margin-bottom: 0in">
+Constraints and conditions define tests that must be true. A
+constraint is a compile-time test (that checks the values of
+parameters) whereas a condition is a run-time test (that checks a
+value).</P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+Tests that involve parameters are only evaluated if the parameter has
+been assigned a value.</P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+Constraints encode relationships between parameters. The test must
+evaluate as true for the datatype definition to be legal.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<B><SPAN LANG="en-US">Example 9.</SPAN></B> <B><SPAN LANG="en-US">Constraints</SPAN></B></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">&lt;constraint
+test=&quot;dt:le($type.min, $type.max)&quot; /&gt;</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">constraint</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element constraint { </FONT></FONT></SPAN>
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">test
+</FONT></FONT></SPAN>
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;condition&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element tests whether a particular condition is
+satisfied by a value. The value is not valid if the test evaluates to
+false.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">condition</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element condition {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">test
+</FONT></FONT></SPAN>
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">Tests are done through a <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">test</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute which holds an XPath expression. If the
+effective boolean value of the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">test</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute is true then the test succeeds.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">test</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute test { XPath }</FONT></FONT></SPAN></P>
+<H2 LANG="en-US" STYLE="margin-top: 0.18in; line-height: 0.31in; page-break-after: avoid">
+<FONT FACE="Arial"><FONT SIZE=5 STYLE="font-size: 17pt"><B>Variable
+Binding</B></FONT></FONT></H2>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.12in; margin-bottom: 0in">
+<SPAN LANG="en-US">Parameters, properties and variables all declare
+variables for use in binding expressions (i.e. XPath expressions).
+Parameter variables are of the form <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">$type.<I>name</I>
+</FONT></FONT>where <I><FONT FACE="Courier New">name</FONT></I></SPAN>
+<SPAN LANG="en-US">is the name of the parameter; property variables
+are of the form <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">$this.<I>name</I>
+</FONT></FONT>where <I><FONT FACE="Courier New">name</FONT></I></SPAN>
+<SPAN LANG="en-US">is the name of the property; ordinary variables
+just use the name of the variable.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">The type attribute (or <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;datatype&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">child element) specifies the type of the
+parameter, property or variable. The provided value is cast to that
+type as follows:</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.92in; margin-top: 0.07in; margin-bottom: 0in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US">1. If the type of the provided
+value is a string, the value is taken as the string value of the
+required type and parsed/tested accordingly. It is an error if it is
+not a legal value or if the required type is an abstract type.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.92in; margin-top: 0.07in; margin-bottom: 0in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US">2. If the provided value is a
+subtype of the required type, that value is used as is.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.92in; margin-top: 0.07in; margin-bottom: 0in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US">3. If the provided value is of
+type T and the required type is type R, and there is a map from T to
+R, then that map is used to convert the value to the required type.
+If there are several possible maps then it is an error if they result
+in different values.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.92in; margin-top: 0.07in; margin-bottom: 0in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US">4. If the provided value is a
+supertype of the required type, that value must meet all the
+additional constraints specified by the required type, otherwise it's
+an error.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.92in; margin-top: 0.07in; margin-bottom: 0in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US">5. In other cases, the string
+value of the provided value is taken as the string value of the
+required type and parsed/tested accordingly. It is an error if it is
+not a legal string value or if the required type is an abstract type.</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+Variable binding is carried out in order. It is an error if a
+variable is referenced without being declared (although note that
+parameters and properties do not have to be declared locally, since
+they can be inherited from a supertype).</P>
+<H3 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=4><B>Parameters</B></FONT></FONT></H3>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.1in; margin-bottom: 0in">
+Parameters hold datatype-level values that can be used to
+parameterise the conditions that might apply to legal values of the
+datatype.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">Parameters are defined using a <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;param&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element. The value of the parameter is accessible
+in the bindings and tests of following parameters, properties,
+constraints and conditions via a variable reference of the form
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">$type.<I>name</I>
+</FONT></FONT>where <I><FONT FACE="Courier New">name</FONT></I></SPAN>
+<SPAN LANG="en-US">is the name of the param.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<B><SPAN LANG="en-US">Example 10.</SPAN></B> <B><SPAN LANG="en-US">Parameter
+Declarations</SPAN></B></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">&lt;param
+name=&quot;min&quot; type=&quot;integer&quot; value=&quot;0&quot;
+subtype=&quot;ge&quot; /&gt;</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">assigns</SPAN> <SPAN LANG="en-US">the integer <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">0</FONT></FONT></SPAN>
+<SPAN LANG="en-US">to the variable <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">$type.min</FONT></FONT>.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">paramDef</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element param {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">name,
+type?, binding?, subtype?,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">subtype</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute controls the relationship between the
+value of the parameter for a subtype and the value of the parameter
+for its supertype.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">subtype</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute subtype { relation }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">There are five built-in relationships -- <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">eq</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">lt</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">le</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">gt</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">ge</FONT></FONT></SPAN>
+<SPAN LANG="en-US">-- and this set can be extended. The value <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">'eq'</FONT></FONT></SPAN>
+<SPAN LANG="en-US">effectively fixes the value of the parameter. The
+value <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">'any'</FONT></FONT></SPAN>
+<SPAN LANG="en-US">means that the subtype's value can be anything.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">relation</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+&quot;any&quot; | &quot;eq&quot; | &quot;lt&quot; | &quot;le&quot; |
+&quot;gt&quot; | &quot;ge&quot; | extension-relation</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">Extension relationships are
+implementation-defined, and represented by a qualified name. For
+example, an implementation might define a <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">ext:substring</FONT></FONT></SPAN>
+<SPAN LANG="en-US">relationship that indicates that the subtype's
+value must be a substring of the supertype's value. If an
+implementation doesn't recognise the extension relationship then it
+must treat it as <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">'any'</FONT></FONT>.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-relation</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+xs:QName - xs:NCName</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;param&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element defined here (as opposed to parameter
+declarations, described above), assigns a value to a parameter and is
+used when subtyping a datatype. A binding must be specified and the
+value of the parameter must meet the constraints specified on the
+parameter declaration.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">param</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element param {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">name,
+binding,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<H3 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=4><B>Properties</B></FONT></FONT></H3>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.1in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element specifies a property of the datatype. The
+values of properties are available via the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">dt:property()</FONT></FONT></SPAN>
+<SPAN LANG="en-US">extension function (or via other APIs). The value
+of a property for a value can be referenced using <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">$this.<I>name</I>
+</FONT></FONT>where <I><FONT FACE="Courier New">name</FONT></I></SPAN>
+<SPAN LANG="en-US">is the value of the name attribute on the
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element. Properties are inherited by subtypes. If
+no binding is specified for a property, the datatype is an abstract
+datatype; the value of that property can be supplied in its subtypes
+or in mappings to the datatype.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<B><SPAN LANG="en-US">Example 11.</SPAN></B> <B><SPAN LANG="en-US">Mapping
+and Supertypes</SPAN></B></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+For example, consider:</P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">&lt;datatype
+name=&quot;RGBcolour&quot;&gt;</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property
+name=&quot;red&quot; type=&quot;byte&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property
+name=&quot;green&quot; type=&quot;byte&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property
+name=&quot;blue&quot; type=&quot;byte&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;map
+to=&quot;HSLcolour&quot;&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property
+name=&quot;hue&quot; select=&quot;...&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property
+name=&quot;saturation&quot; select=&quot;...&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property
+name=&quot;luminence&quot; select=&quot;...&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;/map&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;/datatype&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;datatype
+name=&quot;RRGGBB&quot;&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;super
+type=&quot;RGBcolour&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;regex
+name=&quot;colour&quot; ignore-whitespace=&quot;true&quot;&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">#(?[red][0-9A-F]{2})</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">(?[green][0-9A-F]{2})</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">(?[blue][0-9A-F]{2})</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;/regex&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property
+name=&quot;red&quot; select=&quot;$colour/red&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property
+name=&quot;green&quot; select=&quot;$colour/green&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property
+name=&quot;blue&quot; select=&quot;$colour/blue&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;/datatype&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">property</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element property {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">name,
+type?, binding?,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<H3 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=4><B>Variables</B></FONT></FONT></H3>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.1in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;variable&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element binds a value to a variable. Variables are
+similar to properties except that they are not inherited by subtypes
+and their values aren't accessible via APIs. Variables therefore must
+have a binding specified. The value of a variable is accessed through
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">$<I>name</I>
+<FONT SIZE=2><FONT FACE="Times New Roman">,</FONT></FONT></FONT></FONT></SPAN>
+<SPAN LANG="en-US">where <I><FONT FACE="Courier New">name</FONT></I></SPAN>
+<SPAN LANG="en-US">is the name of the variable. Variables are used
+for intermediate calculations.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">variable</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element variable {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">name,
+type?, binding,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<H3 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=4><B>Type Specifiers</B></FONT></FONT></H3>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.1in; margin-bottom: 0in">
+<SPAN LANG="en-US">There are two ways to specify a type: via a <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">type</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute (with <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;param&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">elements further parameterising the type) or via
+an anonymous <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;datatype&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">type</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+attribute type { datatype-reference }, param*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">type</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+anonymous-datatype</FONT></FONT></SPAN></P>
+<H3 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=4><B>Value Specifiers</B></FONT></FONT></H3>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.1in; margin-bottom: 0in">
+<SPAN LANG="en-US">There are three built-in ways to bind a value to a
+parameter, property or variable: through the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">value</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute, which holds a literal value, through a
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">select</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute, which holds an XPath expression, or
+through a sequence of <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">elements. Implementations can also define their
+own extension binding elements.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">binding</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+(literal-value | select | property+), extension-binding-element*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">If a <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">value</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute is specified, its value is the string
+value of the value of the variable; the type of the variable is used
+to interpret that value.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">literal-value</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute value { text }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">If a <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">select</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute is specified, the XPath expression it
+contains is evaluated to give the value of the parameter, property or
+variable.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">select</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute select { XPath }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">If a sequence of <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">elements is used, they provide a value of an
+abstract type. The type specified by the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">type</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute (or the anonymous datatype) must be an
+abstract type.</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+Extension binding elements are used where more power is needed to
+specify the value of a parameter, property or variable. This can be
+used to provide values using methods such as XSLT or MathML. If an
+implementation does not support any of the extension binding elements
+specified, then it must assign to the variable the value specified by
+the value or select attribute instead. If an implementation supports
+one or more of the extension binding elements, then it must use that
+element to calculate the value of the variable.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-binding-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+extension-element</FONT></FONT></SPAN></P>
+<H2 LANG="en-US" STYLE="margin-top: 0.18in; line-height: 0.31in; page-break-after: avoid">
+<FONT FACE="Arial"><FONT SIZE=5 STYLE="font-size: 17pt"><B>Mapping</B></FONT></FONT></H2>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.12in; margin-bottom: 0in">
+There are two ways of specifying a mapping to another datatype:
+through a basic map and through a supertype relationship. Mappings
+are uni-directional: if there's a mapping from datatype A to datatype
+B then every legal value of datatype A must map onto a legal value of
+datatype B, but the reverse is not necessarily the case. The only
+difference between a map and a supertype is that a subtype inherits
+properties, parameters and collations from its supertype but doesn't
+from datatypes onto which it maps.</P>
+<H3 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=4><B>Maps</B></FONT></FONT></H3>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.1in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;map&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element defines a map from one datatype to
+another. Maps can be local (in which case they define a map to or
+from the datatype in which they're specified) or top-level. To be a
+legal value of a datatype, a value must be castable to a legal value
+of each datatype to which the datatype maps. The content of the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;map&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element defines how the mapping is done.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Arial"><B>Note:
+</B>Note that it is possible for there to be maps to and from two
+datatypes, but it is not necessarily the case that a round-trip will
+result in the same string value.</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; margin-top: 0.14in; margin-bottom: 0in">
+<B><SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Arial">Example
+12.</FONT></FONT></SPAN></B> <B><SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Arial">Changes
+When Round-Tripping</FONT></FONT></SPAN></B></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.94in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=2 STYLE="font-size: 9pt">For example,
+with the datatype definitions:</FONT></FONT></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.94in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=1 STYLE="font-size: 8pt">&lt;datatype
+name=&quot;UKDate&quot;&gt;</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&lt;regex
+name=&quot;date&quot; ignore-whitespace=&quot;true&quot;&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">(?[day][0-9]{1,2})/(?[month][0-9]{1,2})/(?[year][0-9]{4})</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&lt;/regex&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&lt;property
+name=&quot;year&quot; select=&quot;$date/year&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&lt;property
+name=&quot;month&quot; select=&quot;$date/month&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&lt;property
+name=&quot;day&quot; select=&quot;$date/day&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&lt;map
+to=&quot;ISODate&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">select=&quot;concat(format-number($this.year,
+'0000'), '-',</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">format-number($this.month,
+'00'), '-',</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">format-number($this.day,
+'00'))&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;<SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&lt;/datatype&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;<SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&lt;datatype
+name=&quot;ISODate&quot;&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&lt;regex
+name=&quot;date&quot; ignore-whitespace=&quot;true&quot;&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">(?[year][0-9]{4})/(?[month][0-9]{2})/(?[day][0-9]{2})</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&lt;/regex&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&lt;property
+name=&quot;year&quot; select=&quot;$date/year&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&lt;property
+name=&quot;month&quot; select=&quot;$date/month&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&lt;property
+name=&quot;day&quot; select=&quot;$date/day&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&lt;map
+to=&quot;UKDate&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">select=&quot;concat($this.day,
+'/', $this.month, '/', $this.year)&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; line-height: 0.15in">
+&nbsp;<SPAN LANG="en-US"><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&lt;/datatype&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Arial">the</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Arial">UKDate
+</FONT></FONT><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&quot;5/1/1947&quot;</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Arial">maps
+to the ISODate </FONT></FONT><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&quot;1947-01-05&quot;</FONT></FONT><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Arial">,
+which maps back to the UKDate </FONT></FONT><FONT SIZE=1 STYLE="font-size: 8pt"><FONT FACE="Courier New">&quot;05/01/1947&quot;</FONT></FONT><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Arial">.</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">Local maps appear within <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;datatype&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">elements and define maps to or from the datatype
+in which the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;map&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element appears from or to the datatype specified
+by the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">from</FONT></FONT>
+or <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">to</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">local-map</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element map {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">(from
+| to), mapping,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">Top-level maps appear within the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;datatypes&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element and define maps from the datatype
+referenced in the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">from</FONT></FONT>
+attribute to the datatype referenced in the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">to</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">top-level-map</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element map {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">from,
+to, mapping,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">to</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute holds a reference to a datatype.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">to</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute to { datatype-reference }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">from</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute holds a reference to a datatype.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">from</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute from { datatype-reference }</FONT></FONT></SPAN></P>
+<H4 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<FONT FACE="Arial"><B>Mapping Definitions</B></FONT></H4>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.08in; margin-bottom: 0in">
+Mapping definitions are carried out in two ways depending on whether
+the target datatype is an abstract datatype or a concrete datatype.
+If the target datatype is concrete, the map is done through a binding
+which creates a string which is a valid string value for the target
+datatype. If the target datatype is abstract, the map provides values
+for unbound properties defined by the target datatype.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">mapping</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+binding</FONT></FONT></SPAN></P>
+<H3 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=4><B>Supertypes</B></FONT></FONT></H3>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.1in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;super&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element defines a map from the datatype to a
+supertype. There are several differences between a map and a
+subtype-supertype relationship:</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.81in; margin-top: 0.07in; margin-bottom: 0in">
+&bull;&nbsp;&nbsp; <SPAN LANG="en-US">a</SPAN> <SPAN LANG="en-US">subtype
+cannot be a supertype of its supertype (no circularity)</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.81in; margin-top: 0.07in; margin-bottom: 0in">
+&bull;&nbsp;&nbsp; <SPAN LANG="en-US">if</SPAN> <SPAN LANG="en-US">both
+types are concrete, all string values that are legal for the subtype
+must also be legal for the supertype</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.81in; margin-top: 0.07in; margin-bottom: 0in">
+&bull;&nbsp;&nbsp; <SPAN LANG="en-US">a</SPAN> <SPAN LANG="en-US">subtype
+inherits parameters, properties and the collation of its supertype</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.81in; margin-top: 0.07in; margin-bottom: 0in">
+&bull;&nbsp;&nbsp; <SPAN LANG="en-US">it</SPAN> <SPAN LANG="en-US">is
+not legal for an abstract type to have a concrete supertype</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+A type can have multiple supertypes. It inherits properties and
+parameters from all of them. A subtype also inherits the collations
+from its supertypes; either the subtype must define its own
+collations or all the supertypes must use the same collations.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">super</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element supertype {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">attribute
+ref { datatype-reference },</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">param*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<H3 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=4><B>Subtypes</B></FONT></FONT></H3>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.1in; margin-bottom: 0in">
+A datatype can define itself by reference to subtypes, which is
+equivalent to creating a union type.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<B><SPAN LANG="en-US">Example 13.</SPAN></B> <B><SPAN LANG="en-US">Creating
+Union Types</SPAN></B></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">&lt;datatype
+name=&quot;myDate&quot;&gt;</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property
+name=&quot;year&quot; type=&quot;year&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property
+name=&quot;month&quot; type=&quot;month&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property
+name=&quot;day&quot; type=&quot;day&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;subtype
+ref=&quot;ISODate&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;subtype&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;parse
+name=&quot;date&quot;&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;regex&gt;(?[day][0-9]{1,2})
+(?[month][A-Z]{3}) (?[year][0-9]{4})&lt;/regex&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;/parse&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property
+name=&quot;year&quot; select=&quot;$date/year&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property
+name=&quot;month&quot; select=&quot;$date/month&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;property
+name=&quot;day&quot; select=&quot;$date/day&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;/subtype&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;/datatype&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;subtype&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element references an existing datatype via the
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">ref</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute. The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;datatype&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element in which the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;subtype&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element appears is a supertype for the referenced
+datatype. The subtype can be parameterised.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">sub</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+element subtype {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">attribute
+ref { datatype-reference },</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">param*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;subtype&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element creates a local, anonymous datatype and
+defines its supertype as being the datatype defined by the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;datatype&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element in which the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;subtype&gt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">element appears.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">sub</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+element subtype {</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">datatype-definition-element*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<H2 LANG="en-US" STYLE="margin-top: 0.18in; line-height: 0.31in; page-break-after: avoid">
+<FONT FACE="Arial"><FONT SIZE=5 STYLE="font-size: 17pt"><B>Collations</B></FONT></FONT></H2>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.12in; margin-bottom: 0in">
+<SPAN LANG="en-US">Collations define how two values of a particular
+datatype can be compared. Collations can be specified either through
+a simple collation or through a combination of simple collations.
+Each datatype can specify multiple collations, but there can be only
+one collation without a <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">test</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute. When comparing two values, the first
+collation whose <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">test</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute evaluates to true for both values is
+used to compare the values. If there is no such collation, the values
+are deemed incomparable.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">collate</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+simple-collation</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">collate</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+complex-collation</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">A simple collation compares two values by
+comparing the values given by the binding for the collation. These
+values are compared according to the type specified either by the
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">type</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute or the <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">uri</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute; any parameters specified are passed
+into the relevant collation in order to carry out the comparison.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">If no binding is specified, it defaults to using
+the value itself (the same as <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">select=&quot;$this&quot;</FONT></FONT>).</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">If no type or URI is specified, it defaults to
+using the codepoint collation (the same as
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">uri=&quot;http://www.jenitennison.com/datatypes/collations/codepoint&quot;</FONT></FONT>).</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">If <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">order=&quot;descending&quot;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">is specified, the comparison is reversed (if value
+A is less than value B, the result of the collation is that value A
+is greater than value B).</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">simple-collation</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element collate { </FONT></FONT></SPAN>
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">test?,
+</FONT></FONT></SPAN>
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">(type
+| uri)?, </FONT></FONT></SPAN>
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">order,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">param*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">collation-binding?</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; 
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">order</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute order { &quot;ascending&quot; | &quot;descending&quot; }</FONT></FONT></SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+A complex collation performs multiple simple collations in sequence.
+If value A is equal to value B according to the first simple
+collation, then the two values are compared using the second simple
+collation. If they are still equal, the third simple collation is
+used to compare them and so on. Only if they are equal for all the
+collations are they equal overall.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">complex-collation</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element collate { </FONT></FONT></SPAN>
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">test?,
+</FONT></FONT></SPAN>
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">param*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">simple-collation,
+simple-collation+ </FONT></FONT></SPAN>
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">}</FONT></FONT></SPAN></P>
+<H3 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=4><B>Collation Binding</B></FONT></FONT></H3>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.1in; margin-bottom: 0in">
+If a single binding is specified, it is evaluated and the resulting
+value used to compare the two values.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">collation-binding</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+binding</FONT></FONT></SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+If a minimum and maximum binding is specified, they are both
+evaluated. A value A is greater than a value B if A's min is greater
+than B's max. A value A is less than a value B if A's max is less
+than B's min. A value A is equal to a value B if A's min is equal to
+A's max, B's min and B's max (i.e. the minimum and maximum for both
+values are equal, and equal to each others'). In other cases, the
+order relationship is indeterminate.</P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+If extension binding elements are used, they are paired, with the
+first specifying the minimum value and the second the maximum value.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">collation-binding</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+min-binding, max-binding, </FONT></FONT></SPAN>
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">(min-extension-binding-element,
+</FONT></FONT></SPAN>
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">max-extension-binding-element)*</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">min-binding</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+literal-min-value</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">min-binding</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+min-select</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">max-binding</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+literal-max-value</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">max-binding</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+max-select</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">literal-min-value</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute value.min { text }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">literal-max-value</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute value.max { text }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">min-select</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute select.min { XPath }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">max-select</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute select.max { XPath }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">min-extension-binding-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+extension-binding-element</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">max-extension-binding-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+extension-binding-element</FONT></FONT></SPAN></P>
+<H3 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=4><B>Collation URIs</B></FONT></FONT></H3>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.1in; margin-bottom: 0in">
+There are three built-in collation URIs: one for the Unicode
+codepoint collation, one for numerical ordering, and one for
+locale-aware string comparisons.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">The <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">uri</FONT></FONT></SPAN>
+<SPAN LANG="en-US">attribute specifies a collation that should be
+used to compare the values.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">uri</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute uri { collation-uri }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">collation-uri</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+built-in-collation-uri</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">collation-uri</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+extension-collation-uri</FONT></FONT></SPAN></P>
+<H4 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<FONT FACE="Arial"><B>Built-in Collation URIs</B></FONT></H4>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">built-in-collation-uri</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+codepoint-collation-uri</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">built-in-collation-uri</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+number-collation-uri</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">built-in-collation-uri</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">|=
+string-collation-uri</FONT></FONT></SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+The codepoint collation uses the codepoints of the characters in the
+values to order the values.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">codepoint-collation-uri</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+xs:anyURI
+&quot;http://www.jenitennison.com/datatypes/collations/codepoint&quot;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">The number collation compares the values
+numerically. The order is the same as that specified for <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">xs:double</FONT></FONT></SPAN>
+<SPAN LANG="en-US">in XPath 2.0.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">number-collation-uri</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+xs:anyURI &quot;http://www.jenitennison.com/datatypes/collations/number&quot;</FONT></FONT></SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+The string collation compares the values as strings. It takes a
+number of parameters to specify how the strings should be collated,
+namely:</P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+lang</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; margin-top: 0.07in; margin-bottom: 0in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US">specifies
+the language used for comparing the strings; this must be a legal
+language specifier as in xs:language.</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+case</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; margin-top: 0.07in; margin-bottom: 0in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US">specifies
+the case ordering. The legal values are <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;upper-first&quot;</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;lower-first&quot;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">or <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;ignore&quot;</FONT></FONT>.
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;ignore&quot;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">means that tertiary differences are ignored (as in
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">strength=&quot;secondary&quot;</FONT></FONT>).
+Default is language-dependent.</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+strength</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; margin-top: 0.07in; margin-bottom: 0in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;primary&quot;</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;secondary&quot;</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;tertiary&quot;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">or <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;identical&quot;</FONT></FONT>.
+Default is <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;identical&quot;</FONT></FONT>.
+Setting to <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;primary&quot;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">or <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&quot;secondary&quot;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">ignores case differences.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<B><SPAN LANG="en-US">Example 14.</SPAN></B> <B><SPAN LANG="en-US">Customising
+the String Collation</SPAN></B></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+For example, to create a collation for strings that are in English
+and should be compared case-insensitively, use:</P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<FONT FACE="Courier New"><FONT SIZE=2 STYLE="font-size: 9pt">&lt;collate
+uri=&quot;http://www.jenitennison.com/datatypes/collations/string&quot;&gt;</FONT></FONT></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="de-DE"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;param
+name=&quot;lang&quot; value=&quot;en&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;param
+name=&quot;case&quot; value=&quot;ignore&quot; /&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;/collate&gt;</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">string-collation-uri</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+xs:anyURI &quot;http://www.jenitennison.com/datatypes/collations/string&quot;</FONT></FONT></SPAN></P>
+<H4 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<FONT FACE="Arial"><B>Extension Collation URIs</B></FONT></H4>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.08in; margin-bottom: 0in">
+Implementations can define their own collation URIs, including
+parameterised URIs in order to support language-sensitive collations.
+Implementations are encouraged to provide users with ways of
+specifying collations, perhaps using extension top-level elements.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-collation-uri</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+xs:anyURI - built-in-collation-uri</FONT></FONT></SPAN></P>
+<H2 LANG="en-US" STYLE="margin-top: 0.18in; line-height: 0.31in; page-break-after: avoid">
+<FONT FACE="Arial"><FONT SIZE=5 STYLE="font-size: 17pt"><B>Common
+Constructs</B></FONT></FONT></H2>
+<H3 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=4><B>Common Types</B></FONT></FONT></H3>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.69in; margin-right: 0.03in; margin-top: 0.1in; border: 1.00pt solid #000000; padding-top: 0.14in; padding-bottom: 0.02in; padding-left: 0.03in; padding-right: 0.03in; line-height: 0.18in">
+We have several possible choices about what variant of XPath to
+accept:</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.69in; margin-right: 0.03in; margin-top: 0.07in; margin-bottom: 0in; border: 1.00pt solid #000000; padding-top: 0.14in; padding-bottom: 0.02in; padding-left: 0.03in; padding-right: 0.03in">
+&bull;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US">XPath</SPAN> <SPAN LANG="en-US">1.0</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.69in; margin-right: 0.03in; margin-top: 0.07in; margin-bottom: 0in; border: 1.00pt solid #000000; padding-top: 0.14in; padding-bottom: 0.02in; padding-left: 0.03in; padding-right: 0.03in">
+&bull;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US">XPath</SPAN> <SPAN LANG="en-US">2.0</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.69in; margin-right: 0.03in; margin-top: 0.07in; margin-bottom: 0in; border: 1.00pt solid #000000; padding-top: 0.14in; padding-bottom: 0.02in; padding-left: 0.03in; padding-right: 0.03in">
+&bull;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US">a</SPAN> <SPAN LANG="en-US">restricted version of
+XPath 2.0</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.69in; margin-right: 0.03in; margin-top: 0.07in; margin-bottom: 0in; border: 1.00pt solid #000000; padding-top: 0.14in; padding-bottom: 0.02in; padding-left: 0.03in; padding-right: 0.03in">
+&bull;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US">control</SPAN> <SPAN LANG="en-US">version via
+xpath-version attribute</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.69in; margin-right: 0.03in; margin-top: 0.07in; margin-bottom: 0in; border: 1.00pt solid #000000; padding-top: 0.14in; padding-bottom: 0.02in; padding-left: 0.03in; padding-right: 0.03in">
+&bull;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<SPAN LANG="en-US">implementation-defined</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.69in; margin-right: 0.03in; margin-top: 0.07in; border: 1.00pt solid #000000; padding-top: 0.14in; padding-bottom: 0.02in; padding-left: 0.03in; padding-right: 0.03in; line-height: 0.18in">
+Whichever we use, implementations will still be able to support more
+via extension binding elements. I think, therefore, that the last two
+options aren't necessary.</P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.69in; margin-right: 0.03in; margin-top: 0.07in; border: 1.00pt solid #000000; padding-top: 0.14in; padding-bottom: 0.02in; padding-left: 0.03in; padding-right: 0.03in; line-height: 0.18in; page-break-after: avoid">
+The useful things in XPath 2.0 are its support for if expressions and
+for sequences of atomic values; there's also a lot that's in excess
+of what's required. Subsetting just makes it harder to get conformant
+processors and for users to remember which bits are in and which bits
+are out. I'm inclined to stick to XPath 1.0 for now.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.69in; margin-right: 0.03in; border: 1.00pt solid #000000; padding-top: 0.14in; padding-bottom: 0.02in; padding-left: 0.03in; padding-right: 0.03in; line-height: 0.14in; page-break-after: avoid">
+&nbsp;</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.69in; margin-right: 0.03in">
+&nbsp;</P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+Variable, property and parameter values are available within an XPath
+expression if the variable, property or parameter is declared prior
+to the XPath expression. If the property or parameter is declared
+within a supertype, the reference to that supertype must come before
+the XPath expression in which the property or parameter is declared.</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US">The comparisons <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">!=</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&gt;</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&gt;=</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;</FONT></FONT></SPAN>
+<SPAN LANG="en-US">and <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">&lt;=</FONT></FONT></SPAN>
+<SPAN LANG="en-US">follow XPath 1.0 rules. To carry out comparisons
+between typed values that are based on the collation for the value's
+type, use the following extension functions, each of which take two
+arguments and returns true or false:</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.81in; margin-top: 0.07in; margin-bottom: 0in">
+&bull;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">dt:eq()</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">dt:neq()</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">dt:lt()</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">dt:le()</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">dt:gt()</FONT></FONT>,
+<FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">dt:ge()</FONT></FONT></SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+An empty node-set is returned if the values aren't comparable (do not
+share the same collation). In most cases, this will be treated the
+same way as false.</P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+Within a datatype library, each concrete datatype has a corresponding
+extension function named after the name of the datatype. This
+function takes a single argument, which is a string, and returns a
+typed value based on that string. Note that this works for all
+datatypes, including lists and unions. A type error is raised if the
+string does not meet the constraints for that datatype.</P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+Other extension functions are:</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+&nbsp;<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">dt:comparable(value,
+value)</FONT></FONT></SPAN> 
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; margin-top: 0.07in; margin-bottom: 0in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US">returns
+true if the values are comparable, false otherwise</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+&nbsp;<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">dt:item(list-value,
+number)</FONT></FONT></SPAN> 
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; margin-top: 0.07in; margin-bottom: 0in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US">returns
+the item in the list-value at the index given by the number (counting
+starts from 1); returns an empty string if the number is greater than
+the number of items in the list-value. Values that aren't of a list
+type are treated like list-type values with a single item.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+&nbsp;<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">dt:property(value,
+prop-name)</FONT></FONT></SPAN> 
+</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.94in; margin-top: 0.07in; margin-bottom: 0in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US">returns
+the value of the named property</SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+An XPath 1.0 expression</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">XPath</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+text</FONT></FONT></SPAN></P>
+<P LANG="en-US" CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+An XPath 2.0 regular expression</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">regular-expression</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+text</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US">An XPath 2.0 regular expression with named
+subexpressions.</SPAN> <SPAN LANG="en-US">Named subexpressions are
+specified with the syntax <FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">(?[<I>name</I>]<I>regex</I>)</FONT></FONT></SPAN>
+<SPAN LANG="en-US">where <I><FONT FACE="Courier New">name</FONT></I></SPAN>
+<SPAN LANG="en-US">is name of the subexpression and <I><FONT FACE="Courier New">regex</FONT></I></SPAN>
+<SPAN LANG="en-US">is the subexpression itself.</SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<B><SPAN LANG="en-US">Example 15.</SPAN></B> <B><SPAN LANG="en-US">Extended
+Regular Expression</SPAN></B></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.07in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">(?[year]-?[0-9]{4})-(?[month][0-9]{2})-(?[day][0-9]{2})</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extended-regular-expression</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+text</FONT></FONT></SPAN></P>
+<H3 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=4><B>Common Attributes</B></FONT></FONT></H3>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">name</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute name { xs:NCName }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">dt-name</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute dt:name { xs:NCName }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">ns</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute ns { xs:anyURI }</FONT></FONT></SPAN></P>
+<H3 LANG="en-US" STYLE="margin-left: 0.67in; margin-top: 0.15in; margin-bottom: 0in">
+<FONT FACE="Arial"><FONT SIZE=4><B>Extension Elements and Attributes</B></FONT></FONT></H3>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; margin-top: 0.14in; margin-bottom: 0in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-element</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+element * - dt:* { anything }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">extension-attribute</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute * - local:* { text }</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;</P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">anything</FONT></FONT></SPAN>
+<SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">=
+attribute * { text }*,</FONT></FONT></SPAN></P>
+<P CLASS="msonormal" STYLE="margin-left: 0.67in; line-height: 0.16in">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN LANG="en-US"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Courier New">mixed
+{ element * { anything }* }</FONT></FONT></SPAN></P>
+   </body>
+</html>

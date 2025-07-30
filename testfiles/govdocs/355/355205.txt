@@ -1,0 +1,302 @@
+#!/bin/bash -
+#script to install and compile EMPIRE II package
+#directory in which EMPIRE is to be installed
+instdir=$HOME
+#directory with EMPIRE distribution
+sourcedir=`pwd`
+#EMPIRE version number
+empver=2-19b24
+#EXFOR version number (may be different (older)) 
+X4ver=2-19b24
+echo ' '
+echo ' '
+echo 'This is the EMPIRE-II installations script. It will lead you'
+echo 'through the set-up procedure and eventually compile whole '
+echo 'the package. Hit return to accept defaults within [].'
+echo ' '
+echo ' '
+echo 'Specify directory with EMPIRE-II distribution ['$sourcedir']:'
+read dir
+if [ ! "$dir" = "" ]; then
+   sourcedir=$dir
+fi
+if [ -f $sourcedir/empire-$empver.tgz ]; then
+   echo ' '
+   echo 'OK empire-'$empver'.tgz found'
+   echo ' '
+else
+   echo ' '
+   echo 'empire-'$empver'.tgz not found in '$sourcedir', restart setup script '
+   echo 'and specify the correct path to the empire-'$empver'.tgz file'
+   exit
+fi
+echo 'Specify existing directory in which EMPIRE-II should be installed.'
+echo 'The directory "empire" will be created inside so default should be'
+echo 'a good choice (hit return to accept default) ['$instdir']:'
+read dir
+if [ ! "$dir" = "" ]; then
+   instdir=$dir
+fi
+echo 'You may choose to install old version of the EXFOR library (340 Mb).'
+echo 'Lack of EXFOR disables comparison with experimental data'  
+echo 'but does not compromise EMPIRE calculations. '  
+echo 'NOTE: this version of the EXFOR library will soon be retired'
+echo 'in favour of the relational database that is offered next'
+echo 'so you may want to say NO here'
+echo 'Do you want to install old EXFOR y/n [n]:'
+read yesno
+if [ ! "$yesno" = "" ]; then
+        exfor=$yesno
+        else
+        exfor=n
+fi
+echo 'You may choose to install relational (MySQL) version of the' 
+echo 'EXFOR library (440 Mb).'
+echo 'NOTE: if you have already installed the traditional version'
+echo 'of EXFOR you do not need to have them both although you may.'
+echo 'If you say YES I will set your default for the MySQL database'
+echo 'Do you want to install MySQL EXFOR y/n [y]:'
+read yesno
+if [ ! "$yesno" = "" ]; then
+        exforel=$yesno
+        else
+        exforel=y
+fi
+echo 'You may choose to install HF-BCS level densities (200 Mb).'
+echo 'Lack of HF-BCS disables HF-BCS option (LEVDEN=3) but does not'  
+echo 'affect calculations using other level density options.'  
+echo 'Do you want to install HF-BCS level densities y/n [y]:'
+read yesno
+if [ ! "$yesno" = "" ]; then
+        hfbcs=$yesno
+        else
+        hfbcs=y
+fi
+
+cd $instdir
+echo 'exploding EMPIRE-II source'
+#  gunzip $sourcedir/empire-$empver.tgz
+#  tar xvf $sourcedir/empire-$empver.tar
+tar xzvf $sourcedir/empire-$empver.tgz
+echo 'Have decompressed EMPIRE-II in the directory '$instdir
+
+if [ "$exfor" = "y" ]; then
+  if [ -f $sourcedir/X4-$X4ver.tgz ]; then
+     echo 'exploding EXFOR library'
+#    gunzip $sourcedir/X4-$X4ver.tgz
+#    tar xzf $sourcedir/X4-$X4ver.tar
+     tar xvzf $sourcedir/X4-$X4ver.tgz
+   else
+     echo 'EXFOR library installation failed, '
+     echo 'X4-'$X4ver'.tgz file not found'
+  fi   
+fi
+
+if [ "$exforel" = "y" ]; then
+  if [ -f $sourcedir/x4cd.tgz ]; then
+     echo 'exploding MySQL EXFOR library'
+     cd empire
+#    gunzip $sourcedir/x4cd.tgz
+#    tar xzf $sourcedir/x4cd.tar
+     tar xvzf $sourcedir/x4cd.tgz
+   else
+     echo 'EXFOR library installation failed, '
+     echo 'x4cd.tgz file not found'
+  fi   
+fi   
+
+if [ "$hfbcs" = "y" ]; then
+   if [ -f $sourcedir/HFBCS-lev-dens.tgz ]; then
+      echo 'exploding HF-BCS level densities'
+#     gunzip $sourcedir/HFBCS-lev-dens.tgz
+#     tar xzf $sourcedir/HFBCS-lev-dens.tar
+      tar xvzf $sourcedir/HFBCS-lev-dens.tgz
+   else
+      echo 'Installation of HF-BCS level densities failed'
+      echo 'HFBCS-lev-dens.tgz file not found'
+   fi
+else
+   if [ -f $sourcedir/RIPL-2/densities/total/level-densities-hfbcs/z008.dat ]; then
+      mkdir empire/RIPL-2/densities
+      mkdir empire/RIPL-2/densities/total
+      ln -s $sourcedir/RIPL-2/densities/total/level-densities-hfbcs  empire/RIPL-2/densities/total/level-densities-hfbcs
+      echo ' '
+      echo 'Have created link to the HFBCS level densities on CD-ROM'
+      echo ' '
+   fi
+fi
+
+echo ' '
+echo 'Now I will compile the whole package.'
+echo 'By default g77 FORTRAN compiler will be used but'
+echo 'you may enter your preferred one below or hit return '
+echo 'to accept default [g77]:'
+read ftn
+if [ "$ftn" = "" ]; then
+   ftn=g77
+fi
+#Compilation
+cd source
+if [ ! "$ftn" = "g77" ]; then
+   sed s/"=  g77"/"=  $ftn"/ Makefile >Makefile1
+   mv Makefile1 Makefile
+fi
+echo 'A few complains when compiling subecis03.f is OK'
+if [ "$exforel" = "y" ]; then
+   sed s/"IX4ret = 3"/"IX4ret = 1"/ input.f >inputgonethroughsed
+   mv inputgonethroughsed input.f
+fi
+echo 'Compiling EMPIRE '
+make
+cd ../util/empend
+if [ ! "$ftn" = "g77" ]; then
+   sed s/"=  g77"/"=  $ftn"/ Makefile >Makefile1
+   mv Makefile1 Makefile
+fi
+echo 'Compiling EMPEND '
+make
+cd ../x4toc4
+if [ ! "$ftn" = "g77" ]; then
+   sed s/"=  g77"/"=  $ftn"/ Makefile >Makefile1
+   mv Makefile1 Makefile
+fi
+echo 'Compiling X4TOC4 '
+make
+cd ../c4sort
+if [ ! "$ftn" = "g77" ]; then
+   sed s/"=  g77"/"=  $ftn"/ Makefile >Makefile1
+   mv Makefile1 Makefile
+fi
+echo 'Compiling C4SORT '
+make
+cd ../plotc4
+if [ ! "$ftn" = "g77" ]; then
+   sed s/"=  g77"/"=  $ftn"/ Makefile >Makefile1
+   mv Makefile1 Makefile
+fi
+echo 'Compiling PLOTC4 '
+make
+cd ../fixup
+if [ ! "$ftn" = "g77" ]; then
+   sed s/"=  g77"/"=  $ftn"/ Makefile >Makefile1
+   mv Makefile1 Makefile
+fi
+echo 'Compiling FIXUP '
+make
+cd ../sixtab
+if [ ! "$ftn" = "g77" ]; then
+   sed s/"=  g77"/"=  $ftn"/ Makefile >Makefile1
+   mv Makefile1 Makefile
+fi
+echo 'Compiling SIXTAB '
+make
+cd ../lsttab
+if [ ! "$ftn" = "g77" ]; then
+   sed s/"=  g77"/"=  $ftn"/ Makefile >Makefile1
+   mv Makefile1 Makefile
+fi
+echo 'Compiling LSTTAB '
+make
+cd ../legend
+if [ ! "$ftn" = "g77" ]; then
+   sed s/"=  g77"/"=  $ftn"/ Makefile >Makefile1
+   mv Makefile1 Makefile
+fi
+echo 'Compiling LEGEND '
+make
+cd ../endres
+if [ ! "$ftn" = "g77" ]; then
+   sed s/"=  g77"/"=  $ftn"/ Makefile >Makefile1
+   mv Makefile1 Makefile
+fi
+echo 'Compiling ENDRES '
+make
+cd ../pltlst
+if [ ! "$ftn" = "g77" ]; then
+   sed s/"=  g77"/"=  $ftn"/ Makefile >Makefile1
+   mv Makefile1 Makefile
+fi
+echo 'Compiling PLTLST '
+make
+cd ../recent
+if [ ! "$ftn" = "g77" ]; then
+   sed s/"=  g77"/"=  $ftn"/ Makefile >Makefile1
+   mv Makefile1 Makefile
+fi
+echo 'Compiling RECENT '
+make
+cd ../sigma1
+if [ ! "$ftn" = "g77" ]; then
+   sed s/"=  g77"/"=  $ftn"/ Makefile >Makefile1
+   mv Makefile1 Makefile
+fi
+echo 'Compiling SIGMA1 '
+make
+cd ../c4zvd
+echo 'Compiling ZVView '
+make -f c4dat.mak
+make -f datzvdl.mak
+make -f endzvd.mak
+make -f curzvd3l.mak
+make -f pntdatl.mak
+cd ../../EXFOR
+if [ ! "$ftn" = "g77" ]; then
+   sed s/"=  g77"/"=  $ftn"/ Makefile >Makefile1
+   mv Makefile1 Makefile
+fi
+echo 'Compiling EXFOR '
+make
+cd ../
+#Installing Tcl/Tk packages
+echo ' '
+echo 'We will need Tcl/Tk and itcl packages to run EMPIRE GUI. '
+echo 'Although your system might have these packages installed  '
+echo 'it often happens that they are not compatible with EMPIRE. '
+echo 'To be on a safe side I would install ActiveTcl package that '
+echo 'runs on most Linuxes.'
+echo 'I strongly recommend to install this package. It will be '
+echo 'installed locally in the empire directory and will not mess up '
+echo 'with your native Tcl/Tk installation. To make it active you will'
+echo 'have to add a line to your shell initialization file as indicated '
+echo 'by the ActivTcl installation script. To return to your native Tcl '
+echo 'it is enough to remove this line, then logoff and login.'
+echo 'If you decide to instal ActivTcl say yes bellow and follow the'
+echo 'instructions (you may choose '$instdir' as an installation directory) '
+echo 'DO NOT FORGET TO ADD THE LINE AS ADVISED, THEN LOGOFF AND LOGIN! '
+echo 'Do you want to install ActiveTcl package y/n [y]:'
+read yesno
+if [ ! "$yesno" = "" ]; then
+        activetcl=$yesno
+        else
+        activetcl=y
+fi
+echo ' '
+if [ "$activetcl" = "y" ]; then
+  if [ -f $sourcedir/ActiveTcl8.4.7.0-linux-ix86-108887.tar.gz ]; then
+     echo 'exploding ActiveTcl'
+#    gunzip $sourcedir/ActiveTcl8.4.7.0-linux-ix86-108887.tar.gz
+#    tar xzf $sourcedir/ActiveTcl8.4.7.0-linux-ix86-108887.tar
+     tar xvzf $sourcedir/ActiveTcl8.4.7.0-linux-ix86-108887.tar.gz
+     cd ActiveTcl8.4.7.0-linux-ix86
+     sh install.sh
+     cd ../
+     echo 'DO NOT FORGET TO ADD THE LINE AS ADVISED, THEN LOGOFF AND LOGIN! '
+  else
+     echo 'ActiveTcl installation failed, '
+     echo '$sourcedir/ActiveTcl8.4.7.0-linux-ix86-108887.tar.gz file not found'
+  fi   
+fi   
+
+echo ' '
+echo 'If you are lucky EMPIRE-II is successfully installed! '
+echo 'If there were errors during installation of the TCL/Tk packages'
+echo 'you will have to pick up CD-ROM(s) with your system and install'
+echo 'Tcl, Tk, and itcl packages to be able to use GUIs'
+echo 'If all went fine you should logout, login, change to the '
+echo $instdir'/empire/work directory and type:'
+echo 'Xrun.tcl &'
+echo 'to start EMPIRE GUI.'
+echo 'If this does not work you may try the old interface (lrun.tcl &)'
+echo 'Good luck!'
+exit
+

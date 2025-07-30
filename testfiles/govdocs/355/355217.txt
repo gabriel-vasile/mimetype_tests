@@ -1,0 +1,323 @@
+
+Defining and Maintaining Attribute Sets for Use with the Z39.50 Protocol: A
+Discussion Paper
+
+Clifford Lynch
+
+January 31, 1996; revised February 1, 1996
+
+Introduction
+
+The proliferation of attribute sets for use with the Z39.50 protocol raises
+formidable interoperability and maintenance problems.  This document reviews
+the history of attribute sets as a construct within the Z39.50 standard,
+identifies a number of the problems that have emerged, and offers various
+proposals and principles that might be used to address these problems. These
+are outlined for discussion at the Z39.50 implementors' group (ZIG) meeting
+in Gainesville, Florida in February 1996.  The outcome of those discussions
+will provide guidance for the development of a revised statement of
+principles and design approaches, and (hopefully) clarify the possible need
+for revisions and clarifications in future versions of the Z39.50 standard,
+as well as helping to identify, what, if any supplementary documents will
+need to be developed to provide guidance on attribute set design and
+maintenance.
+
+The Evolution of Attribute Sets in Z39.50
+
+Attribute sets define access points that are used in the construction of
+Z39.50 queries.  In the early days of Z39.50 version 2 there was essentially
+one attribute set in wide use; this was called BIB-1 and was oriented
+towards the searching of databases of bibliographic records (though it has
+also been used with some success in conjunction with other, related, types
+of records, such as abstracting and indexing database records, and full
+text).  It was assumed by the developers of the version 2 standard that as
+time went on additional attribute sets would be defined that met the needs
+of other communities dealing with non-bibliographic databases, such as
+databases of scientific or geo-spatial information.  The design of Z39.50
+version 2 was not informed by much experience with the development, use and
+maintenance of additional attribute sets, and numerous problems became
+evident as new attribute sets emerged.  Among the most serious of these
+problems:
+
+1. Duplication.  In Z39.50 Version 2 a query is constructed using a single
+attribute set.  Thus, it is necessary to duplicate common attributes needed
+in a range of applications with unique attribute set requirements (such as
+the relational attribute of equality) in each specialized attribute set,
+since one attribute set could not explicitly "extend" or be used as a
+supplement to another as a protocol construct.  One attribute set could not
+be viewed as extending another because the protocol did not address
+interrelationships among attribute sets; one attribute set could not
+supplement another because of the limitation of the type 1 query, since
+attributes had to be drawn from a single attribute set for a given query.
+
+In practice, the ability of one attribute set to extend another was achieved
+by mapping the tag space of a base attribute set (normally BIB-1) directly
+into the tag space of another attribute set (as was done with STAS, the
+scientific and technical attribute set, for example); servers handled the
+semantic mappings by more or less ignoring the attribute set ID and assuming
+that if an attribute had the same tag (or perhaps the same tag modulo some
+offset) in two attribute sets it had the same semantics.  This approach was
+undesirable for a number of reasons.  Ongoing management of the tag space
+for the various attribute sets without duplication was a problem. The
+structure (classes of attributes) of the base set were imposed on the
+extending attribute set -- or perhaps more accurately, should have been
+imposed, since the meaning of a given class of attributes from one attribute
+set translated into the context of a different attribute class structure in
+an extending set were typically not explicitly defined.
+
+Definitions of semantics for attributes in the extended attribute set were
+also compromised because the rules for inheritance of semantics were only
+implied, not explicit, and two independent groups (the maintainers of the
+base and the extended attribute sets) could both alter the meaning of
+attributes independently and asynchronously: as a case in point, if the
+meaning of a BIB-1 attribute changed or was clarified, would this
+automatically propagate into all attribute sets that embedded BIB-1?
+
+As multiple attribute sets developed, the notions of base and extended
+attribute sets became more problematic; one might want to use the logical
+union of more than multiple attribute sets, including several which extended
+a common base set (perhaps with different embeddings of the base set into
+the extended attribute set tag spaces).  Attribute sets moved away from a
+simple hierarchy of a base set and an extended set on a base set to a series
+of non-orthogonal extensions to a common base set.  This led to a situation
+where it seemed as if it would be desirable for every attribute set to embed
+all (or at least many) other attribute sets, in effect returning the
+protocol to the use of a single global "flat" attribute set rather than a
+set of independently developed and maintained attribute sets, with all of
+the centralized maintenance problems that such a single (enormous) logical
+attribute set implies.
+
+2. Interoperability problems due to attribute set proliferation.  Even if an
+extended attribute set essentially embedded a well-known attribute set as a
+base attribute set, a Z39.50 client or server had no way of knowing this
+without out-of-band implementor agreements.  The net effect was to
+proliferate partially redundant attribute sets without any automatic way to
+permit clients and servers to recognize that they contained well-known,
+familiar subsets of attributes that were part of an embedded base set.
+
+3. Ambiguities in the semantics of attributes.  The standard is unclear
+about the assumptions that the server should make when attributes are
+repeated or omitted.  It is not even clear whether these semantics are
+specific to a given attribute set or whether they are more general
+properties of the type 1 query's semantics; put another way, it is not clear
+from the standard exactly what properties have to be specified in the
+definition of a new attribute set.  Version 2 (and to some extent version 3)
+also suffer from problems related to ambiguities in the datatyping,
+representation and normalization of values for attributes.
+
+4. Problems specific to the BIB-1 attribute set.  The semantics of BIB-1,
+and the proper behavior of a server that supports BIB-1, are still not
+defined in rigorous detail in current versions of the standard; indeed, they
+are not defined at all in the version 2 standard.  This led quickly to a
+series of glaring and sometimes appalling interoperability problems even
+among bibliographic clients and servers.  It remains ambiguous as to whether
+the semantics of BIB-1 are really part of the Z39.50 standard, or whether
+they are currently informal implementor agreements which might be
+appropriately codified in some separate formal standard in future.  In
+addition to the lack of good definition documents, BIB-1 suffered from the
+lack of a good scope statement (and hence gave rise to many debates about
+what attributes were appropriate to include or exclude for BIB-1).  BIB-1
+also suffered from a lack of consultation with the broad community concerned
+with bibliographic records, their interchange formats, and their retrieval;
+it was developed by the Z39.50 implementors' group, which has expertise in
+protocol development but much less comprehensive expertise in matters
+related to bibliographic records, interchange formats and retrieval.
+
+Version 3 of Z39.50 attempted to address some of these problems in light of
+growing experience with additional attribute sets.  A key change in version
+3 of the protocol is that a single query can contain attributes selected
+from multiple attribute sets; this avoids (or at least reduces) the need for
+one attribute set to embed another.  Z39.50 version 3 also includes the
+first attempt at defining an EXPLAIN facility for the interchange of certain
+Z39.50-related metadata; this could, at least in theory, be used to convey
+information about the relationships among multiple attribute sets, which had
+to be established "out of band" (that is, outside the scope of protocol
+mechanisms) in version 2.
+
+There are still major problems with attribute sets in Version 3. BIB-1,
+while included in the Z39.50 version 3 specification, is still not as well
+defined as it should be, as discussed above.  The introduction of the
+additional flexibility to intermix attributes from multiple attribute sets
+in version 3 actually introduced substantial new ambiguities into the
+standard. There is no useful guidance about the semantics of commingling
+attributes from multiple attribute sets in a single Z39.50 query; this
+problem is particularly serious when the attribute sets being intermixed are
+not "conformant" (i.e. the classes of attributes are not the same from one
+attribute set to another, as opposed to simply multiple attribute sets with
+identical attribute classes but, for example, different use attributes).
+Duplicated and omitted attribute semantics remain murky; the question of
+whether these are attribute-set specific, specific to the combination of
+attributes used in a given query, or part of type 1 query semantics
+consistently have still not been well addressed, and has now become a more
+serious issue, since it is effectively impossible for the developer of a
+single attribute set to define interactions between attributes in that set
+and attributes in other sets in a comprehensive fashion.  Finally, it is
+unclear whether the attribute-value structure that is currently used in the
+type 1 query is sufficiently flexible to support the full range of
+requirements for z39.50 application environments; this question calls for
+critical re-examination in light of the work in areas such as advanced
+natural language and IR queries..
+
+While there is growing experience with attribute sets beyond BIB-1, it
+remains unclear whether future applications will call for a limited number
+of attribute sets or a massive proliferation of attribute sets.  There is
+one emerging school of thought that says that attribute sets should be tied
+to database data elements for various applications environments; within this
+viewpoint an attribute set (or at least a set of use attributes) becomes a
+natural dual to an SGML DTD, for example.  Means of specifying these
+relationships have not been examined, and in some sense go beyond the
+current scope of Z39.50 but may be critical to the development of future
+Z39.50 applications.
+
+All of these problems are making the version 3 capability to use of multiple
+attribute sets within a single query very difficult to exploit.  There is, I
+believe, a general sense within the Z39.50 implementor community that the
+current ad-hoc approach to attribute set definition and maintenance is
+rapidly approaching its limits and that some fundamental architectural
+modeling is needed to establish principles for the future development and
+management of attribute sets.
+
+Proposed Assumptions and Design Principles for Attribute Sets
+
+In addressing these attribute set problems, I propose the following
+principles and assumptions as a point of departure:
+
+1. Work on attribute set architecture should assume the capabilities of
+version 3. Backwards compatibility and interoperability with version 2 and
+its limitation of a single attribute set per query should not confine our
+thinking.  It will take a long time for new attribute sets to become widely
+established, particularly if they need to be defined (or redefined) and
+documented according to guidelines we set out; by the time this happens,
+version 3 implementations will be widely available.  It is likely that as we
+re-think attribute set definition, virtually all existing attribute sets
+(including, for example, STAS as well as BIB-1) will require revisions.
+There is likely to be a protracted and complex conversion that will require
+consideration of a number of limited-term interoperability and backwards
+compatibility issues, but backwards compatibility should not drive our
+architectural model.
+
+2. Other than special purpose attribute sets needed for the operation of the
+protocol (such as attribute sets used with EXPLAIN databases) it should not
+be the role of the Z39.50 implementors' group to define specific attribute
+sets; this should be done by groups with content expertise the areas in
+question, subject to broad architectural guidance from the ZIG about how to
+structure, register, manage and maintain an attribute set. The ZIG should
+not serve as a maintenance agency for attribute sets that do not play a
+structural role in the protocol.  Further, it is desirable to create a
+situation in which various groups can independently develop and maintain
+attribute sets, with only minimal coordination (such as the assignment of
+attribute set ID) by the overall Z39.50 maintenance agency.
+
+One consequence of this principle is that we should plan to phase out the
+BIB-1 attribute set and replace it with a new attribute set for
+bibliographic applications developed by the bibliographic community under
+non-ZIG (perhaps NISO) auspices, or at least to transition the management of
+the current BIB-1 attribute set.  My personal view is that BIB-1 is so
+profoundly compromised and so widely implemented that it would be easier to
+start the development of a new successor attribute set that is clearly
+different from BIB-1 (though much of the work and experience on BIB-1 would
+be important input to the development of such a successor attribute set).
+
+3. We should recognize that as intellectual constructs attribute sets may
+have value beyond the context of Z39.50, and that they may (but do not
+necessarily) have complex and close relationships to data element
+dictionaries, record interchange formats, document structure definitions,
+metadata interchange structures and other areas.  This would appropriately
+be the domain of the attribute set definition groups to establish, although
+general guidelines in this area that are established by the ZIG (perhaps
+working in conjunction with other groups) may be valuable.  Conversely,
+ongoing work in defining data or metadata element sets in other contexts
+many naturally give rise to Z39.50 attribute sets suitable for use in
+conjunction with collections of data or metadata for that applications
+domain; facilitating such reuse should be a goal in developing an attribute
+set architecture.
+
+4. We need to establish and very carefully document those properties of
+attribute sets and their semantics within type 1 queries that are properly
+part of the protocol as opposed to those that are within the scope of the
+attribute set itself as part of our guidance to attribute set developers.
+Within this effort we need to consider the issues that arise in intermixing
+of attributes from multiple sets within a query; the combinatorial explosion
+suggests to me that rules for intermixing attributes from multiple attribute
+sets, and perhaps for the semantics of duplicate and omitted attributes need
+to be part of the type 1 query definition.  In cases where we don't know
+what to specify, we should be clear about what is undefined and recommend
+server actions that promote interoperability and predictable, comprehensible
+behavior across servers.
+
+As a complement to this effort, we should also specify explicitly what needs
+to be defined as part of an attribute set definition.
+
+5. We should consider carefully whether the notion of an attribute set class
+is a useful one. An attribute set class is a template for attribute sets
+where each attribute set in the class has the same attribute set types and
+these types have common general semantics, although the specific attribute
+values will vary from one set to the next within the class, and attribute
+value semantics would be defined as part of the individual attribute set
+definitions.  Within a class, we should be able to define meaningful
+inheritance rules and relationships among attribute sets, and also rules for
+determining the semantics of attributes from multiple sets within a single
+query. I believe that this will be very difficult to extend from one class
+of attribute sets to the next (although concepts of subclasses may be of
+some use here as well).  It seems to me that we should consider the
+experience with STAS, for example, in developing our thinking on attribute
+set classes, and not automatically assume that BIB-1 is the correct template
+for defining a primary or default attribute set class.
+
+6. We should also consider whether there are some specific attribute types
+(in particular use attributes, relational attributes, and perhaps
+normalization attributes) which might be architectural primitives that
+transcend specific attribute set classes and which might deserve definition
+and discussion within the standard itself.  We can partition the world of
+attributes both by attribute type and by source attribute set.
+
+7. As attribute set classes (and perhaps distinguished common attribute
+types) are established, one role of registry of a new attribute set (and
+thus of the overall Z39.50 maintenance agency) may be to identify it as
+member of an attribute set class, or to recognize that it is using
+distinguished common attribute types.  Registry may also involve the
+definition of inheritance or mapping relationships, and this may have
+implications for the role of the maintenance agency for the standard (and/or
+for the attribute set in question).
+
+8. We need to consider whether we want to develop an attribute set class or
+classes that make an explicit linkage between data elements in records and
+attributes in attribute sets; this is a potentially-commonplace application
+scenario.  It may be appropriate to add support elsewhere within Z39.50,
+such as within the EXPLAIN database, to facilitate use of such attribute
+sets.
+
+9. We need to consider whether the type 1 query, in conjunction with
+appropriate attribute sets (or attribute set classes) has sufficient
+semantic and syntactic flexibility to represent queries that involve
+extensible abstract datatype systems and extensible query operator systems
+(such as Postquel or SQL3).  An inability to support the mapping of such
+queries (within the broad constraints that limit Z39.50 to retrieval
+operations) should be regarded as a warning indicator about limitations of
+the Z39.50 protocol to support the next generation of applications.  It
+should be recognized that this type of extensible query language does raise
+some serious questions about semantic interoperability (since a client needs
+to know the semantics of the ADTs and operators for a given target database)
+which Z39.50 has tried to circumvent through the use of well-known attribute
+sets (the solution to this in the post-relational database world is
+standardized class libraries); while Z39.50 queries that are mappings from
+such post-relational query languages are going to have some interoperability
+limitations. the ability to perform the mapping does serve as a good
+benchmark for flexibility in our query definitions and attribute set
+architecture.
+
+10. A clear definition of attribute set semantics (or attribute set class
+semantics) affords us an opportunity to make explicit the distribution of
+function between clients and servers in areas such as the normalization of
+values that accompany USE attributes.  There are no "right" answers here,
+but one of the problems with the standard as it exists today is that it does
+not permit a client to be clear about the functions that it is taking
+responsibility for and those that it is delegating to the server within the
+processing of a Z39.50 query.  We should use this opportunity to enrich and
+clarify the protocol functions that allow the identification of situations
+when responsibility for activities such as value normalization are being
+delegated to the server by the client; this should result in more
+predictable behavior as clients and servers interact, and improved
+interoperability as perceived by users of Z39.50 implementations.
+
+

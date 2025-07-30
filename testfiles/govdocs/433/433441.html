@@ -1,0 +1,1536 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+<head>
+<META name="ROBOTS" content="NOFOLLOW">
+<meta name="description" content="Puma2: a system for high-throughput analysis of genomes and metabolic reconstruction with a grid computational backend">
+<title>
+PUMA2: 1.1.1.62
+</title>
+
+<link rel="stylesheet" type="text/css" href="http://compbio.mcs.anl.gov/puma2/CSS/default.css">
+<link rel="stylesheet" type="text/css" href="http://compbio.mcs.anl.gov/puma2/CSS/myfreetemplates.css">
+
+<script type="text/javascript" language="JavaScript" src="http://compbio.mcs.anl.gov/puma2/javascript/scripts.js"></script>
+
+<script type="text/javascript" language="JavaScript" src="http://compbio.mcs.anl.gov/puma2/javascript/overlib_mini.js"><!-- overLIB (c) Erik Bosrup --></script> 
+
+<script type="text/javascript" language="JavaScript">
+<!-- Hide script from incompatible browsers! -->
+function openPhyloWindow() {
+    child = window.open("http://compbio.mcs.anl.gov/ulrich/phyloblock/indexEKB.html",
+                        "PhyloWindow", "width=550,height=580" + ",statusbar=yes" +
+                        ",toolbar=yes,resizable=yes,scrollbars=yes,menubar=yes")
+}
+
+function updatePhyloWindow( nref ) {
+    if (self.child.document.Form1.data.value.match(nref))
+        self.child.document.Form1.data.value = 
+            self.child.document.Form1.data.value.replace(nref+' ', '')
+    else
+        self.child.document.Form1.data.value += nref + ' ';
+}
+
+function clearPhyloWindow() {
+    self.child.document.Form1.data.value = '';
+}
+//   Hide script from incompatible browsers! -->
+</script>
+
+<script type="text/javascript" language="JavaScript" src="http://compbio.mcs.anl.gov/puma2/javascript/myfreetemplates.js"></script>
+
+</head>
+
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="MM_preloadImages()">
+<script type="text/javascript" language="JavaScript">
+
+	vqm__notice='Visual QuickMenu Pro, (c) 2004 OpenCube Inc., All Rights Reserved, Visit - www.opencube.com';
+
+	vqm__codebase='http://compbio.mcs.anl.gov/puma2/navbar/code/';
+	vqm__database='http://compbio.mcs.anl.gov/puma2/navbar/images/';
+
+</script>
+<script type="text/javascript" language="JavaScript1.2" src="http://compbio.mcs.anl.gov/puma2/navbar/code/puma2-hnavbar.js"></script>
+<script type="text/javascript" language="JavaScript1.2" src="http://compbio.mcs.anl.gov/puma2/navbar/code/tdqm_loader.js"></script>
+
+<table cellspacing=0 cellpadding=0 width="100%" border=0>
+<tbody>
+  <tr>
+    <td width=247 rowspan=2 bgcolor="#dbe9f4">
+      <a href="http://compbio.mcs.anl.gov/"><img border=0 height=87 width=247 src="http://compbio.mcs.anl.gov/puma2/images/toplogo2.jpg" alt="topbar"></a>
+    </td>
+    <td width=34 rowspan=2 bgcolor="92bed7">
+      <img height=87 width=34 src="http://compbio.mcs.anl.gov/puma2/images/topmidspace.jpg" alt="topbar">
+    </td>
+    <td height=54 background="http://compbio.mcs.anl.gov/puma2/images/topbg.jpg">
+      <font size=3 color="#2172A1" face="Verdana, Arial, Helvetica"><b>
+        PUMA2 -- Evolutionary Analysis of Metabolism
+      </b></font>
+    </td>
+    <td height=54 background="http://compbio.mcs.anl.gov/puma2/images/topbg.jpg">
+<form method="get" action="http://compbio.mcs.anl.gov/puma2/cgi-bin/login.cgi" enctype="application/x-www-form-urlencoded" style="padding:0;border:0;margin:0">
+<input type="hidden" name="ec" value="1.1.1.62" />
+<input type="hidden" name="cgi_script" value="enzyme.cgi" />
+<input type="submit"  value="Login" style="background:#92bed7 none; color:#000000; width:5em;" />
+<div></div></form>
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2 height=33 background="http://compbio.mcs.anl.gov/puma2/images/topnavbg.jpg"><script type="text/javascript" language="JavaScript1.2">generate_mainitems();</script></td>
+  </tr>
+</tbody>
+</table>
+<div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"></div>
+<table border="0" width="100%" cellpadding="0" cellspacing="5">
+  <tr>
+    <td align="center" valign="middle">
+      <font color="#CC0000">PUMA2 is not being maintained or updated by Argonne National Laboratory and will be taken down in the near future.<br>
+If there is any data here that you wish to preserve, you are responsible for downloading it.<br>
+An overview of the bioinformatics research being conducted at the Mathematics and Computer Science Division is available at <a href="http://www.mcs.anl.gov/research/group_detail.php?id=6"><font color="#0000CC">this page</font></a>.</font>
+    </td>
+  </tr>
+</table>
+<table border="0" cellspacing="0" cellpadding="3" width="100%">
+<tr>
+<td class="bgHead" align="left" valign="middle">
+&nbsp;<b>EC-number:</b>&nbsp;
+<b><a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/enzyme.cgi?ec=1.1.1.62" target="puma2_org"><span id="exclaimHead"><b><font color="black"><u>1.1.1.62</font></u></b></span></a>  -----   estradiol 17beta-dehydrogenase</b>
+</td>
+</tr>
+</table>
+       
+<table border=0 cellspacing=0 cellpadding=2 width="100%" bgcolor="#DBE9F4">
+<tr> 
+<td class="bgItemLabel" width=100>
+EC-NUMBER
+</td>
+<td width="20%">
+1.1.1.62
+</td>
+</tr>
+<tr>
+<td class="bgItemLabel" width=100>
+ENZYME-NAME
+</td>
+<td width="20%">
+estradiol 17beta-dehydrogenase
+</td>
+</tr>
+<tr>
+<td class="bgItemLabel" width=100>
+ENZYME-SYSNAME
+</td>
+<td width="20%">
+Also acts on (S)-20-hydroxypregn-4-en-3-one and related compounds, oxidizing the (S)-20-group. B-specific with respect to NAD(P)+ (cf. EC 1.1.1.149 20alpha-hydroxysteroid dehydrogenase).
+</td>
+</tr>
+<tr>
+<td class="bgItemLabel" width=100>
+ENZYME-CLASS
+</td>
+<td width="20%">
+Oxidoreductases            Acting on the CH-OH group of donors            With NAD+ or NADP+ as acceptor
+</td>
+</tr>
+<tr>
+<td class="bgItemLabel" width=100>
+SYNONYMS
+</td>
+<td width="50%">
+17beta,20alpha-hydroxysteroid dehydrogenase;;
+17beta-HSD;
+17beta-estradiol dehydrogenase;;
+20alpha-hydroxysteroid dehydrogenase;;
+
+&nbsp;&nbsp;<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/synonym_list.cgi?ec=1.1.1.62&user=&key=&header=puma2" onclick="window.open('http://compbio.mcs.anl.gov/puma2/cgi-bin/synonym_list.cgi?ec=1.1.1.62&user=&key=&header=puma2','Windowname','width=700,top=200,left=425,resizable=0,scrollbars,height=550,location=yes');return false;"><font color="blue"><u><b>>>more synonyms</u></b></font></a>
+
+<tr>
+<td class="bgItemLabel" width=100>
+REACTION
+</td>
+<td width="20%">
+ estradiol-17beta + NAD(P)+ = estrone + NAD(P)H + H+ [RN:R02352 R02353]
+</td>
+</tr>
+<tr>
+<td class="bgItemLabel" width=100>
+PATHWAY
+</td>
+<td width="80%">
+<b>EMP-PATHWAYS:</b>
+NO EMP PATHWAY FOUND
+<tr>
+<td class="bgItemLabel" width=100>
+</td>
+<td width="80%">
+<b>KEGG-PATHWAYS:</b>
+ Androgen and estrogen metabolism;
+
+&nbsp;&nbsp;<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/kegg_pathway_list.cgi?ec=1.1.1.62&user=&key=&header=puma2" onclick="window.open('http://compbio.mcs.anl.gov/puma2/cgi-bin/kegg_pathway_list.cgi?ec=1.1.1.62&user=&key=&header=puma2','Windowname','width=750,top=200,left=425,resizable=0,scrollbars,height=600,location=yes');return false;"><font color="blue"><u><b>>>more KEGG pathways</u></b></font></a>
+
+</tr>
+<tr> 
+<td class="bgItemLabel" width=100>
+GO_TERM
+</td>
+<td width="20%">
+GO:<a href="http://www.godatabase.org/cgi-bin/amigo/go.cgi?view=details&search_constraint=terms&depth=0&query=GO:0004303" target="ncbi"><span id="exclaimHead"><b><font color=blue><u>0004303</u></font></b></span></a>:estradiol 17-beta-dehydrogenase activity  
+</td>
+</tr>
+<tr>
+<td class="bgItemLabel" width=100>
+ENZYME-COMMENT
+</td>
+<td width="20%">
+estradiol-17beta:NAD(P)+ 17-oxidoreductase
+</td>
+</tr>
+<tr>
+<td colspan="3">
+<img src="http://compbio.mcs.anl.gov/puma2/images/trans.gif" alt="spacer">
+</td>
+</tr>
+</TR>
+</TABLE>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
+<tr>
+<td valign=top width="10%">
+<table border="0" cellspacing="0" cellpadding="1" bgcolor="#2172A1">
+<tr>
+<td class="bgDiv" align="center">
+<table border="0" cellspacing="0" cellpadding="3">
+<tr>
+<td class="bgDiv" align="center">
+<b>ExternalDB   -----  DBLINKS</b>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td class="bgDiv" align="left">
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%" bgcolor="#ddeeff">
+<tr>
+<td>
+<form method="post" action="http://us.expasy.org/cgi-bin/get-enzyme-entry?1.1.1.62" enctype="application/x-www-form-urlencoded" style="padding:0;border:0;margin:0">
+<input type="submit" name="swiss_prot" value="ENZYME" style="background:#DBE9F4 none; color:#000000; width:12em" />
+<div></div></form>
+</td>
+</tr>
+
+<tr>
+<td>
+<form method="post" action="http://www.brenda.uni-koeln.de/php/result_flat.php4?ecno=1.1.1.62" enctype="application/x-www-form-urlencoded" style="padding:0;border:0;margin:0">
+<input type="submit" name="brenda" value="BRENDA" style="background:#DBE9F4 none; color:#000000; width:12em" />
+<div></div></form>
+</td>
+</tr>
+
+<tr>
+<td>
+<form method="get" action="http://www.chem.qmul.ac.uk/iubmb/enzyme/EC1/1/1/62.html" enctype="application/x-www-form-urlencoded" style="padding:0;border:0;margin:0">
+<input type="submit" name="iubmb" value="IUBMB" style="background:#DBE9F4 none; color:#000000; width:12em" />
+<div></div></form>
+</td>
+</tr>
+
+<tr>
+<td>
+<form method="post" action="http://www.genome.jp/dbget-bin/www_bget?ec:1.1.1.62" enctype="application/x-www-form-urlencoded" style="padding:0;border:0;margin:0">
+<input type="submit" name="kegg" value="KEGG" style="background:#DBE9F4 none; color:#000000; width:12em" />
+<div></div></form>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+
+<tr>
+<td class="bgDiv" align="center">
+<table border="0" cellspacing="0" cellpadding="3">
+<tr>
+<td class="bgDiv" align="center">
+<b>Diseases</b>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td class="bgDiv" align="left">
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%" bgcolor="#ddeeff">
+<tr>
+<td>
+<form method="post" action="http://compbio.mcs.anl.gov/puma2/cgi-bin/get_enzyme_data.cgi" enctype="application/x-www-form-urlencoded" ="" target="CGI=HASH(0x814ccd4)" style="padding:0;border:0;margin:0" #dbe9f4="#000000" 1.1.1.62="12">
+<input type="hidden" name="ec" value="1.1.1.62" />
+<input type="hidden" name="user" value="" />
+<input type="hidden" name="key" value="" />
+<input type="hidden" name="header" value="" />
+<input type="hidden" name="flag" value="disease" />
+<input type="submit" name="omim" value="OMIM" style="background:#DBE9F4 none; color:#000000; width:12em" />
+<div></div></form>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+
+<tr>
+<td class="bgDiv" align="center">
+<table border="0" cellspacing="0" cellpadding="3">
+<tr>
+<td class="bgDiv" align="center">
+<b>Structure</b>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td class="bgDiv" align="left">
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%" bgcolor="#ddeeff">
+<tr>
+<td>
+<form method="post" action="http://compbio.mcs.anl.gov/puma2/cgi-bin/get_enzyme_data.cgi" enctype="application/x-www-form-urlencoded" ="" target="CGI=HASH(0x814ccd4)" style="padding:0;border:0;margin:0" #dbe9f4="#000000" 1.1.1.62="12">
+<input type="hidden" name="ec" value="1.1.1.62" />
+<input type="hidden" name="user" value="" />
+<input type="hidden" name="key" value="" />
+<input type="hidden" name="header" value="" />
+<input type="hidden" name="flag" value="pdb" />
+<input type="submit" name="swiss_prot" value="PDB" style="background:#DBE9F4 none; color:#000000; width:12em" />
+<div></div></form>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+
+<tr>
+<td class="bgDiv" align="center">
+<table border="0" cellspacing="0" cellpadding="3">
+<tr>
+<td class="bgDiv" align="center">
+<b>Gene</b>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td class="bgDiv" align="left">
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%" bgcolor="#ddeeff">
+<tr>
+<td>
+<form method="post" action="http://compbio.mcs.anl.gov/puma2/cgi-bin/get_enzyme_data.cgi" enctype="application/x-www-form-urlencoded" ="" target="CGI=HASH(0x814ccd4)" style="padding:0;border:0;margin:0" #dbe9f4="#000000" 1.1.1.62="12">
+<input type="hidden" name="ec" value="1.1.1.62" />
+<input type="hidden" name="user" value="" />
+<input type="hidden" name="key" value="" />
+<input type="hidden" name="header" value="" />
+<input type="hidden" name="flag" value="puma2ana" />
+<input type="submit" name="cds" value="PUMA2" style="background:#DBE9F4 none; color:#000000; width:12em" />
+<div></div></form>
+</td>
+</tr>
+
+<tr>
+<td>
+<form method="post" action="http://compbio.mcs.anl.gov/puma2/cgi-bin/get_enzyme_data.cgi" enctype="application/x-www-form-urlencoded" ="" target="CGI=HASH(0x814ccd4)" style="padding:0;border:0;margin:0" #dbe9f4="#000000" 1.1.1.62="12">
+<input type="hidden" name="ec" value="1.1.1.62" />
+<input type="hidden" name="user" value="" />
+<input type="hidden" name="key" value="" />
+<input type="hidden" name="header" value="" />
+<input type="hidden" name="flag" value="kegg_gene" />
+<input type="submit" name="kegg_gene" value="KEGG" style="background:#DBE9F4 none; color:#000000; width:12em" />
+<div></div></form>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+
+<tr>
+<td class="bgDiv" align="center">
+<table border="0" cellspacing="0" cellpadding="3">
+<tr>
+<td class="bgDiv" align="center">
+<b>Motif</b>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td class="bgDiv" align="left">
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%" bgcolor="#ddeeff">
+<tr>
+<td>
+<form method="get" action="http://www.ebi.ac.uk/interpro/ISearch?query=1.1.1.62&mode=all" enctype="application/x-www-form-urlencoded" target="CGI=HASH(0x814ccd4)" style="padding:0;border:0;margin:0" #dbe9f4="#000000" 1.1.1.62="12">
+<input type="submit" name="interpro" value="INTERPRO" style="background:#DBE9F4 none; color:#000000; width:12em" />
+<div></div></form>
+<form method="post" action="http://compbio.mcs.anl.gov/puma2/cgi-bin/get_enzyme_data.cgi" enctype="application/x-www-form-urlencoded" ="" target="CGI=HASH(0x814ccd4)" style="padding:0;border:0;margin:0" #dbe9f4="#000000" 1.1.1.62="12">
+<input type="hidden" name="ec" value="1.1.1.62" />
+<input type="hidden" name="user" value="" />
+<input type="hidden" name="key" value="" />
+<input type="hidden" name="header" value="" />
+<input type="hidden" name="flag" value="prosite" />
+<input type="submit" name="interpro" value="PROSITE" style="background:#DBE9F4 none; color:#000000; width:12em" />
+<div></div></form>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+
+<tr>
+<td class="bgDiv" align="center">
+<table border="0" cellspacing="0" cellpadding="3">
+<tr>
+<td class="bgDiv" align="center">
+<b>Ortholog</b>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td class="bgDiv" align="left">
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%" bgcolor="#ddeeff">
+<tr>
+<td>
+<form method="post" action="http://compbio.mcs.anl.gov/puma2/cgi-bin/get_enzyme_data.cgi" enctype="application/x-www-form-urlencoded" ="" target="CGI=HASH(0x814ccd4)" style="padding:0;border:0;margin:0" #dbe9f4="#000000" 1.1.1.62="12">
+<input type="hidden" name="ec" value="1.1.1.62" />
+<input type="hidden" name="user" value="" />
+<input type="hidden" name="key" value="" />
+<input type="hidden" name="header" value="" />
+<input type="hidden" name="flag" value="kegg_ko" />
+<input type="submit" name="kegg-ko" value="KEGG-KO" style="background:#DBE9F4 none; color:#000000; width:12em" />
+<div></div></form>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+
+<tr>
+<td class="bgDiv" align="center">
+<table border="0" cellspacing="0" cellpadding="3">
+<tr>
+<td class="bgDiv" align="center">
+<b>Literature</b>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td class="bgDiv" align="left">
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%" bgcolor="#ddeeff">
+<tr>
+<td>
+<form method="post" action="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Search&db=PubMed&term=1.1.1.62" enctype="application/x-www-form-urlencoded" target="CGI=HASH(0x814ccd4)" style="padding:0;border:0;margin:0" #dbe9f4="#000000" 1.1.1.62="12">
+<input type="submit" name="pubmed" value="PubMed" style="background:#DBE9F4 none; color:#000000; width:12em" />
+<div></div></form>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+
+<tr>
+<td class="bgDiv" align="center">
+<table border="0" cellspacing="0" cellpadding="3">
+<tr>
+<td class="bgDiv" align="center">
+<b>Other</b>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td class="bgDiv" align="left">
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%" bgcolor="#ddeeff">
+<tr>
+<td>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>
+</td>
+<td valign="top">
+
+<!--  InterPro  -->
+<form name="interpro" method="GET" enctype="multipart/form-data" action="http://compbio.mcs.anl.gov/puma2/cgi-bin/enzyme.cgi">
+
+<input type="hidden" name="header" value="puma2">
+
+<input type="hidden" name="ec" value="1.1.1.62">
+<table cols="2" border="0" cellspacing="1" cellpadding="0" width="100%" bgcolor="white">
+<tr valign="top">
+<td colspan="3" align="center" bgcolor="#2172A1">
+<b><font color="white">InterPro Domains found in sequences annotated as EC 1.1.1.62</font></b>
+</td>
+</tr>
+<tr>
+<td>
+<input type="checkbox" name="interpro_color" value="IPR000276" >&nbsp;&nbsp;
+</td>
+<td width="90" valign="top">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR000276" class="off" onMouseOver="this.className='over';" onMouseOut="this.className='off';">IPR000276</a>
+</td>
+<td>
+Rhodopsin-like GPCR superfamily<br>
+</td>
+</tr>
+<tr>
+<td>
+<input type="checkbox" name="interpro_color" value="IPR001395" >&nbsp;&nbsp;
+</td>
+<td width="90" valign="top">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR001395" class="off" onMouseOver="this.className='over';" onMouseOut="this.className='off';">IPR001395</a>
+</td>
+<td>
+Aldo/keto reductase<br>
+</td>
+</tr>
+<tr>
+<td>
+<input type="checkbox" name="interpro_color" value="IPR002086" >&nbsp;&nbsp;
+</td>
+<td width="90" valign="top">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002086" class="off" onMouseOver="this.className='over';" onMouseOut="this.className='off';">IPR002086</a>
+</td>
+<td>
+Aldehyde dehydrogenase<br>
+</td>
+</tr>
+<tr>
+<td>
+<input type="checkbox" name="interpro_color" value="IPR002198" >&nbsp;&nbsp;
+</td>
+<td width="90" valign="top">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198" class="off" onMouseOver="this.className='over';" onMouseOut="this.className='off';">IPR002198</a>
+</td>
+<td>
+Short-chain dehydrogenase/reductase SDR<br>
+</td>
+</tr>
+<tr>
+<td>
+<input type="checkbox" name="interpro_color" value="IPR002347" >&nbsp;&nbsp;
+</td>
+<td width="90" valign="top">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347" class="off" onMouseOver="this.className='over';" onMouseOut="this.className='off';">IPR002347</a>
+</td>
+<td>
+Glucose/ribitol dehydrogenase<br>
+</td>
+</tr>
+<tr>
+<td>
+<input type="checkbox" name="interpro_color" value="IPR002539" >&nbsp;&nbsp;
+</td>
+<td width="90" valign="top">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002539" class="off" onMouseOver="this.className='over';" onMouseOut="this.className='off';">IPR002539</a>
+</td>
+<td>
+MaoC-like dehydratase<br>
+</td>
+</tr>
+<tr>
+<td>
+<input type="checkbox" name="interpro_color" value="IPR003033" >&nbsp;&nbsp;
+</td>
+<td width="90" valign="top">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR003033" class="off" onMouseOver="this.className='over';" onMouseOut="this.className='off';">IPR003033</a>
+</td>
+<td>
+Sterol-binding<br>
+</td>
+</tr>
+<tr>
+<td>
+<input type="checkbox" name="interpro_color" value="IPR005097" >&nbsp;&nbsp;
+</td>
+<td width="90" valign="top">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR005097" class="off" onMouseOver="this.className='over';" onMouseOut="this.className='off';">IPR005097</a>
+</td>
+<td>
+Saccharopine dehydrogenase<br>
+</td>
+</tr>
+<tr>
+<td>
+<input type="checkbox" name="interpro_color" value="IPR006058" >&nbsp;&nbsp;
+</td>
+<td width="90" valign="top">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR006058" class="off" onMouseOver="this.className='over';" onMouseOut="this.className='off';">IPR006058</a>
+</td>
+<td>
+2Fe-2S ferredoxin, iron-sulfur binding site<br>
+</td>
+</tr>
+<tr>
+<td>
+<input type="checkbox" name="interpro_color" value="IPR011024" >&nbsp;&nbsp;
+</td>
+<td width="90" valign="top">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR011024" class="off" onMouseOver="this.className='over';" onMouseOut="this.className='off';">IPR011024</a>
+</td>
+<td>
+Gamma-crystallin related<br>
+</td>
+</tr>
+<tr>
+<td>
+<input type="checkbox" name="interpro_color" value="IPR011348" >&nbsp;&nbsp;
+</td>
+<td width="90" valign="top">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR011348" class="off" onMouseOver="this.className='over';" onMouseOut="this.className='off';">IPR011348</a>
+</td>
+<td>
+17beta-dehydrogenase<br>
+</td>
+</tr>
+<tr>
+<td>
+&nbsp;
+</td>
+<td colspan="2">
+<select name="interpro_color_rigor">
+<option value="loose" selected>color IDs with selected Interpro hits
+<option value="tight">color IDs with selected Interpro hits (AND NO OTHERS)
+</select>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="submit" value="Submit">
+</td>
+</tr>
+</table>
+</form>
+
+<!--  SuperFamily  -->
+<table cols="2" border="0" cellspacing="1" cellpadding="0" width="100%" bgcolor="white">
+<tr valign="top">
+<td colspan="2" align="center" bgcolor="#2172A1">
+<b><font color="white">PIR SuperFamilies containing EC 1.1.1.62</font></b>
+</td>
+</tr>
+<tr>
+<td width="90" valign="top">
+<a href="http://pir.georgetown.edu/cgi-bin/ipcSF?id=SF000092">SF000092</a>
+</td>
+<td>
+short-chain dehydrogenase
+</td>
+</tr>
+<tr>
+<td width="90" valign="top">
+<a href="http://pir.georgetown.edu/cgi-bin/ipcSF?id=SF000095">SF000095</a>
+</td>
+<td>
+estradiol 17beta-dehydrogenase 1
+</td>
+</tr>
+<tr>
+<td width="90" valign="top">
+<a href="http://pir.georgetown.edu/cgi-bin/ipcSF?id=SF000097">SF000097</a>
+</td>
+<td>
+Aldehyde reductase
+</td>
+</tr>
+<tr>
+<td width="90" valign="top">
+<a href="http://pir.georgetown.edu/cgi-bin/ipcSF?id=SF000126">SF000126</a>
+</td>
+<td>
+11beta-hydroxysteroid dehydrogenase
+</td>
+</tr>
+<tr>
+<td width="90" valign="top">
+<a href="http://pir.georgetown.edu/cgi-bin/ipcSF?id=SF006067">SF006067</a>
+</td>
+<td>
+retinol dehydrogenase
+</td>
+</tr>
+</table>
+
+<!-- Taxonomy  -->
+<form name="taxonomy" method="GET" enctype="multipart/form-data" action="http://compbio.mcs.anl.gov/puma2/cgi-bin/print_clust.cgi" target="_blank">
+
+<input type="hidden" name="header" value="puma2">
+
+<input type="hidden" name="tax_id" value="">
+<table cols=2 border=0 cellspacing=0 cellpadding=0 width="100%" bgcolor="white">
+<tr valign="top">
+<td colspan="2" align="center" bgcolor="#2172A1">
+<b><font color="white">Taxonomic breakdown of EC 1.1.1.62 sequences</font></b>
+</td>
+</tr>
+<tr>
+<td colspan=2>
+To perform phylogenetic analysis, first select some protein ids by clicking on their checkboxes, then click on one of the buttons below.
+</td>
+</tr>
+<tr>
+<td colspan=2>
+<input type="submit" name="submit" value="Display FASTA" style="background: #FFFFFF;font-family: Helvetica" /><input type="submit" name="submit" value="Create Alignment" style="background: #FFFFFF;font-family: Helvetica" /><input type="submit" name="submit" value="POAVIZ" style="background: #FFFFFF;font-family: Helvetica" /><input type="submit" name="submit" value="Chisel" style="background: #FFFFFF;font-family: Helvetica" /><input type="submit" name="submit" value="PhyloBlocks" style="background: #FFFFFF;font-family: Helvetica" />&nbsp;&nbsp;Additional gi numbers:&nbsp;<input type="text" name="add_gis"  size="50" maxlength="250" />
+&nbsp;<input type="reset" name=".reset" value="Reset" style="background: #FFFFFF; font-family: Helvetica" /></td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFEEFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=2">Bacteria</a>
+</td>
+<td>
+
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="100" valign="top" bgcolor="#FFEEFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=1117">Cyanobacteria</a>
+</td>
+<td>
+
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="130" valign="top" bgcolor="#FFEEFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id= "> </a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="150" valign="top" bgcolor="#FFEEFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=1172">Anabaena variabilis</a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="100" valign="top" bgcolor="#FFEEFF">
+<input type="checkbox" name="gi" value="75907234">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=75907234&header=puma2">75907234</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#FFEEFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#FFEEFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFEEFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#FFEEFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+</table></tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td width="100" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=1224">Proteobacteria</a>
+</td>
+<td>
+
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="130" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=28216">Betaproteobacteria</a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="150" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=269483">Burkholderia sp. 383</a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="100" valign="top" bgcolor="#FFFFFF">
+<input type="checkbox" name="gi" value="78061512">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=78061512&header=puma2">78061512</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#FFEEFF">
+<input type="checkbox" name="gi" value="78061994">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=78061994&header=puma2">78061994</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#FFFFFF">
+<input type="checkbox" name="gi" value="78062026">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=78062026&header=puma2">78062026</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#FFEEFF">
+<input type="checkbox" name="gi" value="78062027">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=78062027&header=puma2">78062027</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#FFFFFF">
+<input type="checkbox" name="gi" value="78062556">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=78062556&header=puma2">78062556</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#FFEEFF">
+<input type="checkbox" name="gi" value="78065345">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=78065345&header=puma2">78065345</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#FFFFFF">
+<input type="checkbox" name="gi" value="78067281">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=78067281&header=puma2">78067281</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+</table></tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=2759">Eukaryota</a>
+</td>
+<td>
+
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="100" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=7711">Chordata</a>
+</td>
+<td>
+
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="130" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=40674">Mammalia</a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="150" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=9483">Callithrix jacchus</a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="100" valign="top" bgcolor="#EEFFFF">
+<input type="checkbox" name="gi" value="9858765">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=9858765&header=puma2">9858765</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#EEFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#EEFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+</table></tr>
+</table>
+</td>
+</tr>
+<tr>
+<td width="150" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=9615">Canis familiaris</a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="100" valign="top" bgcolor="#FFFFFF">
+<input type="checkbox" name="gi" value="55956946">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=55956946&header=puma2">55956946</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#FFFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#FFFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+</table></tr>
+</table>
+</td>
+</tr>
+<tr>
+<td width="150" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=9606">Homo sapiens</a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="100" valign="top" bgcolor="#EEFFFF">
+<input type="checkbox" name="gi" value="4504501">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=4504501&header=puma2">4504501</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#EEFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#EEFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR011348">IPR011348</a>
+</td>
+<td bgcolor="#EEFFFF">
+17beta-dehydrogenase
+</td>
+</tr>
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#FFFFFF">
+<input type="checkbox" name="gi" value="4504503">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=4504503&header=puma2">4504503</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#FFFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#FFFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR006058">IPR006058</a>
+</td>
+<td bgcolor="#FFFFFF">
+2Fe-2S ferredoxin, iron-sulfur binding site
+</td>
+</tr>
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#EEFFFF">
+<input type="checkbox" name="gi" value="4504505">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=4504505&header=puma2">4504505</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#EEFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#EEFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002539">IPR002539</a>
+</td>
+<td bgcolor="#EEFFFF">
+MaoC-like dehydratase
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR003033">IPR003033</a>
+</td>
+<td bgcolor="#EEFFFF">
+Sterol-binding
+</td>
+</tr>
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#FFFFFF">
+<input type="checkbox" name="gi" value="7705421">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=7705421&header=puma2">7705421</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#FFFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#FFFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR005097">IPR005097</a>
+</td>
+<td bgcolor="#FFFFFF">
+Saccharopine dehydrogenase
+</td>
+</tr>
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#EEFFFF">
+<input type="checkbox" name="gi" value="46389820">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=46389820&header=puma2">46389820</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR001395">IPR001395</a>
+</td>
+<td bgcolor="#EEFFFF">
+Aldo/keto reductase
+</td>
+</tr>
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#FFFFFF">
+<input type="checkbox" name="gi" value="55661902">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=55661902&header=puma2">55661902</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002086">IPR002086</a>
+</td>
+<td bgcolor="#FFFFFF">
+Aldehyde dehydrogenase
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#FFFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#FFFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR011024">IPR011024</a>
+</td>
+<td bgcolor="#FFFFFF">
+Gamma-crystallin related
+</td>
+</tr>
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#EEFFFF">
+<input type="checkbox" name="gi" value="57209743">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=57209743&header=puma2">57209743</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#EEFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#EEFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+</table></tr>
+</table>
+</td>
+</tr>
+<tr>
+<td width="150" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=10090">Mus musculus</a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="100" valign="top" bgcolor="#FFFFFF">
+<input type="checkbox" name="gi" value="2198501">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=2198501&header=puma2">2198501</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#FFFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#FFFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#EEFFFF">
+<input type="checkbox" name="gi" value="6680285">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=6680285&header=puma2">6680285</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#EEFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#EEFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#FFFFFF">
+<input type="checkbox" name="gi" value="6754248">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=6754248&header=puma2">6754248</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR000276">IPR000276</a>
+</td>
+<td bgcolor="#FFFFFF">
+Rhodopsin-like GPCR superfamily
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#FFFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#FFFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR011348">IPR011348</a>
+</td>
+<td bgcolor="#FFFFFF">
+17beta-dehydrogenase
+</td>
+</tr>
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#EEFFFF">
+<input type="checkbox" name="gi" value="13487925">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=13487925&header=puma2">13487925</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR001395">IPR001395</a>
+</td>
+<td bgcolor="#EEFFFF">
+Aldo/keto reductase
+</td>
+</tr>
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#FFFFFF">
+<input type="checkbox" name="gi" value="26340924">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=26340924&header=puma2">26340924</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#FFFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#FFFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+</table></tr>
+</table>
+</td>
+</tr>
+<tr>
+<td width="150" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=9600">Pongo pygmaeus</a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="100" valign="top" bgcolor="#EEFFFF">
+<input type="checkbox" name="gi" value="55731234">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=55731234&header=puma2">55731234</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR001395">IPR001395</a>
+</td>
+<td bgcolor="#EEFFFF">
+Aldo/keto reductase
+</td>
+</tr>
+</table></tr>
+</table>
+</td>
+</tr>
+<tr>
+<td width="150" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=10116">Rattus norvegicus</a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="100" valign="top" bgcolor="#FFFFFF">
+<input type="checkbox" name="gi" value="8393576">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=8393576&header=puma2">8393576</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#FFFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#FFFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#EEFFFF">
+<input type="checkbox" name="gi" value="13242301">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=13242301&header=puma2">13242301</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#EEFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#EEFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#FFFFFF">
+<input type="checkbox" name="gi" value="16758926">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=16758926&header=puma2">16758926</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#FFFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#FFFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR011024">IPR011024</a>
+</td>
+<td bgcolor="#FFFFFF">
+Gamma-crystallin related
+</td>
+</tr>
+</table></tr>
+<tr>
+<td width="100" valign="top" bgcolor="#EEFFFF">
+<input type="checkbox" name="gi" value="55778294">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=55778294&header=puma2">55778294</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR000276">IPR000276</a>
+</td>
+<td bgcolor="#EEFFFF">
+Rhodopsin-like GPCR superfamily
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#EEFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#EEFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR011348">IPR011348</a>
+</td>
+<td bgcolor="#EEFFFF">
+17beta-dehydrogenase
+</td>
+</tr>
+</table></tr>
+</table>
+</td>
+</tr>
+<tr>
+<td width="150" valign="top" bgcolor="#EEFFFF">
+<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=9823">Sus scrofa</a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="100" valign="top" bgcolor="#FFFFFF">
+<input type="checkbox" name="gi" value="27518279">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/protein.cgi?id_type=NCBI_GI&id=27518279&header=puma2">27518279</font></a>
+</td>
+<td>
+<table cols=2 border=0 cellspacing=1 cellpadding=0 width="100%">
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002198">IPR002198</a>
+</td>
+<td bgcolor="#FFFFFF">
+Short-chain dehydrogenase/reductase SDR
+</td>
+</tr>
+<tr>
+<td width="85" valign="top" bgcolor="#FFFFFF">
+<a href="http://www.ebi.ac.uk/interpro/DisplayIproEntry?ac=IPR002347">IPR002347</a>
+</td>
+<td bgcolor="#FFFFFF">
+Glucose/ribitol dehydrogenase
+</td>
+</tr>
+</table></tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<input type="submit" name="submit" value="Display FASTA" style="background: #FFFFFF;font-family: Helvetica" /><input type="submit" name="submit" value="Create Alignment" style="background: #FFFFFF;font-family: Helvetica" /><input type="submit" name="submit" value="POAVIZ" style="background: #FFFFFF;font-family: Helvetica" /><input type="submit" name="submit" value="Chisel" style="background: #FFFFFF;font-family: Helvetica" /><input type="submit" name="submit" value="PhyloBlocks" style="background: #FFFFFF;font-family: Helvetica" />&nbsp;&nbsp;Additional gi numbers:&nbsp;<input type="text" name="add_gis"  size="50" maxlength="250" />
+&nbsp;<input type="reset" name=".reset" value="Reset" style="background: #FFFFFF; font-family: Helvetica" /></form>
+
+<p>
+To perform phylogenetic analysis:
+<ol>
+<li>Select some ids by clicking on their checkboxes.</li>
+<li>Click on one of the buttons above.</li>
+</ol>
+<!--  End : Taxonomy -->
+</table>
+<!--  End of Precomputed  -->
+</td>
+</table>
+<!--  End of the Main Body  -->
+</body></html></td>
+</TR>
+</table>
+<p>
+<table border="0" cellspacing="0" width="100%">
+<tr>
+<td class="footer" align="center">
+<a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/index.cgi">Front page</a>
+ | <a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/search.cgi">Protein Query</a>
+ | <a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/index.cgi?info=contact">Acknowledgements</a>
+ | <a href="http://compbio.mcs.anl.gov/puma2/cgi-bin/site_map.cgi">Site Map</a>
+<br>
+<a href="http://www.anl.gov/disclaimer.html">Disclaimer</a>
+ | <a href="http://www.anl.gov/notice.html">Security Notice</a>
+<p>
+Questions & Concerns: <a href="mailto:puma2@mcs.anl.gov">puma2@mcs.anl.gov</a>
+</td>
+</tr>
+</table>
+
+</body>
+</html>
+

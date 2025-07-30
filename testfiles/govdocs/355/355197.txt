@@ -1,0 +1,204 @@
+#!/usr/bin/perl
+
+# Script name : probe5pval.pl
+# This script is used for validating 5' sequence of rearrayed probes:
+# gathers info from processed new 5' sequencing fasta file
+# (to verify successful sequencing of rearrayed probes)
+# fetch original 5' sequences and
+# performs cross_match to compare new 5' seq against the original 5' seq and
+# gather info from cross_match output file
+# (to confirm that sequence matches to original EST)
+# and updates the rearray probe table in mysql database
+
+# To use this script, you should first set up a relational table 
+# to include rearray probe info to be validated
+# You should also have the original sequence data entered in another relational table
+# At command line type probe5pval.pl seq_file.fasta plate_number
+# Author name and contact : David Hummel at hummel@pw.usda.gov 
+
+use DBI;
+
+# usage
+unless ($ARGV[0] && $ARGV[1]) {
+	die "\nusage: $0 <5p_fasta_file> <albany_plate_block>\n\ni.e. $0 9509-12_5p.fasta 9509-9512\n\n";
+}
+
+# open db
+$dbh = DBI->connect("DBI:mysql:dbname", 'usrname', 'password');
+
+# globals
+($start_plate, $end_plate) = split (/-/, $ARGV[1]);
+$cm_args[0] = "/usr/local/phrap/cross_match";
+$cm_args[1] = $ARGV[0];
+$cm_args[2] = "$ARGV[0].5p_val_cmref";
+@cm_args[3..9] = ('-penalty','-5','-minmatch','50','-minscore','75','>');
+$cm_args[10] = "$ARGV[0].5p_val_cmout";
+
+# update 5p_seq in nsf.probes
+&update5pseq;
+
+# generate 5p cross_match reference file and perform cross_match
+&cm;
+
+# update 5p_val in nsf.probes
+&update5pval;
+
+# generate 5p_val fasta file (hand checking?)
+#&get5pvalfasta;
+
+# close db
+$dbh->disconnect;
+
+print ("All done!\n");
+
+######
+
+sub update5pseq {
+	print "validating 5' sequencing results...";
+	my ($albany_plate,@albany_plates,$well,$sql,$sth,$ErrNum,$ErrText);
+	# check for successful sequencing
+	open (FAS, $ARGV[0]) or die "couldn't open $ARGV[0]\n";
+	while (<FAS>) {
+		if (($albany_plate,$well) = (/>(\d+)_([A-H]\d\d)/)) {
+			if ($albany_plate != $albany_plates[-1]) { # new plate detected
+				push (@albany_plates,$albany_plate);
+				# reset 5p_seq to null for this plate
+				print "resetting probes.5p_seq to NULL for: $albany_plate\n";
+				$sql = "update probes set 5p_seq = NULL where albany_plate = $albany_plate";
+				$sth = $dbh->prepare($sql); $sth->execute; $ErrNum = $dbh->err; $ErrText = $dbh->errstr; $sth->finish;
+				if ($ErrNum) {
+					print "couldn't reset 5p_seq for: ${albany_plate}\n";
+				} else {
+					#print "reset 5p_seq for: ${albany_plate}\n";
+				}
+			}
+			$sql = "update probes set 5p_seq = 'y' where albany_plate = $albany_plate and well = '$well'";
+			$sth = $dbh->prepare($sql); $sth->execute; $ErrNum = $dbh->err; $ErrText = $dbh->errstr; $sth->finish;
+			if ($ErrNum) {
+				print "couldn't set 5p_seq = 'y' for: ${albany_plate}_$well\n";
+			} else {
+				#print "set 5p_seq = 'y' for: ${albany_plate}_$well\n";
+			}
+		}
+	}
+	close (FAS);
+	# set unsuccessful sequences (missing from fasta file) to 'n' for each albany_plate
+	foreach (@albany_plates) {
+		$sql = "update probes set 5p_seq = 'n' where albany_plate = $_ and 5p_seq is null";
+		$sth = $dbh->prepare($sql); $sth->execute; $ErrNum = $dbh->err; $ErrText = $dbh->errstr; $sth->finish;
+		if ($ErrNum) {
+			print "couldn't set 5p_seq = 'n' for plate: $_\n";
+		} else {
+			#print "set 5p_seq = 'n' for plate: $_\n";
+		}
+	}
+	print "done\n";
+}
+
+sub cm {
+	print "generating 5' cross_match reference file...";
+	my ($ests,$seq,$sub,$sql,$sth,$ErrNum,$ErrText);
+	# generate plate block reference file to cm against
+	if ($end_plate) {$sql = "select est from probes where albany_plate between $start_plate and $end_plate";}
+	else {$sql = "select est from probes where albany_plate = $start_plate";}
+	$ests = $dbh->selectcol_arrayref($sql); $ErrNum = $dbh->err; $ErrText = $dbh->errstr;
+	if ($ErrNum || !@$ests) {die "sorry, there was a problem with cross_match reference file generation\n";}
+	# write the reference file
+	open (CMREF, ">$cm_args[2]") or die "couldn't open $cm_args[2] for writing\n";
+	foreach (@$ests) {
+		$sql = "select seq from west.est where name = '$_'";
+		$sth = $dbh->prepare($sql); $sth->execute; $ErrNum = $dbh->err; $ErrText = $dbh->errstr;
+		if ($ErrNum) {die "sorry, there was a problem with cross_match reference file generation\n";}
+		while (($seq) = $sth->fetchrow) {
+			print CMREF ">$_\n";
+			while ($seq) {
+				$sub = substr ($seq, 0, 50, "");
+				print CMREF "$sub\n";
+			}
+		}
+		$sth->finish;
+	}
+	close (CMREF);
+	print "done\nsee $cm_args[2]\n";
+	# perform the cross_match
+	print "performing crossmatch...";
+	#system(@cm_args) == 0 or die "sorry, there was a problem with cross_match: $?\n";
+	#system("/usr/local/phrap/cross_match $ARGV[0] $ARGV[0]_5p_cmref -penalty -5 -minmatch 50 -minscore 100 > $ARGV[0]_5p_val.out") == 0 or die "sorry, there was a problem with cross_match: $?\n";
+	system("@cm_args") == 0 or die "sorry, there was a problem with cross_match: $?\n";
+	print "done\nsee $cm_args[10]\n";
+}
+
+sub update5pval {
+	print "validating 5' sequence reference match...";
+	my ($albany_plate,$well,$est_match,$est_actual,$sql,$sth,$ErrNum,$ErrText);
+	# reset 5p_val to null for the plate(s)
+	#printf "resetting probes.5p_val to NULL for: $start_plate%s\n", $end_plate ? "-$end_plate" : "";
+	if ($end_plate) {$sql = "update probes set 5p_val = NULL where albany_plate between $start_plate and $end_plate";}
+	else {$sql = "update probes set 5p_val = NULL where albany_plate = $start_plate";}
+	$sth = $dbh->prepare($sql); $sth->execute; $ErrNum = $dbh->err; $ErrText = $dbh->errstr; $sth->finish;
+	if ($ErrNum) {
+		printf "couldn't reset 5p_val for: $start_plate%s\n", $end_plate ? "-$end_plate" : "";
+	} else {
+		#printf "reset 5p_val for: $start_plate%s\n", $end_plate ? "-$end_plate" : "";
+	}
+	# check for successful reference match
+	open (VAL, $cm_args[10]) or die "couldn't open $cm_args[10]\n";
+	while (<VAL>) {
+		if (($albany_plate,$well,$est_match) = (/(\d+)_([A-H]\d\d).+(WHE\S+)/)) {
+			# check for est match
+			$sql = "select est from probes where albany_plate = $albany_plate and well = '$well'";
+			$sth = $dbh->prepare($sql); $sth->execute; $ErrNum = $dbh->err; $ErrText = $dbh->errstr;
+			($est_actual) = $sth->fetchrow; $sth->finish;
+			if ($ErrNum || !$est_actual) {
+				print "couldn't get EST name for: ${albany_plate}_$well\n";
+			} else {
+				if ($est_match eq $est_actual) {
+					$sql = "update probes set 5p_val = 'y' where albany_plate = $albany_plate and well = '$well'";
+					$sth = $dbh->prepare($sql); $sth->execute; $ErrNum = $dbh->err; $ErrText = $dbh->errstr; $sth->finish;
+					if ($ErrNum) {
+						print "couldn't set 5p_val = 'y' for: ${albany_plate}_$well\n";
+					} else {
+						#print "set 5p_val = 'y' for: ${albany_plate}_$well\n";
+					}
+				} else {
+					$sql = "update probes set 5p_val = 'n' where albany_plate = $albany_plate and well = '$well'";
+					$sth = $dbh->prepare($sql); $sth->execute; $ErrNum = $dbh->err; $ErrText = $dbh->errstr; $sth->finish;
+					if ($ErrNum) {
+						print "couldn't set 5p_val = 'n' for: ${albany_plate}_$well\n";
+					} else {
+						#print "set 5p_val = 'n' for: ${albany_plate}_$well\n\t${albany_plate}_$well matched $est_match instead of $est_actual\n";
+					}
+				}
+			}
+		}
+	}
+	close (VAL);
+	print "done\n";
+}
+
+sub get5pvalfasta {
+	print "generating 5' validated fasta file...";
+	my ($ests,$sub,$sql,$sth,$ErrNum,$ErrText);
+	# generate plate block 5' validated fasta file
+	if ($end_plate) {$sql = "select est from probes where albany_plate between $start_plate and $end_plate and 5p_seq = 'y' and 5p_val = 'y'";}
+	else {$sql = "select est from probes where albany_plate = $start_plate and 5p_seq = 'y' and 5p_val = 'y'";}
+	$ests = $dbh->selectcol_arrayref($sql); $ErrNum = $dbh->err; $ErrText = $dbh->errstr;
+	if ($ErrNum || !@$ests) {die "sorry, there was a problem with 5' validated fasta file generation\n";}
+	# write the fasta file
+	open (FAS, ">$ARGV[0].5p_val") or die "couldn't open $ARGV[0].5p_val for writing\n";
+	foreach (@$ests) {
+		$sql = "select seq from west.est where name = '$_'";
+		$sth = $dbh->prepare($sql); $sth->execute; $ErrNum = $dbh->err; $ErrText = $dbh->errstr;
+		if ($ErrNum) {die "sorry, there was a problem with 5' validated fasta file generation\n";}
+		while (($seq) = $sth->fetchrow) {
+			print FAS ">$_\n";
+			while ($seq) {
+				$sub = substr ($seq, 0, 50, "");
+				print FAS "$sub\n";
+			}
+		}
+		$sth->finish;
+	}
+	close (FAS);
+	print "done\nsee $ARGV[0].5p_val\n";
+}

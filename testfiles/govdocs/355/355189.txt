@@ -1,0 +1,2649 @@
+                      FCC FM Engineering Data Base
+________________________________________________________________________________
+NOTES:  The database referred to in the following pages was removed from service
+in September 1999 and replaced with CDBS (Consolidated DataBase System).  This
+page is retained for reference.
+
+Current data in a format very close to that explained below may be obtained
+through the FM Query at http://www.fcc.gov/mb/audio/fmq.html.  (Select only the
+the VAX output to retrieve all current records. )  Once the text file is generated,
+save it to your computer as a text file, e.g. fmfxeng.txt.  Alternatively you
+may download a zipped file version (fmfxeng.zip) at
+http://www.fcc.gov/ftp/Bureaus/MB/Databases/formatted/ or
+ftp://ftp.fcc.gov/pub/Bureaus/MB/Databases/formatted/ .  These files are
+primarily intended for users of older programs that were constructed using this
+layout.  New programs should be constructed using the CDBS relational database
+files at http://www.fcc.gov/ftp/Bureaus/MB/Databases/cdbs/ or
+ftp://ftp.fcc.gov/pub/Bureaus/MB/Databases/cdbs/ .
+
+Not all fields listed below will be populated.  Structure of the current file
+is shown here:
+
+
+Revised FM Engineering Database "Flatfile"
+
+/* Positions 1 to 10    -- Formerly part of Mainkey (from BAPS), now Application ID */
+/* Positions 11 to 16   -- Formerly part of Mainkey (from BAPS), now Facility ID */
+/* Positions 17, 18, 19 -- Station Channel */
+/* Positions 20, 21     -- Service    */
+/* Positions 22, 23     -- Country  */
+/* Positions 24, 25     -- State  */
+/* Positions 26 - 75    -- City */
+/* Positions 76 - 80    -- Frequency */
+/* Positions 81 - 92    -- Call Sign */
+/* Position  93         -- Latitude direction */
+/* Positions 94, 95     -- Latitude degrees   */
+/* Positions 96, 97     -- Latitude minutes   */
+/* Positions 98, 99     -- Latitude seconds   */
+/* Position  100        -- Longitude direction*/
+/* Positions 101,102,103-- Longitude degrees  */
+/* Positions 104,105    -- Longitude minutes  */
+/* Positions 106,107    -- Longitude seconds  */
+/* Positions 108 - 113  -- FM domestic status */
+/* Positions 114 - 119  -- International Status */
+/* Positions 121 - 126  -- Application Prefix */
+/* Positions 127 - 134  -- Application ARN (Awaiting Review Number) */
+/* Positions 135, 136   -- Station Class (Domestic)    */
+/* Position  137        -- Near Border (within 320 km) */
+/* Positions 138-140    -- Distance to border */
+/* Positions 141-144    -- ERP (Horizontal)   */
+/* Positions 145-148    -- ERP maximum (Beam Tilt, horizontal) */
+/* Positions 149-153    -- HAAT (Horizontally polarized)   */
+/* Positions 154-158    -- RCAMSL (Horizontally polarized) */
+/* Positions 159-162    -- ERP (Vertical)   */
+/* Positions 163-166    -- ERP maximum (Beam Tilt, vertical) */
+/* Positions 167-171    -- HAAT   (Vertically polarized) */
+/* Positions 172-176    -- RCAMSL (Vertically polarized) */
+/* Positions 177-181    -- RCAMSL (Vertically polarized) */
+/* Position  182        -- Beam Tilt Indicator */
+/* Position  183        -- Directional Antenna Indicator */
+/* Positions 184-191    -- Docket number */
+/* Positions 192-241    -- Licensee or Permittee */
+/* Positions 258-261    -- Antenna Make */
+/* Positions 262-274    -- Antenna model */
+/* Positions 275-279    -- Directional Antenna Rotation */
+/* Position  308        -- Section 73.215 indicator */
+/* Positions 333,334    -- International Class */
+/* Positions 335-338    -- Antenna Radiation center AGL (Horizontal polarization) */
+/* Positions 339-342    -- Antenna Radiation center AGL (Vertical polarization)   */
+
+(October 2004)
+
+The original description follows:
+____________________________________________________________________________
+
+
+
+
+            FCC FM Engineering Data Base                                         Page 1
+
+                                                                            7 June 1995
+
+
+
+
+
+                                 FEDERAL COMMUNICATIONS COMMISSION
+
+                                         Mass Media Bureau
+
+                                      Audio Services Division
+
+
+
+                               FM Engineering Data Base Release Tape
+
+
+
+            The FM Engineering Data Base is an unofficial secondary source.  It is
+
+            designed solely for use by FCC Engineers as an aid for processing
+
+            applications, petitions for rulemaking, and notifications.  The various
+
+            data elements are the minimum deemed necessary for the stated purpose.  Its
+
+            usefulness to any other group or for any other purpose is coincidental.
+
+            See Section 0.434 of the FCC Rules for a further warning and disclaimer.
+
+
+
+            This description applies to the format in which the FCC's FM Engineering
+
+            Data Base is stored on magnetic tape when it is made available outside of
+
+            the FCC.  In the FCC's VAX computer, the FM Engineering Data Base is stored
+
+            as a relational data base.  However, it is necessary to unload it into
+
+            sequential files to copy it on tape.  This description applies to the tape
+
+            format.
+
+
+
+            The tape is recorded pursuant to ANSI X3.27-1978 (FIPS Pub 79) using
+
+            variable length records in 2048-byte blocks.  Although the second, third,
+
+            and fourth files on this tape contain fixed-length records, these files are
+
+            written on the tape as though they contained variable-length records.  The
+
+            first file contains records that are truly variable length.
+
+
+
+            The volume identifier in the Volume-Header Label is "FCCFM".
+
+
+
+            As this is being written, the characters are from the ASCII character set.
+
+            However, it is possible that, in the future, there may be characters from
+
+            the Latin Alpha 1 character set from ISO Standard 8859; these include
+
+            accented characters, etc., and are an expansion to the ASCII character set.
+
+
+
+            The tape contains four files.  The files are:
+
+
+
+                 1.  The tape description.  This document is included on the tape so
+
+                     that users who receive the tapes on a periodic basis can compare
+
+                     the first file on each tape with the first file on the previous
+
+                     tape.  If there are no changes, then the format and descriptions
+
+                     have not changed.  However, if there are differences, it is
+
+                     necessary to review the first file on the new tape to determine
+
+                     what changes in format and/or descriptions have been made.  The
+
+                     first file will also contain announcements about possible future
+
+                     changes.
+
+
+
+                 2.  The primary FM Engineering Data Base.  This contains the
+
+                     engineering data for all existing and proposed stations, vacant
+
+                     and used allotments, and proposed rulemakings.  Pertinent
+
+                     engineering parameters, such as power, height, frequency, class,
+
+                     and coordinates, are included, as well as identifying information
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                         Page 2
+
+                                                                            7 June 1995
+
+
+
+
+
+                     such as call sign, city, state, and owner's name.
+
+
+
+                 3.  The comments for the FM Engineering Data Base.  This contains the
+
+                     comments associated with records in the primary FM Engineering
+
+                     Data Base.
+
+
+
+                 4.  The directional antenna tabulations for certain FM stations.
+
+                     Initially, this will contain the tabulations only for those
+
+                     directional facilities which have applied pursuant to Section
+
+                     73.215 of the FCC rules.  Ultimately, we intend to have
+
+                     tabulations for all directional FM stations, but this may take
+
+                     years to finish.
+
+
+
+
+
+            Before describing the second, third, and fourth files on this tape, it is
+
+            important to discuss the concepts used in the data base design.  As
+
+            mentioned above, the FCC stores the FM Engineering Data Base as a
+
+            relational data base.  For a good description of relational data bases, see
+
+            __ ____________ __ ________ _______
+            An Introduction to Database Systems, Volume I, Fourth Edition, by
+
+            C. J. Date, Addison-Wesley Publishing Co., 1986.
+
+
+
+            The second, third, and fourth files on this tape are each a relation, or
+
+            table, from the relational data base.  Each record has a unique primary
+
+            key.
+
+
+
+            The primary key for the second file on this tape (the primary FM
+
+            Engineering Data Base) is a data element called "mainkey".
+
+
+
+            The primary key for the third file on this tape (the comments) is the
+
+            concatenation of the data elements "mainkey", "comment type", and "comment
+
+            number".  The comments can be joined to the records in the primary table by
+
+            use of the "mainkey".  FM records without comments do not have any records
+
+            in the comment file.
+
+
+
+            The primary key for the fourth file on this tape (the directional antenna
+
+            tabulations) is the concantenation of the data elements "make" and "model".
+
+            The directional antenna tabulations can be joined to the records in the
+
+            primary table by use of the "make" and "model".  Non-directional FM records
+
+            do not have any records in the directional antenna tabulation file.  Also,
+
+            since this is a newly-created file, initially, most directional FM records
+
+            will not have any records in the directional antenna tabulation file.
+
+
+
+            The "mainkey" data element is 16 characters long, and is a hexadecimal
+
+            representation of a 64-bit value.
+
+
+
+               ___
+            Do not assume that the records on this tape are sorted in any particular
+
+            order.  The relations (or tables) in a relational data base are logically
+
+            stored in a random order.
+
+
+
+            The remainder of this description covers the data elements in the FM
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                         Page 3
+
+                                                                            7 June 1995
+
+
+
+
+
+            Engineering Data Base, the related comments, and the directional antenna
+
+            pattern tabulations.  The description includes the name of the data
+
+            element, its starting position in the record, its length, and a definition
+
+            of the element itself.
+
+
+
+            All of the information is stored in character format; floating point
+
+            numbers and integers are not used.  Accordingly, the numbering for the
+
+            beginning of the field and the length of the field is in characters.
+
+            Numeric fields are right justified, and will have leading spaces rather
+
+            than leading zeros to fill the field.
+
+
+
+            If you obtained the tape from NTIS, and the tape is bad, contact NTIS.
+
+
+
+            If you are having trouble with the tape structure, refer to ANSI standard
+
+                                                          _____ _______
+            X3.27-1978, particularly Section 6.2 entitled Block Formats.  Because the
+
+            records are treated as variable length in all four files on the tape,
+
+                                    _______________ _______ ___
+            Section 6.2.3, entitled Variable-Length Records (D), is especially
+
+            pertinent.
+
+
+
+            Please report any errors, omissions, etc., in the data to:
+
+
+
+                                Data Management Staff
+
+                                Room 350
+
+                                Federal Communications Commission
+
+                                1919 M St., NW
+
+                                Washington, DC 20554
+
+                                (202) 418-2789
+
+
+
+                                           _______ _____
+                                           Release Notes
+
+
+
+            The coordinate reference system for the latitudes and longitudes given in
+
+            this data base is the North American Datum of 1927 (NAD 27).  The FCC is
+
+            reviewing the steps required to convert to the North American Datum of 1983
+
+            (NAD 83).  The Commission will issue further guidance on the conversion to
+
+            NAD83 as more information becomes available.
+
+
+
+                                     _______ __ ___ ____ ____
+                                     Changes to the Data Base
+
+
+
+            The primary FM Engineering Data Base has been changed to add one new
+
+            service class.
+
+
+
+                  o  "FS" is a full-service FM station auxiliary transmitting antenna.
+
+                     These records are secondary, hence "FS".  They are not protected
+
+                     in any domestic or international study.  They are not notified
+
+                     internationally.
+
+
+
+            This change occured on June 9, 1995.
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                         Page 4
+
+                                                                            7 June 1995
+
+
+
+
+
+                               FCC Primary FM Engineering Data Base
+
+
+
+                                           Data Elements
+
+
+
+            Data Element    Begins   Length             Description
+
+
+
+            Mainkey             1    16   A unique value for each record in this file.
+
+                                          This is the "primary key" for this file.
+
+                                          This is essentially a random value for each
+
+                                          record.
+
+
+
+            Channel            17     3   The FM channel number, ranging from 200
+
+                                          through 300.
+
+
+
+            Service Class      20     2   This indicates the type of record.  The
+
+                                          allowable possibilities are:
+
+
+
+                                             FA   A vacant or used channel in the Table
+
+                                                  of Allotments.
+
+                                             FM   A full-service FM station or
+
+                                                  application.
+
+                                             FS   A full-service FM station auxiliary
+
+                                                  transmitting antenna or application.
+
+                                             FX   A translator or application for a
+
+                                                  translator.
+
+                                             FR   A proposed rule making to amend the
+
+                                                  Table of Allotments.
+
+                                             FB   A booster station or application for
+
+                                                  a booster.
+
+
+
+            Country            22     2   A two-letter field indicating which country
+
+                                          the station is located in.  Possible values
+
+                                          are:
+
+
+
+                                             US   The United States.
+
+                                             CA   Canada.
+
+                                             MX   Mexico.
+
+                                             VI   British Virgin Islands.
+
+
+
+                                          If records for any other country are included
+
+                                          in the future, they will have the two-letter
+
+                                          FIPS codes for countries from FIPS
+
+                                          Publication 10-3, February 9, 1984, or a
+
+                                          later version.
+
+
+
+            State              24     2   A two-character abbreviation for the state
+
+                                          (province in Canada).  The possible codes
+
+                                          depend on the country.  Here are the
+
+                                          possibilities:
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                         Page 5
+
+                                                                            7 June 1995
+
+
+
+
+
+                                          For the United States (country is "US"), we
+
+                                          have the following abbreviations for the
+
+                                          states, etc.:
+
+
+
+                                               AK  Alaska.
+
+                                               AL  Alabama.
+
+                                               AR  Arkansas.
+
+                                               AS  American Samoa.
+
+                                               AZ  Arizona.
+
+                                               CA  California.
+
+                                               CO  Colorado.
+
+                                               CT  Connecticut.
+
+                                               DC  The District of Columbia
+
+                                               DE  Delaware.
+
+                                               FL  Florida.
+
+                                               FM  the Federated States of Micronesia,
+
+                                                   which is a part of the Caroline
+
+                                                   Islands.
+
+                                               GA  Georgia.
+
+                                               GU  Guam.
+
+                                               HI  Hawaii.
+
+                                               IA  Iowa.
+
+                                               ID  Idaho.
+
+                                               IL  Illinois.
+
+                                               IN  Indiana.
+
+                                               KS  Kansas.
+
+                                               KY  Kentucky.
+
+                                               LA  Louisiana.
+
+                                               MA  Massachusetts.
+
+                                               MD  Maryland.
+
+                                               ME  Maine.
+
+                                               MH  the Republic of the Marshall
+
+                                                   Islands.
+
+                                               MI  Michigan.
+
+                                               MN  Minnesota.
+
+                                               MO  Missouri.
+
+                                               MP  the Northern Marianas.
+
+                                               MS  Mississippi.
+
+                                               MT  Montana.
+
+                                               NC  North Carolina.
+
+                                               ND  North Dakota.
+
+                                               NE  Nebraska.
+
+                                               NH  New Hampshire.
+
+                                               NJ  New Jersey.
+
+                                               NM  New Mexico.
+
+                                               NV  Nevada.
+
+                                               NY  New York.
+
+                                               OH  Ohio.
+
+                                               OK  Oklahoma.
+
+                                               OR  Oregon.
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                         Page 6
+
+                                                                            7 June 1995
+
+
+
+
+
+                                               PA  Pennsylvania.
+
+                                               PR  Puerto Rico.
+
+                                               PW  the Republic of Palou, which is part
+
+                                                   of the Caroline Islands.
+
+                                               RI  Rhode Island.
+
+                                               SC  South Carolina.
+
+                                               SD  South Dakota.
+
+                                               TN  Tennessee.
+
+                                               TX  Texas.
+
+                                               UT  Utah.
+
+                                               VA  Virginia.
+
+                                               VI  the U.S.  Virgin Islands (not the
+
+                                                   British Virgin Islands).
+
+                                               VT  Vermont.
+
+                                               WA  the state of Washington (not
+
+                                                   Washington, DC).
+
+                                               WI  Wisconsin.
+
+                                               WV  West Virginia.
+
+                                               WY  Wyoming.
+
+
+
+                                          For Canada (country is "CA"), we have the
+
+                                          following abbreviations for the Canadian
+
+                                          provinces:
+
+
+
+                                               AB  Alberta
+
+                                               BC  British Columbia
+
+                                               MB  Manitoba
+
+                                               NB  New Brunswick
+
+                                               NF  Newfoundland
+
+                                               NS  Nova Scotia
+
+                                               NT  Northwest Territories
+
+                                               ON  Ontario
+
+                                               PE  Prince Edward Island
+
+                                               QU  Quebec
+
+                                               SA  Saskatchewan
+
+                                               YT  Yukon
+
+
+
+                                          For Mexico (country is "MX"), we have the
+
+                                          following abbreviations for the Mexican
+
+                                          states:
+
+
+
+                                               AG  Aguascalientes
+
+                                               BN  Baja California North
+
+                                               BS  Baja California South
+
+                                               CH  Chihuahua
+
+                                               CI  Coahuila
+
+                                               CL  Colima
+
+                                               CM  Campeche
+
+                                               CS  Chiapas
+
+                                               DF  Federal District
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                         Page 7
+
+                                                                            7 June 1995
+
+
+
+
+
+                                               DU  Durango
+
+                                               GR  Guerrero
+
+                                               GT  Guanajuato
+
+                                               HG  Hidalgo
+
+                                               JA  Jalisco
+
+                                               MC  Michoacan
+
+                                               ML  Morelos
+
+                                               MX  Mexico
+
+                                               NA  Nayarit
+
+                                               NL  Nuevo Leon
+
+                                               OA  Oazaca
+
+                                               PU  Puebla
+
+                                               QE  Queretaro
+
+                                               QR  Quintana Roo
+
+                                               SI  Sinaloa
+
+                                               SL  San Luis Potosi
+
+                                               SO  Sonora
+
+                                               TA  Tamaulipas
+
+                                               TB  Tabasco
+
+                                               TL  Tlaxcala
+
+                                               VC  Vera Cruz
+
+                                               YC  Yucatan
+
+                                               ZA  Zacatecas
+
+
+
+                                          Note that it is unlikely that all of the
+
+                                          above abbreviations will appear in the FM
+
+                                          Engineering Data Base because many of the
+
+                                          Mexican states are beyond the border area,
+
+                                          and, thus, stations in those states are not
+
+                                          notified to the U.S.
+
+
+
+                                          For the British Virgin Islands (country is
+
+                                          "VI"), we do not carry abbreviations for
+
+                                          states or state-equivalents.
+
+
+
+            City               26    50   The city in which the station is licensed or
+
+                                          proposed.
+
+
+
+            Frequency          76     5   The FM frequency, ranging from 87.9 through
+
+                                          107.9, in megahertz.  The decimal point is
+
+                                          specified.  If the frequency is less than 100
+
+                                          MHz, there will be a leading space.  The
+
+                                          frequency can be read with a FORTRAN F5.1
+
+                                          format.
+
+
+
+            Call Sign          81    12   The Call Sign of the station or application.
+
+                                          For applications and construction permits
+
+                                          which do not have call signs, a value of
+
+                                          "NEW" is used for full-service stations and
+
+                                          "NEW-T" is used for translators.  This will
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                         Page 8
+
+                                                                            7 June 1995
+
+
+
+
+
+                                          be blank for vacant and used allotments and
+
+                                          some rulemakings.  Applications for new
+
+                                          boosters (which do not yet have call signs
+
+                                          assigned) will have a pseudo-call sign
+
+                                          consisting of the call sign of the parent
+
+                                          station, followed by "-A", "-B", etc.
+
+                                          Assigned booster call signs have suffixes of
+
+                                          "-1", "-2", etc.
+
+
+
+            Latitude Indicator 93     1   "N" for North Latitude; "S" for South
+
+                                          Latitude.
+
+
+
+            Latitude Degrees   94     2   The degrees portion of the latitude.  If it
+
+                                          is less than 10, there will be a leading
+
+                                          space.
+
+
+
+            Latitude Minutes   96     2   The minutes portion of the latitude.  If it
+
+                                          is less than 10, there will be a leading
+
+                                          space.
+
+
+
+            Latitude Seconds   98     2   The seconds portion of the latitude.  If it
+
+                                          is less than 10, there will be a leading
+
+                                          space.
+
+
+
+            Longitude Ind.    100     1   "W" for West Longitude; "E" for East
+
+                                          Longitude.
+
+
+
+            Longitude Degrees 101     3   The degrees portion of the longitude.  If it
+
+                                          is less than 100, there will be one or two
+
+                                          leading spaces.
+
+
+
+            Longitude Minutes 104     2   The minutes portion of the longitude.  If it
+
+                                          is less than 10, there will be a leading
+
+                                          space.
+
+
+
+            Longitude Seconds 106     2   The seconds portion of the longitude.  If it
+
+                                          is less than 10, there will be a leading
+
+                                          space.
+
+
+
+            Domestic Status   108     6   The domestic status of the record, left
+
+                                          justified.  For a record with a service class
+
+                                          of FM, FX or FB, possible values for the
+
+                                          first three characters are:
+
+
+
+                                               APP     Application
+
+                                               CP      Construction Permit
+
+                                               LIC     License
+
+
+
+                                          The last three characters include these
+
+                                          possibilities:
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                         Page 9
+
+                                                                            7 June 1995
+
+
+
+
+
+                                               MOD    Used with "CP " to show a
+
+                                                      construction permit modification.
+
+                                               GID    Granted by an Initial Decision in
+
+                                                      hearing.
+
+                                               DID    Denied by an Initial Decision in
+
+                                                      hearing.
+
+
+
+                                          With a service class of FR, the following are
+
+                                          possibilities:
+
+
+
+                                               ADD     A proposal to add a channel.
+
+                                               DEL     A proposal to delete a channel.
+
+
+
+                                          With a service class of FA, the following are
+
+                                          possibilities:
+
+
+
+                                               VACANT An allotment that is not used or
+
+                                                      has only new applications
+
+                                                      pending.
+
+                                               USED   An allotment that has a license
+
+                                                      or construction permit
+
+                                                      assignment.
+
+
+
+            Internat. Status  114     6   The international status of the record, left
+
+                                          justified.  Following are allowable values:
+
+
+
+                                            ADD     Proposal to add an allotment to the
+
+                                                    Table of Allotments.
+
+
+
+                                            DELETE  Proposal to delete an allotment
+
+                                                    from the Table of Allotments.
+
+
+
+                                            VACANT  Vacant allotment in the Table of
+
+                                                    Allotments.
+
+
+
+                                            USED    Non-vacant allotment in the Table
+
+                                                    of Allotments.
+
+
+
+                                            PROPN   Proposed new primary assignment.
+
+
+
+                                            PROPM   Proposed modification of an
+
+                                                    existing primary assignment.
+
+
+
+                                            OPER    Operating primary assignment.
+
+
+
+                                            SPROPN  Proposed new secondary assignment;
+
+                                                    secondary assignments are FM
+
+                                                    translators and boosters.
+
+
+
+                                            SPROPM  Proposed modification of an
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                        Page 10
+
+                                                                            7 June 1995
+
+
+
+
+
+                                                    existing secondary assignment;
+
+                                                    secondary assignments are FM
+
+                                                    translators and boosters.
+
+
+
+                                            SOPER   Operating secondary assignment;
+
+                                                    secondary assignments are FM
+
+                                                    translators and boosters.
+
+
+
+                                            INF     Informally coordinated proposal;
+
+                                                    examples would be initial referrals
+
+                                                    for FM shortspacings.
+
+
+
+                                            TEST    Test Record.
+
+
+
+                                            spaces  Not applicable to this record; for
+
+                                                    example, a U.S. record outside of
+
+                                                    the border area.
+
+
+
+            Coord. Status     120     1   The Coordination Status.  If this is a U.S.
+
+                                          record, this refers to the status of our
+
+                                          notification to Canada or Mexico.  If this is
+
+                                          a Canadian record, this refers to the status
+
+                                          of the Canadian notification to the U.S.  If
+
+                                          this is a Mexican record, this refers to the
+
+                                          status of the Mexican notification to the
+
+                                          U.S.  Possible values are:
+
+
+
+                                                A     Notification that is accepted.
+
+
+
+                                                B     Notification that is accepted
+
+                                                      with conditions; see remarks.
+
+
+
+                                                O     Notification that is objected to.
+
+
+
+                                                P     Pending status (e.g., awaiting
+
+                                                      additional data, awaiting
+
+                                                      clarification).
+
+
+
+                                                U     Unstudied.
+
+
+
+                                              spaces  Not applicable to this record;
+
+                                                      for example, a U.S. record
+
+                                                      outside of the border area.
+
+
+
+                                          Note that the Coordination Status has not yet
+
+                                          been implemented, so it is likely that this
+
+                                          field will remain blank for most records as
+
+                                          statuses are slowly loaded.
+
+
+
+            File No. Prefix   121     6   The prefix to the file number, right
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                        Page 11
+
+                                                                            7 June 1995
+
+
+
+
+
+                                          justified.  The dash between the prefix and
+
+                                          the ARN is not included in the data base.
+
+
+
+            App Ref No (ARN)  127     8   The application reference number, or the
+
+                                          numeric portion of the file number.  This is
+
+                                          left justified.
+
+
+
+            Class             135     2   The class of the station, left justified,
+
+                                          such as "A", "B1","B","C3","C2", "C1", "C",
+
+                                          and "D".  This is the class according to the
+
+                                          FCC rules, and may be different than the
+
+                                          international class.
+
+
+
+            Border            137     1   This indicates whether the coordinates are
+
+                                          sufficiently close to an international border
+
+                                          that an agreement with a foreign country is
+
+                                          applicable.  For U.S.  stations, the value is
+
+                                          "C" if it is sufficiently close to Canada,
+
+                                          and "M" if it is sufficiently close to
+
+                                          Mexico.  For Canadian and Mexican stations,
+
+                                          it is "A" if they are sufficiently close to
+
+                                          the U.S.  It will be blank if the station is
+
+                                          not close to a border.
+
+
+
+            Border Dist.      138     3   The distance to the nearest point on the
+
+                                          international border, in kilometers.  This
+
+                                          will be blank if the coordinates are not in a
+
+                                          border area.  This is a right-justified
+
+                                          integer.  If the distance is less than 100
+
+                                          km, there will be one or two leading spaces.
+
+
+
+            Horizontal ERP    141     4   The horizontally polarized effective radiated
+
+                                          power (ERP) in kilowatts.  This is right
+
+                                          justified and a decimal point may be
+
+                                          specified.  This can be read with a FORTRAN
+
+                                          F4.0 format.
+
+
+
+            Horiz. Max ERP    145     4   The maximum horizontally polarized ERP.  This
+
+                                          is used only in the case of beam tilt.  When
+
+                                          there is beam tilt, this field contains the
+
+                                          maximum ERP, at the tilt angle, while the
+
+                                          Horizontal ERP field contains the ERP in the
+
+                                          horizontal plane.  This is right justified
+
+                                          and a decimal point may be specified.  This
+
+                                          can be read with a FORTRAN F4.0 format.
+
+
+
+            Horizontal HAAT   149     5   The height above average terrain (HAAT) of
+
+                                          the center of radiation of the horizontally
+
+                                          polarized antenna, in meters.  This is right
+
+                                          justified, and an integer; there may be
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                        Page 12
+
+                                                                            7 June 1995
+
+
+
+
+
+                                          leading spaces.
+
+            Horiz RCAMSL      154     5   The radiation center above mean sea level
+
+                                          (RCAMSL) of the horizontally polarized
+
+                                          antenna, in meters.  This is right justified,
+
+                                          and an integer; there may be leading spaces.
+
+
+
+            Vertical ERP      159     4   The vertically polarized ERP in kilowatts.
+
+                                          This is right justified and a decimal point
+
+                                          may be specified.  This can be read with a
+
+                                          FORTRAN F4.0 format.
+
+
+
+            Vert. Max ERP     163     4   The maximum vertically polarized ERP.  This
+
+                                          is used only in the case of beam tilt.  When
+
+                                          there is beam tilt, this field contains the
+
+                                          maximum ERP, at the tilt angle, while the
+
+                                          Vertical ERP field contains the ERP in the
+
+                                          horizontal plane.  This is right justified
+
+                                          and a decimal point may be specified.  This
+
+                                          can be read with a FORTRAN F4.0 format.
+
+
+
+            Vertical HAAT     167     5   The HAAT of the center of radiation of the
+
+                                          vertically polarized antenna, in meters.
+
+                                          This is right justified, and an integer;
+
+                                          there may be lading spaces.
+
+
+
+            Vert RCAMSL       172     5   The RCAMSL of the vertically polarized
+
+                                          antenna, in meters.  This is right justified,
+
+                                          and an integer; there may be leading spaces.
+
+
+
+            Maximum HAAT      177     5   The maximum HAAT in any direction, based on
+
+                                          the higher of the horizontally polarized or
+
+                                          vertically polarized RCAMSL, in meters.  This
+
+                                          will be blank if both the horizontal and
+
+                                          vertical RCAMSL's are blank, or if the
+
+                                          coordinates are in an area where we do not
+
+                                          have digitized topographic data.  This is
+
+                                          right justified, and an integer; there may be
+
+                                          leading spaces.
+
+
+
+            Beam Tilt         182     1   An indicator of whether beam tilt is used.
+
+                                          It is "Y" if beam tilt is used, and "N" if
+
+                                          beam tilt is not used.
+
+
+
+            Directional Ant   183     1   An indicator of whether a directional antenna
+
+                                          is used.  It is "Y" if a directional antenna
+
+                                          is used, and "N" if a directional antenna is
+
+                                          not used.
+
+
+
+            Docket No.        184     8   The Docket Number of a hearing or rulemaking
+
+                                          associated with this record.
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                        Page 13
+
+                                                                            7 June 1995
+
+
+
+
+
+            Owner             192    50   The name of the owner of the existing or
+
+                                          proposed station.  This could be the
+
+                                          applicant, licensee, or petitioner.
+
+
+
+            Filler            242     2   Reserved for future use in expanding the
+
+                                          cutoff date to include four characters for
+
+                                          the year, as we move towards the year 2000.
+
+
+
+            Cutoff Date       244     6   Normally, the cutoff date for an application.
+
+                                          However, for a record with the service class
+
+                                          of "FA", this date is the window close date.
+
+                                          For a record with the service class of "FR",
+
+                                          this date is the date that the Rule Making
+
+                                          Petition to Amend the FM Table of Allotments
+
+                                          was filed.  It is a 6-number field in the
+
+                                          format YYMMDD.
+
+
+
+            Filler            250     2   Reserved for future use in expanding the
+
+                                          window open date to include four characters
+
+                                          for the year, as we move towards the year
+
+                                          2000.
+
+
+
+            Window Open Date  252     6   This should appear only in U.S. records.  For
+
+                                          a record with a service class of "FA", it is
+
+                                          the date on which the window opened for
+
+                                          applications for this allotment.  It is a
+
+                                          6-number field in the format YYMMDD.
+
+
+
+            Antenna Make      258     3   This is the three-character abbreviation of
+
+                                          the manufacturer of the directional antenna
+
+                                          used by this station.  This will be blank for
+
+                                          all non-directional records, and for those
+
+                                          directional records which do not have a
+
+                                          tabulation in the directional antenna
+
+                                          tabulation file.
+
+
+
+            Antenna Model     261    14   This is the model number for the directional
+
+                                          antenna used by this station.  This will be
+
+                                          blank for all non-directional records, and
+
+                                          for those directional records which do not
+
+                                          have a tabulation in the directional antenna
+
+                                          tabulation file.
+
+
+
+            Rotate            275     5   This tells how much the stored tabulation of
+
+                                          the directional antenna pattern must be
+
+                                          rotated to point in the proper direction.
+
+                                          This will be blank for all non-directional
+
+                                          records, and for those directional records
+
+                                          which do not have a tabulation in the
+
+                                          directional antenna tabulation file.  See the
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                        Page 14
+
+                                                                            7 June 1995
+
+
+
+
+
+                                          section of this documentation entitled
+
+                                          ___________ _______ ___________ __ ___ ___ __
+                                          Directional Antenna Tabulations in the FCC FM
+
+                                          ___________ ____ ____
+                                          Engineering Data Base for further details on
+
+                                          the tabulation.
+
+
+
+            Filler            280     2   Reserved for future use in expanding the date
+
+                                          of last notification to include four
+
+                                          characters for the year, as we move towards
+
+                                          the year 2000.
+
+
+
+            Last Notify Date  282     6   Normally, the date at which this was last
+
+                                          notified to a foreign country.  It is a
+
+                                          6-number field in the format YYMMDD.  Note
+
+                                          that this will be empty for most records
+
+                                          since we have not had the opportunity to load
+
+                                          it.
+
+
+
+            Last Notify Time  288     6   Normally, the time at which this was last
+
+                                          notified to a foreign country.  It is a
+
+                                          6-number field in the format HHMMSS.  Note
+
+                                          that this will be empty for most records
+
+                                          since we have not had the opportunity to load
+
+                                          it.
+
+
+
+            Filler            294     2   Reserved for future use in expanding the date
+
+                                          of last update to include four characters for
+
+                                          the year, as we move towards the year 2000.
+
+
+
+            Last Update Date  296     6   The date of the last update of this record.
+
+                                          This is a 6-number field in the format
+
+                                          YYMMDD.
+
+
+
+            Last Update Time  302     6   The time of the last update of this record.
+
+                                          This is a 6-number field in the format
+
+                                          HHMMSS.
+
+
+
+            Is it 73.215      308     1   This indicates whether this record represents
+
+                                          something that was initially applied for
+
+                                          under Section 73.215 of the FCC Rules.
+
+                                          Possible values are:
+
+
+
+                                            Y  This record represents something that
+
+                                               was initially applied for under Section
+
+                                               73.215 of the FCC Rules.
+
+
+
+                                            N  This record represents something that
+
+                                               was initially applied for under a
+
+                                                       _____ ____
+                                               section other than Section 73.215 of the
+
+                                               FCC Rules.
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                        Page 15
+
+                                                                            7 June 1995
+
+
+
+
+
+            Filler            309     2   Reserved for future use in expanding the cp
+
+                                          expire date to include four characters for
+
+                                          the year, as we move towards the year 2000.
+
+
+
+            CP Expire Date    311     6   The date that the construction permit
+
+                                          expires, for records with a service class of
+
+                                          "FM" and a domestic status of "CP" or
+
+                                          "CP MOD" only.  This is a 6-number field in
+
+                                          the format YYMMDD.
+
+
+
+            Filler            317     2   Reserved for future use in expanding the
+
+                                          filed license date to include four characters
+
+                                          for the year, as we move towards the year
+
+                                          2000.
+
+
+
+            Filed Lic Date    319     6   The date that a license application was filed
+
+                                          for records with a service class of "FM" and
+
+                                          a domestic status of "CP" or "CP MOD" only.
+
+                                          This is a 6-number field in the format
+
+                                          YYMMDD.
+
+
+
+            Filler            325     2   Reserved for future use in expanding the
+
+                                          filed 307 date to include four characters for
+
+                                          the year, as we move towards the year 2000.
+
+
+
+            Filed 307 Date    327     6   The date that a FCC Form 307 was filed for
+
+                                          records with a service class of "FM" and a
+
+                                          domestic status of "CP" or "CP MOD" only.
+
+                                          This is a 6-number field in the format
+
+                                          YYMMDD.
+
+
+
+            Internat. Class   333     2   The class of the station as determined by the
+
+                                          pertinent international FM broadcasting
+
+                                          agreement between the United States and
+
+                                          Canada or Mexico.  The field will contain
+
+                                          blanks for those records not close to a
+
+                                          border.
+
+
+
+            Horiz. RCAGL      335     4   The radiation center above ground (RCAGL) of
+
+                                          the horizontally polarized antenna, in
+
+                                          meters.  This is right justified, and an
+
+                                          integer; there may be leading spaces.  We
+
+                                          started loading this data for applications
+
+                                          received after October 5, 1992.  We will not
+
+                                          load this data for records existing in the
+
+                                          data base before October 5th, except for
+
+                                          those records where we need the data for our
+
+                                          own use.
+
+
+
+            Vert. RCAGL       339     4   The radiation center above ground (RCAGL) of
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                        Page 16
+
+                                                                            7 June 1995
+
+
+
+
+
+                                          the vertically polarized antenna, in meters.
+
+                                          This is right justified, and an integer;
+
+                                          there may be leading spaces.  We started
+
+                                          loading this data for applications received
+
+                                          after October 5, 1992.  We will not load this
+
+                                          data for records existing in the data base
+
+                                          before October 5th, except for those records
+
+                                          where we need the data for our own use.
+
+
+
+            There are 342 characters in each record.
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                        Page 17
+
+                                                                            7 June 1995
+
+
+
+
+
+                           Comments in the FCC FM Engineering Data Base
+
+
+
+                                           Data Elements
+
+
+
+            Data Element    Begins   Length             Description
+
+
+
+            Mainkey             1    16   A unique value for each record in the FM
+
+                                          Engineering Data Base file; this comment is
+
+                                          associated with that record.
+
+
+
+            Comment Type       17     1   The type of comment.  Possible values are:
+
+
+
+                                            G  General Comments.
+
+                                            I  International Comments.  These are
+
+                                               comments relating to our international
+
+                                               agreements, and may reflect special
+
+                                               requirements in the agreements, or the
+
+                                               results of special negotiations
+
+                                               involving this station.
+
+                                            R  Rules Comments.  These are comments
+
+                                               relating to the FCC Rules.  Generally,
+
+                                               these would be only for FA records, and
+
+                                               would relate to specific rules for the
+
+                                               allotment, or special requirements from
+
+                                                   ______ ___ _____
+                                               the Report and Order.
+
+
+
+            Comment Number     18     3   A sequential number assigned to each comment
+
+                                          of a particular type for a specific station.
+
+                                          Sorting in order by mainkey, comment type,
+
+                                          and comment number would group the comments
+
+                                          in the proper order.  This is right
+
+                                          justified, and an integer; if it is less than
+
+                                          100, there will be one or two leading spaces.
+
+
+
+            Comment            21    76   A comment record associated with a record in
+
+                                          the FM Engineering Data Base.  A single
+
+                                          record in the FM Engineering Data Base may
+
+                                          have no comments associated, or one or more
+
+                                          comments associated.  If there are no
+
+                                          comments associated, there will be no record
+
+                                          with that mainkey in this file.
+
+
+
+            There are 96 characters in each record.
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                        Page 18
+
+                                                                            7 June 1995
+
+
+
+
+
+                Directional Antenna Tabulations in the FCC FM Engineering Data Base
+
+
+
+            The pattern tabulations are stored using the relative field pattern.
+
+            Values are stored every 10 degrees, and there is provision for as many as
+
+            ten special azimuths, where radiations can be stored at azimuths other than
+
+            integer multiples of 10 degrees.
+
+
+
+            The data element "rotate" for a station in the primary FM Engineering Data
+
+            Base is used to determine how much to rotate the tabulated pattern to
+
+            achieve the proper orientation of the pattern.
+
+
+
+            The effective radiated power for a station is used to adjust the size of
+
+            the tabulated pattern.
+
+
+
+                                           Data Elements
+
+
+
+            Data Element    Begins   Length             Description
+
+
+
+            Antenna Make        1     3    A 3-character abbreviation of the name of
+
+                                           the manufacturer of the directional antenna.
+
+                                           "ODD" is used if the antenna is a composite
+
+                                           of antennas from more than one manufacturer.
+
+                                           This corresponds to the "Antenna Make" field
+
+                                           in the primary FM Engineering Data Base.
+
+
+
+            Antenna Model       4    14    A 14-character, left-justified model number
+
+                                           for the directional antenna.  Normally, the
+
+                                           model number is the manufacturer's model
+
+                                           number.  If the antenna is custom designed,
+
+                                           the model number will have "ODD" as the
+
+                                           first three characters.  This corresponds to
+
+                                           the "Antenna Model" field in the primary FM
+
+                                           Engineering Data Base.
+
+
+
+            Rad at 0 deg       18     5    The relative field radiation of the pattern
+
+                                           at zero degrees.  This is stored in the form
+
+                                           X.XXX and may be read with a FORTRAN f5.0
+
+                                           format because the decimal point is
+
+                                           specified.
+
+
+
+            Rad at 10 deg      23     5    The relative field radiation of the pattern
+
+                                           at 10 degrees.
+
+
+
+            Rad at 20 deg      28     5    The relative field radiation of the pattern
+
+                                           at 20 degrees.
+
+
+
+            Rad at 30 deg      33     5    The relative field radiation of the pattern
+
+                                           at 30 degrees.
+
+
+
+            Rad at 40 deg      38     5    The relative field radiation of the pattern
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                        Page 19
+
+                                                                            7 June 1995
+
+
+
+
+
+                                           at 40 degrees.
+
+
+
+            Rad at 50 deg      43     5    The relative field radiation of the pattern
+
+                                           at 50 degrees.
+
+
+
+            Rad at 60 deg      48     5    The relative field radiation of the pattern
+
+                                           at 60 degrees.
+
+
+
+            Rad at 70 deg      53     5    The relative field radiation of the pattern
+
+                                           at 70 degrees.
+
+
+
+            Rad at 80 deg      58     5    The relative field radiation of the pattern
+
+                                           at 80 degrees.
+
+
+
+            Rad at 90 deg      63     5    The relative field radiation of the pattern
+
+                                           at 90 degrees.
+
+
+
+            Rad at 100 deg     68     5    The relative field radiation of the pattern
+
+                                           at 100 degrees.
+
+
+
+            Rad at 110 deg     73     5    The relative field radiation of the pattern
+
+                                           at 110 degrees.
+
+
+
+            Rad at 120 deg     78     5    The relative field radiation of the pattern
+
+                                           at 120 degrees.
+
+
+
+            Rad at 130 deg     83     5    The relative field radiation of the pattern
+
+                                           at 130 degrees.
+
+
+
+            Rad at 140 deg     88     5    The relative field radiation of the pattern
+
+                                           at 140 degrees.
+
+
+
+            Rad at 150 deg     93     5    The relative field radiation of the pattern
+
+                                           at 150 degrees.
+
+
+
+            Rad at 160 deg     98     5    The relative field radiation of the pattern
+
+                                           at 160 degrees.
+
+
+
+            Rad at 170 deg    103     5    The relative field radiation of the pattern
+
+                                           at 170 degrees.
+
+
+
+            Rad at 180 deg    108     5    The relative field radiation of the pattern
+
+                                           at 180 degrees.
+
+
+
+            Rad at 190 deg    113     5    The relative field radiation of the pattern
+
+                                           at 190 degrees.
+
+
+
+            Rad at 200 deg    118     5    The relative field radiation of the pattern
+
+                                           at 200 degrees.
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                        Page 20
+
+                                                                            7 June 1995
+
+
+
+
+
+            Rad at 210 deg    123     5    The relative field radiation of the pattern
+
+                                           at 210 degrees.
+
+
+
+            Rad at 220 deg    128     5    The relative field radiation of the pattern
+
+                                           at 220 degrees.
+
+
+
+            Rad at 230 deg    133     5    The relative field radiation of the pattern
+
+                                           at 230 degrees.
+
+
+
+            Rad at 240 deg    138     5    The relative field radiation of the pattern
+
+                                           at 240 degrees.
+
+
+
+            Rad at 250 deg    143     5    The relative field radiation of the pattern
+
+                                           at 250 degrees.
+
+
+
+            Rad at 260 deg    148     5    The relative field radiation of the pattern
+
+                                           at 260 degrees.
+
+
+
+            Rad at 270 deg    153     5    The relative field radiation of the pattern
+
+                                           at 270 degrees.
+
+
+
+            Rad at 280 deg    158     5    The relative field radiation of the pattern
+
+                                           at 280 degrees.
+
+
+
+            Rad at 290 deg    163     5    The relative field radiation of the pattern
+
+                                           at 290 degrees.
+
+
+
+            Rad at 300 deg    168     5    The relative field radiation of the pattern
+
+                                           at 300 degrees.
+
+
+
+            Rad at 310 deg    173     5    The relative field radiation of the pattern
+
+                                           at 310 degrees.
+
+
+
+            Rad at 320 deg    178     5    The relative field radiation of the pattern
+
+                                           at 320 degrees.
+
+
+
+            Rad at 330 deg    183     5    The relative field radiation of the pattern
+
+                                           at 330 degrees.
+
+
+
+            Rad at 340 deg    188     5    The relative field radiation of the pattern
+
+                                           at 340 degrees.
+
+
+
+            Rad at 350 deg    193     5    The relative field radiation of the pattern
+
+                                           at 350 degrees.
+
+
+
+            Sp.  Az.  #1      198     5    The azimuth of the first of the (optional)
+
+                                           set of special azimuths.  As many as ten
+
+                                           special azimuths with corresponding
+
+                                           radiations can be included here to cover
+
+                                           azimuths other than integral multiples of 10
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                        Page 21
+
+                                                                            7 June 1995
+
+
+
+
+
+                                           degrees.  This is in the format XXXXX and
+
+                                           should be handled with an F5.0 format in
+
+                                           FORTRAN since the decimal point may or may
+
+                                           not be specified.  For example, 21 degrees
+
+                                           could be stored as 00021, 0021., 021.0, etc.
+
+                                           If this is blank, there are no special
+
+                                           azimuths.
+
+
+
+            Sp.  Rad.  #1     203     5    The radiation at the first of the special
+
+                                           azimuths.  As with the other radiations,
+
+                                           this is in the format X.XXX and can be
+
+                                           handled with an F5.0 format in FORTRAN since
+
+                                           the decimal point is specified.  This will
+
+                                           be blank if the corresponding special
+
+                                           azimuth is blank.
+
+
+
+            Sp.  Az.  #2      208     5    The azimuth of the second of the set of
+
+                                           special azimuths.  If this is blank, it
+
+                                           means there is no second (or subsequent)
+
+                                           special azimuth.
+
+
+
+            Sp.  Rad.  #2     213     5    The radiation at the second of the special
+
+                                           azimuths.  This will be blank if the
+
+                                           corresponding special azimuth is blank.
+
+
+
+            Sp.  Az.  #3      218     5    The azimuth of the third of the set of
+
+                                           special azimuths.  If this is blank, it
+
+                                           means there is no third (or subsequent)
+
+                                           special azimuth.
+
+
+
+            Sp.  Rad.  #3     223     5    The radiation at the third of the special
+
+                                           azimuths.  This will be blank if the
+
+                                           corresponding special azimuth is blank.
+
+
+
+            Sp.  Az.  #4      228     5    The azimuth of the fourth of the set of
+
+                                           special azimuths.  If this is blank, it
+
+                                           means there is no fourth (or subsequent)
+
+                                           special azimuth.
+
+
+
+            Sp.  Rad.  #4     233     5    The radiation at the fourth of the special
+
+                                           azimuths.  This will be blank if the
+
+                                           corresponding special azimuth is blank.
+
+
+
+            Sp.  Az.  #5      238     5    The azimuth of the fifth of the set of
+
+                                           special azimuths.  If this is blank, it
+
+                                           means there is no fifth special azimuth.
+
+
+
+            Sp.  Rad.  #5     243     5    The radiation at the fifth of the special
+
+                                           azimuths.  This will be blank if the
+
+                                           corresponding special azimuth is blank.
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                        Page 22
+
+                                                                            7 June 1995
+
+
+
+
+
+            Sp.  Az.  #6      248     5    The azimuth of the sixth of the set of
+
+                                           special azimuths.  If this is blank, it
+
+                                           means there is no sixth special azimuth.
+
+
+
+            Sp.  Rad.  #6     253     5    The radiation at the sixth of the special
+
+                                           azimuths.  This will be blank if the
+
+                                           corresponding special azimuth is blank.
+
+
+
+            Sp.  Az.  #7      258     5    The azimuth of the seventh of the set of
+
+                                           special azimuths.  If this is blank, it
+
+                                           means there is no seventh special azimuth.
+
+
+
+            Sp.  Rad.  #7     263     5    The radiation at the seventh of the special
+
+                                           azimuths.  This will be blank if the
+
+                                           corresponding special azimuth is blank.
+
+
+
+            Sp.  Az.  #8      268     5    The azimuth of the eighth of the set of
+
+                                           special azimuths.  If this is blank, it
+
+                                           means there is no eighth special azimuth.
+
+
+
+            Sp.  Rad.  #8     273     5    The radiation at the eighth of the special
+
+                                           azimuths.  This will be blank if the
+
+                                           corresponding special azimuth is blank.
+
+
+
+            Sp.  Az.  #9      278     5    The azimuth of the ninth of the set of
+
+                                           special azimuths.  If this is blank, it
+
+                                           means there is no ninth special azimuth.
+
+
+
+            Sp.  Rad.  #9     283     5    The radiation at the ninth of the special
+
+                                           azimuths.  This will be blank if the
+
+                                           corresponding special azimuth is blank.
+
+
+
+            Sp.  Az.  #10     288     5    The azimuth of the tenth of the set of
+
+                                           special azimuths.  If this is blank, it
+
+                                           means there is no tenth special azimuth.
+
+
+
+            Sp.  Rad.  #10    293     5    The radiation at the tenth of the special
+
+                                           azimuths.  This will be blank if the
+
+                                           corresponding special azimuth is blank.
+
+
+
+            Comment           298    76    Comment inserted by the Data Base Management
+
+                                           Staff.
+
+
+
+            Filler            374     2    Reserved for future use in expanding the
+
+                                           date of last update to include four
+
+                                           characters for the year, as we move towards
+
+                                           the year 2000.
+
+
+
+            Last Update Date  376     6    The date of the last update of this record.
+
+                                           This is a six-number field in the format
+
+
+
+
+
+
+
+
+
+
+
+
+
+            FCC FM Engineering Data Base                                        Page 23
+
+                                                                            7 June 1995
+
+
+
+
+
+                                           YYMMDD.
+
+
+
+            Filler            382     1    To ensure that there are an even number of
+
+                                           characters in each record to assist those
+
+                                           who have computers that cope better with an
+
+                                           even number of characters per record.
+
+
+
+            There are 382 characters in each record.
+
+
+
+                End of Documentation for FCC FM Engineering Data Base Release Tape
+

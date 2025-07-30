@@ -1,0 +1,204 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>7.1 Global m4 Settings</TITLE>
+<META NAME="description" CONTENT="7.1 Global m4 Settings">
+<META NAME="keywords" CONTENT="Caesar">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="Caesar.css">
+
+<LINK REL="next" HREF="node21.html">
+<LINK REL="previous" HREF="node19.html">
+<LINK REL="up" HREF="node19.html">
+<LINK REL="next" HREF="node21.html">
+</HEAD>
+
+<BODY background="images/backgrounds/hallstone.jpg" 
+          text="000000" link="000066" vlink="006600" alink="990000">
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1114"
+  HREF="node21.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="icons/next.png"></A> 
+<A NAME="tex2html1108"
+  HREF="node19.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="icons/up.png"></A> 
+<A NAME="tex2html1102"
+  HREF="node19.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="icons/prev.png"></A> 
+<A NAME="tex2html1110"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="icons/contents.png"></A> 
+<A NAME="tex2html1112"
+  HREF="node596.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="icons/index.png"></A> <BR>
+<B> Next:</B> <A NAME="tex2html1115"
+  HREF="node21.html">7.2 Type m4 Macros</A>
+<B>Up:</B> <A NAME="tex2html1109"
+  HREF="node19.html">7. m4 Preprocessing</A>
+<B> Previous:</B> <A NAME="tex2html1103"
+  HREF="node19.html">7. m4 Preprocessing</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION05210000000000000000"></A><A NAME="2695"></A>
+<BR>
+<SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">1</SPAN> Global m4 Settings
+</H1><A NAME="settings_m4"></A><P>
+The ``settings'' set of m4 commands defines the m4 environment that is 
+used in the C<SMALL>&#198;SAR</SMALL> Code Package:
+
+<P>
+
+<UL>
+<LI>The m4 quotation characters are changed to ``['' and ``]'', 
+      to avoid interaction with standard F90 syntax.
+</LI>
+<LI>The m4 comment character is changed to ``!'', to coincide
+      with the F90 comment character. Note that comments in m4 are 
+      echoed to the output with no macro expansion. To avoid echoing
+      at all, the m4 command ``dnl'' must be used (this may change in
+      future versions of Gnu m4).
+</LI>
+<LI>Builtin m4 macros must be called with a prefix of ``m4_''. For
+      example, the ``format'' macro must be called via ``m4_format''.
+      Therefore, all of the m4 preprocessing in the C<SMALL>&#198;SAR</SMALL> Code 
+      Package must be done with Gnu m4, using either the <TT>-P</TT>
+      or <TT>-prefix-builtins</TT> option.
+</LI>
+<LI>Certain commonly used m4 builtins are defined to be usable
+      without an ``m4_'' prefix.
+</LI>
+</UL>
+
+<P>
+In addition to these environmental settings, some globally useful
+macros are defined.
+
+<P>
+<SPAN  CLASS="textbf">m4 macros defined in the 
+                  <TT>include/settings.m4</TT> file:</SPAN>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>__date__  </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Date field (mm/dd/yy).</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>__file__  </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Unprefixed form of <TT>m4___file__</TT>.</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>__line__  </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Unprefixed form of <TT>m4___line__</TT>.</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>__time__  </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Time field (hh:mm:ss, 24-hour).</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>define    </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Unprefixed form of <TT>m4_define</TT>.</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>dnl       </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Unprefixed form of <TT>m4_dnl</TT>.</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>expand    </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Force macro expansion in words containing underscores.</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>firstword </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Returns the first word from a space-delimited 
+              list of words.</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>forloop   </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">A numerical text iterator (see <A HREF="node300.html#settings_m4_code">code listing</A> 
+              for input/output details).</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>fortext   </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">A textual text iterator (see <A HREF="node300.html#settings_m4_code">code listing</A> 
+              for input/output details).</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>ifdef     </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Unprefixed form of <TT>m4_ifdef</TT>.</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>ifelse    </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Unprefixed form of <TT>m4_ifelse</TT>.</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>include   </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Unprefixed form of <TT>m4_include</TT>.</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>m4_chop   </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Removes last character of input string.</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>m4_die    </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Prints error message and terminates.</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>popdef    </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Unprefixed form of <TT>m4_popdef</TT>.</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>pushdef   </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Unprefixed form of <TT>m4_pushdef</TT>.</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>tailwords </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Returns everything except the first word from  
+              a space-delimited list of words.</TD>
+</TR>
+<TR VALIGN="BASELINE"><TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT"><TT>undefine  </TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD><TD ALIGN="LEFT">Unprefixed form of <TT>m4_undefine</TT>.</TD>
+</TR>
+</TABLE>
+<P>
+The <A HREF="node300.html#settings_m4_code">Settings m4 Macros code listing</A> contains additional documentation.
+  
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1114"
+  HREF="node21.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="icons/next.png"></A> 
+<A NAME="tex2html1108"
+  HREF="node19.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="icons/up.png"></A> 
+<A NAME="tex2html1102"
+  HREF="node19.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="icons/prev.png"></A> 
+<A NAME="tex2html1110"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="icons/contents.png"></A> 
+<A NAME="tex2html1112"
+  HREF="node596.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="icons/index.png"></A> <BR>
+<B> Next:</B> <A NAME="tex2html1115"
+  HREF="node21.html">7.2 Type m4 Macros</A>
+<B>Up:</B> <A NAME="tex2html1109"
+  HREF="node19.html">7. m4 Preprocessing</A>
+<B> Previous:</B> <A NAME="tex2html1103"
+  HREF="node19.html">7. m4 Preprocessing</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<a href="mailto:hall@lanl.gov">Michael L. Hall</a>
+</ADDRESS>
+</BODY>
+</HTML>

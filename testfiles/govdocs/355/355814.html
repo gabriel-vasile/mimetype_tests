@@ -1,0 +1,218 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>A.1 Settings m4 Macros</TITLE>
+<META NAME="description" CONTENT="A.1 Settings m4 Macros">
+<META NAME="keywords" CONTENT="Caesar">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="Caesar.css">
+
+<LINK REL="next" HREF="node301.html">
+<LINK REL="previous" HREF="node299.html">
+<LINK REL="up" HREF="node299.html">
+<LINK REL="next" HREF="node301.html">
+</HEAD>
+
+<BODY background="images/backgrounds/hallstone.jpg" 
+          text="000000" link="000066" vlink="006600" alink="990000">
+
+<DIV CLASS="navigation">
+<A NAME="tex2html5503"
+  HREF="node301.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="icons/next.png"></A> 
+<A NAME="tex2html5497"
+  HREF="node299.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="icons/up.png"></A> 
+<A NAME="tex2html5491"
+  HREF="node299.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="icons/prev.png"></A> 
+<A NAME="tex2html5499"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="icons/contents.png"></A> 
+<A NAME="tex2html5501"
+  HREF="node596.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="icons/index.png"></A> <BR>
+<B> Next:</B> <A NAME="tex2html5504"
+  HREF="node301.html">A.2 Type m4 Macros</A>
+<B>Up:</B> <A NAME="tex2html5498"
+  HREF="node299.html">A. m4 Preprocessing Code</A>
+<B> Previous:</B> <A NAME="tex2html5492"
+  HREF="node299.html">A. m4 Preprocessing Code</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION07110000000000000000"></A><A NAME="24252"></A>
+<BR>
+A.<SPAN CLASS="arabic">1</SPAN> Settings m4 Macros
+</H1><A NAME="24253"></A><A NAME="settings_m4_code"></A><P>
+The <A HREF="node20.html#settings_m4">main documentation of the Settings m4 Macros</A> contains additional explanation of this 
+code listing.
+
+<P>
+<PRE>
+dnl
+dnl Author: Michael L. Hall
+dnl         P.O. Box 1663, MS-D409, LANL
+dnl         Los Alamos, NM 87545
+dnl         ph: 505-665-4312
+dnl         email: hall@lanl.gov
+dnl 
+dnl Created on: 02/26/98
+dnl Date:       03/21/00, 17:15:20
+dnl Version:    6.8
+
+
+dnl Change the quotation characters to avoid F90 conflicts.
+
+m4_changequote([,])
+
+
+dnl Change the comment characters to eliminate m4 macro 
+dnl expansion in F90 comments.
+
+m4_changecom([!])
+
+
+dnl Redefine the "dnl" command to be unprefixed. Note that the "dnl"
+dnl command is nonfunctional before this definition is made, but that
+dnl unwanted output from the processing of this file is avoided by
+dnl diverting the entire output (up until now) to nowhere. (Notice the 
+dnl m4_divert(-1) command in the initialization.)
+
+m4_define([dnl],m4_defn([m4_dnl]))
+m4_divert
+
+
+dnl Define unprefixed versions of m4 builtin macros that are 
+dnl commonly used. All other m4 builtin macros must be prefixed 
+dnl by "m4_".
+
+m4_define([define],m4_defn([m4_define]))
+m4_define([ifdef],m4_defn([m4_ifdef]))
+m4_define([ifelse],m4_defn([m4_ifelse]))
+m4_define([include],m4_defn([m4_include]))
+m4_define([popdef],m4_defn([m4_popdef]))
+m4_define([pushdef],m4_defn([m4_pushdef]))
+m4_define([undefine],m4_defn([m4_undefine]))
+
+
+dnl The m4_chop macro (based on perl's chop command) returns the 
+dnl input string minus its final character. m4_chop is useful for 
+dnl removing "\n" from m4_esyscmd strings. 
+
+define([m4_chop], [m4_substr($1, 0, m4_decr(m4_len($1)))])
+
+
+dnl Define cpp-style predefined macros for date and time information.
+dnl These names correspond to those described in "The C Programming 
+dnl Language", B. W. Kernighan and D. M. Ritchie (1988), page 233.
+dnl The __file__ and __line__ predefined macros are already defined
+dnl in Gnu m4, but are redefined here to remove the "m4_" prefix.
+
+define([__date__], [m4_chop(m4_esyscmd(date +%D))])
+define([__time__], [m4_chop(m4_esyscmd(date +%T))])
+define([__file__], m4_defn([m4___file__]))
+define([__line__], m4_defn([m4___line__]))
+
+
+dnl The m4_die macro (based on perl's die command) prints an error 
+dnl message and then terminates.
+
+define([m4_die],[m4_errprint([m4:]__FILE__:__LINE__: [$1]) m4_m4exit(1)]) 
+
+
+dnl The expand macro is used to force macro expansion in a word
+dnl containing underscores, since underscores are not a word-delimiter
+dnl in standard m4.
+
+define([expand], [m4_translit(m4_translit([$1], [_], [*]), [*], [_])])
+
+
+dnl The forloop macro, which iterates a section of text numerically,
+dnl letting the loop variable take on successive numerical values when
+dnl expressing the section of text. This version is better than the
+dnl version in the Gnu m4 manual because it checks for the case of
+dnl starting loop value greater than final loop value, and produces
+dnl no output when this occurs.
+dnl
+dnl The arguments for the forloop macro are:
+dnl
+dnl   $1 - The name of the iteration variable.
+dnl   $2 - The starting value.
+dnl   $3 - The final value.
+dnl   $4 - The text to be expanded for each iteration.
+
+define([forloop],
+[ifelse(
+  m4_eval($2 &gt; $3),  1,
+    [],
+  m4_eval($2 &lt;= $3), 1, 
+    [pushdef([$1], [$2])$4[]popdef([$1])])[]dnl
+ifelse(
+  m4_eval($2 &lt; $3), 1,
+    [forloop([$1], m4_incr($2), [$3], [$4])])])
+
+
+dnl The firstword and tailwords macros operate on a space-delimited list  
+dnl of words. The firstword macro returns the first word in the list, and 
+dnl the tailwords macro returns a space-delimited list of words derived 
+dnl by eliminating the first word.
+
+define([firstword],
+[ifelse(
+  m4_index([$1], [ ]), [-1],
+    [$1],
+    [m4_substr([$1],0,m4_index([$1], [ ]))])[]dnl
+])
+
+define([tailwords],
+[ifelse(
+  m4_index([$1], [ ]), [-1],
+    [],
+    [m4_substr([$1],m4_incr(m4_index([$1], [ ])))])[]dnl
+])
+
+
+dnl The fortext macro is similar to the forloop macro, except that the 
+dnl loop variable takes on successive textual values instead of numerical 
+dnl values. The arguments for the fortext macro are:
+dnl
+dnl   $1 - The name of the iteration variable.
+dnl   $2 - A string of values for the iteration variable, separated by 
+dnl        spaces.
+dnl   $3 - The text to be expanded for each iteration.
+
+define([fortext],
+[ifelse(
+  firstword($2), [],
+    [],
+    [pushdef([$1],[firstword($2)])$3[]fortext(
+      [$1], tailwords($2), [$3])])popdef([$1])[]dnl
+])
+</PRE>
+  <BR> <HR>
+<ADDRESS>
+<a href="mailto:hall@lanl.gov">Michael L. Hall</a>
+</ADDRESS>
+</BODY>
+</HTML>

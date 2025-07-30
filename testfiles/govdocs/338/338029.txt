@@ -1,0 +1,147 @@
+package util;
+import vrml.field.*;
+import vrml.node.*;
+import vrml.*;
+
+public class Blocker extends Script {
+
+	SFBool enabled;
+	SFBool bool_out;
+	SFColor color_out;
+	SFImage image_out;
+	SFInt32 int_out;
+	SFFloat float_out;
+	SFNode node_out;
+	SFRotation rotation_out;
+	SFString string_out;
+	SFTime time_out;
+	SFVec2f vec2_out;
+	SFVec3f vec3_out;
+	MFColor color_m_out;
+	MFInt32 int_m_out;
+	MFFloat float_m_out;
+	MFNode node_m_out;
+	MFRotation rotation_m_out;
+	MFString string_m_out;
+	MFVec2f vec2_m_out;
+	MFVec3f vec3_m_out;
+
+public void initialize()
+{
+Node n = (Node)(((SFNode)getField("t")).getValue());
+enabled = (SFBool)n.getExposedField("loop");
+bool_out = (SFBool)getEventOut("bool_out");
+color_out = (SFColor)getEventOut("color_out");
+image_out = (SFImage)getEventOut("image_out");
+int_out = (SFInt32)getEventOut("int_out");
+float_out = (SFFloat)getEventOut("float_out");
+node_out = (SFNode)getEventOut("node_out");
+rotation_out = (SFRotation)getEventOut("rotation_out");
+string_out = (SFString)getEventOut("string_out");
+time_out = (SFTime)getEventOut("time_out");
+vec2_out = (SFVec2f)getEventOut("vec2_out");
+vec3_out = (SFVec3f)getEventOut("vec3_out");
+color_m_out = (MFColor)getEventOut("color_m_out");
+int_m_out = (MFInt32)getEventOut("int_m_out");
+float_m_out = (MFFloat)getEventOut("float_m_out");
+node_m_out = (MFNode)getEventOut("node_m_out");
+rotation_m_out = (MFRotation)getEventOut("rotation_m_out");
+string_m_out = (MFString)getEventOut("string_m_out");
+vec2_m_out = (MFVec2f)getEventOut("vec2_m_out");
+vec3_m_out = (MFVec3f)getEventOut("vec3_m_out");
+}
+
+public void processEvent(Event event)
+{
+if (!(enabled.getValue())) return;
+
+switch (event.getName().charAt(0)) {
+case 'b':
+//	bool_in
+	bool_out.setValue((ConstSFBool)event.getValue());
+	break;
+case 'c':
+if (event.getName().charAt(6)=='i')
+//	color_in
+	color_out.setValue((ConstSFColor)event.getValue());
+else
+//	color_m_in
+	color_m_out.setValue((ConstMFColor)event.getValue());
+	break;
+case 'f':
+if (event.getName().charAt(6)=='i')
+//	float_in
+	float_out.setValue((ConstSFFloat)event.getValue());
+else
+//	float_m_in
+	float_m_out.setValue((ConstMFFloat)event.getValue());
+	break;
+case 'i':
+switch (event.getName().charAt(4)) {
+	case 'e':
+	//	image_in
+	image_out.setValue((ConstSFImage)event.getValue());
+		break;
+	case 'i':
+	//	int_in
+	int_out.setValue((ConstSFInt32)event.getValue());
+		break;
+	case 'm':
+	//	int_m_in
+	int_m_out.setValue((ConstMFInt32)event.getValue());
+		break;
+	}
+	break;
+case 'n':
+if (event.getName().charAt(5)=='i')
+//	node_in
+	node_out.setValue((ConstSFNode)event.getValue());
+else
+//	node_m_in
+	node_m_out.setValue((ConstMFNode)event.getValue());
+	break;
+case 'r':
+if (event.getName().charAt(9)=='i')
+//	rotation_in
+	rotation_out.setValue((ConstSFRotation)event.getValue());
+else
+//	rotation_m_in
+	rotation_m_out.setValue((ConstMFRotation)event.getValue());
+	break;
+case 's':
+if (event.getName().charAt(7)=='i')
+//	string_in
+	string_out.setValue((ConstSFString)event.getValue());
+else
+//	string_m_in
+	string_m_out.setValue((ConstMFString)event.getValue());
+	break;
+case 't':
+//	time_in
+	time_out.setValue((ConstSFTime)event.getValue());
+	break;
+case 'v':
+switch ((event.getName().charAt(3)-'2') + event.getName().charAt(5)) {
+	case 'i':
+	//	vec2_in
+	vec2_out.setValue((ConstSFVec2f)event.getValue());
+		break;
+	case 'm':
+	//	vec2_m_in
+	vec2_m_out.setValue((ConstMFVec2f)event.getValue());
+		break;
+	case 'j':
+	//	vec3_in
+	vec3_out.setValue((ConstSFVec3f)event.getValue());
+		break;
+	case 'n':
+	//	vec3_m_in
+	vec3_m_out.setValue((ConstMFVec3f)event.getValue());
+		break;
+	}
+	break;
+}
+
+}
+}
+

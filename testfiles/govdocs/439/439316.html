@@ -1,0 +1,485 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:daisyutil="xalan://org.outerj.daisy.frontend.util.XslUtil" xmlns:urlencoder="xalan://java.net.URLEncoder" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns:n="http://outerx.org/daisy/1.0#navigation" xmlns:d="http://outerx.org/daisy/1.0">
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>SafeStr</title>
+<link href="/daisy/resources/skins/bsi/css/daisy.css" type="text/css" rel="stylesheet">
+<script>
+          var daisy;
+          if (!daisy) daisy = new Object();
+          daisy.mountPoint = "/daisy";
+          daisy.skin = "bsi";
+          
+            daisy.site = {};
+            daisy.site.name = "bsi";
+            daisy.site.branch = "main";
+            daisy.site.branchId = "1";
+            daisy.site.language = "default";
+            daisy.site.languageId = "1";
+          
+          daisy.user = {};
+          daisy.user.id = "101";
+          daisy.user.login = "guest";
+        </script><script src="/daisy/resources/js/daisy.js" type="text/javascript"></script><script src="/daisy/resources/skins/bsi/js/menu.js" type="text/javascript"></script><script src="/daisy/resources/skins/bsi/js/MailTo.js" type="text/javascript"></script>
+</head>
+<body>
+<a style="display:none;" href="#skipnav" title="Skip to content">Skip to
+content</a>
+<div class="container">
+<div parseWidgets="false" id="header">
+<div class="logo">
+<a href="/daisy/bsi/"><img alt="Build Securit In: Setting a highter standard for software assurance" src="/daisy/resources/local/bsi.jpg"></a>
+</div>
+<div id="search">
+<form action="/daisy/bsi/search">
+<input id="searchInput" name="query" type="text"> <input id="searchButton" value="Search" type="submit">
+</form>
+</div>
+</div>
+<div class="section">
+<div parseWidgets="false" class="raised" id="generalNavigation">
+<b class="top"><b class="b1"></b><b class="b2"></b><b class="b3"></b><b class="b4"></b></b>
+<div class="boxcontent">
+<span>&nbsp;</span>
+<ul class="tabNavigation">
+<li class="tabNavigation">
+<a class="menuLink" onmouseover="status=''; return true;" href="#">Actions</a>
+<ul>
+<li class="tabNavigation">
+<a href="/daisy/bsi/articles/knowledge/coding/271-BSI/referrers.html">Referrers</a>
+</li>
+<li xmlns:cinclude="http://apache.org/cocoon/include/1.0" xmlns:p="http://outerx.org/daisy/1.0#publisher" class="tabNavigation">
+<a href="/daisy/bsi/recentChanges">Recent Changes</a>
+</li>
+<li class="tabNavigation">
+<a href="/daisy/bsi/articles/knowledge/coding/271-BSI.html?layoutType=plain">Hide navigation</a>
+</li>
+<li class="tabNavigation">
+<a href="/daisy/bsi/articles/knowledge/coding/271-BSI.pdf">PDF</a>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<b class="bottom"><b class="b4b"></b><b class="b3b"></b><b class="b2b"></b><b class="b1b"></b></b>
+</div>
+<div id="content">
+<a xmlns:lt="http://outerx.org/daisy/1.0#linktransformer" xmlns:einclude="http://outerx.org/daisy/1.0#externalinclude" name="skipnav"></a>
+<h1 id="dsy271-BSI" class="daisy-document-name">SafeStr</h1>
+
+
+<p xmlns:jx="http://apache.org/cocoon/templates/jx/1.0" xmlns:ns="http://outerx.org/daisy/1.0">Daniel Plakosh, Software&nbsp;Engineering&nbsp;Institute
+[<a title="Plakosh, Daniel" href="/daisy/bsi/about_us/authors/268-BSI.html">vita</a>]</p>
+
+
+
+
+<p>Copyright &copy; 2005 Pearson Education, Inc.</p>
+
+
+
+
+<table class="borderless" print-width="100%" width="100%">
+<tbody>
+
+<tr>
+
+<td>
+
+<p>2005-09-27; Updated 2008-07-17</p>
+
+</td>
+<td valign="top">
+
+<p align="right">
+<a title="Maturity Levels and Audience Indicators" href="/daisy/bsi/1084-BSI.html">L1 / D/P, L</a>&nbsp;&nbsp;&nbsp;&nbsp;</p>
+
+</td>
+
+</tr>
+
+</tbody>
+</table>
+
+
+
+
+<p>The C String Library (SafeStr) from Messier and Viega provides a rich
+string-handling library for C that has secure semantics yet is interoperable
+with legacy library code in a straightforward manner.</p>
+
+
+
+
+<h2>
+<a>Development Context</a>
+</h2>
+
+
+<p>
+<a>String manipulation</a>
+</p>
+
+
+<h2>
+<a>Technology Context</a>
+</h2>
+
+
+<p>
+<a>C, UNIX, Win32</a>
+</p>
+
+
+<h2>
+<a>Attacks</a>
+</h2>
+
+
+<p>
+<a>Attacker executes arbitrary code on machine with permissions of
+compromised process or changes the behavior of the program.</a>
+</p>
+
+
+<h2>
+<a>Risk</a>
+</h2>
+
+
+<p>
+<a>Standard C string manipulation functions are prone to programmer mistakes
+that can result in buffer overflow vulnerabilities.</a>
+</p>
+
+
+<h2>
+<a>Description</a>
+</h2>
+
+
+<p>
+<a>The C String Library (SafeStr) from Messier and Viega provides a rich
+string-handling library for C that has secure semantics yet is interoperable
+with legacy library code in a straightforward manner [Messier 03].</a>
+</p>
+
+
+<p>
+<a>The SafeStr library uses a dynamic approach for C that automatically
+resizes strings as required. SafeStr accomplishes this by reallocating memory
+and moving the contents of the string whenever an operation requires that a
+string grow in size. As a result, buffer overflows should not result from using
+the library.</a>
+</p>
+
+
+<p>
+<a>The SafeStr library is built around the safestr_t type. The safestr_t type
+is compatible with char * and allows safestr_t structures to be cast as char *
+and behave as C-style strings. The safestr_t type keeps accounting information
+(e.g., the actual and allocated length) in memory directly preceding the memory
+referenced by the pointer.</a>
+</p>
+
+
+<p>
+<a>The SafeStr library supports immutable strings. Strings can be specified
+as immutable during initialization or by calling</a>
+</p>
+
+
+<p>
+<a><tt>void safestr_makereadonly(safestr_t s);</tt></a>
+</p>
+
+
+<p>
+<a>Immutable strings cannot be modified using the SafeStr API. However, the
+memory can still be overwritten. The library only prevents writes initiated
+through SafeStr functions.</a>
+</p>
+
+
+<p>
+<a>The SafeStr API can help track trusted and untrusted data in the style of
+Perl&rsquo;s taint mode. A developer can use this mechanism to mark strings
+originating from untrusted sources as such. Strings that have been checked for
+potentially malicious input could subsequently be marked as trusted. When
+modifying a string, the trusted property of that string is set to "untrusted" if
+any of the operands are untrusted. When creating a new string from operations on
+other strings, the new string is marked as trusted only if all the strings that
+influence its value are trusted.</a>
+</p>
+
+
+<p>
+<a>The trust property will not properly propagate if the SafeStr API is
+circumvented. The SafeStr API does not currently provide any routines that check
+the trusted flag. However, you can explicitly check the flag yourself as shown
+in </a>Figure 1.</p>
+
+
+<p>
+<a><strong>Figure&nbsp;1.&nbsp;Trusted and untrusted data in SafeStr</strong></a>
+</p>
+
+
+<pre>
+<a>1. int safer_system(safestr_t cmd) {
+2.   if (!safestr_istrusted(cmd)) {
+3.     printf("Untrusted data in safer_system!\n");
+4.     abort();
+5.   }
+6.   return system((char *)cmd);
+7. }</a>
+</pre>
+
+
+<p>Error handling in SafeStr is performed using
+<a href="http://www.zork.org/xxl">XXL</a>, a library that provides both
+exceptions and asset management for C and C++. The caller is responsible for
+handling exceptions thrown by SafeStr and XXL. If no exception handler is
+specified, the default action is to output a message to stderr and call
+<tt>abort()</tt>. The dependency on XXL can be an issue because both libraries
+need to be adopted to support this solution.</p>
+
+
+<p>SafeStr is released under an open source BSD-style license.</p>
+
+
+<h2>
+<a>References</a>
+</h2>
+
+
+<table class="borderless" column-widths="120">
+<col width="120">
+<col>
+<tbody>
+
+<tr>
+
+<td valign="top">
+
+<p>[ISO/IEC 99]</p>
+
+</td>
+<td valign="top">
+
+<p>ISO/IEC. <em>ISO/IEC 9899 Second edition 1999-12-01 Programming languages &mdash;
+C</em>. International Organization for Standardization, 1999.</p>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td valign="top">
+
+<p>[Messier 03]</p>
+
+</td>
+<td valign="top">
+
+<p>Messier, Matt &amp; Viega, John. <em>Safe C String Library v1.0.3</em>.
+http://www.zork.org/safestr (2005).</p>
+
+</td>
+
+</tr>
+
+</tbody>
+</table>
+
+
+
+
+<a name="skipnav"></a>
+<h1 id="dsy270-BSI" class="daisy-document-name">Pearson Education, Inc. Copyright</h1>
+
+
+<p>This material is excerpted from <em>Secure Coding in C and C++</em>, by
+Robert C. Seacord, copyright &copy; 2006 by Pearson Education, Inc., published as a
+CERT<sup>&reg;</sup> book in the SEI Series in Software Engineering. All rights
+reserved. It is reprinted with permission and may not be further reproduced or
+distributed without the prior written consent of Pearson Education, Inc.</p>
+
+
+
+
+<p>
+<a title="Adobe Acrobat Reader" href="http://www.adobe.com/products/acrobat/readstep2.html"><img alt="Get Adobe Reader" border="0" src="/daisy/resources/local/pdficon_small.gif"> Get Adobe Reader</a>
+</p>
+</div>
+</div>
+<div parseWidgets="false" id="documentNavigation">
+<ul class="navigation">
+<li class="navigation ">
+<a href="/daisy/bsi/home.html" class="navigation ">Home</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/mission.html" class="navigation ">Mission</a>
+</li>
+<li class="navigation  navnode-open">
+<a href="/daisy/bsi/articles.html" class="navigation  navnode-open">Articles [by Content Area]</a>
+<ul>
+<li class="navigation  navnode-closed">
+<a href="/daisy/bsi/articles/best-practices.html" class="navigation  navnode-closed">Best Practices</a>
+</li>
+<li class="navigation  navnode-open">
+<a href="/daisy/bsi/articles/knowledge.html" class="navigation  navnode-open">Knowledge</a>
+<ul>
+<li class="navigation  navnode-closed">
+<a href="/daisy/bsi/articles/knowledge/assurance.html" class="navigation  navnode-closed">Assurance Cases</a>
+</li>
+<li class="navigation  navnode-closed">
+<a href="/daisy/bsi/articles/knowledge/attack.html" class="navigation  navnode-closed">Attack Patterns</a>
+</li>
+<li class="navigation  navnode-closed">
+<a href="/daisy/bsi/articles/knowledge/business.html" class="navigation  navnode-closed">Business Case Models</a>
+</li>
+<li class="navigation  navnode-open">
+<a href="/daisy/bsi/articles/knowledge/coding.html" class="navigation  navnode-open">Coding Practices</a>
+<ul>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/277-BSI.html" class="navigation ">Arbitrary Precision Arithmetic</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/295-BSI.html" class="navigation ">C++ std::string</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/305-BSI.html" class="navigation ">Coding Practices</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/278-BSI.html" class="navigation ">Compiler Checks</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/476-BSI.html" class="navigation ">Consistent Memory Management Conventions</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/310-BSI.html" class="navigation ">Detection and Recovery</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/300-BSI.html" class="navigation ">fgets() and gets_s()</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/301-BSI.html" class="navigation ">Guard Pages</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/302-BSI.html" class="navigation ">Heap Integrity Detection</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/303-BSI.html" class="navigation ">memcpy_s() and memmove_s()</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/304-BSI.html" class="navigation ">Null Pointers</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/269-BSI.html" class="navigation ">OpenBSD</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/315-BSI.html" class="navigation ">OpenBSD's strlcpy() and strlcat()</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/306-BSI.html" class="navigation ">Phkmalloc</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/307-BSI.html" class="navigation ">Randomization</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/308-BSI.html" class="navigation ">Range Checking</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/311-BSI.html" class="navigation ">Runtime Analysis Tools</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/312-BSI.html" class="navigation ">Safe Integer Operations</a>
+</li>
+<li class="navigation active-navnode">
+<a href="/daisy/bsi/articles/knowledge/coding/271-BSI.html" class="navigation active-navnode">SafeStr</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/314-BSI.html" class="navigation ">strcpy_s() and strcat_s()</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/313-BSI.html" class="navigation ">strcpy() and strcat()</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/487-BSI.html" class="navigation ">strlcpy() and strlcat()</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/317-BSI.html" class="navigation ">strncpy_s() and strncat_s()</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/316-BSI.html" class="navigation ">strncpy() and strncat()</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/318-BSI.html" class="navigation ">Strong Typing</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/272-BSI.html" class="navigation ">Strsafe.h</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/273-BSI.html" class="navigation ">Vstr</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/articles/knowledge/coding/276-BSI.html" class="navigation ">Windows XP SP2</a>
+</li>
+</ul>
+</li>
+<li class=" navigation">
+<a href="/daisy/bsi-rules/76.html" class=" navigation">Coding Rules</a>
+</li>
+<li class="navigation  navnode-closed">
+<a href="/daisy/bsi/articles/knowledge/guidelines.html" class="navigation  navnode-closed">Guidelines</a>
+</li>
+<li class="navigation  navnode-closed">
+<a href="/daisy/bsi/articles/knowledge/lessons.html" class="navigation  navnode-closed">Lessons Learned</a>
+</li>
+<li class="navigation  navnode-closed">
+<a href="/daisy/bsi/articles/knowledge/principles.html" class="navigation  navnode-closed">Principles</a>
+</li>
+<li class="navigation  navnode-closed">
+<a href="/daisy/bsi/articles/knowledge/sdlc.html" class="navigation  navnode-closed">SDLC Process</a>
+</li>
+</ul>
+</li>
+<li class="navigation  navnode-closed">
+<a href="/daisy/bsi/articles/tools.html" class="navigation  navnode-closed">Tools</a>
+</li>
+</ul>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/securecoding.html" class="navigation ">Secure Coding Sites</a>
+</li>
+<li class=" navigation">
+<a href="https://buildsecurityin.us-cert.gov/swa/" class=" navigation">DHS SwA Web Site</a>
+</li>
+<li class="navigation  navnode-closed">
+<a href="/daisy/bsi/dhs.html" class="navigation  navnode-closed">DHS Software Assurance Resources</a>
+</li>
+<li class="navigation  navnode-closed">
+<a href="/daisy/bsi/resources.html" class="navigation  navnode-closed">Additional Resources</a>
+</li>
+<li class="navigation  navnode-closed">
+<a href="/daisy/bsi/events.html" class="navigation  navnode-closed">Events</a>
+</li>
+<li class="navigation  navnode-closed">
+<a href="/daisy/bsi/about_us.html" class="navigation  navnode-closed">About Us</a>
+</li>
+<li class="navigation  navnode-closed">
+<a href="/daisy/bsi/faqs.html" class="navigation  navnode-closed">FAQs</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/rss.html" class="navigation ">RSS Feeds</a>
+</li>
+<li class="navigation ">
+<a href="/daisy/bsi/bsi.html" class="navigation ">Contact Us</a>
+</li>
+</ul>
+</div>
+</div>
+</body>
+</html>

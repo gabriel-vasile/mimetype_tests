@@ -1,0 +1,118 @@
+<html>
+<head>
+<title>
+Event model: The event
+</title>
+</head>
+<body>
+<H2> Event model: The event </H2>
+
+D. Adams
+<br>
+27sep01 1300
+
+<P><HR><P>
+
+<H3>Data in the event</H3>
+There are two types of data associated with an event: environmental
+information that describes the conditions under which the event was
+created and the much larger physics data. Users will want to access
+both types of data for single events and more often for collections
+of events which meet some criteria. Example criteria might include:
+<ul>
+<li>
+events from a particular run (time period),
+<li>
+all events with missing Et above 150 GeV reported by a specified algorithm or
+<li>
+all data which has not been processed with a particular algorithm
+</ul>
+A typical usage pattern would be to iterate over such a collection and
+apply the same set of algorithms to each event.
+
+<H3>Environmental data</H3>
+The environmental information for an event includes
+<ul>
+<li>event identifier (e.g. run and event numbers)
+<li>time stamp
+<li>trigger(s)
+<li>luminosity
+<li>ID for the processor(s) constructing the event
+<li>for Monte Carlo data, the random number states(s)
+</ul>
+We will not discuss the details of these here. We simply note that users
+will want to access these data for particular events.
+
+<H3>Physics data</H3>
+Most of the physics data is derived. For Monte Carlo everything can be
+derived from the initial random number state (e.g. seeds). For real data,
+everything is derived from the raw data. Here we do not discuss the
+physics content (clusters, tracks, jets, electrons, ...) of this data.
+<p>
+The physics data is immutable. Once written, the data is not modified.
+This greatly simplifies the management of persistent data. However it
+is always possible for the data to grow either by applying new algorithms,
+or old algorithms with different parameters or code.
+<p>
+We impose a condition of reproducibility. The event is required to
+carry history information that is sufficient to reproduce its derived
+data. Platform variability, such as
+differences in numeric representation (especially floating point)
+may lead to different results on different computers and we do not 
+(yet) impose
+the requirement that all machines produce exactly the same data.
+<p>
+The derived data is created by a series of algorithms. The output of any
+one algorithm is a piece (or pieces) of data derived from some
+subset of the existing data.
+The ATLAS unit of persistent data is the "data object".
+We will refer to the piece produced by an algorithm as
+an event data object or EDO.
+An EDO will typically be a container of reconstructed objects,
+e.g. tracks or electrons.
+<p>
+Our conditions of immutability and extensibility are achieved by
+making EDO's truly immutable--they cannot be modified in any way
+including expansion. However the event can be expanded by adding
+more EDO's.
+<p>
+The requirement of reproducibility is met by requiring the event
+carry history information for each EDO. This history is sufficient
+information sufficient to reproduce its EDO. It includes:
+<ul>
+<li>a unique algorithm identifier (e.g. name and version)
+<li>the run time parameters used by the algorithm
+<li>the calibration, alignment or other external data used by
+    the algorithm
+<li>algorithm return status (success/fail or pass/fail for a filter)
+<li>the list of EDO's used as input
+<li>computer identifier
+<li>time stamp
+</ul>
+
+<H3>Data storage</H3>
+The above describes the nature of the event information
+that it is available to users. It does not describe the user interface
+(later sections) or the manner in which this data is stored either in
+memory or on disk. Clearly much of the event environment and EDO history
+is common to multiple events and need not be duplicated. Also it may be
+desirable to defer the transfer of most or all event information until it
+is required. This transfer may be from disk to memory, tape to disk or
+between remote sites.
+
+<H3>Virtual data</H3>
+The existence of the EDO history information enables the use of virtual
+data where an EDO is generated (or regenerated) on-demand from the history
+rather than being read in from disk. The choice of real or virtual data
+can be determined by the relative availability of processing power and
+storage capacity.
+<p>
+The problem of platform variability must be handled
+especially if data is to be regenerated. One step might be to identify
+a category of platforms which produce identical results and restrict
+production of a particular EDO to that category.
+
+<P>
+<HR><A HREF=mailto:dladams@bnl.gov>dladams@bnl.gov</A></P>
+</body>
+</html>

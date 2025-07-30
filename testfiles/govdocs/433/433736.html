@@ -1,0 +1,582 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html lang="en"><!-- InstanceBegin template="/Templates/ContentLevel1.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>Kepler Mission &gt; Transit Detection and Simulation</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="keywords" content="extrasolar, extrasolar, extra-solar, exoplanet, exo-planet, Kepler Mission, Kepler, transit, 
+photometry, habitable, habitable planet, Johannes Kepler, Earth-size, planets, space, NASA, National Aeronautics and Space Administration, 
+Ames, Ames Research Center, Planet Quest, terrestrial, extraterrestrial">
+<meta http-equiv="description" content="Kepler Mission to find Earth-size planets in the habitable zones of stars">
+<meta name="author" content="">
+<script language="JavaScript">
+<!-- Hide from older browsers (C.Lawshe)
+
+function lastMod ()  {
+ 	var monthNames = new Array( "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" );
+ 	var lastDate = new Date( document.lastModified );
+ 	var yy = lastDate.getYear();
+		year = (yy < 1000) ? yy + 1900 : yy;
+  		month = lastDate.getMonth();
+		day = lastDate.getDate();
+
+		printDate = monthNames[ month ] + " " + day + ", " + year;
+
+		towrite = printDate;
+  return towrite;
+}
+
+function MM_openBrWindow(theURL,winName,features) { //v2.0
+  window.open(theURL,winName,features);
+}
+
+function startPopUp(desktopURL, w, h) {
+  var desktop = 
+  window.open(desktopURL, "_blank","scrollbars=no,resizable=yes,width=" + w + ",height=" + h);
+	self.name = "main";
+}
+
+function new_window(url, w, h)
+{
+   link = window.open(url,"Link","toolbar=1,location=0,directories=0,status=0,menubar=yes,scrollbars=yes,resizable=yes,width=" + w + ",height=" + h);
+}
+
+// stop hiding -->
+</script>
+<script language="JavaScript">
+<!--
+function MM_findObj(n, d) { //v4.01
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+function MM_swapImage() { //v3.0
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+function MM_swapImgRestore() { //v3.0
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+
+function MM_preloadImages() { //v3.0
+ var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+   var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+   if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+
+function mmLoadMenus() {
+  if (window.mm_menu_0527133955_0) return;
+        window.mm_menu_0527133955_0 = new Menu("root",475,18,"Verdana, Arial, Helvetica, sans-serif",12,"#FFFFFF","#FFFFFF","#000066","#6666CC","left","middle",3,0,100,-5,7,true,false,true,0,false,true);
+  mm_menu_0527133955_0.addMenuItem("IN-DEPTH&nbsp;SCIENCE&nbsp;CONTENTS","location='http://kepler.nasa.gov/sci/basis/index.html'");
+  mm_menu_0527133955_0.addMenuItem("Scientific&nbsp;Goals","location='http://kepler.nasa.gov/sci/basis/goals.html'");
+  mm_menu_0527133955_0.addMenuItem("Nature&nbsp;of&nbsp;the&nbsp;Investigation","location='http://kepler.nasa.gov/sci/basis/nature.html'");
+  mm_menu_0527133955_0.addMenuItem("Characteristics&nbsp;of&nbsp;Transits","location='http://kepler.nasa.gov/sci/basis/character.html'");
+  mm_menu_0527133955_0.addMenuItem("Differential&nbsp;Photometry","location='http://kepler.nasa.gov/sci/basis/diffphot.html'");
+  mm_menu_0527133955_0.addMenuItem("Transit&nbsp;Detection&nbsp;and&nbsp;Simulation","location='http://kepler.nasa.gov/sci/basis/simulation.html'");
+  mm_menu_0527133955_0.addMenuItem("Stellar&nbsp;Variability","location='http://kepler.nasa.gov/sci/basis/variability.html'");
+  mm_menu_0527133955_0.addMenuItem("Detectable&nbsp;Planet&nbsp;Size","location='http://kepler.nasa.gov/sci/basis/sizes.html'");
+  mm_menu_0527133955_0.addMenuItem("Target&nbsp;Field&nbsp;of&nbsp;View&nbsp;-&nbsp;Interactive&nbsp;FOV","location='http://kepler.nasa.gov/sci/basis/fov.html'");
+  mm_menu_0527133955_0.addMenuItem("Stellar&nbsp;Classification&nbsp;Program","location='http://kepler.nasa.gov/sci/basis/stellarclass.html'");
+  mm_menu_0527133955_0.addMenuItem("Number&nbsp;of&nbsp;Stars&nbsp;for&nbsp;Which&nbsp;Planets&nbsp;Can&nbsp;Be&nbsp;Detected","location='http://kepler.nasa.gov/sci/basis/number.html'");
+  mm_menu_0527133955_0.addMenuItem("Follow-up&nbsp;Observing&nbsp;Program","location='http://kepler.nasa.gov/sci/basis/complementary.html'");
+  mm_menu_0527133955_0.addMenuItem("Expected&nbsp;Results","location='http://kepler.nasa.gov/sci/basis/results.html'");
+  mm_menu_0527133955_0.addMenuItem("Detection&nbsp;of&nbsp;Giant&nbsp;Planets","location='http://kepler.nasa.gov/sci/basis/giants.html'");
+  mm_menu_0527133955_0.addMenuItem("Team","location='http://kepler.nasa.gov/about/team.html'");
+  mm_menu_0527133955_0.addMenuItem("Technical&nbsp;Papers","location='http://kepler.nasa.gov/sci/papers.html'");
+  mm_menu_0527133955_0.addMenuItem("References","location='http://kepler.nasa.gov/sci/references.html'");
+   mm_menu_0527133955_0.fontWeight="bold";
+   mm_menu_0527133955_0.hideOnMouseOut=true;
+   mm_menu_0527133955_0.bgColor='#555555';
+   mm_menu_0527133955_0.menuBorder=1;
+   mm_menu_0527133955_0.menuLiteBgColor='#ffffff';
+   mm_menu_0527133955_0.menuBorderBgColor='#555555';
+          window.mm_menu_0527142000_1 = new Menu("root",475,18,"Verdana, Arial, Helvetica, sans-serif",12,"#FFFFFF","#ffffff","#000066","#6666CC","left","middle",3,0,100,-5,7,true,false,true,0,false,true);
+  mm_menu_0527142000_1.addMenuItem("RELATED&nbsp;SCIENCE","location='http://kepler.nasa.gov/sci/related.html'");
+  mm_menu_0527142000_1.addMenuItem("Asteroseismology","location='http://kepler.nasa.gov/sci/asteroseismology.html'");
+  mm_menu_0527142000_1.addMenuItem("Participating&nbsp;Scientist&nbsp;Program","location='http://kepler.nasa.gov/sci/psp.html'");
+  mm_menu_0527142000_1.addMenuItem("Guest&nbsp;Observer&nbsp;Program","location='http://kepler.nasa.gov/sci/godap.html'");
+  mm_menu_0527142000_1.addMenuItem("Data&nbsp;Analysis&nbsp;Program","location='http://kepler.nasa.gov/sci/dap.html'");
+  mm_menu_0527142000_1.addMenuItem("Capabilities&nbsp;of&nbsp;Planet&nbsp;Detection&nbsp;Methods","location='http://kepler.nasa.gov/sci/capabilities.html'");
+  mm_menu_0527142000_1.addMenuItem("Planet&nbsp;Detection&nbsp;-&nbsp;Additional&nbsp;Reading","location='http://kepler.nasa.gov/planetfinding/reading.html'");
+  mm_menu_0527142000_1.addMenuItem("Planet&nbsp;Detection&nbsp;-&nbsp;Links","location='http://kepler.nasa.gov/planetfinding/links.html'");
+   mm_menu_0527142000_1.fontWeight="bold";
+   mm_menu_0527142000_1.hideOnMouseOut=true;
+   mm_menu_0527142000_1.bgColor='#555555';
+   mm_menu_0527142000_1.menuBorder=1;
+   mm_menu_0527142000_1.menuLiteBgColor='#ffffff';
+   mm_menu_0527142000_1.menuBorderBgColor='#555555';
+window.mm_menu_0527143202_2 = new Menu("root",475,18,"Verdana, Arial, Helvetica, sans-serif",12,"#FFFFFF","#ffffff","#000066","#6666CC","left","middle",3,0,100,-5,7,true,false,true,0,false,true);
+  mm_menu_0527143202_2.addMenuItem("MISSION&nbsp;DESIGN","location='http://kepler.nasa.gov/sci/design/index.html'");
+  mm_menu_0527143202_2.addMenuItem("Photometer&nbsp;and&nbsp;Spacecraft","location='http://kepler.nasa.gov/sci/design/spacecraft.html'");
+  mm_menu_0527143202_2.addMenuItem("Launch&nbsp;Vehicle&nbsp;and&nbsp;Spacecraft&nbsp;Orbit","location='http://kepler.nasa.gov/sci/design/orbit.html'");
+  mm_menu_0527143202_2.addMenuItem("Picture&nbsp;Gallery","location='http://kepler.nasa.gov/media/gallery.html'");
+  mm_menu_0527143202_2.addMenuItem("Acronyms","location='http://kepler.nasa.gov/about/acronyms.html'");
+   mm_menu_0527143202_2.fontWeight="bold";
+   mm_menu_0527143202_2.hideOnMouseOut=true;
+   mm_menu_0527143202_2.bgColor='#555555';
+   mm_menu_0527143202_2.menuBorder=1;
+   mm_menu_0527143202_2.menuLiteBgColor='#ffffff';
+   mm_menu_0527143202_2.menuBorderBgColor='#555555';
+      window.mm_menu_0527143639_3 = new Menu("root",475,18,"Verdana, Arial, Helvetica, sans-serif",12,"#FFFFFF","#ffffff","#000066","#6666CC","left","middle",3,0,100,-5,7,true,false,true,0,false,true);
+  mm_menu_0527143639_3.addMenuItem("EDUCATION/OUTREACH","location='http://kepler.nasa.gov/ed/index.html'");
+  mm_menu_0527143639_3.addMenuItem("Kepler&nbsp;in&nbsp;Brief","location='http://kepler.nasa.gov/ed/nutshell.html'");
+  mm_menu_0527143639_3.addMenuItem("Education&nbsp;and&nbsp;Public&nbsp;Outreach&nbsp;Projects","location='http://kepler.nasa.gov/ed/epo-chart.html'");
+  mm_menu_0527143639_3.addMenuItem("Activities","location='http://kepler.nasa.gov/ed/activities.html'");
+  mm_menu_0527143639_3.addMenuItem("Handouts","location='http://kepler.nasa.gov/ed/pdf/factlitho.html'");
+  mm_menu_0527143639_3.addMenuItem("Powerpoint&nbsp;Files","location='http://kepler.nasa.gov/ed/ppt'");
+  mm_menu_0527143639_3.addMenuItem("Models&nbsp;and&nbsp;Simulations","location='http://kepler.nasa.gov/ed/models&sims.html'");
+  mm_menu_0527143639_3.addMenuItem("Request&nbsp;a&nbsp;Kepler&nbsp;Speaker","location='http://lhs.berkeley.edu/hou/kepler/speaker.php'");
+  mm_menu_0527143639_3.addMenuItem("Solar&nbsp;System&nbsp;Transits","location='http://kepler.nasa.gov/ed/sstransits.html'");
+  mm_menu_0527143639_3.addMenuItem("Web&nbsp;&nbsp;Links&nbsp;for&nbsp;Educators","location='http://kepler.nasa.gov/ed/otherlinks.html'");
+  mm_menu_0527143639_3.addMenuItem("Your&nbsp;Name&nbsp;in&nbsp;Space","location='http://kepler.nasa.gov/ed/name.html'");
+   mm_menu_0527143639_3.fontWeight="bold";
+   mm_menu_0527143639_3.hideOnMouseOut=true;
+   mm_menu_0527143639_3.bgColor='#555555';
+   mm_menu_0527143639_3.menuBorder=1;
+   mm_menu_0527143639_3.menuLiteBgColor='#ffffff';
+   mm_menu_0527143639_3.menuBorderBgColor='#555555';
+window.mm_menu_0527144330_4 = new Menu("root",475,18,"Verdana, Arial, Helvetica, sans-serif",12,"#FFFFFF","#ffffff","#000066","#6666CC","left","middle",3,0,100,-5,7,true,false,true,0,false,true);
+  mm_menu_0527144330_4.addMenuItem("JOHANNES&nbsp;KEPLER","location='http://kepler.nasa.gov/johannes/index.html'");
+  mm_menu_0527144330_4.addMenuItem("Johannes&nbsp;Kepler&nbsp;-&nbsp;Links","location='http://kepler.nasa.gov/johannes/keplersites.html'");
+  mm_menu_0527144330_4.addMenuItem("Biographies&nbsp;and&nbsp;Books","location='http://kepler.nasa.gov/johannes/books.html'");
+   mm_menu_0527144330_4.fontWeight="bold";
+   mm_menu_0527144330_4.hideOnMouseOut=true;
+   mm_menu_0527144330_4.bgColor='#555555';
+   mm_menu_0527144330_4.menuBorder=1;
+   mm_menu_0527144330_4.menuLiteBgColor='#ffffff';
+   mm_menu_0527144330_4.menuBorderBgColor='#555555';
+  window.mm_menu_0527144632_5 = new Menu("root",275,18,"Verdana, Arial, Helvetica, sans-serif",12,"#FFFFFF","#ffffff","#000066","#6666CC","left","middle",3,0,100,-5,7,true,false,true,0,false,true);
+  mm_menu_0527144632_5.addMenuItem("MULTIMEDIA","location='http://kepler.nasa.gov/media/index.html'");
+  mm_menu_0527144632_5.addMenuItem("Graphics","location='http://kepler.nasa.gov/media/art.html'");
+  mm_menu_0527144632_5.addMenuItem("Animations","location='http://kepler.nasa.gov/media/animations.html'");
+  mm_menu_0527144632_5.addMenuItem("Photo&nbsp;Gallery","location='http://kepler.nasa.gov/media/gallery.html'");
+   mm_menu_0527144632_5.fontWeight="bold";
+   mm_menu_0527144632_5.hideOnMouseOut=true;
+   mm_menu_0527144632_5.bgColor='#555555';
+   mm_menu_0527144632_5.menuBorder=1;
+   mm_menu_0527144632_5.menuLiteBgColor='#ffffff';
+   mm_menu_0527144632_5.menuBorderBgColor='#555555';
+  window.mm_menu_0527150217_6 = new Menu("root",375,18,"Verdana, Arial, Helvetica, sans-serif",12,"#FFFFFF","#ffffff","#000066","#6666CC","left","middle",3,0,100,-5,7,true,false,true,0,false,true);
+  mm_menu_0527150217_6.addMenuItem("IN&nbsp;THE&nbsp;NEWS","location='http://kepler.nasa.gov/ed/articles/index.html'");
+  mm_menu_0527150217_6.addMenuItem("News&nbsp;About&nbsp;Kepler","location='http://kepler.nasa.gov/ed/articles/index.html'");
+  mm_menu_0527150217_6.addMenuItem("News&nbsp;About&nbsp;Planet-finding","location='http://kepler.nasa.gov/ed/articles/articles-planetfinding.html'");
+   mm_menu_0527150217_6.fontWeight="bold";
+   mm_menu_0527150217_6.hideOnMouseOut=true;
+   mm_menu_0527150217_6.bgColor='#555555';
+   mm_menu_0527150217_6.menuBorder=1;
+   mm_menu_0527150217_6.menuLiteBgColor='#ffffff';
+   mm_menu_0527150217_6.menuBorderBgColor='#555555';
+
+mm_menu_0527150217_6.writeMenus();
+} // mmLoadMenus()
+
+//-->
+</script>
+<script language="JavaScript1.2" src="../../images/leftnavigation/mm_menu.js"></script>
+<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
+<link href="../../styles/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body bgcolor="#000000" alink="#ff0000" vlink="#0000FF" link="#0000FF" onLoad="MM_preloadImages('../../images/leftnavigation/leftnav01_f2.gif','../../images/leftnavigation/leftnav02_f2.gif','http://kepler.nasa.gov//Desktop/../images/leftnavigation/leftnav03_f2.gif','../../images/leftnavigation/leftnav04_f2.gif','../../images/leftnavigation/leftnav05_f2.gif','../../images/leftnavigation/leftnav06_f2.gif','../../images/leftnavigation/leftnav07_f2.gif','../../images/leftnavigation/leftnav08_f2.gif','../../images/leftnavigation/leftnav09_f2.gif','../../images/leftnavigation/leftnav10_f2.gif','../../images/leftnavigation/leftnav11_f2.gif','../../images/leftnavigation/leftnav12_f2.gif')">
+<script language="JavaScript1.2">mmLoadMenus();</script>
+<div align="center">
+
+<!-- Table below is for layout purposes only."-->
+<table border="0" cellspacing="0" cellpadding="0" bgcolor="#ffffff" width="750">
+<tr>
+<td>
+		
+<!-- Begin Top Bar - mostly space for search function
+<div align="right">
+<table border="0" cellspacing="0" cellpadding="0" width="750" bgcolor="#FFFFFF">
+	<tr>
+		<td class="footer" width="280">&nbsp;</td>
+		<td width="200">&nbsp;</td>
+		<td width="120">&nbsp;</td>
+		<td width="150" >
+		   <div align="center"><span class="body_text">
+			<a href="http://search1.nasa.gov:80/nasasearch/search/advSearch.jsp?nasaInclude=&qt=all&qx=&qm=anywhere&dct=Any+Type&dn=kepler.arc.nasa.gov&dt=at&recPerPg=10&displayFormat=detail&sortBy=Scoredesc" target="_blank"><strong>Search this Website</strong></a></span> </div></td>
+
+	</tr>
+</table>
+</div>
+-->
+ 
+<!-- End Top Bar-->
+<div align="center">
+<table border="0" cellspacing="0" cellpadding="0" width="750">
+<tr><td colspan="2">
+
+<!-- Kepler Banner Begin -->
+<div align="center">
+<!-- InstanceBeginEditable name="Banner" -->
+
+<a href="../../index.html"><img src="../../images/Keplerbanner2.jpg"></a>
+<!-- InstanceEndEditable -->
+</div>
+<!-- Kepler Banner End -->
+</td>
+</tr>
+<!-- Middle Section Begin -->
+
+<tr>
+<!-- Left Hand Navigation Begin -->
+<td bgcolor="#f2f2f2" valign="top" width="141" align="left"><!-- from Fireworks file LeftNav2 --> 	
+ 
+<a href="http://kepler.nasa.gov" onMouseOut="MM_swapImgRestore();" onMouseOver="MM_swapImage('leftnav01','','../../images/leftnavigation/leftnav01_f2.gif',1);">
+   		<img name="leftnav01" src="../../images/leftnavigation/leftnav01.gif" width="139" height="24" border="0" alt=""></a><br>
+<a href="http://kepler.nasa.gov/about" onMouseOut="MM_swapImgRestore();" onMouseOver="MM_swapImage('leftnav02','','../../images/leftnavigation/leftnav02_f2.gif',1);">
+	<img name="leftnav02" src="../../images/leftnavigation/leftnav02.gif" width="139" height="24" border="0" alt=""></a><br>
+<a href="http://kepler.nasa.gov/about/news.html" onMouseOut="MM_swapImgRestore();" onMouseOver="MM_swapImage('leftnav03','','../../images/leftnavigation/leftnav03_f2.gif',1);">
+	<img name="leftnav03" src="../../images/leftnavigation/leftnav03.gif" width="139" height="24" border="0" alt=""></a><br>
+<a href="http://kepler.nasa.gov/about/faq.html" onMouseOut="MM_swapImgRestore();" onMouseOver="MM_swapImage('leftnav04','','../../images/leftnavigation/leftnav04_f2.gif',1);">
+	<img name="leftnav04" src="../../images/leftnavigation/leftnav04.gif" width="139" height="24" border="0" alt=""></a><br>
+<a href="http://kepler.nasa.gov/sci/basis" onMouseOut="MM_swapImgRestore();MM_startTimeout();" onMouseOver="MM_showMenu(window.mm_menu_0527133955_0,139,0,null,'leftnav05');MM_swapImage('leftnav05','','../../images/leftnavigation/leftnav05_f2.gif',1)">
+	<img name="leftnav05" src="../../images/leftnavigation/leftnav05.gif" width="139" height="24" border="0" alt=""></a><br>
+<a href="http://kepler.nasa.gov/sci/related.html" onMouseOut="MM_swapImgRestore();MM_startTimeout();" onMouseOver="MM_showMenu(window.mm_menu_0527142000_1,139,0,null,'leftnav06');MM_swapImage('leftnav06','','../../images/leftnavigation/leftnav06_f2.gif',1)">
+	<img name="leftnav06" src="../../images/leftnavigation/leftnav06.gif" width="139" height="24" border="0" alt=""></a><br>
+<a href="http://kepler.nasa.gov/sci/design" onMouseOut="MM_swapImgRestore();MM_startTimeout();" onMouseOver="MM_showMenu(window.mm_menu_0527143202_2,139,0,null,'leftnav07');MM_swapImage('leftnav07','','../../images/leftnavigation/leftnav07_f2.gif',1)">
+	<img name="leftnav07" src="../../images/leftnavigation/leftnav07.gif" width="139" height="24" border="0" alt=""></a><br>
+<a href="http://kepler.nasa.gov/ed" onMouseOut="MM_swapImgRestore();MM_startTimeout();" onMouseOver="MM_showMenu(window.mm_menu_0527143639_3,139,0,null,'leftnav08');MM_swapImage('leftnav08','','../../images/leftnavigation/leftnav08_f2.gif',1)">
+	<img name="leftnav08" src="../../images/leftnavigation/leftnav08.gif" width="139" height="24" border="0" alt="0"></a><br>
+<a href="http://kepler.nasa.gov/johannes" onMouseOut="MM_swapImgRestore();MM_startTimeout();" onMouseOver="MM_showMenu(window.mm_menu_0527144330_4,139,0,null,'leftnav09');MM_swapImage('leftnav09','','../../images/leftnavigation/leftnav09_f2.gif',1)">
+	<img name="leftnav09" src="../../images/leftnavigation/leftnav09.gif" width="139" height="24" border="0" alt="0"></a><br>
+<a href="http://kepler.nasa.gov/media" onMouseOut="MM_swapImgRestore();MM_startTimeout();" onMouseOver="MM_showMenu(window.mm_menu_0527144632_5,139,0,null,'leftnav10');MM_swapImage('leftnav10','','../../images/leftnavigation/leftnav10_f2.gif',1)">
+	<img name="leftnav10" src="../../images/leftnavigation/leftnav10.gif" width="139" height="24" border="0" alt="0"></a><br>
+<a href="http://kepler.nasa.gov/ed/articles" onMouseOut="MM_swapImgRestore();MM_startTimeout();" onMouseOver="MM_showMenu(window.mm_menu_0527150217_6,139,0,null,'leftnav11');MM_swapImage('leftnav11','','../../images/leftnavigation/leftnav11_f2.gif',1)">
+	<img name="leftnav11" src="../../images/leftnavigation/leftnav11.gif" width="139" height="24" border="0" alt="0"></a><br>
+<a href="http://search1.nasa.gov:80/nasasearch/search/advSearch.jsp?nasaInclude=&qt=all&qx=&qm=anywhere&dct=Any+Type&dn=kepler.arc.nasa.gov&dt=at&recPerPg=10&displayFormat=detail&sortBy=Scoredesc" target="_blank" onMouseOver="MM_swapImage('leftnav12','','../../images/leftnavigation/leftnav12_f2.gif',1);" onMouseOut="MM_swapImgRestore();">
+	<img name="leftnav12" src="../../images/leftnavigation/leftnav12.gif" width="139" height="24" border="0" alt="0"></a><br>
+<br>
+<!-- InstanceBeginEditable name="LowerLeftNook" -->
+			
+			<!-- InstanceEndEditable -->
+</td>
+
+<!-- Left Hand Navigation End -->		
+<!-- Content cell Begin -->
+<td width="609" align="left"  valign="top">
+	
+	
+    <table cellspacing="5" cellpadding="5">
+  <tr>
+    <td align="left" width="440">
+    <span class="breadcrumb">
+	<!-- InstanceBeginEditable name="BreadCrumbsTop" --><a href="http://kepler.nasa.gov" class="breadcrumb">Kepler Home</a> &gt; <a href="../index.html" class="breadcrumb">In Depth Science</a> &gt; <a href="simulation.html" class="breadcrumb">Simulation</a><!-- InstanceEndEditable --></span>
+    </td>
+    <td width="165" align="right" class="breadcrumb"><SELECT NAME="info" onChange="window.open(this.options[this.selectedIndex].value,'_top')">
+      <OPTION value SELECTED>Quick Links</OPTION>
+      <OPTION value="http://kepler.nasa.gov/">KEPLER&nbsp;HOME</OPTION>
+      <OPTION value="http://kepler.nasa.gov/about/">OVERVIEW</OPTION>
+      <OPTION value="http://kepler.nasa.gov/about/news.html">STATUS&nbsp;&&nbsp;SCHEDULE</OPTION>
+      <OPTION value="http://kepler.nasa.gov/about/faq.html">FAQ</OPTION>
+      <OPTION value="http://kepler.nasa.gov/sci/basis">IN&nbsp;DEPTH&nbsp;SCIENCE</option>
+      <OPTION value="http://kepler.nasa.gov/sci/basis/goals.html">&nbsp;&nbsp;Goals</option>
+      <OPTION value="http://kepler.nasa.gov/sci/basis/nature.html">&nbsp;&nbsp;The&nbsp;Investigation</option>
+      <OPTION value="http://kepler.nasa.gov/sci/basis/capabilities.html">&nbsp;&nbsp;Planet&nbsp;Detection</option>
+      <OPTION value="http://kepler.nasa.gov/sci/basis/character.html">&nbsp;&nbsp;Transits</option>
+      <OPTION value="http://kepler.nasa.gov/sci/basis/diffphot.html">&nbsp;&nbsp;Photometry</option>
+      <OPTION value="http://kepler.nasa.gov/sci/basis/simulation.html">&nbsp;&nbsp;Transit&nbsp;Detection</option>
+      <OPTION value="http://kepler.nasa.gov/sci/basis/variability.html">&nbsp;&nbsp;Stellar&nbsp;Variability</option>
+      <OPTION value="http://kepler.nasa.gov/sci/basis/sizes.html">&nbsp;&nbsp;Planet&nbsp;Sizes</option>
+      <OPTION value="http://kepler.nasa.gov/sci/design/fov.html">&nbsp;&nbsp;Target&nbsp;Field</option>
+      <OPTION value="http://kepler.nasa.gov/sci/design/stellarclass.htm">&nbsp;&nbsp;Stellar&nbsp;Classification</option>
+      <OPTION value="http://kepler.nasa.gov/sci/basis/number.html">&nbsp;&nbsp;Number&nbsp;of&nbsp;Stars</option>
+      <OPTION value="http://kepler.nasa.gov/sci/basis/fop.html">&nbsp;&nbsp;Follow-up</option>
+      <OPTION value="http://kepler.nasa.gov/sci/basis/results.html">&nbsp;&nbsp;Expected&nbsp;Results</option>
+      <OPTION value="http://kepler.nasa.gov/sci/basis/giants.html">&nbsp;&nbsp;Detection&nbsp;of&nbsp;Giants</option>
+      <OPTION value="http://kepler.nasa.gov/about/team.html">&nbsp;&nbsp;Team</OPTION>
+      <OPTION value="http://kepler.nasa.gov/sci/papers.html">&nbsp;&nbsp;Papers</option>
+      <OPTION value="http://kepler.nasa.gov/sci/references.html">&nbsp;&nbsp;References</option>
+      <OPTION value="http://kepler.nasa.gov/sci/psp.html">RELATED&nbsp;SCIENCE</option>
+      <OPTION value="http://kepler.nasa.gov/sci/psp.html">&nbsp;&nbsp;PSP</option>
+      <OPTION value="http://kepler.nasa.gov/sci/godap.html">&nbsp;&nbsp;Guest&nbsp;Observers</option>
+      <OPTION value="http://kepler.nasa.gov/sci/dap.html">&nbsp;&nbsp;Data&nbsp;Analysis&nbsp;Prog</option>
+      <OPTION value="http://kepler.nasa.gov/sci/dap.html">&nbsp;&nbsp;PlanetFinding</option>
+      <OPTION value="http://kepler.nasa.gov/planetfinding/reading.html">&nbsp;&nbsp;&nbsp;&mdash;Reading</option>
+      <OPTION value="http://kepler.nasa.gov/planetfinding/links.html">&nbsp;&nbsp;&nbsp;&mdash;Links</option>
+      <OPTION value="http://kepler.nasa.gov/sci/design/index.html">MISSION&nbsp;DESIGN</option>
+      <OPTION value="http://kepler.nasa.gov/sci/design/spacecraft.html">&nbsp;&nbsp;Spacecraft</option>
+      <OPTION value="http://kepler.nasa.gov/sci/design/orbit.html">&nbsp;&nbsp;Launch&nbsp;Vehicle/Orbit</option>
+      <OPTION value="http://kepler.nasa.gov/media/gallery.html">&nbsp;&nbsp;Picture&nbsp;Gallery</option>
+      <OPTION value="http://kepler.nasa.gov/ed">FOR&nbsp;EDUCATORS</option>
+      <OPTION value="http://kepler.nasa.gov/ed/nutshell.htm">&nbsp;&nbsp;Kepler&nbsp;in&nbsp;Brief</OPTION>
+      <OPTION value="http://kepler.nasa.gov/ed/activities.htm">&nbsp;&nbsp;Activities</OPTION>
+      <OPTION value="http://kepler.nasa.gov/ed/pdf/factlitho.html">&nbsp;&nbsp;Handouts</OPTION>
+      <OPTION value="http://kepler.nasa.gov/ed/ppt/index.html">&nbsp;&nbsp;Powerpoint&nbsp;Files</OPTION>
+      <OPTION value="http://kepler.nasa.gov/ed/models&sims.htm">&nbsp;&nbsp;Models/Simulations</OPTION>
+      <OPTION value="http://lhs.berkeley.edu/hou/kepler/speaker.php">&nbsp;&nbsp;Speakers</OPTION>
+      <OPTION value="http://kepler.nasa.gov/ed/sstransits.html">&nbsp;&nbsp;Solar&nbsp;System&nbsp;Transits</OPTION>
+      <OPTION value="http://kepler.nasa.gov/ed/otherlinks.htm">&nbsp;&nbsp;Educator&nbsp;links</OPTION>
+      <OPTION value="http://kepler.nasa.gov/johannes/">JOHANNES&nbsp;KEPLER</OPTION>
+      <OPTION value="http://kepler.nasa.gov/media/gallery.htm">&nbsp;&nbsp;Weblinks</OPTION>
+      <OPTION value="http://kepler.nasa.gov/johannes/books.html">&nbsp;&nbsp;Books</OPTION>
+      <OPTION value="http://kepler.nasa.gov/media/">MULTIMEDIA</OPTION>
+      <OPTION value="http://kepler.nasa.gov/media/gallery.htm">&nbsp;&nbsp;Picture&nbsp;Gallery</OPTION>
+      <OPTION value="http://kepler.nasa.gov/media/art.html">&nbsp;&nbsp;Images</OPTION>
+      <OPTION value="http://kepler.nasa.gov/media/animations.html">&nbsp;&nbsp;Animations</OPTION>
+      <OPTION value="http://kepler.nasa.gov/ed/pdf/factlitho.html">&nbsp;&nbsp;Handouts</OPTION>
+      <OPTION value="http://kepler.nasa.gov/ed/articles">IN&nbsp;THE&nbsp;NEWS</OPTION>
+    </SELECT></td>
+  </tr>
+ 
+  <tr>
+   
+    <td colspan="2">
+   
+			
+			<table border="0" cellspacing="0" cellpadding="0" width="580" cols="1">
+				<tr><td><img src="../../images/spacer.gif" height="5"></td></tr>
+				<tr><td><div class="Title"><!-- InstanceBeginEditable name="Title" -->Transit Detection and Simulation<!-- InstanceEndEditable --> </div></td></tr>
+				<tr><td><img src="../../images/spacer.gif" height="2"></td></tr>
+				<tr><td><img src="../../images/grspacer.gif" width="580" height="1"></td></tr>
+				<tr><td><img src="../../images/spacer.gif" height="3"></td></tr>
+				<tr>
+				  <td class="body_text"><!-- InstanceBeginEditable name="Content" -->
+				
+					<img src="../techdemo/images/Assembly_7a.gif" width="234" height="300" align="right"><b>Detecting Transiting Planets</b>
+					
+					<BLOCKQUOTE>
+					  <P>Detecting transit and reflected light signals
+					  are classical signal-detection problems for deterministic signals
+					  in colored noise (Van Trees 1968). Essentially, the optimal detector
+					  whitens the observations and then correlates the whitened data
+					  with the signal resulting from passing a transit through the
+					  same whitening filter. An essential component of signal detection
+					  is the characterization of the observational noise, including
+					  stellar variability. The result is a time series of test statistics
+					  representing the likelihood that a transit was occurring at each
+					  point in time. Folding this time series at the orbital period
+					  of a planet coherently adds the test statistics for the bin containing
+					  the transit. The test statistics add incoherently if the wrong
+					  period or bin is chosen. The detection threshold is set so that
+					  no more than one false alarm occurs for the entire mission. Thus,
+					  the result is still meaningful even if terrestrial planets are
+					  infrequent or the mission had to be de-scoped. The detection
+					  rate depends on the SNR of a single event, the number of observed
+					  events and the detection threshold. The adaptive, nonparametric
+					  matched filter algorithm suggested by Kay (1999) is well suited
+					  to <I>Kepler</I>'s needs, particularly when modified as per Jenkins
+					  (1999).</P>
+					  <P>The number of independent tests depends on
+					  the signal to be detected and the range of values each signal
+					  parameter can have. In the case of transits, there are two basic
+					  parameters: period and phase (time to first transit). For orbital
+					  periods of less than 2 years, there are about 5x10<sup>6</sup> tests per star required, for a total of 5x10<sup>11</sup> tests. In order to have no more than one false alarm
+					  for the entire experiment, a detection threshold of 7 sigma is
+					  required, assuming Gaussian statistics, which is important for
+					  being able to address a null result. We note that the measurement
+					  noise in the Tech Demo was well characterized as being Gaussian.
+					  For the point design of a 4 sigma single event SNR the combined
+					  SNR of a set of four transits is 8 sigma, yielding a detection
+					  efficiency of 84%.</P>
+					  <P>The figure below<B> </B>shows SNRs for four
+					  transits of an Earth-size planet about an m<sub>v</sub>=12 G2 dwarf star as a function of transit duration
+					  during periods of low, high and mean stellar variability. Here,
+					  low, high and mean stellar variability correspond to data collected
+					  by ACRIM 1 in 1985 and 1986, in the last half of 1988 and in
+					  1989 and over the entire data set, respectively. For transits
+					  between 3 and 5 hours, 1 R<sub>e</sub>
+					  planets are detected at least 84% of the time on average. If
+					  the transits are longer than 5 hours, 97% are detected on average,
+					  and at least 84% are detected even if all transits occur during
+					  high stellar activity. Planets of 1.3 R<sub>e</sub> are detected virtually always out to m<sub>v</sub>=12, and about 88% of the time for those orbiting
+					  m<sub>v</sub>=14 G-dwarf stars. Planets
+					  yielding average SNRs below the threshold are also detected,
+					  but at a lower rate. For example, planets with SNRs of 7 sigma
+					  and 6.5 sigma are detected 50% and 30% of the time, respectively.</P>
+					  <P>Note that a central Earth-analog passage lasts
+					  13 hours. Since the chord length of a circle falls as the cosine
+					  with distance from the center &gt;50% of transiting Sun-Earth-analogs
+					  have durations &gt;11.3 hours, &gt;70% are &gt;9.2 hours. Quoting
+					  results for 6.5-hour periods represents a conservative estimate
+					  of the single event SNR.</P>
+					  <BLOCKQUOTE>
+						<P><CENTER><IMG src="../design/images/SNR.gif" width="297" height="196" align="BOTTOM"><BR>
+						<B>Signal to Noise Ratio as a Function of Transit Duration for Various Stellar Variabilities</B></CENTER>
+						<BR>The three curves give the SNR for 4 combined transits about an m<sub>v</sub>=12
+						solar-like star at times of low, medium and high stellar variability.</P></BLOCKQUOTE>
+					 </BLOCKQUOTE>
+					
+					<b>Simulated Transit Events</b>
+					
+					<BLOCKQUOTE>
+					  <P>A simulation was performed to demonstrate
+					  the detectability of the transit signal for an Earth-size planet
+					  in the presence of all the noise that is expected to be in the
+					  data.</P>
+					  <OL>
+						<LI>The stellar noise was generated to match the solar noise spectrum obtained from the ACRIM 1 instrument aboard the SMM spacecraft to form a 4 year data sequence.
+						<LI>Shot noise and pointing noise were added to the synthetic stellar noise to model the case for an m<sub>v</sub>=12 G2V (solar-like) star.
+						<LI>A set of four 12 hour Earth-size transits (R=1.0 R<sub>e</sub>) was added to the noise sequence.
+					  </OL>
+					  <P>A matched filter algorithm was applied to
+					  the data set to search for planets with periods between 100 and
+					  400 days. The peak event of 8.5 sigma indicated a planet with
+					  the correct period of 365 days, as shown in the figure below.
+					  The probability of this event occurring by chance is less than
+					  1x10<sup>-17</sup> for Gaussian noise, demonstrating the significance
+					  of the detection. The additional blue spikes result from folding
+					  signals composed of multiple pulses. The red points are the result
+					  for the same data set without the transits incorporated.</P>
+					  <BLOCKQUOTE>
+						<P><CENTER><IMG src="../design/images/prob_occur.gif" width="410" height="256" align="BOTTOM"><BR>
+						<B>Probability of Occurrence by Chance for Simulated Data.</B></CENTER><BR>
+						The strong minimum at 365 days in blue indicates the presence
+						of a planet with a high confidence level. The red points are
+						the result for the same data set without transits, with all events
+						attributable to noise.</P></BLOCKQUOTE>
+					  <P>The figure below shows the sections of the
+					  data used in the above simulation. The individual transits are
+					  shown (left-hand scale), along with the result of folding and
+					  adding the data at the correct period derived with the detection
+					  algorithm (right-hand scale).</P>
+					  <BLOCKQUOTE>
+						<P><CENTER><IMG src="../design/images/Tran_det_sim.gif" width="439" height="214" align="BOTTOM" border="0"><BR>
+						<B>Transit Detection Simulations</B></CENTER>
+						<BR>The four sections of a light curve containing the transits of an Earth-size planet 
+						(1.0 R<sub>e</sub>) are folded at the correct period, with the sum shown
+						in red. The presence of the transit is unmistakable.</P></BLOCKQUOTE>
+					</BLOCKQUOTE>
+					
+					<b>Detecting Giant-Inner Planets</b>
+					
+					<BLOCKQUOTE>
+					  <P>For the case of detecting giant-inner planets
+					  by phase modulation of reflected light, the number of tests depends
+					  only on the length of observation and on the largest planetary
+					  period to be considered. Stellar variability limits this search
+					  space to periods less than about 7 days as shown in the figure
+					  below. Thus, there are about 1,278 tests per star, for a total
+					  of 1.3x10<sup>8</sup> tests (assuming
+					  the solar rotation period is typical of all stars in the sample).
+					  Jovian-size planets are detectable with periods less than 6 days
+					  and Uranus-size planets with periods less than 2.5 days. Because
+					  the signal amplitude depends on the planetary albedo, planets
+					  with low albedos are more difficult to detect than that shown
+					  here.</P>
+						<P><CENTER><IMG src="../design/images/pwr_spect_den.gif" width="417" height="265" align="BOTTOM"><BR>
+						<B>Detectability of Reflected Light from Short-Period Giant Planets</B></CENTER>
+						<BR>The blue, red and green curves represent the total noise
+						and include expected stellar variability, shot noise, CCD noise
+						and pointing noise appropriate for m<sub>v</sub>=10, 12, and 14 stars, respectively. <BR>
+						The blue spike at 4.2 days is the reflected light signature of
+						a 51 Peg-type planet with an albedo of 0.5 (assumed to match
+						Jupiter) in orbit about a m<sub>v</sub>=10
+						star. At other periods, the strength of this spike would vary,
+						as given by the black dotted reflected light envelope. Since
+						this envelope exceeds the measurement noise curves for periods
+						less than about 7 days, giant planets with periods up to 7 days
+						are detectable.</P></BLOCKQUOTE>
+				
+				<table width="580" border="0" cellpadding="0" cellspacing="0"><tr><td width="50%" align="left"><a href="diffphot.html" class="breadcrumb">&lt;Previous Topic</a></td>
+				<td width="50%" align="right"><a href="variability.html" class="breadcrumb"><img src="images/fingersmall.gif" width="72" height="33" align="middle">Next Topic &gt;</a></td>
+				</tr></table>
+				
+				<!-- InstanceEndEditable --></td>
+				</tr>
+				<tr><td><img src="../../images/spacer.gif" height="10"></td></tr>
+				<tr><td><img src="../../images/grspacer.gif" width="580" height="1"></td></tr>
+				<tr><td><img src="../../images/spacer.gif" height="5"></td></tr>
+				
+				<tr><td width="580"><img src="../../images/spacer.gif" height="5"></td>
+				</tr>
+            </table>	
+
+     </td>
+  </tr>
+ 
+  <tr>
+    <td><span class="breadcrumb">
+    <!-- InstanceBeginEditable name="BreadCrumbsBottom" --><a href="http://kepler.nasa.gov" class="breadcrumb">Kepler Home</a> &gt; <a href="../index.html" class="breadcrumb">In Depth Science</a> &gt; <a href="simulation.html" class="breadcrumb">Simulation</a>
+    <span class="breadcrumb"><!-- InstanceEndEditable -->
+    </span>
+    </td>
+    </tr>
+</table>
+	
+	
+			
+		</td>		
+</tr>	
+</table>
+
+</div>
+<!-- Middle Section End -->
+<!-- Bottom Navigation Elements Begin -->
+<div align="right">
+<table border="0" cellspacing="0" cellpadding="0" width="750">
+	<tr>
+		<td width="180" bgcolor="000066"><a href="http://discovery.nasa.gov/missions.html" target="_blank">
+		<div class="bot_nav">Discovery Missions</div></a></td>
+		<td  align="center" width="150"  bgcolor="000066"><a href="http://planetquest.jpl.nasa.gov/" target="_blank">
+		  <div class="bot_nav">Planet Quest</div></a></td>
+		<td align="center" width="120"  bgcolor="000066"><a href="http://kepler.nasa.gov//about/contactus.html">
+		  <div class="bot_nav">Contact Us</div></a></td>
+		<td align="center" width="120"  bgcolor="000066"><a href="http://kepler.nasa.gov//about/sitemap.html" ><div class="bot_nav">Site Map</div></a></td>
+		
+	<td align="right" width="180"  bgcolor="000066"><div class="bot_nav">Last Modified: <br>
+<!-- InstanceBeginEditable name="datemodified" -->
+			 <!-- #BeginDate format:Sw1 -->28 July, 2005<!-- #EndDate -->
+<!--<script language="JavaScript">document.write(lastMod())</script>-->
+			<!-- InstanceEndEditable -->
+		<!--<script language="JavaScript">document.write(lastMod())</script>-->
+		</div></td>
+	</tr>
+</table>
+</div>
+
+<!-- Bottom Navigation Elements Begin --> 
+<div align="right">
+<table border="0" cellpadding="0" cellspacing="0" bgcolor="f2f2f2" width="750">
+	<tr>
+   		<td width="180" align="center" valign="middle">
+		<table cellspacing="2" cellpadding="2">
+          <tr>
+            <td><a href="http://www.nasa.gov/" target="_blank"><img src="../../images/foot_nasa.gif" alt="" width="57" height="49" border="0" align="left"></a></td>
+            <td><span class="footer"><a href="http://www.nasa.gov/" target="_blank" class="footer">+ NASA Homepage</a><br>
+                <a href="http://www.nasa.gov/about/highlights/En_Espanol.html" target="_blank" class="footer">+ NASA en Espa&ntilde;ol</a> <br>
+                <a href="http://www.nasa.gov/about/contact/" target="_blank" class="footer">+ Contact NASA</a> </span></td>
+          </tr>
+        </table>   		  
+		</td>
+   		<td width="150" align="center" valign="middle"><div align="left"><a href="http://www.nasa.gov/about/highlights/HP_Privacy.html" class="footer" target="_blank">+ NASA Privacy Statement, <br>
+&nbsp;&nbsp;   		  Disclaimer, and Accessibility<br>
+&nbsp;&nbsp;&nbsp;Certification</a></div></td>
+   		<td width="120" align="center" valign="middle"><a href="http://www.arc.nasa.gov/" target="_blank"><img src="../../images/ARC-logo.gif" alt="Ames Research Center" height="42" width="109" border="0" livesrc="../../../../Ames_Logo.ai"></a></td>
+   		<td width="120" align="right" valign="middle" class="footer"><div align="center"><a href="http://kepler.nasa.gov"><img src="../../images/Kepler-logo.gif" width="99" height="39" alt="Kepler" border="0"></a></div></td>
+		<td width="180" align="left" valign="middle" class="footer">  <p>&nbsp; Curators:&nbsp;<a href="../../images/emailpics/davesemail.gif">David Koch</a>, <a href="../../images/emailpics/ag-email.gif">Alan Gould</a></p>
+		  </td>
+	</tr>
+</table>
+</div>
+<!-- Bottom Navigation Elements End -->
+
+</td>
+</tr>
+</table>
+</div>
+
+<!-- <font color="#000000" style="font-size: 7pt;">Extrasolar planets, NASA exterrestrial extrasolar planets around nearby stars.   SIM Space Interferometory Mission.  Keck Interferometer.  Terrestrial Planet Finder.  Extrasolar planets, or exoplanets.  Extraterrestrial.  Exo-planets life space, outer space.
+	 <p>Extrasolar planets.  Exo-planets.  Searching for extrasolar planets. Searching for exo-planets.   Earth-like planets in the Milky Way. Exoplanets and extra-solar planets, or exoplanets and extra-solar planets.  Planets around others stars are called extrasolar planets. What is an extrasolar planet?  Astronomy, or astronomy and finding planets.</b></font> -->
+
+
+<!-- Image Maps Begin -->
+<map name="NASAbanner">
+	<area coords="77,10,242,50" href="http://www.arc.nasa.gov/" target="_blank" alt="NASA Ames Research Center">
+</map>
+
+
+<map name="NASAnav">
+	<area coords="48,4,175,23" href="http://planetquest.jpl.nasa.gov/" target="_blank" alt="Planet Quest">
+	<area coords="282,4,466,23" href="http://www.nasa.gov/news/highlights/" target="_blank" alt="Other NASA Missions">
+	<area coords="551,5,713,24" href="/kepler/johannes/index.html" alt="Johannes Kepler">
+</map>
+<!-- Image Maps End -->
+
+</body>
+<!-- InstanceEnd --></html>

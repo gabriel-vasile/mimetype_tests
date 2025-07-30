@@ -1,0 +1,1984 @@
+1 trread
+
+This is the help file for TRREAD -- a fortran library for reading
+TRANSP output data.
+
+2 introduction
+This fortran library gives access to TRANSP output data.  The TRANSP 
+output data can be stored in TRANSP legacy formats, in NetCDF format, 
+or in MDS+.
+
+The routines in this library give access to the core functionality
+of the legacy TRANSP `rplot' output data browser, that is, access to:
+
+ -- establishment of connection to a TRANSP run.
+
+ -- table of contents
+    -- lists of scalar functions f(t), with labels & physical units.
+    -- lists of profile functions f(x[j],t), with labels & units,
+       and associated x axis data which can also vary with time t.
+    -- lists of "scalar multigraphs" -- groupings of related scalar
+       functions all with the same physical units and each with 
+       associated sign factor +/-1
+    -- lists of "profile multigraphs" -- groupings of related profile
+       functions all with the same phsical units, x axis, and each
+       with associated sign factor +/-1.
+    -- (multigraphs are typically used to construct particle-, 
+       momentum-, or power-balance plots).
+    -- special lists-- e.g. lists of all plasma particle species.
+
+ -- the data itself
+    -- timebase for scalar functions f(t).
+    -- timebase for profile functions f(x,t).
+    -- the scalar functions {f(t)}.
+    -- the profile functions {f(x,t)} (the time evolving x axes are
+       also considered profile functions).
+
+ -- the calculator
+    -- string based, algebraic syntax.
+    -- standard arithmetic operators and mathematical functions.
+    -- numerical integration and differentiation.
+    -- geometry-dependent operators such as volume integrators and
+       flux-surface-averaged gradient operators.
+    -- constants, scalar functions, and categories of profile functions 
+       as supported data types.
+    -- ability to create user defined scalar and profile functions.
+    -- ability to create and modify multigraph definitions.
+    -- ability to access data from multiple runs for comparison.
+
+ -- extraction of MHD equilibrium data at specified time or averaged 
+    over a time range.
+
+ -- extraction of scalar or profile information at a specified time or
+    averaged over a time range.
+
+ -- extraction of TRANSP namelist data
+    -- limiter locations
+    -- TRANSP run control options
+    -- etc., etc.
+
+The library routines can be used to drive time-dependent or time-slice
+based post-processors, acquire data for loading of relational databases,
+or to build a modern (e.g. IDL or AVS/express based) GUI-oriented data
+browser tool to replace the ancient command line `rplot' data browser.
+
+2 trread_philosophy
+
+Consistent with the RPLOT legacy software on which it is built, the
+trread software is optimized for the detailed examination of data
+from a single TRANSP run-- i.e. one run at a time.
+
+When connected to a particular run, data from other runs can be
+fetched e.g. for comparison, by using RPLOT calculator commands.
+This works reasonably well, but, the software is not optimal for
+intensive cross-run comparisons.
+
+For studying trends of select data extracted from many different
+runs, the usual approach is to load a relational database.  Relational
+database software is better optimized for these types of queries.
+
+2 update_notice
+TRREAD was updated ca. September 2001, to support labeling of 
+members of multigraphs based on a single data item from multiple 
+distinct runs.
+
+The maximum length of data identifiers or "abbreviations" was 
+increased from 10 characters to 21 characters length.
+
+This means that, although individual TRANSP run databases still 
+have a limit of 10 characters for names of data items stored on 
+disk, longer names can be generated internally -- specifically,
+calls to `run_mg' can result in the creation of longer identifiers 
+with imbedded runid aliases-- for example:
+
+  NEUTT$37065K17  -- total neutrons vs. time, run 37065K17
+  NEUTT$37065K18  -- total neutrons vs. time, run 37065K18
+
+TRREAD interfaces (including the calculator) now support the longer
+names, but, applications built over TRREAD may need uprading to
+access the new functionality; this could affect user interfaces and
+the labeling of graphical output.
+
+Also new in September 2001:  The calculator command %GS2FETCH can
+acquire tabulated GS2 data (cf R. Budny) as profile functions in
+a TRREAD session.  For more information contact dmccune@pppl.gov
+or rbudny@pppl.gov.
+
+2 related_software_modules
+
+Routines in the trread library just read the single precision
+TRANSP data.  Separate NTCC modules contain related software.
+
+For example, one can use `trxplib' to extract a data timeslice from
+a TRANSP run in order to setup a standalone test driver for a 
+physics module:
+
+test driver
+ (1) acquire data
+   -->trxplib
+      -->trread (connect to TRANSP run, read data)
+      -->xplasma (setup interpolation on data)
+         -->pspline (interpolation primitives:  set up coefficients)
+ (2) call physics module which uses the data
+   -->[physics module]
+      -->xplasma (retrieve plasma parameters, field & metric
+            information in coordinates chosen by the physics module)
+         -->pspline (interpolation primitives)
+
+The `trxplib' library uses `trread' to extract timeslices from the data
+and then uses `xplasma' to set up continuous differentiable interpolation
+and mapping between cartesian/cylindric coordinates and the original 
+magnetic flux coordinates of the plasma model.  `trxplib' also knows
+most TRANSP physical units conventions and can usually do an MKS 
+conversion of the data.  It also convers the data to REAL*8 precision.
+With `trxplib' one can access TRANSP data via interpolation, without
+dealing explicitly with TRANSP numerical grids.  
+
+Access via the `trread' library is at a "lower level" and does expose 
+the TRANSP numerical grids.  On the other hand `trread' allows one
+to access time evolving data, whereas `trxplib' and `xplasma' are
+oriented to time slices.
+
+The `xplasma' library presents the interface to the interpolation and
+coordinate mapping software, with extensions to reconstruct plasma
+parameters and magnetic field vectors and their gradients in user 
+selected coordinate systems.  Interpolation, mapping, and field
+reconstruction software is all fully vectorized.  While the plasma
+state is stored inside xplasma's internal fortran-90 data module,
+argument vectors (e.g. locations of particles or ray bundles) are
+all handled through subroutine arguments and local variables, to
+yield an architecture naturally consistent with common parallelization
+strategies.
+
+The `pspline' library provides the basic interpolation software--
+cubic/bicubic/tricubic splines and hermite piecewise cubic as well
+as piecewise linear/bilinear/trilinear interpolation.
+
+2 load_libraries
+
+On most systems the `trread' library will be stored as `libtrread.a'
+in an area reserved for ntcc binary object libraries.  For example,
+on the PPPL unix cluster these libraries are found in /usr/ntcc/lib
+or /usr/ntcc/ffc/lib for Intel Linux (Fujitsu fortran) systems.  In 
+traditional TRANSP development environments the library filename is 
+shortened to `trread.a' and is found in $LOCAL/lib.
+
+Programs which thoroughly exercise trread functionality will need to
+link several other ntcc libraries as well.  Specifically:
+
+  (Last update:  dmc 28 Sept 1999)
+
+UNIX libraries (for loading) -- NOTE the order is important!
+
+  libtrread.a       ! trread
+  librp_kernel.a    ! "rplot kernel" library
+  librplot_io.a     ! "rplot i/o" library
+  libxdatmgr.a      ! rplot COMMON buffer memory management
+  libmdstransp.a    ! rplot/TRANSP/MDS+ interface library
+  libinterp_sub.a   ! legacy interpolation primitives
+  libsmlib.a        ! legacy smoothing primitives
+  libcomput.a       ! miscellaneous computational routines
+  libfftsub.a       ! fft routines
+  libvaxonly.a      ! legacy portability routines
+  libportlib.a      ! standard portability routines
+
+    (MDS+, NetCDF -- these libraries are optional but recommended).
+
+  libgeneric_dummy.a  ! dummy routines for missing optional libraries.
+
+It is important that the libraries be specified in the order shown.
+
+2 MDS+_data_cache
+
+Applications loaded with MDS+ can access TRANSP data directly over
+the internet via an MDS+ client/server connection.  CAUTION:  the
+user must arrange for permission to access server data.  This is
+usually administered on a tokamak-by-tokamak basis; typically the
+user will need to establish an account on the server machine and
+arrange for that account to have access permission to the desired
+data.  The MDS+ server will then create a server process in the 
+user's account on the server machine to mediate data requests.
+MDS+ server access permission / security requirements are in 
+addition to any general firewall requirements set at the server
+site.
+
+Since networked access can be slow, but disk space is cheap and
+TRANSP data once written never changes, trread supports a mechanism
+for caching data to local disk.  Users enable this by defining
+the RPLOT_CACHE environment variable.  For example (csh):
+
+  > setenv RPLOT_CACHE TRUE
+
+    the directory ~/.rplot_cache will be created, and cache files 
+    will be written in subdirectories of this directory, on a run
+    by run basis.
+
+  > setenv RPLOT_CACHE /scratch/joe/rplot
+
+    the directory /scratch/joe/rplot/.rplot_cache will be created,
+    and cache files will be written in subdirectories of this 
+    directory, on a run by run basis.
+
+Even if cached data files are present, the cache is "validated" by
+checking the TRANSP run date against a cached value.  If this does
+not match, the cache data is invalidated, removed, and MDS+ networked
+access is employed.
+
+Generally, if data from a given TRANSP run is to be accessed more than
+once, it is worthwhile from a performance perspective to enable the
+cache.  Note, however, that the trread software does not actively
+manage the cache in the sense of removing old data to make room for
+new data.  Usually, therefore, it will be best to set RPLOT_CACHE to
+use a "scratch disk" which gets skimmed by the system from time to 
+time.
+
+2 trread_system_initialization
+
+No startup calls are required.  However, optional calls are available
+to control message output.  By default, errors and warning messages
+from trread are written on fortran unit 6, i.e. stdout.  Use the
+following calls to change this behavior.
+
+(optional:)
+  to change the LUN and/or file where messages are written:
+
+        INTEGER ilun           ! FORTRAN i/o logical unit number
+
+        CALL PLC_MSGS(ilun,' ')
+            ...directs messages to unit ILUN (file opened by caller)
+        CALL PLC_MSGS(ilun,'msg.file')
+            ...directs messages to "msg.file" which will be opened
+            on unit (ilun) by the PLC_MSGS subroutine
+
+2 connect_to_TRANSP_run
+
+There are two alternative methods:  
+
+(a) "integrated method" -- connect to the run and return standard
+information such as a status code, a run label, the size of the 
+run's timebase, and size of largest profile function.
+
+(b) "call sequence method" -- separate calls are made for making
+the connection, for retrieving the label, and for retrieving sizes
+of the run's timebase and largest profile function.
+
+First the call sequence method is shown.  Then, the call for the
+integrated method is shown.
+
+****** call sequence method ******
+
+    ** to connect to a TRANSP run **
+
+        CHARACTER*(*) path     ! (IN) path to run, path/runid
+        INTEGER ier            ! (OUT) completion code, 0 = normal
+
+
+        CALL RCONNECT(path,ier)
+
+The caller should check the status code to verify that the connect
+was successful.
+
+Notes on PATH syntax:
+
+ !    MDS+ path syntax:  two variants:
+ !                 MDS+:<server-name>:<tree-name>(<shot-number>) or
+ !                 MDS+:<server-name>:<tree-name>(<tok.yy>,<runid>)
+ !
+ !         (the appropriate choice depends on the server).
+ !
+ !    Unix file path syntax:  <path>/<runid> or just <runid>
+ !
+ !    VMS file path syntax:   <disk>:[<dir>]<runid> or just <runid>
+ !
+ !  examples:
+ !    CMOD MDS+          "MDS+:CMODA.PSFC.MIT.EDU:TRANSP03(12345678)"
+ !    OLD PPPL MDS+      "MDS+:TRANSPGRID.PPPL.GOV:TRANSP(TFTR.88,37065Y82)"
+ !    unix, local files  "$ARCDIR/TFTR/88/37065Z19"
+ !
+
+   ** to fetch a generic label for a run, after RCONNECT call **
+
+        CHARACTER*(*) rlabel   ! about 50 characters
+
+        CALL GRUNLB2(rlabel)
+
+        ... the label might be useful for messages or plots.
+
+   ** to fetch basic run data size statistics
+
+It might be useful to know the largest number of words required by any
+scalar or profile function.  This can be found with:
+
+        INTEGER nsctime,nprtime,nxmax,nmax
+
+        CALL RPSTATS(nsctime,nprtime,nxmax,nmax)
+
+which returns
+
+    nsctime = number of timepoints in scalar functions timebase
+    nprtime = number of timepoints in profile functions timebase
+    nxmax   = largest number of X axis points occurring in run
+    nmax    = largest total number of words for any function in
+              the run database (generally nmax = nprtime*nxmax).
+
+****** integrated method ******
+
+        CALL KCONNECT(path,rlabel,nsctime,nprtime,nxmax,nmax,ier)
+
+        (individual arguments are as in the call sequence method;
+        PATH is input, all others are output).
+
+2 more_details_on_TRANSP_data
+TRANSP data consists of the following:
+
+  * a SCALAR FUNCTIONS timebase, and a set of named scalar functions 
+    of time f(t).  Each function has a name (up to 10 characters long,
+    alphanumeric, no imbedded blanks), a label (up to 32 characters 
+    long) and a physical units label (up to 16 characters long).
+
+  * a PROFILE FUNCTIONS timebase, and a set of named profile functions
+    of time and the additional coordinate, f(x,t).  As with the 
+    scalars, each function has a name, label, and physical units.
+    In addition, each profile function has an "x axis type" attribute
+    (an integer) which identifies x.  This x is itself a profile 
+    function of time but generally satisfies the condition of being 
+    monotonic increasing at all times.
+
+    note that the SCALAR FUNCTIONS and PROFILE FUNCTIONS do not
+    always have the same timebase.  The dimensioning of profile
+    function data is always (nx,nt) where nx is the number of 
+    points associated with x, and nt is the number of time points
+    in the profile function timebase.  nx is the dimension of
+    contiguous storage (the first dimension in the fortran
+    convention).
+
+  * a set of MULTIGRAPHS, each of which consists of a label and a
+   "signed" list of function names.  The functions in the list are
+    all of the same type, i.e. scalar or profile all with the same
+    x axis type.  Also, generally all multigraph function members
+    share a common physical units label, which becomes the physical
+    units label of the multigraph.  Each function in the list has
+    an associated sign, +/-1, which is meant to be applied prior to
+    display of the data.  The idea here is to support "power balance"
+    type plots, which generally show a collection of terms related
+    to eachother in an additive equation, e.g. "beam heating",
+    "RF heating" balanced against "convection loss", "conduction
+    loss", and "d/dt(energy content)".  Because of the way these
+    quantities are defined inside TRANSP, sometimes a factor of -1
+    needs to be applied before display.  Multigraphs contain a
+    maximum of 15 functions.
+
+  * via the RPLOT CALCULATOR, the user can define new profile or
+    scalar functions, and multigraphs, and, members can be added to
+    or removed from multigraphs.  Function and multigraph labels 
+    can be modified.  Data from other runs can be accessed.
+    Functionality not available through direct trread calls can
+    often be found by using the calculator.
+
+  * the software enforces uniqueness of all names across all lists:
+    if "XYZ" names a multigraph, it will not also name a scalar or
+    profile function.
+          
+  * a general guide to the use of the RPLOT CALCULATOR is provided
+    ftp://ftp.pppl.gov:/pub/transp/codata/doc/rpcalc.doc
+
+2 more_on_the_calculator
+
+The calculator controls evaluation of arithmetic expressions based
+on TRANSP data.  (In the TRREAD library, the calculator is accessed
+by calling `rpcalc' with a string argument containing the desired
+calculator expression or command).  The following examples illustrate
+some calculator capabilities:
+
+  PCUR*VSUR        # plasma current * surface voltage, vs. time
+
+  UETMP = VOLINT(1.5*1.601E-19*NE*TE)    # integrated electron energy
+                   # vs time and flux coordinate, stored as "UETMP"
+  UITMP = VOLINT(1.5*1.601E-19*NI*TI)    # ditto the ions, as "UITMP".
+
+  USCALAR = %XINTERP(X=1.0,EXPR=(UETMP+UITMP))
+                   # ion energy + electron energy, integrated out to
+                   # the plasma boundary (X=1.0), vs. time only;
+                   # saved as "USCALAR".
+
+Calculator expressions can be passed as character strings to the
+appropriate `trread' subroutines; results are returned in user
+supplied data buffers.
+
+The calculator can also be used to fetch data from a different run
+and map it to the current run's timebase, as in:
+
+  %RFETCH("MDS+:TRANSPGRID.PPPL.GOV:TRANSP:JET.00",50632C02,TE,TE2)
+
+which fetches the TRANSP run JET.00 50632C02 from the PPPL MDS+
+server, reads that run's TE data, maps that to the current run's
+database, and stores the result as TE2.
+
+This can be the basis of a quite general method for comparing data
+from multiple runs.
+
+For detailed information on the calculator see:
+
+    ftp://ftp.pppl.gov:/pub/transp/codata/doc/rpcalc.doc
+
+2 trread_data_types(istype)
+
+In much of the software, a data "subtype code", typically referred to
+as "istype", specifies the type of a given data item:
+
+      INTEGER istype
+
+      istype = -1  -- scalar function of time
+      istype = +1  -- profile function of time and X axis #1
+      istype = +2  -- profile function of time and X axis #2
+        ...
+      istype = +N  -- profile function of time and X axis #N.
+
+Generally in TRANSP:
+
+  istype=1 ... identifies f(x,t) where x is the flux surface label
+               and the profile data is zone-center oriented.
+               examples:  temperatures, densities, Zeff...
+
+  istype=2 ... identifies f(x,t) where x is the flux surface label
+               and the profile data is zone-boundary oriented.
+               examples:  transport coefficients, radial velocities...
+
+  the flux surface label is 
+
+      x = sqrt((toroidal_flux)/(toroidal_flux_at_boundary))
+
+  other istype codes will correspond to "midplane major radius",
+  energy grids or chord indices for diagnostic simulations, etc.
+
+2 programming_with_trread
+The trread library is probably best used in conjunction with 
+dynamic memory allocation.  When there is a data item or list
+that can have variable length, there will be a corresponding
+pair of routines, the first of which returns the length, and
+the second of which returns the actual data or list.  Between
+the two calls, dynamic allocation of the necessary buffer can
+take place.
+
+For data access, another approach will be to look at the maximum
+data object size returned at run connect time by KCONNECT (or
+later by a call to RPSTATS).  This could be used to create buffers
+that would persist for the duration of connection to a particular
+run, which could contain e.g. the complete data set for any
+multigraph, and which could be used repeatedly.
+
+2 contents_of_TRANSP_run
+
+3 lists_of_x_axes
+It may be useful to know how many profile X axis types exists in the
+TRANSP run, and what their names are:
+
+  ** getting total number of x axis types in the run **
+  ** getting a list of known profile x axis type names **
+
+Summary:
+
+  Subroutine RPNUMX returns the number of defined profile X axes.
+  Subroutine RPXNAME returns the X axis name, given the number.
+
+Details:
+
+      INTEGER istype,naxes,nxmax
+      PARAMETER (nxmax=100)         ! should be big enough...
+      CHARACTER*21 xnames(nxmax)
+
+      CALL RPNUMX(naxes)            ! get number of known x axes in run
+
+        ...and assuming nxmax was big enough...
+      DO istype=1,naxes
+        CALL RPXNAME(istype,xnames(istype))
+                                    ! get function name for each x axis
+      ENDDO
+
+Profile function "subtype codes", generally referred to by the name
+"ISTYPE", identify the function's non-temporal x axis.
+
+3 function_and_multigraph_lists
+
+  ** get current length of funtion or multigraph list **
+  ** acquiring lists of function and multigraph names **
+  ** applications bear in mind these lists can change dynamically **
+
+Summary:
+
+  Subroutine RPNLIST gives the length of a selected list;
+  Subroutine RPLIST returns the actual list.
+
+  List elements are CHARACTER*21 names.
+
+  Use these routines to build a "table of contents" of the TRANSP run.
+  In a dynamic memory context, use RPNLIST to figure out the minimum
+  size of an array that can hold a particular list of names.
+
+RPNLIST Details:
+
+      CHARACTER*(*) ztype      ! type of list (input)
+      INTEGER istype           ! subtype code (input)
+      INTEGER isize            ! length of list (output)
+
+      CALL RPNLIST(ztype,istype,isize)
+ 
+...example:  CALL RPNLIST('PROFILE',0,inum)
+
+...more details:
+
+      subroutine RPNLIST(ztype,istype,isize)
+C
+      character*(*) ztype               ! input:  list type
+C
+C  choose ztype = "scalar" or "profile" or "multigraph"
+C
+      integer istype                    ! input:  list subtype 
+C
+C  if ztype = "scalar", istype is ignored.  for "multi" or "profile":
+C
+C  set istype = 0 to not restrict the list by subtype.
+C  set istype = -1 for scalars only (e.g. if zytpe.eq.'multi')
+C  set istype = +N for type N profiles only
+C
+      integer isize                     ! output:  list size
+C
+C  ztype can be 'profile', 'scalar', or 'multigraph'
+C   actually only the first 5 characters are tested with a case blind
+C   compare.
+C
+C  see subroutine rplist ... to get the actual names.
+C  see subroutine rptype ... to get subtype data associated with names.
+
+    ** EXAMPLES **
+
+    CALL RPNLIST('scalar',0,isize)   ! returns total no. of scalar fcns
+    CALL RPNLIST('profile',0,isize)  ! total no. of profile functions
+    CALL RPNLIST('multi',0,isize)    ! total no. of multigraphs
+
+    CALL RPNLIST('profile',2,isize)  ! no. of profile fcns, x axis type 2
+
+    CALL RPNLIST('multi',-1,isize)   ! no. of scalar function multigraphs
+    CALL RPNLIST('multi',3,isize)    ! no. of multigraphs, x axis type 3
+
+C  ztype can also be qualified with a "substring", using the syntax
+C  <list-subtype>:<substring>.  If a substring is given, only names
+C  which contain the specified substring will be counted.
+
+    ** EXAMPLE **
+
+    CALL RPNLIST('profile:NIMP_',0,isize)
+          ! get number of profile functions whose names contain
+          ! "NIMP_" as a substring.  The substring test is based on
+          ! a case blind comparison.
+
+Once RPNLIST has been used to determine the length of the list...
+
+...use RPLIST to get the actual list of names; the first two arguments
+of RPLIST work the same as with RPNLIST.
+
+RPLIST Details:
+
+      CHARACTER*(*) ztype      ! type of list (input)
+      INTEGER istype           ! subtype code (input)
+      INTEGER namax            ! size of alist array (input)
+      CHARACTER*21 alist(namax) ! list returned (output)
+      INTEGER isize            ! length of list returned (output)
+      INTEGER ier              ! completion code (output) 0=OK
+
+      CALL RPLIST(ztype,istype,alist,namax,isize,ier)
+
+...example:  CALL RPLIST('PROFILE',0,alist,namax,isize,ier)
+      where plist is an array of character*21 which could have
+      been allocated to length namax based on prion RPNLIST call.
+ 
+...more details:
+      subroutine rplist(ztype,istype,alist,namax,isize,ier)
+C
+C  return sorted list of RPLOT names of requested type.
+C
+      character*(*) ztype               ! input:  list type
+C
+C  choose ztype = "scalar" or "profile" or "multigraph"
+C
+      integer istype                    ! input:  list subtype control
+C
+C  if ztype = "scalar", istype is ignored.  for "multi" or "profile":
+C
+C  set istype = 0 to not restrict the list by subtype.
+C  set istype = -1 for scalars only (e.g. if zytpe.eq.'multi')
+C  set istype = +N for type N profiles only
+C
+      integer namax                     ! input:  size of list array
+C
+      character*(*) alist(namax)        ! output:  the list
+C
+      integer isize                     ! actual number of items in list
+C
+      integer ier                       ! error code, 0=OK
+C
+C  ztype can be 'profile', 'scalar', or 'multigraph'
+C   actually only the first 5 characters are tested with a case blind
+C   compare.
+C
+C  the substring qualifier for ztype, valid for RPNLIST and described
+C  above, is valid for RPLIST as well.
+C
+C  note that because of RPLOT calculator action, these lists can grow
+C  dynamically and may need to be refetched...
+C
+C  see subroutine rpnlist ... to get current list size
+C  see subroutine rptype ... to get subtype data associated with names.
+C
+C  error codes (no message written):
+C
+C    ier=1  invalid "ztype" input
+C    ier=2  width of "alist" elements less than what is required
+C           (n.b. character*10 is standard)
+C    ier=3  length of "alist" does not accomodate actual list.
+
+3 single_item_details
+
+** getting information on a particular named entity **
+
+Summary:  
+
+-- use RPLABEL to get the labeling and type information
+on a particular named item in the run database.  See also RPDIMS
+(below).
+
+-- use RPDIMS to get dimensioning information on a specific named
+item, by using its subtype code returned from RPLABEL.
+
+4 RPLABEL
+
+Details: 
+
+      CHARACTER*21 name          ! item name (input)
+      CHARACTER*32 label         ! item label (output)
+      CHARACTER*16 units         ! physical units (output)
+      INTEGER imulti             ! multigraph flag (output =1 if TRUE)
+      INTEGER istype             ! subtype code...
+
+      CALL RPLABEL(name,label,units,imulti,istype)
+
+...example:  CALL RPLABEL('TE',label,units,imulti,istype)
+
+...more details:
+
+      subroutine rplabel(abbrev,zlabel,zunits,imulti,istype)
+C
+C  given an RPLOT name (abbrev) return the label (zlabel) and units
+C  (zunits)
+C
+      character*(*) abbrev              ! input name (C*21)
+      character*(*) zlabel              ! output label (C*32)
+      character*(*) zunits              ! output units label (C*16)
+C
+      integer imulti                    ! output =1 if a multigraph
+      integer istype                    ! output data subtype code
+C
+C         istype = -1   -- scalar f(t) function or multigraph
+C         istype = 1,2,... -- various f(x,t) profile functions / 
+C                  multigraphs
+C
+C  if the name is not recognized, 
+C     zlabel = zunits = 'error' are returned, and
+C     imulti = istype = -1000   are returned.
+
+4 RPDIMS
+
+** getting dimensioning information **
+** procedure:  use RPLABEL to get the function subtype code (istype);
+   then use RPDIMS to get dimensioning information associated with
+   this subtype.
+
+      INTEGER istype              ! subtype code (input)...
+      INTEGER IRANK               ! dimensionality or rank (output)
+      INTEGER IDIMS(8)            ! dimensioning information (output)
+      CHARACTER*21 ZXABB          ! x-axis abbreviation (output)
+      INTEGER IER                 ! completion code (output) 0=OK
+
+      CALL RPDIMS(istype,irank,idims,zxabb,ier)
+
+...examples:
+
+      CALL RPDIMS(-1,irank,idims,zxabb,ier)
+
+...returns dimensioning information on a scalar function of time:
+irank = 1, idims(1)=[# of points in scalar functions timebase],
+zxabb=' ' (no x axis), ier=0
+
+      CALL RPDIMS(1,irank,idims,zxabb,ier)
+
+...returns dimensioning information on any function having istype=1:
+irank = 2, idims(1)= [no. of points in x axis],
+idims(2)= [no. of points in profile functions timebase],
+zxabb='X' [or some other X axis function id], ier=0
+
+...more details:
+
+      subroutine rpdims(istype,irank,idims,zxabb,ier)
+C
+C  return dimensioning information for given function subtype code
+C
+C  subroutine "rplabel" returns subtype codes given the function name.
+C
+      integer istype              ! input:  function subtype code
+C
+C         istype = -1   -- scalar f(t) function or multigraph
+C         istype = 1,2,... -- various f(x,t) profile functions / 
+C                  multigraphs
+C
+      integer irank               ! output:  rank or dimensionality
+      integer idims(*)            ! output:  sizes of dimensions
+C
+C         idims(1) = 1st (contiguous storage) dimension
+C         idims(2) = 2nd dimension -- if irank.ge.2
+C         ...etc...
+C
+C         idims(j) is not referenced if j.gt.irank.
+C         nothing above irank=2 exists in TRANSP databases as of 1999
+C         (dmc).
+C
+      character*(*) zxabb         ! for profiles:  X axis function
+C
+C         the non-temporal coordinate is represented by the named function
+C         this is a default specification; other X axis functions can be
+C         chosen.
+C
+      integer ier                 ! exit code, 0=OK, 1= invalid istype.
+
+------------------------------
+
+3 multigraph_contents
+
+** getting contents of an individual multigraph **
+
+Summary:  return the labeling information and contents of a
+named multigraph.
+
+      CHARACTER*21 name           ! name of multigraph (mg) (input)
+      INTEGER istype              ! subtype code of mg contents (output)
+      CHARACTER*32 label          ! multigraph label (output)
+      CHARACTER*16 units          ! multigraph units (output)
+      INTEGER infuns              ! no. of functions in mg (output)
+      INTEGER isigns(15)          ! member sign factors +/-1 (output)
+      CHARACTER*21 zmembs(15)     ! names of member functions (output)
+      INTEGER ier                 ! completion code, 0=OK (output)
+
+      CALL RPMULTI(name,istype,label,units,infuns,isigns,zmembs,ier)
+
+...example:  CALL RPMULTI('PTEMP',istype,...)
+
+...more details:
+
+      subroutine rpmulti(zname,istype,zlbl,zuns,infuns,isigns,zmembs,
+     >   ier)
+C
+C  fetch information on a named multigraph
+C
+      character*(*) zname         ! multigraph name, input
+C
+      integer istype              ! x axis type code, output
+      character*(*) zlbl          ! multigraph label (C*32), output
+      character*(*) zuns          ! multigraph units (C*16), output
+      integer infuns              ! number of function members, output
+      integer isigns(*)           ! sign code for each member, output
+      character*(*) zmembs(*)     ! name of each member, output
+C
+      integer ier                 ! completion code, output, 0=OK
+C
+C  abnormal completion means:  multigraph name invalid.
+C
+
+        ...notes:  isigns(...) is an ARRAY of integers
+                   zmembs(...) is an ARRAY of CHARACTER*21
+                   ...since time immemorial the array size for multigraph
+                   member lists has been... 15.
+
+2 routines_for_fetching_data
+
+** ROUTINES FOR FETCHING ACTUAL DATA **
+
+** applications may want to use the "table of contents" routines
+   RPLABEL, RPDIMS et al, to get dimensioning information first,
+   thus allowing dynamic allocation of properly sized buffer arrays
+   for receiving the data itself.
+
+Summary:
+
+RPTIME_S, RPTIME_P, RPSCALAR and RPROFILE return actual
+numerical data associated with specific items in the run database.
+
+RPCALC returns data formed by evaluating an arithmetic expression
+which uses TRANSP data items as operands.
+
+3 basic_data_access_routines
+
+(for individual functions, not multigraphs)
+
+      CHARACTER*21 zname   ! name of desired function (input)
+      INTEGER ibufsize     ! buffer size (input)
+      REAL zbuf(ibufsize)  ! array to contain data returned
+      INTEGER iret         ! actual number of data points returned.
+      INTEGER ier          ! completion code returned, 0=normal
+
+      CALL RPTIME_S(zbuf,ibufsize, iret)  ! scalar timebase
+      CALL RPTIME_P(zbuf,ibufsize, iret)  ! profile timebase
+
+      CALL RPSCALAR(zname, zbuf,ibufsize, iret, ier)  ! f(t) data
+
+      CALL RPROFILE(zname, zbuf,ibufsize, iret, ier)  ! f(x,t) data
+
+3 rplot_calculator
+
+Summary:  to calculate an item and return the result in a memory
+          buffer, use RPCALC.
+
+          to calculate an item and not return it, e.g. as an
+          intermediate step in a longer calculation, use RPCAL0.
+
+      CHARACTER*512 expr   ! calculator expression string (input)
+      INTEGER ibufsize     ! buffer size (input)
+      REAL zbuf(ibufsize)  ! array to contain data returned
+      INTEGER iret         ! actual number of data points returned.
+      INTEGER ier          ! completion code returned, 0=normal
+
+ ! more output:
+
+      INTEGER istype       ! x axis type of result of expression
+      INTEGER iwarn        ! non-zero if arithmetic errors were detected
+
+        ...
+
+      CALL RPCAL0(expr, iwarn, ier)
+
+      CALL RPCALC(expr, zbuf,ibufsize, iret, istype, iwarn, ier)
+
+example:
+      CALL RPCAL0('TMP=NE*TE',iwarn,ier)
+
+      (check for errors)
+
+      CALL RPCALC('NI*TI + TMP', zbuf,ibufsize, iret, istype, 
+     >             iwarn, ier)
+
+      (check for errors)
+
+...more details
+      subroutine RPCAL0 -- expr, iwarn, ier as in RPCALC.
+
+      subroutine RPCALC(zexpr,zbuf,ibufsize,iret,istype,iwarn,ier)
+C
+C  fetch an rplot calculator result.
+C  data only, use rptime_p or rptime_s for timebase.
+C  use rpdims for dimensioning information.
+C
+      character*(*) zexpr   ! calculator expression (input)
+      integer ibufsize      ! size of buffer for data (input)
+C
+C  output arguments:
+C
+      real zbuf(ibufsize)   ! buffer into which to write result
+C
+      integer iret          ! number of data points written
+      integer istype        ! data type code of result
+C
+C  istype=-1 -- scalar f(t)
+C  istype= 1 -- f(x,t), x is TRANSP zone ctrs if this is TRANSP data
+C  istype= 2 -- f(x,t), x is TRANSP zone bdys if this is TRANSP data
+C  ..etc..
+C  istype = 0 indicates an error
+C
+      integer iwarn         ! arithmetic warning, 0 = OK
+      integer ier           ! completion code, 0 = OK
+C
+C  ier=1 means:  error in the calculator, messages were written.
+C  ier=2 means:  insufficient buffer space
+C
+C  iwarn.ne.0 means:  arithmetic errors were trapped during evaluation.
+C    example:  expr is "tmp=1/pbe" and pbe (beam heating) is zero at
+C    some times during the experiment.  Then iwarn=1 is set; the data
+C    points for which an error occurred are zeroed.  The caller does
+C    not have access to detailed information about which points had
+C    the error.
+C
+C  a side effect of errors:
+C      iret=0 if an error occurs.
+C
+
+3 multigraph_data_access
+
+Summary:
+
+First use RPMULTI to get the multigraph member names (mgnames), integer 
+sign factors (mgsigns, +/- 1 for each member), and number of members 
+(nnames) and generic labeling information.  (RPMULTI is described in
+the section on routines describing the contents of the TRANSP output
+database).  Then, the multigraph data, or the data transformed e.g. 
+by a volume integral, is fetched with one of the following
+calls.  The data will be returned in a 2d array
+
+4 standard_arguments
+
+The following arguments in all multigraph data access subroutine calls.
+Details:  (mg = short for multigraph):
+
+      PARAMETER (mgmax=15)            ! max no. of members in mg's
+
+ ! obtained from RPMULTI, input to multigraph read routine:
+      CHARACTER*21 mgnames(mgmax)     ! multigraph names
+      INTEGER mgsigns(mgmax)          ! +/-1 sign factors
+      INTEGER nnames                  ! actual no. of names, this mg.
+
+ ! buffer for output data
+      REAL zmgbuf(<item size>,mgmax)  ! where <item size> is greater 
+                                      ! than or equal to the number 
+                                      ! of data points in each member 
+                                      ! function.
+
+      INTEGER ibufsize                ! ibufsize = <item size>
+
+ ! output other than the data itself...
+
+      INTEGER iret                    ! actual no. data pts *per item*
+      INTEGER istype                  ! item subtype code
+      INTEGER iwarn                   ! arithmetic warning flag
+      INTEGER ier                     ! error flag
+
+4 RPMG0CAL
+
+Just read the multigraph data...
+
+        ...
+
+      call RPMG0CAL(mgnames,mgsigns,nnames,zmgbuf,ibufsize,
+     >                 iret,istype,iwarn,ier)
+
+      returns the multigraph data in zmgbuf(*,*), and:
+
+         iret   = actual multigraph member data item size, .le. 
+                  ibufsize.  note iret is the item size, not the 
+                  total amount retrieved!
+         istype = x axis type of data
+         iwarn  = warning flag (0 = no warning)
+         ier    = error flag (0 = no error)
+
+4 RPMG1CAL
+
+Read the multigraph data, running each item through a one step
+calculator program
+
+RPLOT calculator expressions are used to return standard transforms of
+multigraph data.  For example,
+
+      character*50 zxpr
+      zxpr='volint(@)'    ! multigraph names substituted at "@" symbol.
+
+      call RPMG1CAL(mgnames,mgsigns,nnames,zxpr,zmgbuf,ibufsize,
+     >                  iret,istype,iwarn,ier)
+
+Will cause zmgbuf(*,*) to be filled with a set of profiles of volume
+integral transforms of the original data.  An error flag would be set if
+the named items were of the wrong type to be volume integratable.
+
+On output, 
+
+         iret   = actual multigraph member data item size, .le. 
+                  ibufsize.  note iret is the item size, not the 
+                  total amount retrieved!
+         istype = x axis type of data
+         iwarn  = arithmetic warning flag (0 = no warning)
+         ier    = error flag (0 = no error)
+
+If iwarn is set, it means arithmetic errors occurred during
+evaluation of the calculator expression.
+
+Note that the calculator expression can change `istype' to something
+other than the `istype' of the original multigraph contents.
+
+4 additional_routines
+
+Multi-step calculations can also be performed:
+
+      parameter (maxprog=10)
+      character*512 cprog(maxprog)
+
+C  2 step calculation on each member:
+      prog(1)= <whatever#1>
+      prog(2)= <whatever#2>
+      call RPMG2CAL(mgnames,mgsigns,nnames,prog(1),prog(2),zmgbuf
+     >                  ibufsize, iret,istype,iwarn,ier)
+C  3 step calculation on each member:
+      prog(1)= <whatever#1>
+      prog(2)= <whatever#2>
+      prog(3)= <whatever#3>
+      call RPMG3CAL(mgnames,mgsigns,nnames,
+     >                  prog(1),prog(2),prog(3),zmgbuf,
+     >                  ibufsize, iret,istype,iwarn,ier)
+
+C  arbitrary sized calculation
+
+      prog(1) = <whatever#1>
+        ...
+      prog(nsteps) = <last-whatever>
+      call RPMGCALC(mgnames,mgsigns,nnames,prog,nsteps,zmgbuf,
+     >                  ibufsize, iret,istype,iwarn,ier)
+
+C  an example of a multistep calculation would be:
+C  ("@" symbol shows where to substitute multigraph data in expressions).
+
+      call RPMG2CAL(mgnames,mgsigns,nnames,
+     >                  '_tmp_norm = %TIME_TRACE(I1.0, VOLAVG(@))',
+     >                  '@/_tmp_norm'
+     >                  zmgbuf,ibufsize, iret,istype,iwarn,ier)
+
+C  ...the first step extracts as a function of time the last point
+C  of the volume average transform of multigraph members (i.e. the 
+C  volume average over the entire plasma), and then, the data returned
+C  is the original data "@" renormalized by dividing out _tmp_norm.
+C
+C  **history note**
+C  This is the "H(r)" transform traditionally used by experimental physicists
+C  to characterize the peakedness of neutral beam deposition or heating
+C  profiles.
+
+On output, 
+
+         iret   = actual multigraph member data item size, .le. 
+                  ibufsize.  note iret is the item size, not the 
+                  total amount retrieved!
+         istype = x axis type of data
+         iwarn  = arithmetic warning flag (0 = no warning)
+         ier    = error flag (0 = no error)
+
+If iwarn is set, it means arithmetic errors occurred during
+evaluation of the calculator expression.
+
+Note that the calculator expression can change `istype' to something
+other than the `istype' of the original multigraph contents.
+
+3 time_slice_extraction
+
+  T1SCALAR -- extract a scalar number from f(t) at the selected time
+  T1PROFIL -- extract a profile from f(x,t) at the selected time
+  T1MHDEQ  -- get the TRANSP MHD equilibrium at the selected time
+
+  RPTIMAV  -- extract time slice(s) from time dependent data already
+              read into memory.
+              
+4 T1SCALAR
+
+fortran-90 code for extracting scalar data from the currently 
+connected TRANSP run.
+
+subroutine t1scalar(zname,zlabel,zunits,ztime,zdelta,zvalue,ierr)
+ !
+ !  fetch a scalar function of time and interpolate to the indicated
+ !  time value (ztime), optionally with averaging (+/- zdelta)
+ !
+  character(*), intent(in) :: zname    ! name of scalar function
+  character(*), intent(out) :: zlabel  ! function label
+  character(*), intent(out) :: zunits  ! function units label
+ !
+  real, intent(in) :: ztime   ! time (seconds) to which to interpolate
+  real, intent(in) :: zdelta  ! +/- averaging time (seconds)
+ !
+  real, intent(out) :: zvalue ! the interpolated or averaged value.
+ !
+  integer, intent(out) :: ierr  ! completion code, 0=OK
+
+4 T1PROFIL
+
+fortran-90 code for extracting profile data from the currently 
+connected TRANSP run.
+
+subroutine t1profil(zname,zlabel,zunits,ztime,zdelta, &
+     istype,zprofil,nmax,ngot,ierr)
+ !
+ !  fetch a profile function of time and interpolate to the indicated
+ !  time value (ztime), optionally with averaging (+/- zdelta)
+ !
+  character(*), intent(in) :: zname    ! name of profile function
+  character(*), intent(out) :: zlabel  ! function label
+  character(*), intent(out) :: zunits  ! function units label
+ !
+  real, intent(in) :: ztime   ! time (seconds) to which to interpolate
+  real, intent(in) :: zdelta  ! +/- averaging time (seconds)
+ !
+  integer, intent(out) :: istype  ! type of x-axis associated with profile
+  integer, intent(in) :: nmax   ! dimension of zprofil array
+  real, dimension(nmax), intent(out) :: zprofil   ! the output profile
+  integer, intent(out) :: ngot  ! actual size of profile returned
+ !
+  integer, intent(out) :: ierr  ! completion code, 0=OK
+
+4 T1MHDEQ
+
+fortran-90 code for extracting an MHD equilibrium dataset from a
+TRANSP run.  There is an MKS units conversion option.
+
+subroutine t1mhdeq(ztime,zdelta,nsmax,ntheta,nsgot,units_option, &
+     theta, &
+     Rarr,Zarr, &
+     rho,psi,pmhd,qmhd,gmhd, &
+     tflux, pcur, ierr )
+ !
+  implicit none
+ !
+ !  read in the TRANSP MHD equilibrium at a particular time
+ !  or averaged over a range of times
+ !
+ ! in seconds:
+ !
+  real, intent(in) :: ztime     ! time at which equilibrium is wanted
+  real, intent(in) :: zdelta    ! +/- zdelta for time average, or 0.0
+ !
+ ! dimensioning info:
+ !
+  integer, intent(in) :: nsmax  ! max no. of surfaces, counting axis
+  integer, intent(in) :: ntheta ! no. of theta points in Rarr,Zarr
+  integer, intent(out) :: nsgot ! actual no. of surfaces counting axis
+ !
+ ! output physical units option
+ !
+  character(*), intent(in) :: units_option
+ !                             "TRANSP" for TRANSP traditional units
+ !                             "MKS"    for MKS units:
+ !              TRANSP  MKS
+ !  Rarr,Zarr     cm     m
+ !   rho                      (dimensionless)
+ !   psi         Webers/rad   (same for both)
+ !   Pmhd        Pascals      (same for both)
+ !   Qmhd                     (dimensionless)
+ !   Gmhd        T*cm   T*m
+ !   Tflux       Webers       (same for both)
+ !   Pcura       Amps         (same for both)
+ !
+  real, intent(in), dimension(ntheta) :: theta   ! theta grid, input
+ !---------------------------
+ !  equilibrium geometry:
+  real, intent(out), dimension(ntheta,nsmax) :: Rarr   ! R(theta,rho)
+  real, intent(out), dimension(ntheta,nsmax) :: Zarr   ! Z(theta,rho)
+ !
+ !  normalized sqrt(toroidal flux):
+  real, intent(out), dimension(nsmax) :: rho     ! sqrt(phi)/sqrt(philim)
+ !
+ !  poloidal flux profile
+  real, intent(out), dimension(nsmax) :: psi     ! Webers/radian
+ !
+ !  MHD pressure
+  real, intent(out), dimension(nsmax) :: pmhd    ! (see units_option)
+ !
+ !  q profil
+  real, intent(out), dimension(nsmax) :: qmhd
+ !
+ !  g profile
+  real, intent(out), dimension(nsmax) :: gmhd    ! (see units_option)
+ !
+ !  total enclosed flux
+  real, intent(out) :: tflux                     ! Webers
+ !
+ !  total toroidal plasma current
+  real, intent(out) :: pcur                      ! Amps
+ !
+ !----> completion code
+ !
+  integer, intent(out) :: ierr     ! completion code, 0=OK
+
+4 RPTIMAV
+If time dependent data has been read in, RPTIMAV can be used to
+extract a timeslice.
+
+RPTIMAV time interpolates individual function or multigraph
+data to a specified time, or, optionally, time averages at the 
+specified time +/- delta_t (for interpolation only, use 
+delta_t=0.0):
+
+input:
+      INTEGER ibufsize,nfcns       ! buffer dimension information
+      REAL zmgbuf(ibufsize,nfcns)  ! data buffer
+      INTEGER istype               ! data subtype code
+      REAL ttarg                   ! time-of-interest (seconds)
+      REAL delta_t                 ! +/- averaging time (seconds)
+
+      INTEGER ioutsize             ! output buffer size / result
+output:
+
+      REAL outbuf(ioutsize,nfcns)  ! output data buffer
+      INTEGER ier                  ! completion code, 0=OK
+
+        ...
+
+      call RPTIMAV(zmgbuf,ibufsize,nfcns,istype,ttarg,delta_t,
+     >              outbuf,ioutsize, ier)
+C
+C  where:  
+C        zmgbuf = the data to be interpolated or averaged
+C                 from a prior RPMGCALC or RPMG*CAL call, or an
+C                 individual function or calculator result (set nfcns=1).
+C
+C        ibufsize = 1st array dimension of zmgbuf, (max) size per item.
+C
+C        nfcns = number of functions to time average
+C
+C        istype = function subtype code (will determine actual item size)
+C
+C        ttarg = time to interpolate to or average around
+C        delta_t = average +/- delta_t around ttarg
+C              if delta_t is NEGATIVE then 1/[time average of (1/data)]
+C              is computed.  ("double inverse averaging").
+C
+C output:
+C        outbuf = array into which to write results of interpolation
+C        ioutsize = (max) size per result
+C
+C        ier = completion code, 0 = normal
+C
+C               RPTIMAV declares 
+C                   real zmgbuf(ibufsize,nfcns)
+C                   real outbuf(ioutsize,nfcns)
+C
+
+3 calculator_miscellany
+
+** GUARD character **
+
+The RPLOT calculator supports "expressions" and "commands" (for details
+see ftp://ftp.pppl.gov:/pub/transp/codata/doc/rpcalc.doc).  The parser
+uses a leading "guard character" to determine that the following
+string is a command rather than an expression.  This guard character
+can be reset, although care should be taken not to reuse a character
+that has other meaning.
+
+The default guard character is "%".  To get the current guard character,
+
+      CHARACTER*1 cguard
+
+      CALL RPGETGC(cguard)
+
+or, to SET the guard character,
+
+      cguard='!'
+      CALL RPSETGC(cguard)
+
+(The guard character should not be reset unless the programmer feels
+strongly that "%" is just too ugly... the should first carefully read
+the calculator documentation and help messages before selecting a
+new guard character).
+
+** HELP messages **
+
+The following routines generate ascii output, in the file allocatd
+for messages (see initialization).  They describe aspects of the
+RPLOT calculator:
+
+      call rpgetgc(cguard)
+
+      call plcintro(cguard) -- introductory information; "%" as guard
+                            character for RPLOT calculator commands.
+
+      call plclis           -- list of arithmetic expression operators
+
+      call plcmds(cguard)   -- list of calculator commands.
+
+** UNITS conversion **
+
+Generally, the calculator cannot automatically process units labels
+of inputs to determine the physical units of the output of a calculator
+expression.  However, for a few simple operators, units conversions
+are supported.  These operators are:
+
+  VOLINT(...)     -- volume integral  (#/cm3 --> #)
+  ARINT(...)      -- area integral    (A/cm2 --> A)
+  FLXINT(...)     -- "flux" integral  (#/cm3/sec --> #/cm2/sec)
+  GRAD(...)       -- gradient         (anything --> anything/cm)
+  LOGDERIV(...)   -- inv. scale length (anything --> cm**-1)
+  SCALEN(...)     -- scale length     (anything --> cm)
+  TIME_DERIV(...) -- time derivative  (anything --> anything/sec)
+
+It may be useful to access these transformations e.g. to modify
+the units string from a multigraph when plotting a volume 
+integral transform.  To do so:
+
+      CHARACTER*16 units
+      CHARACTER*10 transform
+      INTEGER iok
+
+      CALL RPFIXUNS(units, transform, iok)
+
+details:
+
+      subroutine rpfixuns(units,transform,iok)
+C
+C  call up an RPLOT units transformation.
+C
+C  does stuff like #/cm3/sec -> #/sec (e.g. for "VOLINT")
+C
+C  in/out
+      character*(*) units             ! units to be transformed
+C
+C  in
+      character*(*) transform         ! type of transform
+C
+C  out
+      integer iok                     ! =1 if transform type is known.
+C
+C  if iok.ne.1 on exit, units are unchanged.  no message is generated.
+C
+C     iok=0 means transform not recognized.
+C     iok=2 means transform recognized but units change call did not
+C           change the units string
+C
+
+3 programming_example
+
+example of a subroutine which uses several of the calls described
+above:  trread/rpcalcd.for:
+
+      subroutine rpcalcd(zexpr, rlabel, 
+     >   zdata, zxdata, ndmax, ztdata, ntmax,
+     >   nxgot, ntgot, istype, iwarn, ier)
+c
+c  call the rplot calculator routine rpcalc.
+c  return a copy of the data computed, the corresponding x axis data
+c  if applicable, and the corresponding timebase data.
+c
+c  input:
+      character*(*) zexpr               ! calculator expression (cf rpcalc).
+      character*(*) rlabel              ! run label (for error message)
+c
+c  storage buffers filled on output:
+      integer ndmax                     ! max size of data item (INPUT)
+      integer ntmax                     ! max size of timebase (INPUT)
+c
+      real zdata(ndmax)                 ! buffer for calculator results data
+      real zxdata(ndmax)                ! buffer for x axis data
+      real ztdata(ntmax)                ! buffer for timebase
+c
+c  scalars set on output:
+c
+      integer nxgot                     ! no. of x pts, 1 for scalar f(t) data
+      integer ntgot                     ! no. of time pts in timebase
+c
+c  ntgot words are written in ztdata;
+c  nxgot*ntgot words are written in zdata
+c  if (istype.ge.1) nxgot*ntgot words are written in zxdata
+c  ...the x variation is stored contiguously, i.e. the fortran 2d
+c  array declaration would be array(nxgot,ntgot)
+c
+      integer istype                    ! data item type code
+c
+c  istype=-1 -- scalar f(t)
+C  istype= 1 -- f(x,t), x is TRANSP zone ctrs if this is TRANSP data
+C  istype= 2 -- f(x,t), x is TRANSP zone bdys if this is TRANSP data
+C  ..etc..
+C  istype = 0 indicates an error
+C
+      integer iwarn                     ! arithmetic warning, 0 = OK
+      integer ier                       ! completion code, 0 = OK
+c
+c--------------------------------------------------------------------
+c
+      integer str_length,lunzer
+c
+      integer irank,idims(10)
+      character*21 zxabb
+c
+c--------------------------------------------------------------------
+c
+c  OK... call the calculator
+c
+      ilunz=lunzer(0)
+c
+      call rpcalc(zexpr,zdata,ndmax,igot,istype,iwarn,ier)
+c
+c  message on warning or error
+c
+      if(max(ier,iwarn).ne.0) then
+         ile=str_length(zexpr)
+         ilb=str_length(rlabel)
+         write(ilunz,1001) rlabel(1:ilb),zexpr(1:ile),iwarn,ier
+ 1001    format(/
+     >      '%rpcalcd:  runid:  ',a/
+     >      ' expression:  ',a/
+     >      ' iwarn=',i6,'      ier=',i6)
+      endif
+      if(ier.ne.0) then
+         nxgot=0
+         ntgot=0
+         return
+      endif
+c
+      if(istype.eq.-1) then
+c
+c  if a scalar function result:  have data already, just get timebase
+c
+         nxgot=1
+         ntgot=igot
+         call rptime_s(ztdata,ntmax,igot)
+         return
+      else
+c
+c  if a profile function result:  have data already, get profile
+c  timebase and x axis function
+c
+         call rpdims(istype,irank,idims,zxabb,ier)
+         if(irank.gt.2) then
+            write(ilunz,*) 
+     >         ' ??rpcalcd:  irank.gt.2 object not supported!'
+            nxgot=0
+            ntgot=0
+            ier=99
+         else
+            nxgot=idims(1)
+            ntgot=idims(2)
+         endif
+c  check time dimension
+         if(ntgot.gt.ntmax) then
+            write(ilunz,*) ' ??rpcalcd:  ntgot.gt.ntmax, ntgot=',ntgot,
+     >         ' ntmax=',ntmax
+            nxgot=0
+            ntgot=0
+            ier=88
+         else
+c  get timebase
+            call rptime_p(ztdata,ntmax,igot)
+c  get x axis
+            call rprofile(zxabb,zxdata,ndmax,iret, ier)
+         endif
+c
+      endif
+c
+      return
+      end
+
+2 special_lists
+
+3 plasma_species
+
+The following routines are available:
+
+  rd_nspecies  --  return information on total number of distinct
+                   plasma species, and numbers in each of several
+                   categories of plasma species
+
+  rd_species   --  get list of all plasma species
+
+  rd_thspec    --  get list of non-impurity thermal species
+
+  rd_thxspec   --  get list of impurity thermal species
+
+  rd_bmspec    --  get list of beam species
+
+  rd_rfspec    --  get list of RF tail species
+
+  rd_fuspec    --  get list of fusion product species
+
+4 rd_nspecies
+subroutine rd_nspecies(n_species,n_thi,n_thx,n_bi,n_rfi,n_fusi)
+ !
+ !  return the number of species in the (currently open) TRANSP run
+ !  return n_species=0 if no run is currently open.
+ !  return n_species=-1 if some other error occurred (rare).
+ !
+  implicit NONE
+ !
+  integer, intent(out) :: n_species  ! total no. of species including electrons
+  integer, intent(out) :: n_thi      ! no. of "non-impurity" therm. ion species
+  integer, intent(out) :: n_thx      ! no. of "impurity" thermal ion species
+  integer, intent(out) :: n_bi       ! no. of "beam" ion species
+  integer, intent(out) :: n_rfi      ! no. of "RF tail" ion species
+  integer, intent(out) :: n_fusi     ! no. of "fusion product" ion species.
+
+4 rd_species
+subroutine rd_species(maxn,n_species,zlbla,abray,itype,ifast,zz,aa,izc)
+ !
+ !   find all plasma species -- return information in passed arrays
+ !
+  implicit NONE
+ !
+  integer, intent(in) :: maxn    ! max no. of species (array sizes)
+  integer, intent(out) :: n_species  ! actual no. of species (-1 if error)
+ !
+  character*20, intent(out) :: zlbla(maxn)      ! descr. label for each specie
+ !
+  character*21, intent(out) :: abray(4,maxn)    ! specie profile names
+ !
+ !   for specie j:
+ !     abray(1,j) = name of density profile-- for all species (n/cm**3).
+ !     abray(2,j) = name of temperature or "average energy" profile.
+ !     abray(3,j) = name of perpendicular energy density profile or
+ !                  average perp energy per particle or " ".
+ !     abray(4,j) = name of parallel energy density profile or 
+ !                  average pll energy per particle or " ".
+ !        (generally abray(3:4,j) will be set for fast species only)
+ !
+  integer, intent(out) :: itype(maxn)           ! species type code
+ !
+ !   itype(j)=-1  -- electrons
+ !
+ !   itype(j)=+1  -- non-impurity thermal specie, usually H or He isotope
+ !                   can be Li
+ !   itype(j)=+2  -- impurity thermal specie:  Z and A are known, constant
+ !   itype(j)=+3  -- impurity thermal specie:  Z and A are functions of time
+ !
+ !   itype(j)=+4  -- beam ion specie
+ !   itype(j)=+5  -- rf tail ion specie
+ !   itype(j)=+6  -- fusion product ion specie
+ !
+  integer, intent(out) :: ifast(maxn)           ! thermal/fast flag
+ !
+ !   ifast(j)=0   -- thermal electron or ion specie, 
+ !                   abray(2,j) contains temperature, eV, abray(3:4,j)=" ".
+ !   ifast(j)=1   -- fast specie, abray(2,j) is avg energy / ptcl <E>, eV
+ !                   abray(3:4,j) contain perp, pll energy density, J/cm**3
+ !   ifast(j)=2   -- fast specie, abray(2,j) is "temperature" = 2/3 <E>, eV
+ !                   abray(3:4,j) contain perp, pll <E>/ptcl, eV
+ !
+ !        (other fast specie configurations may be added later)
+ !
+  real, intent(out) :: zz(maxn)                 ! charge of specie
+  real, intent(out) :: aa(maxn)                 ! mass of specie (amu)
+  integer, intent(out) :: izc(maxn)             ! atomic number of species 
+ !
+ !---------------------------------
+4 other routines
+The following routines have a subset of the arguments of rd_species.
+For argument details see rd_species.
+
+The argument "ngot" (integer, intent(out)) specifies the number of 
+species found, which can be zero for routines other than rd_thspec.
+
+subroutine rd_thspec(maxn,abray,zz,aa,izc,ngot)  ! non-impurity, thermal
+
+subroutine rd_thxspec(maxn,abray,zz,aa,izc,ngot) ! impurity, thermal
+
+  note:  if rd_thxspec returns ngot=1, zz=aa=0, this means that the
+         impurity Z and A are functions of time:  read the scalar
+         functions "XZIMP" and "AIMP".
+
+subroutine rd_bmspec(maxn,abray,zz,aa,izc,ngot)  ! beam species (ifast=1)
+
+subroutine rd_rfspec(maxn,abray,zz,aa,izc,ngot)  ! RF tail species (ifast=2)
+
+subroutine rd_fuspec(maxn,abray,zz,aa,izc,ngot)  ! fusion products (ifast=1)
+
+3 other_lists
+We are open to suggestions for other useful aggregate lists.
+To get in touch with the `trread' authors send email to
+dmccune@pppl.gov
+2 namelist_access
+
+The trread library includes a facility for reading and parsing
+TRANSP namelists.  
+
+Summary:  first read the namelist.  Then, named items can be
+extracted.
+
+---> To read the namelist:
+
+      INTEGER ilun              ! fortran i/o unit number (input)
+      INTEGER ier               ! status code returned (0=OK)
+
+      call tr_getnl_text(ilun,ier)    ! read in the namelist
+
+
+---> To extract named items
+
+      CHARACTER*32 ZNAME        ! name of desired item (input)
+      INTEGER MAXVAL            ! array dimension (input)...
+
+      INTEGER intvec(MAXVAL)    ! INTEGER vector (output)
+      LOGICAL logvec(MAXVAL)    ! LOGICAL vector (output)
+      REAL r4vec(MAXVAL)        ! standard REAL vector (output)
+      REAL*8 r8vec(MAXVAL)      ! REAL*8 vector (output)
+
+      INTEGER istat             ! status code (output)
+ !
+ !  on output:
+ !
+ ! normal returns:
+ !  istat = 0 -- no values found
+ !  istat = N, 1.le.N.le.maxval -- N values found, stored in intvec(1:N)
+ !
+ ! error returns:
+ !  istat = -1 -- error (e.g. namelist was never read)
+ !  istat = -N, N.gt.maxval -- N values were found, intvec(1:maxval) set
+ !          to the first maxval of them, there are too many values to
+ !          return them all
+ !
+
+      CALL TR_GETNL_INTVEC(zname,intvec,maxval,istat)
+      CALL TR_GETNL_LOGVEC(zname,logvec,maxval,istat)
+      CALL TR_GETNL_R4VEC(zname,r4vec,maxval,istat)
+      CALL TR_GETNL_R8VEC(zname,r8vec,maxval,istat)
+
+---> Artificial Example:
+
+ ! declarations
+
+      integer ilun          ! i/o unit
+      integer ier           ! status code (namelist file read)
+      integer istat         ! status code (namelist item lookup)
+      integer ngmax         ! #of plasma species (namelist)
+      real*8 aplasm(5)      ! A of plasma species (namelist)
+      real*8 backz(5)       ! Z of plasma species (namelist)
+
+ ! read namelist file
+
+      ilun=99
+      call tr_getnl_text(ilun,ier)
+      if(ier.ne.0) then
+        ...handle error...
+      endif
+
+ ! get number of plasma species
+
+      call tr_getnl_intvec('NGMAX',ngmax,1,istat)
+      if(istat.ne.1) then
+        ...treat as error...
+      else if(ngmax.gt.5) then
+        ...treat as error...
+      endif
+
+ ! get A of plasma species
+
+      call tr_getnl_r8vec('APLASM',aplasm,ngmax,istat)
+      if(istat.ne.ngmax) then
+        ...treat as error...
+      endif
+
+ ! get Z of plasma species
+
+      call tr_getnl_r8vec('BACKZ',backz,ngmax,istat)
+      if(istat.ne.ngmax) then
+        ...treat as error...
+      endif
+
+(A more substantial example is in the trxplib source code:  see
+routines trx_wall.f90, trx_getnlims.f90, trx_getcrlim.f90, and
+trx_getlnlim.f90)
+
+---> Cautionary Notes...
+
+The TRANSP code maintains default values for namelist variables.
+This means that some runs may rely on default values for some items,
+in which case there will be no specific mention of the item in the
+namelist file.  **The software described here does not have access
+to the default values at this time**.  Any attempt to read a defaulted
+variable will yield istat=0, not found.  If there is a requirement
+to change this, something can be done.  However, reliability will be 
+less than 100% over time, because, the TRANSP code evolves, the namelist
+evolves, and the code's default values for namelist controls can change.
+
+On the other hand, certain information cannot be defaulted, or the
+default has a well known and stable interpretation, so that a namelist
+read can be reliably employed.  Bottom line:  seek advice from a TRANSP
+expert when contemplating a namelist read to fetch TRANSP data.
+
+A final note:  the tr_getnl_*vec(...) routines can fetch scalar or
+singly dimensioned vector integer, logical, and floating point data.
+At present there is no support for fetching character data or data
+elements from multiply dimensioned arrays.  Thus there are a small
+number of items in the TRANSP namelist that cannot be accessed with
+the software as currently implemented.
+
+2 data_from_other_runs
+
+Most of the trread software is organized around the idea of
+"connecting" to a single "primary" run, and then reading data 
+out of that run exclusively.
+
+However, the following routines allow access to data from "secondary"
+runs without disrupting the connection to the primary run.
+
+Indeed, these routines are the legacy callable interface to TRANSP
+data.  The earlist versions of TRPROFIL and TRSCALAR are over ten 
+years old.
+
+Summary:
+
+  TRSCALAR -- read a named function f(t) from a TRANSP run
+  TRPROFIL -- read a named function f(x,t) from a TRANSP run
+
+These routines have similar arguments:
+
+ ! input:
+      CHARACTER*(*) DISK   ! VMS DISK **or** MDS+ SERVER & TREE NAME
+      CHARACTER*(*) DIR    ! UNIX PATH **or** PPPL MDS+ tok.yy ID
+      CHARACTER*(*) RUNID  ! TRANSP RUND **or** non-PPPL MDS+ shot no.
+
+      CHARACTER*(*) ABBREV ! TRANSP id for data item sought
+
+      INTEGER MAXTIMES     ! max. no. of time points in data returned.
+
+ ! input, TRPROFIL ONLY:
+
+      INTEGER MAXDATA      ! data buffer size limit
+
+ ! output:
+
+      CHARACTER*32 LABEL   ! TRANSP 32 character label for item
+      CHARACTER*16 UNITS   ! TRANSP 16 character units label for item
+
+ ! output, TRPROFIL ONLY:
+
+      INTEGER ITYPE        ! X-axis type code for data returned
+      INTEGER INX          ! no. of X points in data returned. 
+
+ ! output:
+      INTEGER NTIMES       ! number of time points returned.
+      REAL TIMES(MAXTIMES) ! TIMES(1:NTIMES) = the time points returned.
+
+ ! output, TRSCALAR ONLY:
+
+      REAL SDATA(MAXTIMES) ! SDATA(1:NTIMES) = the data points returned.
+
+ ! output, TRPROFIL ONLY:
+
+      REAL DATA(MAXDATA)   ! DATA(1:NTIMES*INX) = the data points 
+                           ! returned.  ordering:  INX points at
+                           ! TIME(1), then INX points at TIME(2),
+                           ! etc., contiguously stored.
+
+ ! output:
+
+      INTEGER IERR         ! completion code, 0=OK (error codes see below)
+ 
+         ... ...
+
+      CALL TRSCALAR( DISK,
+     1               DIR,     RUNIDIN, ZABBREV,MAXTIMES,
+     2               LABEL,   UNITS,
+     3               NTIMES,  TIMES,   SDATA,  IERR     )
+
+         ... ...
+
+      CALL TRPROFIL( DISK,
+     1               DIR,    RUNIDIN, ZABBREV,MAXTIMES, MAXDATA,
+     2               LABEL,  UNITS,   ITYPE,  INX,
+     3               NTIMES, TIMES,   DATA,   IERR     )
+
+
+ ! error codes...
+
+C       IERR     - INTEGER ERROR MESSAGE. RETURNED = 0 IF OK.
+C            0 = OK
+C            2 = ERROR READING MF FILE.
+C            3 = UNEXPECTED EOF READING MF FILE.
+C            5 = TRIED TO READ OLD FORMAT TF FILE.
+C           15 = PROFILE ABBREVIATION NOT FOUND
+C           16 = COULDN'T OPEN MF FILE
+C           17 = COULDN'T OPEN TF FILE
+C           26 = RUNID IN FILE IS DIFFERENT THAN ASKED FOR
+C          101 = # OF TIMES IN  FILE > MAXTIMES.
+C                MAXTIMES TIMES WERE READ IN.
+C          102 = # OF PROFILES > DIMENSION OF BUFFER.
+C                NO DATA READ IN.
+c          103 = TIMES RETURNED ARE NOT MONOTONICALLY
+C                INCREASING. DATA IS ALSO RETURNED.
+C          104 = # OF TIMES * # IN X DIRECTIONS > MAXDATA
+C          105 = # OF POINTS IN X DIRECTION = 0
+C
+
+-----------------
+MDS+ examples:
+
+PPPL TRANSP archives -- runs are identified by tok.yy & runid string;
+                        treename = TRANSP
+
+                        DISK  = "MDS+-<server_name>@<treename>"
+                        DIR   = "tok.yy"
+                        RUNID = "<TRANSP_runid>"
+
+ ! fetch plasma current (PCUR) vs. time...
+
+      CALL TRSCALAR( 'MDS+-TRANSPGRID.PPPL.GOV@TRANSP', 
+     >               'JET.00', '50632C02', 'PCUR', MAXTIMES,
+     2               LABEL,   UNITS,
+     3               NTIMES,  TIMES,   SDATA,  IERR     )
+
+
+non-PPPL servers -- runs are identified by treename & shot number
+
+                        DISK  = "MDS++<server_name>@<treename>"
+                        DIR   = " "
+                        RUNID = "<shot_number>"  ! in ascii
+
+ ! fetch electron temperature profile evolution data...
+
+      CALL TRPROFIL( 'MDS++CMODA.PSFC.MIT.EDU@TRANSP01', 
+     >               ' ', '123456789', 'TE', MAXTIMES, MAXDATA,
+     2               LABEL,  UNITS,   ITYPE,  INX,
+     3               NTIMES, TIMES,   DATA,   IERR     )
+
+
+-----------------
+non MDS+ examples
+
+NetCDF or legacy format TRANSP run on UNIX filesystem:
+
+                        DISK  = " "
+                        DIR   = "<unix path>"
+                        RUNID = "<TRANSP_runid>"
+
+ ! fetch electron temperature profile evolution data...
+
+      CALL TRPROFIL( ' ', '/u/transp/results/JET.98',
+     >               '46243C02', 'TE', MAXTIMES, MAXDATA,
+     2               LABEL,  UNITS,   ITYPE,  INX,
+     3               NTIMES, TIMES,   DATA,   IERR     )
+
+(files are at /u/transp/results/JET.98/46243C02* ... the DIR string
+can also have a leading environment variable, which will be 
+translated, e.g. "RUNDATA/JET.98").
+
+
+NetCDF or legacy format TRANSP run on VMS filesystem:
+
+                        DISK  = "<disk name>", trailing ":" optional
+                        DIR   = "<directory>", no brackets
+                        RUNID = "<TRANSP_runid>"
+
+ ! fetch electron temperature profile evolution data...
+
+      CALL TRPROFIL( 'RUNDATA', 'TRANSP.JET.98',
+     >               '46243C02', 'TE', MAXTIMES, MAXDATA,
+     2               LABEL,  UNITS,   ITYPE,  INX,
+     3               NTIMES, TIMES,   DATA,   IERR     )
+
+(files are at RUNDATA:[TRANSP.JET.98]46243C02*.*)
+
+2 multi_run_multigraphs
+
+There is a special routine for the situation where it is desired to
+read a single data item (scalar or profile function) from several
+distinct runs.  A call to this routine causes a multigraph to be
+created containing items of the form
+
+  <item>$<runid_1>
+  <item>$<runid_2>
+  <item>$<runid_3>
+    ...etc...
+
+  (up to 15 runs)
+
+  --> note that this causes data ids with name lengths greater than 10
+      to be created; indeed, throughout TRREAD the maximum length of a
+      data identifier or "abbreviation" has been increased from 10 to 21
+      characters, to accomodate the $<runid> suffix.
+
+For example:
+
+  character*10 mgname
+  character*10 item
+
+  integer :: numruns=3
+  character*80 paths(numruns)
+  character*10 aliases(numruns)
+
+  integer inum_cur          ! set inum_cur to indicate "current run"
+                            ! i.e. the run accessed via a prior
+                            ! KCONNECT or RCONNECT call
+
+  integer iwarn(numruns),ierr
+
+
+  mgname = 'neut_mg'   ! multigraph name
+  item = 'neutt'       ! function id -- total neutrons, f(t)
+
+  inum_cur = 0         ! (not required to be set)
+
+  paths(1) = '/transp/results/dmccune/output/TFTR.88/37065S10'
+  paths(2) = 'MDS+:TRANSPGRID.PPPL.GOV:TRANSP(TFTR.88,37065K12)'
+  paths(3) = 'MDS+:TRANSPGRID.PPPL.GOV:TRANSP(TFTR.88,37065K13)'
+
+  aliases(1) = '37065S10'
+  aliases(2) = '37065K12'
+  aliases(3) = '37065K13'
+
+  (Here runids are used for aliases but in another context, something
+  else e.g. MDS+ tree ids, or, shot numbers, might want to be used).
+
+  call run_mg(mgname,rpitem,numruns,paths,aliases,inum_cur, &
+  &           iwarn,ierr)
+
+  ierr is set if there is an error such that the multigraph 
+  "neut_mg" cannot be created; iwarn is set for any run where
+  either an item could not be accessed or an existing item in
+  the TRREAD session was replaced due to the name already being
+  in use.
+
+  if the call is successful, scalar functions
+
+     NEUTT$37065S10
+     NEUTT$37065K12
+     NEUTT$37065K13
+
+  are created and grouped in the multigraph
+
+     NEUT_MG
+
+  calculator expressions such as
+
+     DNEUTT,"Neutron Difference","N/SEC" = NEUTT$37065K13 - NEUTT$37065K12
+
+  can be formed, and the multigraph contents can be manipulated by
+  calculator commands e.g. %MG_ADDFUN and %MG_DELFUN: for standard
+  information on the calculator see
+
+     ftp://ftp.pppl.gov:/pub/transp/codata/doc/rpcalc.doc
+
+The subroutine header follows...
+
+subroutine run_mg(mgname,rpitem,numruns,runPath,runAlias,inum_cur,iwarn,ier)
+
+  ! create a multigraph of a single item (rpitem, e.g. "TE" or "PCUR")
+  ! read from several different runs.
+
+  ! create the member functions for the multigraph, forming labels of the
+  ! form <rpitem>$<runAlias(i)> for i = 1 to numruns
+
+  ! inum_cur.ne.0 indicates that this runPath corresponds to the "main"
+  ! run to which the session is connected (via prior call to rconnect or
+  ! kconnect), hence we just copy the data item and do not have to read 
+  ! from a separate run database (no trprofil or trscalar call needed)
+
+  implicit NONE
+
+  character*(*), intent(in) :: mgname   ! name of multigraph (mg)
+  character*(*), intent(in) :: rpitem   ! item out of which to build mg
+
+  ! the multigraph label and phys. units will be taken from rpitem in
+  ! the current run (which must exist)
+
+  integer, intent(in) :: numruns        ! no. of runs (.le. 15)
+  character*(*), intent(in) :: runPath(numruns)  ! run paths (rconnect syntax)
+  character*(*), intent(in) ::  runAlias(numruns)  ! run aliases (max 10 chars)
+
+  ! for description of runPath syntax see rconnect subroutine
+  ! note each runAlias must be unique
+
+  integer, intent(in) :: inum_cur       ! if non-zero -- index to current run
+
+  integer, intent(out) :: iwarn(numruns)  ! warn on data access failures
+  integer, intent(out) :: ier           ! completion code, 0=OK
+
+  ! ier.ne.0 means an error with the arguments or that *all* data access
+  ! attempts for *all* runs failed...
+
+  !    ier=1  mg <mgname> already exists
+  !    ier=2  item <rpitem> does *not* exist in current run 
+  !    ier=3  numruns.le.0  .or.  numruns.gt.15
+  !    ier=4  inum_cur.lt.0  .or.  inum_cur.gt.numruns
+  !    ier=5  alias error:
+  !       runAlias(i).eq.runAlias(j) for some i.ne.j
+  !    ier=6  **all** data access attempts failed
+  !    ier=7  (... some other error ...)
+
+  !   iwarn(j)=0 is the normal return
+  !   iwarn(j)=1 -- data access failure on runPath(j)
+  !   iwarn(j)=2 -- <rpitem>$<runAlias(j)> already exists -- replaced.
+

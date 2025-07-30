@@ -1,0 +1,919 @@
+
+
+
+
+<html>
+<head>
+<title>Search for Anti-HIV Cell-Based Data</title>
+<META NAME="Author" CONTENT="David Rezvani">
+<META NAME="Keywords" CONTENT="Cygnus Corporation">
+<META NAME="Description" CONTENT="">
+
+
+<body vlink="darkblue" link="darkblue" alink="darkblue" bgcolor="#FFFFFF" onload="fcn_start()">
+
+<SCRIPT LANGUAGE="JavaScript">
+/*This function displays ASP links for user assistance in searching.  Code is used by two different
+select boxes located in the form.  id is the name of the select box and value is the value of the 
+select box.  fcn_help is executed "on change" of the Select Field select boxes.*/ 
+
+var href_; //Global var indicating the name of the ASP page used by function open_win(id).
+function fcn_help(id, value)
+{
+write_innerText("SF_1b", "");
+write_innerText("SF_2b", "");
+
+var innerText_; //Inner text of anchor (what user clicks on for link).
+var anchors_; //Reference names to the particular anchors in the form.
+	if (id == "lstANField1_ID"){
+		anchors_ = "SF_1";
+	}
+	else if (id == "lstANField2_ID"){
+		anchors_ = "SF_2";
+	}
+	else if (id == "lstANField3_ID"){
+		anchors_ = "SF_3";
+	}
+	else if (id == "lstANField4_ID"){
+		anchors_ = "SF_4";
+	}
+
+	switch (value)
+	{
+	case "NSC":
+		href_="AN_NSC.asp";
+		innerText_="Click for a list of NSC numbers."
+		break;
+	case "CLASS":
+		href_="AN_class.asp";
+		innerText_="Click for a list of class types."
+		break;
+	case "COMPANY":
+		href_="AN_company.asp";
+		innerText_="Click for a list of companies."
+		break;
+	case "MOLWEIGHT_BTW":
+		innerText_="Example range: 200 and 300 [NOTE: You MUST include 'AND']"
+ 		break;
+	case "LOG_P_EST_BTW":
+		innerText_="Example range: -3 AND 5 [NOTE: You MUST include 'AND']"
+ 		break;
+	case "MOLFORMULA":
+		write_innerText("SF_1", "");
+		write_innerText("SF_2", "");
+		innerText_="Example formula: C16 H13 Cl N2 O [NOTE: one space between elements]"
+		if (id == "lstANField1_ID"){
+			anchors_ = "SF_1b";
+		}
+		else if (id == "lstANField2_ID"){
+			anchors_ = "SF_2b";
+		}
+ 		break;
+	default:
+		href_="";
+		innerText_=""
+		break;
+		}
+
+write_innerText(anchors_, innerText_);
+}
+
+
+//Set inner text "innerText_" of specific anchor name indicated by anchors_.
+//Browser detection for correct syntax
+function write_innerText(anchors_, innerText_){
+	if (navigator.appName == "Netscape") {
+			document.links[anchors_].innerHTML = innerText_;
+		} else {
+			document.anchors(anchors_).innerText=innerText_;
+		}
+}
+
+//Displays ASP page in mini browser window.
+var href_iden; //Global function used by child window to detect which HREF was clicked.
+function open_win(id_){
+  href_iden = id_;
+  var window_open = 
+ open(href_,"child_win",",height=500,width=400, resizable=yes, scrollbars, left=0, top=0, screenX=0, screenY=0");
+}
+
+
+/*fcnAllowSend is an event handler function that checks to make sure the proper entries are entered 
+prior to the user sending information to the ASP page.  This function is invoked by the submit button*/
+function fcnAllowSend(name_){
+var msg = "";
+var why_msg = "";
+var doc = document[name_];
+
+setAppletVal();
+	
+	/*Check each text field and select box to determine if information is missing.  
+	Append error messages as needed to why_msg.*/
+
+    if  (doc.molstructure.value.length <= 87){
+		why_msg +="Can not search without a structure.\n\n ";
+	} 
+
+	//first box
+	if (doc.lstANField1_ID.value== "" && doc.txtANQuery1_ID.value != ""){
+		why_msg += "A field selection is required for the first Select Field box.\n"; 
+	}
+	if (doc.lstANField1_ID.value != "" && doc.txtANQuery1_ID.value == ""){
+		why_msg += "An entry is required for the first Enter Term box.\n";
+	}
+
+	//second box
+	if (doc.lstANField2_ID.value == "" && doc.txtANQuery2_ID.value != ""){
+		why_msg += "A field selection is required for the second Select Field box.\n";
+	}
+	if (doc.lstANField2_ID.value != "" && doc.txtANQuery2_ID.value == ""){
+		why_msg += "An entry is required for the second Enter Term box.\n";
+	}
+	
+	//third box
+	if (doc.lstANField3_ID.value == "" && doc.txtANQuery3_ID.value != ""){
+		why_msg += "A selection is required for the first Select Quantitative Field box.\n";
+	}
+	if (doc.lstANField3_ID.value != "" && doc.txtANQuery3_ID.value == ""){
+		why_msg += "A numeric entry is required for the first Select Quantitative entry box.\n";
+	}
+	//Check field for numeric value
+	if ((doc.lstANField3_ID.value != "LOG_P_EST_BTW") && (doc.lstANField3_ID.value != "MOLWEIGHT_BTW")){
+		if (isNaN(doc.txtANQuery3_ID.value)){
+				why_msg += "Only numeric entries are accepted for the first Select Quantitative Field box.\n";		
+		}
+	}
+
+	//forth box
+	if (doc.lstANField4_ID.value == "" && doc.txtANQuery4_ID.value != ""){
+		why_msg += "A selection is required for the second Select Quantitative Field box.\n";
+	}
+	if (doc.lstANField4_ID.value != "" && doc.txtANQuery4_ID.value == ""){
+		why_msg += "A numeric entry is required for second the Select Quantitative entry box.\n";
+	}
+	//Check field for numeric value
+	if ((doc.lstANField4_ID.value != "LOG_P_EST_BTW") && (doc.lstANField4_ID.value != "MOLWEIGHT_BTW")){
+		if (isNaN(doc.txtANQuery4_ID.value)){
+				why_msg += "Only numeric entries are accepted for the second Select Quantitative Field box.\n";		
+		}
+	}
+	
+	//Special case with Chemical Name or Synonym.
+	if ((doc.txtANChemAlt.value == "") && ((doc.lstANField1_ID.value == "" && doc.txtANQuery1_ID.value == "") 	&& (doc.lstANField2_ID.value == "" && doc.txtANQuery2_ID.value == "") && (doc.lstANField3_ID.value == "" && doc.txtANQuery3_ID.value == "") && (doc.lstANField4_ID.value == "" && doc.txtANQuery4_ID.value == "") && ( doc.molstructure.value.length <= 87) )){ 
+
+			why_msg += "Please enter search criteria.\n";	
+	}
+
+	//standardizing searching fields
+	if (doc.lstANField1_ID.value == "" && doc.txtANQuery1_ID.value == ""){
+		if (doc.lstANField2_ID.value != "" && doc.txtANQuery2_ID.value != ""){
+		why_msg += "Please populate Select Field 1 first.\n"; 
+		}
+	}
+
+	//checking molecular weight fields
+	var field3;
+	var field4;
+	
+	if(doc.lstANField3_ID.value != "MOLWEIGHT_BTW"){
+		field3 = doc.lstANField3_ID.value.substring(0, 9);
+	}else{
+		field3 = "MOLWEIGHT_BTW";
+	}
+
+	if(doc.lstANField4_ID.value != "MOLWEIGHT_BTW"){
+		field4 = doc.lstANField4_ID.value.substring(0, 9);
+	}else{
+		field4 = "MOLWEIGHT_BTW";
+	}
+	
+	if ((field3 == "MOLWEIGHT" && field4 == "MOLWEIGHT") && (doc.lstAndOr3_ID.value == "AND"))
+	{
+		why_msg += "When searching two molecular weights, an 'OR' is required instead of an 'AND'.\n"; 
+	}
+	
+
+	//If no messages then allow send to ASP page.
+	if (!why_msg) return true;
+
+	msg = "________________________________________________\n\n";
+	msg += "The form was not submitted because of the following error(s).\n";
+	msg += "Please correct these error(s) and re-submit.\n";
+	msg += "________________________________________________\n\n"
+	
+	//If messages accumulated then prepare for display through alert command.
+	if (why_msg){
+		msg += why_msg + "\n";
+	}
+	alert(msg);
+	return false;
+}
+
+
+//The below functions are all used for the text expansion.
+
+// This function checks for DOM strategy, then 
+// returns an object reference.
+function WM_checkIn(id) {
+  if (document.all) {
+    return document.all[id].style;
+  } else if(document.layers) {
+    return document.layers[id];
+  }
+}
+
+// set hidden/visible vars for Netscape 4 compatibility
+if (document.layers) {
+  var hidden = "hide";
+  var visible = "show";
+  var none = "none";
+} else {
+  var hidden = "hidden";
+  var visible = "visible";
+  var none = "none";
+}
+var toggle = "toggle";
+
+
+function WM_changeVisibility() {
+	
+	if (document.layers || document.all) {
+	var inc, endInc = arguments.length;
+    // run through the args (objects) and set the visibility of each
+    for (inc=0; inc<endInc; inc+=2) {
+      // get a good object reference
+      var daObj = WM_checkIn(arguments[inc]);
+	 // alert(daObj);
+	      if (daObj.display == "") {
+          daObj.display = none;
+        } else if (daObj.display == none) {
+          daObj.display = "";
+        }
+    }
+  }
+}
+
+//onload function to initialize form.
+function fcn_start(){
+	doc = document.frmANSearch;
+
+	if (doc.SSType[0].checked == true) {
+		doc.simops.style.display="";
+		doc.flexops.style.display="none";
+	}
+	if (doc.SSType[1].checked == true) {
+		doc.flexops.style.display="";
+		doc.simops.style.display="none";
+	}
+	if (doc.SSType[2].checked == true) {
+		doc.flexops.style.display="none";
+		doc.simops.style.display="none";
+	}
+
+	if (doc.txtANChemAlt.value != ""){
+		display_andOr(doc.txtANChemAlt);
+	}
+
+	if (doc.lstANField1_ID.value != ""){
+		fcn_help(doc.lstANField1_ID.id, doc.lstANField1_ID.value);
+		display_andOr(doc.lstANField1_ID);
+	}
+	if (doc.lstANField2_ID.value != ""){
+		fcn_help(doc.lstANField2_ID.id, doc.lstANField2_ID.value);
+		display_andOr(doc.lstANField2_ID);
+	}
+	if (doc.lstANField3_ID.value != ""){
+		fcn_help(doc.lstANField3_ID.id, doc.lstANField3_ID.value);
+		display_andOr(doc.lstANField3_ID);
+	}
+	if (doc.lstANField4_ID.value != ""){
+		fcn_help(doc.lstANField4_ID.id, doc.lstANField4_ID.value);
+	}
+	
+	if (navigator.appName == "Netscape") {
+		doc.all["divANField2"].style.display="";
+		doc.all["divANQuery2"].style.display="";
+		doc.all["divANField4"].style.display="";
+		doc.all["divANQuery4"].style.display="";
+	} else { 
+		if (doc.lstANField1_ID.value == ""){
+			doc.lstANField2.style.display ="none";
+			doc.txtANQuery2.style.display="none";
+			doc.all["divANField2"].style.display="none";
+			doc.all["divANQuery2"].style.display="none";
+		}
+		if (doc.lstANField3_ID.value == ""){
+			doc.lstANField4.style.display ="none";
+			doc.txtANQuery4.style.display="none";
+			doc.all["divANField4"].style.display="none";
+			doc.all["divANQuery4"].style.display="none";
+		}
+	}
+}
+
+function display_andOr(obj){
+
+var doc = document.frmANSearch;
+	if ( obj.name == "txtANChemAlt"){
+		doc.lstAndOr0_1.style.display ="";
+
+	}
+	if ( obj.name == "lstANField1"  && obj.value != ""){
+		doc.lstAndOr1.style.display ="";
+		doc.lstANField2.style.display="";
+		doc.txtANQuery2.style.display="";
+		doc.all["divANField2"].style.display="";
+		doc.all["divANQuery2"].style.display="";
+		
+	}else if ( obj.name == "lstANField1"  && obj.value == "") {
+		doc.lstAndOr1.style.display ="none";
+		if (navigator.appName != "Netscape") {
+			doc.lstANField2.style.display="none";
+			doc.txtANQuery2.style.display="none";
+		}
+		doc.all["divANField2"].style.display="none";
+		doc.all["divANQuery2"].style.display="none";
+	}
+	if ( obj.name == "lstANField2"  && obj.value != ""){
+		doc.lstAndOr2.style.display ="";
+	}else if ( obj.name == "lstANField2"  && obj.value == ""){
+		doc.lstAndOr2.style.display ="none";
+	}
+	if ( obj.name == "lstANField3"  && obj.value != ""){
+		doc.lstAndOr3.style.display ="";
+
+		doc.lstANField4.style.display="";
+		doc.txtANQuery4.style.display="";
+		doc.all["divANField4"].style.display="";
+		doc.all["divANQuery4"].style.display="";
+
+	}else if ( obj.name == "lstANField3"  && obj.value == ""){
+		doc.lstAndOr3.style.display ="none";
+		
+		if (navigator.appName != "Netscape") {
+			doc.lstANField4.style.display="none";
+			doc.txtANQuery4.style.display="none";
+		}
+		doc.all["divANField4"].style.display="none";
+		doc.all["divANQuery4"].style.display="none";
+	}
+}
+
+function fcn_clear(name){
+/*	var doc = document.frmANSearch;
+	doc.lstAndOr0_1.style.display ="none";
+	doc.lstAndOr1.style.display ="none";
+
+	if (navigator.appName != "Netscape") {
+		doc.lstANField2.style.display="none";
+		doc.txtANQuery2.style.display="none";
+	
+		doc.all["divANField2"].style.display="none";
+		doc.all["divANQuery2"].style.display="none";
+	}
+
+	doc.lstAndOr2.style.display ="none";
+	doc.lstAndOr3.style.display ="none";
+
+	if (navigator.appName != "Netscape") {
+		doc.lstANField4.style.display="none";
+		doc.txtANQuery4.style.display="none";
+		doc.all["divANField4"].style.display="none";
+		doc.all["divANQuery4"].style.display="none";
+	}
+
+	write_innerText("SF_1", "");
+	write_innerText("SF_2", "");
+	write_innerText("SF_3", "");
+	write_innerText("SF_4", "");
+
+	doc.flexops.style.display="none";
+	doc.simops.style.display="none"; */
+
+	window.location.replace("an_struct_search.asp?pg=&del=y");//<--------------------
+}
+
+//this function changes 'AND' to 'OR' 
+//when molecular weight is selected
+function mol_weight(value_){
+var doc = document.frmANSearch;
+var val = value_.value;
+var test;
+
+	switch (value_.name)
+	{
+	case "lstANField3":
+		test = doc.lstANField4;
+		break;
+	case "lstANField4":
+		test = doc.lstANField3;
+		break;
+	}
+
+	if(val == "MOLWEIGHT<=" || val == "MOLWEIGHT>="){
+		if(test.value == "MOLWEIGHT<=" || test.value == "MOLWEIGHT>="){
+			doc.lstAndOr3.value ="OR";
+		}
+	}else{
+		doc.lstAndOr3.value ="AND";	
+	}
+}
+
+
+//processes submit from Marvin interface
+function setAppletVal() {
+	form=document.frmANSearch;
+	//gets mole from Marvin Sketch window
+	var s = document.MSketch.getMol('mol');
+	//s = unix2local(s);
+	form.molstructure.value=s;
+}
+
+function sOption(obj){
+var doc = document.frmANSearch;
+
+	if (obj.value == 1) {
+	doc.simops.style.display="";
+	doc.flexops.style.display="none";
+	}
+	if (obj.value == 2) {
+	doc.flexops.style.display="";
+	doc.simops.style.display="none";
+	}
+    if (obj.value == 3) {
+	doc.flexops.style.display="none";
+	doc.simops.style.display="none";
+	}
+}
+
+</script>
+
+</HEAD>
+
+
+
+<!-----------------------Form Begins--------------------------->	 
+
+<table>
+<tr>
+	<td>
+	<font face="arial,helvetica,sans-serif" color=00008B ><a href="../default.asp"><b>NIAID Home</a> / <a href="AN_search.asp">Anti-HIV/OI Chemical Compound Search</b></a> / Structure Based Search </FONT>
+	</td>
+</tr>
+<tr> 
+	<td>&nbsp;</td>
+</tr>
+<tr> 
+	<td>
+	<font face="arial,helvetica,sans-serif" color=00008B ><A href="#" onclick="WM_changeVisibility('foo',toggle);">Anti-HIV/OI chemical compound database</A></FONT>
+</tr>
+
+<tr id=foo style ="display: none"> 
+	<td height="31" width="*">
+	<FONT face="arial,helvetica,sans-serif" SIZE="2" COLOR="#006666">This database contains over 159,500                                                                                                                             
+ compounds that have been tested against HIV, HIV enzymes, or opportunistic pathogens. The data was derived from the open literature, patents, and meeting abstracts.</FONT></td>  
+</tr>
+<!--
+<tr>
+	<td height="31" width="80%">
+	<b><i><font size="3" face="Arial, Helvetica, sans-serif" color="#003366">Search by chemical name or synonym, or select a field. Not all boxes require an entry. </font></b></i><br><FONT face="Arial, Helvetica, sans-serif" SIZE="2" COLOR="#003399">Use a '%' character as a wildcard when doing a "Contains" search for multiple fragments. (e.g. dideoxy%inosine). </font></td>
+</tr>
+-->
+<tr> 
+	<td>&nbsp;</td>
+</tr>
+</table>
+
+<!----------- mol file upload code begin  by JZ 7-14-2003 --------------->
+<br>
+<table border=1 cellspacing="0" cellspacing="0" bordercolor="#00008B" width="650">
+<tr><td>
+	<form name="formUpload" id="formUpload" method="post" enctype="multipart/form-data" action="AN_struct_search.asp">
+	<FONT face= "Arial, MS Serif" SIZE="3" COLOR="#336666"><b>&nbsp;&nbsp;&nbsp;Upload a molfile to applet:</b></FONT>
+	<FONT face= "Arial, MS Serif" SIZE="1" COLOR="#336666"><i>(Hint: 1. Choose a mol file.  2. Upload.)</i></FONT><br>
+    &nbsp;&nbsp;&nbsp;<input type="file" name="filemol" size=35 accept="text/*"> <FONT face= "Arial, MS Serif" SIZE="2" COLOR="#003399">a mol file. </FONT>
+    <input type="submit" name="submit" value="Upload">
+	</form>
+</td></tr>
+</table>
+<!----------- mol file upload code end ----------------->
+
+<br>
+<table width="800" border="0" height="350" align="center">
+
+<form action="an_struct_many.asp"
+      method="post" 
+      name="frmANSearch"
+      onSubmit="return fcnAllowSend(this.name)">
+
+<tr> 
+    <td colspan="3" height="19">
+		<CENTER>
+		<input language = "JavaScript" type="submit" value="Submit" name="submit3">
+		<input language = "JavaScript" type="reset" value="    Clear    " name="Reset32" onclick="fcn_clear(this.name)">
+		</CENTER>
+	</td>
+</tr>
+<tr>
+	<td width="400" colspan=2 align="center"><b><FONT face="Arial, Helvetica, sans-serif">Structure:</Font></b></td>
+	
+	<td width="500"align="center">&nbsp;&nbsp;&nbsp;<b><FONT face="Arial, Helvetica, sans-serif">Data:</Font></b></td>
+</tr>
+<tr> 
+    <td colspan="3" height="19">&nbsp;</td>
+</tr>
+<tr>
+	<td colspan="2" height="19"><FONT face="Arial, Helvetica, sans-serif" SIZE="2"><CENTER>MarvinSketch courtesy of <A HREF="http://www.chemaxon.com">ChemAxon</A></Font><br><FONT face="Arial, Helvetica, sans-serif" SIZE="1" COLOR="#8D8D8D">Click structure input box below to show/hide the MarvinSketch</CENTER></FONT></td>
+	<td  height="19">&nbsp;</td>
+</tr>
+<tr>
+	<td colspan=2 valign="top">
+	
+	<center>
+		<input type="hidden" name="molstructure">
+		
+
+<script LANGUAGE="JavaScript1.1" SRC="../marvin.js"></script>
+<script LANGUAGE="JavaScript1.1">
+<!--
+    marvin_jvm = "builtin"; // "builtin" or "plugin"
+    //marvin_gui = "awt"; // "awt" or "swing"
+	msketch_name="MSketch";
+    //msketch_begin("..", "240", "240");
+	msketch_begin("..", "300", "300");
+	msketch_param("preload", "MolExport,GraphInvariants,Parity");
+    //msketch_param("bgcolor", "#F4F4F4");
+    msketch_param("background", "#F4F4F4");
+	msketch_param("molbg", "#F0F0F0");
+    //msketch_param("dispopts", "implicitH=off");
+	msketch_param("implicitH","off");
+    msketch_param("queryatoms", "any,hetero,list,notlist");
+    msketch_param("extrabonds", "arom,any,1or2,wedge,either,ctu");
+    msketch_param("undo", "50");
+    msketch_param("detach", "hide");
+    msketch_param("autoscale", "true");
+    //msketch_param("viewonly","true");
+    msketch_param("mol","../temp_mol/515835765.mol");
+    msketch_end();
+//-->
+</script>
+
+		</center>
+
+	</td> 
+
+	<td rowspan="9">
+	<!-- This is the second column in the main table ... the other table fits into this one. -->
+
+
+
+
+	<!-- inner table -->
+	<table width="530" border="0" height="334" align="left">
+
+		<tr> 
+			<td colspan=3 width="300" height="19">&nbsp;</td>
+			<!-- <td width="240" height="19"> 
+				<div align="center">
+					<input language="JavaScript" type="submit" value ="Submit" name="submit2">
+					<input language="JavaScript" type="reset" value="Clear" name="Reset22" onclick="fcn_clear(this.name)">
+				</div></td>
+			<td width="331" height="19">&nbsp;</td> -->
+		</tr>
+
+		<tr> 
+			<td width="300" height="19">&nbsp;</td>
+			<td width="240" height="19" align="left">
+<!--					<font face="Verdana, Arial, Helvetica" size="2" color="#003366"><b><i>Use % Key as Wildcard</font></i></b>
+-->
+			</TD>
+			<td width="331" height="19" align="left">
+					<font face="Verdana, Arial, Helvetica" size="2" color="#003366"><b><i>Search by:</font></i></b></TD>
+		</tr>
+
+		<tr> 
+			<td width="300" height="19">
+					<p align="right"><b><font size="-1" face="Arial, Helvetica, sans-serif">Chemical Name or Synonym:</b></font></p></td>
+			<td width="240" height="19">
+					<p align="left"><INPUT id="txtANChemAlt" name="txtANChemAlt" size="35" style="HEIGHT: 22px; WIDTH: 200px" onFocus="display_andOr(this)"></td>
+			<td width="331" height="19"> 
+					<SELECT id=ANChemAltCrit name=ANChemAltCrit>
+						<OPTION VALUE="ext" selected>Exact Name 
+						<OPTION VALUE="sndlk">Sounds Like 
+						<OPTION VALUE="cnt">Contains 
+						<OPTION VALUE="bgwt">Begins With 
+						<OPTION VALUE="enwh">Ends With </OPTION>
+					 </SELECT></td>
+		</tr>
+
+		<tr> 
+			<td width="300" height="19">&nbsp;</td> 
+	<td width="240" height="19" align="left"><font face="Verdana, Arial, Helvetica" size="1"> (<a href="../name/name.asp" TARGET="_blank">Browse partial synonym list</a>)</font></td>
+			<td width="331" height="19">
+					<SELECT id=lstAndOr0_1_ID name=lstAndOr0_1 style="display: none">
+						<OPTION VALUE="AND" selected>AND 
+						<OPTION VALUE="AND NOT">AND NOT
+						<OPTION VALUE="OR">OR</OPTION>
+					</SELECT></td>
+		</tr>
+
+		<tr> 
+			<td width="300" height="19">&nbsp;</td>
+			<td width="240" height="19" align="left">
+<!--					<font face="Verdana, Arial, Helvetica" size="2" color="#003366"><b><i>Use % Key as Wildcard</font></i></b>
+--></TD>
+			<td width="331" height="19">&nbsp;</td>
+		</tr>
+
+		<tr> 
+			<td width="300" height="19">
+					<div align="right"><b><font size="-1" face="Arial, Helvetica, sans-serif">
+					
+					<font size=3> <a href="javascript: void window.open('../help/how_to_search/anhelp.htm', 'wndDefaultHelp', 'resizable=yes, scrollbars=yes, WIDTH=400, HEIGHT=400')"><b>?</b></a> </font>&nbsp;
+
+					Select Field:</b></font></div></td>
+			<td width="240" height="19">
+					<SELECT id="lstANField1_ID" name="lstANField1" style="HEIGHT: 22px; WIDTH: 201px" onclick="fcn_help(this.id,this.value)" onchange="display_andOr(this)">  
+							<OPTION VALUE="" selected>SELECT A FIELD
+							<OPTION VALUE="CHEM_NAME">CHEMICAL NAME
+							<OPTION VALUE="ALT_NAME">SYNONYMS
+							<OPTION VALUE="AIDS">AIDS#
+							<OPTION VALUE="NSC">NSC#
+							<OPTION VALUE="CAS">CAS#
+							<OPTION VALUE="CLASS">COMPOUND CLASS
+							<OPTION VALUE="COMPANY">COMPANY
+							<OPTION VALUE="MOLFORMULA">MOL FORMULA
+							</OPTION> 
+					</SELECT></td>
+			<td width="331" height="19">
+					<!------ LINK HERE  -------------------------------------------------------------->
+					<font size="-1"><A id="SF_1" name="lstField1_HREF" HREF="#" onClick="open_win(this.id);"></A><A id="SF_1b" name="lstField1b_HREF" ></A></font></td>
+
+		</tr>
+
+		<tr> 
+			<td width="300" height="19">
+					<div align="right"><b><font size="-1" face="Arial, Helvetica, sans-serif">Enter Term:</font></b></div></td>
+			<td width="240" height="19">
+					<INPUT id="txtANQuery1_ID" name="txtANQuery1" size="35" style="height: 22px; WIDTH: 201px"></td>
+			<td width="331" height="19">
+					<SELECT	id=lstAndOr2_ID name=lstAndOr1 style="display: none">
+						<OPTION VALUE="AND" selected>AND 
+						<OPTION VALUE="AND NOT">AND NOT
+						<OPTION VALUE="OR">OR</OPTION>
+					</SELECT></td>
+		</tr>
+
+		<tr> 
+			<td width="300" height="19">&nbsp;</td>
+			<td width="240" height="19">&nbsp;</td>
+			<td width="331" height="19">&nbsp;</td>
+		</tr>
+
+		<tr> 
+			<td width="300" height="19"> 
+					
+					
+					<div align="right" id="divANField2"><b><font size="-1" face="Arial, Helvetica, sans-serif">
+					<font size=3> <a href="javascript: void window.open('../help/how_to_search/anhelp.htm', 'wndDefaultHelp', 'resizable=yes, scrollbars=yes, WIDTH=400, HEIGHT=400')"><b>?</b></a> </font>&nbsp;
+					
+					Select Field:</font></b></div> 
+					
+					</td>
+			<td width="240" height="19">
+					<SELECT id="lstANField2_ID" name="lstANField2" style="WIDTH: 201px; height: 22px" onclick="fcn_help(this.id,this.value)" onchange="display_andOr(this)"> 
+							<OPTION VALUE="" selected>SELECT A FIELD
+							<OPTION VALUE="CHEM_NAME">CHEMICAL NAME
+							<OPTION VALUE="ALT_NAME">SYNONYMS
+							<OPTION VALUE="AIDS">AIDS#
+							<OPTION VALUE="NSC">NSC#
+							<OPTION VALUE="CAS">CAS#
+							<OPTION VALUE="CLASS">COMPOUND CLASS
+							<OPTION VALUE="COMPANY">COMPANY
+							<OPTION VALUE="MOLFORMULA">MOL FORMULA
+							</OPTION>   
+					</SELECT></td>
+			<td width="331" height="19">
+					 <!------ LINK HERE  -------------------------------------------------------------->
+					<font size="-1"><A id="SF_2" name="lstField2_HREF" HREF="#" onClick="open_win(this.id);"></A><A id="SF_2b" name="lstField2b_HREF" ></A></font></td>
+		</tr>
+
+		<tr>	
+			<td width="300" height="19"> 
+					<div align="right"  id="divANQuery2"><b><font size="-1" face="Arial, Helvetica, sans-serif">Enter Term:</font></b></div></td>
+			<td width="240" height="19">
+					<INPUT id="txtANQuery2_ID" name="txtANQuery2" size="35" style="height: 22px; WIDTH: 201px"></td>
+			<td width="331" height="19">
+					<SELECT	id=lstAndOr2_ID name=lstAndOr2 style="display: none">
+						<OPTION VALUE="AND" selected>AND 
+						<OPTION VALUE="AND NOT">AND NOT
+						<OPTION VALUE="OR">OR</OPTION>
+					</SELECT></td>
+		</tr>
+
+		<tr> 
+			<td width="300" height="19">&nbsp;</td>
+			<td width="240" height="19">&nbsp;</td>
+			<td width="331" height="19">&nbsp;</td>
+		</tr>
+
+		<tr> 
+			<td width="300" height="19"> 
+					<div align="right"><b><font size="-1" face="Arial, Helvetica, sans-serif">
+					
+					<font size=3><a href="javascript: void window.open('../help/how_to_search/anquantitative.htm', 'wndDefaultHelp', 'resizable=yes, scrollbars=yes, WIDTH=400, HEIGHT=400')"><b>?</b></a> </font> &nbsp;
+					
+					Select Quantitative Field:</font></b></div></td>
+			<td width="240" height="19">
+					<SELECT id="lstANField3_ID" name="lstANField3" style="WIDTH: 201px; height: 22px" onclick="fcn_help(this.id,this.value), mol_weight(this)" onchange="display_andOr(this)"> 
+							<OPTION VALUE="" selected>SELECT A FIELD
+							<OPTION VALUE="MOLWEIGHT<=">MOL WGT&nbsp;&lt;&nbsp;=
+							<OPTION VALUE="MOLWEIGHT>=" >MOL WGT&nbsp;&gt;&nbsp;=
+							<OPTION VALUE="MOLWEIGHT_BTW">MOL WGT Range
+							<OPTION VALUE="LOG_P_EST<=">Estimated Log P&nbsp;&lt;&nbsp;=
+							<OPTION VALUE="LOG_P_EST>=">Estimated Log P&nbsp;&gt;&nbsp;=
+							<OPTION VALUE="LOG_P_EST_BTW">Estimated Log P Range
+							</OPTION> 
+					</SELECT></td>
+			<td width="331" height="19">
+					 <!------ LINK HERE  -------------------------------------------------------------->
+					<font size="-1"><A id="SF_3" name="lstField3_HREF"></A></font></td>
+		</tr>
+
+		<tr> 
+			<td width="300" height="19"> 
+					<div align="right"><b><font size="-1" face="Arial, Helvetica, sans-serif">Enter Numeric Value:</font></b></div></td>
+			<td width="240" height="19"> 
+					<input id="txtANQuery3_ID" name="txtANQuery3" size="35" style="HEIGHT: 22px; WIDTH: 201px"></td>
+			<td width="331" height="19">
+					<SELECT	id=lstAndOr3_ID name=lstAndOr3 style="display: none">
+						<OPTION VALUE="AND" selected>AND 
+						<OPTION VALUE="AND NOT">AND NOT
+						<OPTION VALUE="OR">OR</OPTION>
+					</SELECT>
+			</td>
+		</tr>
+
+		<tr> 
+			<td width="300" height="19">&nbsp;</td>
+			<td width="240" height="19">&nbsp;</td>
+			<td width="331" height="19">&nbsp;</td>
+		</tr>
+		<tr> 
+			<td width="300" height="19"> 
+					<div align="right" id="divANField4"><b><font size="-1" face="Arial, Helvetica, sans-serif">
+					
+					<font size=3><a href="javascript: void window.open('../help/how_to_search/anquantitative.htm', 'wndDefaultHelp', 'resizable=yes, scrollbars=yes, WIDTH=400, HEIGHT=400')"><b>?</b></a> </font> &nbsp;
+					
+					Select Quantitative Field:</font></b></div></td>
+			<td width="240" height="19">
+					<SELECT id="lstANField4_ID" name="lstANField4" style="WIDTH: 201px; height: 22px" onclick="fcn_help(this.id,this.value), mol_weight(this)"> 
+							<OPTION VALUE="" selected>SELECT A FIELD
+							<OPTION VALUE="MOLWEIGHT<=">MOL WGT&nbsp;&lt;&nbsp;=
+							<OPTION VALUE="MOLWEIGHT>=" >MOL WGT&nbsp;&gt;&nbsp;=
+							<OPTION VALUE="MOLWEIGHT_BTW">MOL WGT Range
+							<OPTION VALUE="LOG_P_EST<=">Estimated Log P&nbsp;&lt;&nbsp;=
+							<OPTION VALUE="LOG_P_EST>=">Estimated Log P&nbsp;&gt;&nbsp;=
+							<OPTION VALUE="LOG_P_EST_BTW">Estimated Log P Range
+							</OPTION> 
+					</SELECT></td>
+			<td width="331" height="19">
+					 <!------ LINK HERE  -------------------------------------------------------------->
+					<font size="-1"><A id="SF_4" name="lstField4_HREF"></A></font></td>
+		</tr>
+
+		<tr> 
+			<td width="300" height="19"> 
+					<div align="right" id="divANQuery4"><b><font size="-1" face="Arial, Helvetica, sans-serif">Enter Numeric Value:</font></b></div></td>
+			<td width="240" height="19"> 
+					<input id="txtANQuery4_ID" name="txtANQuery4" size="35" style="HEIGHT: 22px; WIDTH: 201px"></td>
+			<td width="331" height="19">&nbsp;</td>
+		</tr>
+		<tr> 
+			<td width="300" height="19">&nbsp;</td>
+			<td width="240" height="19">&nbsp;</td>
+			<td width="331" height="19">&nbsp;</td>
+		</tr>
+		<!-- <tr> 
+			<td width="300" height="19">&nbsp;</td>
+			<td width="240" height="19"> 
+					<div align="center"> 
+						<input language="JavaScript" type="submit" value ="Submit" name="submit2">
+						<input language = "JavaScript" type="reset" value="Clear" name="Reset32" onclick="fcn_clear(this.name)">
+					</div></td>
+			<td width="331" height="31">&nbsp;</td>
+		</tr>
+
+		<tr> 
+			<td width="300" height="19">&nbsp;</td>
+			<td width="240" height="19">&nbsp;</td>
+			<td width="331" height="19">&nbsp;</td>
+		</tr>
+
+		<tr> 
+			<td width="300" height="19">&nbsp;</td>
+			<td width="240" height="19">&nbsp;</td>
+			<td width="331" height="19">&nbsp;</td>
+		</tr> 
+ -->
+
+		</table>
+
+	</td>
+</tr>
+
+		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td><b><FONT face="Arial, Helvetica, sans-serif">Search Type:</FONT></b></td>
+			<td><b><FONT face="Arial, Helvetica, sans-serif">Search Option:</FONT></b></td>
+		</tr>
+		<tr>
+			<td><input type = "radio" name="SSType" value = 1  onClick = "sOption(this)"><FONT face="Arial, Helvetica, sans-serif">Similarity</FONT>
+			<!--onChange="handleSearchType(this)" class="forms">-->
+			</td>
+			<td>
+			<select name="simops" style = "display:none">
+					 <option value="45">45
+					 <option value="50">50
+					 <option value="55">55
+					 <option value="60">60
+					 <option value="65">65
+					 <option value="70">70
+					 <option value="75">75
+					 <option value="80" selected>80
+					 <option value="85">85
+					 <option value="90">90
+					 <option value="95">95
+					 <option value="100">100
+					 </select>
+			</td>
+		<tr>
+			<td><input type = "radio" name="SSType" value = 2 onClick = "sOption(this)"><FONT face="Arial, Helvetica, sans-serif">Flexmatch</FONT></td>
+			<td>
+				<select name="flexops" style = "display: none">
+					 <!-- <option value="ALL" selected>
+					   Exact match -->
+					 <option value="/BON/CHA/DAT/END/FRA/HYD/MAS/MET/MIX/MSU/POL/RAD/SAL/TYP/VAL" selected>Cis/trans or stereo isomers
+					 <option value="/FRA/TAU/SAL">Tautomers
+					 <option value="/MAS/STE/MET/FRA/BON/VAL/RAD/MIX/POL/TYP">Parent molecule
+					 <option value="NONE">Most flexible match
+				 </select>
+			</td>
+		<tr>
+			<td nowrap><input type = "radio" name="SSType" value = 3 checked onClick = "sOption(this)"><FONT face="Arial, Helvetica, sans-serif">Substructure Search</FONT></td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td nowrap><input type = "radio" name="SSType" value = 4 onClick = "sOption(this)"><FONT face="Arial, Helvetica, sans-serif">Exact Match</FONT></td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td height="19">
+					<SELECT id=AndOr_Aplt name=AndOr_Aplt>
+						<OPTION VALUE="AND" selected> Structure AND Data  
+						<OPTION VALUE="AND NOT">Structure AND NOT Data
+						<OPTION VALUE="OR">Structure OR Data</OPTION>
+					</SELECT></td>
+			<td>&nbsp;</td>
+		</tr>
+
+
+<tr height=40>
+	<td>&nbsp;</td>
+	<td>&nbsp;</td>
+</tr>
+<tr> 
+
+    <td colspan="3" height="19"> 
+		<CENTER><input language = "JavaScript" type="submit" value="Submit" name="submit3">
+		<input language = "JavaScript" type="reset" value="    Clear    " name="Reset32" onclick="fcn_clear(this.name)"></CENTER>
+	</td>
+</tr>
+ <tr>
+	<td colspan="3" height="19" >&nbsp;</td>
+</tr>
+
+<tr> 
+	<td colspan="3" height="19" >
+		<CENTER><a href="../Default.asp"><b><font face="Arial, Helvetica, sans-serif">Home</a> 
+		| <a href="../privacy.htm">Privacy Statement</a> | <a href="javascript: void window.open('../help/help_index.htm', 'wndDefaultHelp', 'resizable=yes, scrollbars=yes, width = 400, height = 400 ')">Help</a></font></CENTER>
+	</td>
+</tr>
+<tr> 
+	<td height="19" colspan="3" valign="bottom" align="center">
+	<b><font face="Arial, Helvetica, sans-serif" color="333399" size=1>comments: <a href="mailto:chemweb@niaid.nih.gov">chemweb@niaid.nih.gov</a></font></b>
+<!--	<a href="mailto:chemweb@niaid.nih.gov" onMouseOut="MM_swapImgRestore();"  onMouseOver="MM_swapImage('default_r30_c10','','../images/default/default_r30_c10_f2.jpg',1);" ><img name="default_r30_c10" src="../images/default/default_r30_c10.jpg" width="227" height="11" border="0" align="center"></a>
+--></td>
+</tr> 
+
+</table>
+</form>
+</body>
+</HTML>

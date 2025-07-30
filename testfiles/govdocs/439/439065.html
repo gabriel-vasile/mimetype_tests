@@ -1,0 +1,127 @@
+<HEAD>
+<TITLE>Porting TCL</TITLE>
+</HEAD>
+<BODY><P>
+ <A NAME=948 HREF=section3.9.html><IMG SRC="http://www-mipl.jpl.nasa.gov/icons/previous.xbm"></A> <A NAME=950 HREF=portguide.html><IMG SRC="http://www-mipl.jpl.nasa.gov/icons/up.xbm"></A>  <A NAME=946 HREF=section3.11.html><IMG SRC="http://www-mipl.jpl.nasa.gov/icons/next.xbm"></A>  <b>Previous:</b> <A NAME=949 HREF=section3.9.html>Porting Fortran</A>  <b>Up:</b> <A NAME=951 HREF=portguide.html>VICAR Porting Guide</A>  <b>Next:</b> <A NAME=947 HREF=section3.11.html>Mixing Fortran and C</A> <P>
+ <H1>Porting TCL</H1>
+<A NAME=porttcl><IMG SRC="http://www-mipl.jpl.nasa.gov/icons/invis_anchor.xbm"></A>
+<P>
+TCL procedure PDFs must be portable as well.  TCL is the TAE Command Language,
+used to write most VICAR procedures.  Although it is designed to be fairly
+portable, in that the commands are the same for any version of TAE, there are
+some things you need to watch out for.
+<P>
+The most significant thing that will have to be changed is use of the <tt> dcl</tt>
+command inside a procedure.  This command allows you to put VMS DCL commands
+in your procedure, which are, of course, not portable.  The corresponding
+command under Unix is <tt> ush</tt>, which allows you to execute shell commands
+inside the procedure.
+<P>
+In order to use the <tt> dcl</tt> or <tt> ush</tt> commands, there has to be some way
+of determining which operating system you are on.  Fortunately, there is
+a global variable called ``$syschar'' that holds the type of operating
+system.  Index 1 in this variable is either ``UNIX'' or ``VAX_VMS''.
+For example:
+<P>
+<PRE><TT>
+procedure
+parm file string
+refgbl $syschar
+body
+if ($syschar(1) = &quot;UNIX&quot;)
+  ush rm &amp;file
+else
+  dcl delete &amp;file
+end-if
+end-proc
+</TT></PRE>
+<P>
+Unfortunately, there appears to be no straightforward way to determine the
+particular version of Unix, so stick to common shell commands.
+<P>
+Another major trouble area for porting TCL is filenames.  Filenames and
+pathnames look much different under VMS and Unix.  There is a lot of TCL
+code in VICAR that parses filenames, appends filenames to directories, etc.
+Many test scripts use hardcoded VMS directories and filenames to find test
+files.  All of these will have to change.  The same ``$syschar'' variable
+can be used to do different things with the filename, or pick different test
+files, based on which system you are using.
+<P>
+The ``$syschar'' variable may also be tested inside help files, help within
+a PDF, and menus via special conditional commands.  These commands are part
+of TAE, but they are unfortunately not documented by TAE.  The conditionals
+all test to see if the given string is in any element of the ``$syschar''
+variable.  Like other PDF/MDF directives, they should appear on a line by
+themselves with the ``.'' in the first column.
+<P>
+<UL>
+<P>
+<LI> .if <i> string</i>:  Prints the following lines (up to .elseif or .ifend)
+if <i> string</i> is in ``$syschar''.
+<P>
+<LI> .ifn <i> string</i>:  Prints the following lines (up to .elseif or .ifend)
+if <i> string</i> is not in ``$syschar''.
+<P>
+<LI> .elseif <i> string</i>:  Prints the following lines of text (up to .ifend
+or another .elseif) if the previous condition was not met, and <i> string</i>
+is in ``$syschar''.
+<P>
+<LI> .ifend:  Ends a conditional clause.
+<P>
+<LI> .if1 <i> string</i>:  Single-line conditional.  Just like .if, but only
+the next line is printed, and no .ifend is required.
+<P>
+<LI> .ifn1 <i> string</i>:  Single-line negative conditional.  Just like .ifn,
+but only the next line is printed, and no .ifend is required.
+<P>
+</UL>
+<P>
+For example, the following lines are taken from the TAE command mode help file
+(commode.hlp):
+<P>
+<PRE><TT>
+<P>
+                CONT*INUE
+.if VAX_VMS
+                DCL              any-VMS/DCL-command
+                DCL-NOINTERRUPT  any-VMS/DCL-command
+.ifend
+                DEFC*MD COMMAND=command-name STRING=replacement-string
+<P>
+...
+<P>
+                T*UTOR-NOSCREEN PROC=proc-subcmd  parameters
+.if1 UNIX
+                USH any-UNIX/shell-command
+                WAIT-ASYNC JOB=job-name-list
+<P>
+...
+<P>
+                        RUNTYPE Command Qualifier (continued)
+<P>
+           If the command qualifier is set to BATCH, the following TAE
+           message is displayed:
+<P>
+.if VAX_VMS
+               Job (nnn) submitted to queue (que)
+<P>
+           where &quot;nnn&quot; is the assigned job number and &quot;que&quot; is
+           the name of the queue the job was submitted to.
+<P>
+.elseif UNIX
+                Batch job file &quot;filename&quot; submitted successfully.
+<P>
+           where &quot;filename&quot; is the batch job file name, defined
+           as &quot;proc&quot;.job.
+<P>
+.ifend
+</TT></PRE>
+<P>
+You should refer to the TAE documentation if you have more questions on
+writing portable TCL.
+<P>
+
+</BODY>
+<P><ADDRESS>
+<I>rgd059@ipl.jpl.nasa.gov</I>
+</ADDRESS>

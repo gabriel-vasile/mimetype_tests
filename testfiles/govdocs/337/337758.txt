@@ -1,0 +1,156 @@
+=============================================================================
+MMTx V2.4.C Release Announcement                      Tuesday, January 30, 2007
+=============================================================================
+
+    We are pleased to announce the release of MMTx 2.4.C.  New Features,
+    Misc. Changes, and Bug Fixes are identified below.
+     
+    Along with this release, we would like to solicit some feedback on the
+    idea of replacing MMTx with the actual MetaMap program.
+     
+    When we started the MetaMap Transfer (MMTx) project, the ability to
+    distribute the original MetaMap program without requiring users to install
+    numerous and somewhat pricey software packages was not available.
+    Technology has finally caught up, and we believe that we now have the
+    ability to distribute the MetaMap program.
+     
+    It's important to note at this point that we are in the very preliminary
+    stages of determining how viable this option will be and what might be
+    involved in the distribution.  We know that if we were to proceed with
+    this option that we would need to build a bridge to the MetaMap program
+    that would allow people to easily access the program from within their
+    existing Java programs.  We are not sure of all the ways people are using
+    MMTx and that is why we decided to try and solicit feedback at this early
+    stage so we can better plan and see what the impact might be.
+     
+    The MetaMap program itself has always been our primary development effort
+    and what we use in-house.  Being able to distribute MetaMap instead of the
+    MMTx program does provide several obvious benefits:
+
+    1. Probably the biggest benefit to users would be that MetaMap runs
+       significantly faster than MMTx.
+
+    2. This would allow us to eliminate the problem of having different results
+       from the two systems - this still occurs occasionally even after all of
+       this development time.
+
+    3. MMTx users would have access to new options as soon as they are put into
+       MetaMap instead of having to wait for a port to the MMTx version.
+
+    4. MetaMap data is typically updated twice a year (UMLS AA version of data
+       and UMLS AD version of the data), but we normally only provide a single
+       set of the MMTx data because of the effort involved in creating multiple
+       sets and versions.
+
+    5. Eliminating a parallel development effort would allow us more time to
+       focus on MetaMap development.  The divided effort has slowed the
+       implementation of some options for the MetaMap program and this refocus
+       would allow us to proceed at a quicker pace.  Future work along these
+       lines involves: positional information, shape identification (chemicals,
+       genes, etc), acronym/abbreviation identification, and Word Sense
+       Disambiguation.
+
+Notes:
+
+    * We would still include the source code. In this case, it would be for the
+      actual MetaMap program which is written in Prolog and C.  There are some
+      auxiliary Java and shell scripts as well. If you wanted to do development
+      work on the Prolog code, it would require the purchase of the Quintus
+      prolog software (http://www.sics.se/quintus/) from the Swedish Institute
+      of Computer Science.
+
+    * We would still support and provide the Data File Builder to allow you to
+      create your own data.
+
+    * Moving away from Java means the software is no longer platform
+      independent, so we would no longer be able to support the Apple Mac
+      platform.
+
+Questions:
+
+    1. What do you think of the idea?
+
+    2. What kinds of problems with your work do you foresee with a change of
+       this type?
+
+    3. Do you use any of the components of MMTx for other purposes -- for
+       example, LVG or the tagger?
+
+    4. Do you modify the MMTx source code for your own uses?
+
+    5. Would building a bridge or API allow you to still use your existing
+       codebase with MetaMap instead of MMTx?
+
+=============================================================================
+MMTx 2.4.C Release Notes
+=============================================================================
+
+New Features
+
+    * Added the -G/--print_sources option to MMTx. 
+
+    * Implemented stopPhrases.  
+
+    * For those that want to embed MMTx within a tomcat environment:
+      On install, the mmtxProjectJS.jar is created which contains all the
+      classes PLUS the config file.  This mmtxProjectJS.jar should be moved to
+      the tomcat application directory.  The MMTx application will now find the
+      config file within this jar rather than having to have the developer
+      figure out the path to it.
+
+Misc. Changes
+
+    * Updated to 2006 data and configuration settings.
+
+    * The location of the lexical tools (lvg) was moved from nls/mmtx/lvg to
+      nls/lvg. 
+
+Bug Fixes (details for each fix are listed on the MMTx web site)
+
+    * BerkeleyBtreeJ.java fixed bug in Hashtable constructor.
+
+    * Some ambiguous java 1.5 features were removed because of behavior
+      differences of code when run using 1.4 and 1.5 interpreters.
+
+    * Several changes were made to more closely align Metamap and MMTx output.
+
+    * Treecodes are now properly indexed.
+
+    * During Candidate Generation, additional bounds checking was added to
+      remove the Array Out of Bounds errors that were occurring. 
+
+    * Fixed TR206: Make sure exact matches are picked up.       
+
+    * Fixed TR207: Added a method to remove duplicate candidates that come from
+      the same concept.
+
+    * Fixed TR213: Added a check to see if the matchedVariants exists before
+      trying to use it within the getMatchedLexicalElements() method. 
+
+    * Fixed TR217: Made sure that first_words always returns the first token,
+      not the first space-delimited word.
+
+    * Fixed TR256: Fixed error where builddatafiles was copying files from
+      KSYear data lexicon directory to custom data top level directory instead
+      of lexicon directory.
+
+    * Quotes were put around the join field arguments within several dfbuilder
+      scripts to fix problem where join would not work on the linux platform.
+
+    * Fixed quick composite mode bug - the term_processing flag should not be
+      turned on during processing.
+
+    * Fixed problem where duplicate terms were kept on the variant list.
+
+    * Fixed issue where classes or files were not found in the classpath when
+      looking for them via the getResourceAs() methods. There has to be a "/" in
+      front of the class name. This is a work around that looks like a Java 1.4
+      issue.
+
+    * Fixed problem where the -a and  -D options were either/or options not
+      combinatory.
+
+    * Fixed problem where variants were being generated for tokens w/out regard
+      to category.
+
+    * Fixed problem where the same variants were being generated multiple times.
