@@ -1,0 +1,210 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>How does the data set describe geographic features?</title>
+  <link rel="P3Pv1" href="/w3c/p3p.xml">
+  <link rel="stylesheet" type="text/css" href="../styles/common.css">
+  <link rel="stylesheet" type="text/css" href="../styles/local.css">
+</head>
+<body>
+<!-- BEGIN USGS Header Template -->
+<div id="usgscolorband">
+	<div id="usgsbanner">
+		<div id="usgsidentifier"><a href="http://www.usgs.gov/"><img src="/images/header_graphic_usgsIdentifier_white.jpg" alt="USGS - science for a changing world" title="U.S. Geological Survey Home Page" width="178" height="72" /></a></div>
+		<div id="usgsccsabox">
+			<div id="usgsccsa">
+			  <br /><a href="http://www.usgs.gov/">USGS Home</a>
+			  <br /><a href="http://www.usgs.gov/ask/">Contact USGS</a>
+			  <br /><a href="http://search.usgs.gov/">Search USGS</a>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="usgstitle">
+	<p>Formal metadata: information and software</p>
+</div>
+<!-- END USGS Header Template -->
+
+
+<br>
+<a href="http://geology.usgs.gov/tools/metadata/tools/doc/ctc/">Metadata in plain language</a>
+
+<h1><a href="what.shtml">What does the data set describe?</a></h1>
+
+<h3>How does the data set <em>describe</em> geographic features?</h3>
+
+People need to know what <b>attributes</b> of the geographic
+<b>features</b> are supplied in the data set.  The <em>spatial extent</em>
+of the geographical features is described explicitly by the data; what
+are the other characteristics of the features such as scientific
+measurements, identifiers and labels, or characteristics associated
+with the geographic regions delimited by the features (population
+within census tracts, for example)?
+<br>
+
+In spatial data sets, attributes are typically associated with
+geographic features, although other arrangements are possible.
+Describe the attributes of each type of feature together, since the
+attributes of one type of feature are typically contained in one or a
+few related digital files or tables.
+<br>
+
+You can describe the features and attributes using a
+<span class="element">Detailed_Description</span>, which is best, or
+an <span class="element">Overview_Description</span>.  Use an overview
+only if <em>all</em> of the details of the attribute values are explained
+in some published source.
+<br>
+
+<h3>Features</h3>
+
+<pre>
+<span class="element">Entity_and_Attribute_Information:</span>
+  <span class="element">Detailed_Description:</span>
+    <span class="element">Entity_Type:</span>
+      <span class="element">Entity_Type_Label:</span> <span class="code"><i>Name of the feature type or table</i></span>
+      <span class="element">Entity_Type_Definition:</span> <span class="code"><i>What is this feature or table?</i></span>
+      <span class="element">Entity_Type_Definition_Source:</span> <span class="code"><i>Document, if any, that defines this type of feature.</i></span>
+</pre>
+
+<div style="margin-left: 2em;">
+If this type of feature or table isn't defined in some authoritative
+publication like FIPS 173, and you don't know what to put in
+<span class="element">Entity_Type_Definition_Source</span>, leave
+that element out.  It is mandatory, but meaningless information
+is worse than no information.
+
+<h3>Attributes</h3>
+
+For each attribute, you should know the attribute's <b>name</b> in the
+data set, a <b>definition</b> of the attribute, and what <b>values</b>
+the attribute holds.
+
+<pre>
+    <span class="element">Attribute:</span>
+      <span class="element">Attribute_Label:</span> <span class="code"><i>Name of the item or attribute</i></span>
+      <span class="element">Attribute_Definition:</span> <span class="code"><i>What information does it provide?</i></span>
+      <span class="element">Attribute_Definition_Source:</span> <span class="code"><i>Document, if any, that defines this attribute.</i></span>
+</pre>
+
+<div style="margin-left: 2em;">
+If this attribute isn't defined in some authoritative
+publication like FIPS 173, and you don't know what to put in
+<span class="element">Attribute_Definition_Source</span>, leave
+that element out.
+
+<h4>What sort of values does the attribute hold?</h4>
+In general, attributes either <b>measure</b>, <b>categorize</b>, or
+<b>characterize</b> the features or entities they describe.
+<ul>
+<li>Labels or names that <b>characterize</b> the features
+<pre>
+  <span class="element">Enumerated_Domain:</span>
+    <span class="element">Enumerated_Domain_Value:</span> <span class="code"><i>One possible value</i></span>
+    <span class="element">Enumerated_Domain_Value:</span> <span class="code"><i>Another possible value</i></span>
+    <span class="element">Enumerated_Domain_Value:</span> <span class="code"><i>Still another possible value</i></span>
+    <span class="element">. . .</span>
+    <span class="element">Enumerated_Domain_Value_Definition_Source:</span> <span class="code"><i>Published reference for the names, if there is one.</i></span>
+</pre>
+</li>
+<li>Text codes or integer numbers that <b>categorize</b> the features
+<pre>
+  <span class="element">Enumerated_Domain:</span>
+    <span class="element">Enumerated_Domain_Value:</span> <span class="code"><i>One of the possible values</i></span>
+    <span class="element">Enumerated_Domain_Value_Definition:</span> <span class="code"><i>What it means</i></span>
+    <span class="element">Enumerated_Domain_Value_Definition_Source:</span> <span class="code"><i>Document, if any, that defines the value.</i></span>
+  <span class="element">Enumerated_Domain:</span>
+    <span class="element">Enumerated_Domain_Value:</span> <span class="code"><i>Another possible value</i></span>
+    <span class="element">Enumerated_Domain_Value_Definition:</span> <span class="code"><i>What it means</i></span>
+    <span class="element">Enumerated_Domain_Value_Definition_Source:</span> <span class="code"><i>Document, if different, that defines the value.</i></span>
+  <span class="element">. . .</span>
+</pre>
+If you have a simple table of values and definitions, you can use the
+<a href="edom.shtml">Enumerated_Domain Helper</a> to code the metadata.
+
+<div style="margin: 1em 4em; background-color: #ffcccc; padding: 8px;">
+<b><em>NOTE</em>:</b> An Enumerated_Domain does <b>not</b> have to contain <b>only
+numbers</b>!  Here the word <em>enumerated</em> means the values
+are specified one by one in a list.
+</div>
+
+</li>
+<li>Integers or decimal (floating- or fixed-point) values showing
+some <b>measure</b> of the features
+<pre>
+  <span class="element">Range_Domain:</span>
+    <span class="element">Range_Domain_Minimum:</span> <span class="code"><i>Lowest possible value</i></span>
+    <span class="element">Range_Domain_Maximum:</span> <span class="code"><i>Highest possible value</i></span>
+</pre>
+What are the units?
+<pre>
+<span class="element">Attribute_Units_of_Measure:</span> <span class="code"><i>units</i></span>
+</pre>
+<hr>
+<b><em>Optional information about attribute values:</em></b>
+<hr>
+<br>
+What is the resolution of the measurements?
+<pre>
+<span class="element">Attribute_Measurement_Resolution:</span> <span class="code"><i>smallest meaningful difference</i></span>
+</pre>
+Were measurements made at regular time intervals?<p>
+<ul>
+<li>When did you start making measurements?
+<pre>
+<span class="element">Beginning_Date_of_Attribute_Values:</span> <span class="code"><i>start date</i></span>
+</pre>
+</li>
+<li>When did you stop making measurements?
+<pre>
+<span class="element">Ending_Date_of_Attribute_Values:</span> <span class="code"><i>stop date</i></span>
+</pre>
+</li>
+<li>How often did you make measurements?
+<pre>
+<span class="element">Attribute_Measurement_Frequency:</span> <span class="code"><i>time interval</i></span>
+</pre>
+</li>
+</ul>
+What about the accuracy of the values?
+<pre>
+<span class="element">Attribute_Value_Accuracy_Information:</span>
+  <span class="element">Attribute_Value_Accuracy:</span> <span class="code"><i>Quantitative estimate</i></span>
+  <span class="element">Attribute_Value_Accuracy_Explanation:</span> <span class="code"><i>How did you estimate it?</i></span>
+</pre>
+</div>
+</div>
+
+<br>
+
+<hr>
+<table border="0" cellpadding="2">
+<tr><td>Next:</td><td><a href="who.shtml">Who produced the data set?</a></td></tr>
+<tr><td>Previous:</td><td><a href="what.shtml">What does the data set describe?</a></td></tr>
+</table>
+<br>
+
+<!-- BEGIN USGS Footer Template -->
+<div id="usgsfooter">
+	<p id="usgsfooterbar">
+		<a href="http://www.usgs.gov/laws/accessibility.html" title="Accessibility Policy (Section 508)">Accessibility</a>
+		<a href="http://www.usgs.gov/foia/" title="Freedom of Information Act">FOIA</a>
+		<a href="http://www.usgs.gov/laws/privacy.html" title="Privacy policies of the U.S. Geological Survey.">Privacy</a>
+		<a href="http://www.usgs.gov/laws/policies_notices.html" title="Policies and notices that govern information posted on USGS Web sites.">Policies and Notices</a>
+	</p>
+
+	<p id="usgsfootertext">
+		<a href="http://www.takepride.gov/"><img src="http://www.usgs.gov/images/footer_graphic_takePride.jpg" alt="Take Pride in America logo" title="Take Pride in America Home Page" width="60" height="58" /></a>
+		<a href="http://usa.gov/"><img src="http://www.usgs.gov/images/footer_graphic_usagov.jpg" alt="USA.gov logo" title="USA.gov: Government made easy" width="90" height="26" /></a>
+		<a href="http://www.doi.gov/">U.S. Department of the Interior</a> |
+		<a href="http://www.usgs.gov/">U.S. Geological Survey</a><br />
+		URL: <a href="http://(none)/tools/metadata/tools/doc/ctc/describe.shtml">http://(none)/tools/metadata/tools/doc/ctc/describe.shtml</a><br/>
+		Page Contact Information: <a href="http://geology.usgs.gov/peter/">Peter Schweitzer</a><br/>
+		Page Last Modified: Friday, 19-Oct-2007 12:26:37 EDT</p>
+	</p>
+</div>
+<!-- END USGS Footer Template -->
+
+
+</body>
+</html>

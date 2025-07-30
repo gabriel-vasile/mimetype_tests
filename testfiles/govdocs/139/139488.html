@@ -1,0 +1,826 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002-2-1 (1.70) JA patch-2.0
+patched version by:  Kenshi Muto, Debian Project.
+* modified by:  Shige TAKENO
+LaTeX2HTML 2002-2-1 (1.70),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>9. Developing New Modules and Enhancements</TITLE>
+<META NAME="description" CONTENT="9. Developing New Modules and Enhancements">
+<META NAME="keywords" CONTENT="prog">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002-2-1 JA patch-2.0">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="prog.css">
+
+<LINK REL="next" HREF="node14.html">
+<LINK REL="previous" HREF="node12.html">
+<LINK REL="up" HREF="prog.html">
+<LINK REL="next" HREF="node14.html">
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+<!--Navigation Panel-->
+<A NAME="tex2html1255"
+  HREF="node14.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.gif"></A> 
+<A NAME="tex2html1251"
+  HREF="prog.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.gif"></A> 
+<A NAME="tex2html1245"
+  HREF="node12.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.gif"></A> 
+<A NAME="tex2html1253"
+  HREF="node4.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1256"
+  HREF="node14.html">10. Testing the Program</A>
+<B> Up:</B> <A NAME="tex2html1252"
+  HREF="prog.html">NWCHEM Programmer's Guide, Release</A>
+<B> Previous:</B> <A NAME="tex2html1246"
+  HREF="node12.html">8. Installing NWChem</A>
+ &nbsp; <B>  <A NAME="tex2html1254"
+  HREF="node4.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html1257"
+  HREF="node13.html#SECTION001310000000000000000">9.1 General Design Guidelines</A>
+<LI><A NAME="tex2html1258"
+  HREF="node13.html#SECTION001320000000000000000">9.2 Coding Style</A>
+<UL>
+<LI><A NAME="tex2html1259"
+  HREF="node13.html#SECTION001321000000000000000">9.2.1 Version information</A>
+<LI><A NAME="tex2html1260"
+  HREF="node13.html#SECTION001322000000000000000">9.2.2 Standard interface for top-level modules</A>
+<LI><A NAME="tex2html1261"
+  HREF="node13.html#SECTION001323000000000000000">9.2.3 No globally defined common blocks</A>
+<LI><A NAME="tex2html1262"
+  HREF="node13.html#SECTION001324000000000000000">9.2.4 Naming of routines and common blocks</A>
+<LI><A NAME="tex2html1263"
+  HREF="node13.html#SECTION001325000000000000000">9.2.5 Inclusion of common block definitions</A>
+<LI><A NAME="tex2html1264"
+  HREF="node13.html#SECTION001326000000000000000">9.2.6 Convention for naming <TT>include</TT> files</A>
+<LI><A NAME="tex2html1265"
+  HREF="node13.html#SECTION001327000000000000000">9.2.7 Syntax for including files using the C preprocessor</A>
+<LI><A NAME="tex2html1266"
+  HREF="node13.html#SECTION001328000000000000000">9.2.8 No implicitly typed variables</A>
+<LI><A NAME="tex2html1267"
+  HREF="node13.html#SECTION001329000000000000000">9.2.9 Use <TT>double precision</TT> rather than <TT>real*8</TT></A>
+<LI><A NAME="tex2html1268"
+  HREF="node13.html#SECTION0013210000000000000000">9.2.10 C macro definitions should be in upper case</A>
+<LI><A NAME="tex2html1269"
+  HREF="node13.html#SECTION0013211000000000000000">9.2.11 Fortran source should be in lower or mixed case</A>
+<LI><A NAME="tex2html1270"
+  HREF="node13.html#SECTION0013212000000000000000">9.2.12 Naming of variables holding handles/pointers obtained from
+  MA/GA</A>
+<LI><A NAME="tex2html1271"
+  HREF="node13.html#SECTION0013213000000000000000">9.2.13 Fortran unit numbers</A>
+<LI><A NAME="tex2html1272"
+  HREF="node13.html#SECTION0013214000000000000000">9.2.14 Use standard print control</A>
+<LI><A NAME="tex2html1273"
+  HREF="node13.html#SECTION0013215000000000000000">9.2.15 Error handling</A>
+<LI><A NAME="tex2html1274"
+  HREF="node13.html#SECTION0013216000000000000000">9.2.16 Comments</A>
+<LI><A NAME="tex2html1275"
+  HREF="node13.html#SECTION0013217000000000000000">9.2.17 Message IDs</A>
+<LI><A NAME="tex2html1276"
+  HREF="node13.html#SECTION0013218000000000000000">9.2.18 Bit operations -- <TT>bitops.fh</TT></A>
+<LI><A NAME="tex2html1277"
+  HREF="node13.html#SECTION0013219000000000000000">9.2.19 Blockdata statements and linking</A>
+</UL></UL>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H1><A NAME="SECTION001300000000000000000">
+9. Developing New Modules and Enhancements</A>
+</H1>
+<A NAME="sec:develop"></A>
+<P>
+When developing new modules or enhancements to the code, the developer must
+pay careful attention to design and coding style.  This chapter offers
+guidance on general design requirements and defines coding style rules.
+In addition, the specific considerations for inserting a new module
+into the code are presented in detail.
+
+<P>
+
+<H1><A NAME="SECTION001310000000000000000"></A>
+<A NAME="sec:gendesign"></A>
+<BR>
+9.1 General Design Guidelines
+</H1>
+
+<P>
+The complexity of NWChem and the large number of developers working with the
+code makes it highly advisable to consider very carefully the effect of even
+minor changes in the code.  This is particularly the case when considering
+changes that may impact the performance of the code in a parallel computing 
+environment.  The first, last, and only rule is <EM>Think before you code!</EM>
+Then think again.  Nothing will be as simple as you thought at first.
+
+<P>
+However, the code is not likely to develop new capability on its own, so you
+must do something, sooner or later.  The following list of design guidelines
+should be followed when adding code to NWChem.
+
+<P>
+
+<OL>
+<LI>Design your code before you start adding code.
+</LI>
+<LI>Set up a performance model that will effectively estimate the
+CPU, communication and IO costs.
+</LI>
+<LI>Use the model to guide the development of the code.  Remember
+that several algorithms may need to be developed, but the programmer
+should try to develop an algorithm that will scale in CPU, memory and
+IO.
+</LI>
+<LI>Use the interfaces and APIs that are defined.  <B>DO NOT</B>
+use any of the lower level routines that are used by the APIs.  If
+you deem it necessary to use a lower level routine, first talk to
+one of the primary NWChem developers.
+</LI>
+<LI>When possible and appropriate, think about creating objects
+instead of just data structures.
+</LI>
+<LI>If an object is not appropriate, think about creating an API
+that isolates details from other programmers.
+</LI>
+<LI>Create well defined modules.  When possible create and/or
+use ``generic'' routines to emphasize reuse of code.
+</LI>
+<LI>Don't be afraid to ask questions.  It is better to ask and
+move in a sensible direction than to not ask and have to redo some
+or all of the programming.
+</LI>
+</OL>
+
+<P>
+Remember, fortune favors the bold, but you will live longer and happier if you
+consult regularly with other NWChem developers and the NWChem Program
+Manager.
+
+<H1><A NAME="SECTION001320000000000000000"></A>
+<A NAME="sec:coding-style"></A>
+<BR>
+9.2 Coding Style
+</H1>
+
+<P>
+In a project this large, it is necessary to impose some standards on
+the coding style employed by developers.  The primary goal of these
+standards is not to constrain developers, but to enhance both the
+quality of the final product and its functionality. 
+
+<P>
+Code quality is somewhat subjective, but clearly embraces the ideas of
+
+<UL>
+<LI>correctness 
+</LI>
+<LI>maintainability 
+</LI>
+<LI>efficiency
+</LI>
+<LI>readability 
+</LI>
+<LI>re-usability
+</LI>
+<LI>modularity 
+</LI>
+<LI>ease of integration with other packages
+</LI>
+<LI>speed of development
+</LI>
+<LI>density of bugs
+</LI>
+<LI>ease of debugging
+</LI>
+<LI>detection of errors at run time
+</LI>
+<LI>exposure of available functionality
+</LI>
+<LI>ease-of-use of the API
+</LI>
+</UL>
+Compromise is clearly necessary. We are interested in
+high-performance, so some key kernels may sacrifice readability (but
+perhaps not modularity) for efficiency, but most code (i.e., 99.9%)
+is not an inner loop in need of such optimization, as long as the
+overall structure is correct.
+
+<P>
+The single most important thing you can do to achieve quality code has
+little to do with programming style. It is the <EM>design</EM> -- putting
+in the necessary thought and effort before even a single line of code
+is written. 
+
+<P>
+The following subsections present the recommended "Do's and Don'ts"
+for programming modules and modifications in NWChem.
+The recommendations are organized by a 'top-down' logic, to reflect the
+most efficient order in thinking about the various considerations
+the developer must keep in mind when designing a new piece of code.
+
+<P>
+
+<H2><A NAME="SECTION001321000000000000000">
+9.2.1 Version information</A>
+</H2>
+
+<P>
+Each source file should include a comment line that contains the CVS
+revision and date information.  This is accomplished by including a
+comment line containing the string <code>$</code><code>Id</code><code>$</code>.  CVS
+substitutes the correct version information each time the file is
+checked out or updated.  These lines are processed from the source and can be
+output at runtime to aid in bug-tracking.
+
+<P>
+
+<H2><A NAME="SECTION001322000000000000000">
+9.2.2 Standard interface for top-level modules</A>
+</H2>
+
+<P>
+In order to allow for automatic configuration of various modules in
+a compilation of NWChem (to control the size of the executable
+in memory-critical situations), all top-level modules must have a
+standard interface.  Currently it looks like this;
+<PRE>
+  logical function MODULE(rtdb)
+</PRE>
+The argument <code>rtdb</code> is the handle for the run-time database.  The
+function should return <code>.true.</code> or <code>.false.</code> on success or failure
+respectively.
+
+<P>
+The only sources of information for a module are the database, or files
+with names that can be inferred from data in the database or from defaults.
+Futhermore the naming of database entries is standardized such that:
+
+<UL>
+<LI>The string with which database entries are prefixed must be
+  lowercase and match the module name used in the input.  E.g., input
+  for the SCF module appears in the <code>scf;...;end</code> block and the
+  prefix used in the databse is <code>scf</code>.  This is so that the user
+  can delete all state information using the <code>UNSET</code> directive.
+</LI>
+<LI>Common quantities (such as energy, gradient, ...) should be
+  stored using that name.  E.g., <code>scf:energy</code>.
+</LI>
+</UL>
+
+<P>
+
+<H2><A NAME="SECTION001323000000000000000">
+9.2.3 No globally defined common blocks</A>
+</H2>
+
+<P>
+Use of global variables (e.g., common blocks) is generally a bad idea.
+Such variables break modularity, form hidden dependencies and make
+code hard to reuse and maintain.  <EM>Do not use common blocks to
+  pass data between routines</EM>.
+
+<P>
+However, common blocks are very useful in supporting a modular
+programming style which encourages code reuse and improves
+maintainability.  To this end common blocks can be used to hide data
+behind a subroutine interface so that access to the common is limited
+to a few tightly integrated routines.  The benefits of using common
+blocks (smaller argument lists, static data allocation, contiguous
+memory layout) can thus, with care, be realized without any problems.
+Examples of this include the basis, geometry, RTDB, integral,
+symmetry, global array, message passing, SCF, optimizer, input, and
+MP2 libraries.
+
+<P>
+
+<H2><A NAME="SECTION001324000000000000000">
+9.2.4 Naming of routines and common blocks</A>
+</H2>
+
+<P>
+To avoid name clashes and for easy identification, prefix all
+subroutine, function and common block names with the name of the
+module they are associated with.  For instance,
+
+<UL>
+<LI><TT>rtdb_...</TT> -- run-time database
+</LI>
+<LI><TT>ma_...</TT> -- memory allocator
+</LI>
+<LI><TT>ga_...</TT> -- global array
+</LI>
+<LI><TT>scf_...</TT> -- SCF
+</LI>
+<LI><TT>stpr_...</TT> -- Stepper (geometry optimization)
+</LI>
+</UL>
+
+<P>
+
+<H2><A NAME="SECTION001325000000000000000">
+9.2.5 Inclusion of common block definitions</A>
+</H2>
+
+<P>
+All common block definitions, including typing of variables in the
+common, are to be made once only in a single file (a <TT>.fh</TT> file),
+that is included in other source using the C preprocessor.  The
+<code>include</code> file should document the meaning of all variables.  
+This helps ensure that variables in a common block are consistently named and
+dependencies of routines on common blocks are easily generated
+and maintained.
+
+<P>
+
+<H2><A NAME="SECTION001326000000000000000">
+9.2.6 Convention for naming <TT>include</TT> files</A>
+</H2>
+
+<P>
+All <code>include</code> files should be named using the following conventions,
+
+<UL>
+<LI>Use <code>.fh</code> for files that can be included only by Fortran routines
+</LI>
+<LI>Use <code>.h</code> for files that can be included by C routines only, or
+  for files that are included by both C and Fortran routines
+</LI>
+</UL>
+
+<P>
+
+<H2><A NAME="SECTION001327000000000000000">
+9.2.7 Syntax for including files using the C preprocessor</A>
+</H2>
+
+<P>
+A very important distinction hinges on the seemingly trivial difference between
+the two different <code>include</code> forms,
+
+<UL>
+<LI><code>#include "filename"</code>
+</LI>
+<LI><code>#include &lt;filename&gt;</code>
+</LI>
+</UL>
+According to Kernighan and Ritchie:
+<BLOCKQUOTE>
+"If the <EM>filename</EM> is quoted, searching for the file typically
+ begins where the source program was found; if it is not found there,
+ or if the name is enclosed in <code>&lt;</code> and <code>&gt;</code>, searching follows
+ an implementation-defined rule to find the file."
+
+</BLOCKQUOTE>
+For this reason, and by common convention, only system-defined <code>include</code>
+files are included using angle brackets.  Those <code>include</code> files that are defined
+within an application are included using quotes.  The
+automatic generation of dependencies of source files upon <code>include</code>
+files within NWChem <EM>relies</EM> upon this convention.
+
+<P>
+
+<H2><A NAME="SECTION001328000000000000000">
+9.2.8 No implicitly typed variables</A>
+</H2>
+
+<P>
+The command <TT>implicit none</TT> should appear at the top of every routine
+in the NWChem code.  No other
+implicit statements are permitted and all variables must be explicitly
+declared.  <EM>This rule should be religiously observed in new code.</EM> It
+
+<UL>
+<LI>lets the compiler help you find typos and other errors
+</LI>
+<LI>makes the code more readable and more maintainable
+</LI>
+<LI>provides a natural point to document arguments and local
+  variables
+</LI>
+<LI>makes silly variable names like <TT>iii, ii1</TT> both
+  obvious and even more embarrassing when others catch you doing it
+</LI>
+</UL>
+
+<P>
+When integrating existing code, this rule may seem to be more work than
+it is worth, but several bugs in existing code have been found in this
+fashion.
+
+<P>
+
+<H2><A NAME="SECTION001329000000000000000">
+9.2.9 Use <TT>double precision</TT> rather than <TT>real*8</TT></A>
+</H2>
+
+<P>
+<TT>REAL*8</TT> is not standard Fortran.  <TT>DOUBLE PRECISION</TT> is the
+standard, it is usually what you want, it is more portable, and
+standardization of declarations enables us to perform 
+necessary code transformations more readily.
+
+<P>
+
+<H2><A NAME="SECTION0013210000000000000000">
+9.2.10 C macro definitions should be in upper case</A>
+</H2>
+
+<P>
+NWChem uses the ANSI C preprocessor to handle machine dependencies and
+other conditional compilation requirements.  By forcing all C macros
+to be upper case the code is made more readable and we also avoid
+potential accidental munging of Fortran source.  This practice is
+consistent with conventional use of the preprocessor in C programs.
+
+<P>
+
+<H2><A NAME="SECTION0013211000000000000000">
+9.2.11 Fortran source should be in lower or mixed case</A>
+</H2>
+
+<P>
+This convention is complementary to the above C macro convention.
+If there are no fully upper-case Fortran tokens then there can
+be no accidental conflict with the C preprocessor.
+
+<P>
+
+<H2><A NAME="SECTION0013212000000000000000">
+9.2.12 Naming of variables holding handles/pointers obtained from
+  MA/GA</A>
+</H2>
+
+<P>
+So that these critical variables are immediately recognizable, the
+following conventions are recommended.
+
+<UL>
+<LI>handles obtained from MA should be prefaced with <TT>l_</TT>
+</LI>
+<LI>pointers (into <TT>dbl_mb()</TT>, etc.) obtained from MA should be
+  prefaced with <TT>k_</TT>
+</LI>
+<LI>handles obtained from GA should be prefaced with <TT>g_</TT>
+</LI>
+</UL>
+
+<P>
+Alternatively, you can insert 
+comment lines describing the
+variables at the point of declaration, if you do not want to
+follow these conventions.
+
+<P>
+
+<H2><A NAME="SECTION0013213000000000000000">
+9.2.13 Fortran unit numbers</A>
+</H2>
+
+<P>
+All references to Fortran I/O units should be done with parameters or
+variables instead of hardwired constants.  For the ``standard I/O''
+units, corresponding to the C <code>stdin</code>, <code>stdout</code>, and <code>stderr</code>, you should
+include the file <TT>stdio.fh</TT> and use the variables <code>luin</code>,
+<code>luout</code>, and <code>luerr</code> instead of 5, 6, and 0.
+
+<P>
+The code uses very few other files, and there is no organized list 
+of parameter names for
+non-standard I/O units.  Users are free to use parameter names that make sense
+to them, so long as they adhere to the convention.  Using parameters rather
+than hardwired integer constants helps insure that I/O unit designations
+can be changed easily if needed, and may facilitate moving to a
+more general convention in a future version of the code.
+
+<P>
+
+<H2><A NAME="SECTION0013214000000000000000">
+9.2.14 Use standard print control</A>
+</H2>
+
+<P>
+All modules should understand the <code>PRINT</code> directive and
+accept at least the following keywords for this
+
+<UL>
+<LI><code>none</code> -- no output whatsoever except for error messages
+</LI>
+<LI><code>low</code> -- minimal output; e.g., title, critical parameters
+and a final energy
+</LI>
+<LI><code>medium</code> = <code>default</code> -- usual output
+</LI>
+<LI><code>high</code> -- extra verbose output
+</LI>
+<LI><code>debug</code> -- anything useful for diagnosing problems
+</LI>
+</UL>
+
+<P>
+Ideally all applications should control most printing via the print
+control routines (see Section <A HREF="node11.html#sec:print">7.4</A>).  A uniform
+look and feel is important.
+
+<P>
+
+<H2><A NAME="SECTION0013215000000000000000">
+9.2.15 Error handling</A>
+</H2>
+
+<P>
+All fatal errors should result in a call to <code>errquit()</code> (see Section
+<A HREF="node11.html#errquit">7.3.2</A>), which prints out the string and status value to both
+standard error and standard output and attempts to kill all parallel
+processes and to tidy any allocated system resources (e.g., system V
+shared memory).
+
+<P>
+
+<H2><A NAME="SECTION0013216000000000000000">
+9.2.16 Comments</A>
+</H2>
+
+<P>
+The use of comment lines is strongly recommended in all coding.
+Commented code is easier to read, and often is easier to debug, maintain,
+and modify.  Liberal use of comments is particularly important in NWChem, 
+since it is used by a large and diverse group of people, it is constantly being
+modified as capabilities are added and refined, and it has only a limited
+amount of detailed documentation.
+
+<P>
+Requirements for in-source documentation are given in detail in 
+Chapter <A HREF="node15.html#sec:newdoc">11</A>
+but the general recommendation for comment lines in the code is
+the more the merrier.  At a minimum the source code should
+be able to provide the following information, 
+
+<UL>
+<LI>terse comments at the top of each subroutine to describe
+  (accurately!) its function,
+</LI>
+<LI>documentation of dependencies/effects on state that are not passed
+  directly through its argument list (e.g., files, the database, common
+  blocks)
+</LI>
+<LI>descriptions of all arguments, including the flow of information (i.e.,
+  label arguments as input or output, or input-output)
+</LI>
+<LI>documentation of local variables with functions that are not apparent
+  from their names, or which have an algorithmic role that is opaque or obscure
+</LI>
+</UL>
+
+<P>
+In some circumstances, comments at the top of a routine can be quite
+lengthy since this is a <TT>very</TT> good place to store details of the
+algorithm.
+Automatic generation of documentation
+from code comments is being designed, 
+but this will produce useful documentation
+<EM>only if
+developers write clear and concise commentary in the code as they work.</EM>
+
+<P>
+The following partial listings show examples of minimalist in-source documentation
+using comment lines.  It would not be difficult to say more.  The rule of 
+thumb should be "from those who have much, more will be expected". The more important
+a routine is to a particular algorithm, the more it does in the way of carrying
+out the solution, the more detailed and voluminous should be it's comment lines.
+
+<P>
+Example of comments in a simple routine:
+
+<P>
+<PRE>
+  logical function bas_numbf(basis,nbf)
+  implicit none
+  integer basis   ! [input] basis set handle         
+  integer nbf     ! [output] number of basis functions
+*
+*  nbf returns the total number of functions.
+*  Returns true on success, false if the handle is invalid
+*
+</PRE>
+
+<P>
+Example of comments in a less simple routine:
+
+<P>
+<PRE>
+      subroutine sym_symmetrize(geom, basis, odensity, g_a)
+C$Id: codingsty.tex,v 1.4 1998/12/15 16:22:36 d35162 Exp $
+      implicit none
+      integer geom, basis  ! [input] Handles
+      integer g_a          ! [input] Handle to input/output GA
+      logical odensity     ! [input] True if matrix is a density
+c
+c     Symmetrize a skeleton matrix (in a global array) in the
+c     given basis set.
+c
+c     A &lt;- (1/2h) * sum(R) [RT * (A + AT) * R]
+c
+c     where h = the order of the group and R = operators of the
+c     group (including the identity)
+c
+c     Note that density matrices transform according to slightly
+c     different rules to Hamiltonian matrices if components
+c     of a shell (e.g., Cartesian d's) are not orthonormal.
+c     (see Dupuis and King, IJQC 11, 613-625, 1977)
+</PRE>
+
+<P>
+
+<H2><A NAME="SECTION0013217000000000000000">
+9.2.17 Message IDs</A>
+</H2>
+
+<P>
+The use of tags/IDs/types on messages is strongly suggested.
+If all messages with the program
+have distinct types and the message-passing software forces the types
+of messages to match between sender and receiver, then
+there is a way to prove that messages
+are being sent and received correctly.  If they are not, a 
+runtime error will be detected.
+This is especially important
+to NWChem since the code makes use of many third party linear algebra libraries that
+do a lot of message passing.
+
+<P>
+Modules which do a significant amount of messaging 
+should reserve a section of the message
+ID space for their own use (e.g., GA or PEIGS).  Most modules, however, do
+only a small amount of messaging.  For these, the <code>include</code> file <TT>  msgids.fh</TT> should be used to reserve individual message IDs.  This
+file defines Fortran parameters for message IDs used in most NWChem
+<EM>Hardwired message IDs should not be used in any NWChem routine.</EM>
+
+<P>
+
+<H2><A NAME="SECTION0013218000000000000000">
+9.2.18 Bit operations -- <TT>bitops.fh</TT></A>
+</H2>
+
+<P>
+The following bitwise operations (see Table
+<A HREF="#tabbit">9.1</A> for definitions) are the recommended standards for use in
+NWChem.
+
+<UL>
+<LI><code>ior(i,j)</code> -- inclusive OR
+</LI>
+<LI><code>ieor(i,j)</code> -- exlusive OR
+</LI>
+<LI><code>iand(i,j)</code> -- AND
+</LI>
+<LI><code>not(i)</code> -- NOT or one's complement
+</LI>
+<LI><code>rshift(i,nbits)</code> -- right shift with zero fill
+</LI>
+<LI><code>lshift(i,nbits)</code> -- left shift with zero fill
+</LI>
+</UL>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="7044"></A>
+<TABLE>
+<CAPTION><STRONG>Table 9.1:</STRONG>
+ Effect of Bit Operations</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+</DIV>
+<P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
+<TR><TD ALIGN="CENTER">ior</TD>
+<TD ALIGN="CENTER">ieor</TD>
+<TD ALIGN="CENTER">iand</TD>
+<TD ALIGN="CENTER">not</TD>
+<TD ALIGN="CENTER">lshift</TD>
+<TD ALIGN="CENTER">rshift</TD>
+</TR>
+<TR><TD ALIGN="CENTER">&nbsp;</TD>
+<TD ALIGN="CENTER">&nbsp;</TD>
+<TD ALIGN="CENTER">&nbsp;</TD>
+<TD ALIGN="CENTER">&nbsp;</TD>
+<TD ALIGN="CENTER">&nbsp;</TD>
+<TD ALIGN="CENTER">&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="CENTER">110</TD>
+<TD ALIGN="CENTER">110</TD>
+<TD ALIGN="CENTER">110</TD>
+<TD ALIGN="CENTER">10</TD>
+<TD ALIGN="CENTER">10111011</TD>
+<TD ALIGN="CENTER">10111011</TD>
+</TR>
+<TR><TD ALIGN="CENTER">100</TD>
+<TD ALIGN="CENTER">100</TD>
+<TD ALIGN="CENTER">100</TD>
+<TD ALIGN="CENTER">&nbsp;</TD>
+<TD ALIGN="CENTER">2 bits</TD>
+<TD ALIGN="CENTER">2 bits</TD>
+</TR>
+<TR><TD ALIGN="CENTER">110</TD>
+<TD ALIGN="CENTER">010</TD>
+<TD ALIGN="CENTER">100</TD>
+<TD ALIGN="CENTER">01</TD>
+<TD ALIGN="CENTER">11101100</TD>
+<TD ALIGN="CENTER">00101110</TD>
+</TR>
+</TABLE>
+<BR>
+<BR>
+
+</DIV>
+<P>
+<DIV ALIGN="CENTER">
+</DIV></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+These operations are readily generated using
+in-line functions from most other definitions.
+The shift examples in Table 3.1
+use an eight bit word written with the most significant bit on the
+left.
+All operations operate on full integer words (32 or 64 bit as
+necessary) and produce integer results.  The declarations and any
+necessary statement functions are in <code>bitops.fh</code>.  The presence
+of data statements makes it impossible to have a single include file
+make declarations and define statement functions.  To circumvent this
+the declarations are in <code>bitops_decls.fh</code> and the statement
+functions are in <code>bitops_funcs.fh</code>.
+
+<P>
+
+<H2><A NAME="SECTION0013219000000000000000">
+9.2.19 Blockdata statements and linking</A>
+</H2>
+
+<P>
+At least one machine (the CRAY-T3D) discards all symbols that are not
+explicitly referenced, even if other symbols from the same <code>.o</code>
+file are used.  Thus, <code>BLOCK DATA</code> subprograms are not linked in.
+One fix to this is to declare each <code>BLOCK DATA</code> subprogram as an
+undefined external on the link command, but this makes the link
+command depend on the list of modules being built.  An alternative
+mechanism that works on the T3D is to reference each <code>BLOCK DATA</code>
+subprogram in an <code>EXTERNAL</code> statement within a <code>SUBROUTINE</code> or
+<code>FUNCTION</code> that is guaranteed to be linked if any reference is to
+be made to the <code>COMMON</code> block being initialized.
+
+<P>
+<A NAME="sec:newmod"></A>
+<P>
+This is being redesigned.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1255"
+  HREF="node14.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.gif"></A> 
+<A NAME="tex2html1251"
+  HREF="prog.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.gif"></A> 
+<A NAME="tex2html1245"
+  HREF="node12.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.gif"></A> 
+<A NAME="tex2html1253"
+  HREF="node4.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1256"
+  HREF="node14.html">10. Testing the Program</A>
+<B> Up:</B> <A NAME="tex2html1252"
+  HREF="prog.html">NWCHEM Programmer's Guide, Release</A>
+<B> Previous:</B> <A NAME="tex2html1246"
+  HREF="node12.html">8. Installing NWChem</A>
+ &nbsp; <B>  <A NAME="tex2html1254"
+  HREF="node4.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Dunyou Wang
+2009-03-13
+</ADDRESS>
+</BODY>
+</HTML>

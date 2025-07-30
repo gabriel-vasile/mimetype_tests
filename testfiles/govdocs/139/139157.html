@@ -1,0 +1,220 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN" "http://www.w3.org/MarkUp/Wilbur/HTML32.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <meta name="GENERATOR" content="Quadralay WebWorks Publisher 2003 for FrameMaker 8.0.5.1556">
+    <meta name="RSISYM" content="False">
+    <meta name="TEMPLATEBASE" content="DynHTML">
+    <meta name="LASTUPDATED" content="03/06/07 15:45:48">
+    <title>Warping Images to Maps</title>
+    <link rel="StyleSheet" href="document.css" type="text/css" />
+    <link rel="StyleSheet" href="catalog.css" type="text/css" />
+  </head>
+
+  <body text="#000000" bgcolor="#FFFFFF">
+
+<table border="0" cellpadding="0" cellspacing="0" width="98%" bgcolor="#E2E2E2" valign="bottom" >
+  <tr> 
+    <td width="10%">
+<a href="Plotting_Contours_Over_Maps.html"><img src="images/prev.gif" border="0" alt="Previous"></a>    </td>
+    <td width="80%" align="center">
+<font size=-1><i>Getting Started with IDL</i>: <a href="Mapping.html">Mapping</a></font>    </td>
+    <td width="10%" align="right">
+<a href="More_About_Mapping.html"><img src="images/next.gif" border="0" alt="Next"></a>    </td>
+  </tr>
+</table>
+
+<a name="wp1001674"> </a><h2 class="pHeading1">
+Warping Images to Maps
+</h2>  
+
+<a name="wp1001677"> </a><p class="pBody">
+Image data can also be displayed on maps. The MAP_IMAGE function returns a warped version of an original image that can be displayed over a map projection. In this example, elevation data for the entire globe is displayed as an image with continent outlines and grid lines overlaid.
+</p>  
+
+<div class="pSmartList1"><ol type="1" class="pSmartList1">
+
+
+<a name="wp1001679"> </a><div class="pSmartList1"><li>Define the template for the file worldelv.dat. This file contains a 360 by 360 square array of byte values.</li></div>  
+
+<div class="pPreformatted"><pre class="pPreformatted">
+WORLDTEMPLATE=BINARY_TEMPLATE(FILEPATH(&#39;worldelv.dat&#39;, $
+&#160;&#160;&#160;SUBDIR=[&#39;examples&#39;, &#39;data&#39;]))  
+</pre>
+</div>
+<P class="Ignore">&nbsp;</P>
+<a name="wp1003198"> </a><div class="pSmartList1"><li>When the binary template dialog box appears, name the template &quot;WORLDTEMPLATE&quot; and then click <span style="font-weight: bold">New Field</span>. </li></div>  
+
+<P class="Ignore">&nbsp;</P>
+<a name="wp1003343"> </a><div class="pSmartList1"><li>In the <span style="font-weight: bold">New Field</span> dialog, enter &quot;W&quot; for the <span style="font-weight: bold">Field Name</span>, be sure to specify that you have two dimensions and that the field sizes are 360 and 360. </li></div>  
+
+<P class="Ignore">&nbsp;</P>
+<a name="wp1003347"> </a><div class="pSmartList1"><li>Also select <span style="font-weight: bold">Byte (unsigned) </span>in the <span style="font-weight: bold">Type</span> field. Now click <span style="font-weight: bold">OK </span>in the<span style="font-weight: bold"> New Field </span>dialog. Click &quot;OK&quot; to close the binary template dialog as well.<span style="font-weight: bold"> </span>Next, read the file by entering:</li></div>  
+
+<div class="pPreformatted"><pre class="pPreformatted">
+WORLDELV_BINARY=READ_BINARY(FILEPATH(&#39;worldelv.dat&#39;, $
+&#160;&#160;&#160;SUBDIR=[&#39;examples&#39;, &#39;data&#39;]),TEMPLATE=WORLDTEMPLATE)  
+</pre>
+</div>
+<P class="Ignore">&nbsp;</P>
+<a name="wp1002327"> </a><div class="pSmartList1"><li>Load a color table.</li></div>  
+
+<div class="pPreformatted"><pre class="pPreformatted">
+loadct, 26  
+</pre>
+</div>
+<P class="Ignore">&nbsp;</P>
+<a name="wp1001685"> </a><div class="pSmartList1"><li>View the data as an image.</li></div>  
+
+<div class="pPreformatted"><pre class="pPreformatted">
+TV, WORLDELV_BINARY.W  
+</pre>
+<a name="wp1005284"> </a><p class="pBodyRelative">
+</P><P class="Ignore">&nbsp;</P>
+<div>
+<P class="Ignore"><I><FONT SIZE=-1><CENTER>
+<a name="wp1004998"> </a>Figure 9-8: worldelv.dat Visualized with TV  
+</CENTER></FONT></I></P>
+<table border="0" cellpadding="5" id="wp1004998table1004994">
+  <caption><a name="wp1004998"> </a>Figure 9-8: worldelv.dat Visualized with TV  
+</caption>
+  <tr align="left">    <td><a name="wp1004996"> </a><div class="pCellBody">
+</div>
+<div align="center"><img src="images/gsmap07.gif" id="wp1005000" border="0" hspace="0" vspace="0"/></div><div class="pCellBody">
+
+</div>  
+
+</td>
+</tr>
+</table>
+</div>
+
+  
+
+<P class="Ignore">&nbsp;</P>
+<a name="wp1001686"> </a><p class="pIndentedRelative">The first column of data in this image corresponds to 0 degrees longitude. Because MAP_IMAGE assumes that the first column of the image being warped corresponds to -180 degrees, we'll use the SHIFT function on the dataset before proceeding. </p>  
+
+<P class="Ignore">&nbsp;</P>
+<a name="wp1002359"> </a><div class="pSmartList1"><li>Shift the array 180 elements in the row direction and 0 elements in the column direction to make -180 degrees the first column in the array.</li></div>  
+
+<div class="pPreformatted"><pre class="pPreformatted">
+WORLDELV_BINARY.W=SHIFT(WORLDELV_BINARY.W, 180, 0)  
+</pre>
+</div>
+<P class="Ignore">&nbsp;</P>
+<a name="wp1001696"> </a><div class="pSmartList1"><li>View the data as an image.</li></div>  
+
+<div class="pPreformatted"><pre class="pPreformatted">
+TV, WORLDELV_BINARY.W  
+</pre>
+<a name="wp1005285"> </a><p class="pBodyRelative">
+</P><P class="Ignore">&nbsp;</P>
+<div>
+<P class="Ignore"><I><FONT SIZE=-1><CENTER>
+<a name="wp1005036"> </a>Figure 9-9: Shifting the Array  
+</CENTER></FONT></I></P>
+<table border="0" cellpadding="5" id="wp1005036table1005029">
+  <caption><a name="wp1005036"> </a>Figure 9-9: Shifting the Array  
+</caption>
+  <tr align="left">    <td><a name="wp1005034"> </a><div class="pCellBody">
+</div>
+<div align="center"><img src="images/gsmap08.gif" id="wp1005032" border="0" hspace="0" vspace="0"/></div><div class="pCellBody">
+
+</div>  
+
+</td>
+</tr>
+</table>
+</div>
+
+  
+
+<P class="Ignore">&nbsp;</P>
+<a name="wp1005040"> </a><p class="pIndentedRelative">From the image contained in the data, we can create a warped image to fit any of the available map projections. A map projection must be defined before using MAP_IMAGE, because MAP_IMAGE uses the currently defined map parameters.</p>  
+
+<P class="Ignore">&nbsp;</P>
+<a name="wp1001699"> </a><div class="pSmartList1"><li>Create a Mollweide projection with continents and gridlines.</li></div>  
+
+<div class="pPreformatted"><pre class="pPreformatted">
+MAP_SET,/MOLLWEIDE,/CONT,/GRID,COLOR=100  
+</pre>
+</div>
+<P class="Ignore">&nbsp;</P>
+<a name="wp1001700"> </a><div class="pSmartList1"><li>Warp the image using bilinear interpolation and save the result in the variable new.</li></div>  
+
+<div class="pPreformatted"><pre class="pPreformatted">
+NEW=MAP_IMAGE(WORLDELV_BINARY.W,SX,SY,/BILIN)  
+</pre>
+</div>
+<P class="Ignore">&nbsp;</P>
+<a name="wp1001701"> </a><p class="pIndentedRelative">The SX and SY in the command above are output variables that contain the X and Y position at which the image should be displayed. Setting the BILIN keyword causes bilinear interpolation to be used, resulting in a smoother warped image.</p>  
+
+<P class="Ignore">&nbsp;</P>
+<a name="wp1001702"> </a><div class="pSmartList1"><li>Display the new image over the map:</li></div>  
+
+<div class="pPreformatted"><pre class="pPreformatted">
+TV,NEW,SX,SY  
+</pre>
+<a name="wp1005286"> </a><p class="pBodyRelative">
+</P><P class="Ignore">&nbsp;</P>
+<div>
+<P class="Ignore"><I><FONT SIZE=-1><CENTER>
+<a name="wp1003223"> </a>Figure 9-10: Warping an Image to a Map  
+</CENTER></FONT></I></P>
+<table border="0" cellpadding="5" id="wp1003223table1003219">
+  <caption><a name="wp1003223"> </a>Figure 9-10: Warping an Image to a Map  
+</caption>
+  <tr align="left">    <td><a name="wp1003221"> </a><div class="pCellBody">
+</div>
+<div align="center"><img src="images/gsmap09.gif" id="wp1005071" border="0" hspace="0" vspace="0"/></div><div class="pCellBody">
+
+</div>  
+
+</td>
+</tr>
+</table>
+</div>
+
+  
+
+<P class="Ignore">&nbsp;</P>
+<a name="wp1001703"> </a><p class="pIndentedRelative">The SX and SY variables provide TV with the proper starting coordinates for the warped image. TV usually displays images starting at position (0, 0). See the map in the previous figure. Note that the warped image gets displayed over the existing continent and grid lines. </p>  
+
+<P class="Ignore">&nbsp;</P>
+<a name="wp1003249"> </a><div class="pSmartList1"><li>The continent outlines and thick grid lines can be displayed, as shown next, by entering:</li></div>  
+
+<div class="pPreformatted"><pre class="pPreformatted">
+MAP_CONTINENTS  
+MAP_GRID,GLINETHICK=3  
+</pre>
+<a name="wp1005287"> </a><p class="pBodyRelative">
+</P><P class="Ignore">&nbsp;</P>
+<div>
+<P class="Ignore"><I><FONT SIZE=-1><CENTER>
+<a name="wp1003235"> </a>Figure 9-11: Showing gridlines and continents  
+</CENTER></FONT></I></P>
+<table border="0" cellpadding="5" id="wp1003235table1003231">
+  <caption><a name="wp1003235"> </a>Figure 9-11: Showing gridlines and continents  
+</caption>
+  <tr align="left">    <td><a name="wp1003233"> </a><div class="pCellBody">
+</div>
+<div align="center"><img src="images/gsmap10.gif" id="wp1005089" border="0" hspace="0" vspace="0"/></div><div class="pCellBody">
+
+</div>  
+
+</td>
+</tr>
+</table>
+</div>
+
+  
+
+
+</ol></div>
+
+<P></P>
+<P></P>
+<P><FONT COLOR="gray" SIZE="-3">&nbsp;&nbsp;IDL Online Help (March 06, 2007)</FONT></P>
+  </body>
+</html>

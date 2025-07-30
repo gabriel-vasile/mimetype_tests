@@ -1,0 +1,108 @@
+
+;+
+; NAME:
+;        sb_gtrans
+; PURPOSE:
+;        Perform geometric transformation of an image array
+;        using WCS information, and target image information.
+
+; CATEGORY:
+;        image processing
+; CALLING SEQUENCE:
+;        d_out = sb_gtrans(d_in,wcs,disp=cimd[i].disp)
+; INPUTS:
+;        d_in = fltarr(nx,ny) input image
+;        wcs  = WCS structure for input image
+; KEYWORDS (INPUT):
+;        disp = disp substructure of cimd (see sb_initcom). Required!
+;        /proj = re-project onto sphere (e.g., view magnetogram from STEREO)
+;        obswcs = wcs of observer (only if /proj; only time and position used)
+;        width : smooth input image with filter of width
+;        interp : interpolation type: 0=nearest neighbor, 1=bilinear, 2=cubic
+;     Notes: for /proj: obswcs is required and interp set to nearest neighbor
+;            if proj not set, and width and/or interp not supplied then a
+;            "reasonable" default is used for width and/or interp
+; OUTPUTS:
+;        d_out = fltarr.  Output image.  Size: disp.naxis
+; KEYWORDS (OUTPUT):
+; COMMON BLOCKS:
+; SIDE EFFECTS:
+; RESTRICTIONS:
+;        Only for a single 2D image
+; PROCEDURE:
+; MODIFICATION HISTORY:
+;        JPW, 3/28/2006
+;        JPW, 2/27/2007 simple minded implementation of /sc and /helio
+;                       proper way would be via expanded disp structure
+;-
+
+function sb_gtrans,din,wcs,disp=disp,proj=proj,obswcs=owcs, $
+                       width=wid,interp=bilin  ,sc=sc,helio=helio,swcs=swcs
+
+; set appropriate defaults for width and interp, and calculate p,q
+; - /proj: use nearest neighbor (ignores interp). default width: no smoothing
+; - otherwise (/proj not set):
+;   - calculate transformation parameters p,q
+;   - default interp to nearest neighbor if width set
+;   - default width to no smoothing if interp bilinear or cubic
+;   - otherwise: calculate 1/zoom_factor, smooth with wid=fix(1/zoom)
+;     i.e., zoom>0.5: no smooth, 0.5>zoom>0.333: smooth=2,
+;     0.333>zoom>0.2: smooth=3,  0.2>zoom>0.143: smooth=5, etc.
+;   - if interp not yet set:
+;     - do bilinear for zoom betw. 0.5 and 1, nearest neighbor otherwise
+
+if keyword_set(proj) then begin
+   if n_elements (wid) eq 0 then wid=0
+endif else begin
+   ; first calculate p,q (needed for default width and later for poly_2d)
+;   sb_pq,wcs,p,q,disp=disp
+   sb_pq,wcs,p,q,disp=disp ,helio=helio,sc=sc,swcs=swcs
+   if n_elements(wid) eq 1 and n_elements(bilin) eq 0 then bilin=0
+   if n_elements(wid) eq 0 and n_elements(bilin) eq 1 then if bilin gt 0 $
+      then wid=0
+   if n_elements(wid) eq 0 then begin
+      wid = fix(sqrt(total([p[1:2],q[1:2]]^2.0)/2.0))   ; wid = fix(1/zoom)
+      if n_elements(bilin) eq 0 then if wid eq 1 then bilin=1 else bilin=0
+   endif
+endelse
+
+; if wid set, perform smoothing to minimize aliasing:
+d = din
+if fix(wid) eq 2 then begin        ; use convol for smoothing with width 2
+   ; convol
+   kern = [[1,2,1],[2,4,2],[1,2,1]]
+   scal = fix(total(kern))
+   d = convol(d,kern,scal,/edge_truncate)
+endif
+if wid ge 3 then d = smooth(d,wid,/edge_truncate) ; use smooth if wid gt 2
+
+if keyword_set(proj) then begin
+
+   ; project image onto sphere, rotate sphere to pos, project back
+   ; interpolation method: nearest neighbor only
+
+   ; calculate the corresponding pixel indices in the image and the display
+;   sb_disp2im,wcs,ipix,dpix,disp=disp,obswcs=owcs
+   sb_disp2im,wcs,ipix,dpix,disp=disp,obswcs=owcs ,helio=helio,sc=sc,swcs=swcs
+
+   ; transform the image
+   dinval = d[ipix]
+   minval = 0 < min(dinval)
+   sdin = size(din)
+   d = make_array(dim=disp.naxis,type=sdin[sdin[0]+1],val=minval)
+   d[dpix] = dinval
+
+endif else begin
+
+   ; simple transformation via poly_2d
+   ;   parameters p,q have already been calculated
+   ;   nearest neighbor requires a 0.5 input pixel correction
+   miss = min(d) < 0
+   if bilin eq 0 then pqo=[0.5,0.,0.,0.] else pqo=[0.,0.,0.,0.]
+   d = poly_2d(d,p+pqo,q+pqo,bilin,disp.naxis[0],disp.naxis[1],missing=miss)
+
+endelse
+
+return,d
+
+end

@@ -1,0 +1,863 @@
+                                          ABSTRACT
+
+Murphy P. P., K. C. Kelly, R. A. Feely, and R. H. Gammon. 1995. Carbon Dioxide
+     Concentrations in Surface Water and the Atmosphere During 1986-1989 PMEL Cruises in the
+     Pacific and Indian Oceans. ORNL/CDIAC-75, NDP-047. Carbon Dioxide Information Analysis
+     Center, Oak Ridge National Laboratory, Oak Ridge, Tennessee.
+
+     This document presents the carbon dioxide concentration data in surface water and the
+atmosphere collected during the Pacific Marine Environmental Laboratory (PMEL) expeditions
+during 1986-1989.  Carbon dioxide was measured quasi-continuously on 5 PMEL expeditions (12
+legs) in the Pacific and Indian Oceans.  These cruises were conducted under support from the
+National Oceanic and Atmospheric Administration (NOAA).
+     Carbon dioxide measurements in the atmosphere and in surface water were made by
+analyzing of mixing ratios of CO2 with an automated, temperature-controlled gas
+chromatographic system described by Murphy et al. (1991) and Bates et al. (1993).  
+Instrument precision was determined by the average percent standard deviation of the standard 
+response over a 6-hour period.  The precision varied between cruises but was always less than 
+1.2% and was more typically around 0.4%. 
+     Air was pumped through 3/8-inch diameter, plastic-coated, aluminum tubing from the jackstaff
+on the bow of the ship (10 meters above the sea surface) to the oceanographic laboratory for
+analysis. Surface seawater entered the ship via a forward intake line located approximately 5
+meters below the water level.
+     Fifteen files are described in this report and distributed along with it including one 
+documentation file (ndp047.txt) that provides an overview of the cruise network and describes details
+on the content and format of the thirteen data files; one FORTRAN 77 retrieval code (pmeldat.for) 
+that may be used to read and print any of the data files; and thirteen data files, one (pmel8689.dat) 
+that contains the data from all twelve legs, and separate files (12 total) for each leg. Each of the 
+data files contains the same variables: cruise name; date (day, month, year); day of the year 
+[Greenwich Mean Time (GMT)]; latitude and longitude (in decimal degrees); cumulative distance since 
+the first sampling location on the leg; sea surface temperature (degrees C); warming temperature 
+[indicates the degrees of warming (degrees C) for seawater as it transited from the intake line 
+to the analysis site]; sea surface salinity; atmospheric pressure; reported atmospheric CO2
+concentration,[X(CO2)]air which is the mole fraction of the dried air pumped from the bow line; reported 
+surfase seawater CO2, concentration [X(CO2)]sw which is the mole fraction of the dried vapor drown 
+from the equilibrator headspace; the calculated fugacity values for the air [f(CO2)air] and seawater 
+[f(CO2)sw] given in the data tables are in situ fugacities which have been corrected for the warming 
+of the seawater; and quality flags.
+     The data set is available, free of charge, as a Numeric Data Package (NDP) from CDIAC.
+The NDP consists of printed documentation and machine-readable files.  The data files also available 
+on 9-track magnetic tape; IBM-formatted floppy diskettes; 8-mm tapes; 150-mB, quarter-inch tape cartridge;
+and from CDIAC's anonymous File Transfer Protocol (FTP) area via Internet.  Printed document also contains an
+Appendix, which is a full reprint of NOAA Technical Memorandum ERL PMEL-101 authored by Murphy et al. 1994, 
+which fully describes cruise information, sampling methods and instrumentation, and defines limitations and 
+restrictions of the data.
+     
+
+Keywords:   Carbon dioxide;  Pacific  Ocean;  Indian Ocean;  Carbon cycle;  fugacity;  data file. 
+
+
+                                    1. BACKGROUND INFORMATION
+
+
+     A dramatic increase in the atmospheric concentration of carbon dioxide (CO2) has been
+directly observed over the past 30 years (Keeling et al, 1989). Although the present growth rate
+of CO2 in the atmosphere is about 3.4 gigatons of carbon per year (GtC/yr), the present estimate
+of anthropogenic CO2 sources to the atmosphere is much larger (approximately 6 GtC/yr; IPCC,
+1990). Most of the CO2 (77%) released to the atmosphere originates from the combustion of
+fossil fuels (Marland and Rotty, 1989). The remainder is estimated to originate from deforestation
+and changing land use patterns (IPCC, 1990). Since the growth rate of CO2 in the atmosphere
+is less than the rate of carbon release, some of the anthropogenic carbon released to the
+atmosphere must be absorbed by either the terrestrial biosphere or the oceans.
+     The oceans have been suggested as a repository for carbon dioxide from the atmosphere
+through a chemical and biological pathway. Carbon dioxide dissolves readily in the surface
+oceans. The dissolved gas reacts with water to form carbonic acid which rapidly dissociates to
+bicarbonate and carbonate ions. Ocean plants can also draw down CO2, some of which is
+converted to particulate matter which sinks out of surface waters.
+     The uncertain role of the ocean in absorbing anthropogenic carbon from the atmosphere
+has stimulated interest in the cycling and fate of carbon in the sea. PMEL has made
+measurements on 12 cruise legs (5 expeditions) between 1986 and 1989 to determine the
+concentrations of trace gases in the atmosphere and in surface seawater. The purpose of this
+report is to present the CO2 results and to show the calculations which have been used to convert
+the raw values to fugacities in units of microatmospheres (uatm).
+
+                     1.1 General Discussion of CO2 Measurements and Fugacity
+
+     Field measurements of carbon dioxide gas concentrations are often observed as the mole
+fraction of CO2 in an aliquot of dried vapor. The concentration of CO2 expressed as the mole
+fraction in dry air is an absolute and observable quantity, but is not necessarily the quantity
+which geochemists need to evaluate air-sea fluxes or to examine the relationship of dissolved
+CO2  with other carbonate parameters. Geochemical assessments generally require the correction
+of CO2 concentrations from the measurement units and conditions to units of microatmospheres
+at the in situ sea surface conditions. Partial pressures of CO2  in units of uatm have been
+historically reported, but in recent years, fugacities have also been reported. We here offer a brief
+discussion of the distinction between fugacity and partial pressure, and the motivation for using
+fugacity in this report.
+     Fugacity is an expression for the concentration of a real gas in a mixture of real gases,
+whereas partial pressure is an expression for the concentration of an ideal gas in a mixture of 
+ideal gases. Ideal gases are conceptualized as comprising molecules which occupy no volume and
+between which no forces exist. The concept of fugacity is introduced in order to use for real
+gases the thermodynamic relationships established for ideal gases. Fugacity cannot be measured
+directly, as pressure is, yet the basis for discussion of equilibrium, solubility, etc. is based on the
+thermodynamic quantity of fugacity, not on the observable quantity of pressure.
+     The thermodynamic equation of state for ideal gases is PV=nRT, where P is pressure, V
+is volume, n is number of moles of gas, R is the gas constant, and T is absolute temperature.
+This equation can be used to convert the number of moles of pure, ideal gas to the pressure of
+the gas. If we make a plot of pressure vs. PV/nRT for pure nitrogen (N2), pure carbon dioxide
+(CO2), and a pure ideal gas, we can see that an ideal gas is a line with  zero slope and
+y-intercept=1. Nitrogen approximates an ideal gas at low pressures, but becomes less ideal at
+higher pressures as the volume of the molecules becomes significant relative to the total volume.
+CO2 is a highly non-ideal gas, even at low pressures. The negative deviation from ideality at low
+pressures suggests attractive forces between CO2 molecules. The significance of this factor
+becomes less important at higher pressures. The approximation of ideality for CO2 may be
+acceptable at ambient pressures when high accuracy is not required.  The difference between
+pressure and fugacity for a typical ambient CO2 concentration is 1 to 1.5 uatm (~0.3%) over the
+temperature range 0 to 30 C. These calculations assume a binary gas mixture of CO2 and air,
+where air is treated as a homogeneous gas. For this report, fugacities rather than partial pressures
+are reported.
+
+
+                                   1.2 Summary of Data Presented
+
+     The data presented in this report are from PMEL cruises conducted in the Pacific and
+Indian Oceans during 1986-1989 (Table 1). The data files provide a complete listing of the
+calculated fugacities, the warming-corrected mole fraction CO2 concentrations, and the  data
+required to convert between in situ mole fraction and fugacity. 
+
+     Table 1. Summary of PMEL Cruises 1986 to 1989. The distance given is the distance over
+              which data were collected along the cruise track.
+
+--------------------------------------------------------------------------------------------------
+ Year |  Cruise Section  |  Imports                    |  Dates                 | Distance (km)  | 
+--------------------------------------------------------------------------------------------------
+ 1986 |  EPOCS           |  Balboa - Honolulu          |  21 May - 20 June      |      12172     |
+      |                  |                             |                        |                |
+ 1986 |  RITS/CO2        |  Honolulu - Kodiak          |  1 Luly - 23 July      |      7709      |
+      |                  |                             |                        |                |
+ 1987 |  SAGA II, Transit|  Hilo - Kuril Trench        |  1 May - 8 May         |      4503      |
+      |                  |                             |                        |                |
+ 1987 |  SAGA II, Leg 1  |  Kuril Trench - Wellington  |  8 May - 9 June        |     11441      |
+      |                  |                             |                        |                |
+ 1987 |  SAGA II, Leg 2  |  Wellington - Singapore     |  12 June - 6 July      |     11912      |
+      |                  |                             |                        |                |
+ 1987 |  TEW-3           |  Townsville - Kwajalein     |  13 July - 27 July     |      3491      |
+      |                  |                             |                        |                |
+ 1987 |  RITS/CO2        |  Kwajalein - Seattle        |  29 July - 28 August   |     10520      |
+      |                  |                             |                        |                |
+ 1988 |  RITS/CO2        |  Dutch Harbor - Am. Samoa   |  6 April - 5 May       |      8648      |
+      |                  |                             |                        |                |
+ 1988 |  EPOCS           |  Am. Samoa - Honolulu       |  9 May - 4 June        |      8492      |
+      |                  |                             |                        |                |
+ 1989 |  RITS/CO2, Leg 1 |  Seattle - Easter Island    |  5 February - 1 March  |      7097      |
+      |                  |                             |                        |                |
+ 1989 |  RITS/CO2, Leg 2 |  Easter Island - Papeete    |  4 March - 2 April     |     11365      |
+      |                  |                             |                        |                |
+ 1989 |  RITS/CO2, Leg 3 |  Papeete - Seattle          |  7 April - 20 April    |      7773      |
+--------------------------------------------------------------------------------------------------
+
+
+
+     The fugacities were calculated according to equations given in Murphy et al. (1994). The
+fugacity calculations use observations of dry gas concentrations in units of parts per million, sea
+surface temperature, equilibrator temperature, sea surface salinity, and atmospheric pressure. The
+relative humidity is assumed to be 100% at the sea surface. The vapor pressure of seawater is
+calculated from temperature and salinity, and the functional relationship between gas solubility
+and temperature used is from Weiss et al. (1982). The fugacity values given in the data tables
+are the in situ fugacities which have been corrected for the warming of the seawater in transiting
+to the equilibrator.
+     The mole fraction values given in the data tables are the dry gas concentrations at the in
+situ temperature. For the air values, the reported concentration, X(CO2)air, is the mole fraction
+of the dried air pumped from the bow line. For the water values, the reported concentration,
+X(CO2)sw, is the mole fraction of the dried vapor drown from the equilibrator headspace which
+has been converted to fugacity, corrected for warming, and converted back to mole fraction.
+     The warming values provided in the data tables indicate the degrees of warming ( C) for
+seawater as it transited from the intake line to the analysis site. The warming values were derived
+from the regression of hourly warming on hourly sea surface temperature. Detailed information
+on the temperatures data and analyses for each of these cruises are provided in Murphy et al.
+(1993).
+
+                                          2. METHODS
+
+                   2.1 Measurement of CO2 in the Atmosphere and in Surface Seawater
+
+     Carbon dioxide measurements in the atmosphere and in surface water were made on these
+cruises by Kimberly Kelly. Mixing ratios of CO2 were analyzed with an automated,
+temperature-controlled gas chromatographic system similar to that described by Weiss (1981),
+and Bates et al. (1993). Every 12 minutes one of four gases (atmospheric sample, standard 1,
+equilibrator vapor sample, or standard 2) was injected for analysis. Details of sample collection,
+gas standard calibration, and data reduction follow.
+     Air was pumped through 3/8-inch O.D. plastic-coated aluminum tubing (Decoron) from
+the jackstaff on the bow of the ship, 10 meters above the sea surface, to the oceanographic
+laboratory for analysis. This line was continuously flushed at 8-10 L/min. Aliquots from this air
+stream were dried using phosphorous pentoxide and 2 milliliters were injected into a gas
+chromatograph (GC) where CO2 was separated from the other gases, catalytically reduced to
+methane, and routed to the flame ionization detector. The instrument response was compared with
+the response of standard gases for quantification. The standard gases were dried and treated in
+exactly the same manner as the air and equilibrator samples. 
+     Surface seawater entered the ship's seachest via a forward intake line located
+approximately 5 meters below the water level. From the seachest, the water was pumped up to
+a showerhead-type Plexiglas equilibrator designed by R. Weiss (Butler et al., 1988). Water rains
+through the equilibrator at 15-20 L/min and the gases dissolved in the seawater partition between
+the aqueous and vapor phases according to their solubilities at the temperature and salinity of the
+seawater in the equilibrator. Aliquots of the equilibrator vapor phase were sampled, dried, and
+analyzed as described above for atmospheric samples.
+     The gas standards were dried, whole-air mixtures contained in aluminum cylinders. The
+working standards were calibrated against the primary standards before and after the 1987, 1988,
+and 1989 cruises. The primary standards (CC48232 - 352.47 ppm, CC48302 - 355.97 ppm,
+CC48314 - 353.39 ppm) were filled and calibrated by the National Oceanic and Atmospheric
+Administration/Climate Monitoring and Diagnostics Laboratory (NOAA/CMDL) in February
+1987. Subsequent calibrations of these primary standards by CMDL in November 1987, June
+1990 and August 1990 have shown that the CO2 mixing ratios remained constant during this 3.5
+year period. The CO2 mixing ratios in the working standards ranged from 228.15 ppm to 460.43
+ppm. The working standards were calibrated by CMDL in 1990. These calibrations agreed to
+within 0.5% of the values assigned to each tank by PMEL based on the primary standards and
+a linear FID detector response. The data reported here have been reduced using the CMDL
+calibrations of the working standards. The mixing ratios reported here are in the
+World Meteorological Organization (WMO) X85 scale (Thoning et al., 1987). The accuracies of
+the CO2 standards are given by CMDL as +/- 0.6% by comparison with the manometric analyses
+of C. D. Keeling at the Scripps Institution of Oceanography. Instrument precision was determined
+by the average percent standard deviation of the standard response over a 6-hour period. The
+precision varied between cruises but was always less than 1.2% and was more typically around
+0.4% (Table 2).
+
+     Table 2. Instrument precision in percent standard
+              deviation from the standard value.
+
+      ---------------------------------------------
+      | Year |  Cruise             |  % Std. Dev  |
+      ---------------------------------------------
+      | 1986 |  EPOCS              |     0.94     |
+      |      |                     |              |
+      | 1986 |  RITS/CO2           |     0.71     |
+      |      |                     |              |
+      | 1987 |  SAGA II            |     0.24     |
+      |      |                     |              |
+      | 1987 |  TEW-3, RITS/CO2    |     0.32     |
+      |      |                     |              |
+      | 1988 |  RITS/CO2           |     0.60     |
+      |      |                     |              |
+      | 1988 |  EPOCS              |     0.21     |
+      |      |                     |              |
+      | 1989 |  RITS/CO2           |     0.37     |
+      ---------------------------------------------
+
+
+
+
+     The CO2 mixing ratios in the air and equilibrator samples were calculated as follows. The
+data were first visually filtered to eliminate any episodes of ship contamination. These episodes
+were quit evident from the extremely high carbon monoxide values that were measured
+simultaneously. The mixing ratios of CO2 in both the air and equilibrator samples were then
+computed based on peak area and either a 4- hour or 6-hour running mean single-point standard.
+These dry-air mixing ratios were then binned into hourly values based on the measurements made
+30 minutes before and after the hour.
+
+                             2.2 Ancillary measurements
+
+     The ancillary measurements used to calculate in situ CO2 concentrations in the
+atmospheric and surface seawater samples are sea surface temperature, temperature of seawater
+in the equilibrator, salinity, and atmospheric pressure. Surface seawater temperature was measured
+near the bow intake line on most cruises with a thermosalinograph provided by the ship. The
+temperature of seawater in the equilibrator was measured by mercury thermometer and
+thermistors. Salinity was taken from the thermosalinograph located near the bow intake line, and
+atmospheric pressure was recorded hourly from a barometer located on the bridge deck of the
+ships.
+
+                       3. CRUISE DESCRIPTIONS AND DATA RESULTS.
+
+     All dates and times given in the text and the data files are Greenwich Mean Time (GMT).
+North latitudes and east longitudes are listed as positive values. South latitudes and west
+longitudes are given as negative values. The data flags used in the tables follow the WOCE water
+sample quality flag definitions. The value 2 in the flag column indicates acceptable X(CO2) sw
+data; the value 3 indicates questionable X(CO2)sw data; the value 5 indicates not reported data;
+and letter P in the flag column indicates questionable latitude and/or longitude.
+     Positional data were checked against the available ship log records using two methods.
+First, plots of time vs. latitude and of time vs. longitude were made for each cruise. A given
+point was checked against the marine operations abstracts (moas) if it was judged to be
+sufficiently far from the trend. A second check was made by plotting time vs. the distance
+travelled in an hour. Most of the data show the ship speeds between 0 and 20 knots, but a few
+points suggested much higher speeds. The positions were checked against the moas if the speeds
+exceeded 25 knots. Since the original ship log records for the 1987 SAGA II expedition were not
+available for this comparison, the data were compared against the 3-hour positional data provided.
+No obvious problems were found with this record, and so the hourly positions, interpolated from
+the 3-hour record were used without corrections. These errors could decrease the cumulative
+distance totals for the SAGA II expeditions by several hundred kilometers.
+
+                                   3.1 EPOCS 1986
+
+     The EPOCS cruise designated EP2-86-OC began on 21 May (Day 141) 1986 aboard the
+NOAA Research Vessel (R/V) Oceanographer. The ship departed from Balboa, Panama and
+headed southwest to the equator at 97W. The cruise track continued west along the equator,
+diverting for mooring work along 110W and 140W. The cruise continued northwest from the
+equator at 143W, ending in Honolulu, Hawaii on 20 June (Day 171). CTD and oxygen
+measurements for this track are reported in Lynch et al. (1988). Chlorofluorocarbon (CFC)
+measurements are reported by Wisegarver et al. (1993).
+     The mean atmospheric Fugacity, f(CO2)air, for this equatorial track was 334.7 +/- 1.1
+uatm. Surface seawater values, f(CO2)sw, ranged between ~410 uatm and 430 uatm along the
+equator from 90W to 112W. Concentration dropped sharply (to ~370 uatm) when the ship
+diverted north into fresher, warmer waters to the north of 3N. f(CO2)sw rose to ~420 uatm as
+the cruise track returned to the equator, but dropped to ~360 uatm as the ship moved away from
+the equator near 143W, 6N. Concentrations continued low (~350 uatm) into Hawaii. The mean
+percent standard deviation of the standard gases on this leg was <1%.
+     Seven points were anomalously low on this track. They are flagged in the data files.
+
+                                    3.2 RITS/CO2 1986
+
+     The RITS/CO2 cruise was continuation of the EPOCS 1986 cruise. The NOAA R/V
+Oceanographer sailed from Hawaii on 1 July (Day 182) and headed northeast, southeast,
+northeast, north along 135/145W, and into Kodiak, Alaska on 23 July (Day 204).  
+     Mean atmospheric f(CO2) along this section was 342.41 uatm with values ranging from
+337 near 20N to 350 uatm near 52N. Surface seawater concentrations were near equilibrium or
+slightly undersaturated north of Hawaii to 30N. Supersaturations of ~15 uatm persisted from 30N
+but the waters became undersaturated by ~34uatm near 45N. f(CO2)sw remained slightly
+undersaturated along 50N, but dropped to ~290 uatm as the ship continued north and into the
+Gulf of Alaska.
+     The mean percent standard  deviation of the standard gases on this leg was <0.7%.
+
+                            3.3 SAGA II 1987, Kamchatka Transit
+
+     The expedition aboard the Russian vessel Akademik Korolev began in Hilo, Hawaii. The
+portion from Hilo to the Kuril Trench off Kamchatka, began 1 May (Day 121) 1987, and is
+termed the Kamchatka Transit.  Data were collected sporadically along this transit, so the record
+is not continuous. The available surface seawater concentrations indicate general undersaturation
+by up to 50 uatm relative to atmospheric values. Surface water values were high approaching the
+Kuril Trench, but dropped sharply (from 412 to 256 uatm) over an hour near 48N. This steep
+gradient was also found by Butler et al. (1988) and attributed to high primary productivity. The
+mean percent standard deviation of the standard gases on this leg was 0.24%.
+
+                                 3.4 SAGA II 1987, Leg 1
+
+     Leg 1 began on 8 May (Day 128) from the Kuril Trench region and followed the 160E
+meridian south to 5S. After a jog to the east, the track continued south along the 170E meridian
+into Wellington, New Zealand on 9 June (Day 160). 
+     Atmospheric values were near 350 uatm in the north, dropping to 330 uatm just south of
+the equator and increasing to 345 uatm near 45S. Surface seawater values were high leaving the
+Kuril Trench area, but dropped to ~260 uatm near 40N. To the south f(CO2)sw increased to near
+saturation but dropped to ~300 uatm near 10S. Surface water values remained near 300 uatm as
+the ship continued south, but increased sharply as the ship approached New Zealand. The mean
+percent standard deviation of the standard gases on this leg was 0.24%.
+
+                                   3.5 SAGA II 1987, Leg 2
+
+     Leg 2 began out of Wellington on 12 June (Day 163) heading west into the Indian Ocean
+and concluding in Singapore on 6 July (Day 187).
+     Atmospheric f(CO2) ranged from a low of 332 uatm near the end of the track to 349 uatm
+off the west coast of New Zealand. Surface seawater values were highly variable along this track,
+ranging from 290 to 410 uatm. The mean percent standard deviation of the standard gases on this
+leg was 0.24%.
+
+                                       3.6 TEW-3 1987
+
+     The NOAA Ship Oceanographer departed Townsville, Australia on 13 July (Day 194) for
+the TW3- 87-OC cruise and steamed northeast to 5S, 165E for station work in the Samoan
+Passage. The ship then continued north along 165E and into Kwajalein, Micronesia on 27 July
+(Day 208). Details of the CTD temperature, salinity, and oxygen data are given by Mangum et
+al. (1991).
+     The mean atmospheric value for this section was 334.01 +/- 1.11 uatm. Surface seawater
+CO2 was largely undersaturated through the Coral Sea but increased rapidly to 353 uatm near
+5S. Water values remained near saturation or supersaturated north to 1S. Across the equator
+surface seawater was undersaturated as far north as 2N, but dropped again quickly to
+undersaturation from 2N and north into Kwajalein. The mean percent standard deviation of the
+standard gases on this leg was 0.32%.
+
+                                      3.7 RITS/CO2 1987
+
+     The RITS/CO2 cruise was an continuation of the TEW-3 cruise, beginning on 29 July
+(Day 210) from Kwajalein. The cruise track continued north along 165E to 50N and then east
+into Dutch Harbor, Alaska. After a brief stop in Dutch Harbor on Days 233/234, the ship
+continued east along 50N and then into Seattle, Washington on 28 August (Day 240).
+     Atmospheric f(CO2) values were steady at 334 uatm out of Kwajalein, but ranged from
+330 to 343 uatm along the cruise track. Surface seawater CO2 was supersaturated from Kwajalein
+north to 36N. f(CO2)sw dropped sharply to 264 uatm near 40N and remained undersaturated until
+the ship diverted from its eastward track north into Dutch Harbor. After the ship returned to 50N
+f(CO2)sw returned to undersaturation. Values climbed to 375 uatm near 50N, 152W and then
+decreased to near- or undersaturation as the ship moved east and into Seattle. The mean percent
+standard deviation of the standard gases on this leg was 0.32%.
+
+                                      3.8 RITS/CO2 1988
+
+     The RITS/CO2 1988 cruise began on 6 April (Day 97) aboard the NOAA ship
+Oceanographer. They sailed from Dutch Harbor to the south along 170W to American Samoa,
+arriving on 5 May (Day 126).
+     Atmospheric f(CO2) was highest near to the north (357 uatm) and generally decreased
+to ~ 335 uatm to the south along this track. Seawater f(CO2) values were low out of Dutch
+Harbor, but rose to 384 uatm near 48N and then dropped gradually to <300 uatm near 34N. This
+undersaturation persisted as far south as 10N. The surface waters across the equator from 10N
+to 6S were supersaturated by as much as 96 uatm relative to the atmosphere. Near 6N the f(CO2)
+values dropped sharply to undersaturation which persisted into Samoa. The mean percent standard
+deviation of the standard gases in this leg was 0.60%.
+
+                                        3.9 EPOCS 1988
+
+     The EPOCS 1988 cruise was a continuation of RITS/CO2. R/V Oceanographer sailed out
+of  Samoa on 9 May (Day 130) north to the equator. They then continued east along the equator
+to 140W and then north to Honolulu, Hawaii on 4 June (Day 156). The temperature, salinity, and
+oxygen data from CTD measurements made on this cruise are given in Mangum et al. (1993).
+     Atmospheric f(CO2) was lowest near Samoa (333 uatm) and increased to the north,
+reaching 345 uatm near 15N. Surface seawater values were also lowest near Samoa, but increased
+toward the equator. Supersaturation persisted along equator (~430 uatm), but CO2 concentrations
+dropped to near-saturation north of 5N and into Hawaii. The mean percent standard deviation of
+the standard gases on this leg was 0.21%. Two values were anomalously high on this track. They
+are flagged in the data set.
+
+                                    3.10 RITS/CO2 1989, Leg 1
+ 
+     The NOAA R/V Discoverer left Seattle on 5 February (Day 37) 1989. After two brief
+stops in San Diego and then Manzanillo, Mexico, the ship continued southward along
+105W/110W and into Easter Island on 1 March.
+     Atmospheric values were high off Baja, California, but dropped to a relatively stable value
+of ~339 uatm between 10N and Easter Island. Surface seawater values were supersaturated off
+Baja, but dropped to neat-saturation to the south. The pattern of f(CO2) across the equator is
+complex, rising to 423 uatm  near 2S, dropping to saturation and then increasing to a maximum
+of 481 uatm at 4S. From there the values dropped slowly reaching 354 uatm near 16S. From 16S
+to Easter Island, surface seawater was supersaturated by up to 60 uatm. The mean percent
+standard deviation of the standard gases on this leg was 0.37%.
+
+                                   3.11 RITS/CO2 1989, Leg 2
+
+     Leg 2 began on 4 March (Day 63), with R/V Discoverer continuing south along 105W
+to 60S. The cruise track then turned northwest and the ship arrived in Tahiti on 2 April (Day 92). 
+     Atmospheric values were quite variable along this section, ranging from 328 uatm near
+60S to 353 uatm near 45S. Surface seawater values were ~380 uatm south from Easter Island to
+40S where they dropped to near-saturation. Surface seawater f(CO2) dropped suddenly near 61S
+from 332 to 266 uatm within 1 hour and stayed low for several  hours. The system was  shut
+down to remove krill from the equilibrator and to check instrument performance. When the
+system was started again near 58S, seawater f(CO2) had returned to equilibrium values. Seawater
+values close to saturation persisted into Tahiti. One anomalously high value (near 58S) is flagged
+in data file. The mean percent standard deviation of the standard gases on this leg was 0.37%.
+
+                                   3.12 RITS/CO2 1989, Leg 3
+
+     The final leg of the 1989 cruise began 7 April (Day 97) from Tahiti and ended 20 April
+(Day 110) in Seattle. 
+     Atmospheric f(CO2) values were 334 uatm in the southern hemisphere and rose to a high
+of 350 uatm approaching Seattle. Surface seawater values were oversaturated from Tahiti, and
+peaked at 440 uatm just south of the equator (2S), dropping to saturation near 14N. Seawater
+remained near- or under-saturated from 14N and dropped sharply on the approach to coastal
+waters. The mean percent standard deviation of the standard gases on this leg was 0.37%.
+
+
+                              4. DATA CHECKS PERFORMED BY CDIAC
+
+     An important part of the numeric data package (NDP) preparation process at the Carbon Dioxide
+Information Analysis Center (CDIAC) involves the quality assurance (QA) of data before
+distribution.  Data received at CDIAC are rarely in a condition that would permit immediate
+distribution, regardless of the source.  To guarantee data of the highest possible quality, CDIAC
+conducts extensive QA reviews.  Reviews involve examining the data for completeness,
+reasonableness, and accuracy.  Although they have common objectives, these reviews are tailored
+to each data set, often requiring extensive programming efforts.  In short, the QA process is a
+critical component in the value-added concept of supplying accurate, usable data for researchers.
+     The following summarizes the QA checks performed by CDIAC on the data obtained during the
+1986-1989 PMEL cruises in Pacific and Indian Oceans.
+
+1. These data were provided to CDIAC as twelve ASCII-formatted files with accompanying printed 
+   documentation (NOAA Technical Memorandum ERL PMEL-101). A FORTRAN 77 retrieval program was
+   written and used to reformat the original twelwe files into twelwefiles with identical formats
+   and to merge all data into a single file that was sorted and arranged chronologically.
+
+2. All data were plotted to check for obvious outliers.
+
+3. Dates, times, and coordinates were checked for bogus values (e.g., values of DAY <1 or >31;
+   YEAR <1986 or >1989; DAYGMT <1.000 or >365.999; LAT <-90.000 or >90.000; LONG <-180.000 or >180.000).
+
+4. All cruise tracks were plotted and compered with the maps and cruise information supplied by
+   Murphy et al. (1994).
+
+5. The data quality flags for missing values, given as "-99" in the original data files, were changed
+   to "5". The data accuracy quality flags, also given as "-99" in the original data files, were changed 
+   to "2". These changes reflect the quality flag definitions specified by the WOCE Hydrographic Program 
+   (WHP) Data Reporting Requirements (1991).  Under these guidelines, "5" and "2" denote "data not reported"
+   and "acceptable measurements", respectively.
+
+6. The designation for missing values, given as "-99.00" in the original files, was changed to "-999.9".
+
+
+
+                            5. HOW TO OBTAIN THE DATA FILES
+
+     This data base is available upon request in machine-readable form, free-of-charge from CDIAC.
+CDIAC will also distribute subsets of the data base as needed.  It can be acquired on
+9-track magnetic tape; 8-mm tape; 150 mB, quarter inch tape cartridge; IBM-formatted floppy
+diskettes; or from CDIAC's anonymous File Transfer Protocol (FTP) area via Internet (see FTP
+address below).  Requests should include any specific media instructions (i.e., 1600 or 6250 BPI,
+labeled or nonlabeled, ASCII or EBCDIC characters, and variable- or fixed-length records; 3.5-
+or 5.25- inch floppy diskettes, high or low density; and 8200 or 8500 format 8-mm tape) required
+by the user to access the data.  Magnetic tape requests not accompanied by specific instructions
+will be filled on 9-track, 6250 BPI, standard-labeled tapes with EBCDIC characters.  Requests
+should be addressed to:
+
+                      Carbon Dioxide Information Analysis Center
+                      Oak Ridge National Laboratory
+                      Post Office Box 2008
+                      Oak Ridge, Tennessee 37831-6335
+                      U.S.A.
+
+ Telephone:           (615) 574-0390 or (615) 574-3645
+ Fax:                 (615) 574-2232
+
+ Electronic Mail:     INTERNET: CDP@ORNL.GOV
+                      OMNET:    CDIAC
+
+
+The data files can be also acquired from CDIAC's anonymous FTP account via Internet:
+
+                      FTP to cdiac.esd.ornl.gov (128.219.24.36)
+                      Enter "ftp" or "anonymous" as the userid
+                      Enter your electronic mail address as the password (e.g.,"alex@alex.esd.ornl.gov")
+                      Change to the directory "pub/ndp047"
+                      Acquire the files using the FTP "get" or "mget" command
+
+
+                                  6. REFERENCES
+
+Bates, T. S., K. C. Kelly, and J. E. Johnson. 1993.  Concentrations and fluxes of dissolved   
+     biogenic gases (DMS, CH4, CO, CO2) in the equatorial Pacific during the SAGA-3              
+     experiment. J. Geophysical Research, 98: 16969 16977.
+
+Butler, J. H., J. W. Elkins, C. M. Brunson, K. B. Egan, T. M. Thompson, T. J. Conway, and B.
+     D. Hall. 1988.  Trace gases in and over the West Pacific and East Indian Oceans during the El
+     Nino-Southern oscillation event of 1987. NOAA Data Report ERL ARL-16, 104 pp.
+
+Broecker, W. S., and T.-H. Peng. 1982.  Tracers in the Sea. Eldigio Press, Lamont-Doherty 
+     Geological Observatory of Columbia University, Palisades, New York.
+
+Goff, J., and S. Gratch. 1946.  Low-pressure properties of water from -160 to 212F. Transactions
+     American Society of Heating and Ventilating Engineers, 52, 95-122.
+
+Guggenheim, E. A. 1967.  Thermodynamics. North-Holland, Amsterdam, 5th ed., 390 pp.
+
+IPCC. 1990.  Climate Change: The Intergovernmental Panel on Climate Change Assessment.
+     Published for the IPCC, Cambridge University Press, Cambridge, 365 pp.
+
+Keeling, C. D., S. C. Piper, and M. Heimann. 1989.  A tree-dimensional model of atmospheric
+     CO2 transport based on observed winds, 4. Mean annual gradients and interannual variations, in
+     Aspects of Climate Variability in the Pacific and the Western Americas, Geophys. Monogr. Ser.,
+     vol. 55 edited by D. H. Peterson, AGU, Washington, D.C, 305-363.
+
+Lynch, J. M., L. J. Mangum, and S. P. Hayes. 1988.  CTD/O2 measurements during 1986 as part
+     of the equatorial Pacific Ocean Climate Studies (EPOCS).  NOAA Data Report ERL PMEL-24,
+     261 pp.
+
+Mangum L. J., J. M. Lynch, K. McTaggart, L. Stratton, and S. Hayes. 1991.  CTD/O2 data
+     measurements collected on TEW (Transport of equatorial waters) June-August 1987. NOAA Data
+     Report ERL PMEL-33, 375  pp.
+
+Mangum L., J. Lynch, L. Stratton, and K. McTaggart. 1993.  CTD/O2 measurements during 1987
+     and 1988 as part of the Equatorial Pacific Ocean Climate Studies (EPOCS). NOAA Data Report
+     ERL PMEL- 46, 620 pp.
+
+Marland, G. and R. M. Rotty. 1984.  Carbon dioxide emissions from fossil fuels: a procedure for
+     estimation and results for 1950-1982. Tellus, 36B, 232-261.
+
+Murphy, P. P., R. A. Feely, R. H. Gammon, D. E. Harrison, K. C. Kelly, and L. S. Waterman. 1991.
+     Assessment of the air-sea axchange of CO2 in the South Pacific during austral autumn.
+     J. Geophys. Res., 96, 20455-20465.
+
+Murphy, P. P., C. Cosca, D. C. Lee, and R. A. Felly. 1993.  Temperature calibration and
+     correction report for PMEL trace gas cruises 1986-1989. NOAA Tech. Memo. ERL PMEL-97,
+     192 pp.
+
+Weiss, R. F. 1970.  The solubility of nitrogen, oxygen and argon on water and seawater.
+     Deep-Sea Res., 17, 721-735.
+
+Weiss, R. F. 1974.  Carbon dioxide in water and seawater: The solubility of a non-ideal gas.   
+     Marine Chemistry 2:203-215.
+
+Weiss, R. F. 1981.  Determinations of carbon dioxide and methane by dual catalyst flame
+     ionization chromatography and nitrous oxide by electron capture chromatography. J. Chromatogr.
+     Sci., 19, 611-616.
+
+Weiss, R. F., R. A. Jahnke, and C. D. Keeling. 1982.  Seasonal effects of temperature and
+     salinity on the partial pressure of CO2 in seawater. Nature, 300, 511-513.
+
+Weiss, R. F., and B. A. Price. 1980.  Nitrous oxide solubility in water and seawater. Marine
+     Chemistry, 8, 347-359.
+
+Wisegarver, D. P., J. L. Bullister, R. H. Gammon, F. A. Menzia, and K. C. Kelly. 1993.  NOAA
+     chlorofluorocarbon tracer program air and seawater measurements: 1986-1989. NOAA Data
+     Report ERL PMEL-43, 417 pp.
+
+WOCE Operations Manual, Rev. 1. 1991. WHP Office Report WHPO 90-1. WOCE Report No. 
+     67/91. Vol. 3, Sec. 3.1, Part 3.2.1.
+
+
+
+6. FILE DESCRIPTIONS
+
+     This section describes the content and format of each of the 15 files that comprise this NDP (see
+Table 1).  Because CDIAC distributes the data set in a variety of media (e.g., via anonymous FTP and
+9-track magnetic tape), each of the 15 files is referenced by both an ASCII filename, which is given in
+lower-case, bold-faced type (e.g., ndp047.txt), and a file number.  The remainder of this section describes
+(or lists, where appropriate) the contents of each of the 15 files.  The files are discussed in the order in
+which they appear on the magnetic tapes.
+
+
+             Table 3.  Content, size, and format of data files
+
+                                     
+----------------------------------------------------------------------------------------
+      File number, name,                Logical    FTP file         Block       Record
+      and description                   records  size in bytes      size        length
+----------------------------------------------------------------------------------------                                     
+
+1.    ndp047.txt:                         890       54,347          8,000         80
+      a detailed description
+      of the cruise network
+      and data files
+
+2.    pmeldat.for:                         48        1,894          8,000         80
+      a FORTRAN 77 data retrieval
+      routine that may be used to read 
+      and print all data files 
+      (Files 3 15)
+
+3.    pmel8689.dat:                     6,013      829,797          6,850        137
+      data file containing CO2
+      measurements, hydrographic 
+      measurements, and the calculations 
+      of in situ fugacities of CO2 for
+      all PMEL cruises during 1986-89
+
+4.    ep86.dat:                           637       87,906          6,850        137
+      data file containing CO2
+      measurements, hydrographic 
+      measurements, and the calculations 
+      of in situ fugacities of CO2 for
+      the EPOCS 1986 cruise
+
+5.    rt86.dat:                           461       63,618          6,850        137
+      data file containing CO2
+      measurements, hydrographic 
+      measurements, and the calculations 
+      of in situ fugacities of CO2 for
+      the RITS/CO2 1986 cruise 
+
+6.    sa0_87.dat:                         218       30,084          6,850        137
+      data file containing CO2
+      measurements, hydrographic 
+      measurements, and the calculations 
+      of in situ fugacities of CO2 for
+      the SAGA II 1987 cruise, Transit
+
+7.    sa1_87.dat:                         633       87,354          6,850        137
+      data file containing CO2
+      measurements, hydrographic 
+      measurements, and the calculations 
+      of in situ fugacities of CO2 for
+      the SAGA II 1987 cruise, Leg 1
+
+8.    sa2_87.dat:                         501       69,138          6,850        137
+      data file containing CO2
+      measurements, hydrographic 
+      measurements, and the calculations 
+      of in situ fugacities of CO2 for
+      the SAGA II 1987 cruise, Leg 2
+
+9.    tw87.dat:                           297       40,986          6,850        137
+      data file containing CO2
+      measurements, hydrographic 
+      measurements, and the calculations 
+      of in situ fugacities of CO2 for
+      the TEW-3 1987 cruise
+
+10.   rt87.dat:                           669       92,322          6,850        137
+      data file containing CO2
+      measurements, hydrographic 
+      measurements, and the calculations 
+      of in situ fugacities of CO2 for
+      the RITS/CO2 1987 cruise 
+
+11.   rt88.dat:                           668       92,184          6,850        137
+      data file containing CO2
+      measurements, hydrographic 
+      measurements, and the calculations 
+      of in situ fugacities of CO2 for
+      the RITS/CO2 1988 cruise 
+
+12.   ep88.dat:                           547       75,486          6,850        137
+      data file containing CO2
+      measurements, hydrographic 
+      measurements, and the calculations 
+      of in situ fugacities of CO2 for
+      the EPOCS 1988 cruise 
+
+      13.rt1_89.dat:                      398       54,924          6,850        137
+      data file containing CO2
+      measurements, hydrographic 
+      measurements, and the calculations 
+      of in situ fugacities of CO2 for
+      the RITS/CO2 1989 cruise, Leg 1
+
+14.   rt2_89.dat:                         686       94,668          6,850        137
+      data file containing CO2
+      measurements, hydrographic 
+      measurements, and the calculations 
+      of in situ fugacities of CO2 for
+
+15.   rt3_89.dat:                         298       41,124          6,850        137
+      data file containing CO2
+      measurements, hydrographic 
+      measurements, and the calculations 
+      of in situ fugacities of CO2 for
+      the RITS/CO2 1989 cruise, Leg 3
+
+      -----                             ------    ---------                                                    
+      Total                             12,964    1,715,832
+---------------------------------------------------------------------------------------     
+                                     
+
+
+
+ndp047.txt (File 1)
+
+    This file provides an overview of the dataset and a detailed description of the thirteen oceanographic
+data files.  It exists primarily for the benefit of individuals who do not have copies of this documentation
+or acquire the data files from CDIAC's anonymous FTP area.
+
+
+pmeldat.for (File 2)
+
+    This file contains a FORTRAN 77 data retrieval routine that may be used to read and print any of the
+13 data files (Files 3 15). The following is a listing of this program. For additional information regarding
+variable definitions and format statements, please see the description for pmel8689.dat-rt3_89.dat files
+on pages 16-18.
+
+c***************************************************************
+c* This is a FORTRAN 77 retrieval code to read and print the   *
+c* Carbon Dioxide concentrations data in surface water and     * 
+c* atmosphere: PMEL cruises 1986-1989                          *
+c***************************************************************
+c*Defines variables*
+
+       INTEGER DAY, YEAR 
+       CHARACTER CRUISE*19, MONTH*3, FLAG*1
+       REAL DAYGMT, LAT, LONG, DIST, TEMP, WARM, SAL, APRE
+       REAL XCO2A, XCO2SW, FCO2A, FCO2SW
+       OPEN (unit=1, file='file.in')
+       OPEN (unit=2, file='file.out')
+       WRITE (2, 5)
+
+
+c*Writes out column labels*
+
+ 5     FORMAT (8x,'CRUISE NAME',2X,'CRUISE DATE',2X,'DAY GMT',3X,
+     1 'LATIT',5X,'LONGIT',2X,'DISTAN',4X,'TEMP',1X,'WARMING',2X,
+     2 'SALINITY',1X,'ATM.PRE',1X,'X(CO2)a',1X,'X(CO2)w',1X,
+     3 'f(CO2)a',1x,'f(CO2)w',1X,'QF',/,20X,'day mon year',10X,
+     4 'dec.deg',4X,'dec.deg',6X,'km',3X,'deg.C',3X,'deg.C',7X,
+     5 'ppt',4X,'mbar',5X,'ppm',5X,'ppm',4X,'uatm',4X,'uatm',//)
+
+c*Sets up a loop to read and format all the data in the file*
+
+ 7     CONTINUE    
+       READ (1, 10, end=999) CRUISE, DAY, MONTH, YEAR, DAYGMT, LAT, 
+     1 LONG, DIST, TEMP, WARM, SAL, APRE, XCO2A, XCO2SW, FCO2A, 
+     2 FCO2SW, FLAG
+ 10    FORMAT (A19, 2X, I2, 1X, A3, 1X, I4, 2X, F7.3, 1X, F7.3, 3X,
+     1 F8.3, 1X, F7.1, 1X, F7.2, 1X, F7.2, 2X, F8.3, 2X, F6.1, 1X,
+     2 F7.2, 1X, F7.2, 1X, F7.2, 1X, F7.2, 2X, A1)
+  
+       WRITE (2, 20) CRUISE, DAY, MONTH, YEAR, DAYGMT, LAT, 
+     1 LONG, DIST, TEMP, WARM, SAL, APRE, XCO2A, XCO2SW, FCO2A, 
+     2 FCO2SW, FLAG
+ 20    FORMAT (A19, 2X, I2, 1X, A3, 1X, I4, 2X, F7.3, 1X, F7.3, 3X,
+     1 F8.3, 1X, F7.1, 1X, F7.2, 1X, F7.2, 2X, F8.3, 2X, F6.1, 1X,
+     2 F7.2, 1X, F7.2, 1X, F7.2, 1X, F7.2, 2X, A1)
+
+       GOTO 7
+ 999   CLOSE(unit=1)    
+       CLOSE(unit=2)
+       STOP
+       END
+
+
+
+pmel8689.dat-rt3_89.dat (Files 3 15) 
+
+       These 13 data files containing CO2 measurements, hydrographic measurements, and the calculations
+of in situ fugacities of CO2 for PMEL cruises conducted from 1986-1989.  All 13 data files have the same
+format and can be read by using the following FORTRAN 77 code [contained in pmeldat.for (File 2)]:
+  
+      
+       INTEGER DAY, YEAR 
+       CHARACTER CRUISE*19, MONTH*3, FLAG*1
+       REAL DAYGMT, LAT, LONG, DIST, TEMP, WARM, SAL, APRE
+       REAL XCO2A, XCO2SW, FCO2A, FCO2SW
+
+ 7     READ (1, 10, end=999) CRUISE, DAY, MONTH, YEAR, DAYGMT, LAT, 
+     1 LONG, DIST, TEMP, WARM, SAL, APRE, XCO2A, XCO2SW, FCO2A, 
+     2 FCO2SW, FLAG
+ 10    FORMAT (A19, 2X, I2, 1X, A3, 1X, I4, 2X, F7.3, 1X, F7.3, 3X,
+     1 F8.3, 1X, F7.1, 1X, F7.2, 1X, F7.2, 2X, F8.3, 2X, F6.1, 1X,
+     2 F7.2, 1X, F7.2, 1X, F7.2, 1X, F7.2, 2X, A1)
+
+       GOTO 7
+ 999   CLOSE 1
+       STOP
+
+The contents of these data files are listed in Table 4.
+
+
+Table 4.  Description of contents of pmel8689.dat rt3_89.dat (Files 3 15)
+                                     
+------------------------------------------------------------------------------
+Variable                Variable        Variable         Starting       Ending
+name                      type            width           column        column
+------------------------------------------------------------------------------                                     
+
+CRUISE                  Character          19                1            19
+DAY                      Numeric            2               22            23
+MONTH                   Character           3               25            27
+YEAR                     Numeric            4               29            32
+DAYGMT                   Numeric            7               35            41
+LAT                      Numeric            7               43            49
+LONG                     Numeric            8               53            60
+DIST                     Numeric            7               62            68
+TEMP                     Numeric            7               70            76
+WARM                     Numeric            7               78            84
+SAL                      Numeric            8               87            94
+APRE                     Numeric            6               97           102
+XCO2A                    Numeric            7              104           110
+XCO2SW                   Numeric            7              112           118
+FCO2A                    Numeric            7              120           126
+FCO2SW                   Numeric            7              128           134
+FLAG                    Character           1              137           137
+------------------------------------------------------------------------------                                     
+
+Where:
+
+CRUISE is the cruise name;
+
+DAY    is the day of sampling (GMT);
+
+MONTH  is the month of sampling;
+
+YEAR   is the year of sampling;
+
+DAYGMT is the day of the year [expressed in decimal time (GMT)];
+
+LAT    is the latitude of the sampling location (decimal degrees; negative values indicate the Southern
+       Hemisphere);
+
+LONG   is the longitude of the sampling location (decimal degrees; negative values indicate the Western
+       Hemisphere);
+
+DIST   is the cumulative distance since the first sampling location on the leg (km);
+
+TEMP   is the sea-surface temperature ( deg C);
+
+WARM   is the warming temperature [indicates the degrees of warming (deg C) for seawater
+       as it transited from the intake line to analysis site];
+
+SAL    is the sea-surface salinity [Practical Salinity Scale (PSS)];
+
+APRE   is the atmospheric pressure (mbar);
+
+XCO2A  is the observed mole fraction of CO2 in air [ppm (dry air)];
+
+XCO2SW is the observed mole fraction of CO2 in surface water [corrected for warming, 
+       ppm (dry air)];
+
+FCO2A  is the calculated in situ fugacity of CO2 in air [ uatm (moist air)];
+
+FCO2SW is the calculated in situ fugacity of CO2 in surface water (corrected for warming,
+        uatm (moist air)];
+
+FLAG   is the data quality flag:
+
+       2   =  Acceptable measurements of X(CO2)sw;
+       3   =  Questionable measurements of X(CO2)sw;
+       5   =  Data were not reported;
+       P   =  Questionable latitude and/or longitude;
+       
+Missing values for variables are represented by -999.9.

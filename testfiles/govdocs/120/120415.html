@@ -1,0 +1,588 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<style type="text/css" media="screen">@import "/css/fixed.css";</style>
+<style type="text/css" media="screen">@import "/css/sis.css";</style>
+<link rel="stylesheet" type="text/css" media="print" href="/css/print.css" />
+<link type="text/css" rel="stylesheet" href="/css/toxnetstyles.css">
+<head>
+<SCRIPT type="text/javascript" src="/fsrscripts/search/oeTriggerParams.js"></SCRIPT>
+<SCRIPT type="text/javascript" src="/fsrscripts/oeLauncher.js"></SCRIPT>
+<SCRIPT type="text/javascript">openFSRTracker(1);</SCRIPT>
+
+
+<title>TOXLINE Search</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<!--<LINK type="text/css" rel="stylesheet" href="/styles.css">-->
+<META NAME="KEYWORDS" Content="Environmental health, environmental health information, toxicology, toxicology information, toxicology databases, chemical information, environmental health databases, chemical databases, tehip, environmental information, environmental databases">
+<META NAME="DESCRIPTION" Content="Toxicology, environmental health, and chemical databases and other information resources from the Toxicology and Environmental Health Information Program, National Library of Medicine, National Institutes of Health">
+
+<script language="JavaScript">
+<!--
+var spellword="";
+var wordid=0;
+function check()
+{
+   if (document.mainform.queryxxx.value == "")
+   {
+      alert("Type search terms in the search box.");
+      return false;
+   }
+   else
+   {
+/*
+      if (document.mainform.subset[1].checked==true) {
+         queryPubMed();
+         return false;
+      }
+      else if (document.mainform.subset[2].checked==true) {
+         queryPubMed();
+         return true;
+      }
+      else
+*/
+         return true;
+   }
+}
+function queryPubMed()
+{
+
+   var where="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Search&db=PubMed&term=";
+   var querystr=document.mainform.queryxxx.value ;
+   reg=/ and | or | not /i;
+   re=/\(|\)/g;
+
+      if (querystr.indexOf("(")!=-1 && querystr.search(reg)==-1)       
+      {         
+         where=where + '"' + escape(querystr.replace(re, " ")) + '"';
+      }
+      else
+         where = where + escape(querystr);
+ 
+   where = where + escape(" AND Tox[sb]");
+
+   searchWin = window.open(where, "pmsearch", "toolbar=yes,scrollbars=yes,location=yes,resizable=yes,menubar=yes,status=yes,directories=yes,width=800,height=600,screenX=105,screen=95");
+}
+function subst(str1, str2, id)
+{
+  if(wordid==id) {
+   str=document.mainform.queryxxx.value;
+   if (spellword=="") {
+      newstr = str.replace(str2, str1);
+      spellword = str1;
+   }
+   else {
+      newstr = str.replace(spellword, str1);
+      spellword=str1;
+   }
+   document.mainform.queryxxx.value=newstr;
+  }
+  else {
+    str=document.mainform.queryxxx.value;
+    newstr = str.replace(str2, str1);
+    spellword=str1;
+    document.mainform.queryxxx.value=newstr;
+  }
+  wordid=id;
+}
+function MM_findObj(n, d) { //v4.0
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && document.getElementById) x=document.getElementById(n); return x;
+}
+
+function MM_changeProp(objName,x,theProp,theValue) { //v3.0
+  var obj = MM_findObj(objName);
+  if (obj && (theProp.indexOf("style.")==-1 || obj.style)) eval("obj."+theProp+"='"+theValue+"'");
+}
+
+function MM_setTextOfTextfield(objName,x,newText) { //v3.0
+  var obj = MM_findObj(objName); if (obj) obj.value = newText;
+}
+function MM_swapImage() { //v3.0
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+function MM_swapImgRestore() { //v3.0
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+
+function MM_preloadImages() { //v3.0
+ var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+   var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+   if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+function openWindow(url) {
+   popupWin = window.open(url, 'remote', 'width=480,height=200,toolbar=yes,resizable=yes,scrollbars=yes,status=yes,location=yes,screenX=10,screenY=10,top=10,left=10,alwaysRaised=yes,z-lock=yes')
+   popupWin.focus();
+   }
+   function changeWindow(url) {
+   if (window.remote) 
+                   remote.location.href = "[url]";
+                else openWindow(url);
+   }
+        function goTW(){
+                if (document.stats.site.selectedIndex!=0) {
+                    var URL = document.stats.site.options[document.stats.site.selectedIndex].value;
+                    window.location.href = URL;
+                }
+        }
+
+function setCookie(name, value, expires, path, domain, secure) {
+  var subsetVal="";
+  var chemsynVal;
+  var i;
+
+  for (i=0; i<document.mainform.pubmed.length; i++) {
+    if (document.mainform.pubmed[i].checked==true)
+       subsetVal=i;
+  }
+
+  for (i=0; i<document.mainform.chemsyn.length; i++) {
+   if (document.mainform.chemsyn[i].checked==true)
+      chemsynVal=i;
+  }
+  value=value + "|" + subsetVal + "|" + chemsynVal;
+  var curCookie = name + "=" + escape(value) +
+      ((expires) ? "; expires=" + expires.toGMTString() : "") +
+      ((path) ? "; path=" + path : "") +
+      ((domain) ? "; domain=" + domain : "") +
+      ((secure) ? "; secure" : "");
+  document.cookie = curCookie;
+}
+
+function getCookie(name) {
+  var dc = document.cookie;
+  var prefix = name + "=";
+  var begin = dc.indexOf("; " + prefix);
+  if (begin == -1) {
+    begin = dc.indexOf(prefix);
+    if (begin != 0) return null;
+  } else
+    begin += 2;
+  var end = document.cookie.indexOf(";", begin);
+  if (end == -1)
+    end = dc.length;
+  return unescape(dc.substring(begin + prefix.length, end));
+}
+
+function deleteCookie(name, path, domain) {
+  if (getCookie(name)) {
+    document.cookie = name + "=" +
+    ((path) ? "; path=" + path : "") +
+    ((domain) ? "; domain=" + domain : "") +
+    "; expires=Thu, 01-Jan-70 00:00:01 GMT";
+  }
+}
+
+
+function fixDate(date) {
+  var base = new Date(0);
+  var skew = base.getTime();
+  if (skew > 0)
+    date.setTime(date.getTime() - skew);
+}
+
+   window.focus();
+   
+   if (document.images)
+
+     self.name = 'main';
+//-->
+</script>
+</head>
+<body bgcolor="#FFFFFF" onLoad="MM_preloadImages('/img/listOn_01.jpg','/img/listOn_02.jpg','/img/listOn_03.jpg','/img/listOn_04.jpg','/img/listOn_05.jpg','/img/listOn_06.jpg','/img/listOn_07.jpg','/img/listOn_08.jpg','/img/listOn_09.jpg','/img/listOn_10.jpg','/img/listOn_11.jpg','/img/listOn_12.jpg','/img/listOn_14.jpg','/img/toxmapOn.jpg','/img/toxnetOn.jpg')">
+<p style="font-size: 0px;margin:0px 0px;padding: 0px 0px;position: absolute;z-index: -2;"><a href="#skipnav" style="color:white;">Skip Navigation</a></p>
+
+<map name="map1">
+<area shape="rect" coords="1,1,220,25" href="/cgi-bin/sis/htmlgen?CHEM"  alt="ChemIDplus - Dictionary of over 370,000 chemicals (names, synonyms, and structures). Includes links to NLM and other databases and resources."   title="ChemIDplus - Dictionary of over 370,000 chemicals (names, synonyms, and structures). Includes links to NLM and other databases and resources.">
+<area shape="rect" coords="222,1,243,25" href="javascript:openWindow('/cgi-bin/sis/htmlgen?DescChemID.htm')" alt="About ChemIDplus" title="About ChemIDplus">
+</map>
+<map name="map2">
+<area shape="rect" coords="1,1,220,20" href="/cgi-bin/sis/htmlgen?HSDB" alt="Hazardous Substances Data Bank (HSDB) - Comprehensive, peer-reviewed toxicology data for about 5,000 chemicals."  title="Hazardous Substances Data Bank (HSDB) - Comprehensive, peer-reviewed toxicology data for about 5,000 chemicals.">
+<area shape="rect" coords="222,1,243,20" href="javascript:openWindow('/cgi-bin/sis/htmlgen?DescHSDB.htm')" alt="About HSDB" title="About HSDB">
+</map>
+<map name="map3">
+<area shape="rect" coords="1,1,220,20" href="/cgi-bin/sis/htmlgen?TOXLINE" alt="Toxicology Literature Online (TOXLINE) - References from toxicology literature."  title="Toxicology Literature Online (TOXLINE) - References from toxicology literature.">
+<area shape="rect" coords="222,1,243,20" href="javascript:openWindow('/cgi-bin/sis/htmlgen?DescTOXLINE.htm')" alt="About TOXLINE" title="About TOXLINE">
+</map>
+<map name="map4">
+<area shape="rect" coords="1,1,220,20" href="/cgi-bin/sis/htmlgen?CCRIS" alt="Chemical Carcinogenesis Research Information System (CCRIS) - carcinogenicity and mutagenicity test results for over 8,000 chemicals." title="Chemical Carcinogenesis Research Information System (CCRIS) - carcinogenicity and mutagenicity test results for over 8,000 chemicals.">
+<area shape="rect" coords="222,1,243,20" href="javascript:openWindow('/cgi-bin/sis/htmlgen?DescCCRIS.htm')" alt="About CCRIS" title="About CCRIS">
+</map>
+<map name="map5">
+<area shape="rect" coords="1,1,220,20" href="/cgi-bin/sis/htmlgen?DARTETIC" alt="Developmental and Reproductive Toxicology Database (DART) - References to developmental and reproductive toxicology literature."  title="Developmental and Reproductive Toxicology Database (DART) - References to developmental and reproductive toxicology literature.">
+<area shape="rect" coords="222,1,243,20" href="javascript:openWindow('/cgi-bin/sis/htmlgen?DescDART.htm')" alt="About DART" title="About DART">
+</map>
+<map name="map6">
+<area shape="rect" coords="1,1,220,20" href="/cgi-bin/sis/htmlgen?GENETOX" alt="Genetic Toxicology Data Bank (GENE-TOX) - Peer-reviewed genetic toxicology test data for over 3,000 chemicals."  title="Genetic Toxicology Data Bank (GENE-TOX) - Peer-reviewed genetic toxicology test data for over 3,000 chemicals.">
+<area shape="rect" coords="222,1,243,20" href="javascript:openWindow('/cgi-bin/sis/htmlgen?DescGENE.htm')" alt="About GENE-TOX" title="About GENE-TOX">
+</map>
+<map name="map7">
+<area shape="rect" coords="1,1,220,20" href="/cgi-bin/sis/htmlgen?IRIS" alt="Integrated Risk Information System (IRIS) - Hazard identification and dose-response assessments for over 500 chemicals."  title="Integrated Risk Information System (IRIS) - Hazard identification and dose-response assessments for over 500 chemicals.">
+<area shape="rect" coords="222,1,243,20" href="javascript:openWindow('/cgi-bin/sis/htmlgen?DescIRIS.htm')" alt="About IRIS" title="About IRIS">
+</map>
+<map name="map8">
+<area shape="rect" coords="1,1,220,20" href="/cgi-bin/sis/htmlgen?iter" alt="International Toxicity Estimates for Risk (ITER) - Risk information for over 600 chemicals from authoritative groups worldwide."  title="International Toxicity Estimates for Risk (ITER) - Risk information for over 600 chemicals from authoritative groups worldwide.">
+<area shape="rect" coords="222,1,243,20" href="javascript:openWindow('/cgi-bin/sis/htmlgen?DescITER.htm')" alt="About ITER" title="About ITER">
+</map>
+<map name="map9">
+<area shape="rect" coords="1,1,220,20" href="/cgi-bin/sis/htmlgen?Multi" alt="Multi-Database Search - Search all factual chemical databases."  title="Multi-Database Search - Search all factual chemical databases.">
+<area shape="rect" coords="222,1,243,20" href="javascript:openWindow('/cgi-bin/sis/htmlgen?DescMulti.htm')" alt="About Multi-Database Search" title="About Multi-Database Search">
+</map>
+<map name="map10">
+<area shape="rect" coords="1,1,220,20" href="/cgi-bin/sis/htmlgen?TRI" alt="Toxics Release Inventory (TRI) - Annual environmental releases of over 600 toxic chemicals by U.S. facilities."  title="Toxics Release Inventory (TRI) - Annual environmental releases of over 600 toxic chemicals by U.S. facilities.">
+<area shape="rect" coords="222,1,243,20" href="javascript:openWindow('/cgi-bin/sis/htmlgen?DescTRI.htm')" alt="About TRI" title="About TRI">
+</map>
+<map name="map11">
+<area shape="rect" coords="1,1,220,20" href="http://hazmap.nlm.nih.gov" alt="Haz-Map - Links jobs and hazardous tasks with occupational diseases and their symptoms."  title="Haz-Map - Links jobs and hazardous tasks with occupational diseases and their symptoms.">
+<area shape="rect" coords="222,1,243,20" href="javascript:openWindow('/cgi-bin/sis/htmlgen?DescHazMap.htm')" alt="About Haz-Map" title="About Haz-Map">
+</map>
+<map name="map12">
+<area shape="rect" coords="1,1,220,20" href="http://hpd.nlm.nih.gov" alt="Household Products Database - Potential health effects of chemicals in 6,000 common household products."  title="Household Products Database - Potential health effects of chemicals in 6,000 common household products.">
+<area shape="rect" coords="222,1,243,20" href="javascript:openWindow('/cgi-bin/sis/htmlgen?DescHPD.htm')" alt="About Household Products Database" title="About Household Products Database">
+</map>
+<map name="map13">
+<area shape="rect" coords="1,1,220,20" href="http://toxmap.nlm.nih.gov" alt="TOXMAP - Environmental Health e-Maps. Geographic representation of TRI data with links to other TOXNET resources."  title="TOXMAP - Environmental Health e-Maps. Geographic representation of TRI data with links to other TOXNET resources.">
+<area shape="rect" coords="222,1,243,20" href="javascript:openWindow('/cgi-bin/sis/htmlgen?DescToxMap.htm')" alt="About TOXMAP" title="About TOXMAP">
+</map>
+<map name="map14">
+<area shape="rect" coords="1,1,220,20" href="/cgi-bin/sis/htmlgen?index.html" alt="Return to TOXNET Home."  title="Return to TOXNET Home.">
+<area shape="rect" coords="222,1,243,20" href="javascript:openWindow('http://sis.nlm.nih.gov/enviro/databasetable.html')" alt="About TOXNET Databases" title="About TOXNET Databases">
+</map>
+<map name="map15">
+<area shape="rect" coords="1,1,220,20" href="/cgi-bin/sis/htmlgen?LACT" alt="Drugs and Lactation (LactMed) - A peer-reviewed and fully referenced database of drugs to which breastfeeding mothers may be exposed."  title="Drugs and Lactation (LactMed) - A peer-reviewed and fully referenced database of drugs to which breastfeeding mothers may be exposed.">
+<area shape="rect" coords="222,1,243,20" href="javascript:openWindow('/cgi-bin/sis/htmlgen?DescLACT.htm')" alt="About LactMed" title="About LactMed">
+</map>
+<map name="map16">
+<area shape="rect" coords="1,1,220,25" href="/cgi-bin/sis/htmlgen?CPDB.htm" alt="Carcinogenic Potency Database (CPDB) - Standardized analyses of the results of 6540 chronic, long-term animal cancer tests. CPDB is hosted at UC Berkeley."  title="Carcinogenic Potency Database (CPDB) - Standardized analyses of the results of 6540 chronic, long-term animal cancer tests. CPDB is hosted at UC Berkeley.">
+<area shape="rect" coords="222,1,243,25" href="javascript:openWindow('/cgi-bin/sis/htmlgen?DescCPDB.htm')" alt="About CPDB" title="About CPDB">
+</map>
+<div id="wrapper">
+	
+	<div id="header">
+	
+		<div class="headerbar" id="sidebar">
+			<table width="752" border="0" cellpadding="0" cellspacing="0">
+			  <tr> 
+                      <td width="197" valign="top" class="main"><a href="http://www.nlm.nih.gov/"><img src="/img/indhdr_nlmlogo.gif" alt="NLM Home" width="197" height="68" border="0" /></a></td>
+
+                      <td width="555" align="right" valign="top" class="rightCorner"><a href="/index.html"><img src="/img/bannerRounded.jpg" alt="TOXNET" width="555" height="68" border="0" /></a></td>
+
+			  </tr>
+			</table>
+		</div>
+		<!-- Nav -->
+		
+		<div id="nav">
+			<ul>
+                                <li class="left"><a href="/pda/">TOXNET PDA Access</a></li>
+				<li class="first"><a href="http://sis.nlm.nih.gov/">SIS Home</a></li>
+				<li><a href="http://www.nlm.nih.gov/pubs/factsheets/sis.html">About Us</a></li>
+				<li><a href="http://sis.nlm.nih.gov/sitemapsearch.html">Site Map &amp; Search</a></li>
+				<li><a href="http://sis.nlm.nih.gov/siscontact.html">Contact Us</a></li>
+			</ul>
+		</div>
+		
+	</div>
+
+
+<TABLE width=752 border="0" cellspacing="0" cellpadding="0">
+  <TR>
+  <TD colspan="7" class="bodytext">
+  <DIV align="left">
+  <!--<img src="/img/shim.gif" height="20" width="752" ><br>-->
+<div align="right">
+<img src="/img/shim.gif" height="4" width="752" alt="" ><br>
+<img src="/ToxNetImages/arrowYellowffcc66.gif" width="19" height="10" alt="bullet">
+<SPAN class="breadCrumbVisited"><A href="http://sis.nlm.nih.gov/enviro.html" class="nounderline">Env. Health & Toxicology</A></SPAN><IMG src="/ToxNetImages/arrowYellowffcc66.gif" width="19" height="10" alt="bullet">
+<SPAN class="breadCrumbVisited"><A href="/index.html" class="nounderline">TOXNET</A></SPAN>
+<IMG src="/ToxNetImages/arrowYellowffcc66.gif" width="19" height="10" alt="bullet"><SPAN class="breadCrumbCurrent">TOXLINE</SPAN>
+</div>
+<img src="/img/shim.gif" height="10" width="752" alt=""><br>
+<font class="titleSubBlack">Toxicology Literature Online (TOXLINE) - </font>   References from toxicology literature.
+  <br><img src="/img/shim.gif" alt="" height="20" width="752" ><br>
+
+  </DIV>
+  </TD>
+  </TR>
+  <TR> 
+  <TD width="3"><img src="/img/shim.gif" alt=""width="3"></TD>
+    <TD align="left" valign="top" width="243">
+
+<table width="243" border="0" cellpadding="0" cellspacing="0">
+<tr><td bgcolor="#388D38" class="titleSub" align="center">
+    <img src="/img/shim.gif" height="4" width="243" alt=""><br>
+Select Database<br>
+    <img src="/img/shim.gif" height="4" width="243" alt="" ><br>
+
+
+ </td></tr>
+	<tr>
+		
+    <td>
+	<img name="list_01" src="/img/list_01.jpg" onMouseOut="MM_swapImgRestore()"  onMouseOver="MM_swapImage('list_01','','/img/listOn_01.jpg',1);"
+width="243" height="26" alt="ChemIDplus - Dictionary of over 370,000 chemicals (names, synonyms, and structures). Includes links to NLM and other databases and resources." border="0" usemap="#map1"/></td>
+	</tr>
+	<tr>
+		
+    <td>
+	<img name="list_02" src="/img/list_02.jpg" onMouseOut="MM_swapImgRestore()"  onMouseOver="MM_swapImage('list_02','','/img/listOn_02.jpg',1);" width="243" height="21" alt="Hazardous Substances Data Bank (HSDB) - Comprehensive, peer-reviewed toxicology data for about 5,000 chemicals." border="0" usemap="#map2"/></td>
+	</tr>
+	<tr>
+		
+    <td>
+<img name="listOn_03" src="/img/listOn_03.jpg" width="243" height="21" alt="Toxicology Literature Online (TOXLINE) - References from toxicology literature." border="0" usemap="#map3"/></td>
+	</tr>
+	<tr>
+		
+    <td>
+	<img name="list_04" src="/img/list_04.jpg" onMouseOut="MM_swapImgRestore()"  onMouseOver="MM_swapImage('list_04','','/img/listOn_04.jpg',1);" width="243" height="21" alt="Chemical Carcinogenesis Research Information System (CCRIS) - carcinogenicity and mutagenicity test results for over 8,000 chemicals." border="0" usemap="#map4"/></td>
+	</tr>
+	<tr>
+		
+    <td>
+	<img name="list_05" src="/img/list_05.jpg" onMouseOut="MM_swapImgRestore()"  onMouseOver="MM_swapImage('list_05','','/img/listOn_05.jpg',1);" width="243" height="21" alt="Developmental and Reproductive Toxicology Database (DART) - References to developmental and reproductive toxicology literature." border="0" usemap="#map5"/></td>
+	</tr>
+	<tr>
+		
+    <td>
+	<img name="list_06" src="/img/list_06.jpg" onMouseOut="MM_swapImgRestore()"  onMouseOver="MM_swapImage('list_06','','/img/listOn_06.jpg',1);" width="243" height="21" alt="Genetic Toxicology Data Bank (GENE-TOX) - Peer-reviewed genetic toxicology test data for over 3,000 chemicals." border="0" usemap="#map6"/></td>
+	</tr>
+	<tr>
+		
+    <td>
+	<img name="list_07" src="/img/list_07.jpg" onMouseOut="MM_swapImgRestore()"  onMouseOver="MM_swapImage('list_07','','/img/listOn_07.jpg',1);" width="243" height="21" alt="Integrated Risk Information System (IRIS) - Hazard identification and dose-response assessments for over 500 chemicals." border="0" usemap="#map7"/></td>
+	</tr>
+	<tr>
+		
+    <td>
+	<img name="list_08" src="/img/list_08.jpg" onMouseOut="MM_swapImgRestore()"  onMouseOver="MM_swapImage('list_08','','/img/listOn_08.jpg',1);" width="243" height="21" alt="International Toxicity Estimates for Risk (ITER) - Risk information for over 600 chemicals from authoritative groups worldwide." border="0" usemap="#map8"/></td>
+	</tr>
+	<tr>
+		
+    <td>
+	<img name="list_14" src="/img/list_14.jpg" onMouseOut="MM_swapImgRestore()"  onMouseOver="MM_swapImage('list_14','','/img/listOn_14.jpg',1);" width="243" height="21" alt="Drugs and Lactation (LactMed) - A peer-reviewed and fully referenced database of drugs to which breastfeeding mothers may be exposed." border="0" usemap="#map15"/></td>
+	</tr>
+	<tr>
+		
+    <td>
+	<img name="list_09" src="/img/list_09.jpg" onMouseOut="MM_swapImgRestore()"  onMouseOver="MM_swapImage('list_09','','/img/listOn_09.jpg',1);" width="243" height="21" alt="Multi-Database Search - Search all factual chemical databases." border="0" usemap="#map9"/></td>
+	</tr>
+	<tr>
+		
+    <td>
+	<img name="list_10" src="/img/list_10.jpg" onMouseOut="MM_swapImgRestore()"  onMouseOver="MM_swapImage('list_10','','/img/listOn_10.jpg',1);" width="243" height="21" alt="Toxics Release Inventory (TRI) - Annual environmental releases of over 600 toxic chemicals by U.S. facilities." border="0" usemap="#map10"/></td>
+	</tr>
+	<tr>
+		
+    <td>
+	<img name="list_11" src="/img/list_11.jpg" onMouseOut="MM_swapImgRestore()"  onMouseOver="MM_swapImage('list_11','','/img/listOn_11.jpg',1);" width="243" height="21" alt="Haz-Map - Links jobs and hazardous tasks with occupational diseases and their symptoms."  border="0" usemap="#map11"/></td>
+	</tr>
+	<tr>
+		
+    <td>
+	<img name="list_12" src="/img/list_12.jpg" onMouseOut="MM_swapImgRestore()"  onMouseOver="MM_swapImage('list_12','','/img/listOn_12.jpg',1);" width="243" height="21" alt="Household Products Database - Potential health effects of chemicals in 6,000 common household products."  border="0" usemap="#map12"/></td>
+	</tr>
+	<tr>
+		
+    <td>
+	<img name="list_13" src="/img/toxmap.jpg" onMouseOut="MM_swapImgRestore()"  onMouseOver="MM_swapImage('list_13','','/img/toxmapOn.jpg',1);" width="243" height="21" alt="TOXMAP - Environmental Health e-Maps. Geographic representation of TRI data with links to other TOXNET resources."  border="0" usemap="#map13"/></td>
+	</tr>
+       <tr>
+    <td>
+	<img name="list_15" src="/img/toxnetOff.jpg" onMouseOut="MM_swapImgRestore()"  onMouseOver="MM_swapImage('list_15','','/img/toxnetOn.jpg',1);" width="243" height="28" alt="Return to TOXNET Home."  border="0" usemap="#map14"/></td>
+        </tr>
+</table>
+<br>
+
+<table width="243" border="0" cellpadding="0" cellspacing="0">
+<tr><td bgcolor="#388D38" class="titleSub" align="center">
+    <img src="/img/shim.gif" height="4" width="243" alt="" ><br>
+Additional Resource<br>
+    <img src="/img/shim.gif" height="4" width="243" alt=""><br>
+ </td></tr>
+
+        <tr>
+    <td bgcolor="#E7F1FA">
+        <img name="list_16" src="/img/list_16.jpg" onMouseOut="MM_swapImgRestore()"  onMouseOver="MM_swapImage('list_16','','/img/listOn_16.jpg',1);" width="243" height="26" alt="Carcinogenic Potency Database (CPDB) - Standardized analyses of the results of 6540 chronic, long-term animal cancer tests. CPDB is hosted at UC Berkeley." border="0" usemap="#map16"/>
+
+        </td>
+	</tr>
+</table>
+
+
+    </TD>
+   <TD width="10"><img src="/img/shim.gif" width="10" alt=""></TD>
+   <TD class="bodyText" align="left" valign="top" width="258"> 
+   <a name="skipnav"></a>
+      <table width="100%" border="0" cellpadding="2" cellspacing="0">
+      <tr><td bgcolor="#388D38" class="titleSub" align="center">
+      <img src="/img/shim.gif" height="2" width="258" alt=""><br>
+Search TOXLINE
+      <br>
+      <img src="/img/shim.gif" height="2" width="258" alt="" ><br>
+      </td></tr>
+      <tr><td bgcolor="#ffffff"><img src="/img/shim.gif" height="5" width="258" alt=""><br></td></tr>
+<!--Search Box Begins -->
+
+       <tr> 
+                  <td  bgcolor="#388D38" align="center" valign="top"> 
+                    
+                    <table width="100%" border="0" cellpadding="2" cellspacing=0 bgcolor="#ffffff">
+                    <tr> 
+                      <td align="center" valign="top" class="bodytext">
+<img src="/img/shim.gif" height="6" width="250" alt="">
+   <!-- -------- view --------- -->
+                              <form  action="/cgi-bin/sis/search" name="mainform" method=POST onSubmit="return check()">
+                                <div align="center"> 
+                                
+                                   <input type="text" name="queryxxx" id="queryxxx" title="search box" value="" size="30" >
+<br><img src="/img/shim.gif" height="1" width="200" alt=" "><br>
+<label for="queryxxx">(e.g. asphalt fumes roofers, calcium <br>aging, Neville DM autoimmune)</label>
+                                  <br>
+                                  <br>
+                                  <input type="image" src="/ToxNetImages/Search.gif" border="0" alt="Search" name="submit2" width="60" height="21">
+                                  &nbsp; <a href="javascript:document.mainform.reset()"><img src="/ToxNetImages/Clear.gif" border="0" alt="Clear" width="60" height="21"></a> 
+                                  &nbsp; <a href="http://sis.nlm.nih.gov/toxnethelp/toxlinehelp.html"><img src="/ToxNetImages/helpButton.gif" border="0" alt="Help" width="60" height="21"></a>
+<script language="JavaScript">
+<!--
+document.mainform.queryxxx.focus()
+//-->
+</script>
+                                  <br>
+                                  <br>
+                                    For chemicals, add synonyms <br>and CAS numbers 
+                                    to search:<br>
+                                  <input type="radio" name="chemsyn" id="chemsyn_yes" title="Yes" value="1" checked>
+                                    <label for="chemsyn_yes">Yes </label>
+                                  <input type="radio" name="chemsyn" id="chemsyn_no" title="No" value="">
+                                    <label for="chemsyn_no">No</label> <br>
+                                  <br>
+                                    Include PubMed records:
+                                    <br>
+                                    <input type="radio" name="pubmed" id="includepubmed" value="1" title="Yes" checked>
+                                    <label for="includepubmed">Yes</label> 
+                                    <input type="radio" name="pubmed" id="excludepubmed" value="" title="No">
+                                    <label for="excludepubmed">No </label><br>
+                                  <br>
+
+
+<!--  hidden form elements -->
+<input type="hidden" name="basicsearch" value="/cgi-bin/sis/htmlgen?TOXLINE">
+<input type="hidden" name="browsesearch" value="/cgi-bin/sis/htmlgen?toxlineb.htm">
+<input type="hidden" name="advancedsearch" value="/cgi-bin/sis/htmlgen?toxadv.htm">
+<input type="hidden" name="revisesearch" value="TOXLINE.htm">
+<input type="hidden" name="second_search" value="1">
+
+<input type="hidden" name="database" value="toxline">
+<input type="hidden" name="and" value="1">
+<input type="hidden" name="Stemming" value="1">
+<input type="hidden" name="max" value="50000">
+<!-- end of form -->
+                                  <br>
+                                  <a href="/cgi-bin/sis/htmlgen?toxadv.htm" onClick="setCookie('TOXLINE-basic', document.mainform.queryxxx.value, null, '/', null, null)"><img src="/ToxNetImages/Limits.gif" width="60" height="21" border="0" alt="Limits" onClick="setCookie('TOXLINE-basic', document.mainform.queryxxx.value, null, '/', null, null)"></a>&nbsp; 
+                                  <a href="/cgi-bin/sis/htmlgen?toxlineb.htm"><img src="/ToxNetImages/Browse.gif" alt="Browse the Index" width="115" height="20" border="0"></a> 
+                                </div>
+                              </form>
+                            </td>
+                          </tr>
+                        </table>
+   <!-- -------- view2 --------- -->
+                        <!-- end inner box table -->
+                  <!-- end inner box table -->
+                </td>
+              </tr>
+<!-Search Box Ends -->
+      </table>
+       <img src="/img/shim.gif" height="10" width="258" alt=""><br>
+
+   </TD>
+
+<!--Right Column -->
+
+   <TD width="10"><img src="/img/shim.gif" width="10" alt=""></TD>
+   <TD align="left" valign="top" width="217">
+      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+      <tr><td bgcolor="#388D38" class="titleSub" align="center" colspan="5">
+      <img src="/img/shim.gif" height="4" width="217" alt="" ><br>
+         Env. Health & Toxicology <br>
+      <img src="/img/shim.gif" height="4" width="217" alt="" ><br>
+      </td></tr>
+      <tr>
+      <td width="1" bgcolor="#388D38"><img src="/img/shim.gif" width="1" alt=""></td>
+      <td width="100" bgcolor="#E7F1FA" align="center">
+    <img src="/img/shim.gif" height="7" width="100" alt=""><br>
+    <a href="http://sis.nlm.nih.gov/enviro.html"><img src="/img/fields2.jpg" border="0" alt="Environmental Health and Toxicology Portal"></a><br>
+    <img src="/img/shim.gif" height="7" width="100" alt=""><br>
+    <a href="http://sis.nlm.nih.gov/enviro.html"><img src="/img/button_visitSite.gif" border="0" alt="Visit Site"></a><br>
+    <img src="/img/shim.gif" height="10" width="100" alt=""><br>
+      </td>
+      <td width="5" bgcolor="#E7F1FA"><img src="/img/shim.gif" width="5" alt=""></td>
+      <td width="110" align="left" class="titleSubSub" bgcolor="#E7F1FA">
+       Portal to environmental health and toxicology resources</td>
+      <td width="1" bgcolor="#388D38"><img src="/img/shim.gif" width="1" alt=""></td>
+      </tr>
+      </table>
+      <table cellpadding=0 cellspacing=0 border=0>
+      <tr><td width="217" bgcolor="#388D38"><img src="/img/shim.gif" width="217" height="1" alt=""></td></tr></table>
+
+<!--Support Pages -->
+   <img src="/img/shim.gif" height="12" width="217" alt="">
+
+      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+      <tr><td bgcolor="#388D38" class="titleSub" align="center" colspan="4">
+      <img src="/img/shim.gif" height="4" width="217" alt="" ><br>
+        Support Pages <br>
+      <img src="/img/shim.gif" height="4" width="217" alt="" ><br>
+      </td></tr>
+      <tr>
+      <td width="1" bgcolor="#388D38"><img src="/img/shim.gif" width="1" alt=""></td>
+      <td width="3" bgcolor="#E7F1FA"><img src="/img/shim.gif" width="3" alt=""></td>
+      <td width="212" bgcolor="#E7F1FA" align="left" >
+      <img src="/img/shim.gif" height="7" width="212" alt="" ><br>
+
+<!-- support pages begin -->
+
+<img src="/img/bluebulletarrow.gif" alt="blue arrow">&nbsp;<a href="http://sis.nlm.nih.gov/toxnethelp/toxlinehelp.html" class="nounderline">Help</a><br><img src="/img/shim.gif" height=2 alt=""><br>
+<img src="/img/bluebulletarrow.gif" alt="blue arrow">&nbsp;<a href="http://www.nlm.nih.gov/pubs/factsheets/toxlinfs.html" class="nounderline">Fact Sheet</a><br><img src="/img/shim.gif" height=2 alt=""><br>
+<img src="/img/bluebulletarrow.gif" alt="blue arrow">&nbsp;<a href="http://toxnet.nlm.nih.gov/cgi-bin/sis/search/r?dbs+toxline:@and+environmental+polychlorinated+biphenyls" class="nounderline">Sample Record</a><br><img src="/img/shim.gif" height=2 alt=""><br>
+<img src="/img/bluebulletarrow.gif" alt="blue arrow">&nbsp;<a href="http://sis.nlm.nih.gov/toxnet_faq.html" class="nounderline">TOXNET FAQ</a><br><img src="/img/shim.gif" height=2 alt=""><br>
+<img src="/img/bluebulletarrow.gif" alt="blue arrow">&nbsp;<a href="http://sis.nlm.nih.gov/enviro/captivate/toxlinespecialimports.htm" class="nounderline">Importing Citations into</a><br> &nbsp; &nbsp;<a href="http://sis.nlm.nih.gov/enviro/captivate/toxlinespecialimports.htm" class="nounderline">Reference Manager</a> 
+<br><img src="/img/shim.gif" height=2 alt=""><br>
+<!-- support pages end -->
+
+      <img src="/img/shim.gif" height="10" width="212" alt=""><br>
+      </td>
+      <td width="1" bgcolor="#388D38"><img src="/img/shim.gif" width="1" alt=""></td>
+      </tr>
+      </table>
+      <table cellpadding=0 cellspacing=0 border=0>
+      <tr><td width="217" bgcolor="#388D38"><img src="/img/shim.gif" width="217" height="1" alt=""></td></tr></table>
+   </TD>
+   <TD width="3"><img src="/img/shim.gif" width="3" alt=""></TD>
+  </TR>
+</TABLE>
+<img src="/img/shim.gif" width="752" height="20" alt="">
+<table cellpadding=0 cellspacing=0 border=0 width="100%">
+<tr><td width="100%" bgcolor="#cccccc"><img src="/img/shim.gif" width="752" height="5" alt=""></td></tr>
+</table>
+
+<div id="footer"> <span><a href="http://www.nlm.nih.gov/copyright.html">Copyright</a>, <a href="http://www.nlm.nih.gov/privacy.html">Privacy</a>, <a href="http://www.nlm.nih.gov/accessibility.html">Accessibility</a><br /> 
+<a href="http://www.nlm.nih.gov">U.S. National Library of Medicine</a>, 8600 Rockville Pike, Bethesda, MD 20894
+<br /> 
+<a href="http://www.nih.gov/">National Institutes of Health</a>, <a href="http://www.os.dhhs.gov/">Health &amp; Human Services</a></span> </div> 
+
+
+
+</div>
+
+<hr>Last Modified <b>Thu Jun 12 21:53:24 2008
+</b>
+</body>
+
+</html>
+
+

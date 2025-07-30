@@ -1,0 +1,180 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan* with significant contributions from:  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<html>
+<head>
+<title>Index Insertions</title>
+<meta NAME="description" CONTENT="Index Insertions">
+<meta NAME="keywords" CONTENT="paper">
+<meta NAME="resource-type" CONTENT="document">
+<meta NAME="distribution" CONTENT="global">
+
+<link REL="STYLESHEET" HREF="paper.css">
+<link REL="next" HREF="node19.html">
+<link REL="previous" HREF="node17.html">
+<link REL="up" HREF="node17.html">
+<link REL="next" HREF="node19.html">
+</head>
+<body>
+<!--Navigation Panel-->
+<a NAME="tex2html234" HREF="node19.html">
+<img WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="http://www-fp.mcs.anl.gov/~lusk/images/papers/next_motif.gif"></a> 
+<a NAME="tex2html232" HREF="node17.html">
+<img WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="http://www-fp.mcs.anl.gov/~lusk/images/papers/up_motif.gif"></a> 
+<a NAME="tex2html226" HREF="node17.html">
+<img WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="http://www-fp.mcs.anl.gov/~lusk/images/papers/previous_motif.gif"></a>   
+<br>
+<b> Next:</b> <a NAME="tex2html235" HREF="node19.html">Index Deletions</a>
+<b> Up:</b> <a NAME="tex2html233" HREF="node17.html">Updating the Clause Sets</a>
+<b> Previous:</b> <a NAME="tex2html227" HREF="node17.html">Updating the Clause Sets</a>
+<br>
+<br>
+<!--End of Navigation Panel-->
+
+<h3><a NAME="SECTION00041100000000000000">
+Index Insertions</a>
+</h3>
+
+<p>
+To ensure that an index is well-formed at all times during insertions,
+we make an assumption about the underlying hardware, and use a simple
+technique for manipulating pointers while making the insertion.
+
+<p>
+We assume that storing a pointer in memory is an atomic operation.  In
+particular, when accessing a pointer that may be being updated by
+another process, a process gets either the old pointer or the new
+pointer, not some bits from the old one and others from the new one.
+
+<p>
+The data structures for the indices are linked lists and trees.  The
+trees are implemented as linked lists of subtrees, so we can limit the
+presentation to linked lists.  Suppose we have a doubly-linked list
+[<i>A</i>,<i>B</i>,<i>C</i>,<i>D</i>], and suppose we wish to insert node <i>X</i>between nodes <i>B</i> and <i>C</i>.  See Figure ??.
+<br>
+<div ALIGN="CENTER"><a NAME="227">&nbsp;</a>
+<table WIDTH="50%">
+<caption><strong>Figure:</strong>
+During Insertion of <i>X</i></caption>
+<tr><td>9#9</td></tr>
+</table>
+</div>
+<br>
+We simply make sure that node <i>X</i> is well-formed,
+including the pointers to <i>C</i> and <i>D</i> and data of <i>X</i> (e.g., a subtree),
+before making <i>B</i>'s ``next'' pointer and <i>C</i>'s
+``previous'' pointer point to <i>X</i>.  Another process traversing the list
+while the update is occurring might visit node <i>X</i>, and it might not.
+
+<p>
+We now show that it does not matter whether the other process visits
+node <i>X</i>.  Insertion into an index means that a clause becomes a
+candidate for an operation.  Visiting node <i>X</i> corresponds to finding
+clause say <i>C</i><sub><i>x</i></sub>.  For each type of index, we show that the
+nondeterminism of visiting <i>X</i> causes redundancy or optimization
+rather than incompleteness (failure to perform a required operation).
+
+<p>
+<dl>
+<dd><p>
+<dt><strong><i>Clash-index.</i></strong>
+<dd>A clause, say <i>C</i><sub><i>x</i></sub>, (the given clause) is inserted into <i>Clash-index</i> at the beginning of a Task A when it moves from <i>Set-of-support</i> to <i>Have-been-given</i>.  The clause <i>C</i><sub><i>x</i></sub> must be
+available via indexing to complete inferences in that and all
+subsequent instances of Task A.  Previous instances of Task A that are
+still executing at the time of the insert can then find <i>C</i><sub><i>x</i></sub> via the
+<i>Clash-index</i>.  We prevent the use of <i>C</i><sub><i>x</i></sub> by those previous
+instances of Task A with the following technique.  Each given clause
+is given a unique <i>sequence number</i>, starting with 0.  This can be
+accomplished, because the beginnings of instances of Task A are
+serialized (at the highest level by the monitor).  When an instance of
+Task A is using <i>Clash-index</i> to complete inferences, it rejects
+clauses with sequence numbers greater than that of the given clause.
+All rejected clauses have been inserted into <i>Clash-index</i> since
+the start of this instance of Task A, and need not be used to complete
+inferences. Such clauses would not be found through <i>Clash-index</i>
+an analogous sequential execution.
+
+<p>
+<dt><strong><i>All-index.</i></strong>
+<dd>A clause is inserted into <i>All-index</i> when it is kept by Task B.
+(There is no analog of the <i>Clash-index</i> sequence number for <i>All-index</i>.)  Four operations make use of <i>All-index</i>: forward
+subsumption, back subsumption, back demodulation, and unit conflict.
+
+<p>
+<dl>
+<dt><strong><b>Forward subsumption.</b></strong>
+<dd><p>
+Just one instance of Task B can be executing at a given time, and Task
+B makes the second (and final) forward subsumption test, so the
+decision to keep a clause (inserting it into <i>Set-of-support</i> and
+<i>All-index</i>) is serialized.  If all forward subsumption tests were
+performed by Task B, then forward subsumption would clearly be
+correct.  Forward subsumption tests performed by Task A can be viewed
+as an optimization, because they can be performed in parallel and any
+clause subsumed in Task A will also be subsumed in Task
+B<a NAME="tex2html15" HREF="footnode.html#foot247"><sup>3</sup></a>.  In
+particular, it does not matter if a clause newly inserted into <i>All-index</i> is found by Task A forward subsumption.
+<p>
+<dt><strong><b>Back subsumption.</b></strong>
+<dd><p>
+We assume that whenever back subsumption is in use, forward
+subsumption is also in use.  Clauses are enqueued for back subsumption
+(Task C) in Task B after being inserted into all-index.  We show that
+back subsumption with a clause <i>C</i> is unaffected by any clause, say
+<i>C</i><sub><i>x</i></sub>, that is inserted into <i>All-index</i> while back subsumption is
+occurring with clause <i>C</i>.  Since <i>C</i> is inserted into <i>All-index</i>
+before <i>C</i><sub><i>x</i></sub> is inserted, <i>C</i> does not subsume <i>C</i><sub><i>x</i></sub>; otherwise,
+forward subsumption would have caused <i>C</i><sub><i>x</i></sub> to be deleted.  Therefore,
+back subsumption on <i>C</i> does not find <i>C</i><sub><i>x</i></sub> by indexing.
+
+<p>
+<dt><strong><b>Back demodulation.</b></strong>
+<dd><p>
+The argument for the correctness of back demodulation is similar to
+that for back subsumption.  A newly-kept clause <i>C</i><sub><i>x</i></sub> cannot
+be back demodulated by <i>C</i>, because <i>C</i> became a demodulator before
+the final demodulation of <i>C</i><sub><i>x</i></sub> by by Task B.
+
+<p>
+<dt><strong><b>Unit conflict.</b></strong>
+<dd>Task B performs the unit conflict test.
+Therefore, <i>All-index</i> cannot be updated at the same time the unit
+conflict occurs.
+
+<p>
+</dl>
+<p>
+<dt><strong><i>Demod-index.</i></strong>
+<dd><p>
+We assume that back demodulation is in effect; otherwise, no
+demodulators are inserted into <i>Demod-index</i> after initialization.  The
+argument for the correctness of the operation of <i>Demod-index</i> is
+similar to that for forward subsumption with <i>All-index</i>.  In analogy
+with forward subsumption, Task B performs a second (and final)
+demodulation of potentially new clauses.  A newly-kept clause that
+becomes a new demodulator is inserted into <i>Demod-index</i> by Task B,
+so that the any final demodulations and insertion into <i>Demod-index</i>
+are serialized.  Any demodulation done by Task A can be viewed as
+an optimization.
+
+<p>
+</dl>
+<p>
+<hr>
+<!--Navigation Panel-->
+<a NAME="tex2html234" HREF="node19.html">
+<img WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="http://www-fp.mcs.anl.gov/~lusk/images/papers/next_motif.gif"></a> 
+<a NAME="tex2html232" HREF="node17.html">
+<img WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="http://www-fp.mcs.anl.gov/~lusk/images/papers/up_motif.gif"></a> 
+<a NAME="tex2html226" HREF="node17.html">
+<img WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="http://www-fp.mcs.anl.gov/~lusk/images/papers/previous_motif.gif"></a>   
+<br>
+<b> Next:</b> <a NAME="tex2html235" HREF="node19.html">Index Deletions</a>
+<b> Up:</b> <a NAME="tex2html233" HREF="node17.html">Updating the Clause Sets</a>
+<b> Previous:</b> <a NAME="tex2html227" HREF="node17.html">Updating the Clause Sets</a>
+<!--End of Navigation Panel-->
+<address>
+<i>Karen D. Toonen</i>
+<br><i>1998-11-19</i>
+</address>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<HTML>
+<HEAD><title>HTML Help for TIECONV</title></HEAD>
+<BODY>
+<H1>Help for TIECONV</H1>
+<pre>
+PURPOSE
+
+     TIECONV prepares a gridded dataset for POLYGEOM, GEOMA, 
+     LGEOM,  MGEOM,  GEOMV or  GEOMZ  transformations. Input
+     is paired sets of tiepoints with no restrictions. It is
+     in principle, a surface generation routine, but creates 
+     the  gridded  dataset so as to best interface with  the 
+     VICAR routines above.   The sequence GEN,  TIECONV, and 
+     GEOMZ can be used to generate a surface in image format 
+     through an arbitrary set of points.
+     TIECONV uses the finite element method  (triangulation) 
+     for  surface  fitting.   It is anticipated  that  other 
+     surface  fitting methods will be integrated into  VICAR 
+     in  the same fashion as tieconv so that users will have 
+     maximum flexibility both in terms of choice of  surface 
+     fit and in terms on application.
+     The triangulation method is Thiessen triangulation. The
+     maximum number of points is  probably  about 1 million.
+     The largest case  tried so far is 400,000 points, which
+     ran in 4 hours 31 minutes on a SUN SPARCstation 20.
+     
+     TIECONV can be used to prepare a  <A HREF="tieconv_level2.html#linear">linear</A> surface fit or
+     a bilinear surface fit.  The corresponding keywords are
+     <A HREF="tieconv_level2.html#linear">LINEAR</A> and  <A HREF="tieconv_level2.html#keystone">KEYSTONE</A>.  The latter is  commonly  used to 
+     convert a  perspective view  to an  orthographic in  an
+     approximate fashion.  The former  requires  three  tie-
+     points and the latter requires  four.   More  tiepoints
+     will be handled with a least squares fit and the resid-
+     uals can be viewed.  All input output formats are valid
+     with these options except for <A HREF="tieconv_level2.html#plot">PLOT</A>.
+      
+TAE COMMAND LINE FORMAT
+
+     tieconv <A HREF="tieconv_level2.html#out">OUT</A>=B PARAMS
+     tieconv <A HREF="tieconv_level2.html#parms">PARMS</A>=parm_file <A HREF="tieconv_level2.html#out">OUT</A>=B PARAMS
+     tieconv <A HREF="tieconv_level2.html#inp">INP</A>=tiep  <A HREF="tieconv_level2.html#out">OUT</A>=B  PARAMS
+
+     where
+
+     parm_file           is an optional disk parameter dataset 
+			   containing the input tiepoints.
+     tiep		 is an optional IBIS tabular file containing
+			   the input tiepoints.
+     B                   is the output parameter dataset.
+     PARAMS              is a standard VICAR parameter field.
+OPERATION
+
+     tieconv operates in two phases.   In phase 1, the input 
+     points  are  fully  triangulated  by  a version  of the 
+     Thiessen   algorithm.   This operates by  computing the
+     Voronoi polygons (polygons of area  nearest each point)
+     and  computing  the  triangles  formed by the bisectors
+     of the  polygons.   Four extra points  are  added  five 
+     diameters away from the convex hull so that the surface 
+     will extend smoothly beyond the input tiepoints.
+
+     In  phase 2,  the output grid is formed by  evaluating 
+     the  triangular surface at grid point locations.   That 
+     is,  a grid point will fall in some triangle,  and  the 
+     GEOM  shift  will  be the <A HREF="tieconv_level2.html#linear">linear</A> interpolation  of  the 
+     input shifts at the three corners of the triangle.  The 
+     user  should  note  that  the  triangular  surface   is 
+     continuous but not differentiable and it passes through 
+     all  of  the input  points.   Point-surface  generation 
+     routines can e compared in the following table.
+|       \ PROPERTIES| CONTI-|DIFFEREN-| EVALUATES |   WELL   |
+|        \    OF    | NUOUS |TIABLE   | AT INPUT  |  BEHAVE  |
+| METHOD  \ SURFACE |       |         |   POINT   | NO MESAS |
+|-------------------|-------|---------|-----------|----------|
+| Triangulation     |  yes  |    no   |    yes    |   yes    |
+|-------------------|-------|---------|-----------|----------|
+|                -1 |       |         |           |          |
+| Interpolation r   |   no  |    no   |    yes    |   yes    |
+|-------------------|-------|---------|-----------|----------|
+|                -p |       |         |           |          |
+| Interpolation r   |   no  |    no   |    yes    |    no    |
+|-------------------|-------|---------|-----------|----------|
+| Polynomial Fit    |  yes  |    yes  |    no     |    no    |
+|-------------------|-------|---------|-----------|----------|
+| <A HREF="tieconv_level2.html#linear">Linear</A>            |  yes  |    yes  |    no     |   yes    |
+|-------------------|-------|---------|-----------|----------|
+| Bilin (<A HREF="tieconv_level2.html#keystone">keystone</A>)  |  yes  |    yes  |    no     |   yes    |
+|-------------------|-------|---------|-----------|----------|
+
+<A NAME="examples">EXAMPLE</A>
+
+     tieconv <A HREF="tieconv_level2.html#out">OUT</A>=B 'GEOMA <A HREF="tieconv_level2.html#nah">NAH</A>=44 <A HREF="tieconv_level2.html#nav">NAV</A>=24
+           <A HREF="tieconv_level2.html#tiepoint">TIEPOINT</A>=(   346       432       353      422
+                        479       316       482      313
+                         .
+                         .
+                         .
+                        723       529       715      527)
+     POLYGEOM <A HREF="tieconv_level2.html#inp">INP</A>=X <A HREF="tieconv_level2.html#parms">PARMS</A>=B <A HREF="tieconv_level2.html#out">OUT</A>=Y
+
+     In this example,  the tiepoints are used to set up a 44 
+     x  24 grid for use by POLYGEOM.   The tiepoints can  be 
+     scattered  over  the  image  in  any  fashion   whereas 
+     POLYGEOM requires a regular grid.
+     
+     TIECONV can be used to prepare a  <A HREF="tieconv_level2.html#linear">linear</A> surface fit or
+     a bilinear surface fit.  The corresponding keywords are
+     <A HREF="tieconv_level2.html#linear">LINEAR</A> and  <A HREF="tieconv_level2.html#keystone">KEYSTONE</A>.  The latter is  commonly  used to 
+     convert a  perspective view  to an  orthographic in  an
+     approximate fashion.  The former  requires  three  tie-
+     points and the latter requires  four.   More  tiepoints
+     will be handled with a least squares fit and the resid-
+     uals can be viewed.  All input output formats are valid
+     with these options except for <A HREF="tieconv_level2.html#plot">PLOT</A>.
+      
+     
+
+     GEN <A HREF="tieconv_level2.html#out">OUT</A>=X NL=1000 NS=1000 IVAL=0 LINC=0 SINC=0
+     tieconv <A HREF="tieconv_level2.html#out">OUT</A>=B 'GEOMZ              TIEPOINTS=(
+               1   1    0
+               1000   1    0
+               1    1000     0
+               1000  1000      0
+               500   500       255)
+     GEOMZ <A HREF="tieconv_level2.html#inp">INP</A>=X <A HREF="tieconv_level2.html#parms">PARMS</A>=B <A HREF="tieconv_level2.html#out">OUT</A>=Y
+
+     this  example constructs a "pyramid" shaped  brightness 
+     surface in the image Y.
+
+TIMING
+
+     Timing  is dominated by the triangulation method  which 
+     is 0(n*log(n)) where n is the number of input points.  A case 
+     with  10000  points  was run in 1.63 minutes  CPU  time, 
+     and a case with 400,000 points was run in 4.52 hours on
+     a SPARCstation 20.
+     
+RESTRICTIONS
+
+   The maximum number of input tiepoints is probably about 1 million.
+   This value will increase as the machines get more virtual and
+   real memory since dynamic memory allocation is used throughout
+   the algorithm.
+   
+   The maximum number of output tiepoints is limited by IBIS table
+   size (currently about 10 million?).  Internal to the program,
+   dynamic memory allocation is used.
+
+
+WRITTEN BY:            A. L. Zobrist, 29 August 1979
+
+<A NAME="CogProg">COGNIZANT PROGRAMMER:  B. A. McGuffie</A>
+
+REVISIONS: 
+  PORTED TO UNIX	C. R. Schenk (CRI)  31-Oct 1994
+  ALGORITHM UPDATED     A. L. Zobrist 19-Jul 1999
+
+</pre>
+<hr>
+<H2>PARAMETERS:</H2>
+<HR><A HREF="tieconv_level2.html#inp"><H3>INP</H3></A>
+Input IBIS tabular file
+<HR><A HREF="tieconv_level2.html#cols"><H3>COLS</H3></A>
+Columns to use from
+IBIS file.
+<HR><A HREF="tieconv_level2.html#out"><H3>OUT</H3></A>
+Output dataset (type depends
+on other parameters, see
+detailed help)
+<HR><A HREF="tieconv_level2.html#parms"><H3>PARMS</H3></A>
+Input parameter dataset
+<HR><A HREF="tieconv_level2.html#tiepoint"><H3>TIEPOINT</H3></A>
+Specify <A HREF="tieconv_level2.html#tiepoint">tiepoint</A> pairs 
+<HR><A HREF="tieconv_level2.html#nah"><H3>NAH</H3></A>
+Number of grid cells horizontal
+<HR><A HREF="tieconv_level2.html#nav"><H3>NAV</H3></A>
+Number of grid cells vertical
+<HR><A HREF="tieconv_level2.html#minl"><H3>MINL</H3></A>
+Bounds of the output grid
+<HR><A HREF="tieconv_level2.html#mins"><H3>MINS</H3></A>
+Bounds of the output grid
+<HR><A HREF="tieconv_level2.html#maxl"><H3>MAXL</H3></A>
+Bounds of the output grid
+<HR><A HREF="tieconv_level2.html#maxs"><H3>MAXS</H3></A>
+Bounds of the output grid
+<HR><A HREF="tieconv_level2.html#reject"><H3>REJECT</H3></A>
+Radius for duplicate  points
+<HR><A HREF="tieconv_level2.html#mode"><H3>MODE</H3></A>
+GEOMA for GEOMA or POLYGEOM use 
+GEOMZ for GEOMZ  use
+LGEOM for LGEOM  use 
+MGEOM for MGEOM  use
+<HR><A HREF="tieconv_level2.html#plot"><H3>PLOT</H3></A>
+Gen <A HREF="tieconv_level2.html#plot">plot</A> file of triangulation
+<HR><A HREF="tieconv_level2.html#noprint"><H3>NOPRINT</H3></A>
+Keyword to suppress printout
+<HR><A HREF="tieconv_level2.html#abend"><H3>ABEND</H3></A>
+<A HREF="tieconv_level2.html#abend">ABEND</A> abend if duplicate points
+<HR><A HREF="tieconv_level2.html#linear"><H3>LINEAR</H3></A>
+forget triangulation and do
+<A HREF="tieconv_level2.html#linear">linear</A> fit
+<HR><A HREF="tieconv_level2.html#keystone"><H3>KEYSTONE</H3></A>
+forget triangulation and do
+bilinear (<A HREF="tieconv_level2.html#keystone">keystone</A>) fit
+
+<HR><A HREF="tieconv.html#examples"><H4>See Examples:</H4></A>
+<HR><A HREF="tieconv.html#CogProg"><H4>Cognizant Programmer:</H4></A>
+</BODY>
+</HTML>

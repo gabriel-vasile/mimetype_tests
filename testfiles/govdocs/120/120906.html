@@ -1,0 +1,1009 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+			"http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+
+<head>
+
+	<script language="JavaScript">
+	<!--
+
+
+	/*
+	BrowserDetector()
+	Parses User-Agent string into useful info.
+
+	Source: Webmonkey Code Library
+	(http://www.hotwired.com/webmonkey/javascript/code_library/)
+
+	Author: Richard Blaylock
+	Author Email: blaylock@wired.com
+
+	Usage: var bd = new BrowserDetector(navigator.userAgent);
+	*/
+
+
+	// Utility function to trim spaces from both ends of a string
+	function Trim(inString) {
+	  var retVal = "";
+	  var start = 0;
+	  while ((start < inString.length) && (inString.charAt(start) == ' ')) {
+	    ++start;
+	  }
+	  var end = inString.length;
+	  while ((end > 0) && (inString.charAt(end - 1) == ' ')) {
+	    --end;
+	  }
+	  retVal = inString.substring(start, end);
+	  return retVal;
+	}
+
+	function BrowserDetector(ua) {
+
+	// Defaults
+	  this.browser = "Unknown";
+	  this.platform = "Unknown";
+	  this.version = "";
+	  this.majorver = "";
+	  this.minorver = "";
+
+	  uaLen = ua.length;
+
+	// ##### Split into stuff before parens and stuff in parens
+	  var preparens = "";
+	  var parenthesized = "";
+
+	  i = ua.indexOf("(");
+	  if (i >= 0) {
+	    preparens = Trim(ua.substring(0,i));
+	        parenthesized = ua.substring(i+1, uaLen);
+	        j = parenthesized.indexOf(")");
+	        if (j >= 0) {
+	          parenthesized = parenthesized.substring(0, j);
+	        }
+	  }
+	  else {
+	    preparens = ua;
+	  }
+
+	// ##### First assume browser and version are in preparens
+	// ##### override later if we find them in the parenthesized stuff
+	  var browVer = preparens;
+
+	  var tokens = parenthesized.split(";");
+	  var token = "";
+	// # Now go through parenthesized tokens
+	  for (var i=0; i < tokens.length; i++) {
+	    token = Trim(tokens[i]);
+	        //## compatible - might want to reset from Netscape
+	        if (token == "compatible") {
+	          //## One might want to reset browVer to a null string
+	          //## here, but instead, we'll assume that if we don't
+	          //## find out otherwise, then it really is Mozilla
+	          //## (or whatever showed up before the parens).
+	        //## browser - try for Opera or IE
+	    }
+	        else if (token.indexOf("MSIE") >= 0) {
+	      browVer = token;
+	    }
+	    else if (token.indexOf("Opera") >= 0) {
+	      browVer = token;
+	    }
+	        //'## platform - try for X11, SunOS, Win, Mac, PPC
+	    else if ((token.indexOf("X11") >= 0) || (token.indexOf("SunOS") >= 0) ||
+	(token.indexOf("Linux") >= 0)) {
+	      this.platform = "Unix";
+	        }
+	    else if (token.indexOf("Win") >= 0) {
+	      this.platform = token;
+	        }
+	    else if ((token.indexOf("Mac") >= 0) || (token.indexOf("PPC") >= 0)) {
+	      this.platform = token;
+	        }
+	  }
+
+	  var msieIndex = browVer.indexOf("MSIE");
+	  if (msieIndex >= 0) {
+	    browVer = browVer.substring(msieIndex, browVer.length);
+	  }
+
+	  var leftover = "";
+	  if (browVer.substring(0, "Mozilla".length) == "Mozilla") {
+	    this.browser = "Netscape";
+	        leftover = browVer.substring("Mozilla".length+1, browVer.length);
+	  }
+	  else if (browVer.substring(0, "Lynx".length) == "Lynx") {
+	    this.browser = "Lynx";
+	        leftover = browVer.substring("Lynx".length+1, browVer.length);
+	  }
+	  else if (browVer.substring(0, "MSIE".length) == "MSIE") {
+	    this.browser = "IE";
+	    leftover = browVer.substring("MSIE".length+1, browVer.length);
+	  }
+	  else if (browVer.substring(0, "Microsoft Internet Explorer".length) ==
+	"Microsoft Internet Explorer") {
+	    this.browser = "IE"
+	        leftover = browVer.substring("Microsoft Internet Explorer".length+1,
+	browVer.length);
+	  }
+	  else if (browVer.substring(0, "Opera".length) == "Opera") {
+	    this.browser = "Opera"
+	    leftover = browVer.substring("Opera".length+1, browVer.length);
+	  }
+
+	  leftover = Trim(leftover);
+
+	  // # Try to get version info out of leftover stuff
+	  i = leftover.indexOf(" ");
+	  if (i >= 0) {
+	    this.version = leftover.substring(0, i);
+	  }
+	  else
+	  {
+	    this.version = leftover;
+	  }
+	  j = this.version.indexOf(".");
+	  if (j >= 0) {
+	    this.majorver = this.version.substring(0,j);
+	    this.minorver = this.version.substring(j+1, this.version.length);
+	  }
+	  else {
+	    this.majorver = this.version;
+	  }
+
+	} // function BrowserCap
+
+	// -->
+
+	</script>
+	<script>
+	var bd = new BrowserDetector(navigator.userAgent);
+		if ((bd.platform.indexOf("PPC") >= 0) || (bd.platform.indexOf("Mac") >= 0)) {
+			if (bd.browser.indexOf("Netscape") >=0) {
+				if (bd.majorver == 4) {
+					document.write ('<LINK REL=stylesheet HREF="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/four_style.css" TYPE="text/css">');
+				}
+				else if (bd.majorver >= 5) {
+					document.write ('<LINK REL=stylesheet HREF="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/mac_ns_new_style.css" TYPE="text/css">');
+				}
+			}
+			else {
+					if (bd.majorver == 4) {
+						document.write ('<LINK REL=stylesheet HREF="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/four_style.css" TYPE="text/css">');
+					}
+					else if (bd.majorver >= 5) {
+						document.write ('<LINK REL=stylesheet HREF="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/new_style.css" TYPE="text/css">');
+					}
+				}
+		}
+		else {
+			document.write ('<LINK REL=stylesheet HREF="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/new_style.css" TYPE="text/css">');
+			}
+		
+	 </script>
+	
+	<title>
+	MobyLives.com
+	</title>
+	
+	<meta name="generator" content="BBEdit 5.1.1">
+	
+	<SCRIPT LANGUAGE="JavaScript">
+	<!-- Original:  Eric King (eric_andrew_king@hotmail.com) -->
+	<!-- Web Site:  http://redrival.com/eak/ -->
+	<!-- Begin
+		function NewWindow(mypage, myname, w, h, scroll) {
+			var winl = (screen.width - w) / 2;
+			var wint = (screen.height - h) / 2;
+			winprops = 'height='+h+',width='+w+',top='+wint+',left='+winl+',scrollbars='+scroll+',resizable'
+			win = window.open(mypage, myname, winprops)
+			if (parseInt(navigator.appVersion) >= 4) { win.window.focus(); }
+		}
+	//  End -->
+	</script>
+	
+</head>
+
+<body bgcolor="#000033" link="#0000CC" vlink="#6666FF" alink="#6666FF" valign=top>
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+function SetCookie(cookieName,cookieValue,nDays) {
+  var today = new Date();
+  var expire = new Date();
+  if (nDays==null || nDays==0) nDays=1;
+  expire.setTime(today.getTime() + 86400000*nDays);
+  document.cookie = cookieName+"="+escape(cookieValue)
+    + ";expires="+expire.toGMTString() + ";path=/";
+}
+function SetAnchorDate(date) {
+  SetCookie("request.anchordate",date,365);
+}
+function SetAnchorWindow(maxSeconds) {
+  SetCookie("request.anchorwindow",maxSeconds,365);
+}
+</script>
+
+<!--
+  ======================================
+  BEGIN Wayback INSERTED TIMELINE BANNER
+
+  The following HTML has been inserted
+  by the Wayback application to enhance
+  the viewing experience, and was not
+  part of the original archived content.
+  ======================================
+-->
+<script type="text/javascript">
+	function minimizeTL(){
+		document.getElementById("wm-minimized").style.display = "";
+		document.getElementById("wm-maximized").style.display = "none";
+	}
+	function maximizeTL(){
+		document.getElementById("wm-minimized").style.display = "none";
+		document.getElementById("wm-maximized").style.display = "";
+	}
+</script>
+<link href="http://webarchive.loc.gov:80/collections/css/timeline.css" type="text/css" rel="stylesheet" />
+<div id="wm-ipp" style="position:relative;z-index:99999;border:3px solid #c33;color:black; direction: ltr;
+		background-color:#fee; font-size:10px;font-family:sans-serif;padding:0px 5px; margin:5px;" >
+	<div id="wm-minimized" style="display:none">
+		<table width="100%" cellspacing="0" cellpadding="5" border="0">
+			<tr>
+				<td width="194" style="text-align: left;">
+					<img src="http://webarchive.loc.gov:80/collections/images/loc_logo.jpg" alt="Library of Congress" title="Library of Congress" />
+				</td>
+				<td style="text-align:left; font: 17px trebuchet ms, helvetica, arial, verdana; color: #c33;">
+					September 11 Web Archive Collection
+				</td>
+				<td width="20">
+					<img src="http://webarchive.loc.gov:80/collections/images/maximize2.jpg" title="maximize" alt="maximize" style="cursor:pointer; cursor: hand;"
+						onclick="maximizeTL();"/>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div id="wm-maximized">
+		<table width="100%" cellspacing="0" cellpadding="5" border="0">
+			<tr>
+				<td width="194" style="text-align: left;">
+					<img src="http://webarchive.loc.gov:80/collections/images/loc_logo.jpg" alt="Library of Congress" title="Library of Congress" />
+				</td>
+				<td style="text-align:left; font: 17px trebuchet ms, helvetica, arial, verdana; color: #c33;">
+					September 11 Web Archive Collection
+					<span style="display:block; font: 12px trebuchet ms, helvetica, arial, verdana; color: #555;">
+						This is an archived Web site from the Library of Congress.
+					</span>
+				</td>
+				<td width="20">
+					<img src="http://webarchive.loc.gov:80/collections/images/minimize2.jpg" title="maximize" alt="maximize" style="cursor:pointer; cursor: hand;"
+						onclick="minimizeTL();"/>
+				</td>
+			</tr>
+			<tr>
+				<td width="194" style="font: 11px helvetica, arial, verdana; text-align: left;">
+					<a href="javascript: history.go(-1)">Back to previous page</a>
+				</td>
+				<td colspan="2" style="text-align:left; font: 14px trebuchet ms, helvetica, arial, verdana; color: #c33;">
+					<strong>http://www.mobylives.com/</strong><br />
+					Archived: <strong>Dec 13, 2001</strong> at 00:29:22
+				</td>
+			</tr>
+			<tr>
+				<td width="194" style="font: 10px helvetica, arial, verdana; text-align: left;">
+					Note: External links, forms and search boxes may not function within this collection
+				</td>
+				<td colspan="2">
+					<table width="100%" cellspacing="0" cellpadding="2" border="0" style="font: 15px helvetica, arial, verdana;">
+						<tr>
+							<td width="20%" style="text-align: left;">
+								<a href="http://webarchives.loc.gov/collections/lcwa0001/20011010225646/http://www.mobylives.com/" class="timePadded">&laquo;&laquo; First</a>
+								
+							</td>
+							<td width="20%" style="text-align: left;">
+								<a href="http://webarchives.loc.gov/collections/lcwa0001/20011212030801/http://www.mobylives.com/">&laquo; Previous</a>
+								
+							</td>
+							<td width="20%" style="text-align: center;">
+								<span class="timeOf"><span class="timeVersion"><strong># 67</strong></span> of 77</span>
+							</td>
+							<td width="20%" style="text-align: right;">
+								<a href="http://webarchives.loc.gov/collections/lcwa0001/20011216025814/http://www.mobylives.com/" class="timePadded">Next &raquo;</a>
+								
+							</td>
+							<td width="20%" style="text-align: right;">
+								<a href="http://webarchives.loc.gov/collections/lcwa0001/20020916082133/http://www.mobylives.com/">Last &raquo;&raquo;</a>
+								
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: left;">
+								10/10/2001
+							</td>
+							<td colspan="3">&nbsp;</td>
+							<td style="text-align: right;">
+								09/16/2002
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
+<script type='text/javascript' src='http://www.loc.gov/global/s_code.js'></script>
+<!--
+  ======================================
+  END Wayback INSERTED TIMELINE BANNER
+  ======================================
+-->
+
+
+<table width=100% cellspacing="0" cellpadding="0" valign=top>
+	<tr>
+		<td width=70% cellspacing="0" cellpadding="0" valign=top>
+			<img src="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/largerlogo.gif" border="0" valign=top>
+		</td>
+		<td width=30%>
+			<table>
+				<tr>
+					<td>
+						<img src="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/slug.gif" align=bottom>
+						<br>
+						<br>
+						<script>
+							var bd = new BrowserDetector(navigator.userAgent);
+							if (bd.majorver == 4) {
+							document.write ('<br><br>');
+			                   }
+						 </script>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<table>
+							<tr>
+								<td align="left" valign="top" width="60">
+									<font size=2><b><span class=toplinks>
+									<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/about.html" onclick="NewWindow(this.href,'name','500','525','yes');return false;"><br><img src="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/aboutm.gif" border="0" height"40" width="77"><br></a>
+									</span></b></font>
+								</td>
+								<td align="left" valign="top">
+									<font size=2><b><span class=toplinks>
+									<a href="mailto:dlj@mobylives.com"><br><img src="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/tips_sugg.gif" border="0" height"40" width="77"></a><br><br>
+									</span></b></font>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+
+<table cellspacing="0" cellpadding="0" width="100%">
+						</span>
+						</b>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+
+				
+<table cellspacing="1" cellpadding="10" width="100%">
+	<tr>
+		<script>
+		var bd = new BrowserDetector(navigator.userAgent);
+		if (bd.browser.indexOf("Netscape") >=0) {
+		document.write ('<td width="30%" bgcolor="#000033" align=center valign=top>');
+          }
+          else {
+          document.write ('<td width="45%" bgcolor="#000033" align=center valign=top>');}
+		</script>
+		
+			<table cellspacing="0" cellpadding="0">	
+			<img src="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/twc.gif" border="0" height"36" width="214" valign=top>
+				<tr>
+					<td bgcolor="#000033" width="275" align=center><font color="#FFFFFF">
+
+<br><span class="today">TREND OF THE YEAR</span></td>
+					<td bgcolor="#000033" width="10" align=center>&nbsp;</td>
+				</tr>
+				<tr>
+					<td bgcolor="#000033" width="275"><font color="#FFFFFF"> <br><br>
+
+
+Maybe you've noticed a minor but growing phenomenon in the book business lately &#151; clusters of books about the same odd thing coming out all at once.  There are similar trends in titles, too, that make you think there's something going on that you're not quite hip to.  <br>
+
+&nbsp; &nbsp; &nbsp;	Maybe it's another indication of how imitative of the movie industry book marketers have become.  After all, the movie biz, as if to show off exactly how bereft of ideas it is, has been doing this for years &#151; giving us not just a rash of Shakespeare movies, say, but, sometime next year, two movies about famous monobrowed Mexican painter Frida Kahlo.  <br>
+
+&nbsp; &nbsp; &nbsp;	On the one hand, this is great;  any movie about Kahlo beats the tar out of the subject matter of most American films.  But, on the other hand, why now?  Kahlo's story hasn't changed since she, uh, died in 1954. <br>
+
+&nbsp; &nbsp; &nbsp;	Anyway, in the book biz, something similar went on earlier this year when there was a cluster of books about Dante.  There was a new translation of the "Inferno," a Penguin lives biography, a collection of essays by poets writing about Dante, and an expensive art book that collected Botticelli drawings illustrating the Divine Comedy. <br>
+
+&nbsp; &nbsp; &nbsp;	Of course, Dante was one of the most important poets of all time and these books make sense, even if the coordinated timing of their appearance is still puzzling.  Or take the current rash of books about last year's endless presidential election.  Even their timing makes sense (and, a year later, is more seemly than the first rash of "instant books" that hit stores right about the time the Supreme Court judges were stepping out of their robes). <br>
+
+&nbsp; &nbsp; &nbsp;	But sensible trends aren't what I'm talking about.  What I'm talking about are those clustered publications that seem to appear for completely obscure reasons. <br>
+
+&nbsp; &nbsp; &nbsp;	Why, for example, was the word "honeymoon" considered a hot choice for titles this year?  (There was "Honeymoon," by Kevin Canty, and Chuck Kinder's great novel, "Honeymooners.")  Or how about the word "hunter"?  ("The Hunter, by Julia Leigh;  "The Hunters," by Claire Messud.)  Or "corrections"?  ("A Few Corrections," by Brad Leithauser, and "The Corrections," by Mr. Anti&#150;trend himself, Jonathan Franzen.) <br>
+
+&nbsp; &nbsp; &nbsp;	And what do you think is going on with the color red lately?  Seems like everyone's using it &#151; there's "My Name is Red," by Ohan Pamuk, "The Red Tent," by Anita Diamant, and "The Heart of Redness," by Zakes Mda. (Not to mention Anne Carson's "Autobiography of Red" from a couple of years ago.) <br>
+
+&nbsp; &nbsp; &nbsp;	Also, let's not forget the great, ongoing rage for titles involving the suffix "ist," such as Colson Whitehead's "The Intuitionist," Donald Antrim's "The Verificationist," and, coming soon, Peter Rock's "The Ambidextrist." <br>
+
+&nbsp; &nbsp; &nbsp;	But my favorite no&#150;apparent&#150;reason trend this year had to do with a trend of subject matter, not title.  Yes, I'm talking about the fact that someone named this Johnson year &#151; this was the year for books oriented around the great eighteenth&#150;century British writer Dr. Samuel Johnson.  Most of them also threw in his sidekick and biographer James Boswell. <br>
+
+&nbsp; &nbsp; &nbsp;	There was, for example, "Boswell's Presumptuous Task:  The Making of the Life of Dr. Johnson," by Adam Sisman, which focused on their relationship and the seven years it took Boswell to write his bio of Johnson.  "A Life of James Boswell," by Peter Martin, was a more straightforward bio. "Dr. Johnson's London" by Liza Picard looks at life in London during Johnson's time.  And there was even a novel &#151; Beryl Bainbridge's "According to Queeney," which, as the book jacket says, "illuminates an intimate corner of the great man's life that his devoted biographer James Boswell never knew." <br>
+
+&nbsp; &nbsp; &nbsp;	The best of the lot, for my money, is Sisman's book.  Boswell has long been portrayed as a dissolute character who somehow got "lucky" when he wrote his masterpiece, a theory akin to the one that if you give a monkey a typewriter he will eventually type "War and Peace" (until then, he'll produce what are known as "insurance policies").  But Sisman portrays Boswell as someone with talent overcoming his troubles, and it's a stirring story. Bainbridge's "Queeney," too, is an absorbing charmer. <br>
+
+&nbsp; &nbsp; &nbsp;	Which goes to show an old trend&#150;basher like me.  I mean, despite their importance as literary figures, Boswell and Johnson are not the stuff of the bestsellers that drive the industry nowadays.  And yet here's a bunch of books about them.  It's an encouraging sign for the industry, and a reminder that some trends are better than others.
+<br><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><br><br>
+
+
+
+
+<b> Last Week&#146;s Column: </b> <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/Weird_2001.html">WEIRD BOOKS FOR WEIRD PEOPLE</a> <i>It's easy to saunter into a bookstore and get someone a bestseller.  But what if you've got to get something for someone with really weird taste?</i>  <br><br>
+
+
+
+
+<br><br><br><br><br>
+
+
+
+<b>EDITORS: INTERESTED IN CARRYING<br>&nbsp;&nbsp;&nbsp;THE MOBYLIVES COLUMN?</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>Find out more </i> &#151; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/about.html" onclick="NewWindow(this.href,'name','500','525','yes');return false;">here</a>, then <a href="mailto:dlj@mobylives.com">here</a>.<br><br>
+
+
+ </font></td>
+					<td bgcolor="#000033" width="10" align=center>
+					
+						&nbsp;
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td width="60%" bgcolor="#CCCCCC" valign=top>
+			<table cellspacing="0" cellpadding="0" bgcolor="#CCCCCC">
+				<tr>
+					<td align=left height="55" colspan="2" valign=top bgcolor="#CCCCCC">
+						<img src="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/news.gif" border=0 usemap="#tabmap">
+<map name="tabmap">
+							<area coords="0,0,80,48" href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/index.html">
+							<area coords="86,0,206,48" href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/letters.html">
+							<area coords="210,0,348,48" href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/archives.html">
+						</map>						
+					</td>
+				</tr>
+				<tr>
+					<td bgcolor="#CCCCCC" width="10" align=left valign=top>
+						&nbsp; 
+					</td>
+					<td bgcolor="#CCCCCC" align=left>
+
+
+
+
+<br><font color="#6666FF">
+Wednesday, 12 December 2001</font color> <br> <br>
+
+
+
+<span class=headline>Goosebumps suit gives Scholastic &#151; well . . . </span><br>
+The Supreme Court has declined to hear a case that would have stopped a class action lawsuit against <b>Scholastic Books</b> brought by its own shareholders, who accuse the company of securities fraud by concealing declining sales of the publisher's "Goosebumps" series of childrens' books.  According to an Associated Press <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://dailynews.yahoo.com/h/ap/20011210/pl/scotus_securities_fraud_1.html">wire story</a>, "The company announced in February 1997 that investors should expect share losses," but "shortly before that" Scholastic vice president <b>Raymond Marchuk</b> "sold about $1.2 million in company stock, or 80 percent of his holdings, the lawsuit says."  The A.P. report says that according to a lawyer for the stockholders, one toy store chain had told Scholastic "that Goosebumps books were not selling well because of the 'scary nature' of the series." <br><br>
+
+<span class=headline>Bezos tests new partnership with spatula . . . </span><br>
+As part of a "whirlwind tour" to promote <b>Amazon.com</b>'s seventh holiday season, <b>Jeff Bezos</b> stopped off in Chicago to make an appearance behind the grill flipping burgers at a local eatery, the Billy Goat.  As The Chicago Tribune's <b>Christine Tatum</b> reports in her <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.chicagotribune.com/technology/chi-0112100224dec10.column">column</a>, Bezos said "Amazon would turn its first 'pro forma operating profit' in the fourth quarter," which she calls "a cagey way of saying that the company stands a good chance of racking up another money&#150;losing year."  Tatum reviews the company's recent buying spree and wide&#150;ranging partnerships with other retailers and notes Bezos nonetheless claims, "We don't want to be all things to all people . . . Physical retailers are coming to us because they're realizing that it's hard to do online business well." She also notes that the owner of the Billy Goat said Bezos "can come again tomorrow at lunch if the Internet thing doesn't work." <br><br> 
+
+<span class=headline>NYU to name reading series after Agha Shahid Ali . . . </span><br>
+<b>New York University</b> has announced it will hold an annual reading series named after the late poet <b>Agha Shahid Ali</b>.  The news was revealed in this <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.rediff.com/us/2001/dec/10obit.htm">obituary</a> of the poet, from the Indian publication Rediff.com.  (No American publications, except for the local newspaper, The Daily Hampshire Gazette, have covered Ali's death yet.)  Ali died at his home in Amherst, Massachusetts on December 8 after a long battle against brain cancer.  <br><br>
+
+<span class=headline>Second opinions on Pauline Kael . . . </span><br>
+When she died, it seemed as if nearly every critical writer in the world had nothing but lavish praise for <b>Pauline Kael</b> (except for a few mentions of <b>Renata Adler</b>'s famous criticism, 20 years ago, that Kael's film reviews for The New Yorker were, "piece by piece, line by line, and without interruption, worthless.")  Now, as <b>Don Aucoin</b> says in a Boston Globe <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.boston.com/dailyglobe2/346/living/DeLillo_takes_us_to_ground_zero_brilliantly+.shtml">column</a> (second item), several writers have begun to discuss her work and influence in a less laudatory fashion.  Critic <b>Tom Carson</b>, for example, says she inspired him when he started writing in the 1970s, but later he says she became a "vain, self&#150;deluding would-be power broker . . . writing about ever&#150;more&#150;vapid films in the same hyperbolic, souped-up tone, contriving momentousness by fiat." Her former friend, director <b>Paul Schrader</b> has also written a critical piece about her.  Aucoin himself says,  "The cult surrounding Kael has always mystified me."<br><br>
+
+<span class=headline>Filming the poet's life difficult when the poet was Miguel Pi&#241;ero . . . </span><br>
+"Poet, playwright, street hustler, thief and drug addict, <b>Miguel Pi&#241;ero</b> made art out of his stormy life," but it took a while for others to make a film about that life, says <b>Dana Calvo</b> in a Los Angeles Times <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.calendarlive.com/top/1,1419,L-LATimes-Movies-X!ArticleDetail-48151,00.html">article</a> about the making of the new movie, "Pi&#241;ero." Actor <b>John Leguizamo</b> spent 18 months developing the movie before deciding he didn't want the title role when "he discovered something that repulsed him" &#151; Pi&#241;ero had sexual relationships with teenaged boys. Leguizamo's replacement, <b>Benjamin Bratt</b>, says Pi&#241;ero "was a freak" leading "a life of crime and hustling," making him "far too troubling and complicated to be a true hero."  But others say the story of the "strung&#150;out genius" who learned to write while imprisoned in Sing&#150;Sing was an important story to tell.  <b>Miguel Algarin</b>, who helped found the <b>Nuyorican Poets Caf&#233;</b> with Pi&#241;ero, says, "Mikey was a great playwright, a great poet. He was the philosopher of the criminal's mind. You deal with the ethics of that." <br><br>
+
+<span class=headline>The dancing laureates . . . </span><br>
+Past winners of the <b>Nobel Prize in Literature</b> were in Stockholm last week for this year's presentation of the prize to this year's winner, <b>V.S. Naipaul</b>.  Among the former winners in attendance were <b>Nadine Gordimer</b> and <b>G&#252;nter Grass</b>.  "Both make no secret of not having recommended Naipaul for the prize," and both "disagree with Naipaul's denial of any political motivation in his writing," with Gordimer calling it "cowardly and pointless" to write "about colonial structures without ever taking a stance on them."  But Gordimer and Grass agree on something else:  "they like each other."  As this Frankfurter Allgemeine <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.faz.com/IN/INtemplates/eFAZ/docmain.asp?rub={B1311FFE-FBFB-11D2-B228-00105A9CAF88}&doc={246832DC-0382-48BD-8F3B-7D6E97171B65}">profile</a> of the two notes, "A picture of the two dancing hangs at her [Gordimer's] home &#151; not a waltz, but the tango. 'It takes two to tango,' says Gordimer, her eyes sparkling." <br><br>
+
+<span class=headline>Ambler's spy novels back, and just in time . . . </span><br>
+Spy novels will undoubtedly change in the aftermath of September 11, observes <b>Mahinder Kingra</b>, but they'll no doubt continue to be popular.  "Every conflict since World War I has inspired libraries of suspense novels about professional and amateur spies, the majority of them jingoistic, crypto&#150;fascist potboilers that only excite the worst passions of a nation at war," she notes.  But "If the genre has produced any works of genuine literary merit, it is largely due to <b>Eric Ambler</b>," the inspiration for writers including <b>John Le Carr&#233;</b> and <b>Alan Furst</b>.  Now, <b>Random House</b> is reissuing two of his books, "Background to Danger" and "A Coffin for Dimitrios." In a <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.citypaper.com/current/books.html">review</a> for the Baltimore CityPaper, Kingra says, "In a world where <b>Tom Clancy</b> and his lesser imitators churn out clich&#233;&#150;ridden stories about square&#150;jawed American heroes and swarthy, hate&#150;filled Muslims, it's worth exploring Ambler's accomplishments to see his ability to craft thought&#150;provoking thrillers based on complicated world events."<br><br>
+
+&#149; <b>RELATED:</b> In the above article, Mahindra Kingra quotes <b>Alfred Hitchcock</b> saying Eric Ambler devised heroes who "are anything but heroic, nor are they startlingly wise, or even daring. They are ordinary, rather pleasant people . . . who want to stay out of trouble and live comfortably."  But a new book about Hitchcock himself, <b>Peter Conrad</b>'s "The Hitchcock Murders," says <b>Tom Shone</b> in this New York Observer <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.observer.com/pages/book1.asp">review</a>, "is a quite terrifying book, designed to give even hardened Hitchcock fans the jitters."<br><br>
+
+<span class=headline>The revival, or diminishment, of the Diaspora? . . . </span><br>
+"At the very moment when Jews have more freedom than ever to assimilate in secular society, more of them than ever are reconnecting to their Jewish culture and faith," observes <b>Larry Tye</b>.  However, many Jews, he says, are put off by the "arrogance" and "insolence" of people in Israel, making the country "a source of pride but not necessarily a place to send their dollars or their children."  So, he says, on an identity quest as a Diaspora Jew, he's written an account of "seven cities that he believes represent the revival of Judaism in the Diaspora: Dusseldorf, Dnepropetrovsk (Ukraine), Boston, Buenos Aires, Dublin, Paris, and Atlanta" &#151; cities he says ""more in common with one another than with the Jewish state."  But in a Jerusalem Post <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.jpost.com/Editions/2001/12/10/Books/Books.39673.html">review</a> of the book, "Home Lands: Portraits of the New Jewish Diaspora," critic <b>Moshe Dann</b> says Tye's thesis is "problematic." For one thing, is it a diaspora or abandonment?  "One cannot dismiss the rate at which Jews are abandoning their faith," Dann notes.<br><br>
+
+<span class=headline>The year's notable poetry . . . </span><br>
+Critics and columnists are starting to come out with their annual "best of" reviews, but few publications seem to feature a particular focus on the year's best poetry.  But poet <b>Carol Muske&#150;Duke</b> was recently given the chance by the Los Angeles Times, and the resultant <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.calendarlive.com/top/1,1419,L-LATimes-Books-X!ArticleDetail-47827,00.html">column</a> includes some unavoidably obvious choices &#151; reading <b>James Merrill</b>'s "Collected Works" is "like reading <b>Marvell</b> or <b>Keats</b> or <b>Dickinson</b>, she says.  But Muske&#150;Duke makes some surprise selections, too, such as the anthology of "Frontier Taiwan," which offers an opportunity to realize "as magnificent, traumatic and revolutionary a breakthrough as any witnessed in world literature during the 20th century" &#151; "the emergence of modern poetry in China." <br><br>
+
+<span class=headline>September 10, New York City . . . </span><br>
+As the editors of The New York Observer note, it is an "aching holiday season" here in New York City.  But when editors asked 50 New York writers to write about their day on September 10, they were "amazed at their tenderness and wit."  They've posted those <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.observer.com/pages/frontpage6.asp">essays</a> in a lenthy section that includes <b>Tom Wolfe</b>, <b>Janet Malcolm</b>, <b>Cynthia Ozick</b>, <b>Dominick Dunne</b>, and numerous other New Yorkers, from <b>Martin Scorcese</b> to <b>Mayor&#150;elect Michael Bloomberg</b>.<br><br>
+
+<span class=headline>Why writers cut a wide path around remainder tables . . . </span><br>
+Novelist <b>Dean Crawford</b> didn't know about it until a friend saw his book on a remainder table in a bookstore:  it had gone out of print.  Poet and critic <b>David Lehman</b> regularly gets requests for his widely discussed, and praised, "Signs of the Times: Deconstruction and the Fall of Paul de Man," especially from academics who ask, "could I buy 30 copies for a class?"  But the book is out of print.  As <b>David Mehegan</b> says in this Boston Globe <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.boston.com/dailyglobe2/346/living/Shelved+.shtml">feature</a>, "Writers dream of their first book and of what comes after," but there's one thing "they're never ready for: having their books go out of print."<br><br> 
+
+<span class=headline>Two suggestions:  stream&#150;of&#150;consciousness writing, or get another house . . . </span><br>
+"One of England's best loved writers," <b>Alan Bennett</b> has been prolific for 40 years, writing plays and movies ("The Madness of King George"), and novels (most recently, "The Clothes They Stood Up In").  But now, he's suffering from "a debilitating bout of writer's block that has made him depressed," says a <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://books.guardian.co.uk/news/articles/0,6109,616371,00.html">report</a> in The Observer. "I've been unable to write at various times in the past, but this is the longest period when I've been unable to complete anything at all," he said at a recent reading in London. "It's not that I don't think of stories, but at the moment they really are too bleak to visit on the public." The Guardian reports that the problem started in his home in Yorkshire, so he's been trying to write at his other house, in London . . . where he has "experienced the same problem."<br><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><span class=tiny>NOTE: Daily newspapers often change URLs when archiving, so some links won't work beyond the day they're first posted. </span><br><br><br>
+
+
+
+
+
+
+
+
+<br><font color="#6666FF">
+Tuesday, 11 December 2001</font color> <br> <br>
+
+<span class=headline>J.R.R. Tolkien, Lord of the Rings;  Chip McGrath, lord of the bestsellers . . . </span><br>
+Over the year's, the <b>Ballantine</b> edition of <b>J.R.R. Tolkien</b>'s "Lord of the Rings" trilogy has sold over 55 million total copies.  Last year, it sold 300,000 of volume one, "The Fellowship of the Ring." This year, in anticipation of the upcoming movie version of "Fellowship," the company has sold 1.8 million copies.  The film is also accredited with putting all three volumes plus a special "Official Movie Guide" in the top four slots of most bestseller lists &#151; except the one at the New York Times, where only the movie guide has made the list, as <b>Paul Colford</b> notes in his New York Daily News <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nydailynews.com/2001-12-11/News_and_Views/Media_and_Business/a-134825.asp">column</a>.  <b>New York Times Book Review</b> editor <b>Charles (Chip) McGrath</b> told him that's because of a "policy" the Times has regarding "backlist titles."  He concedes Tolkien publishers are "not terribly happy about this decision."  Colford points out that's because many stores discount titles on the Times list, thereby "spurring additional sales."<br><br>
+
+<span class=headline>That other Festive Manufactured Holiday Phenomenon for Children gets underway . . . </span><br>
+The next big mega&#150;movie version of a kid's book, the first installment of <b>J.R.R. Tolkien</b>'s "Lord of the Rings" trilogy, is due out next week, but it had a big premiere in London Monday night.  As an Associated Press <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.washingtonpost.com/wp-dyn/articles/A21662-2001Dec10.html">wire story</a> reports, "Although it has not generated the overwhelming attention of last month's premiere of the first 'Harry Potter' film, an estimated 2,000 fans lined London's Leicester Square, screaming and shouting" at arriving stars <b>Liv Tyler</b>, <b>Christopher Lee</b>, <b>Ian McKellen</b> and <b>Elijah Wood</b>.  The story contains no word on what viewers thought of the film, but <b>Neil Spencer</b>, in an <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://books.guardian.co.uk/tolkien/story/0,11168,615651,00.html">commentary</a> in London's Observer, predicts all three films will go over just like the books themselves, which he says remind him of another movie trilogy, "Star Wars": "Both have become massively popular while being derided by purist cineastes and literati."  In fact, says Spencer, there are numerous similarities between the "Rings" books and "Star Wars," such as that "Both returned to traditional story-telling at a time when their respective art forms were gripped by experiment," and "Both are conscious attempts to tap the wellspring of myth."  And both, he says, deserve more credit as serious works of art.  <br><br>
+
+<span class=headline>The REAL question about Harry . . . </span><br>
+"By the end of its cinema release more than one billion children will have seen <b>Harry Potter</b> and the Philosopher's Stone," notes <b>Jim Schembri</b> in a Melbourne Age <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.theage.com.au/entertainment/2001/12/08/FFX0NMAUWUC.html">story</a>. "This is on top of the those who have read the books, which thus far have sold more than 160 million copies throughout the world."  Yet while the film "has been praised for its positive messages about good over evil," he notes, "we never really get a fix on just what kind of hero Harry Potter is &#151; Those glasses, that scarf, the way he rides his broomstick, the fact that his closest friends are a boy and a girl prompts one to ask of Harry Potter the question that is on everybody's mind: is he or isn't he?" <br><br>
+
+<span class=headline>The truth about fiction in womens' magazines . . . </span><br>
+It launched the careers of <b>Sylvia Plath</b>, <b>Truman Capote</b>, <b>Joyce Carol Oates</b>, and even <b>Michael Chabon</b>, won 43 <b>O. Henry Awards</b> and a <b>National Magazine Award for Fiction</b>, but by the time it ceased publication in October after 66 years, <b>Mademoiselle</b> magazine "had become little more than a product&#150;pushing, 'Sex and the City' fanzine," says <b>Kera Bolonik</b> in this Salon <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.salon.com/mwt/style/2001/12/10/women_s_mags/index.html">essay</a>.  Still, she says, the demise prompted many to observe that "Mademoiselle died, along with a handful of other 'women's glossies,' when they stopped publishing fiction back in the 1990s."  That, says Bolonik, has been "interpreted by many in the worlds of media and publishing as a surrender to simplistic marketing instincts and a misinterpretation of readers' interests and aptitude," and has "revived the debate about whether readers of so&#150;called women's magazines would ever buy glossies that included fiction."<br><br>
+
+<span class=headline>Early candidate for most controversial author of 2002 . . . </span><br>
+As <b>David D. Kirkpatrick</b> reported last week in a New York Times <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nytimes.com/2001/12/01/books/01BOOK.html">story</a> (previously posted on MobyLives), controversy already surrounds a new book by Harvard law professor <b>Randall Kennedy</b>, even though it's not out until next month, because of its title:  "Nigger: The Strange Career of a Troublesome Word."  The title "has elicited considerable hand&#150;wringing among the mostly white staff of its publisher, <b>Pantheon Books</b>, where some executives have even refused to say its name," Kirkpatrick noted.  But author Kennedy tells <b>Linton Weeks</b> in this Washington Post <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.washingtonpost.com/wp-dyn/articles/A22726-2001Dec10.html">profile</a> that, for him, "There was no hand&#150;wringing over the title."  Weeks reports, "Over soup and dessert, Kennedy does say the word outright at times. He also uses 'the N&#150;word' euphemism and refers to it as 'that word.'"  As for criticism, Kennedy says it "comes with the territory."   <br><br>
+
+<span class=headline>Inclusion of "alternative" poets in anthology causes ruckus . . . </span><br>
+Poetry anthologies "are a kind of historical record, like time capsules," notes <b>Stephen Burt</b> of The Boston Review. They are also like ice cream: "they vary enormously in taste and quality; like ice cream, they may be classified as "vanilla" or "other." Vanilla anthologies ratify a period's or an audience's already-existing tastes; other anthologies seek to change those tastes."  But the new ambitious, capacious, sometimes capricious  "Anthology of Modern British & Irish Poetry," edited by <bn>Keith Tuma</b>, seems to combine both qualities, says Burt in a <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://bostonreview.mit.edu/BR26.6/burt.html">review</a>.  It "looks vanilla; it includes the standard ingredients (<b>Yeats, Auden, Larkin, Stevie Smith, Tony Harrison</b>)," says Burth.  "In fact, it's more like pineapple gooseberry chip. Some of its British readers have already expressed their surprise and distaste."  Why the fuss? Tuma's book "attempts to turn Americans (and some overseas readers too) into fans of neglected, experimental, and 'alternative' British and Irish poets, who have long relied on small presses, tiny journals, and dedicated non&#150;academic critics. Such poets make up the bulk of this anthology." <br><br>
+
+<span class=headline>Edward Said finds consistency, also gibberish . . . </span><br>
+In his new book, "Reflections on Exile," <b>Edward Said</b> collected decades worth of his essays and cultural criticism.  Talking about the process of putting the book together in an <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://books.guardian.co.uk/departments/politicsphilosophyandsociety/story/0,6000,616545,00.html">interview</a> with <b>Joan Smith</b> (part of a <b>PEN</b> lecture, text courtesy of The Guardian), Said says he found himself disagreeing with his younger self, and sometimes "feeling some disbelief that I could have written such gibberish. Disagreeing and wondering how I came to be interested in that particular subject, and then wishing that I could take it back and change it. It's a grim moment."  He also noticed a consistency:  "I find myself instinctively on the other side of power."<br><br>
+
+<span class=headline>The Book Lady speaks . . . </span><br>
+She's known around St. Paul as "the Book&#150;Bag Lady, the Book Bag&#150;Lady, or simply the Book Lady," and for 50 years has been "materializing at local secondhand bookstores, church-basement bazaars, sidewalk flea markets, estate sales, and going-out-of-business liquidations," where she "unfailingly gathers dozens of volumes and wobbles off beneath a cascading hillock of cast-off histories, out-of-date textbooks, discarded high school yearbooks, and dog-eared paperbacks."  But her name is actually <b>Jeanette Kamman</b>, and she's the founder and sole custodian of the <b>Kamman&#150;Dale Library for Orphans</b>.  In a <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.citypages.com/databank/22/1094/article9961.asp">profile</a> for the Minneapolis CityPaper, <b>Peter Ritter</b> visits her at the library, which is "in three adjacent houses on St. Paul's west side, occupies the better part of 30 rooms, sundry stairwells, various closets and cupboards, and two bathtubs." By the entry is "a sign taped in one window, which reads, in the cut-and-paste lettering style of a ransom note, 'They're Killing Us! Protect Yourself.'" <br><br>
+
+<span class=headline>Looking for the real Anthony Burgess . . . </span><br>
+It's been eight years since <b>Anthony Burgess</b> died, and two biographies of the novelist look about to appear simultaneously sometime next year . . . and couldn't be more different, says <b>Michael Ratcliffe</b>.  In an <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://books.guardian.co.uk/departments/biography/story/0,6000,615585,00.html">essay</a> for The Observer, where Ratcliffe was once Burgess' editor, he considers the two forthcoming books and which may be closer to the truth.  One of the biographers, <b>Andrew Biswell</b>, says he is "assembling a scholarly life of a writer for whom he feels 'deep affection' and greatly admires."  The other writer, <b>Roger Lewis</b>, "thinks the man who wrote 'A Clockwork Orange' was a bit of a monster, and had done his best work by the age of 50."  Lewis is also reputed to have said he was going to "crucify" Burgess in his book, although he strongly denies the quote.  Still, it's contributed to his being seen as "the enemy" by Burgess' widow, who seems to have given an unofficial nod to Biswell.<br><br>
+
+<span class=headline>Prolific scholar faces the ultimate deadline . . . </span><br>
+With six books in 10 years, iconoclastic art historian <b>Michael Camille</b> has been "producing acclaimed work at a breakneck pace," work that "so compels and provokes his colleagues that they are particularly eager for him to complete his umpteen unfinished projects, if humanly possible," says <b>Peter Monaghan</b> in a Chronicle of Higher Education <a href="">profile</a>. "Michael has done more than virtually anyone I can think of to recast the field of medieval art history and to open it up to new perspectives and approaches," says Harvard's <b>Jeffrey F. Hamburger</b>.  As for Camille's more provocative qualities, says Hamburgrer, "A little controversy is a good thing in a field sometimes as staid as medieval studies."  And indeed, Camille's many on&#150;deck projects seem as idiosyncratic as ever, and in an interview, Monaghan says "Camille mentions so many books in progress that he would need two or three more careers to get to them all."  The problem is time is running out on the one he's got &#151; Camille has an deadly brain tumor and is writing as fast as he can.<br><br>
+
+<span class=headline>Confusing industry, or industrial models, with art . . . </span><br>
+As critic <b>Alex Good</b> notes, <b>Charles Baudelaire</b> once said, "What man, worthy of the name of artist, what genuine lover of art, has ever confused industry with art?" But nowadays, says Good, "our attitude has become less certain."  As he notes in a lengthy <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.goodreports.net/industry.htm">essay</a> from his website, GoodReports, "Complaints about the industrialization of the arts and their dissemination by global media corporations have taken on a political dimension. In addition to being soft&#150;hearted and fuzzy&#150;minded in a William Morris kind of way, they are also viewed as elitist."  As things have developed, he asks, can anyone "distinguish between industry and art"?  Perhaps more importantly, he argues, "The engine of change in the arts during the past century was not an advance in technology, but the application of managerial models of production that followed in its wake."<br><br>
+
+<span class=headline>One critic wonders: Has Bellow written his last book? . . . </span><br>
+"There seems to be a bit of mischief going on in the title of <b>Saul Bellow</b>'s new book," notes <b>Stephen Amidon</b> in a New Statesman <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.newstatesman.co.uk/200112100040.htm">review</a> of Bellow's "Collected Stories" &#151; from which, he observes, "a number of novellas and short stories missing."  So, he asks, "Why not "selected"? Could it be that the author is giving us a sly thematic nudge here, using a literary commonplace to indicate a unifying concern?" In fact, he speculates, "Collection here means recollection. For Bellow's vibrant and unforgettable characters are in fact collectors of stories . . . They are on the lookout for memories, gathering them in, jealously bringing them out for a guest to examine . . ." as if in a final book.<br><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><font color="#6666FF">
+Monday, 10 December 2001</font color> <br> <br>
+
+
+<span class=headline>Stolkholm shocker:  Naipaul's acceptance speech seems to have angered no one . . . </span><br>
+After the outrageous remarks he made at an airport news conference upon his arrival in Stolkholm to accept his <b>Nobel Prize</b> in literature, <b>V.S. Naipaul</b> had raised tension levels for his acceptance speech Friday.  But despite his airport remarks &#151; he said he was "delighted" by the war in Afghanistan because the Taliban deserved "to be severely punished" &#151; the speech contained no further controversial commentary, and was apparently both revealing and moving, according to an Associated Press <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.washingtonpost.com/wp-dyn/articles/A12507-2001Dec8.html">wire report</a>.  Looking back on his long career, he said he didn't even like to read as a child and was "surrounded by areas of darkness" growing up.  His subsequent career was about filling in those blanks, he explained, saying, "I never had a plan. I followed no system. . . . I had to do the books I did because there were no books about those subjects to give me what I wanted."  The quest, he said, "is what I meant when I said that . . . I am the sum of my books."  After the 40&#150;minute speech, says the A.P., "Naipaul looked touched" by the results: "a standing ovation by fellow laureates, ambassadors and book lovers in a gilded hall at the <br>Swedish Academy</b>."  The actual Nobel award, and a check for &#36;940,000, will be given to Naipaul today by Sweden's <b>King Carl XVI Gustaf</b>. <br><br>
+
+&#149; <b>MORE:</b> Read the full text of Naipaul's <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://books.guardian.co.uk/departments/generalfiction/story/0,6000,615243,00.html">acceptance speech</a>, courtesy of The Guardian.<br><br>
+
+<span class=headline>RIP:  Agha Shahid Ali . . . </span><br>
+<b>Agha Shahid Ali</b>, whose most recent book of poems, "Rooms Are Never Finished," was nominated for a National Book Award last month, has died of a brain tumor at his home in Amherst, Massachusetts.  He was 52 years old.  Although he died two days ago, little other information is available, however; no American or British sources have yet reported his death.  The only information to be found is through a series of tributes posted by the Indian journal Tehelka, such as this <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.tehelka.com/channels/literary/2001/dec/9/lr120901kamila.htm">remembrance</a> by his former student <b>Kamila Shamsie</b>, who remembers Ali telling one of his other students who wanted their grade changed, "I'll raise your grade if you sing Achey Breaky Heart."  Another <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.tehelka.com/channels/literary/2001/dec/8/lr120801agha.htm">tribute</a> comes from <b>Rukun Advani</b>, who says ALi once said that, "I'm successful in the US of A only because I've raised self-promotion to the level of art." But Advani says Ali "deserved every accolade he got. He had one foot in the realm of mushairas and <b>Faiz Ahmad Faiz</b>, the other in the world of Western versification and translation activity. His own achievement was to blend the two."   And, in this <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.tehelka.com/channels/literary/2001/dec/8/lr120801parsa.htm">recollection</a>, <b>Parsa Venkateshwar Rao Jr.</b> remembers Ali as "one of the finest English poets from India. There was a visible craftsmanship in his verse. And he used that control of the language to express his deeply felt experiences about Kashmir, his home. But Shahid's poetry was not obscure or esoteric. A general reader could relate to the experience and the emotion in the poems. He will continue to be read." <br><br> 
+
+&#149; <b>MORE:</b> In a just&#150;posted <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.gazettenet.com/12102001/obituari/9458.htm">obituary</a> from the Daily Hampshire Gazette of Northampton, Massachusetts, <b>Margaret O'Brien</b>, one of Ali's colleagues from Amherst college, where he was an English professor, says, "He was in all respects just a huge presence with a lavish character and a spacious heart. He had a balance of Old World courtesy and formality and mad, passionate gaiety and fun, very paradoxical."  Meanwhile, University of Massachusetts English department chair <b>Anne Herrington</b> says, "His life, teaching and poetry were really distinguished for his great generosity of spirit. He had a wonderful wit and he brought his wit and sensitivity to language to his poetry." <br><br>
+
+<span class=headline>Mystery writer stakes her reputation on proving Ripper i.d., but so far only proves she can be had by art collectors . . . </span><br>
+After 113 years, mystery writer <b>Patricia Cornwell</b> says she's solved the <b>Jack the Ripper</b> serial killings of 1888.  It was famed impressionist painter <b>Walter Richard Sickert</b>, she said in an interview with <b>Diane Sawyer</b> on the ABC News program <b>PrimeTime Live</b>. "I am staking my reputation on this," the author of the popular series featuring crime&#150;solving coroner <b>Kay Scarpetta</b> told Sawyer.  According to an ABC.com <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://abcnews.go.com/sections/primetime/DailyNews/pt_ripper_011206.html">report</a>, "Cornwell has spent &#36;4 million on her obsession," with expenditures including hiring a forensics team and buying 30 of Sickert's paintings."  The report says Cornwell's experts then "tore apart several of her Sickert paintings, scrutinizing the frames and canvas for fingerprints or traces of blood, but found nothing."  Cornwell &#151; who says she got interested in the case while writing a book where her Scarpetta character looks into the murders &#151 says she is not deterred and will continue, "not for his sake, but for his victims' sake," and for the sake of a nonfiction book she is now writing about it.  Meanwhile, a <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://books.guardian.co.uk/news/articles/0,6109,615448,00.html">report</a> in The Guardian says that in England, Cornwell's claims were called "monstrously stupid" and "were met with derision by Sickert experts and biographers outraged that one of his paintings had been sacrificed . . . Their only consolation was that Cornwell appears to have paid well above the market rate for her collection."<br><br> 
+
+<span class=headline>What happens when you write a book that's critical of the President during wartime . . . </span><br>
+Rumors have been swirling for days in the New York publishing scene about <b>Michael Moore</b>'s new book, "Stupid White Men and Other Excuses for the State of the Union."  Publisher <b>ReaganBooks</b>, an imprint of <b>HarperCollins</b>, withheld from releasing the book on its September release date because it was seen as too critical of <b>George W. Bush</b> after the September 11 tragedies.  But in a New York Post Page Six <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nypost.com/gossip/pagesix.htm">column</a> (fifth item) Moore denies reports that he'd agreed to rewrite the book and tone it down. "I'm not revising the book," he says. "I believe HarperCollins is a publisher that supports a diversity of ideas. I have no doubt that they will do the right thing." But Post columnist <b>Richard Johnson</b> says "a HarperCollins rep told us a different story: 'Both Moore and ReganBooks thought its publication would be insensitive given the events of Sept. 11.'" Meanwhile, Johnson says a reported 100,000 copies of the already&#150;printed book "are gathering dust in a Pennsylvania warehouse." <br><br>
+
+
+<span class=headline>Maybe it's because truth lately is stranger than fiction . . . </span><br>
+Fiction titles aren't staying on the bestseller lists as long as they used to, and even perennial bestselling novelists with books out this holiday season are selling significantly less than with new books in previous holiday seasons, according to a survey by <b>Daisy Maryles</b>, the executive editor of <b>Publishers Weekly</b>.  It's all part of "the most challenging period in several years" for publishers of fiction, according to a Reuters <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://dailynews.yahoo.com/h/nm/20011207/re/bizbooks_dc_1.html">wire story</a>, which blames the troubles on the book industry's "all&#150;Osama&#150;all&#150;the&#150;time funk."  And while some publishers say sales have recovered somewhat since September 11 due to the "typical surge in sales during the holiday season," "Compared with the last few years, it is still underperforming," says <b>Random House</b> spokesman <b>Stuart Applebaum</b>. "It's a very tough market at the moment, and consumers are being extremely selective." <br><br>
+
+<span class=headline>Secret study calls the Koran a "con," says critic . . . </span><br>
+In the Middle East, "even the most apparently dispassionate research can be swept up in the blinding ideological sandstorms that choke reasoned dialogue," says <b>Martin Bright</b>.  "Thus the censorship that plagues the Middle East seeps into every corner of intellectual life."  And, says Bright in a startling <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.newstatesman.co.uk/200112100017.htm">essay</a> for The New Statesman, "Nowhere is this more true" than in a new study "by a group of academics who have spent the past three decades plotting a quiet revolution in the study of the origins of the religion [Islam], the Koran and the life of the Prophet Mohammad."  Their conclusions, says Bright, "are devastating: that we know almost nothing about the life of the Muslim prophet <b>Mohammad</b>; that the rapid rise of the religion can be attributed, at least in part, to the attraction of Islam's message of conquest and jihad for the tribes of the Arabian peninsula; that the Koran as we know it today was compiled, or perhaps even written, long after Mohammad's supposed death in 632AD," and, "most controversially of all," that "there existed an anti&#150;Christian alliance between Arabs and Jews in the earliest days of Islam, and that the religion may be best understood as a heretical branch of rabbinical Judaism."<br><br>
+
+<span class=headline>Bad news continues for Bellesiles . . . </span><br>
+In a lengthy New York Times <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nytimes.com/2001/12/08/books/08GUNS.html">overview</a> of the case against historian <b>Michael Bellesiles</b> and his book "Arming America," an article that essentially rehashes a Boston Globe <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.boston.com/dailyglobe2/317/living/Bellesiles_responds_to_critics_of_his_book+.shtml">report</a> from last month, reporter <b>Robert Worth</b> does not mention the aspects of the controversy that took place on the pages of the Times, such as the glowing <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://search.nytimes.com:80/plweb-cgi/fastweb?state_id=1007994351&view=book-full&numhitsfound=5&query=Michael%20Bellesiles&&docid=7841&docdb=bookrev-arch&dbname=bookrev-cur&dbname=bookrev-arch&dbname=booknews-cur&dbname=booknews-arch&numresults=10&sorting=BYRELEVANCE&operator=AND&TemplateName=doc.tmpl&setCookie=1">review</a> by <b>Garry Wills</b> cited by both sides as evidence for their case, nor the fiery <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://search.nytimes.com:80/plweb-cgi/fastweb?state_id=1007994351&view=book-full&docrank=1&numhitsfound=5&query=Michael%20Bellesiles&&docid=2504&docdb=booknews-arch&dbname=bookrev-cur&dbname=bookrev-arch&dbname=booknews-cur&dbname=booknews-arch&numresults=10&sorting=BYRELEVANCE&operator=AND&TemplateName=doc.tmpl&setCookie=1l">letter</a> in response from Charlton Heston.  However, the Times' report does make one new observation &#151; that "the scholars who have documented serious errors in Mr. Bellesiles's book &#151; many of them gun&#150;control advocates &#151; do not appear to have any sort of political agenda."  The report also seems to question Bellesiles' claim that information stored on his website had been altered by computer hackers.  The news report also issues what seems to be a damning criticism of an upcoming response to critics Bellesiles will publish in an acadmic journal &#151; a draft the Times does not explain how it obtained "leaves many serious errors unaddressed." <br><br>
+
+<span class=headline>Consumer Reports: People prefer independent bookstores, their wallets prefer chains . . . </span><br>
+A recent survey of 25,000 readers of <b>Consumers Report</b> found that the overwhelming majority of respondents &#151; 88 percent &#151; preferred independent bookstores over giant chain stores such as <b>Barnes &#38; Nobel</b> or <b>Borders</b>, and over online stores such as <b>Amazon.com</b>, too, except in one area &#151; price.  As an <b>American Booksellers Association</b> <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.bookweb.org/home/news/btw/5310.html">report</a> notes, the January 2002 issue of the magazine says the high approval rating for independents "puts those stores on a par with the highest-rated stores from any Consumer Reports survey in recent years."  Customers gave independents the top spot in five categories: "whether the bookseller had the book requested, whether the bookseller offered a varied selection, service, ambience, and layout."  However, the Consumer Reports article (unavailable on line) also noted that "a shopping basket of 10 selected titles was more expensive at a sampling of 12 independent stores than a number of chain or online retailers." In the end, it rated indendents in the top spot, with Amazon in second place, followed by <b>Barnesandnoble.com</b>, B&#38;N, Borders, <b>Books&#150;A&#150;Million</b>, <b>B. Dalton</b>, and <b>Waldenbooks</b>. <br><br>
+
+<span class=headline>Through a different looking glass . . . </span><br>
+The illustrations by <b>John Tenniel</b> for the original editions of the two "Alice in Wonderland" books by <b>Lewis Carroll</b>, aided by the 1951 <b>Walt Disney</b> version of the tale that leaned heavily on Tenniel, have etched a particular image of Alice in mind: "all prim and proper in her pinafore and black ankle-strapped shoes . . . with her over&#150;large, blond&#150;tressed head and petulant little mouth."  The image is so widely held that "headbands in Britain today are still called 'Alice bands,'" notes Orlando Sentinel book editor <b>Nancy Pate</b>.  But two new lavishly illustrated version just out for the holidays "liberate" Alice, says Pate in this <a href="">review</a>.
+"<b>DeLoss McGraw</b>'s color-saturated, phantasmagorical images," says Pate, "owe more to the 1960s than the 1860s. "And even though <b>Mervyn Peake</b>'s newly restored pen&#150;and&#150;ink drawings were commissioned in the 1940s, they offer a refreshing mix of the contemporary and traditional."<br><br>
+
+<span class=headline>A preview of upcoming history . . . </span><br>
+History books are thriving like never before, says the books editor of the Raleigh News &#38; Observer, <b>J. Peder Zane</b>.  And what's more, "it's just not your grandfather's history," he notes.  "Modern readers like it jazzed up, and with a human face. They explore it through novels that fold facts and dates into great stories and through nonfiction biographies that personalize the past."  In this <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://newsobserver.com/standing/collections/zane/1100000046899.html">survey</a> he notes the onslaught of both fiction and nonfiction history books due out over the next three months.<br><br>
+
+<span class=headline>Does "Confederacy of Dunces" history bespeak ongoing problems in NY publishing? . . . </span><br>
+A new biography of "Confederacy of Dunces" author <b>John Kennedy Toole</b>, "Ignatius Rising," raises an "enduring question," says reviewer <b>Hugh Murray</b> &#151; "Should New York and Hollywood dictate American culture?"  In his <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.shepherd-express.com/shepherd/22/48/night_and_day/night_and_day.html">review</a> for Milwaukee's Shepherd Express, Murray considers the book received "only rejection, or worse &#151; long delays, mixed signals, and finally further rejection" from New York publishers when Toole first shopped it around.  Murray has both criticism and praise for the new bio &#151; "The authors should be commended for revealing that Toole was gay, but his gay side deserves further exploration," he says.  But what it reveals about the saga of the Pulitzer Prize&#150;winning book itself, he says, makes you wonder "how many other possible classics have gone unpublished about New Orleans, or Missouri or Wisconsin because they did not conform to the values and sensibilities of New York?"<br><br>
+
+<span class=headline>Poetry readings are ruining poetry . . . </span><br> 
+"Over the last 50 years, readings have become one of the most common ways that poetry is experienced," observes <b>Adam Kirsch</b>.  Why have readings become so popular with audiences? "There is the allure of celebrity," he says, "there is the esprit de corps," but "at bottom, though, is the idea that hearing an author read his or her poem is a more authentic way to experience it."  But, Kirsch says in a Slate <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://slate.msn.com/?id=2059241">review</a> of "Poetry Speaks," a coffee table book that includes three CDs of famous poets reading aloud, as interesting as it can be to listen to someone such as <b>Alfred Lord Tennyson</b> or <b>William Butler Yates</b> reading their own work, "the voice of the poet holds little key to the poem." In fact, says Kirsch, the "danger" of relying on readings is that "poetry will degenerate from a written to a spoken art, from literature to performance."  It's already started, he says:  "The poetry reading has already started to affect the way poetry is written, encouraging poets to write simple, conversational, jokey free verse," for example.<br><br>
+
+
+
+
+
+
+
+
+
+
+
+
+<br><font color="#6666FF">
+Friday, 7 December 2001</font color> <br> <br>
+
+
+<span class=headline>"Graphic novel" wins British book award . . . </span><br> 
+For the first time, a comic book, or "graphic novel," has won England's prestigious <b>Guardian First Book Award</b>, it was announced last night. It was also the second time in three years that an American has won the award. "Jimmy Corrigan, or The Smartest Kid on Earth" by Nebraska native (and now Chicago resident) <b>Chris Ware</b> won the &#163;10,000 prize, thus becoming, according to The Guardian's own <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://books.guardian.co.uk/firstbook2001/0,10486,506971,00.html">report</a>, "the first graphic novel to win a big British literary award."  The report further notes that the only previous "graphic novel" to win a big literary award was <b>Art Spiegelman</b>'s "Maus," which won America's <b>Pulitzer Prize</b> in 1992.   However, "the choice was not uncontroversial," notes The Guardian.  One judge, Egyptian novelist <b>Ahdaf Soueif</b>, said she found the book "self-conscious and rather self-indulgent." Another judge, novelist <b>A.L. Kennedy</b>, however, said the book moved "the whole genre forward hugely."  In the end, it was reportedly a "close three&#150;way battle" between "Carter Beats the Devil" by <b>Glen David Gold</b>, "Anthony Blunt: His Lives" by <b>Miranda Carter</b>, and Ware.  The Guardian says, "In the end, Jimmy Corrigan won by a single vote." <br><br>
+
+&#149; <b>MORE:</b> The Guardian offers these <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://books.guardian.co.uk/gallery/0,8550,602660,00.html">sample frames</a> from "Jimmy Corrigan."<br><br>
+
+&#149; <b>MORE:</b> In an <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://books.guardian.co.uk/firstbook2001/story/0,10486,614835,00.html">interview</a> with The Guardian, Chris Ware says, "I still have overwhelming doubt about my ability."<br><br>
+
+<span class=headline>17 years later, is the truth about Bhopal being told or not? . . . </span><br>
+Director <b>Oliver Stone</b> is reportedly making a movie about the deadly gas leak at the <b>Union Carbide</b> plant in Bhopal, India that devastated the town in 1984.  The film will supposedly star <b>Penelope Cruz</b>.  But will it bear any likeness to reality? On the 17th anniversary of the tragedy, reporter <b>Anupreeta Das</b> travelled to Bhopal and says in this Indian Express <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.indian-express.com/flair/20011202/3.html">report</a> that, for one thing, they probably won't shoot the film on the actual location.  "There is too much evidence of the tragedy in the city; too many children born deformed, too many widows, too many disabled," she says. And what of the book the film is expected to be based upon:  "It Was Five Past Midnight in Bhopal" by <b>Dominique Lapierre</b> and <b>Javier Moro</b>? The book is a journalistic account that includes photos, and the authors have "created heroes, villains, victims and survivors out of real people," notes Das.  "Their little stories, so poignantly penned, command your attention beyond the pages of the book. Here's art, through its realism and respect for 'truth,' imitating life."  But arriving in Bhopal to hunt down some of those characters, says Das, "is when the surprises begin."<br><br>
+
+<span class=headline>One more September 11 book, but that's still one less than expected . . . </span><br> 
+He's not an agent, he's an attorney, but he's an attorney who negotiates incredible book deals &#151; and now he's done it again.  <b>Bob Barnett</b>, who started by negotiating the multi &#150;million dollar deals of <b>Hillary Clinton</b> and <b>Bill Clinton</b>, and was in the news only yesterday for the multi&#150;million dollar deal he swung for 11&#150;year&#150;old poet <b>Mattie Stepanek</b> (see the <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.washingtonpost.com/wp-dyn/articles/A1372-2001Dec6.html">story</a>, previously posted on MobyLives), has apparently snared a &#36;1 million book contract for yet another client, <b>Steve Brill</b>.  A New York Post <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nypost.com/business/35885.htm">report</a> by <b>Keith J. Kelly</b> says Brill, founder of <b>Court TV</b> and of the media watchdog magazine <b>Brill's Content</b>, has signed with <b>Simon &#38; Schuster</b> to write "a sweeping saga about the attacks that shook the nation on Sept. 11 and its aftermath," says Kelly. Meanwhile, Kelly also updates another story from yesterday (see the fourth item in this New York Daily News <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nydailynews.com/2001-12-06/News_and_Views/Daily_Dish/a-134321.asp?last6days=1">column</a> by <b>Mitchell Fink</b>, previously posted on MobyLives), saying that there has apparently been little interest amongst publishers in the book being proposed by <b>Howard Lutnick</b>, the CEO of <b>Cantor Fitzgerald</b>, the company that lost 658 employees in the World Trade Center attacks.  Lutnick, who first gained fame for crying about his lost colleagues on TV, but then "was given a public relations pounding when he cut off employees' pay checks after the attack," is a "tough sell," one insider tells Kelly.  "We passed," says a <b>St. Martin's</b> spokesman.<br><br>
+
+<span class=headline>How about "Strike Three" . . . </span><br> 	
+Is a new book about the life on and off the field of a <b>New York Yankees</b> pitcher ripping off one of the most famous sports books ever?  That's what New York Daily News columnist <b>Paul Colford</b> wondered when he heard that former Yankees pitcher <b>David Wells</b> had signed a six&#150;figure deal with <b>HarperCollins</b> imprint <b>William Morrow</b> for a memoir to be called "Ball Five."  Colford says in his <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nydailynews.com/2001-12-07/News_and_Views/Media_and_Business/a-134416.asp">column</a> that he promptly e&#150;mailed <b>Jim Bouton</b> (probably at his <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.jimbouton.com/">website</a>), author of "the most famous baseball memoir ever written," 1970's "Ball Four."  Bouton replied:  "'Ball Five' was my first update to 'Ball Four'!" He also asked, "Is this another example of the modern player making money off the backs of the older players without a note of thanks or a check?" <br><br>
+
+<span class=headline>Killing mystery . . . </span><br>
+Israeli short story writer <b>Etgar Keret</b>, whose collection of stories about life in modern Israel "The Bus Driver Who Wanted to Be God" is just out in the U.S., responds to a request from the L.A. Weekly to describe "what people in Israel are thinking" &#151; in 600 words or less.  In his <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.laweekly.com/ink/02/03/new-keret.shtml">essay</a>, he says his mother, a Holocaust survivor, "says I'll never be able to understand what it's like for a nation to be without a country." He says a Palestinian friend tells him "I'll never be able to understand what it's like for a nation to live under occupation. No, he didn't go through the Holocaust, and his whole family is alive, thank God, at least for the time being."  Meanwhile, his neighbor says "I'll never be able to understand what it's like to lose a loved one in a suicide bombing. And there isn't even anyone to get mad at. After all, the guy that killed him is already dead himself, blown to pieces."  And all of them, Keret says, agree on one thing:  "They are all certain, absolutely certain, that I simply can't understand what¹s going on in their heads."<br><br>
+
+<span class=headline>Vicarious leadership better than none, says critic . . . </span><br> 
+"After years of being told by learned historians that history is not made by great men &#151; that it is made by forces (economic, social, demographic, geographic) beyond the control of individuals, that the very words "great men" are an aspersion on the ordinary people, to say nothing of the women . . . we are now being deluged with best&#150;selling books on our great men," observes <b>Gertrude Himmelfarb</b>.  One in particular seems to be getting biographic attention lately, she says:  <b>Winston Churchill</b>.  She also notes that may people are citing and quoting Churchill since the September 11 attacks.  "It was startling to hear the president, not known for his eloquence, being commended for his Churchillian addresses to the nation," she notes.  But does his example resonate with contemporary reality after all?  Himmelfarb looks at two new biographies to see, and in her New Republic <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.thenewrepublic.com/112601/himmelfarb112601.html">review</a> of "Churchill: A Study in Greatness" by <b>Geoffrey Best</b> and "Churchill: A Biography" by <b>Roy Jenkins</b>, she says "neither book contains very much new about him.  But even the most familiar retelling of this remarkable life has its own justification. It is always exhilarating to climb Everest yet again, if only vicariously.<br><br>
+
+<span class=headline>Radical concept:  reality more interesting than schmaltz . . . </span><br> 	
+Although "condemned for smugness" by British critics such as <b>E.M. Forster</b>, when "Mrs. Miniver" was released in America in 1940 it became "an instant best&#150;seller &#151; a symbol of embattled Britain in its finest hour." The movie two years later starring <b>Greer Garson</b> only elevated the perception that author <b>Jan Struther</b> &#151; a 36&#150;year&#150;old housewife when she began writing the newspaper essays that made up the book &#151; was the real&#150;life model for the beloved heroine, a perception she encouraged.  But "The Real Mrs. Miniver," a new book by Struther's granddaughter, <b>Ysenda Maxtone Graham</b>, tells a different but no less powerful story, says <b>AListair Horne</b> in a Financial Times <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://timeoff.ft.com/ft/gx.cgi/ftc?pagename=View&c=Article&cid=FT365QKZSTC&live=true">review</a>.  Horne says the tale of illicit love, poverty, and a husband in a German POW camp is "the most moving book I have read this year."<br><br>
+
+<span class=headline>The return of Russian literature . . . </span><br> 	
+"For almost two centuries," as <b>Leon Aron</b> points out in this <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.the-idler.com/IDLER-01/12-7.html">essay</a> from The Idler, "Russian literature has persisted in addressing the core issues and dilemmas of human existence.  Even during the Soviet era, when virtually all of Russia's finest writers and poets were exiled, killed, imprisoned, savagely censored, or forbidden to publish, the tradition lived in underground samizdat, manuscripts smuggled abroad, and in the state&#150;run literary magazines of the 'liberal' persuasion, especially during political thaws."  But what has been going on since then?  Aron says that with three recent novels &#151; "Underground: The Hero of Our Times" by <b>Vladimir Makanin</b>, "Freedom" by <b>Mikhail Butov</b>, and The Gift of the Word: Fairy Tales Over the Phone" by <b>Ergaly Ger</b> &#151; Russian literature has once again "announced its presence."<br><br>
+
+<span class=headline>Love &#38; in&#150;laws . . . </span><br>
+An epic television movie airing on German TV tells the story of the Mann family, particularly focussing on <b>Thomas Mann</b> and his brother <b>Heinrich Mann</b>, who was also a popular novelist before both brothers fled Germany in the 1930s with the rise of Naziism.  The series prompts this long <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.faz.com/IN/INtemplates/eFAZ/docmain.asp?rub={B1311FFE-FBFB-11D2-B228-00105A9CAF88}&doc={DA088511-E309-493C-BD49-4E5400F4D1D2}">essay</a> by <b>Martin Thoemmes</b> in the Frankfurter Allgemeine Zeitung that takes another look at Heinrich's wife <b>Nelly Kr&#246;ger</b>, whom Thoemmes says has been maligned by Mann biographers &#151; in part, no doubt, because they "shared Thomas Mann's contempt for his sister&#150;in&#150;law."  A troubled woman who made numerous suicide attempts and had an apprent drinking problem, her husband nonetheless stuck by her, and she by him when his career fell apart in exile.  Nonetheless, Thomas wrote to one friend that she "Made me sick," and when she died, he wrote to another, "My brother, who (luckily) has lost his wife, will now move in with us for a few weeks. It was high time that this alliance was undone through death. It was ruinous . . ." <br><br>
+
+<span class=headline>Let's hope they're cast in "War and Peace" next . . . </span><br> 
+Medievalist librarian <b>Evan Nattrass</b> has always loved <b>J.R.R. Tolkien</b>'s "Lord of the Rings" books, so when he learned it was being filmed where he lived &#151; in New Zealand &#151; he signed up to be an extra.  "My first scenes were as a Gondorian soldier, defending the ruins of Osgiliath from the orcs," he says in this first&#150;person BBC News <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://news.bbc.co.uk/hi/english/entertainment/film/newsid_1692000/1692205.stm">account</a>. "They filmed us madly firing arrows, running up and down the streets of the city, scouting through the ruins, resting in encampments, strolling around, chatting to guards. Later I played an orc, so I fought on both sides of the same battle."  Exciting as it was, he says, there was still "a lot of time sitting around."  And to fill the time, he says, a lot of people were reading "The Lord of the Rings."  Nattrass explains that a lot of his fellow actors "decided that since they were in it, they'd better find out what it was all about." <br><br>
+
+<span class=headline>Paradise found . . . </span><br> 
+This Sunday is the 393rd birthday of <b>John Milton</b>, so to honor him <b>John Basinger</b> plans to recite from memory the entire text of "Paradise Lost" &#151; "All 12 books, all 10,565 lines, all 100,000 words," as <b>Deborah Hornblow</b> iterates in this <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.ctnow.com/features/books/hc-johnbasinger.artdec07.story?coll=hc%2Dheadlines%2Dbooks">story</a> from The Hartford Courant.  "Oh, I know it's wacky," Basinger tells her.  But he says he first came up with the idea &#151; which he calls his "12&#150;step program against Alzheimer's" &#151; after he retired from teaching eight years ago, and he memorized the first 26 lines to have something to focus on when he went to the gym.  The process worked so well he repeated it the next time he went to work out.  "I'd get seven to 10 new lines done at a session, then drill the 14 or 21 or so lines I had done earlier. So each day, I was adding a new chunk."  The whole thing went so well, he says, "I'd go to the gym a lot." <br><br>
+
+<span class=headline>In case you were wondering who to blame:  It was probably an Ohioan . . . </span><br> 	
+It started when he found out about the yo&#150;yo.  "When you find out that your state's responsible for the yo&#150;yo, you just can't let it go," explains <b>Curt Dalton</b>.  And when the curator at the <b>National Cash Register Archives</b> subsequently learned that not only the cash register and the yo&#150;yo but the airplane and the hot dog and thousands of other significant inventions were invented in his native Ohio, he decided he had to write a book.  Thus, "How Ohio Helped Invent the World," which is self&#150;published, self&#150;marketed, and selling well.   In fact, Dalton says in a <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.citybeat.com/current/getlit.shtml">profile</a> from the Cincinnati City Beat, Ohions have created so many important things it was hard for him to narrow it down.  He eventually came up with two categories of inventions: "those that were easily recognized (the stethoscope) and those that were just down right funny (premature burial safeguards)."  The last, he explained, involved a way the dearly not&#150;yet&#150;departed "could ring a little bell from inside the coffin." <br><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><font color="#6666FF">
+Thursday, 6 December 2001</font color> <br> <br>
+
+
+
+<span class=headline>Bigger office vs. bigger stick . . . </span><br> 	
+Just two days after French media giant <b>Vivendi Universal</b> CEO <b>Jean&#150;Marie Messier</b> was the subject of a major profile in the New York Times (see the <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nytimes.com/2001/12/04/business/04MOVE.html">article</a>, previously posted on MobyLives), wherein he discussed his move to New York and joked about the fact that his executive vice chairman had a bigger office in their Seagram Building headquarters, that executive vice chairman with the bigger office, <b>Edgar Bronfman Jr.</b>, announced he's resigning next year.   "I would consider this news quite positive given that it confirms Messier as the only chief on board and it will avoid any potential managerial conflict," says one analyst in this Reuters <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nytimes.com/reuters/business/business-media-vivendi-bronfman.html">wire story</a>.  Another comments about the <b>Houghton Mifflin</b> parent company, "Vivendi Universal originally had a European hub and a U.S. hub, but now that Messier is based in the United States, that made one chief too many for the group." <br><br>
+
+<span class=headline>Mega&#150;corp that swallowed Harcourt says it tastes good . . . </span><br>
+A year after it acquired <b>Harcourt U.S.</b> for &#36;5.65 billion, Anglo&#150;Dutch media giant <b>Reed Elsevier</b> said Harcourt is "exceeding expectations," and is one reason the company will "meet its goal of double&#150;digit growth this year," despite the advertising slump hitting its other media holdings.  (The company also publishes numerous magazines, such as Computer Weekly and Variety.)  A Reuters <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nytimes.com/reuters/business/business-media-reedelsevier.html">wire story</a> says "a revamp and a bevy of top titles were keeping the publisher firmly on track to meet its key targets," and that "a solid performance in science, legal and education publishing offsets a fall in revenues from business titles." <br><br>
+
+<span class=headline>RIP: maverick publisher William Jovanovich . . . </span><br>
+<b>William Jovanovich</b>, who ran Harcourt, Brace Jovanovich for 36 years and "transformed the highbrow literary house into one of the nation's leading textbook publishers," died of a heart attack on Tuesday at his home in San Diego. He was 81.  His New York Times <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nytimes.com/2001/12/06/obituaries/06JOVA.html">obituary</a> describes him as a "reclusive, fiercely independent figure who worked his way up from textbook salesman to company president in seven years" and who "defied industry conventions."  For example, he "shunned the press and declined to join the American Publishers' Association."  He also earned "derision" by buying the Sea World marine parks and moving HBJ headquarters to Orlando, Florida. But he was also an innovator. In 1961, he hired European editors <b>Helen and Kurt Wolff</b> and published books they found under their name, one of the industry's first "imprints."  Subsequently, the Wolffs published books by <b>G&#252;nter Grass</b>, <b>Italo Calvino</b>, and <b>Umberto Eco</b>.  Jovanovich, who was raised in Colorado by Middle European parents, went to Harvard and served in the Navy, also wrote novels &#151; such as "The World's Last Night," which the Times describes as "the story of a Navy officer of Serbian background from Colorado who establishes a major publishing house by cutting brilliant deals and facing down adversaries."<br><br> 
+
+<span class=headline>Boy poet signs multi&#150;million dollar deal . . . </span><br>
+His first two books of poetry were published by a previously unheard&#150;of publisher yet made it via word of mouth to the bestseller lists.  Now, 11&#150;year&#150;old <b>Mattie Stepanek</b> has signed a publishing deal with <b>Hyperion</b> that, according to an Associated Press <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.washingtonpost.com/wp-dyn/articles/A1372-2001Dec6.html">wire story</a>, sources are saying is worth "millions of dollars."  In a deal negotiated by Stepanek's representative, <b>Robert Barnett</b>, who also negotiated book deals for <b>Bill Clinton</b> and <b>Hillary Rodham Clinton</b>, Stepanek's previous publisher, tiny <b>VSP Books</b> of Alexandria, Virginia, will co&#10;publish three books planned for next year with Hyperion.  The A.P. notes that Stepanek writes about the fact that he "has a rare form of muscular dystrophy, a disease that took the lives of his three siblings and left him dependent on a ventilator that feeds oxygen through a tube attached to his neck."  Just two days ago, Stepanek was the subject of a major New York Times <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nytimes.com/2001/11/29/books/29BOOK.html?searchpv=past7days">profile</a> that noted, "There is something irresistibly appealing about how undaunted this boy has been in creating his art, a particularly dreamy story for a season that is supposed to be jolly but will be somewhat less so this year for many people." <br><br>
+
+<span class=headline>Financial wiz discusses how he'll spend money he doesn't have yet . . . </span><br>
+The CEO of <b>Cantor Fitzgerald</b>, the investment firm that was devastated in the September 11 terrorist attacks when 658 of its employees were killed in the World Trade Center, is shopping a book deal.  <b>Howard Lutnick</b> became well known after he gave a series of tearful interviews on television, swearing to stand by victims families, but generated controversy when he "temporarily halted paychecks for missing workers," tells <b>Mitchell Fink</b> of The New York Daily News that he has no firm deal, nor proposal, nor even a title, but says publishers are "all fascinated to meet and talk."  Lutnick says in Fink's <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nydailynews.com/today/News_and_Views/Daily_Dish/a-134321.asp">column</a> (fourth item) that "he will donate 100&#37; of the book's proceeds to the Cantor Fitzgerald Relief Fund, which he said had distributed &#36;8.7 million to Cantor families by Thanksgiving."<br><br>
+
+<span class=headline>No need to giftwrap;  they're taking it as it is . . . </span><br>
+The "sumptuous candy of the big traditional Christmas books still bursts from tables and shelves in the bookstores," notes <b>Martin Arnold</b> in his New York Times "Making Books" <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nytimes.com/2001/12/06/books/06BOOK.html">column</a>.  But this year, many people are skipping them for the kind of books publishers usually say people don't want &#151; large photo books about the painful events of September 11.  Something "different and very intimate is happening with these photo books of terror," says Arnold.  One bookstore clerk tells him that "Many shoppers initially don't appear to want one 'but look at them first and then decide to buy.'"  Then "the strangeness or perhaps awe is such that most of the customers 'seem to feel awkward to ask for them to be gift&#150;wrapped.'" Martin takes a look at what's selling, and notices some other aspects of the trend:  "mainstream publishers shied away" and "the nearer the site the more copies sold."<br><br>
+
+<span class=headline>Seattle's new library: just what's needed in hard times . . . </span><br>
+Recent hard times have hit Seattle particularly hard.  The city's economy, rooted in computers and airplanes, has been devastated by a "triple whammy" &#151; the general economic downturn, the collapse of the tech industry, and the September 11 attacks &#151; that Mayor <b>Paul Schell</b> calls "the perfect storm."  Nonetheless, and even though the City Council just passed an austerity budget, the city is going forth with an ambitious plan to build a new, &#36;159 million <b>Central Library</b> downtown, and neighborhood libraries as well.  A Seattle Weekly <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.seattleweekly.com/features/0149/news-richter.shtml">report</a> asks, "Is this wise?"  But the mayor says the new library and similar civic improvements are "just what the local economy needs right now." <br><br>
+
+<span class=headline>Anthologies:  the best of the best . . . </span><br>
+The late poet <b>William Matthews</b> noted that the word "anthology" comes from "a Greek word that means bouquet." That said, remarks <b>Ricco Villanueva Siasoco</b> of the Boston Phoenix, there were enough "best of" "literary bouquets" in 2001 to "fill a small florist's shop."  Siasoco sifts through the year's anthologies for this <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.bostonphoenix.com/boston/arts/books/documents/02028079.htm">review</a>, looking for three things: "1) diversity of voices, including both established and emerging writers; 2) publication in 2001; and, perhaps most important, 3) an original and intriguing concept (in the case of ongoing series, original and intriguing content)."  Among his favorites:  "A Convergence of Birds: Original Fiction and Poetry Inspired by Joseph Cornell," edited by <b>Jonathan Safron Foer</b> ("arguably the most literary and deeply felt of the year¹s anthologies);  "After Confession: Poetry as Autobiography," edited by <b>Kate Sontag</b> and <b>David Graham </b>; and an anthology of "the best writing on language for word lovers, grammar mavens, and armchair linguists," "Verbatim," edited by <b>Erin McKean</b>. <br><br>
+
+<span class=headline>One way of looking at it . . . </span><br>
+In his new book, "Inventing the Victorians," <b>Mattew Sweet</b> "claims that we preserve an image of Victorians as fusty antiquities because it makes us feel swankily liberal and modern, like children sniggering at their parents," says <b>David Jays</b> in a <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://books.guardian.co.uk/reviews/history/0,6121,610078,00.html">review</a> for London's Observer.  Sweet advances some interesting theories uniting modern sensibilites with those of the Victorians, says Jays, such as their feeling that they "lived in tumultuous times" thanks to technological innovations, such as the railways.  But to Sweet, says Jays, "the coming of the railways merely provides brief encounters and carriage pick&#150;ups."  Overall, it seems "Sweet wants to put the sex back into the 19th century . . . but does he leave room for anything else?"<br><br>
+
+<span class=headline>Gotta write . . . </span><br>
+Novelist <b>Hitonari Tsuji</b>'s "Reisei to Jonetsu no Aida" sold a million copies, which was all the more striking in that it was an unusual experimental work that he co&#150;wrote with <b>Kaori Ekuni</b> in two volumes &#151; "one written by Tsuji from a man's point of view and the other by Ekuni from a woman's perspective," as this <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.yomiuri.co.jp/index-e.htm">profile</a> from Japan's Daily Yomiuri describes it.  "Apparently, the ideal way to approach the work is to read one chapter at a time from each volume."  Now, since the terrorist attacks of September 11, he's already completed another novel and a novella.  As the Yomiuri notes, "Tsuji never wears a watch. Never wishing to consider time as his boss, he works at any hour of the day or night, and sleeps whenever he feels like it."  The author himself says, "Even if people stopped reading novels, I think I'd still carry on writing." <br><br>
+
+<span class=headline>But that's fine with those of us who haven't yet lost our Beatles accents . . . </span><br>
+"Station yourself near the exit of your local multiplex and listen carefully as the pint&#150;sized, would&#150;be <b>Harry Potter</b>s depart," says <b>Julia Keller</b> in her Chicago Tribune <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.chicagotribune.com/features/chi-0112060024dec06.column?coll=chi%2Dleisure%2Dnav">column</a>  "You'll hear lines of dialogue repeated in an accent that sounds about as authentically British as Ye Olde Pretzel Shoppe in a strip mall."  Yes, says Keller, "We are in the midst of an onslaught of bad British accents."  The new Potter movie is "prompting children by the thousands &#151; nay, the millions!" to imitate the characters in the movie.  So, says Keller, "We now must confront the ear&#150;curdling reality of an entire nation of young people who sound as if they are trapped in a Downstate dinner&#150;theater production of 'The Admirable Crichton.'" <br><br>
+
+&#149; <b>RELATED:</b> "Harry Potter and the Sorcerer's Stone" "continues to break box&#150;office records, casting its magic spell over children and creepy middle&#150;aged weirdos alike," says a <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.theonion.com/onion3744/harry_potter_craze.html">report</a> from The Onion.  "There are many possible explanations: a troubled world's need for a little bit of magic, the way the franchise taps into powerful good&#150;versus&#150;evil mythologies, the chance it offers overweight 47&#150;year&#150;olds to retreat from their dreary adult lives into an idealized fantasy childhood. But whatever it is, one thing is clear: The fantastical universe created by author <b>J.K. Rowling</b> speaks to the child in all of us, whether young or way too old." <br><br>
+
+<span class=headline>Just say it to yourself, slow:  they've got a "Lord of the Rings" minister . . . </span><br>
+Hoping to capitalize on the upcoming series of films based on <b>J.R.R. Tolkien</b>'s "The Lord of the Rings," which were filmed in New Zealand, the government of New Zealand "has even appointed one of its members, <b>Pete Hodgson</b>, as unofficial minister for Lord of the Rings," according to a BBC News <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://news.bbc.co.uk/hi/english/entertainment/film/newsid_1694000/1694113.stm">wire story</a>.  The country "will spend NZ&#36;4.5m this year and next to promote New Zealand in the slipstream of the hoped&#150;for success of the films," says the report.  Hodgson recently addressed the New Zealand parliament on the subject, saying he hoped to "maximize the international exposure of New Zealand as a tourist destination" and "remind the world this film was made in New Zealand, using New Zealand skill and creativity and attitude."  Meanwhile, the official Rings website has "registered more than a billion hits &#151; dazzling publicity for this small country," says the BBC. <br><br>
+
+<span class=headline>Somebody should get an award for this award . . . </span><br>
+This year's winner of Great Britain's <b>Golden Bull</b> prize &#151; a.k.a. the "<b>Foot in Mouth</b>" award &#151; given out by the <b>Plain English Campaign</b>, has been announced.  A BBC News <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://news.bbc.co.uk/hi/english/uk/newsid_1693000/1693678.stm">wire story</a> reports that the winner is conceptual artist <b>Tracey Emin</b>, who won for "spouting nonsense" about her forthcoming novel.  "When it comes to words I have a uniqueness that I find almost impossible in art &#151; and it's my words that actually make my art quite unique," Emin said.  As spokesman for the award said no malice was intended toward Emin.  "All we look for with this award is a quote that leaves us baffled. The Tracey Emin quote does that in a unique way," he said. Emin succeeds last year's winner, actress <b>Alicia Silverstone</b>, who said of her movie "Clueless," "I think it was deep in the way that it was very light."<br><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><br><br>
+<font color="#6666FF">
+ <br> <br>
+				 </td>
+					<td bgcolor="#CCCCCC" width="20" align=left>
+						&nbsp;
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td width="20%" bgcolor="#CCCCCC" align="center" valign="top">
+		
+<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/Home_Page_info.html">Make Moby Your Home Page</a><p><p>		
+
+<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/vacation.html" onclick="NewWindow(this.href,'name','500','250','no');return false;">SIGN UP FOR THE MOBYLIVES MAILING LIST</a><p><p>
+
+
+
+
+<br><span class="links"><b>WHALE SIGHTINGS</b></span><p><p>
+
+<b><i>This week's fiction:</b></i><br><br>
+
+"My Mistress' Eyes Are Nothing Like the Sun"<br>
+by <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.doubletakemagazine.org/fiction/html/bausch/index.php">RICHARD BAUSCH</a><br>(from <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.doubletakemagazine.org/">DoubleTake</a>)<br><br>
+
+"To Dance Again"<br>
+by <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://webdelsol.com/tlr/u2001/blackwell.html">KATE BLACKWELL</a><br>(from <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://webdelsol.com/tlr/">The Literary Review</a>)<br><br>
+
+
+<b><i>This week's poetry:</b></i><br><br>
+
+"Humanity"<br>by <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.longshot.org/ls24/gregcorso1.htm">GREGORY CORSO</a><br>
+(from <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.longshot.org/">Long Shot</a>)<br><br>
+
+Four Poems<br>by <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.bway.net/~sskin/stories/issue1/sirowitz_s1.html">HAL SIROWITZ</a><br>
+(from <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.bway.net/~sskin/issue1_main.html">Sensitive Skin</a>)<br><br>
+
+"In the Book of All That's Befallen"<br>by <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.webdelsol.com/Facture/poems/maryjobang.htm">MARY JO BANG</a><br>
+(from <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.webdelsol.com/Facture/">Fracture</a>)<br><br>
+
+
+
+
+<b><i>This week's audio:</b></i><br><br>
+(requires RealPlayer)<br><br>
+
+<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.randomhouse.com/boldtype/0499/englander/reading.html">NATHAN ENGLANDER</a><br>reads two short stories, "For the Relieve of Unbearable Urges" and "Reb Kringle"<br><br>
+
+<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.ubu.com/sound_frames.html">GUILLAUME APOLLINAIRE</a><br>reads his poem "Le Pon Mirabeau" (in French; from a recording made in 1913)<br><br>
+
+ 
+
+
+
+
+<b><i>Special edition:</b></i><br><br>
+
+<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/Ostriker_anthology.html">POEMS FOR THE TIME</a><br>
+
+<b>Alicia Ostriker</b>'s anthology of the poets she's been turning to of late &#151; <b>Stephen Dunn</b>, <b>C.P. Cavafy</b>, <b>Marianne Moore</b>, and others, plus a never&#150;before&#150;seen poem of her own.<br><br>
+
+<br>
+
+
+<br><span class="links"><b>RECENTLY<BR>UNDER&#150;APPRECIATED</b></span><p><p>
+
+
+<b><i>CANARIES IN THE MINESHAFT</i><br>by Renata Adler</b><br>(St. Martin's, &#36;26.95)<br><br><i>Often funny, always engaging, these brilliant essays on media and culture are by one of the most insightful and original minds writing today, with a wide-ranging and fearless intellect, Adler looks at everything from presidential impeachment to Sesame Street's Big Bird.</i><br><br><br>
+
+<b><i>DIRT</i><br>text by Jo McDougall</b><br>(Autumn House Press, &#36;14.95)<br><br><i>Exquisitely timed and shaped, these poems exemplify the high art of artlessness.  Equally impressive is the way her spare, clear voice directly addresses grief and memory, as in "Growing Up in a Small Town":  "Our fathers / kept the sky / from falling. / Our mothers, / talking of recipes and funerals / and that Hopkins girl, / wove our world." </i><br><br><br>
+
+<b><i>20: THE BEST OF THE DRUE HEINZ LITERATURE PRIZE</i><br>edited by John Edgar Wideman<br></b>(University of Pittsburgh, &#36;25)<br><br><i>Celebrating twenty years of debuts, this book showcases the amazing track record of one of the country's most preeminent first book prizes.  The contest has been won by, among others, <b>Stewart O'Nan, Rick DeMaranis, Elizabeth Graver, Robley Wilson, Jane McCafferty</b> and more, and a story from each is featured.</i><br><br><br>
+
+
+
+<br><span class="links">ALL THE REVIEWS THAT FIT</span><p>
+
+
+<b>OFFICIAL TALLY:<br> <br></b> 
+
+<i>Since March 21, 2001 (the MobyLives.com launch date), the New York Times has given <b>154 plugs in 256 days</b> to books written by staffers or former staffers. </i> <br><br>
+
+<b>Average frequency with which the New York Times plugs books by staffers or former staffers: </b> <i>every 1.66 days</i><br><br>
+
+
+<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobylives.com/Times_reviews.html">CHECK OUT THE COMPLETE LIST OF PLUGS</a><br><br>
+
+<b>Most recently:</b><br><br>
+
+
+
+&#149;<b>Plugs 126 &#151; 154</b><br>
+The December 2 Sunday New York Times featured the yearly "Editor's Choice" awards for "best books" of the year.  One of the nine books chosen for an <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nytimes.com/2001/12/02/books/review/editor.html">Editor's Choice</a> was "The Metaphysical Club," by Louis Menand, a contributor to the Times Sunday Magazine.  It's the papers fifth plug of the book, although none of these plugs, including this one, have mentioned Menand's associationg with The Times.  There was also a favorable <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nytimes.com/2001/12/02/books/review/02MOORHOT.html">review</a> of "Travels With a Medieval Queen," by Mary Taylor Simeti, a regular contributor to the Times Sophisticated Traveler Magazine, although the review does not mention this.  There's also a favorable <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nytimes.com/2001/12/02/books/review/02SANDERT.html">critique</a> of "Desperate Hours:  The Epic Rescue of the Andrea Doria," by Richard Goldstein, and editor and writer for the Times obituary section, and a positive <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nytimes.com/2001/12/02/books/review/02ROBINST.html">review</a> for "Prince of Princes: The Life of Potemkin" by Sebag Montefiore who, as is noted in his book jacket bio, "writes for The New York Times, particularly about Russia."  A section heralding the "best" gardening books of 2001 selects "The Minmalist Cooks Dinner" by Times food columnist Mark Bittman for a <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nytimes.com/2001/12/02/books/review/cooking.html">plug</a>. Caroline Seebohm, a long&#2150;time regular contributor to the Times book and travel sections, also gets a good <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nytimes.com/2001/12/02/books/review/02NORWICT.html">review</a> for her "Boca Rococo: How Addison Mizner Invented Florida's Gold Coast."  Meanwhile, in the newspaper's assessment of the year's "Notable Books," there are <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.nytimes.com/2001/12/02/books/review/notablef.html">twenty&#150;one plugs</a> for books by Times contributors.  This includes, in fiction:  "The Center of Things" by Jenny McPhee, who, in her fifth plug from the paper, goes unidentified for the fifth time as a regular contributor to the NYTBR; "The Hunters" by Claire Messud (the book's sixth plug); and "In the Floyd Archives" by Sarah Boxer (her fifth plug).  In nonfiction:  "The Algeria Hotel" by Adam Nossiter, who, in his fourth plug, isn't identified as a staffer; "Ava's Man" by Rick Bragg (the book's third plug); "The Botany of Desire" by Michael Pollan, who is not identified as a Times contributor (his fifth plug); "The Brother" by Sam Roberts (his fourth plug); "Comfort Me With Apples" by Ruth Reichl (her fifth plug); "Crescent and Star" by Stephen Kinzer (his sixth plug); "Displaced Persons" by Joseph Berger (his fifth plug); "Eastward to Tartary" by Robert D. Kaplan (his third plug), who is unidentified as a Times contributor; "Emergence" by Steven Johnson (his fourth plug), whose affiliation with The Times is unacknowledged; "Facing the Wind," by Julie Salamon (her eighth plug); "Germs" by Judith Miller, Stephen Englelberg and William Broad (the book's third plug); "The Lost Children of Wilder" by Nina Bernstein (her sixth plug); "Mary Shelley" by Miranda Seymour, who goes unaccredited as a frequent contributor to the NYTBR (her fourth plug); "Next" by Michael Lewis (his seventh plug), who is not identified as a contributor to The Times Sunday Magazine; "The Noonday Demon" by Andrew Solomon, who is unidentified as a Times (his eighth plug);  "President Nixon: Alone in the White House" by Richard Reeves, who is not identified as a long&#150;time Times reporter (his fourth plug); "Utimate Journey" by Richard Bernstein (his seventh plug); "War in a Time of Peace" by David Halberstam, who is unidentified as a long&#150;time Times staffer (his third plug). <br><br>
+
+<i><b>Should the Times &#8212; or any publication &#8212; review books by its own staffers? <br></i></b> <a href="mailto:dlj@mobylives.com">
+				<span class=letters-bold>
+					WHAT DO YOU THINK?
+				</span>
+			</a> <br> <br><br>
+
+
+
+<br>
+
+<b>RELEVANT READING:</b><br><br><a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://past.thenation.com/cgi-bin/framizer.cgi?url=http://past.thenation.com/issue/000626/0626leonard.shtml"><b> Relevant Reading I</b></a><br><i>John Leonard, former editor of the NYTSBR, tells what it&#146;s like behind the scenes. </i><br><br></tf>
+
+<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://new.jsonline.com/enter/gen/apr00/bk.chri04040300.asp"><b>Relevant Reading II</b></a><br><i>Retiring New York Times book reviewer Christopher Lehmann&#150Haupt talks about the time editors ordered him to give a book a bad review.</i><br><br> 
+
+<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.onlineathens.com/stories/070900/ath_0709000014.shtml"><b>Relevant Reading III</b></a><br><i>The books of Renata Adler, Joe Conason, Gene Lyons, and others get reviewed in the New York Times by people mentioned critically in the book.</i><br><br><br><br><br>
+
+
+
+
+<br>
+
+<span class=links>
+
+				Links
+			</span>
+			<p>
+			<p>
+<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.poetrydaily.org">Poetry Daily</a>
+<p> <p>
+<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.freespeech.org/chekhov/">The Stories of Anton Chekhov</a>
+<p> <p>
+<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.libraries.psu.edu/iasweb/nabokov/zembla.htm">Zembla: The Official Site of the Vladimir Nabokov Society</a><p> <p>
+<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.middlebury.edu/~nereview/">The New England Review</a>
+<p> <p> 
+<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.pshares.org/">Ploughshares</a>
+<p> <p>
+<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.uga.edu/~garev/">The Georgia Review</a><p><p>
+<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.visualthesaurus.com/">Visual Thesaurus</a><p><p>
+<a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.mobydick.org/index.html">Herman Melville's Arrowhead</a>
+<p> <p> <p>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3" align="center">
+			<font color="#ffffff">
+			<br>
+			<br>
+			<a href="mailto:dlj@mobylives.com">
+				<span class=letters-bold>
+					Write to Moby
+				</span>
+			</a>
+			<br>
+			<span class=letters-bold>
+				Letters policy:
+			</span>
+			<span class=letters>		
+				All letters must be signed. Also, please say where you&#146re writing from &#8212; either an affiliation or hometown.
+				<br> 
+				All material not otherwise attributed &#169;2001 Dennis Loy Johnson.
+			</span>
+<br><span class=letters-bold>Site design by <a href="http://webarchives.loc.gov/collections/lcwa0001/20011213002922/http://www.verbforge.com">VerbForge, Inc.</a></span>
+			</font>
+		</td>
+	</tr>
+</table>
+</body>
+</html>

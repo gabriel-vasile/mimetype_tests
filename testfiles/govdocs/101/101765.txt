@@ -1,0 +1,1686 @@
+NATURAL LANGUAGE PROCESSING IN LARGE-SCALE TEXT RETRIEVAL TASKS
+
+
+                                  Tomek Strzalkowski
+                        Courant Institute of Mathematical Sciences
+                                  New York University
+                                715 Broadway, rm. 704
+                                  New York, NY 10003
+                                  tomek@cs.nyu.edu
+
+                   ABSTRACT
+We developed a prototype text retrieval system
+which uses advanced natural language processing
+techniques to enhance the effectiveness of key-word
+based docuinent retrieval. The backbone of our sys-
+tern is a tradifional stafistical engine which builds
+inverted index files from pre-processed documents,
+and then searches and ranks the documents in
+response to user queries. Natural language process-
+ing is used to (1) preprocess the documents in order
+to extract contents-carrying terms, (2) discover inter-
+term dependencies and build a conceptual hierarchy
+specific to the database domain, and (3) process
+user's natural language requests into effective search
+queries. For the present TREC effort, the total of 500
+MBytes of Wall Street Journal articles have been
+processed in two batches of 250 MBytes each. Due to
+time and space limits, two separate inverted indexes
+were produced for each half of the data, with a partial
+concept hierarchy built from the first 250 Mbytes
+only but used for retrieval on either half. Retrieval
+were performed independently on both halfs of the
+database and the partial results were merged to pro-
+duce the final rankings.
+
+
+INTRODUCTION
+    A typical information retrieval (IR) task is to
+select documents from a database in response to a
+user 5 query, and rank these documents according to
+relevance. This has been usually accomplished using
+statisfical methods (often  coupled with manual
+encoding) that (a) select terms (words, phrases, and
+other units) from documents that are deemed to best
+represent their contents, and (b) create an inverted
+index file (or files) that provide and easy access to
+documents containing these terms. A subsequent
+search process will attempt to match a preprocessed
+user query (or queries) against term-based represen-
+tations of documents in each case determining a
+degree of relevance between the two which depends
+upon the number and types of matching terms.
+Although many sophisticated search and matching
+
+
+                                               173
+
+methods are available, the crucial problem remains to
+be that of an adequate representation of contents for
+both the documents and the queries.
+    The simplest word-based representations of
+contents are usually inadequate since single words
+are rarely specific enough for accurate discrimina-
+tion, and their grouping is often accidental. A better
+method is to identify groups of words that create
+meaningful phrases, especially if these phrases
+denote impor~~~t concepts in database domain. For
+ex~ple, joint venture is an important term in Wall
+Street Journal (WSJ henceforth) database, while nei-
+ther joint nor venture is import£~int by itself. In the
+retrieval experiments with the training TREC data-
+base, we noticed that both joint and venture were
+dropped from the list of terms by the system because
+their idf (inverted document frequency) weights were
+too low. In large databases, such as TIPSTER, the
+use of phrasal terms is not just desirable, it becomes
+necessary.
+    The question thus becomes, how to identify the
+correct phrases in the text? Both statistical and syn-
+tactic methods were used before with only limited
+success.  Statistical methods based on word co-
+occurrences and mutual information are prone to high
+error rates, turning out many unwanted associations.
+Syntactic methods suffered from low quality of gen-
+crated parse structures that could be attributed to lim-
+ited coverage gr£~nmars and the lack of adequate lex-
+icons. In fact, the difficulties encountered in applying
+computational linguistics technologies to text pro-
+cessing have contributed to a wide-spread belief that
+automated natural language processing may not be
+suitable   in  IR. These  difficulties  included
+inefficiency, lack of robustness, and prohibitive cost
+of manual effort required to build lexicons and
+knowledge bases for each new text domain. On the
+other hand, while numerous experiments did not
+establish the usefulness of linguistic methods in IR,
+they cannot be considered conclusive because of their
+
+limited scale.
+    The rapid progress in Computational Linguis-
+tics over the last few years has changed this equation
+in various ways. First of all, large-scale resources
+became available: on-line lexicons, including Oxford
+Advanced Learner's Dictionary (OALD), Longman
+Dictionary  of Contemporary  English (LDOCB),
+Webster's Dictionary, Oxford English Dictionary,
+Collins Dictionary, and others, as well as large text
+corpora, many of which can now be obtained for
+research purposes.  Robust text-oriented software
+t(x)ls have been built, including part of speech
+taggers (stochastic and otherwise), and fast parsers
+capable of processing text at speeds of 2600 words
+per minute or more (e.g., TTP parser developed by
+the author). While many of the fast parsers are not
+very accurate (they are usually partial analyzers by
+design),2 some, like TTP, perform in fact no worse
+than standard full-analysis parsers which are many
+times slower and far less robust. 3
+    An accurate syntactic analysis is an essential
+prerequisite for term selection, but it is by no means
+sufficient. Syntactic parsing of the database contents
+is usually attempted in order to extract linguistically
+motivated phrases, which presumably are better indi-
+cators of contents than "stafistical phrases" where
+words are grouped solely on the basis of physical
+proximity (e.g., "college junior" is not the same as
+"junior college"). However, creafion of such com-
+pound terms makes term matching process more
+complex since in addition to the usual problems of
+synonymy and subsumption, one must deal with their
+structure (e.g., "college junior" is the same as "junior
+in college"). In order to deal with structure, parser's
+output needs to be "normalized" or "regularized" so
+that complex terms with the same or closely related
+meanings would indeed receive matching representa-
+tions. This goal has been achieved to a certain extent
+in the present work. As it will be discussed in more
+detail below, indexing terms were selected from
+atnong head-modifier pairs extracted from predicate-
+argument representations of sentences.
+
+
+     Standard IR benchmark collections are statistically too
+small and the experiments can easily produce counterintuitive
+results. For example, Cranfield collection is only approx. 180,000
+English words, while CACM-3204 collection is approx. 200,000
+words.
+     Partial parsing is usually fast enough, but it also generates
+noisy data: as many as 50% of all generated phrases could be in-
+correct (Lewis and Croft, 1990).
+    3 TTP has been shown to produce parse stmctures which are
+no worse in recall, precision and crossing rate than those generated
+by full-scale linguistic parsers when compared to hand-coded
+Treebank parse trees.
+
+
+                                             174
+
+     Introduction of compound terms also compli-
+cates the task of discovery of various semantic rela-
+tionships among them, including synonymy and sub-
+sumption. For example, the term natural language
+can be considered, in certain domains at least, to sub-
+sume any term denofing a specific human language,
+such as English. Therefore, a query containing the
+former may be expected to retrieve documents con-
+tairn'ng the latter. The same can be said about
+language and English, unless language is in fact a
+part of compound term programming language in
+which case the association language - Fortran is
+appropriate. This is a problem because (a) it is a stan-
+dard practice to include both simple and compound
+terms in document representation, and (b) term asso-
+ciations have thus far been computed primarily on
+word level (including fixed phrases) and therefore
+care must be taken when such associations are used
+in term matching. This may prove particularly trou-
+blesome for systems that attempt term clustering in
+order to create "meta-terms" to be used in document
+representation.
+     The system presented here computes term
+associations from text on word and fixed phrase level
+and then uses these associations in query expansion.
+A fairly primitive filter is employed to separate
+synonymy and subsumption relationships from others
+including antonymy and complementation, some of
+which are strongly domain-dependent. This process
+has led to an increased retrieval precision in experi-
+ments with smaller and more cohesive collections
+(CACM-3204), but may be less effective with large
+databases. We are presently studying more advanced
+clustering  methods along with  the   changes in
+interpretation of resulting associations, as signalled in
+the previous paragraph.
+     Working with TREC topics has also helped to
+identify other, perhaps unanticipated problems, some
+of which    may render  the traditional statistical
+approach to information retrieval quite unworkable.
+A typical document retrieval query will specify (in
+one way or another) a set of concepts that are of
+interest to the originator of the query. Thus if the user
+is interested in documents that report on anticipated
+rail strikes, the following query may be appropriate:
+(TREC topic 058) A relevant document will report an
+impending rail strike .... Any other wording can be
+used so long as it is going to denote a concept to be
+found in a document. The system's task is then to dis-
+cover that the same concept is being denoted in both
+the query and a document, no matter how different
+the surface descriptions happen to be. In other
+words, no new information is requested, the query
+being  entirely self  contained and   completely
+
+specified. 4 An altogether different situafion arises
+when  the query actually requests      that cer~un
+underspecified information is found before a docu-
+ment could be judged relevant. In TREC topics (e.g.,
+058, as in many others) the following request is corn-
+monpiace: to be relevant, the document will identiA
+the location of the strike or potential strike. What we
+ask the system here is to extract the value of ce~~~in
+variable that satisfies certain conditions, i.e., find X
+such that location-of-strike(X).  It is impossible to
+properly evaluate such query using any kind of con-
+stant term based retrieval. What is required, at the
+minimum is a general pattern matching capability,
+and appropriately advanced representation of con-
+tents (including more careful NLP processes).
+     In the remainder of this paper we discuss par-
+ticulars of the present system and some of the obser-
+vations made while processing TREC data.      The
+above comments will provide the background for
+situafing our present effort and state-of-the-art with
+respect to where we should be in the future.
+
+
+OVERALL DESIGN
+     Our information retrieval system consists of a
+traditional stafistical backbone (Harman and Candela,
+1989) augmented with various natural language pro-
+cessing components that assist the system in database
+processing (stemming, indexing, word and phrase
+clustering, selectional restrictions), and translate a
+user's information request into an effective query.
+This design is a careful compromise between purely
+statistical non-linguistic approaches and those requir-
+ing rather accomplished (and expensive) semantic
+analysis of data, often referred to as `conceptual
+retrieval'. The conceptual retrieval systems, though
+quite effective, are not yet mature enough to be con-
+sidered in serious information retrieval applications,
+the major problems being their extreme inefficiency
+and  the need for manual encoding of domain
+knowledge (Mauldin, 1991). However, as pointed out
+in the previous section, a more careful text process-
+ing may be required for certain types of requests.
+     In our system the database text is first pro-
+cessed with a fast syntactic parser. Subsequently cer-
+tain types of phrases are extracted from the parse
+trees and used as compound indexing terms in addi-
+tion to single-word terms. The extracted phrases are
+statistically analyzed as syntactic contexts in order to
+discover a variety of similarity links between smaller
+subphrases and words occurring in them. A further
+filtering process maps these similarity links onto
+
+semantic  relations (generalization, specialization,
+synonymy,  etc.)  after which they   are used to
+transform user's request into a search query.
+      The user's natural language request is also
+parsed, and all indexing terms occurring in them are
+identified. Certain highly ambiguous, usually single-
+word terms may be dropped, provided that they also
+occur as elements in some compound terms. For
+example, "natural" is deleted from a query already
+containing "natural   language because   "natural"
+occurs in many unrelated contexts: "natural number",
+"natural logarithm", "natural approach", etc. At the
+same time, other terms may be added, namely those
+which are linked to some query term through admis-
+sible similarity relations. For example, "unlawful
+activity" is added to a query (TREC topic 055) con-
+taining the compound term "illegal activity" via a
+synonymy link between "illegal" and "unlawful".
+After the final query is constructed, the database
+search follows, and a ranked list of documents is
+returned.
+      It should be noted that all the processing steps,
+those performed by the backbone system, and these
+performed by the natural language processing corn-
+ponents, are fully automated, and no human interven-
+tion or manual encoding is required.
+
+
+FAST PARSING WITH TTP PARSER
+      TTP (Tagged Text Parser) is based on the
+Linguistic String  Grammar developed by     Sager
+(1981). The parser currently encompasses some 400
+grammar productions, but it is by 110 means complete.
+The parser's output is a regularized parse tree
+representation of each sentence, that is, a representa-
+tion that reflects the sentence's logical predicate-
+argument structure. For exainple, logical subject and
+logical object are identified in both passive and active
+sentences, and noun phrases are organized around
+their  head elements.   The significance  of this
+representation will be discussed below. The parser is
+equipped   with  a powerful skip-and-fit recovery
+mechanism that allows it to operate effectively in the
+face of ill-formed input or under a severe time pres-
+sure. In the runs with approximately 83 million words
+of TREC's Wall Street Journal texts,5 the parser's
+speed averaged between 0.45 and 0.5 seconds per
+sentence, or up to 2600 words per minute, on a 21
+MIPS SparcStation ELC.
+
+
+try.
+
+     4 This does not mean that the query has to accurately reflect
+the user's intentions. we take what we've got and give it our best
+
+
+                                                     175
+
+      Approximately 0.5 (;Bytes of text, over 4 million sen-
+tences.
+
+     TIT' is a full grammar parser, and initially, it
+attempts to generate a complete analysis for each
+sentence. However, unlike an ordinary parser, it has a
+built-in timer which regulates the amount of time
+allowed for parsing any one sentence. If a parse is not
+returned before the allotted time elapses, the parser
+enters the skip-and-fit mode in which it will try to
+"fit" the parse. While in the skip-and-fit mode, the
+parser will attempt to forcibly reduce incomplete
+constituents, possibly skipping portions of input in
+order to restart processing at a next unattempted con-
+stituent. In other words, the parser will favor reduc-
+tion to backtracking while in the skip-and-fit mode.
+The result of this strategy is an approximate parse,
+partially fitted using top-down predictions. The frag-
+ments skipped in the first pass are not thrown out,
+instead they are analyzed by a simple phrasal parser
+that looks for noun phrases and relative clauses and
+then attaches the recovered material to the main parse
+structure. As an illustration, consider the following
+sentence taken from the CACM-3204 corpus:
+    The method is illustrated by the automatic con-
+    struction of both recursive and iterative pro-
+    grains operating on natural numbers, lists, and
+    trees, in order to construct a program satisfying
+    certain specifications a theorem induced by
+    those specifications is proved, and the desired
+    program is extracted from the proof.
+The italicized fragment is likely to cause additional
+complications in parsing this lengthy string, and the
+parser may be better off ignoring this fragment alto-
+gether. To do so successfully, the parser must close
+the currently open constituent (i.e., reduce a program
+satisfying certain speeLfications to NP), and possibly
+a  few  of  its parent  constituents, removing
+corresponding productions from further considera-
+tion, until an appropriate production is reactivated.
+In this case, TTP may force the following reductions:
+SI ~ to V NP; SA ~ SI; S ~ NP V NP SA, until the
+production S ~ S and S is reached. Next, the parser
+skips input to find and, and resumes normal process-
+ing.
+     As may be expected, the skip-and-fit strategy
+will only be effective if the input skipping can be per-
+formed with a degree of determinism. This means
+that most of the lexical level ambiguity must be
+removed from the input text, prior to parsing. We
+achieve this using a stochastic parts of speech tagger
+to preprocess the text. Full details of the parser can
+be found in (Strzalkowski, 1992).
+
+
+PART OF SPEECII TAGGER
+     One way of dealing with lexical ambiguity is to
+use a tagger to preprocess the input marking each
+word  with a  tags that indicates  its syntactic
+
+
+                                             176
+
+categorization: a part of speech with selected mor-
+phological features such as number, tense, mode,
+case and degree. The following are tagged sentences
+from the CACM-3204 collection: 6
+    The/dt paper/nn presents/vbz a/dt proposai/nn
+    for/in structured/vbn representation/nn of/in
+    multiprogramming/vbg in/in a/dt high/ji level/nn
+    language/nn ./per
+
+    The/dt   notation/nn used/vbn  explicitly/rb
+    associates/vbz  a/dt data/nns  structure/nn
+    shared/vbn by/in concurrent/jj processes/nns
+    with/in operations/nns defined/vbn on/in it/pp
+    ./per
+
+The tags are understood as follows: dt - determiner,
+nn - singular noun, nns - plural noun, in - preposition,
+ii - adjective, vbz - verb in present tense third person
+singular, to - particle "to", vbg - present participle,
+vbn - past participle, vbd - past tense verb, vb -
+infinitive verb, cc - coordinate conjunction.
+     Tagging of the input text substantially reduces
+the search space of a top-down parser since it
+resolves most of the lexical level ambiguities. In the
+examples above, tagging of presents as "vbz" in the
+first sentence cuts off a potentially long and costly
+"garden path" with presents as a plural noun followed
+by a headless relative clause starting with (that) a
+proposal.... In the second sentence, tagging resolves
+ambiguity of used (vbn vs. vbd), and associates (vbz
+vs. nns). Perhaps more impo~'tntly, elimination of
+word-level lexical ambiguity allows the parser to
+make projection about the input which is yet to be
+parsed, using a simple lookahead; in particuL'tr,
+phrase boundaries can be determined with a degree
+of confidence (Church, 1988). This latter property is
+critical for implementing skip-and-fit recovery tech-
+nique ouflined in the previous section.
+     Tagging of input also helps to reduce the
+number of parse structures that can be assigned to a
+sentence, decreases the demand for consulting of the
+dictionary, and simplifies dealing with unknown
+words. Since every item in the sentence is assigned a
+tag, so are the words for which we have no entry in
+the lexicon. Many of these words will be tagged as
+"np" (proper noun), however, the surrounding tags
+may force other selections. In the following exam-
+ple, chinese, which does not appear in the dictionary,
+is tagged as "jj" :~
+    this/dt  paper/nn  dates/vbz back/rb   the/dt
+    genesis/nn of/in binary/jj conception/nn circa/in
+
+    6 Tagged using the 35-tag Penn Treebank Tagset created at
+the University of Pennsylvania.
+    7 We use the machine readable version of the Oxford Ad-
+vanced Leamer's Dictionaiy (OALD).
+
+   5000/cd    years/nns  ago/rb ,/com   as/rb
+   derived/vbn by/in the/di chinese/jj ancients/nns
+   ./per
+
+       The tagger which we use to process the input
+text prior to parsing is based upon a bi-gram model; it
+selects   most likely tag for a word   given co-
+occurrence probabilities computed from a relafively
+small training set.8 While the peak accuracy of the
+best-tag option of the tagger is predicted to approach
+97% (Meteer et al., 1991), we noted that the actual
+performance on unprocessed WSJ text was in fact
+somewhat worse. The main problem, it appears, were
+frequent mistakes in tokenization of input, especially
+in recognizing sentence boundaries. For example,
+when a sentence ended with a period but wasn't fol-
+lowed by at least two blanks or an end-of-line, this
+and the next sentence would be collapsed together.
+On the other hand, intra-sentenfial periods (like those
+following   abbreviated words) were  occasionally
+found followed by a new-line character, and the sen-
+tence was split into two. While the parser contains a
+provision to deal with the case of collapsed sen-
+tences, the tags were likely to be incorrect. The fol-
+lowing example is typical; note tagging errors at the
+second apostrophe, and plans.
+
+Gorbachev was rinining into trouble at home, including the
+August coup, "which I thought would be the end of it," Mr.
+Costa says. Still, plans to send the tank to the U.S. somehow
+moved ahead.
+
+
+   Gorbachev/np    was/vbd running/vbg into/in
+   trouble/nn at/in home/nn ,/com including/vbg
+   the/di   August/np   coup/nn ,/com  "/apos
+   which/wdt   I/pp thought/vbd would/md be/vb
+   the/di end/nn of/in it/pp ,/com "/nn Mr/nn ./per
+
+   Costa/np says/vbz ./per still/rb ,/com plans/vbz
+   to/to send/vb the/di tank/nn to/to the/di U.S./np
+   somehow/rb moved/vbd ahead/rb ./per
+
+
+WORD SUFFIX TRIMMER
+       Word stemming has been an effective way of
+improving document recall since it reduces words to
+their common morphological root, thus allowing
+more successful matches. On the other hand, stem-
+ming tends to decrease retrieval precision, if care is
+not taken to prevent situafions where otherwise unre-
+lated  words are reduced to the same stem. In our
+
+        The program, supplied to us by Bolt Beranek and New-
+man, operates in two alternative modes, either selecting a single
+most likely tag for each word (1,est-tag option, the one we use at
+present), or supplying a short ranked list of alternatives (Meteer et
+at., 1991).
+
+
+                                                177
+
+system we replaced a traditional morphological stein-
+mer with a conservative dictionary-assisted suffix
+trimmer. 9 The suffix trimmer performs essentially
+two tasks: (1) it reduces inflected word forms to their
+root forms as specified in the dictionary, and (2) it
+converts nominalized verb forms (e.g., "implementa-
+tion", "storage") to the root forms of corresponding
+verbs (i.e., "implement", "store"). This is accom-
+plished   by removing     a   standard suffix, e.g.,
+"stor+age", replacing it with a standard root ending
+("+e"), and checking the newly created word against
+the dictionary, i.e., we check whether the new root
+("store") is indeed a legal word, and whether the ori-
+ginal root ("storage") is defined using the new root
+("store") or one of its standard inflecfional forms
+(e.g.,  "storing").  For  exatnple, the following
+definifions are excerpted from  the O~)rd Advanced
+Learner's Dictionary (OALD):
+      storage n [U] (space used for, money paid for)
+      the storing of goods ...
+      diversion n [U] diverting...
+      procession n [C] number of persons, vehicles,
+      etc moving forward and following each other in
+      an orderly way.
+
+Therefore, we can reduce "diversion" to "divert" by
+removing the suffix "+sion" and adding root form
+suffix "+t". On the other hand, "process+ion" is not
+                      10
+reduced to "process
+        Earlier experiments with CACM-3204 collec-
+tion showed an improvement in retrieval precision by
+6% to 8% over the base system   equipped with a stan-
+dard morphological stemmer (the SMART stemmer).
+Due to time limitations these numbers are not avail-
+able for TFIEC database at this time.
+
+
+HEAD-MODIFIER STRUCTURES
+        Syntactic phrases extracted from TTP parse
+trees are head-modifier pairs. The head in such a pair
+is a central element of a phrase (main verb, main
+noun, etc.), while the modifier is one of the adjunct
+£trguments of the head.   In the TREC experiments
+reported here we extracted head-modifier word and
+fixed-phrase pairs only. While TREC WSJ database
+is large enough to warrant generation of ktrger coin-
+pounds, we were in no posiflon to verify their effec-
+tiveness in indexing (largely because of the tight
+schedule). We discuss some options below.
+
+
+      9 Dealing with prefixes is a more complicated matter, since
+they may have quite strong effect upon the meaning of the result-
+ing term, e.g., Un- usually introduces explicit negation.
+      `~ Definition checking is not implemented yet.
+
+     Let us consider a specific example from WSJ
+database:
+    The former Soviet president has heen a local
+    hero ever since a Russian tank invaded Wiscon-
+    sin.
+
+The tagged sentence is given below, followed by the
+regularized parse structure generated by TTP, given
+in Figure 1.
+    The/di formei;~~j Soviet/ji president/nn has/vbz
+    been/vbn a/dt locaiji hero/nn ever/rb since/in
+    a/dt    Russian/ji   tank/im    invaded/vbd
+    Wisconsin/np Iper
+
+     It should be noted that the parser's output is a
+predicate-argument structure centered around main
+elements of various phrases. In Figure 1, BE is the
+main predicate (modified by HAVE) with 2 argu-
+ments (subject, object) and 2 adjuncts (adv, sub_ord).
+INVADE is the predicate in the subordinate clause
+with 2 arguments (subject, object). The subject of
+BE is a noun phrase with PRESDENT as the head
+element, two modifiers (FOR~~R, SOVIET) and a
+determiner (THE). From this structure, we extract
+head-modifier pairs that become candidates for com-
+pound terms. The following types of pairs are con-
+sidered: (1) a head noun and its left adjecfive or noun
+adjunct, (2) a head noun and the head of its right
+
+[assert
+ [[pert [HAVE]l
+  [(verb [BEll
+    [subject
+     [np
+        [n PRESIDENT]
+        (t~pos ThE]
+        [adj [FORMERII
+        ladi [SOVIET] Ill
+    [object
+     [np
+        [n HEROI
+        [t~pos Al
+        [adj [LOCALIIII
+    [adv EVER]
+    [sub_ord
+     [SINCE
+        [[verb [INVADE] I
+         (subject
+           [np
+            [n TANK]
+            [t~os Al
+            [adj [RUSSIAN]]]]
+         (object
+           [np
+            (name [WISCONSIN]]]]]]j]]]
+         Figure 1. Predicate-argument parse structure.
+
+
+                                                   178
+
+adjunct, (3) the main verb of a clause and the head of
+its object phrase, and (4) the head of the subject
+phrase and the main verb.   These types of pairs
+account for most of the syntactic variants for relafing
+two words (or simple phrases) into pairs carrying
+compatible semantic content. For example, the pair
+retrieve+information will be extracted from any of
+the following fragments: information retrieval sys-
+tem, retrieval of information from databases: and
+information  that can be retrieved by   a user-
+controlled interactive search process. In the example
+at  hand,  the following head-modifier pairs are
+extracted (pairs containing low-contents elements,
+such as BE and FORMER, or names, such as
+WISCONSIN, will be later discarded):
+     [PRESIDENT,BE]
+     [PPESIDENT,FORMER]
+     [PRESIDENT,SOVIET]
+     [BE,HERO]
+     [HERO,LOCAL]
+     [TANK,INVADEJ
+     [TANK~USSIAN]
+     [INVADE,WISCONSIN]
+
+We may note that the three-word phrase former
+Soviet president has been broken into two pairs
+former president and Soviet president, both of which
+denote things that are potenfially quite different from
+what the original phrase refers to, and this fact may
+have potentially negafive effect on retrieval preci-
+sion. This is one place where a longer phrase appears
+more appropriate. An further example is shown in
+Figure 2.11 One difficulty in obtaining head-modifier
+pairs of highest accuracy is the notorious ambiguity
+of nominal compounds. For example, the phrase
+natural  language   processing should   generate
+language+natural and processing+language, while
+dynamic information processing is expected to yield
+processing +dynamic  and processing +information.
+Since our parser has no knowledge about the text
+domain, and uses no semantic preferences, it does not
+attempt to guess any internal associations within such
+phrases. Instead, this task is passed to the pair extrac-
+tor module which processes ambiguous parse struc-
+tures in two phases. In phase one, all and only unam-
+biguous head-modifier pairs are extracted, and the
+frequencies of their occurrences are recorded. In
+phase two, frequency information about pairs gen-
+erated in the first pass is used to form associations
+from   ambiguous   structures. For example,  if
+
+     "Note that working with the parsed text ensures a degree of
+predsion in capturing the meaningful phrases, which is especially
+evident when compared with the results usually obtained from ei-
+ther unprocessed or only partially processed text (Lewis and Croft,
+1990). Note also that names, pronouns and dummy verbs are not
+allowed to create pairs.
+
+SENThNclll:
+
+()orbachev ordered the tank shipped to a plant in the Ukraine,
+where seven mechanics worked for three months restoring it.
+
+
+PARSE STRUCTURE:
+
+[assert
+ [[verb [ORDERII
+  [subject
+    [np
+     [name [GORBACHEVIJII
+  [object
+    [[verb []I
+     [subject
+       [np
+        [n TANKI
+        [t~os ThEI
+        [m~wh
+         [[verb [SHIPII
+          [subject ANYONEI
+          [object VARI
+          [TO
+            [np
+             in PLANTI
+             [t~s AJII
+          [IN
+            [np
+             [name [UKRAINEII
+             [t~s ThEI
+             [m_wh
+              [[verb [WORKJI
+                [subject
+                 [np
+                  [n MECHANICI
+                  [count [SEVENIII
+                [FOR
+                 [np
+                  [n MONTh]
+                  [count [THREEIIII
+                [sa~wh
+                 [[verb ~ESTO~l
+                  [subject PROI
+                  [object
+                    [np
+
+significantly fewer times or perhaps none at all, then
+we will prefer the former association as valid.
+    Although the noun phrase disambiguation rou-
+tine has been implemented to work with the pair
+extractor program, it has not been used in the current
+installment of ThEC. A more conservative version of
+pair extractor was used instead (it generates fewer
+pairs) since that version was found effective in test
+runs. 12
+
+
+TERM CORRELATIONS FROM TEXT
+    Head-modifier pairs form compound terms
+used in database indexing. They also serve as
+occurrence contexts for smaller terms, including
+single-word terms. In order to determine whether
+such pairs signify any important association between
+terms, we calculate the value of the Informational
+Contribution (IC) function for each element in a pair.
+This is important because not every syntactic associa-
+tion necessarily translates into a semantic one, and
+we may also need to eliminate spurious pairs gen-
+erated by the parser. Higher values of IC indicate
+stronger association, and  moreover the element
+which has the larger value is considered semantically
+dominant. These values are context dependent, and
+will vary from one corpus to another. 13
+    The likelihood of a given word being paired
+with another word, within one predicate-argument
+structure, can be expressed in statistical terms as a
+conditional probability. In our present approach, the
+required measure had to be uniform for all word
+occurrences, covering different types of predicate-
+argument links, i.e., verb-object, noun-adjunct, etc.
+This is reflected by an additional dispersion parame-
+ter, introduced to evaluate the heterogeneity of word
+associations. The resulting new formula IC (x, [x,y])
+is based on (an estimate of) the conditional probabil-
+ity of seeing a word y as a modifier of the word x,
+normalized with a dispersion parameter for x.
+
+   IC(x,[x,y))=     f:,y
+                 `zX + d~ - 1
+
+EXTRAC~D PAIRS:
+
+MECHANIC WORK
+SHIP TANK
+TANK SHIP
+
+          Figure 2. Extraction of syntactic pairs.
+
+
+language+natural has Occurred unambiguously a
+number times in contexts such as parser for natural
+language, while processing+natural has occurred
+
+
+                                                 179
+
+where ~ is the frequency of [x,y] in the corpus, n~
+is the number of pairs in which x occurs at the same
+position as in [x,yJ, and d(x) is the dispersion pararn-
+eter understood as the number of distinct words with
+    12 In a few test runs with TREC topics 001 to 005 against the
+training database (disk 1), we observed that the inclusion of corn-
+pound terms obtained from head-modifier pairs increased both re-
+call and precision quite sugnificantly. In particular, for topic 003 no
+relevant documents could be found without compound terms.
+    13 For more details please refer to (Strzalkowski and Vau-
+they, 1992).
+
+which x is paired. When JC(x, [x,y]) = 0, x and y
+never    occur   together (i.e.,   ~ = 0);    when
+IC(x, [x,yJ) = 1, x occurs only with y (i.e., ~ =
+and d~= 1).
+       So defined, IC function is asymmetric, a pro-
+perty found desirable by Wuks et al. (1990) in their
+study of word co-occurrences in the Longman dic-
+tionary. In addition, IC is quite stable even for rela-
+tively low frequency words (dispersion parameter
+helps here), and in this respect it compares favour-
+ably to Fano's mutual information formula. The lack
+of stability on low frequency terms is particularly
+worrisome for IR applications since many important
+indexing terms could be eliminated from considera-
+tion.
+       It should also be pointed out that the parficular
+way of generating syntactic pairs was dictated, to
+some degree at least, by statistical considerations.
+Our original experiments with IC formula were per-
+formed on the relafively small CACM-3204 collec-
+tion, and therefore we combined pairs obtained from
+different  syntactic  relations  (e.g.,  verb-object,
+subject-verb, noun-adjunct, etc.) in order to increase
+frequencies   of some   associations.  This became
+largely unnecess~uy in a large collection such as TIP-
+STER, but we had no means to test alternative
+options, and thus decided to stay with the original. It
+should not be difficult to see that this was a
+compromise solution, since many important distinc-
+tions were potentially lost, and strong associations
+could be produced where there weren't any. A way to
+improve things is to consider different syntacfic rela-
+tions independently, perhaps as independent sources
+of evidence that could lend support (or not) to certain
+term similarity predictions. We have already started
+testing  this  option.  A few     examples   of IC
+coefficients obtained from CACM-3204 corpus are
+listed in Table 1.
+       IC values for terms become the basis for calcu-
+lating term-to-term similarity coefficients. If two
+terms tend to be modified with a number of common
+modifiers and otherwise appear in few distinct con-
+texts, we assign them a similarity coefficient, a real
+number between 0 and 1. The similarity is deter-
+mined by comparing distribution characteristics for
+both terms within the corpus: how much information
+contents do they c~trry, do their information contribu-
+tion over contexts vary greatly, are the common con-
+texts in which these terms occur specific enough? In
+general we will credit high-contents terms appearing
+in identical contexts, especially if these contexts are
+not    too commonplace.14 The     relative similarity
+
+       `~ It would not he appropriate to predict similarity between
+language and logarithm on the basis of their co-occurrence with
+natural.
+
+
+                                                   180
+
+      word        head+modifier      IC coeff,
+  distribute     distribute+normal    0.040
+  normal         distribute+normal    0.115
+  minimum        minimum+relative     0.200
+  relative       minimum+relative     0.016
+  retrieve       retrieve+inform      0.086
+  inform         retrieve+inform      0.004
+  size           size +medium         0.009
+  medium         size +medium         0.250
+  editor         editor+text          0.142
+  text           editor+text          0.025
+  system         system+parallel      0.001
+  parallel       system+parallel      0.014
+  read           read+character       0.023
+  character      read+character       0.007
+  implicate      implicate+legal      0.035
+  legal          implicate+legal      0.083
+  system         system+distribute    0.002
+  distribute     system+distribute    0.037
+  make           make +recommend      0.024
+  recommend      make +recommend      0.142
+  infer          infer+deductive      0.095
+  deductive      infer+deductive      0.142
+  share          share +resource      0.054
+  resource       share +resource      0.042
+
+
+Table 1. Examples of IC coefficients.
+
+between two words x1 and x2 is obtained using the
+following formula (0: is a large constant): 15
+SIM(x1 ,x2) = log (0: ~ sim~(xi ,x2))
+
+
+where
+
+sim~(x1,x2)=MJN(IC(x1,[x1,yJ),!C(x2,[x2,yJ))
+             * MIN (IC ty, [x1,y]),IC("', [x2,yJ))
+
+The similarity function is further normalized with
+respect to SIM(x1 ,x1).
+      In addition, we require that words x1 and x2
+appear in at least two distinct common contexts,
+where a common context is a couple of pairs [x1 ,y]
+and [x2,y], or [y~~] and [yx2] such that they each
+occurred at least twice. Thus, banana and baltic will
+
+      `~ This is inspired by a formula used by Hindle (1990), and
+subsequently modified to take into account the asymmetry of IC
+measure.
+
+not be considered for similarity relation on the basis
+of their occurrences in the common context of repub-
+lic, no matter how frequent, Unless there is another
+such common context comparably frequent (there
+wasn't any in TREC WSJ database). 16
+    It may be worth pointing out that the similari-
+ties are calculated using term co-occurrences in syn-
+tactic rather than in document-size contexts, the latter
+being the usual pracfice in non-linguistic clustering
+(e.g., Sparck Jones and Barber, 1971; Crouch, 1988;
+Lewis and Croft, 1990). Although the two methods of
+term clustering may be considered mutually comple-
+mentary in certain situafions, we believe that more
+and stronger associations can be obtained through
+syntactic-context clustering, given sufficient amount
+of data and a reasonably accurate syntactic parser. 17
+
+
+QUERY EXPANSION
+    Similarity relations are used to expand user
+queries with new terms, in an attempt to make the
+final search   query more comprehensive      (adding
+synonyms) and/or more pointed (adding specializa-
+tions).'8 It follows that not all similarity relafions will
+be equally useful in query expansion, for inst£'tnce,
+complementary and antonymous relations like the
+one between australian and canadian, or accept and
+reject may actually harm system's performance,
+since we may end up retrieving many irrelevant
+documents. Similarly, the effectiveness of a query
+containing vitamin is likely to diminish if we add a
+similar but far more general term such as acid. On
+the other hand, database search is likely to miss
+relevant documents if we overlook the fact that for-
+tran is a programming language, or that infant is a
+baby and baby is a child. We noted that an average
+set of similarities generated from a text corpus con-
+tains about as many "good" relations (synonymy,
+specialization)  as     "bad"  relations  (antonymy,
+
+    16 However, SJM(banana,dominican) was generated since
+two independent contexts were indeed found: republic and plant,
+even though word plant apparently occurs in different senses in ba-
+nana plant and dominican plant.
+    17 Non-syntactic contexts cross sentence boundaries with no
+fuss, which is helpful with short, succinct documents (such as
+CACM abstracts), but less so with longer texts; see also (Grishman
+etal., 1986).
+    I' Query expansion (in the sense considered here, though not
+quite in the same way) has been used in information retrieval
+research before (e.g., Sparck Jones and Tait, 1984; Harman, 1988),
+usually with mixed results. An altemative is to use term clusters to
+create new terms, "metaterms", and use them to index the database
+instead (e.g., Crouch, 1988; Lewis and Croft, 1990). We found that
+the query expansion approach gives the system more flexibility, for
+instance, by making room for hypertext-style topic exploration via
+user feedback.
+
+
+                                                  181
+
+complementation, generalization), as seen from the
+query expansion viewpoint. Therefore any attempt to
+separate these two classes and to increase the propor-
+tion of "good" relations should result in improved
+retrieval. This has indeed been confirmed in our ear-
+her experiments where a relatively crude filter has
+visibly increased retrieval precision.
+      In order to create an appropriate filter, we
+expanded the IC function into a global specificity
+measure called the cumulative informational contri-
+bution function (ICW). ICW is calculated for each
+term across all contexts in which it occurs. The gen-
+eral  philosophy here  is  that  a   more specific
+word/phrase would have a more limited its use, i.e., a
+more specific term would appear in fewer distinct
+contexts. In this respect, ICW is similar to the stan-
+dard inverted document frequency (idf) measure
+except that term frequency is measured over syntactic
+units rather than document size units.19 Terms with
+higher ICW values are generally considered more
+specific, but the specificity comparison is only mean-
+ingful for terms which are akeady known to be suni-
+lar. The new function is calculated according to the
+following formula:
+          F JCL(W) * JCR(W) if both exist
+
+JCW(w) =~JCR(W)             if only ICR (w) exists
+
+          Lo                otherwise
+where (with n~, d~ > 0):
+
+ICL(W) = IC ([w,~]) = d~(n~+d~- 1)
+
+ICR (w) =IC([_,wJ) = d~(n~+d~-l)
+
+For any two terms w1 and w2, ~`lnd constants ~ > 1,
+~2 > 1, the following situations were considered. If
+JCW(w2) >- 6~ * ICW(w1) then w2      is considered
+more specific than w1. If ICW(w2) < 62 * ICW(w1)
+and ICW(w2)> ICW(w1) then w2 is considered
+synonymous     with    w 1 20   In   addition,     if
+SIM~rm(W 1,w2) = 0> 0, where 0 is an empirically
+established threshold, then w2 can be added to the
+query containing term w1   with weight o.21 The
+
+      19 We believe that measuring term specificity over
+document-size contexts (e.g., Sparck Jones, 1972) may not be ap-
+propriate in this case. In particular, syntax-based contexts allow for
+processing texts without any intemal document structure.
+      20 In TkBC runs we used 8 = 10 and 82 = 3.
+      21 For CACM-3204 collection the filter was most effective at
+ = 0.57. For TREC we changed the similarity formula slightly in
+order to obtain correct normalizations in all cases~ This however
+lowered similarity coeffidents in general and a new threshold had
+to be selected. We used tt = 0.1 in TREC runs.
+
+cutoffs could be different for synonymy and speciali-
+zation.  For example, the following were obtained
+from TRBC WSJ training database:
+
+
+with
+
+    ICW (child)          - 0.000001
+    ICW (baby)           - 0.000013
+    JCW (infant)         - 0.000055
+
+
+    SJM (child, infant)  - 0.131381
+    SIM (baby, child)    - 0.183064
+    SJM (baby, infant)   -0.323121
+Therefore both baby and infant can be used to spe-
+cialize child (with 6t = 10), while baby and infant
+can be considered synonyms (with ~ = 5). Note that
+if ~ is well chosen, then the above filter will also help
+to reject antonymous and complementary relations,
+such      as  SIMnorm(back,front)=0.305287    with
+ICW (back )=0.000001    and  ICW ("rnntY-0.000006.
+We continue working to develop more effective
+filters.  Bxwnples of   filtered similarity relafions
+obtained from TREC corpus are listed in Tables 2
+and 3.
+
+
+SUMMARY OF RESULTS
+        We have processed the total of 500 MBytes of
+~trticles from Wall Street Journal section of ThEC
+database. Runs were made independently on training
+corpus (250 MBytes) and the test corpus (another 250
+Mbytes). Natural language processing of each half of
+the corpus, including tagging, stemming, parsing and
+pair extraction required approximately 2 weeks of
+nearly uninterrupted processing on two Sparc works-
+tations (we use an assortment of SparcStation 1, BLC
+and 2, with MWS rates varying from 13 to 21 to
+28.5). 22 Computing term similarities from the first
+250 Mbytes of text took up another week. This time
+limitations  in our   computing   resources, mostly
+memory, were the main reason. With a sufficient
+amount of RAM (on the order of 256 MBytes or
+more) we estimated that this process should take no
+more than 20 hours. It should be noted that we com-
+puted term similarities ktsed only on the training
+corpus, but we used them in retrieval freim either
+database.   We assumed that the underlying set of
+concepts and describing them terms does not vary
+greatly between the two databases (the first covered
+Wall Street Journal from 1987 to 1989, the second
+from 1990 to 1992).
+
+        22 Processing of the training corpus took significantly longer
+in practice (real time) since we had only one Sparcstation available
+at ~y given time, and also due too errors made and resulting froin
+them need for re-processing soitie parts.
+
+
+                                                   182
+
+    Subsequent indexing process performed by the
+NIST IR system required additional 2 weeks for each
+half of the database, on a single SparcStation 2.23 In
+tot£'tl, we created three inverted file indexes: two were
+derived from the training corpus, and one from the
+test corpus. The first index created from training
+corpus did not include compound terms; the remain-
+mg two indexes included them. No cumulative index
+was produced, since we estimated it would require
+more than 6 weeks to build.  Some interesting
+discrepancies were observed. While the postings file
+generated from the training corpus was 25% larger
+that the one generated from the test corpus, the
+corresponding dictionary of terms was about 25%
+smaller in the training corpus. This seems to suggest
+that in 1990-92 volumes of Wall Street Journal (test
+corpus) a greater number of unique terms were used,
+while these terms were on average occurring more
+sparsely in the text. This fact may partially under-
+mine an earlier assumption that term similarities gen-
+erated from training corpus were adequate for test
+corpus as well.
+    During the training stage of TREC we per-
+formed only very limited tests, mostly because the
+base system retrieval was quite slow on a database of
+this size (approx. 173 MBytes, 99+K documents). 24
+We run experiments with topics 001 to 005, using
+relevance judgements supplied with the training data-
+base. The purpose of these tests was to (1) observe
+any improvement in performance resulting from the
+use of compound phrase terms, (2) tune the term
+similarity filter by adjusting certain threshold values
+in an attempt to obtain the most effective set of simi-
+larities, and (3) note if any manual intervention into
+the queries could improve retrieval results. As may
+be expected, none of these experiments were con-
+clusive, but this was all we could rely upon in the
+short time given. First of all, we noticed that system
+overall performance (cumulative recall and precision
+levels) were what we could have expected from runs
+on smaller benchmark collections such as CACM-
+3204. This tnay be partially explained by the diver-
+sity of the subject tnatter covered in the TREC data,
+and also by the character of the queries (i.e., requests
+to extract information), but some problem with the
+base search engine may also be to blame. 25 We were
+
+    23 Indexing process could not l~ done in parallel because
+NIST system requires serial processing. Moreover, as indexing
+progressed, and the partial database grows in size, the process
+slowed down significantly from approx. 6 mm/file to 37 mm/file.
+    24 The system needed approx. 60 minutes to process a quety.
+
+      In the middle of the training run we discovered that the
+NIST system has been designed to handle databases up to 65K do-
+cuments (21b) Subsequently we rewrote portions of the code to fix
+this, but we were not certain if other decisions made by the re-
+tneval module (e.g., bitmapping, idf cutoffs) were not in fact coun-
+
+     wordi            word2        SIMnorm
+ abm
+ absence
+ accept
+ accord
+ acquire
+ speech
+ adjustable
+ maxsaver
+ affair
+ affordable
+ disease
+ medium+range
+ aircraft
+ aircraft
+ airline
+ alien
+ anniversary
+ anti+age
+ anti+clot
+ contra
+ candidate
+ contend
+ property
+ attempt
+ await
+ stealth
+ child
+ baggage
+ ban
+ bearish
+ bee
+ roller+coast
+ two +income
+ television
+ soldier
+ treasury
+ research
+ withdrawal
+
+
+Table 2. Filtered
+more specific term).
+
+*anti+ballistic
+*maternity
+acquire
+pact
+purchase
+address
+one +year
+*advance +purchase
+scandal
+low+income
+*ailment
+*air+to+air
+*jetliner
+plane
+carrier
+immigrate
+*bicentennial
+anti+wrinkle
+cholesterol+lower
+*anti+sandinista
+*aspirant
+*aspirant
+asset
+bid
+pend
+*b+1
+*baby
+luggage
+restrict
+bullish
+*honeybee
+*bumpy
+two+earner
+tv
+troop
+*short+term
+study
+*pullout
+
+0.534894
+0.233082
+0.179078
+0A92332
+0A49362
+0.263789
+0.824053
+0.734008
+0.684877
+0.181795
+0.247382
+0.874508
+0.166777
+0.423831
+0.345490
+0.270412
+0.588210
+0.153918
+0.856712
+0.294677
+0.116025
+0.143459
+0.285299
+0.641592
+0.572960
+0.877582
+0.183064
+0.607333
+0.321943
+0.847103
+0.461023
+0.898278
+0.293104
+0.806018
+0.374410
+0.661133
+0.209257
+0.622558
+
+word similarifies (* indicates the
+
+terproductive with  larger databases. Later experiment have
+confirmed this as we obtained new code from NIST.
+
+
+                                                            183
+
+     wordi             word2         SIMnorm
+   lord           abuser             0.261507
+   break          accelerator        0.106775
+   accept         reject             0.275802
+   accord         level              0.152023
+   cent           accrue             0.259478
+   acquire        deficient          0.615525
+   fix+rate       adjustable         0.930180
+   advertise      environmental      0.124026
+   petroleum      aerospace          0.207406
+   afghan         nicaraguan         0A21478
+   banana         dominican          0.444193
+   begin          month              0.346558
+   german         british            0.112465
+   superpower     reagan+ gorbachev  0.400145
+   republic       sea                0.227662
+   sunglasses     sneakers           0.126749
+
+
+Table 3. Some (apparently?) "bad" similarities gen-
+erated.
+
+also quite disappointed with the effect that the query
+expansion had (or did not have) on either precision or
+recall figures.  This was somewhat more directly
+related to the wide domain scope of WSJ articles, and
+we noticed many obvious word sense mixups leading
+to unwanted term associations.  Also, the rather
+straightforward method of query expansion terms
+proved less adequate here, and we are considering
+new methods as outlined briefly in the introduction to
+this paper.  Our final test with manually altered
+queries (terms were deleted or added after consulting
+the original topic) brought only negative results: any
+kind of intervention appeared only to further decrease
+both recall and precision.
+     Final runs were performed as follows:
+(1)  Topics 1-25 were processed using only direct
+     fields  (<title>, <desc>, and  <narr>) with
+     respect to the training database (disk 1). They
+     were subsequently run in the routing mode
+     against the test database (disk 2). 26 Unfor-
+     tunately, the routing results were hindered by a
+     bug in our program that removed duplicate
+     26 While other fields provided much useful information
+about various aspects of a given topic (including definitions of spe-
+cialized terms), we thought that their inclusion in the final query
+would make it difficult to assess the advantages of linguistic pro-
+cessing. This especially applies to Concepts fiels <con> which list-
+ed hand-extracted keywords. Subsequenfly, we realized that more
+often this field in fact provided further clues not found in other sec-
+tions of a topic.
+
+     terms from queries while preparing them for a
+     routing run.
+(2)  Topics 51-75 were processed using the same 3
+     fields as above with respect to the test database
+     only (disk 2). They were then run in ad-hoc
+     mode independently against the training data-
+     base and the test database, and the top 200
+     documents from each run (for each query)
+     were merged using document scores.    The
+     upper 200 documents were selected for the
+     final result. It should be noted that we run
+     topics against disk 1 using idf weights on terms
+     from disk 2 (a roufing-like mode). This, it
+     turned out, created an even distribufion of hits
+     between   the two databases. We   call this
+     method the uniform merge.
+(3)  We repeated run (2), but this time we run
+     topics 51-75 in ad-hoc mode on both disks (i.e.,
+     different weights were used in these runs).
+     Again, top 200 documents were selected. We
+     call this method the bruteft)rce merge.
+(4)  Finally,  we repeated uniform merge   with
+     queries   manually  pruned   before  actual
+     retrieval.
+     Summary statistics for these runs are shown in
+~tbles 4 and 5. It has to be pointed out that these
+results are lower than expected because of various
+problems with the database search prograin and
+because the Concepts field in TREC topics was not
+included in search queries. Subsequent runs with
+Concepts field included in search produced results
+shown in Table 6.
+
+
+ACKNOWLEDGEMENTS
+     We would like to thank Donna Harinan of
+NIST for making her IR system available to us. We
+would also like to thank Ralph Weischedel, Marie
+Meteer and Heidi Fox of BBN for providing and
+assisfing in the use of the part of speech tagger. Jose
+Perez Carballo has contributed a number of valuable
+observations during the course of this work, and his
+assistance in processing the TREC data was critical
+for our being able to finish on time. This paper is
+based  upon    work supported  by  the  Defense
+Advanced Research Project Agency under Contract
+N00014-90-J-1851   from  the   Office of  Naval
+Research, under Contract N00600-88-D-3717 from
+PRC Inc., and the National Science Foundation under
+Grant IRI-89-02304. We also acknowledge support
+from Canadian Institute for Robotics and Intelligent
+Systems (IRIS).
+
+
+                                               184
+
+      Run         nyuirl      nyuir2
+      Name        routing     routing
+      Queries       25         25
+      Tot number of does over all queries
+      Ret         5000        5000
+      Rel         3766        3766
+      RelRet        834    ~  1177
+       Recall     Precision Averages
+        0.00      0.5691      0.6983
+        0.10      0.3618      0.5072
+        0.20      0.1846      0.3508
+        0.30      0.1314      0.2997
+        0.40      0.1065      0.2286
+        0.50      0.0481      0.1481
+        0.60      0.0295      0.0604
+        0.70      0.0104      0.0296
+        0.80      0.0104      0.0260
+        0.90      0.0000      0.0125
+        1.00      0.0000      0.0000
+        Average precision for all points
+      11-pt       0.1320      0.2147
+      Average precision at 0.20, 0.50, 0.80
+      3-pt        0.0811      0.1750
+                  Recall at
+      5 docs      0.0338      0.0374
+      l5docs      0.0671      0.0961
+      30docs      0.0979      0.1533
+      lOodocs     0.2117      0.3119
+      200docs     0.2988      0.4298
+                 Precision at
+      Sdocs       0.3360      0.4480
+      15 docs     0.2960      0.4587
+      30 docs     0.2787      0.3973
+      lOodocs     0.2276      0.3080
+      200docs     0.1668      0.2354
+
+
+Table 4. Routing run statistics: (1) duplicate terms
+(unintenfionally) removed from queries; and (2) du-
+plicate terms retained and Concepts fields included.
+
+    Run        nyuirl ~ nyuir2 } nyuir3
+    Name       brute__~ prune  j_uniform
+    Queries      25   ~  25    J   25
+      Tot number of docs over all queries
+    Ret        4986    4990       4989
+    Rel        3318    3318       3318
+    ReiRet     1161      958      1039
+     Recall        Precision_Averages
+      0.00     0.7830  0.7168    0.7368
+      0.10     0.6216  0.4858    0.5592
+      0.20     0.4891  0.3722    0.4660
+      0.30     0.3815  0.2032    0.3235
+      OAO      0.2350  0.1382    0.2099
+      0.50     0.1871  0.0599    0.1385
+      0.60     0.1447  0.0419    0.0801
+      0.70     0.0705  0.0058    0.0560
+      0.80     0.0229  0.0030    0.0056
+      0.90     0.0000  0.0000    0.0000
+      1.00     0.0000  0.0000    0.0000
+          Average precision for all points
+    11-pt      0.2669  0.1843    0.2341
+      Average precision at 0.20,0.50,0.80
+    3-pt       0.2330  0.1450    0.2034
+    _________     Recall at
+    5 docs     0.0713  0.0444    0.0571
+    l5docs     0.1326  0.0929    0.1297
+    30 docs    0.1868  0.1424    0.1734
+    lOodocs    0.3350  0.2550    0.2918
+    200 docs   0.4294  0.3466    0.3908
+                 Precision at
+    S docs     0.5680  0.5200    0.5360
+    15 docs    0.5200  0A267     0.4907
+    30 does    0.4320  0.3627    0.4147
+    100 docs   0.3140  0.2684    0.2916
+    200docs    0.2322  0.1916    0.2078
+
+Table 5. Ad-hoc run statistics with Automatic Brute
+Force Merge, Uniform Merge with hand pruning, and
+Automatic Uniform Merge.
+
+
+                                            185
+
+   Run         nyuirl {nyui14~       nyuirs
+   Name        brute      concepts  negations
+   Queries      25      j251           25
+        Tot number of  docs over all queries
+   Ret         4986        4984       4984
+   Rel         3318        3318       3318
+   RelRet      1161        1291       1309
+   Recall              Precision Averages
+      0.00     0.7830      0.7685    0.7823
+      0.10     0.6216      0.6521    0.6625
+      0.20     0.4891      0.5396    0.5460
+      0.30     0.3815      0.4306    0.4419
+      OAO      0.2350      0.2671    0.2755
+      0.50     0.1871      0.2094    0.2085
+      0.60     0.1447      0.1457    0.1457
+      0.70     0.0705      0.0660    0.0660
+      0.80     0.0229      0.0385    0.0385
+      0.90     0.0000      0.0000    0.0000
+      1.00     0.0000      0.0000    0.0000
+          Average precision for all points
+   11-pt     [~ 0.2669     0.2834    0.2879
+        Average precision at 0.20, 0.50,0.80
+   3-pt      ~ 0.2330      0.2625    0.2643
+                   Recall at
+   S docs      0.0713      0.0738    0.0741
+   l5docs      0.1326      0.1362    0.1386
+   30docs      0.1868      0.2007    0.2011
+   100 does    0.3350      0.3513    0.3565
+   200 does    0.4294      0.4739    0.4828
+                  Precision at
+   5 docs      0.5680      0.6080    0.6080
+   l5docs      0.5200      0.5360    0.5493
+   30 docs     0.4320      0.4760    0.4773
+   100 does    0.3140      0.3432    0.3484
+   200 does    0.2322      0.2582  ~__0.2618
+
+Table 6. Ad-hoc run statistics using Automatic Brute
+Force Merge: without Concepts field, with Concepts
+field, and with Concepts excluding negated terms.
+
+REFERENCES
+Church, Kenneth Ward and Hanks, Patrick. 1990.
+       "Word associafion norms, mutual informa-
+       tion, and lexicography."       Computational
+       Linguistics, 16(1), MIT Press, pp.22-29.
+Crouch, Carolyn J. 1988. "A cluster-based approach
+       to thesaurus construcfion." Proceedings of
+       ACM SIGIR-88, pp.309-320.
+Grishman, Ralph, Lynette Hirschman, and Ngo T.
+       Nhan. 1986. "Discovery procedures for sub-
+       language selectional patterns: initial experi-
+       ments". Computational Linguistics, 12(3), pp.
+       205-215.
+Grishman, Ralph and Tomek Strzalkowski. 1991.
+       "Information Retrieval and Natural Language
+       Processing." Position paper at the workshop
+       on Future Directions in Natural Language Pro-
+       cessing in Informafion Retrieval, Chicago.
+Harman, Donna. 1988. "Towards interacfive query
+       expansion." Proceedings of ACM SIGIR-88,
+       pp.321-331.
+Harman,   Donna   and  Gerald    Candela.    1989.
+       "Retrieving Records from a Gigabyte of text
+       on a Minicomputer Using Statistical Rank-
+       mg."  Journal of the American Society for
+       Information Science, 41(8), pp.581-589.
+Hindle, Donald. 1990.  "Noun classificafion from
+       predicate-argument structures."   Proc. 28
+       Meeting of the ACL, Pittsburgh, PA, pp.268-
+       275.
+Lewis, David D. and W. Bruce Croft. 1990. "Term
+       Clustering of Syntactic Phrases". Proceedings
+       of ACM SIGIR-90, pp.385-405.
+Mauldin, Michael. 1991. "Retrieval Performance in
+       Ferret: A Conceptual Information Retrieval
+       System." Proceedings of ACM SIGIR-91, pp.
+       347-355.
+Meteer,   Marie, Richard  Schwartz,     and  Ralph
+       Weischedel. 1991. "Studies in Part of Speech
+       Labelling." Proceedings of the 4th DAJJPA
+       Speech and Natural  Language      Workshop,
+       Morgan-Kaufman, San Mateo, CA. pp.331-
+       336.
+Sager, Naomi. 1981. Natural Language Information
+       Processing. Addison-Wesley
+Sparck Jones, Karen. 1972. "Stafistical interpreta-
+       tion of term specificity and its application in
+       retrieval." Journal of Documentation, 28(1),
+       pp.11-20.
+Sparck Jones, K. and B. 0. Barber. 1971.    "What
+       makes automatic keyword classificafion effec-
+       tive?" Journal of the American Society fi)r
+       Information Science, May-June, pp.166-175.
+Sparck Jones, K. and J. I. Tait. 1984.  "Automatic
+       search term variant generation." Journal of
+       Documentation, 40(1), pp.50-66.
+
+
+                                                 186
+
+Strzalkowski, Tomek and Barbara Vauthey. 1991.
+      "Fast         Text  Processing     for    Information
+      Retrieval."       Proceedings of the 4th DARPA
+      Speech        and Natural    Language     Workshop,
+      Morgan-Kaufman, pp.346-351.
+Strzalkowski, Tomek and Barbara Vauthey. 1992.
+      "Information Retrieval Using Robust Natural
+      Language Processing." Proc. of the 30th ACL
+      Meefing, Newark, DE, June-July. pp.104-111.
+Strzalkowski, Tomek.        1992.   "TTP:     A Fast and
+      Robust        Parser  for    Natural      Language."
+      Proceedings of the 14th International Confer-
+      ence     on Computafional Linguistics         (COL-
+      ING), Nantes, France, July 1992. pp.198-204.
+Wilks, Yorick A., Dan Fass, Cheng-Ming Guo,
+      James B. McDonald, Tony Plate, and Brian M.
+      Slator. 1990.       "Providing machine tractable
+      dictionary tools." Machine Translation, 5, pp.
+      99-154.
+
+
+APPENDIX A: EXAMPLE QUERY
+      We show TRBC topic 057 and a part of result-
+mg search query with only top ranked terms showed
+in Table A.1. Please note that we rank terms by their
+idf scores even though their actual scores are idf *
+weight. It is worth pointing out, however, that the
+NIST system uses idf scores to decide if a term falls
+below a preset "significance" threshold.          We only
+show fields used for query generation.
+<top>
+<num> Number: 057
+<title> Topic: MCI
+<desc> Description:
+Document will discuss how MCI has been doing since the Bell
+System breakup.
+~arr> Narrative:
+A relevant document will discuss the financial health of MCI Com-
+munications Corp. since the breakup of the Bell System (AT&T
+and the seven regional Baby Bells) in January 1984. The status in-
+dicated may not necessarily be a direct or indirect result of the
+breakup of the system and ensuing regulation and deregulation of
+Ma Bell or of the restrictions placed upon the seven Bells; it may
+result from any number of factors, such as advances in telecom-
+munications technology,   MCI  initiative, etc. MCI's financial
+hcalth may be reported directly: a broad statement about its eam-
+ings or cash flow, or a report containing financial data such as a
+quarterly report; or it may be reflected by one or more of the fol-
+lowing: credit ratings, share of customers, volume growth, cuts in
+capital spending,   figure net loss, pre-tax charge, analysts' or
+MCI's own forecast about how well they will be doing, or MCI's
+response to price cuts that AT&T makes at its own initiative or
+under orders   from  the  Federal Communications  Commission
+(FCC), such as price reductions, layoffs of employees out of a per-
+ceived need to cut costs, etc. Daily OTC trading stock market and
+monthly short interest reports are NOT relevant; the inventory
+must be longer te~, at least quarterly.
+<Aop>
+
+             teim              idf      weight
+
+       deposit+financial    16.185341   0.192091
+       result+ breakup      16.185341   1.000000
+       restrict+action      16.185341   0.441260
+       number+factor        16.185341   1.000000
+       deposit+financial    16.185341   0.192091
+       layoff+job           15.600377   0.199677
+       report+health        15.185340   1.000000
+       share+cut            15.185340   1.000000
+       benefit+pnce         14.863412   0.263889
+       share+annual         14.600377   0.249365
+       document+ relevant   14.377985   1.000000
+       growth+custom        14.185340   1.000000
+       need+perceive        14.185340   1.000000
+       report+short         14.185340   1.000000
+       earnings+ cash       14.015415   1.000000
+       report+ interest     13.725908   1.000000
+       share+benejit        13.484900   0.263889
+       restrict+place       13.185340   1.000000
+       share+growth         13.097878   1.000000
+       layoff+employee      13.015415   1.000000
+       breakup+system       12.661778   1.000000
+       bell+atarm           12.484900   0.303537
+       number+adjust        12.377985   0.421292
+       hoard+cash           12.278449   0.253572
+       rebate+cash          12.015415   0.112116
+       growth+volume        11.661778   1.000000
+       flow+earnings        11.512915   1.000000
+       pre+tas              11.430452   1.000000
+       report+monthly       11.056057   1.000000
+       flow+capital         10.827788   0.434692
+       report+ quarterly    10.827788   1.000000
+       bell+ baby           10.541484   1.000000
+       reduce+price         10.314976   1.000000
+       health+financial     10.005431   1.000000
+       hoard                 9.956521   0~253572
+       infusion +cash        9.717734   0.332548
+       ensue                 9.505860   1.000000
+       stock+trade           9.327359   1.000000
+       boost+price           9.225338   0.280143
+       breakup               9.135491   1.000000
+       disposable            9.108524   0.216766
+       rebate                8.918553   0.112116
+       fcc                   8.810301   1.000000
+       cut+price             8.763275   1.000000
+       mci                   8.555984   1.000000
+
+
+Table A.1. Partial search query for topic 057
+
+
+                                                       187
+

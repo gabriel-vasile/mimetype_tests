@@ -1,0 +1,344 @@
+<!-- Title: Eve shift. Thu Sep 27, 2001 -->
+<!-- SciCo: Todd Huffman -->
+<!-- DAQAce: David Dagenhart / Abraham Gallas -->
+<!-- MonAce: Michael Schmitt -->
+<!-- CO: Virgil Barnes -->
+<!-- OpManager: Dave Ambrose -->
+<!-- Notes: -->
+<pre>Store 725 
+Luminosity 4.35E30 
+</pre>
+
+
+<!-- Date: Thu Sep 27 16:19:29 2001 -->
+<pre>TOF monitor iFix related problems now fixed. </pre>
+<!-- Author: Stefano -->
+
+
+<!-- Date: Thu Sep 27 16:37:23 2001 -->
+We are running with CMP TOP, North and South walls off. 
+<p> 
+The West toroids have been pulled out, so the rate of garbage hits and stubs is much higher in the west part of the CMX. 
+<br> 
+(Plan: at the end of this store, the toroids on the west will be pushed back in, and the toroids on the east will be pulled out.)
+<br>
+<!-- Author: Schmitt (schmittm@lotus.phys.nwu.edu)-->
+
+
+<!-- Date: Thu Sep 27 17:12:55 2001 -->
+<pre>We completed SVX calibration runs for Saverio:  
+ 
+   127758 DPS ON (EXTRA0=1) 
+   127759 DPS OFF (EXTRA0=0) 
+ 
+The error logger reported: 
+SCPU-P0-E-BadchannelCountsIn event 13 the sum of the channel counts the inconsistent with the total count, VRB slot 16.</pre>
+<!-- Author: Dagenhart, Gallas :: (run <a href='/java/cdfdb/servlet/RunSummary?RUN_NUMBER=127759' target=_top>127759</a>) -->
+<!-- Comment: Thu Sep 27 23;53;39 comment by...muge -->
+the effect on cmx can bee seen in the plot <a href="http://www-cdf.fnal.gov/internal/people/links/MugeKaragoz/muon/ymons/index.html">here</a>. unfortunately, i don't have the special cmp run...
+<!-- Date: Thu Sep 27 17:30:40 2001 -->
+<pre> 
+ The Level 3 monitor all the proccessor went gold, 
+ reseted in RC and stopped and started the L3 proxy 
+ Now we are trying to start a new run.</pre>
+<!-- Author: Dagenhart, Gallas :: (run <a href='/java/cdfdb/servlet/RunSummary?RUN_NUMBER=127759' target=_top>127759</a>) -->
+
+
+<!-- Date: Thu Sep 27 17:39:47 2001 -->
+<pre>With physics_0_02 table, all the monitors (except BeamMon) 
+crashed with error: 
+         run = 127752 event = 532 
+%ERLOG-e makeJetAlgParams: :  
+         /home/cdfsoft/dist/packages/JetObjects/V00-00- 
+36/src/makeJetAlgParams.cc  
+        : 276  could not match rcpid  29 2  Returning n 
+ 
+Fix to make the monitors run is to set: 
+module disable PuffModule 
+ 
+This is done, for now, in the .tcl which is under the runarea. 
+</pre>
+<!-- Author: Kaori -->
+
+
+<!-- Date: Thu Sep 27 17:55:17 2001 -->
+Started a run and it starts OK. The L3 monitoring returns and the runs starts OK.  Forgot to select the option to write all files to the look area so we quickly stop the run and start another.
+<!-- Author: Dagenhart :: (run <a href='/java/cdfdb/servlet/RunSummary?RUN_NUMBER=127760' target=_top>127760</a>) -->
+
+
+<!-- Date: Thu Sep 27 18:12:46 2001 -->
+We lost the S1, S2 and S3 heartbeats. 
+<p> 
+J.C. Yun answered a page and came in to help the cryo operator (KC Cahill) restart iFix.  This required rebooting the S1 PC.  After this step, the heartbeat for A1 returned. 
+<p> 
+Somewhat later, iFix was restarted on the other PC, and S3 and S2 returned.
+<!-- Author: Schmitt -->
+
+
+<!-- Date: Thu Sep 27 18:14:55 2001 -->
+We started the new run with Physics_0_02[1,208] trigger table 
+and we are writing all the files to the look area. 
+L2 people are working and modifying prescales. 
+Date rates and dead time look fine to L2 experts. 
+Data is being written from the CSL.  
+<!-- Author: Dagenhart, Gallas :: (run <a href='/java/cdfdb/servlet/RunSummary?RUN_NUMBER=127761' target=_top>127761</a>) -->
+<!-- Comment: Thu Sep 27 18;17;30 comment by...Dagenhart, Gallas -->
+<pre>
+DTO from b0l2de00 "internal buffer too small"
+HRR ok now.</pre>
+
+
+<!-- Date: Thu Sep 27 19:25:12 2001 -->
+I have talked to Pasha (then Pasha talked to Liz) about the 
+data quality with the new L3 exe. This is because only way we 
+were able to run 
+online consumers was by disabling puffmodule.  (This is also  
+true by reading the data from the disk in the look area). 
+Pasha and Liz said the data is ok.  They said once they fix a problem related to the rcp tag, we should be able to use  
+puffmodule and read jet information. 
+Meanwhile, Todd (SciCo) is getting an information from Rob S.   
+which is not re-assuring whether we can read jet information. 
+Anyway, online monitors are running ok for now. 
+or not. 
+<!-- Author: Kaori -->
+
+
+<!-- Date: Thu Sep 27 20:26:29 2001 -->
+Got an SVT page to help in measuring the beam position... 
+SVT statistics with the normal trigger table was too small 
+so we decided to crank up the track-based triggers at L1. 
+In order to do that without much deadtime we had to 
+reject all the events at L2, and it took a while and several 
+calls to Bill Ashmanskas to figure out all the details... 
+We finally managed to measure the beam position. 
+See later for details on what has been done with that... 
+ 
+I will be back later for the SVT-study time... need to sort 
+few more things with Bill A.'s help....
+<!-- Author: Alex -->
+<!-- Comment: Thu Sep 27 23;15;18 comment by...ADF -->
+Based on analysis of SVX global fit to earlier runs,
+we <a href=
+'/cgi/elog/elog.pl?nb=2001&action=view&page=708&frame=2&anchor=12:01:59'>
+requested a beam tilt shift </a> 
+from MCR of (+500, +150) urad
+today.  Upon further analysis of the September 10
+runs, it looked as if we were likely
+to want an additional (+100, +200) urad.  (This is 
+because the barrels should be fit to slopes individually;
+a global fit to all three barrels is thrown by small
+offset from west barrel to central barrel.)  
+<P>
+ After MCR's shifts, the beamline angle through the
+SVX was found to be, in "accelerator" x, -333, -233, and -313
+urad, for barrels 0,1,2 respectively.  In y, was
+found to be -146, -140, and -253 urad for 0,1,2.
+This indicates we want an additional (+283, +200)
+change in the beam.
+<P>
+ The y change makes some sense, but the x doesn't.
+Perhaps the beam itself has moved and did not start
+out this morning at the same angle as Sept. 10?
+Also, a total motion of +783 urad in x starts
+putting us toward higher losses.  
+<P>
+ If we are confident this is right, then tomorrow
+MCR should <a href=
+'/cgi/elog/elog.pl?nb=2001&action=view&page=705&frame=2&anchor=14:49:39'>
+<b>slowly</b></a>  tune the angle while we 
+watch the losses.
+
+<!-- Date: Thu Sep 27 20:27:45 2001 -->
+Could someone please put an entry in the shift log instructing 
+people what they should do in order to be able to access the  
+jet collection that is currently being written out? 
+ 
+We tried 
+ 
+setenv TCL_TAG 362 
+setenv RCP_DATABASE_PATH official/FileSystemDB:level3/FileSystemDB 
+ 
+and get the following error: 
+ 
+%ERLOG-e XRCPUnableToMakeDB:  
+         rcp-E-XRCPUnableToMakeDB [#1] 
+  Could not make FileSystemDB for database named level3. No subdirectory of this name found in the search path defined by the environment variable RCP_FILESYSTEMDB_WRITABLE_DIR 
+ 
+  Thu Sep 27 20:22:30 2001 
+  -- ZMthrow was issued at line 143 
+  of file "/cdf/code/cdfsoft/dist/packages/rcp/V00-00-09/src/FileSystemDB.cpp" 
+  ... Exception thrown! 
+          
+         27-Sep-2001 20:22:30 run = 0 event = 0 
+%ERLOG-s Abnormal termination: caused by signal:  6Framework abortJob()  
+         27-Sep-2001 20:22:30 run = 0 event = 0 
+Abort (core dumped) 
+ 
+  
+<!-- Author: Frank Chlebana -->
+
+
+<!-- Date: Thu Sep 27 20:36:51 2001 -->
+<u>CMU trip</u> Northeast Field, 0-5.  We turned it back on.
+<!-- Author: Schmitt & Gallas -->
+
+
+<!-- Date: Thu Sep 27 20:59:06 2001 -->
+Changes made to pager listings web page under L3 executable
+<!-- Author: Todd -->
+
+
+<!-- Date: Thu Sep 27 21:01:47 2001 -->
+<pre>CMU Tripped. Drift Field NE W 0-5. Reset it.</pre>
+<!-- Author: Abraham Gallas, David Dagenhart -->
+
+
+<!-- Date: Thu Sep 27 21:23:18 2001 -->
+While Matt was doing his L2 tests he hits the error "resetting card in slot 18 failed" for b0cot03 during ColdStart.  We try rebooting the crate and that fails.  We were going to reset the crate but remembered those are on the detector.  We try "Reset_Crate" from the vx monitor and we can pass ColdStart now.
+<!-- Author: Dagenhart :: (run <a href='/java/cdfdb/servlet/RunSummary?RUN_NUMBER=127767' target=_top>127767</a>) -->
+<!-- Comment: Thu Sep 27 21;49;23 comment by...Dagenhart -->
+When we were resolving this problem we started a run with b0cot03, b0cot04, and b0cot05 removed.  The run started, but the track trigger rate was very high.  Then after we fixed the cot crate problem, the track trigger rate remained high.  We rebooted the XTRP in hopes this would solve the problem.  On ColdStart we get an error from b0svx01 to reset the VRB in slot 12, we do it and then b0svx01 passes ColdStart.  The track trigger rates are still very high.  We try power cycling the XTRP crate.  Track trigger rates are still very high. We are going to page Nathan and see what he thinks.
+
+
+<!-- Comment: Thu Sep 27 22;10;51 comment by...Dagenhart -->
+Nathans talks Matt through masking off the cal data in XTRP board 9 (wedge 18).  We hope this will fix the problem until Nathan can look at it more detail tomorrow.  We cannot try it now because Heather is running with the trigger and calorimeter crates.
+<!-- Comment: Fri Sep 28 00;05;50 comment by...Dagenhart -->
+We get the system back from Heather and when we try to start to run we continue to get a high deadtime.  It is a different trigger now, the CMU track trigger.  We page Nathan Eddy again and he talks me through masking out the same wedge for CMU in the XTRP crate we refresh Hardware database in RC.  When we restart everything is OK, the deadtimes are low.
+<!-- Date: Thu Sep 27 21:55:54 2001 -->
+<table border=0><td><tr><td bgcolor=#e0e030><b>The TLG Computer will be rebooted at around 22:00, and we may lose the store at that point.</b></td></tr></td></table>
+<!-- Author: Schmitt -->
+
+
+<!-- Date: Thu Sep 27 21:58:03 2001 -->
+We paged silicon.  Auke-Pieter Colijn called back and explained how to turn the power off. 
+<p> 
+We turn CMP and COT to standby.  (It's flying wire time, coincidentally.)
+<!-- Author: Schmitt -->
+
+
+
+<!-- Date: Thu Sep 27 22:18:56 2001 -->
+PHA tripped -- no connection with any beam loss, as far as we can tell.  The alarm cleared itself after we hit the `diagnostics' button.
+<!-- Author: Schmitt -->
+
+
+<!-- Date: Thu Sep 27 22:30:55 2001 -->
+<b>Happily, we retained the store</b>  even though they ended up cycling the power on the relevant VME crate. 
+<p> 
+We brought COT and CMP up to full voltage.
+<!-- Author: Schmitt -->
+
+
+<!-- Date: Thu Sep 27 23:02:41 2001 -->
+Auke-Pieter helped us turn on the silicon, and verified that things are in a correct state.  Silicon is ready to go.
+<!-- Author: Schmitt -->
+
+
+
+<!-- Date: Thu Sep 27 23:16:29 2001 -->
+<u>The west side of the CMX is on standby.</u> 
+<p> 
+The toroids are pulled out and this allows a lot of fake stubs and CMX triggers to be produced. 
+Jonathan Lewis suggested we turn the HV to sandby as an alternative to masking out the west CMX in the trigger.   
+With these data he can make clear comparisons between L3 executables. 
+<p> 
+The west side of the CMX should remain on standby throughout this store.  If tomorrow the east side toroids are pulled out, then the east side of the CMX should also be put on stanbdy.
+<!-- Author: Schmitt :: (run <a href='/java/cdfdb/servlet/RunSummary?RUN_NUMBER=127780' target=_top>127780</a>) -->
+
+
+<!-- Date: Thu Sep 27 23:33:56 2001 -->
+We get the crates back from Heather and are trying to start a normal data run.  We get high deadtime at about 60%.  It appears that  CSL is functioning OK  because L3 nodes are not green.  This run is with Physics_0_01[43,207].  Stopping run to try the old default table to see if that helps.
+<!-- Author: 127780 :: (run <a href='/java/cdfdb/servlet/RunSummary?RUN_NUMBER=Dagenhart, Gallas' target=_top>Dagenhart, Gallas</a>) -->
+
+
+<!-- Date: Thu Sep 27 23:36:27 2001 -->
+Try a run with Physics_0_01{28,203].  We get busy timeouts from XFT_FINDER_00, XFT_FINDER_02, and XFT_FINDER_04.  HRR then a scanner manager error with a recommendation to cleanup EVB, so we End->Reset->Cleanup EVB.
+<!-- Author: Dagenhart :: (run <a href='/java/cdfdb/servlet/RunSummary?RUN_NUMBER=127781' target=_top>127781</a>) -->
+
+
+<!-- Date: Thu Sep 27 23:51:10 2001 -->
+<table><tr><td><a href=/cgi/elog/elog.pl?nb=2001&action=view&page=-2453&button=yes target='xxx' onclick='jswindow()'; align=top><img src=/cgi/elog/elog.pl?nb=2001&action=view&page=-2453  width='300' align='top'></td><td>Luminosity + Losses</a></td></tr></table>
+<!-- Author: Schmitt -->
+
+
+<!-- Date: Thu Sep 27 23:51:40 2001 -->
+<table><tr><td><a href=/cgi/elog/elog.pl?nb=2001&action=view&page=-2454&button=yes target='xxx' onclick='jswindow()'; align=top><img src=/cgi/elog/elog.pl?nb=2001&action=view&page=-2454  width='300' align='top'></td><td>l</a></td></tr></table>
+<!-- Author: Schmitt -->
+
+
+
+<!-- Date: Thu Sep 27 23:56:00 2001 -->
+<font color=red>Shift Summary: </font><br><font size=+1><strong>Evening Shift Summary by SciCo</strong></font><br> 
+<p> 
+16:00	Shift start. Running PHysics_0_02[1,208]. 
+</p><p> 
+16:43	Run ended (127754) in order to do SVX calibrations before  
+	run with SVT to determine how effective the earlier beam  
+	movements were. 
+<li>    We are training a new ACE as well. 
+</p><p> 
+17:25	IFIX display lost. M. Schmitt is trying to get it reset and  
+	is talking to Cryo shift. 
+</p><p> 
+17:25	Frank Clehbana has just informed me that RCPID's cause  
+	difficulties in reading the data from any machine in the  
+	consumers that has not been reset. He is concerned that the  
+	data is corrupt and wants people like Liz Sexton  
+	(because of her understanding of RCPID's) to look at 
+	it soon. 
+</p><p> 
+17:38	IFIX display returns.  
+</p><p> 
+17:30	Kaori is doing stuff with Event Display. Problems seem 
+	to be related to RCPID's....see E-log. 
+<li>	Also note the E-log by Kaori at 19:25. 
+</p><p> 
+17:56	Call from Bill Noe, Cryo supervisor. IFIX computer was rebooted 
+	and not just restarted. This required a password which was unknown  
+	to the Cryo person on shift. Passing individual had the password and  
+	this prompts an investigation by the Cryo Supervisor. 
+</p><p> 
+18:04	L1 prescale changed for SVT and SVX studies of beam position. 
+	Current trigger is Physics_0_02[1,208]. 
+</p><p> 
+18:25	L2 prescale changed for SVT and SVX studies of beam position. 
+	They are on a quest for statistics. 
+</p><p> 
+19:27	Sliding into cutting with SVT studies. 
+</p><p> 
+20:18	Beam position seems to need moving again, SVT studies suspended while 
+	data is analyzed. System turned over to Mat and Monica for L2 clustering. 
+</p><p> 
+21:14	COT TDC would not reset. This TDC causes the crate not to work, 
+	this crate also brings down the next 4 neighbors, and then the  
+	XTRP produces large numbers of fake tracks.  
+	This hinders L2 studies. COT DAQ paged. 
+</p><p> 
+21:30	L2 studies (Monica and Heather) have been going on for some time now. 
+</p><p> 
+22:00	TLG from MCR rebooted and crate power cycled.  
+	There was a chance this would cause a loss of  
+	beam, but beam remained and we continued L2 studies. Silicon was off during 
+	this exercise. 
+</p><p> 
+22:44	Begin run to take physics during Owl shift. 
+	Physics_0_01[43,207] starting with run 127780 
+</p><p> 
+23:45	XTRP seems to be causing problems with trigger tables [43,207] 
+	and [28,203]. Stable operation still illudes us as we turn over 
+	the detector to the Owl shift crew. 
+</p><p> 
+</p> 
+   
+<br><b>End of Shift Numbers</b>
+<table><tr><td width=60% align=left>
+<b>CDF Run II <p></b>                       
+<pre>
+Runs                   -127783
+Delivered Luminosity   105  
+Acquired Luminosity    19.11  
+Efficiency             18.2%
+   
+</td></tr></table></pre>
+<!-- Author: Todd Huffman -->
+

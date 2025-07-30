@@ -1,0 +1,96 @@
+Note from Amy Regan to Will Fox:
+
+Hi Will,
+This comes under the heading of "Because of decisions ORNL has made that are different from what we were 
+told when we did the initial design, a cost increase must be incurred if we are to meet spec."
+
+It all gets back to the cable phase drift due to temperature variation issue.  Originally the facility 
+temperature was going to be 75° ±2°F in the tunnel and 75° ±5°F in the klystron gallery.  Given these 
+values, we determined which of our cables needed to be heated and which did not, and established a 
+reasonable phase error budget that allowed us to meet the ±0.5° phase change in the RF field in the cavity.
+
+Now the facility temperatures are 
+			Beam-On           Beam-Off
+FE Building		76 F +/-2         76 F +/-2
+All Tunnels		85 F +/-5         72 F +/-5
+Klystron Gallery	85 F +/-5         72 F +/-5
+HEBT Ser. Bld.		85 F +/-5         72 F +/-5
+Ring Ser. Bld.		85 F +/-10        72 F +/-5
+RTBT Ser. Bld.		85 F +/-10        72 F +/-5
+
+This implies that the cables will see a much greater temperature variation than we expected.  Which in turn 
+implies that the vast majority of the cables we have will have to be heated and insulated.  I need to do more 
+work to determine exactly how many of the cables, and how much it will cost.  I've already spent quite a few 
+hours on it and it'll continue to take my time to address this issue (and hence money up front).  My question 
+for you, do you want me toproceed with this work?
+amy
+
+
+
+
+Amy Regan's answers to Will Fox' questions on the impact of the non-temperature-controlled reference 
+line feeders:
+
+1) If you don't do the work and don't change the current design what
+is the quantitative technical impact?  e.g phase stability will be
++/- ? degree?
+
+The significant problem is the cable between the cavity and our mixer that is located inside the 
+thermal blanket that is wrapped around the reference line.   This cable will be transporting an 
+RF signal, so we need to worry about the RF phase drift seen as the cable changes length due to 
+temperature variation in the tunnel.  Given the specifications listed below, we anticipate that 
+we will need to thermally stabilize each of these cables.  They are only ~10 feet long but given 
+the expected temperature variations, this is long enough to give us trouble.  We expect that an 
+additional uncontrolled phase change of 0.3° will occur if we do nothing.  (±0.15).  0.2° of this 
+is due to the 10' cable, the other 0.1° is due to the cable going back to the RF Controls rack 
+from the tunnel.  I didn't address this here, but it is the same problem - more temperature variation 
+means more electrical length change.
+
+2) What do you estimate the cost of doing the work?
+
+Anticipated M&S
+$1000 per field pickup loop cable x93 pickup loops = $93,000
+Without spending much time on it, we also think we can alleviate the tunnel-to-rack cable problem 
+at a cost of $30,000.  You'll also need some sort of AC junction box located near the reference line 
+for each pickup loop. M&S cost for this - I have no idea.
+
+The real kicker will be the labor, though. 
+Let me list the things that I can think of off the top of my head that will require a person to do 
+the work:
+
+You need to create installation drawings
+-	2.5 weeks
+
+All of the temperature controllers need to interface with EPICS - this requires both software support 
+as well as possibly some special hardware
+-	1 mm SW, 2 mm HW
+
+You'll need a chassis in the RF Control rack to house a summing/OR-type hardware (you now have more 
+controllers than you have IOCS, so you'll need to get that information combined somehow/somewhere).  
+This means you have to design and build it.
+-	3 mm
+
+You need installation labor - no longer do you simply pull a cable and terminate the end (which in 
+itself takes more time than you would expect, just because these terminations are a pain).  In addition 
+to that, it now needs to be insulated; have thermocouples/RTDs applied; and sensor wires, controller 
+wire all need to be run back to the rack.
+-	3 hours/cable * 93 = 279 hours
+
+Then you will need some top level engineering to develop the whole thing and then oversee it all and make 
+sure all details are covered.
+-	3.5 mm
+
+As far as the AC junction boxes
+-	I have no idea how to estimate the labor required for these.
+
+None of the above time estimates include the 80% efficiency factor.
+
+
+3) Do you have any flexibility in your existing work package to cover
+this additional  cost and if not and ORNL won't fund it is there
+something else you would not do that is less important and what is it?
+
+I do not have any flexibility in my work package to cover this.  We are extremely resource limited.  This 
+is not part of any RF Controls contingency work I had envisioned.  There is nothing less important that I 
+would not do.  I have been pushed from the beginning to minimize the cost on this project to such a degree 
+that I cut everything back to the absolute minimum.  We have no fluff in our budget and scope whatsoever.

@@ -1,0 +1,391 @@
+%!PS-Adobe
+/wpdict	120 dict def
+wpdict	begin
+/bdef	{bind def} bind def
+
+/bflg	false def
+/Bfont	0 def
+/bon	false def
+
+/psz	0 def
+/_S	/show load def
+/_t	{0 rmoveto} bdef
+
+/_pixelsnap
+	{transform .25 sub round .25 add
+	 exch .25 sub round .25 add exch itransform
+	} bdef
+/_pixeldsnap
+	{ dtransform round exch round exch idtransform } bdef
+
+/_lt	{_pixelsnap lineto} bdef
+/_rlt	{_pixeldsnap rlineto} bdef
+/_mt	{_pixelsnap moveto} bdef
+/_rmt	{_pixeldsnap rmoveto} bdef
+
+/bshow	{gsave psz 30 div 0 _rmt dup show grestore show} bdef
+
+/DUx	0 def
+/DUy	0 def
+/hscl	0 def
+
+/M	{_mt
+	 2 mul -2 2
+	 { -2 roll 0 _rmt _S } for
+	} bdef
+
+/makeoutl
+	{ dup /OutlineFlag known not
+	  { dup dup length 2 add dict begin
+	    {1 index /FID ne { def }{ pop pop } ifelse } forall
+	    /UniqueID known {/UniqueID UniqueID 10000 add def} if
+	    /PaintType PaintType 0 eq { 2 }{ PaintType } ifelse def
+	    /StrokeWidth 15 def
+	    /OutlineFlag true def
+	    /OutlineFont currentdict end definefont
+	  } if
+	} bdef
+
+/nbuff	50 string def
+/orntsv	0 def
+/plen	0 def
+/pwid	0 def
+/picstr	1 string def
+
+/WPencoding StandardEncoding 256 array copy def 0
+ [ 127/Aacute/Acircumflex/Adieresis/Agrave/Aring/Atilde/Ccedilla
+  /Delta/Eacute/Ecircumflex/Edieresis/Egrave/Eth/Gamma/Iacute
+  /Icircumflex/Idieresis/Igrave/Lambda/Ntilde/Oacute
+  /Ocircumflex/Odieresis/Ograve/Omega/Otilde/Phi/Pi/Psi
+  /Scaron/Sigma/TeXtext32/Theta/Thorn
+  209/Uacute/Ucircumflex/Udieresis/Ugrave/Upsilon/Xi/Yacute
+  /Ydieresis/Zcaron/aacute/acircumflex/adieresis/agrave
+  /aring/atilde/brokenbar
+  228/ccedilla/copyright/degree/divide
+  236/dotlessj/eacute/ecircumflex/edieresis/egrave
+  242/eth/ff/ffi
+  246/ffl/iacute
+  252/icircumflex/idieresis/igrave/logicalnot
+  1/minus/mu/multiply/ntilde/oacute/ocircumflex/odieresis
+  /ograve/onehalf/onequarter/onesuperior/otilde/plusminus
+  /registered/scaron/thorn/threequarters/threesuperior
+  /trademark/twosuperior/uacute/ucircumflex/udieresis
+  /ugrave/yacute/ydieresis/zcaron
+]
+{ dup type /nametype eq
+  { WPencoding 2 index 2 index put pop 1 add }
+  { exch pop } ifelse
+} forall pop
+
+/reencode
+{ dup FontDirectory exch known
+   { findfont }
+   {  dup nbuff cvs dup length 1 sub get 82 eq
+   {dup nbuff cvs dup length 1 sub 0 exch getinterval
+   findfont begin
+   currentdict dup length dict begin
+{ 1 index /FID ne {def} {pop pop} ifelse } forall
+/FontName exch def
+
+/Encoding WPencoding def
+currentdict dup end end
+/FontName get exch definefont
+     }
+     { findfont } ifelse
+  } ifelse
+} bdef
+
+/WPDLencoding StandardEncoding 256 array copy def 0
+[ 127     /SA420000/SD630000/SF010000/SF020000/SF030000
+/SF040000/SF050000/SF060000/SF070000/SF080000/SF090000
+/SF100000/SF110000/SF140000/SF150000/SF160000/SF190000
+/SF200000/SF210000/SF220000/SF230000/SF240000/SF250000/SF260000
+/SF270000/SF280000/SF360000/SF370000/SF380000/SF390000/SF400000
+/SF410000/SF420000/SF430000
+209 /SF440000/SF450000/SF460000/SF470000/SF480000
+/SF490000/SF500000/SF510000/SF520000/SF530000/SF540000
+/SF570000/SF580000/SF590000/SF600000/SF610000
+228 /SM570001/SM590000/SM600000/SM630000
+236 /SM680000/SM690000/SM700000/SM750000/SM750002
+242 /SM770000/SM790000/SP320000
+246 /SS000000/SS010000
+252 /SS260000/SS270000/SV040000/apostrophereverse
+1/arrowboth/arrowdown/arrowleft/arrowright/arrowup/club
+/deutschmark/diamond/diamondopen/exclamdbl/female
+/fiveeighths/franc/heart/male/musicalnote/musicalnotedbl
+/napostrophe/nsuperior/oneeighths/seveneighths/spade
+/threeeights/underscoredbl/SM760000
+]
+{ dup type /nametype eq
+  { WPDLencoding 2 index 2 index put pop 1 add }
+  { exch pop } ifelse
+} forall pop
+
+/reencodeL
+    { dup FontDirectory exch known
+      { findfont }
+      {  dup nbuff cvs dup length 1 sub get 76 eq
+         {    dup nbuff cvs dup length 1 sub 0 exch getinterval
+         findfont begin
+         currentdict dup length dict begin
+         { 1 index /FID ne {def} {pop pop} ifelse } forall
+         /FontName exch def
+         /Encoding WPDLencoding def
+         currentdict dup end end
+         /FontName get exch definefont
+         }
+         { findfont } ifelse
+      } ifelse
+    } bdef
+
+/ron	false def
+/sflg	false def
+/slan	0 def
+/sp	32 def
+
+/sshow
+	{ save exch
+	   gsave
+	    psz 20 div dup neg _rmt dup show
+	   grestore
+	   dup
+	   save exch
+	    Bfont setfont
+	    1 setgray show
+	   restore
+	   currentfont makeoutl setfont show
+	   currentpoint 3 -1 roll
+	  restore _mt
+	} bdef
+
+/Sx	0 def
+/Sy	0 def
+/Ux	0 def
+/Uy	0 def
+/W	/widthshow load def
+
+/_B	{/bflg true def
+	 sflg not {/_S /bshow load def /bon true def} if
+	} bdef
+/_b	{/bflg false def
+	 bon {/_S /show load def /bon false def} if
+	} bdef
+/_bd	{save} bdef
+/_bp	{save 2 setmiterlimit .06 .06 scale 0 0 _mt} bdef
+/_ccprocs
+	{/proc2 exch cvlit def
+	 /proc1 exch cvlit def
+	 /newproc proc1 length proc2 length add
+	 array def
+	 newproc 0 proc1 putinterval
+	 newproc proc1 length proc2 putinterval
+	 newproc cvx
+	} def
+/_clr	{3 {255 div 3 1 roll} repeat
+	 ron {6 3 roll pop pop pop} {setrgbcolor} ifelse
+	} bdef
+/_cp	/closepath load def
+/_cw	{stroke initclip _mt 0 2 index
+	 _rlt 0 _rlt 0 exch neg
+	 _rlt clip newpath
+	} bdef
+/_d	/setdash load def
+/_DU	{currentpoint /DUy exch def /DUx exch def} bdef
+/_du	{gsave
+	  save
+	  8 setlinewidth
+      currentpoint -30 add _mt
+      DUx DUy -30 add _lt stroke
+	  restore
+	  8 setlinewidth
+	  currentpoint -50 add _mt
+	  DUx DUy -50 add _lt stroke
+	 grestore
+	} bdef
+/_ed	{restore} bdef
+/_ep	{showpage restore 0 0 _mt} bdef
+/_f	/eofill load def
+/_ff	{ exch reencode exch
+	  3 div dup /psz exch def
+	  scalefont dup /Bfont exch def setfont
+	} bdef
+/_ffs	{ /slan exch 10 div def /hscl exch 1000 div def
+	  /psz exch 3 div def
+	  [ psz hscl mul 0 slan dup sin exch cos div psz mul psz 0 0 ]
+	  exch reencode exch makefont dup /Bfont exch def setfont
+	} bdef
+/_g	/setgray load def
+/_gs	{neg 100 add 100 div setgray} bdef
+/_i	{gsave
+	  dup /picstr exch 7 add 8 idiv string def
+	  3 1 roll translate dup 1 scale
+	  dup 1 1 [5 -1 roll 0 0 1 0 0]
+	  {currentfile picstr readhexstring pop} image
+         grestore
+        } bdef
+/_is	{save 4 1 roll
+	  dup /picstr exch 7 add 8 idiv string def
+	  3 1 roll translate dup 1 scale
+	  dup 1 1 [5 -1 roll 0 0 1 0 0]
+	  {currentfile picstr readhexstring pop} image
+	 restore
+	} bdef
+/_ie	{1 eq { {1 exch sub} currenttransfer _ccprocs settransfer} if
+	 /_isx exch def /_isy exch def
+	 _isx mul exch _isy mul translate
+	 add 2 div /_txc exch def
+	 add 2 div /_tyc exch def
+	 _txc _isx mul _tyc _isy mul translate
+	 360 exch sub rotate
+	 1 eq { _isx neg _isy scale }
+	 { _isx _isy scale }
+	 ifelse _txc neg _tyc neg translate
+	} bdef
+/_irms	{save
+	  12 1 roll
+	  1 eq {{1 exch sub} currenttransfer _ccprocs settransfer} if
+	  /picstr exch string def translate
+	  2 index 6 index sub 2 div 2 index 6 index sub 2 div neg
+	  translate
+	  5 index 5 index 2 div neg exch 2 div exch
+	  2 copy neg exch neg exch 5 2 roll translate
+	  360 exch sub rotate
+	  3 index 3 index 7 index div exch 8 index div exch scale
+	  translate pop pop 2 index 2 index scale
+	  3 index 0 eq
+	  { [ 3 index 0 0 5 index neg 0 0 ] }
+	  { 3 index 1 eq
+      { [ 3 index 0 0 5 index 0 7 index ] }
+      { 3 index 128 eq
+	  { [ 3 index neg 0 0 5 index neg 7 index 0 ] }
+	  { [ 3 index neg 0 0 5 index 7 index 7 index ] } ifelse
+	    } ifelse
+	  } ifelse
+          {currentfile picstr readhexstring pop} image
+          pop
+	 restore
+	} bdef
+
+/_l	{_lt} bdef
+/_lr	{_rlt} bdef
+/_m	{_mt} bdef
+/_O	{currentfont makeoutl setfont} bdef
+/_o	{Bfont setfont} bdef
+/_ornt	{/pwid exch def /plen exch def
+	 orntsv 1 eq {0 pwid translate -90 rotate} if
+	 orntsv 2 eq {pwid plen translate 180 rotate} if
+	 orntsv 3 eq {plen 0 translate 90 rotate} if
+	 dup 1 eq {pwid 0 translate 90 rotate} if
+	 dup 2 eq {pwid plen translate 180 rotate} if
+	 dup 3 eq {0 plen translate -90 rotate} if
+	 /orntsv exch def
+	} bdef
+/_lod1	{currentpoint orntsv plen pwid 6 -1 roll restore save} bdef
+/_lod2	{_bp 7 2 roll _ornt _mt} bdef
+/_unlod	{currentpoint orntsv plen pwid 7 -2 roll restore restore
+	 _bp 6 1 roll _ornt _mt
+	} bdef
+/_p	{2 copy _mt 1 0 _rlt _mt} bdef
+/_pl	{{_lt} repeat} bdef
+/_R      { /ron true def /_S /_rshow load def /_t /_red load def} bdef
+/_rshow	 { save exch
+	   currentpoint
+	   /RSy exch def /RSx exch def
+	   ron {
+		 sflg
+		 {	currentpoint
+			/Ry exch def /Rx exch def
+			dup stringwidth pop Rx Ry psz 4 div add _mt
+			Rx psz 15 add setlinewidth .95 setgray 0 setlinecap
+			add Ry psz 4 div add _lt stroke Rx Ry _mt 0 0 0 setrgbcolor
+			dup show Rx Ry _mt
+			sshow
+		 }
+		 { _redshow
+		 }ifelse
+	   }
+	   {	 sflg {sshow} if
+	   }ifelse
+	   currentpoint 3 -1 roll
+	   restore _mt
+	 } bdef
+/_red	{ gsave dup
+         currentpoint /Ry exch def /Rx exch def
+         Rx Ry psz 4 div add _mt
+         Rx psz 15 add setlinewidth .95 setgray 0 setlinecap
+         add Ry psz 4 div add _lt stroke
+         Rx Ry _mt
+         grestore
+         0 rmoveto
+    }bdef
+/_redshow {currentpoint
+         /Ry exch def /Rx exch def
+         dup stringwidth pop Rx Ry psz 4 div add _mt
+         Rx psz 15 add setlinewidth .95 setgray 0 setlinecap
+         add Ry psz 4 div add _lt stroke Rx Ry _mt 0 0 0 setrgbcolor
+         show currentpoint _mt
+    }bdef
+/_rmxy	{_rmt} bdef
+/_s	/stroke load def
+/_SH	bon {/bon false def} if
+	{/sflg true def /_S /_rshow load def
+	} bdef
+/_sh	{ ron 	{/sflg false def bflg {_B} if}
+		{/_S /show load def /sflg false def bflg {_B} if}ifelse
+	}bdef
+/_sp	{ gsave stroke grestore } bdef
+/_ST	{currentpoint /Sy exch def /Sx exch def} bdef
+/_st	{gsave
+	  currentpoint pop
+	  Sx dup Sy _mt sub
+	  (\320) stringwidth pop div
+	  dup floor cvi dup
+      dup 0 gt {{(\320) show} repeat}{pop} ifelse sub
+	  dup 0 gt {1 scale (\320) show}{pop} ifelse
+	 grestore
+	} bdef
+/_U	{currentpoint /Uy exch def /Ux exch def} bdef
+/_u	{gsave
+	  currentpoint
+	  -30 add _mt
+	  Ux Uy -30 add _lt
+	  12 setlinewidth
+	  stroke
+	 grestore
+	} bdef
+/_w	/setlinewidth load def
+end
+/#copies 1 def wpdict begin
+_bd a4 statusdict begin 0 setpapertray end a4 _bp 0 14032 9922 _ornt /Times-RomanR 600 _ff
+0 14032 9922 _ornt 
+/_r      { sflg {/_t {0 rmoveto}bdef /ron false def}
+         { /_S /show load def /_t {0 rmoveto}bdef /ron false def}ifelse
+     }bdef
+/Times-RomanR 550 _ff
+1488 12699 _m
+/Times-BoldR 550 _ff
+(Determination)_S 61 _t (of)_S 61 _t (Dimethyl)_S 61 _t (Sulphide)_S 61 _t (\(DMS\))_S 61 _t (and)_S 61 _t (Dimethylsulphoniopropionate)_S 61 _t (\(DMSP\))_S /Times-RomanR 550 _ff
+1200 12051 _m
+(Water)_S 51 _t (samples)_S 50 _t (were)_S 51 _t (taken)_S 51 _t (from)_S 51 _t (the)_S 50 _t (CTD)_S 51 _t (rosette)_S 51 _t (bottle)_S 50 _t (fired)_S 51 _t (nearest)_S 51 _t (to)_S 51 _t (the)_S 50 _t (surface)_S 51 _t (\(approximately)_S 51 _t (3m)_S 1200 11835 _m
+(depth\))_S 121 _t (immediately)_S 120 _t (after)_S 121 _t (the)_S 120 _t (instrument)_S 121 _t (was)_S 121 _t (inboard.)_S 120 _t (Two)_S 121 _t (ground)_S 121 _t (glass)_S 120 _t (bottles)_S 121 _t (were)_S 120 _t (filled)_S 1200 11619 _m
+(simultaneously)_S 74 _t (using)_S 73 _t (teflon)_S 73 _t (tubing)_S 74 _t (which)_S 73 _t (delivered)_S 73 _t (water)_S 74 _t (to)_S 73 _t (the)_S 74 _t (bottom)_S 73 _t (of)_S 73 _t (the)_S 74 _t (bottles.)_S 73 _t (In)_S 74 _t (order)_S 73 _t (to)_S 1200 11403 _m
+(minimise)_S 61 _t (contamination)_S 61 _t (or)_S 61 _t (degassing,)_S 61 _t (the)_S 61 _t (bottles)_S 61 _t (were)_S 61 _t (allowed)_S 61 _t (to)_S 61 _t (overflow)_S 61 _t (before)_S 61 _t (being)_S 61 _t (stoppered.)_S 1200 10971 _m
+(Samples)_S 87 _t (were)_S 87 _t (transferred)_S 88 _t (to)_S 87 _t (the)_S 87 _t (ship's)_S 87 _t (laboratory)_S 87 _t (for)_S 87 _t (immediate)_S 87 _t (analysis)_S 87 _t (by)_S 87 _t (purge)_S 87 _t (and)_S 87 _t (trap)_S 87 _t (gas)_S 1200 10755 _m
+(chromatography.)_S 114 _t (Trace)_S 114 _t (gases)_S 113 _t (were)_S 114 _t (extracted)_S 114 _t (from)_S 114 _t (the)_S 113 _t (water)_S 114 _t (by)_S 114 _t (a)_S 114 _t (stream)_S 114 _t (of)_S 113 _t (nitrogen)_S 114 _t (which)_S 1200 10539 _m
+(subsequently)_S 72 _t (passed)_S 72 _t (through)_S 72 _t (a)_S 71 _t (cold)_S 72 _t (trap)_S 72 _t (\(-150)_S (\346)_S (C\))_S 71 _t (where)_S 72 _t (the)_S 72 _t (gases)_S 71 _t (were)_S 72 _t (concentrated)_S 72 _t (before)_S 71 _t (being)_S 1200 10323 _m
+(heated)_S 61 _t (and)_S 61 _t (injected)_S 61 _t (into)_S 61 _t (the)_S 61 _t (gas)_S 61 _t (chromatographs.)_S 1200 9891 _m
+(For)_S 53 _t (DMS)_S 53 _t (aliquots)_S 53 _t (of)_S 53 _t (filtered)_S 52 _t (water)_S 53 _t (were)_S 53 _t (analysed)_S 53 _t (using)_S 53 _t (a)_S 53 _t (Chromosil)_S 53 _t (330)_S 53 _t (column,)_S 53 _t (isothermal)_S 52 _t (at)_S 53 _t (40)_S (\346)_S (C)_S 1200 9675 _m
+(with)_S 61 _t (flame)_S 61 _t (photometric)_S 61 _t (detection)_S 61 _t (\(FPD\).)_S 61 _t (Full)_S 61 _t (details)_S 61 _t (are)_S 61 _t (given)_S 61 _t (in)_S 61 _t (Turner)_S 61 _t (et)_S 61 _t (al)_S 61 _t (\(1990\).)_S 1200 9243 _m
+(For)_S 62 _t (DMSP)_S 63 _t (aliquots)_S 62 _t (of)_S 62 _t (filtered)_S 62 _t (and)_S 63 _t (unfiltered)_S 62 _t (water)_S 62 _t (were)_S 63 _t (hydrolised)_S 62 _t (with)_S 62 _t (10M)_S 63 _t (NaOH)_S 62 _t (to)_S 62 _t (decompose)_S 1200 9027 _m
+(DMSP)_S 54 _t (to)_S 54 _t (DMS)_S 55 _t (which)_S 54 _t (was)_S 55 _t (then)_S 54 _t (analysed)_S 55 _t (as)_S 54 _t (above.)_S 54 _t (Note)_S 54 _t (that)_S 55 _t (this)_S 54 _t (procedure)_S 55 _t (necessitated)_S 54 _t (a)_S 55 _t (correction)_S 1200 8811 _m
+(for)_S 75 _t (DMS)_S 75 _t (to)_S 74 _t (obtain)_S 75 _t (the)_S 75 _t (DMSP)_S 74 _t (values.)_S 75 _t (If)_S 75 _t (no)_S 74 _t (value)_S 75 _t (for)_S 75 _t (DMS)_S 74 _t (was)_S 75 _t (obtained,)_S 74 _t (this)_S 75 _t (correction)_S 75 _t (was)_S 74 _t (not)_S 1200 8595 _m
+(possible)_S 61 _t (and)_S 61 _t (consequently)_S 61 _t (the)_S 61 _t (DMSP)_S 61 _t (values)_S 61 _t (were)_S 61 _t (overestimated.)_S 1200 8163 _m
+(The)_S 75 _t (data)_S 74 _t (were)_S 75 _t (supplied)_S 75 _t (to)_S 75 _t (BODC)_S 74 _t (in)_S 75 _t (units)_S 75 _t (of)_S 75 _t (ng)_S 74 _t (S/l.)_S 75 _t (These)_S 75 _t (were)_S 75 _t (converted)_S 74 _t (to)_S 75 _t (nM)_S 75 _t (by)_S 75 _t (division)_S 74 _t (by)_S 1200 7947 _m
+(32.064.)_S 1200 7515 _m
+/Times-BoldR 550 _ff
+(Reference)_S /Times-RomanR 550 _ff
+1200 7083 _m
+(Turner,)_S 58 _t (S.M.,)_S 58 _t (Malin,)_S 58 _t (G.,)_S 58 _t (Bagander,)_S 58 _t (L.E.)_S 58 _t (and)_S 58 _t (Leck,)_S 58 _t (C.)_S 58 _t (\(1990\).)_S 58 _t (Interlaboratory)_S 59 _t (calibration)_S 58 _t (and)_S 58 _t (sample)_S 1200 6867 _m
+(analysis)_S 61 _t (of)_S 61 _t (dimethyl)_S 61 _t (sulphide)_S 61 _t (in)_S 61 _t (water.)_S 61 _t (Mar.)_S 61 _t (Chem.)_S 61 _t (29,)_S 61 _t (47-62.)_S _ep
+_ed end
+

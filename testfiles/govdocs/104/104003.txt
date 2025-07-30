@@ -1,0 +1,75 @@
+This is a progress report of an effort to use Dch ambiguity flipping to
+improve some of our fits, especially the fits to the tracks that are 
+modified by TrkDchRadHitAdder.    
+
+In BaBar reconstruction there are options to either fix the left-right ambiguity
+state of a Dch hit when fits are done, or to let the fit process change the
+ambiguity states according to some algorithm.  This ambiguity flipping is done
+in two places: TrkHitOnTrk::setAmbig and DchHitOnTrack::updateAmbiguity.
+These two methods use essentially the same algorithm - they trust the accuracy
+of the track trajectory and assign the ambiguity state according to the
+sign of the hit-trajectory doca.  This works pretty well for pure Dch tracks
+because the Dch track finders do a good job.  This does not presently do a 
+good job for tracks from TrkDchRadHitAdder, and does even worse for tracks
+from TrackMerge. 
+
+The way that we have been operating in production is to do ambiguity flipping
+with Dch helix fits, but not to allow flipping with Kalman fits.  
+Up until very recently the decision to do flipping with Kalman fits was under 
+the control of the TrkBuildEnv tcl parameter ForbidAmbiguityFlip.  Starting 
+with release 13.7.0 the decision for doing flipping with TrkDchRadHitAdder
+is independently controlled by the TrkDchRadHitAdder tcl parameter 
+keepHitAmbig.  In both cases one sets the parameter false to get flipping.
+
+I am running with a test version of updateAmbiguities that relies more on the
+direction of the trajectory than on its position. It looks at all pairs of 
+hits in a superlayer and tries to decide whether they are on the same side 
+or opposite side of the track, and then tries to get which side of the track
+the drift-circle is on.
+In doing this it relies on the doca difference rather than a doca value.
+The algorithm has a number of parameters that can be tuned to get good 
+performance.  I have done some tuning, first with Dch tracks and then with
+TrackMerge tracks.  
+
+I have done tests with 100 Monte Carlo B0-B0bar events.  Jobs were run for 
+three modes, which I call no-flip (which is the present production mode), 
+default-flip (which differs from the no-flip mode in that one of the
+two tcl ambiguity parameters is set false), and the test-flip mode 
+(which has my test version of updateAmbiguities). The comparison of the
+no-flip and default-flip results was easier than the comparison of the
+default-flip and the test-flip results because the for the test-flip mode
+the new test code was used for the Dch-only fits, which made a large fraction
+of the tracks slightly different, sometimes changing BunchT0.
+
+Out of about 950 Dch tracks only 6 changed with default-flips,  One changed
+chi-squared about 5 and the others changed by less than one.  Many more
+changed with the test-flipping, with a similar number getting better and
+getting worse. Five tracks had an increase in chi-squared of at least 100
+for the helix fit.  In each case the subsequent Kalman fit had a chi-squared
+similar to the default-flip chi-squared. So this is not a serious problem.
+I expect that allowing more iterations would fix this,
+
+This 1000 event sample had 37 tracks that were put together by TrackMerge for
+all three flip modes.  Of these 14 were discarded because not all hits came
+from the same GTrack (of which 5 were pi-mu decays). The first page of 
+httl://costard.lbl.gov/~grl/DchFlip/sqrtchisqperdf.ps
+has histograms of the square root of the chi-squared per df for the remaining
+23 TrackMerge tracks.  We see that the default-flip mode does an awful job,
+and the although the test-flip mode is much better than the default-flip, it
+is not better than the no-flip mode. Probably we can tune or modify the 
+algorithm to improve this,  but I think that a better approach is to get
+a better initial orbit for TrackMerge tracks by sewing them together rather 
+than doing a weighted average of the parameters.
+
+The second page of the ps file shows the same plots for tracks to which
+TrkDchRadHitAdder added Dch hits. Again tracks that had hits from more than 
+one GTrack were excluded. We see that out of 36 tracks, there were 13 with
+chi-squared per df greater than 9 in the no-flip mode, 7 in the default-flip
+mode and one in the test-flip mode.  That one large chi-squqared track in 
+the test-flip mode is worse than it looks because this track has a much
+smaller chi-squared in the no-flip mode.
+
+My test code is not a prototype for an official version for many reasons,
+one of which is that it is very slow.  It is convenient for testing in that
+it does not change any header files.  If we decide to implement something
+like this, design changes are needed.

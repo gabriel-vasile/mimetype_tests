@@ -1,0 +1,207 @@
+
+Computer Security Systems
+
+    Basic Issues:
+	Authentication
+	    who are you?
+
+	Authorization
+	    what can you do?
+
+    Implementation -- Security Token
+	Result of Authentication
+	Used for Authorization
+	Not modifiable by you
+	Examples
+	    Physical
+		Fermi ID
+		Credit Card
+		Drivers License
+	    Electronic
+		Unix User-id
+		Kerberos TGT
+		SSL Certificate
+		PGP/GPG key
+		SSH User Key
+
+	Symmetric/Shared Key Encryption
+	    One key function crypt()
+		x = crypt(crypt(x))
+
+	    People who share a key can communicate
+		secretly.
+
+	    lots of algorithms:
+		blowfish
+		des
+		3des
+
+
+	Kerberos
+	    Intro
+		Authentication with symmetric keys
+		Key server who knows everyone's keys
+
+	    Amy wants to talk to Bert:
+		sends keyserver:
+		  crypt_A(request: Bert)
+		keyserver sends back
+	          crypt_A(
+		    use: crypt_S
+		    intro: crypt_B(this_is: Amy, use: crypt_S)
+		  )
+		Amy sends Bertj
+		  crypt_B(this is Amy, use crypt_S)
+		Bert and Amy talk with crypt_S
+
+	    Details
+	        Block of Really Random Bits 
+		    makes key guessing hard
+		Timestamps
+		    prevent "replay" attacks
+
+	    Exercise:
+		setup:
+		    Groups of 4
+		       2 people who want to send a message
+		       1 keyserver
+		       1 snooper
+		    Envelopes for Encryption
+		       name on envelope means encrypted
+		       in that key
+		play kerberos -- send a key request
+		   contact other person, etc.
+
+		If you need to see 1000 envelopes in
+		   a given key to figure out the key,
+		   how many messages can you send?
+		
+        Asymmetric/Public Key systems
+	    Intro
+		Two functions priv, pub
+		x = priv(pub(x)) 
+		x = pub(priv(x)) 
+
+		used in pgp, gpg, etc.
+		also for certificates
+
+	    Sending Messages:
+		combined with shared keys
+	        message sent to a,b,c is:
+		    a: pub_a(shared_key)
+		    b: pub_b(shared_key)
+		    c: pub_c(shared_key)
+		    shared_key(message)
+
+	    Signing Messages:
+		combined with hash/checksum 
+		signature = priv(hash(message))
+
+		checking person sees if:
+		hash(message) == pub(signature)
+			      == pub(priv(hash(message))
+			      == hash(message)
+
+	    Signing Keys:
+		Get someone to make a signature of your
+		public key to "prove" it is yours, and not
+		someone elses.
+
+	    RSA: Fun with Prime Numbers
+		key pair is based on p,q,e,d
+		    prime(p)
+		    prime(q), 
+		    gcd(e,d)==1
+		    (e * d) % ((p-1)*(q-1)) == 1
+
+		n = p*q
+		pub(x): (x ** e) % (n)
+		priv(x): (x ** d) % (n) 
+
+		can't encode numbers bigger than n,
+		slice into blocks.
+
+	    notes:
+
+		Public key is pair of integers (n,e).
+		Private key is pair of integers (n,d).
+
+		"breaking" RSA consists of 
+		factoring n, so you pick 
+		Really Big Primes for p & q
+		to make it hard.
+	
+	   Exercise:
+		is p = 7, q = 13, e = 5, d = 1037 a valid tuple?
+
+		Encode/decode 66, 77, via RSA with key pair 
+			(91,5) (91,1037)
+			
+		notes:
+		    bc: 
+			(66 ^ 5) % 91
+			(40 ^ 1037) % 91
+ 		    pub(66) -> 40
+		    priv(40) -> 66
+
+         Certificates
+
+	     More Fun with Signatures
+		Certificate Authority(CA):
+		   Place with a public key
+
+		Secondary CA:
+		   CA whose key is signed 
+			by another CA
+
+		Certificate:
+		   public_key,
+		   signature_CA1(public_key)
+		   CA1_key
+		   signature_CA2(CA1_key)
+		   CA2_key
+		   signature_CA2(CA3_key)
+
+
+	    ISO Certificates: x509
+
+		File formats
+		Naming conventions (x500)
+		Mechanisms
+		  Certificate Requests
+		  Certificates
+		  Expiration
+		  Revocation Lists
+
+	   Exercise:
+		Setup your own CA
+		Make a CSR, sign it
+		install Cert in apache
+		install CA key in browser
+		revoke certificate
+
+	Adminstering Authenticaion
+	    File permissions
+		chmod
+		lsattr
+		setlinux
+	    kerberos
+		krb5.conf
+		xinetd.d
+		firewalls
+		.k5login
+		.k5users
+		k5arc
+	    PAM
+
+	    Servers
+		X
+		ssh
+		    X Tunnelling
+		    port forwarding
+		    configuration
+		apache
+		    mod_ssl
+
+	    Firewall/Netfilter
+		iptables 

@@ -1,0 +1,3707 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en-US">
+<head>
+<meta name="Page" content="DefaultSingle">
+<meta name="Title" content=" Describing Schema Metadata">
+<title>Describing Schema Metadata</title>
+<link rel="home" href="../../index.htm" title="Library">
+<link rel="toc" href="toc.htm" title="Contents">
+<link rel="index" href="index.htm" title="Index">
+<link rel="copyright" href="../../dcommon/html/cpyr.htm" title="Copyright">
+<link rel="up" href="toc.htm" title="Up">
+<link rel="next" href="oci07lob.htm" title="Next">
+<link rel="previous" href="oci05bnd.htm" title="Previous">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../dcommon/css/doccd.css" rel="stylesheet" title="Default" type="text/css">
+</head>
+<body bgcolor="white">
+<a name="top"></a> <a href="#BEGIN">Skip Headers</a><br>
+<br>
+<table summary="" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td align="left" valign="top"><font color="#330099" face="Helvetica, Arial, sans-serif"><strong>Oracle Call Interface Programmer's Guide<br>
+Release 2 (9.2)</strong><br>
+Part Number A96584-01</font></td>
+<td valign="bottom" align="right" width="144">
+<table summary="" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td align="center" valign="top" width="16%"><a href="../../index.htm"><img src="../../dcommon/gifs/prodicon.gif" alt="Go To Documentation Library" border="0"><br>
+<font size="-2">Home</font></a></td>
+<td align="center" valign="top" width="17%"><a href="../../nav/docindex.htm"><img src="../../dcommon/gifs/bookicon.gif" alt="Go To Product List" border="0"><br>
+<font size="-2">Book List</font></a></td>
+<td align="center" valign="top" width="17%"><a href="toc.htm"><img src="../../dcommon/gifs/conticon.gif" alt="Go To Table Of Contents" border="0"><br>
+<font size="-2">Contents</font></a></td>
+<td align="center" valign="top" width="20%"><a href="index.htm"><img src="../../dcommon/gifs/indxicon.gif" alt="Go To Index" border="0"><br>
+<font size="-2">Index</font></a></td>
+<!--  mix  -->
+<td align="center" valign="top" width="17%"><a href="../../mix.920/a96625/toc.htm"><img src="../../dcommon/gifs/mix.gif" alt="" border="0"><br>
+<font size="-2">Master Index</font></a></td>
+<!--  fdbk  -->
+<td align="center" valign="top" width="17%"><a href="../../dcommon/html/feedback.htm"><img src="../../dcommon/gifs/feedback.gif" alt="" border="0"><br>
+<font size="-2">Feedback</font></a></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+
+<hr>
+<p><a href="oci05bnd.htm"><img src="../../dcommon/gifs/larrow.gif" alt="Go to previous page" border="0"></a> <a href="oci07lob.htm"><img src="../../dcommon/gifs/rarrow.gif" alt="Go to next page" border="0"></a> <a name="BEGIN"></a></p>
+
+<div class="IND"><!-- End Header -->
+<a name="446491"></a> <!--TOC=Title-"446491"-->
+<h1 class="Title"><font face="Arial, Helvetica, sans-serif" color="#330099">6<br>
+ <a name="LNOCI060">Describing Schema Metadata</a></font></h1>
+
+<!--/TOC=Title-->
+<a name="419954"></a> 
+
+<p class="BP">This chapter discusses the use of the <code><a href="oci15r37.htm#455725">OCIDescribeAny()</a></code>function to obtain information about schema elements. The following topics are covered in this chapter:</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="428265"></a><a href="oci06des.htm#428771">Describing Schema Metadata</a></li>
+
+<li class="LB1" type="disc"><a name="441615"></a><a href="oci06des.htm#420228">Using OCIDescribeAny()</a></li>
+
+<li class="LB1" type="disc"><a name="441604"></a><a href="oci06des.htm#448546">Examples Using OCIDescribeAny()</a></li>
+</ul>
+
+<a name="428771"></a> <!--TOC=h1-"428771"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Describing Schema Metadata</font></h2>
+
+<!--/TOC=h1-->
+<a name="446781"></a> 
+
+<p class="BP">This chapter discusses the use of the <code>OCIDescribeAny()</code> function to describe schema objects.</p>
+
+<a name="446787"></a> 
+
+<div align="center">
+<table class="NoteAlso" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="NoteAlso">
+<td class="NoteAlso"><a name="446784"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="446786"></a> 
+
+<ul class="NL">
+<li class="NL" type="disc"><a name="446808"></a>For information about describing select-list items, refer to the section <a href="oci04sql.htm#441219">"Describing Select-List Items"</a><a href="oci04sql.htm#441219"></a></li>
+
+<li class="NL" type="disc"><a name="446811"></a>For additional information about the <code><a href="oci15r37.htm#455725">OCIDescribeAny()</a></code> call and its parameters, refer to the function description<a href="oci15r37.htm#455725"></a></li>
+</ul>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="420228"></a> <!--TOC=h1-"420228"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Using OCIDescribeAny()</font></h2>
+
+<!--/TOC=h1-->
+<a name="428468"></a> 
+
+<p class="BP">The <code>OCIDescribeAny()</code> function enables you to perform an explicit describe of one of the following schema objects, and their subschema objects:</p>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="436995"></a>tables and views</li>
+
+<li class="LB1" type="disc"><a name="436996"></a>synonyms</li>
+
+<li class="LB1" type="disc"><a name="428474"></a>procedures</li>
+
+<li class="LB1" type="disc"><a name="428475"></a>functions</li>
+
+<li class="LB1" type="disc"><a name="440692"></a>packages</li>
+
+<li class="LB1" type="disc"><a name="440694"></a>sequences</li>
+
+<li class="LB1" type="disc"><a name="438435"></a>collections</li>
+
+<li class="LB1" type="disc"><a name="438342"></a>types</li>
+
+<li class="LB1" type="disc"><a name="443919"></a>schemas</li>
+
+<li class="LB1" type="disc"><a name="443920"></a>databases</li>
+</ul>
+
+<a name="428478"></a> 
+
+<p class="BP">Information about other schema elements (procedure/function arguments, columns, type attributes, and type methods) is available through a describe of one of the above schema objects or an explicit describe of the subschema object.</p>
+
+<a name="444870"></a> 
+
+<p class="BP">When an application describes a table, it can then retrieve information about that table's columns. Additionally, <code>OCIDescribeAny()</code> can directly describe subschema objects such as columns of a table, packages of a function, or fields of a type if the user knows the name of the subschema object.</p>
+
+<a name="442263"></a> 
+
+<p class="BP">The <code>OCIDescribeAny()</code> call requires a describe handle as one of its parameters. The describe handle must have been previously allocated with a call to <code><a href="oci15r24.htm#540849">OCIHandleAlloc()</a></code>. After the call to <code>OCIDescribeAny()</code>, an application can retrieve information about the described object from the describe handle.</p>
+
+<a name="438448"></a> 
+
+<p class="BP">The information returned by <code>OCIDescribeAny()</code> is organized hierarchically like a tree. For example, <a href="oci06des.htm#444961">Figure&nbsp;6-1</a> shows how the description of a certain table might be organized.</p>
+
+<a name="444961"></a> 
+
+<h4 class="FT"><font face="Arial, Helvetica, sans-serif"><em>Figure 6-1 OCIDescribeAny() Table Description</em></font></h4>
+
+<a name="444962"><img src="lnoci031.gif" alt="Text description of lnoci031.gif follows"></a><a href="img_text/lnoci031.htm"><br>
+Text description of the illustration lnoci031.gif</a><br>
+<br>
+ <a name="438477"></a> 
+
+<p class="BP">The describe handle returned by <code>OCIDescribeAny()</code> has an attribute, OCI_ATTR_PARAM, that points to such a description tree. Each node of the tree has attributes associated with the node and attributes (which are like recursive describe handles) that point to subtrees containing more information. If all the attributes are homogenous, as in case of elements of a list, such as a column list, then we refer to them as <em class="Italic">parameters</em>. In this chapter, the terms <em class="Italic">handle</em> and <em class="Italic">parameter</em> are used interchangeably. The attributes associated with any node are returned by <code>OCIAttrGet()</code>, and the parameters are returned by <code>OCIParamGet()</code>.</p>
+
+<a name="442081"></a> 
+
+<p class="BP">For example, an <code>OCIAttrGet()</code> on the describe handle for the table can return a handle to the column-list information. An application can then use <code>OCIParamGet()</code> to retrieve the handle to the column description of a particular column in the column-list. The handle to the column descriptor can be passed to <code>OCIAttrGet()</code> to get further information about the column, such as the name and data type (as illustrated by following the left-hand side of the above figure).</p>
+
+<a name="442822"></a> 
+
+<p class="BP">No subsequent <code>OCIAttrGet()</code> or <code>OCIParamGet()</code> call requires extra round trips, as all the description is cached on the client side by <code>OCIDescribeAny()</code>.</p>
+
+<a name="438480"></a> <!--TOC=h2-"438480"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Restrictions</font></h3>
+
+<!--/TOC=h2-->
+<a name="438482"></a> 
+
+<p class="BP">The <code>OCIDescribeAny()</code> call limits information returned to the basic information and stops expanding a node if it amounts to another describe. For example, if a table column is of an object type, then the OCI does not return a subtree describing the type since this information can be obtained by another describe.</p>
+
+<a name="446483"></a> <!--TOC=h2-"446483"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Notes on Types and Attributes</font></h3>
+
+<!--/TOC=h2-->
+<a name="446484"></a> 
+
+<p class="BP">When performing describe operations, you should be aware of the following notes.</p>
+
+<a name="442100"></a> <!--TOC=h3-"442100"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Note on Datatype Codes</font></h4>
+
+<!--/TOC=h3-->
+<a name="446831"></a> 
+
+<div align="center">
+<table class="NoteAlso" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="NoteAlso">
+<td class="NoteAlso"><a name="446828"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="446830"></a> 
+
+<p class="NB">For more information about typecodes, such as the OCI_TYPCODE values returned in the OCI_ATTR_TYPECODE attribute and the SQLT typecodes returned in the OCI_ATTR_DATA_TYPE attribute, refer to the section <a href="oci03typ.htm#441362">"Typecodes"</a><a href="oci03typ.htm#441362"></a></p>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="442282"></a> 
+
+<p class="BP">OCI_ATTR_TYPECODE returns typecodes which represent the types supplied by the user when a new type is created using the <code>CREATE TYPE</code> statement. These typecodes are of the enumerated type <strong class="Bold">OCITypeCode</strong>, and are represented by OCI_TYPECODE constants. Internal PL/SQL types (boolean, indexed table) are not supported.</p>
+
+<a name="442283"></a> 
+
+<p class="BP">OCI_ATTR_DATA_TYPE returns typecodes which represent the datatypes stored in database columns. These are similar to the describe values returned by previous versions of Oracle. These values are represented by SQLT constants (<strong class="Bold">ub2</strong> values). BOOLEAN types return SQLT_BOL.</p>
+
+<a name="442721"></a> <!--TOC=h3-"442721"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Note on Describing Types</font></h4>
+
+<!--/TOC=h3-->
+<a name="442722"></a> 
+
+<p class="BP">In order to describe type objects, it is necessary to initialize the OCI process in object mode:</p>
+
+<pre class="CE">
+<a name="442723"></a>/* Initialize the OCI Process */
+<a name="443558"></a>  if (OCIInitialize((ub4) OCI_OBJECT, (dvoid *)0, 
+<a name="443560"></a>                    (dvoid * (*)(dvoid *, size_t)) 0,
+<a name="443562"></a>                    (dvoid * (*)(dvoid *, dvoid *, size_t))0, 
+<a name="443564"></a>                    (void (*)(dvoid *, dvoid *)) 0 ))
+<a name="443566"></a>  { (void) printf("FAILED: OCIInitialize()\n");
+<a name="443568"></a>    return OCI_ERROR; }
+</pre>
+
+<a name="446861"></a> 
+
+<div align="center">
+<table class="NoteAlso" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="NoteAlso">
+<td class="NoteAlso"><a name="446858"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="446860"></a> 
+
+<p class="NB">For more information on this function, refer to the description of <code><a href="oci15re7.htm#556332">OCIInitialize()</a></code><a href="oci15re7.htm#556332"></a></p>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="446377"></a> <!--TOC=h3-"446377"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Note on Implicit and Explicit Describes</font></h4>
+
+<!--/TOC=h3-->
+<a name="446380"></a> 
+
+<p class="BP">The column attribute OCI_ATTR_PRECISION can be returned using an implicit describe with <code>OCIStmtExecute()</code> and an explicit describe with <code>OCIDescribeAny()</code>. When using an implicit describe, the precision should be set to <strong class="Bold">sb2</strong>. When using an explicit describe, the precision should be set to <strong class="Bold">ub1</strong> for a placeholder. This is necessary to match the datatype of precision in the dictionary.</p>
+
+<a name="442800"></a> <!--TOC=h3-"442800"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Note on OCI_ATTR_LIST_ARGUMENTS</font></h4>
+
+<!--/TOC=h3-->
+<a name="442799"></a> 
+
+<p class="BP">The OCI_ATTR_LIST_ARGUMENTS attribute for type methods represents <em class="Italic">second-level</em> arguments for the method.</p>
+
+<a name="442809"></a> 
+
+<p class="BP">For example, given the following record <code>my_type</code> and the procedure <code>my_proc</code> which takes an argument of type <code>my_type:</code></p>
+
+<pre class="CE">
+<a name="442810"></a>my_type record(a number, b char)
+<a name="443570"></a>my_proc (my_input my_type)
+<a name="443880"></a>
+</pre>
+
+<a name="442833"></a> 
+
+<p class="BP">the OCI_ATTR_LIST_ARGUMENTS attribute would apply to arguments <code>a</code> and <code>b</code> of the <code>my_type</code> record.</p>
+
+<a name="438485"></a> <!--TOC=h2-"438485"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Parameter Attributes</font></h3>
+
+<!--/TOC=h2-->
+<a name="438486"></a> 
+
+<p class="BP">A parameter is returned by <code>OCIParamGet()</code>. Parameters can describe different types of objects or information. Parameters have attributes depending on the type of description they contain and these are the type-specific attributes. This section describes the attributes and handles that belong to different parameters.</p>
+
+<a name="448948"></a> 
+
+<p class="BP">The following table lists the attributes that belong to all parameters:</p>
+
+<a name="448946"></a> 
+
+<h5 class="TTW"><a name="448946"></a><a name="448995"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-1 Attributes Belonging to All Parameters &nbsp;</em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="449001"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="449003"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="449005"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute Datatype</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="449008"></a> 
+
+<p class="TB">OCI_ATTR_NUM_PARAMS</p>
+</td>
+<td class="Formal"><a name="449010"></a> 
+
+<p class="TB">The number of parameters</p>
+</td>
+<td class="Formal"><a name="449012"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="449015"></a> 
+
+<p class="TB">OCI_ATTR_OBJ_ID</p>
+</td>
+<td class="Formal"><a name="449017"></a> 
+
+<p class="TB">Object or schema Id</p>
+</td>
+<td class="Formal"><a name="449019"></a> 
+
+<p class="TB">ub4</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="449022"></a> 
+
+<p class="TB">OCI_ATTR_OBJ_NAME</p>
+</td>
+<td class="Formal"><a name="449024"></a> 
+
+<p class="TB">Database name or object name in a schema</p>
+</td>
+<td class="Formal"><a name="449026"></a> 
+
+<p class="TB">text*</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="449029"></a> 
+
+<p class="TB">OCI_ATTR_OBJ_SCHEMA</p>
+</td>
+<td class="Formal"><a name="449031"></a> 
+
+<p class="TB">Schema name where the object is located</p>
+</td>
+<td class="Formal"><a name="449033"></a> 
+
+<p class="TB">text*</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="449036"></a> 
+
+<p class="TB">OCI_ATTR_PTYPE</p>
+</td>
+<td class="Formal"><a name="449038"></a> 
+
+<p class="TB">Type of information described by the parameter. Possible values are: <a name="449039"></a></p>
+
+<p class="TB">OCI_PTYPE_TABLE - table <a name="449040"></a></p>
+
+<p class="TB">OCI_PTYPE_VIEW - view <a name="449041"></a></p>
+
+<p class="TB">OCI_PTYPE_PROC - procedure <a name="449042"></a></p>
+
+<p class="TB">OCI_PTYPE_FUNC - function <a name="449043"></a></p>
+
+<p class="TB">OCI_PTYPE_PKG - package <a name="449044"></a></p>
+
+<p class="TB">OCI_PTYPE_TYPE - type <a name="449045"></a></p>
+
+<p class="TB">OCI_PTYPE_TYPE_ATTR - attribute of a type <a name="449046"></a></p>
+
+<p class="TB">OCI_PTYPE_TYPE_COLL - collection type information <a name="449047"></a></p>
+
+<p class="TB">OCI_PTYPE_TYPE_METHOD - a method of a type <a name="449048"></a></p>
+
+<p class="TB">OCI_PTYPE_SYN - synonym <a name="449049"></a></p>
+
+<p class="TB">OCI_PTYPE_SEQ - sequence <a name="449050"></a></p>
+
+<p class="TB">OCI_PTYPE_COL - column of a table or view <a name="449051"></a></p>
+
+<p class="TB">OCI_PTYPE_ARG - argument of a function or procedure <a name="449052"></a></p>
+
+<p class="TB">OCI_PTYPE_TYPE_ARG - argument of a type method <a name="449053"></a></p>
+
+<p class="TB">OCI_PTYPE_TYPE_RESULT - the results of a method <a name="449054"></a></p>
+
+<p class="TB">OCI_PTYPE_LIST - column list for tables and views, argument list for functions and procedures, or subprogram list for packages. <a name="449055"></a></p>
+
+<p class="TB">OCI_PTYPE_SCHEMA - schema <a name="449056"></a></p>
+
+<p class="TB">OCI_PTYPE_DATABASE- database</p>
+</td>
+<td class="Formal"><a name="449058"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="449073"></a> 
+
+<p class="TB">OCI_ATTR_TIMESTAMP</p>
+</td>
+<td class="Formal"><a name="449075"></a> 
+
+<p class="TB">The timestamp of the object this description is based on (in Oracle date format)</p>
+</td>
+<td class="Formal"><a name="449077"></a> 
+
+<p class="TB">ub1 *</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<a name="447975"></a> <a name="447812"></a> 
+
+<p class="BP">The subsections that follow list the attributes and handles specific to different types of parameters.</p>
+
+<a name="440333"></a> <!--TOC=h2-"440333"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Types OCI_PTYPE_TABLE or OCI_PTYPE_VIEW</font></h3>
+
+<!--/TOC=h2-->
+<a name="438586"></a> 
+
+<p class="BP">When a parameter is for a table or view (type OCI_PTYPE_TABLE or OCI_PTYPE_VIEW), it has the following type specific attributes:</p>
+
+<a name="446586"></a> 
+
+<h5 class="TTW"><a name="446586"></a><a name="438589"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-2 Attributes Belonging to Tables or Views &nbsp;</em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="438593"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="438595"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="439483"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute Datatype</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438597"></a> 
+
+<p class="TB">OCI_ATTR_OBJID</p>
+</td>
+<td class="Formal"><a name="438599"></a> 
+
+<p class="TB">Object id</p>
+</td>
+<td class="Formal"><a name="439485"></a> 
+
+<p class="TB">ub4</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438601"></a> 
+
+<p class="TB">OCI_ATTR_NUM_COLS</p>
+</td>
+<td class="Formal"><a name="438603"></a> 
+
+<p class="TB">Number of columns</p>
+</td>
+<td class="Formal"><a name="439487"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438605"></a> 
+
+<p class="TB">OCI_ATTR_LIST_COLUMNS</p>
+</td>
+<td class="Formal"><a name="438607"></a> 
+
+<p class="TB">Column list (type OCI_PTYPE_LIST)</p>
+</td>
+<td class="Formal"><a name="439489"></a> 
+
+<p class="TB">dvoid *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="443934"></a> 
+
+<p class="TB">OCI_ATTR_REF_TDO</p>
+</td>
+<td class="Formal"><a name="443936"></a> 
+
+<p class="TB">REF to the TDO of the base type in case of extent tables</p>
+</td>
+<td class="Formal"><a name="443938"></a> 
+
+<p class="TB">OCIRef*</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="443948"></a> 
+
+<p class="TB">OCI_ATTR_IS_TEMPORARY</p>
+</td>
+<td class="Formal"><a name="443950"></a> 
+
+<p class="TB">Is the table temporary?</p>
+</td>
+<td class="Formal"><a name="443952"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="444880"></a> 
+
+<p class="TB">OCI_ATTR_IS_TYPED</p>
+</td>
+<td class="Formal"><a name="444882"></a> 
+
+<p class="TB">Is the table typed?</p>
+</td>
+<td class="Formal"><a name="444884"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="443962"></a> 
+
+<p class="TB">OCI_ATTR_DURATION</p>
+</td>
+<td class="Formal"><a name="443964"></a> 
+
+<p class="TB">Duration of a temporary table. Values can be: <a name="446299"></a></p>
+
+<p class="TB">OCI_DURATION_SESSION - session <a name="446300"></a></p>
+
+<p class="TB">OCI_DURATION_TRANS - transaction <a name="446301"></a></p>
+
+<p class="TB">OCI_DURATION_NULL -table not temporary</p>
+</td>
+<td class="Formal"><a name="443966"></a> 
+
+<p class="TB">OCIDuration</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<a name="438633"></a> 
+
+<p class="BP">The following are additional attributes which belong to tables:</p>
+
+<a name="446589"></a> 
+
+<h5 class="TTW"><a name="446589"></a><a name="438610"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-3 Attributes Specific to Tables &nbsp;</em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="438614"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="438616"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="439499"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute Datatype</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438618"></a> 
+
+<p class="TB">OCI_ATTR_DBA</p>
+</td>
+<td class="Formal"><a name="438620"></a> 
+
+<p class="TB">Data block address of the segment header</p>
+</td>
+<td class="Formal"><a name="439501"></a> 
+
+<p class="TB">ub4</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="441862"></a> 
+
+<p class="TB">OCI_ATTR_TABLESPACE</p>
+</td>
+<td class="Formal"><a name="441864"></a> 
+
+<p class="TB">Tablespace the table resides in</p>
+</td>
+<td class="Formal"><a name="441866"></a> 
+
+<p class="TB">word</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438622"></a> 
+
+<p class="TB">OCI_ATTR_CLUSTERED</p>
+</td>
+<td class="Formal"><a name="438624"></a> 
+
+<p class="TB">Is the table clustered?</p>
+</td>
+<td class="Formal"><a name="439503"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438626"></a> 
+
+<p class="TB">OCI_ATTR_PARTITIONED</p>
+</td>
+<td class="Formal"><a name="438628"></a> 
+
+<p class="TB">Is the table partitioned?</p>
+</td>
+<td class="Formal"><a name="439505"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438630"></a> 
+
+<p class="TB">OCI_ATTR_INDEX_ONLY</p>
+</td>
+<td class="Formal"><a name="438632"></a> 
+
+<p class="TB">Is the table index-only?</p>
+</td>
+<td class="Formal"><a name="439507"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<a name="440332"></a> <!--TOC=h2-"440332"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Procedure/Function/Subprogram Attributes</font></h3>
+
+<!--/TOC=h2-->
+<a name="438635"></a> 
+
+<p class="BP">When a parameter is for a procedure or function (type OCI_PTYPE_PROC or OCI_PTYPE_FUNC), it has the following type specific attributes:</p>
+
+<a name="446592"></a> 
+
+<h5 class="TTW"><a name="446592"></a><a name="438638"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-4 Attribute Belonging to Procedures or Functions &nbsp;</em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="438642"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="438644"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="440121"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute Datatype</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438646"></a> 
+
+<p class="TB">OCI_ATTR_LIST_ARGUMENTS</p>
+</td>
+<td class="Formal"><a name="438648"></a> 
+
+<p class="TB">Argument list. See <a href="oci06des.htm#440341">"List Attributes"</a><a href="oci06des.htm#440341"></a>.</p>
+</td>
+<td class="Formal"><a name="440123"></a> 
+
+<p class="TB">dvoid *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="444033"></a> 
+
+<p class="TB">OCI_ATTR_IS_INVOKER_RIGHTS</p>
+</td>
+<td class="Formal"><a name="444035"></a> 
+
+<p class="TB">Is the procedure or function invoker-rights?</p>
+</td>
+<td class="Formal"><a name="444037"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<a name="441894"></a> 
+
+<p class="BP">The following attributes are defined only for package subprograms:</p>
+
+<a name="446593"></a> 
+
+<h5 class="TTW"><a name="446593"></a><a name="441926"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-5 <strong class="Bold"><em class="Italic">Attributes Specific to Package Subprograms &nbsp;</em></strong></em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="441883"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="441885"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="441887"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute Datatype</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="441889"></a> 
+
+<p class="TB">OCI_ATTR_NAME</p>
+</td>
+<td class="Formal"><a name="441891"></a> 
+
+<p class="TB">Name of the procedure or function</p>
+</td>
+<td class="Formal"><a name="441893"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="441898"></a> 
+
+<p class="TB">OCI_ATTR_OVERLOAD_ID</p>
+</td>
+<td class="Formal"><a name="441900"></a> 
+
+<p class="TB">Overloading ID number (relevant in case the procedure or function is part of a package and is overloaded). Values returned may be different from direct query of a PL/SQL function or procedure.</p>
+</td>
+<td class="Formal"><a name="441902"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<a name="442836"></a> <!--TOC=h2-"442836"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Package Attributes</font></h3>
+
+<!--/TOC=h2-->
+<a name="438650"></a> 
+
+<p class="BP">When a parameter is for a package (type OCI_PTYPE_PKG), it has the following type specific attributes:</p>
+
+<a name="446594"></a> 
+
+<h5 class="TTW"><a name="446594"></a><a name="438653"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-6 Attributes Belonging to Packages &nbsp;</em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="438657"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="438659"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="440127"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute Datatype</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438661"></a> 
+
+<p class="TB">OCI_ATTR_LIST_SUBPROGRAMS</p>
+</td>
+<td class="Formal"><a name="438663"></a> 
+
+<p class="TB">Subprogram list. See <a href="oci06des.htm#440341">"List Attributes"</a><a href="oci06des.htm#440341"></a>.</p>
+</td>
+<td class="Formal"><a name="440129"></a> 
+
+<p class="TB">dvoid *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="444056"></a> 
+
+<p class="TB">OCI_ATTR_IS_INVOKER_RIGHTS</p>
+</td>
+<td class="Formal"><a name="444058"></a> 
+
+<p class="TB">Is the package invoker-rights?</p>
+</td>
+<td class="Formal"><a name="444060"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<a name="440331"></a> <!--TOC=h2-"440331"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Type Attributes</font></h3>
+
+<!--/TOC=h2-->
+<a name="438666"></a> 
+
+<p class="BP">When a parameter is for a type (type OCI_PTYPE_TYPE), it has the attributes listed in <a href="oci06des.htm#438674">Table&nbsp;6-7</a>. These attributes are only valid if the application initialized the OCI process in OCI_OBJECT mode in a call to <code>OCIInitialize()</code>.</p>
+
+<a name="446597"></a> 
+
+<h5 class="TTW"><a name="446597"></a><a name="438674"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-7 Attributes Belonging to Types &nbsp;</em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="438678"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="438680"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="440133"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute Datatype</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="440174"></a> 
+
+<p class="TB">OCI_ATTR_REF_TDO</p>
+</td>
+<td class="Formal"><a name="440176"></a> 
+
+<p class="TB">Returns the in-memory REF of the type descriptor object for the type, if the column type is an object type. If space has not been reserved for the OCIRef, then it is allocated implicitly in the cache. The caller can then pin the TDO with <code>OCIObjectPin()</code>.</p>
+</td>
+<td class="Formal"><a name="440178"></a> 
+
+<p class="TB">OCIRef *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="440186"></a> 
+
+<p class="TB">OCI_ATTR_TYPECODE</p>
+</td>
+<td class="Formal"><a name="440188"></a> 
+
+<p class="TB">Typecode. See <a href="oci06des.htm#442100">"Note on Datatype Codes"</a><a href="oci06des.htm#442100"></a>. Currently can be only OCI_TYPECODE_OBJECT or OCI_TYPECODE_NAMEDCOLLECTION.</p>
+</td>
+<td class="Formal"><a name="440190"></a> 
+
+<p class="TB">OCITypeCode</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438686"></a> 
+
+<p class="TB">OCI_ATTR_COLLECTION_TYPECODE</p>
+</td>
+<td class="Formal"><a name="442421"></a> 
+
+<p class="TB">Typecode of collection if type is collection; invalid otherwise. See <a href="oci06des.htm#442100">"Note on Datatype Codes"</a><a href="oci06des.htm#442100"></a>. Currently can be only OCI_TYPECODE_VARRAY or OCI_TYPECODE_TABLE. Error is returned if this attribute is queried for non-collection type.</p>
+</td>
+<td class="Formal"><a name="440137"></a> 
+
+<p class="TB">OCITypeCode</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438694"></a> 
+
+<p class="TB">OCI_ATTR_IS_INCOMPLETE_TYPE</p>
+</td>
+<td class="Formal"><a name="438696"></a> 
+
+<p class="TB">Is this an incomplete type?</p>
+</td>
+<td class="Formal"><a name="440141"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438698"></a> 
+
+<p class="TB">OCI_ATTR_IS_SYSTEM_TYPE</p>
+</td>
+<td class="Formal"><a name="438700"></a> 
+
+<p class="TB">Is this a system type?</p>
+</td>
+<td class="Formal"><a name="440143"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438702"></a> 
+
+<p class="TB">OCI_ATTR_IS_PREDEFINED_TYPE</p>
+</td>
+<td class="Formal"><a name="438704"></a> 
+
+<p class="TB">Is this a predefined type?</p>
+</td>
+<td class="Formal"><a name="440145"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438706"></a> 
+
+<p class="TB">OCI_ATTR_IS_TRANSIENT_TYPE</p>
+</td>
+<td class="Formal"><a name="438708"></a> 
+
+<p class="TB">Is this a transient type?</p>
+</td>
+<td class="Formal"><a name="440147"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438710"></a> 
+
+<p class="TB">OCI_ATTR_IS_SYSTEM_ <a name="443572"></a></p>
+
+<p class="TB">GENERATED_TYPE</p>
+</td>
+<td class="Formal"><a name="438712"></a> 
+
+<p class="TB">Is this a system-generated type?</p>
+</td>
+<td class="Formal"><a name="440149"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438714"></a> 
+
+<p class="TB">OCI_ATTR_HAS_NESTED_TABLE</p>
+</td>
+<td class="Formal"><a name="438716"></a> 
+
+<p class="TB">Does this type contain a nested table attribute?</p>
+</td>
+<td class="Formal"><a name="440151"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438718"></a> 
+
+<p class="TB">OCI_ATTR_HAS_LOB</p>
+</td>
+<td class="Formal"><a name="438720"></a> 
+
+<p class="TB">Does this type contain a LOB attribute?</p>
+</td>
+<td class="Formal"><a name="440153"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438722"></a> 
+
+<p class="TB">OCI_ATTR_HAS_FILE</p>
+</td>
+<td class="Formal"><a name="438724"></a> 
+
+<p class="TB">Does this type contain a FILE attribute?</p>
+</td>
+<td class="Formal"><a name="440155"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438726"></a> 
+
+<p class="TB">OCI_ATTR_COLLECTION_ELEMENT</p>
+</td>
+<td class="Formal"><a name="438728"></a> 
+
+<p class="TB">Handle to collection element. See <a href="oci06des.htm#442599">"Collection Attributes"</a><a href="oci06des.htm#442599"></a>.</p>
+</td>
+<td class="Formal"><a name="440157"></a> 
+
+<p class="TB">dvoid *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438730"></a> 
+
+<p class="TB">OCI_ATTR_NUM_TYPE_ATTRS</p>
+</td>
+<td class="Formal"><a name="438732"></a> 
+
+<p class="TB">Number of type attributes</p>
+</td>
+<td class="Formal"><a name="440159"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438734"></a> 
+
+<p class="TB">OCI_ATTR_LIST_TYPE_ATTRS</p>
+</td>
+<td class="Formal"><a name="438736"></a> 
+
+<p class="TB">List of type attributes. See <a href="oci06des.htm#440341">"List Attributes"</a><a href="oci06des.htm#440341"></a>.</p>
+</td>
+<td class="Formal"><a name="440161"></a> 
+
+<p class="TB">dvoid *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438738"></a> 
+
+<p class="TB">OCI_ATTR_NUM_TYPE_METHODS</p>
+</td>
+<td class="Formal"><a name="438740"></a> 
+
+<p class="TB">Number of type methods</p>
+</td>
+<td class="Formal"><a name="440163"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438742"></a> 
+
+<p class="TB">OCI_ATTR_LIST_TYPE_METHODS</p>
+</td>
+<td class="Formal"><a name="438744"></a> 
+
+<p class="TB">List of type methods. See <a href="oci06des.htm#440341">"List Attributes"</a><a href="oci06des.htm#440341"></a>.</p>
+</td>
+<td class="Formal"><a name="440165"></a> 
+
+<p class="TB">dvoid *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438746"></a> 
+
+<p class="TB">OCI_ATTR_MAP_METHOD</p>
+</td>
+<td class="Formal"><a name="438748"></a> 
+
+<p class="TB">Map method of type. See <a href="oci06des.htm#440335">"Type Method Attributes"</a><a href="oci06des.htm#440335"></a>.</p>
+</td>
+<td class="Formal"><a name="440167"></a> 
+
+<p class="TB">dvoid *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438750"></a> 
+
+<p class="TB">OCI_ATTR_ORDER_METHOD</p>
+</td>
+<td class="Formal"><a name="438752"></a> 
+
+<p class="TB">Order method of type. See <a href="oci06des.htm#440335">"Type Method Attributes"</a><a href="oci06des.htm#440335"></a>.</p>
+</td>
+<td class="Formal"><a name="440169"></a> 
+
+<p class="TB">dvoid *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="444085"></a> 
+
+<p class="TB">OCI_ATTR_IS_INVOKER_RIGHTS</p>
+</td>
+<td class="Formal"><a name="444087"></a> 
+
+<p class="TB">Is the type invoker-rights?</p>
+</td>
+<td class="Formal"><a name="444089"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="447295"></a> 
+
+<p class="TB">OCI_ATTR_NAME</p>
+</td>
+<td class="Formal"><a name="447297"></a> 
+
+<p class="TB">A pointer to a string which is the type attribute name</p>
+</td>
+<td class="Formal"><a name="447299"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="447306"></a> 
+
+<p class="TB">OCI_ATTR_SCHEMA_NAME</p>
+</td>
+<td class="Formal"><a name="447308"></a> 
+
+<p class="TB">A string with the schema name under which the type has been created</p>
+</td>
+<td class="Formal"><a name="447310"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="447443"></a> 
+
+<p class="TB">OCI_ATTR_IS_FINAL_TYPE</p>
+</td>
+<td class="Formal"><a name="447445"></a> 
+
+<p class="TB">Is this a final type?</p>
+</td>
+<td class="Formal"><a name="447447"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="447450"></a> 
+
+<p class="TB">OCI_ATTR_IS_INSTANTIABLE_TYPE</p>
+</td>
+<td class="Formal"><a name="447452"></a> 
+
+<p class="TB">Is this an instantiable type?</p>
+</td>
+<td class="Formal"><a name="447454"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="447456"></a> 
+
+<p class="TB">OCI_ATTR_IS_SUBTYPE</p>
+</td>
+<td class="Formal"><a name="447458"></a> 
+
+<p class="TB">Is this a subtype?</p>
+</td>
+<td class="Formal"><a name="447460"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="447462"></a> 
+
+<p class="TB">OCI_ATTR_SUPERTYPE_SCHEMA_NAME</p>
+</td>
+<td class="Formal"><a name="447464"></a> 
+
+<p class="TB">Name of the schema containing the supertype</p>
+</td>
+<td class="Formal"><a name="447466"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="447468"></a> 
+
+<p class="TB">OCI_ATTR_SUPERTYPE_NAME</p>
+</td>
+<td class="Formal"><a name="447470"></a> 
+
+<p class="TB">Name of the supertype</p>
+</td>
+<td class="Formal"><a name="447472"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<a name="440334"></a> <!--TOC=h2-"440334"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Type Attribute Attributes</font></h3>
+
+<!--/TOC=h2-->
+<a name="438754"></a> 
+
+<p class="BP">When a parameter is for an attribute of a type (type OCI_PTYPE_TYPE_ATTR), it has the attributes listed in <a href="oci06des.htm#438758">Table&nbsp;6-8</a>.</p>
+
+<a name="446600"></a> 
+
+<h5 class="TTW"><a name="446600"></a><a name="438758"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-8 Attributes Belonging to Type Attributes &nbsp;</em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="438762"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="438764"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="440252"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute Datatype</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438766"></a> 
+
+<p class="TB">OCI_ATTR_DATA_SIZE</p>
+</td>
+<td class="Formal"><a name="438768"></a> 
+
+<p class="TB">The maximum size of the type attribute. This length is returned in bytes and not characters for strings and raws. It returns 22 for NUMBERs.</p>
+</td>
+<td class="Formal"><a name="440254"></a> 
+
+<p class="TB">ub4</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="442443"></a> 
+
+<p class="TB">OCI_ATTR_TYPECODE</p>
+</td>
+<td class="Formal"><a name="442447"></a> 
+
+<p class="TB">Typecode. See <a href="oci06des.htm#442100">"Note on Datatype Codes"</a><a href="oci06des.htm#442100"></a>.</p>
+</td>
+<td class="Formal"><a name="442450"></a> 
+
+<p class="TB">OCITypeCode</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438770"></a> 
+
+<p class="TB">OCI_ATTR_DATA_TYPE</p>
+</td>
+<td class="Formal"><a name="438772"></a> 
+
+<p class="TB">The data type of the type attribute. See <a href="oci06des.htm#442100">"Note on Datatype Codes"</a><a href="oci06des.htm#442100"></a>.</p>
+</td>
+<td class="Formal"><a name="440256"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438774"></a> 
+
+<p class="TB">OCI_ATTR_NAME</p>
+</td>
+<td class="Formal"><a name="438776"></a> 
+
+<p class="TB">A pointer to a string which is the type attribute name</p>
+</td>
+<td class="Formal"><a name="440258"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438778"></a> 
+
+<p class="TB">OCI_ATTR_PRECISION</p>
+</td>
+<td class="Formal"><a name="446327"></a> 
+
+<p class="TB">The precision of numeric type attributes. If the precision is nonzero and scale is -127, then it is a FLOAT, else it is a NUMBER(precision, scale). For the case when precision is 0, NUMBER(precision, scale) can be represented simply as NUMBER.</p>
+</td>
+<td class="Formal"><a name="448905"></a> 
+
+<p class="TB">b1 for explicit describe <a name="448906"></a></p>
+
+<p class="TB">sb2 for implicit describe</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438782"></a> 
+
+<p class="TB">OCI_ATTR_SCALE</p>
+</td>
+<td class="Formal"><a name="446311"></a> 
+
+<p class="TB">The scale of numeric type attributes. If the precision is nonzero and scale is -127, then it is a FLOAT, else it is a NUMBER(precision, scale). For the case when precision is 0, NUMBER(precision, scale) can be represented simply as NUMBER.</p>
+</td>
+<td class="Formal"><a name="440262"></a> 
+
+<p class="TB">sb1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438786"></a> 
+
+<p class="TB">OCI_ATTR_TYPE_NAME</p>
+</td>
+<td class="Formal"><a name="438788"></a> 
+
+<p class="TB">A string which is the type name. The returned value will contain the type name if the data type is SQLT_NTY or SQLT_REF. If the data type is SQLT_NTY, the name of the named data type's type is returned. If the data type is SQLT_REF, the type name of the named data type pointed to by the REF is returned</p>
+</td>
+<td class="Formal"><a name="440264"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438790"></a> 
+
+<p class="TB">OCI_ATTR_SCHEMA_NAME</p>
+</td>
+<td class="Formal"><a name="438792"></a> 
+
+<p class="TB">A string with the schema name under which the type has been created</p>
+</td>
+<td class="Formal"><a name="440266"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438794"></a> 
+
+<p class="TB">OCI_ATTR_REF_TDO</p>
+</td>
+<td class="Formal"><a name="441939"></a> 
+
+<p class="TB">Returns the in-memory REF of the TDO for the type, if the column type is an object type. If space has not been reserved for the OCIRef, then it is allocated implicitly in the cache. The caller can then pin the TDO with <code>OCIObjectPin()</code>.</p>
+</td>
+<td class="Formal"><a name="440268"></a> 
+
+<p class="TB">OCIRef *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438798"></a> 
+
+<p class="TB">OCI_ATTR_CHARSET_ID</p>
+</td>
+<td class="Formal"><a name="438800"></a> 
+
+<p class="TB">The character set id, if the type attribute is of a string/character type</p>
+</td>
+<td class="Formal"><a name="440270"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438802"></a> 
+
+<p class="TB">OCI_ATTR_CHARSET_FORM</p>
+</td>
+<td class="Formal"><a name="438804"></a> 
+
+<p class="TB">The character set form, if the type attribute is of a string/character type</p>
+</td>
+<td class="Formal"><a name="440272"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="447106"></a> 
+
+<p class="TB">OCI_ATTR_FSPRECISION</p>
+</td>
+<td class="Formal"><a name="447108"></a> 
+
+<p class="TB">The fractional seconds precision of a datetime or interval.</p>
+</td>
+<td class="Formal"><a name="447110"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="447112"></a> 
+
+<p class="TB">OCI_ATTR_LFPRECISION</p>
+</td>
+<td class="Formal"><a name="447114"></a> 
+
+<p class="TB">The leading field precision of an interval.</p>
+</td>
+<td class="Formal"><a name="447116"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<a name="440335"></a> <!--TOC=h2-"440335"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Type Method Attributes</font></h3>
+
+<!--/TOC=h2-->
+<a name="438861"></a> 
+
+<p class="BP">When a parameter is for a method of a type (type OCI_PTYPE_TYPE_METHOD), it has the attributes listed in <a href="oci06des.htm#438864">Table&nbsp;6-9</a>.</p>
+
+<a name="446603"></a> 
+
+<h5 class="TTW"><a name="446603"></a><a name="438864"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-9 Attributes Belonging to Type Methods &nbsp;</em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="438868"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="438870"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="440303"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute Datatype</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438872"></a> 
+
+<p class="TB">OCI_ATTR_NAME</p>
+</td>
+<td class="Formal"><a name="438874"></a> 
+
+<p class="TB">Name of method (procedure or function)</p>
+</td>
+<td class="Formal"><a name="440305"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438876"></a> 
+
+<p class="TB">OCI_ATTR_ENCAPSULATION</p>
+</td>
+<td class="Formal"><a name="438878"></a> 
+
+<p class="TB">Encapsulation level of the method (either OCI_TYPEENCAP_PRIVATE or OCI_TYPEENCAP_PUBLIC)</p>
+</td>
+<td class="Formal"><a name="440307"></a> 
+
+<p class="TB">OCITypeEncap</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438880"></a> 
+
+<p class="TB">OCI_ATTR_LIST_ARGUMENTS</p>
+</td>
+<td class="Formal"><a name="438882"></a> 
+
+<p class="TB">Argument list. See <a href="oci06des.htm#442800">"Note on OCI_ATTR_LIST_ARGUMENTS"</a><a href="oci06des.htm#442800"></a>, and <a href="oci06des.htm#440341">"List Attributes"</a><a href="oci06des.htm#440341"></a>.</p>
+</td>
+<td class="Formal"><a name="440309"></a> 
+
+<p class="TB">dvoid *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438884"></a> 
+
+<p class="TB">OCI_ATTR_IS_CONSTRUCTOR</p>
+</td>
+<td class="Formal"><a name="438886"></a> 
+
+<p class="TB">Is method a constructor?</p>
+</td>
+<td class="Formal"><a name="440311"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438888"></a> 
+
+<p class="TB">OCI_ATTR_IS_DESTRUCTOR</p>
+</td>
+<td class="Formal"><a name="438890"></a> 
+
+<p class="TB">Is method a destructor?</p>
+</td>
+<td class="Formal"><a name="440313"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438892"></a> 
+
+<p class="TB">OCI_ATTR_IS_OPERATOR</p>
+</td>
+<td class="Formal"><a name="438894"></a> 
+
+<p class="TB">Is method an operator?</p>
+</td>
+<td class="Formal"><a name="440315"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438896"></a> 
+
+<p class="TB">OCI_ATTR_IS_SELFISH</p>
+</td>
+<td class="Formal"><a name="438898"></a> 
+
+<p class="TB">Is method selfish?</p>
+</td>
+<td class="Formal"><a name="440317"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438900"></a> 
+
+<p class="TB">OCI_ATTR_IS_MAP</p>
+</td>
+<td class="Formal"><a name="438902"></a> 
+
+<p class="TB">Is method a map method?</p>
+</td>
+<td class="Formal"><a name="440319"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438904"></a> 
+
+<p class="TB">OCI_ATTR_IS_ORDER</p>
+</td>
+<td class="Formal"><a name="438906"></a> 
+
+<p class="TB">Is method an order method?</p>
+</td>
+<td class="Formal"><a name="440321"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438908"></a> 
+
+<p class="TB">OCI_ATTR_IS_RNDS</p>
+</td>
+<td class="Formal"><a name="438910"></a> 
+
+<p class="TB">Is "Read No Data State" set for method?</p>
+</td>
+<td class="Formal"><a name="440323"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438912"></a> 
+
+<p class="TB">OCI_ATTR_IS_RNPS</p>
+</td>
+<td class="Formal"><a name="438914"></a> 
+
+<p class="TB">Is "Read No Process State" set for method?</p>
+</td>
+<td class="Formal"><a name="440325"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438916"></a> 
+
+<p class="TB">OCI_ATTR_IS_WNDS</p>
+</td>
+<td class="Formal"><a name="438918"></a> 
+
+<p class="TB">Is "Write No Data State" set for method?</p>
+</td>
+<td class="Formal"><a name="440327"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="438920"></a> 
+
+<p class="TB">OCI_ATTR_IS_WNPS</p>
+</td>
+<td class="Formal"><a name="438922"></a> 
+
+<p class="TB">Is "Write No Process State" set for method?</p>
+</td>
+<td class="Formal"><a name="440329"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="447498"></a> 
+
+<p class="TB">OCI_ATTR_IS_FINAL_METHOD</p>
+</td>
+<td class="Formal"><a name="447500"></a> 
+
+<p class="TB">Is this a final method?</p>
+</td>
+<td class="Formal"><a name="447502"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="447504"></a> 
+
+<p class="TB">OCI_ATTR_IS_INSTANTIABLE_METHOD</p>
+</td>
+<td class="Formal"><a name="447506"></a> 
+
+<p class="TB">Is this an instantiable method?</p>
+</td>
+<td class="Formal"><a name="447508"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="447510"></a> 
+
+<p class="TB">OCI_ATTR_IS_OVERRIDING_METHOD</p>
+</td>
+<td class="Formal"><a name="447512"></a> 
+
+<p class="TB">Is this an overriding method?</p>
+</td>
+<td class="Formal"><a name="447514"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<a name="442599"></a> <!--TOC=h2-"442599"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Collection Attributes</font></h3>
+
+<!--/TOC=h2-->
+<a name="439544"></a> 
+
+<p class="BP">When a parameter is for a collection type (type OCI_PTYPE_COLL), it has the attributes listed in <a href="oci06des.htm#439551">Table&nbsp;6-10</a>.</p>
+
+<a name="446606"></a> 
+
+<h5 class="TTW"><a name="446606"></a><a name="439551"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-10 Attributes Belonging to Collection Types &nbsp;</em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="439555"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="439557"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="440406"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute Datatype</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="439559"></a> 
+
+<p class="TB">OCI_ATTR_DATA_SIZE</p>
+</td>
+<td class="Formal"><a name="439561"></a> 
+
+<p class="TB">The maximum size of the type attribute. This length is returned in bytes and not characters for strings and raws. It returns 22 for NUMBERs.</p>
+</td>
+<td class="Formal"><a name="440408"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="442457"></a> 
+
+<p class="TB">OCI_ATTR_TYPECODE</p>
+</td>
+<td class="Formal"><a name="442461"></a> 
+
+<p class="TB">Typecode. See <a href="oci06des.htm#442100">"Note on Datatype Codes"</a><a href="oci06des.htm#442100"></a>.</p>
+</td>
+<td class="Formal"><a name="442464"></a> 
+
+<p class="TB">OCITypeCode</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="439563"></a> 
+
+<p class="TB">OCI_ATTR_DATA_TYPE</p>
+</td>
+<td class="Formal"><a name="439565"></a> 
+
+<p class="TB">The data type of the type attribute. See <a href="oci06des.htm#442100">"Note on Datatype Codes"</a><a href="oci06des.htm#442100"></a>.</p>
+</td>
+<td class="Formal"><a name="440410"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="439567"></a> 
+
+<p class="TB">OCI_ATTR_NUM_ELEMENTS</p>
+</td>
+<td class="Formal"><a name="439569"></a> 
+
+<p class="TB">The number of elements in an array. It is only valid for collections that are arrays</p>
+</td>
+<td class="Formal"><a name="440412"></a> 
+
+<p class="TB">ub4</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="439571"></a> 
+
+<p class="TB">OCI_ATTR_NAME</p>
+</td>
+<td class="Formal"><a name="439573"></a> 
+
+<p class="TB">A pointer to a string which is the type attribute name</p>
+</td>
+<td class="Formal"><a name="440414"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="439575"></a> 
+
+<p class="TB">OCI_ATTR_PRECISION</p>
+</td>
+<td class="Formal"><a name="446318"></a> 
+
+<p class="TB">The precision of numeric type attributes. If the precision is nonzero and scale is -127, then it is a FLOAT, else it is a NUMBER(precision, scale). For the case when precision is 0, NUMBER(precision, scale) can be represented simply as NUMBER.</p>
+</td>
+<td class="Formal"><a name="448912"></a> 
+
+<p class="TB">b1 for explicit describe <a name="448913"></a></p>
+
+<p class="TB">sb2 for implicit describe</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="439579"></a> 
+
+<p class="TB">OCI_ATTR_SCALE</p>
+</td>
+<td class="Formal"><a name="446304"></a> 
+
+<p class="TB">The scale of numeric type attributes. If the precision is nonzero and scale is -127, then it is a FLOAT, else it is a NUMBER(precision, scale). For the case when precision is 0, NUMBER(precision, scale) can be represented simply as NUMBER.</p>
+</td>
+<td class="Formal"><a name="440418"></a> 
+
+<p class="TB">sb1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="439583"></a> 
+
+<p class="TB">OCI_ATTR_TYPE_NAME</p>
+</td>
+<td class="Formal"><a name="439585"></a> 
+
+<p class="TB">A string which is the type name. The returned value will contain the type name if the data type is SQLT_NTY or SQLT_REF. If the data type is SQLT_NTY, the name of the named data type's type is returned. If the data type is SQLT_REF, the type name of the named data type pointed to by the REF is returned</p>
+</td>
+<td class="Formal"><a name="440420"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="439587"></a> 
+
+<p class="TB">OCI_ATTR_SCHEMA_NAME</p>
+</td>
+<td class="Formal"><a name="439589"></a> 
+
+<p class="TB">A string with the schema name under which the type has been created</p>
+</td>
+<td class="Formal"><a name="440422"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="439591"></a> 
+
+<p class="TB">OCI_ATTR_REF_TDO</p>
+</td>
+<td class="Formal"><a name="441946"></a> 
+
+<p class="TB">Returns the in-memory REF of the TDO for the type, if the column type is an object type. If space has not been reserved for the OCIRef, then it is allocated implicitly in the cache. The caller can then pin the TDO with <code>OCIObjectPin()</code>.</p>
+</td>
+<td class="Formal"><a name="440424"></a> 
+
+<p class="TB">OCIRef *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="439595"></a> 
+
+<p class="TB">OCI_ATTR_CHARSET_ID</p>
+</td>
+<td class="Formal"><a name="439597"></a> 
+
+<p class="TB">The character set id, if the type attribute is of a string/character type</p>
+</td>
+<td class="Formal"><a name="440426"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="439599"></a> 
+
+<p class="TB">OCI_ATTR_CHARSET_FORM</p>
+</td>
+<td class="Formal"><a name="439601"></a> 
+
+<p class="TB">The character set form, if the type attribute is of a string/character type</p>
+</td>
+<td class="Formal"><a name="440428"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<a name="440337"></a> <!--TOC=h2-"440337"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Synonym Attributes</font></h3>
+
+<!--/TOC=h2-->
+<a name="438924"></a> 
+
+<p class="BP">When a parameter is for a synonym (type OCI_PTYPE_SYN), it has the attributes listed in <a href="oci06des.htm#446652">Table&nbsp;6-11</a>.</p>
+
+<a name="446609"></a> 
+
+<h5 class="TTW"><a name="446609"></a><a name="446652"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-11 Attributes Belonging to Synonyms &nbsp;</em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="446658"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="446660"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="446662"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute Datatype</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="446665"></a> 
+
+<p class="TB">OCI_ATTR_OBJID</p>
+</td>
+<td class="Formal"><a name="446667"></a> 
+
+<p class="TB">Object id</p>
+</td>
+<td class="Formal"><a name="446669"></a> 
+
+<p class="TB">ub4</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="446672"></a> 
+
+<p class="TB">OCI_ATTR_SCHEMA_NAME</p>
+</td>
+<td class="Formal"><a name="446674"></a> 
+
+<p class="TB">A string containing the schema name of the synonym translation</p>
+</td>
+<td class="Formal"><a name="446676"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="446679"></a> 
+
+<p class="TB">OCI_ATTR_NAME</p>
+</td>
+<td class="Formal"><a name="446681"></a> 
+
+<p class="TB">A null-terminated string containing the object name of the synonym translation</p>
+</td>
+<td class="Formal"><a name="446683"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="446686"></a> 
+
+<p class="TB">OCI_ATTR_LINK</p>
+</td>
+<td class="Formal"><a name="446688"></a> 
+
+<p class="TB">A null-terminated string containing the database link name of the synonym translation</p>
+</td>
+<td class="Formal"><a name="446690"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<a name="442837"></a> <!--TOC=h2-"442837"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Sequence Attributes</font></h3>
+
+<!--/TOC=h2-->
+<a name="438951"></a> 
+
+<p class="BP">When a parameter is for a sequence (type OCI_PTYPE_SEQ), it has the attributes listed in <a href="oci06des.htm#446696">Table&nbsp;6-12</a>.</p>
+
+<a name="446610"></a> 
+
+<h5 class="TTW"><a name="446610"></a><a name="446696"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-12 Attributes Belonging to Sequences &nbsp;</em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="446702"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="446704"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="446706"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute Datatype</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="446709"></a> 
+
+<p class="TB">OCI_ATTR_OBJID</p>
+</td>
+<td class="Formal"><a name="446711"></a> 
+
+<p class="TB">Object id</p>
+</td>
+<td class="Formal"><a name="446713"></a> 
+
+<p class="TB">ub4</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="446716"></a> 
+
+<p class="TB">OCI_ATTR_MIN</p>
+</td>
+<td class="Formal"><a name="446718"></a> 
+
+<p class="TB">Minimum value (in Oracle NUMBER format)</p>
+</td>
+<td class="Formal"><a name="446720"></a> 
+
+<p class="TB">ub1 *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="446723"></a> 
+
+<p class="TB">OCI_ATTR_MAX</p>
+</td>
+<td class="Formal"><a name="446725"></a> 
+
+<p class="TB">Maximum value (in Oracle NUMBER format)</p>
+</td>
+<td class="Formal"><a name="446727"></a> 
+
+<p class="TB">ub1 *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="446730"></a> 
+
+<p class="TB">OCI_ATTR_INCR</p>
+</td>
+<td class="Formal"><a name="446732"></a> 
+
+<p class="TB">Increment (in Oracle NUMBER format)</p>
+</td>
+<td class="Formal"><a name="446734"></a> 
+
+<p class="TB">ub1 *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="446737"></a> 
+
+<p class="TB">OCI_ATTR_CACHE</p>
+</td>
+<td class="Formal"><a name="446739"></a> 
+
+<p class="TB">Number of sequence numbers cached; zero if the sequence is not a cached sequence (in Oracle NUMBER format)</p>
+</td>
+<td class="Formal"><a name="446741"></a> 
+
+<p class="TB">ub1 *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="446744"></a> 
+
+<p class="TB">OCI_ATTR_ORDER</p>
+</td>
+<td class="Formal"><a name="446746"></a> 
+
+<p class="TB">Whether the sequence is ordered</p>
+</td>
+<td class="Formal"><a name="446748"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="446751"></a> 
+
+<p class="TB">OCI_ATTR_HW_MARK</p>
+</td>
+<td class="Formal"><a name="446753"></a> 
+
+<p class="TB">High-water mark (in Oracle NUMBER format)</p>
+</td>
+<td class="Formal"><a name="446755"></a> 
+
+<p class="TB">ub1 *</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<a name="440339"></a> <!--TOC=h2-"440339"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Column Attributes</font></h3>
+
+<!--/TOC=h2-->
+<a name="438990"></a> 
+
+<p class="BP">When a parameter is for a column of a table or view (type OCI_PTYPE_COL), it has the attributes listed in <a href="oci06des.htm#445140">Table&nbsp;6-13</a>.</p>
+
+<a name="446611"></a> 
+
+<h5 class="TTW"><a name="446611"></a><a name="445140"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-13 Attributes Belonging to Columns of Tables or Views &nbsp;</em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="445146"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="445148"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="445150"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute Datatype</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="447661"></a> 
+
+<p class="TB">OCI_ATTR_CHAR_USED</p>
+</td>
+<td class="Formal"><a name="447663"></a> 
+
+<p class="TB">Returns the type of length semantics of the column. 0 means byte-length semantics and 1 means character-length semantics. See <a href="oci06des.htm#448549">"Character Length Semantics Support in Describing"</a><a href="oci06des.htm#448549"></a> .</p>
+</td>
+<td class="Formal"><a name="447665"></a> 
+
+<p class="TB">ub4</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="447668"></a> 
+
+<p class="TB">OCI_ATTR_CHAR_SIZE</p>
+</td>
+<td class="Formal"><a name="447670"></a> 
+
+<p class="TB">Returns the column character length which is the number of characters allowed in the column. It is the counterpart of OCI_ATTR_DATA_SIZE which gets the byte length. See <a href="oci06des.htm#448549">"Character Length Semantics Support in Describing"</a><a href="oci06des.htm#448549"></a> .</p>
+</td>
+<td class="Formal"><a name="447673"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445153"></a> 
+
+<p class="TB">OCI_ATTR_DATA_SIZE</p>
+</td>
+<td class="Formal"><a name="445155"></a> 
+
+<p class="TB">The maximum size of the column. This length is returned in bytes and not characters for strings and raws. It returns 22 for NUMBERs.</p>
+</td>
+<td class="Formal"><a name="445157"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445160"></a> 
+
+<p class="TB">OCI_ATTR_DATA_TYPE</p>
+</td>
+<td class="Formal"><a name="445164"></a> 
+
+<p class="TB">The data type of the column. See <a href="oci06des.htm#442100">"Note on Datatype Codes"</a><a href="oci06des.htm#442100"></a>.</p>
+</td>
+<td class="Formal"><a name="445167"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445170"></a> 
+
+<p class="TB">OCI_ATTR_NAME</p>
+</td>
+<td class="Formal"><a name="445172"></a> 
+
+<p class="TB">A pointer to a string which is the column name</p>
+</td>
+<td class="Formal"><a name="445174"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445177"></a> 
+
+<p class="TB">OCI_ATTR_PRECISION</p>
+</td>
+<td class="Formal"><a name="446343"></a> 
+
+<p class="TB">The precision of numeric columns. If the precision is nonzero and scale is -127, then it is a FLOAT, else it is a NUMBER(precision, scale). For the case when precision is 0, NUMBER(precision, scale) can be represented simply as NUMBER.</p>
+</td>
+<td class="Formal"><a name="445181"></a> 
+
+<p class="TB">ub1 for explicit describe <a name="445182"></a></p>
+
+<p class="TB">sb2 for implicit describe</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445185"></a> 
+
+<p class="TB">OCI_ATTR_SCALE</p>
+</td>
+<td class="Formal"><a name="446334"></a> 
+
+<p class="TB">The scale of numeric columns. If the precision is nonzero and scale is -127, then it is a FLOAT, else it is a NUMBER(precision, scale). For the case when precision is 0, NUMBER(precision, scale) can be represented simply as NUMBER.</p>
+</td>
+<td class="Formal"><a name="445189"></a> 
+
+<p class="TB">sb1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445192"></a> 
+
+<p class="TB">OCI_ATTR_IS_NULL</p>
+</td>
+<td class="Formal"><a name="445194"></a> 
+
+<p class="TB">Returns 0 if null values are not permitted for the column</p>
+</td>
+<td class="Formal"><a name="445196"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445199"></a> 
+
+<p class="TB">OCI_ATTR_TYPE_NAME</p>
+</td>
+<td class="Formal"><a name="445201"></a> 
+
+<p class="TB">Returns a string which is the type name. The returned value will contain the type name if the data type is SQLT_NTY or SQLT_REF. If the data type is SQLT_NTY, the name of the named data type's type is returned. If the data type is SQLT_REF, the type name of the named data type pointed to by the REF is returned</p>
+</td>
+<td class="Formal"><a name="445203"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445206"></a> 
+
+<p class="TB">OCI_ATTR_SCHEMA_NAME</p>
+</td>
+<td class="Formal"><a name="445208"></a> 
+
+<p class="TB">Returns a string with the schema name under which the type has been created</p>
+</td>
+<td class="Formal"><a name="445210"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445213"></a> 
+
+<p class="TB">OCI_ATTR_REF_TDO</p>
+</td>
+<td class="Formal"><a name="445215"></a> 
+
+<p class="TB">The REF of the TDO for the type, if the column type is an object type</p>
+</td>
+<td class="Formal"><a name="445217"></a> 
+
+<p class="TB">OCIRef *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445220"></a> 
+
+<p class="TB">OCI_ATTR_CHARSET_ID</p>
+</td>
+<td class="Formal"><a name="445222"></a> 
+
+<p class="TB">The character set id, if the column is of a string/character type</p>
+</td>
+<td class="Formal"><a name="445224"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445227"></a> 
+
+<p class="TB">OCI_ATTR_CHARSET_FORM</p>
+</td>
+<td class="Formal"><a name="445229"></a> 
+
+<p class="TB">The character set form, if the column is of a string/character type</p>
+</td>
+<td class="Formal"><a name="445231"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<a name="440340"></a> <!--TOC=h2-"440340"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Argument/Result Attributes</font></h3>
+
+<!--/TOC=h2-->
+<a name="439049"></a> 
+
+<p class="BP">When a parameter is for an argument of a procedure/function (type OCI_PTYPE_ARG), for a type method argument (type OCI_PTYPE_TYPE_ARG) or for method results (type OCI_PTYPE_TYPE_RESULT), it has the attributes listed in <a href="oci06des.htm#445245">Table&nbsp;6-14</a>.</p>
+
+<a name="446612"></a> 
+
+<h5 class="TTW"><a name="446612"></a><a name="445245"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-14 Attributes Belonging to Arguments/Results &nbsp;</em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="445251"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="445253"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="445255"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute Datatype</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445258"></a> 
+
+<p class="TB">OCI_ATTR_NAME</p>
+</td>
+<td class="Formal"><a name="445260"></a> 
+
+<p class="TB">Returns a pointer to a string which is the argument name</p>
+</td>
+<td class="Formal"><a name="445262"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445265"></a> 
+
+<p class="TB">OCI_ATTR_POSITION</p>
+</td>
+<td class="Formal"><a name="445267"></a> 
+
+<p class="TB">The position of the argument in the argument list. Always returns zero.</p>
+</td>
+<td class="Formal"><a name="445269"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445272"></a> 
+
+<p class="TB">OCI_ATTR_TYPECODE</p>
+</td>
+<td class="Formal"><a name="445276"></a> 
+
+<p class="TB">Typecode. See <a href="oci06des.htm#442100">"Note on Datatype Codes"</a><a href="oci06des.htm#442100"></a>.</p>
+</td>
+<td class="Formal"><a name="445279"></a> 
+
+<p class="TB">OCITypeCode</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445282"></a> 
+
+<p class="TB">OCI_ATTR_DATA_TYPE</p>
+</td>
+<td class="Formal"><a name="445286"></a> 
+
+<p class="TB">The data type of the argument. See <a href="oci06des.htm#442100">"Note on Datatype Codes"</a><a href="oci06des.htm#442100"></a>.</p>
+</td>
+<td class="Formal"><a name="445289"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445292"></a> 
+
+<p class="TB">OCI_ATTR_DATA_SIZE</p>
+</td>
+<td class="Formal"><a name="445294"></a> 
+
+<p class="TB">The size of the data type of the argument. This length is returned in bytes and not characters for strings and raws. It returns 22 for NUMBERs.</p>
+</td>
+<td class="Formal"><a name="445296"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445299"></a> 
+
+<p class="TB">OCI_ATTR_PRECISION</p>
+</td>
+<td class="Formal"><a name="445301"></a> 
+
+<p class="TB">The precision of numeric arguments. If the precision is nonzero and scale is -127, then it is a FLOAT, else it is a NUMBER(precision, scale). For the case when precision is 0, NUMBER(precision, scale) can be represented simply as NUMBER.</p>
+</td>
+<td class="Formal"><a name="448919"></a> 
+
+<p class="TB">b1 for explicit describe <a name="448920"></a></p>
+
+<p class="TB">sb2 for implicit describe <a name="445303"></a></p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445306"></a> 
+
+<p class="TB">OCI_ATTR_SCALE</p>
+</td>
+<td class="Formal"><a name="445308"></a> 
+
+<p class="TB">The scale of numeric arguments. If the precision is nonzero and scale is -127, then it is a FLOAT, else it is a NUMBER(precision, scale). For the case when precision is 0, NUMBER(precision, scale) can be represented simply as NUMBER.</p>
+</td>
+<td class="Formal"><a name="445310"></a> 
+
+<p class="TB">sb1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445313"></a> 
+
+<p class="TB">OCI_ATTR_LEVEL</p>
+</td>
+<td class="Formal"><a name="445315"></a> 
+
+<p class="TB">The data type levels. This attribute always returns zero.</p>
+</td>
+<td class="Formal"><a name="445317"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445320"></a> 
+
+<p class="TB">OCI_ATTR_HAS_DEFAULT</p>
+</td>
+<td class="Formal"><a name="445322"></a> 
+
+<p class="TB">Indicates whether an argument has a default</p>
+</td>
+<td class="Formal"><a name="445324"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445326"></a> 
+
+<p class="TB">OCI_ATTR_LIST_ARGUMENTS</p>
+</td>
+<td class="Formal"><a name="445328"></a> 
+
+<p class="TB">The list of arguments at the next level (when the argument is of a record or table type).</p>
+</td>
+<td class="Formal"><a name="445330"></a> 
+
+<p class="TB">dvoid *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445333"></a> 
+
+<p class="TB">OCI_ATTR_IOMODE</p>
+</td>
+<td class="Formal"><a name="445335"></a> 
+
+<p class="TB">Indicates the argument mode: <a name="445336"></a></p>
+
+<p class="TB">0 is IN (OCI_TYPEPARAM_IN), <a name="445337"></a></p>
+
+<p class="TB">1 is OUT (OCI_TYPEPARAM_OUT), <a name="445338"></a></p>
+
+<p class="TB">2 is IN/OUT (OCI_TYPEPARAM_INOUT)</p>
+</td>
+<td class="Formal"><a name="445340"></a> 
+
+<p class="TB">OCITypeParamMode</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445343"></a> 
+
+<p class="TB">OCI_ATTR_RADIX</p>
+</td>
+<td class="Formal"><a name="445345"></a> 
+
+<p class="TB">Returns a radix (if number type)</p>
+</td>
+<td class="Formal"><a name="445347"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445350"></a> 
+
+<p class="TB">OCI_ATTR_IS_NULL</p>
+</td>
+<td class="Formal"><a name="445352"></a> 
+
+<p class="TB">Returns 0 if null values are not permitted for the column</p>
+</td>
+<td class="Formal"><a name="445354"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445357"></a> 
+
+<p class="TB">OCI_ATTR_TYPE_NAME</p>
+</td>
+<td class="Formal"><a name="445359"></a> 
+
+<p class="TB">Returns a string which is the type name, or the package name in the case of package local types. The returned value will contain the type name if the data type is SQLT_NTY or SQLT_REF. If the data type is SQLT_NTY, the name of the named data type's type is returned. If the data type is SQLT_REF, the type name of the named datatype pointed to by the REF is returned.</p>
+</td>
+<td class="Formal"><a name="445361"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445364"></a> 
+
+<p class="TB">OCI_ATTR_SCHEMA_NAME</p>
+</td>
+<td class="Formal"><a name="445366"></a> 
+
+<p class="TB">For SQLT_NTY or SQLT_REF, returns a string with the schema name under which the type was created, or under which the package was created in the case of package local types</p>
+</td>
+<td class="Formal"><a name="445368"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445371"></a> 
+
+<p class="TB">OCI_ATTR_SUB_NAME</p>
+</td>
+<td class="Formal"><a name="445373"></a> 
+
+<p class="TB">For SQLT_NTY or SQLT_REF, returns a string with the type name, in the case of package local types</p>
+</td>
+<td class="Formal"><a name="445375"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445378"></a> 
+
+<p class="TB">OCI_ATTR_LINK</p>
+</td>
+<td class="Formal"><a name="445380"></a> 
+
+<p class="TB">For SQLT_NTY or SQLT_REF, returns a string with the database link name of the database on which the type exists. This can happen only in the case of package local types, when the package is remote.</p>
+</td>
+<td class="Formal"><a name="445382"></a> 
+
+<p class="TB">text *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445385"></a> 
+
+<p class="TB">OCI_ATTR_REF_TDO</p>
+</td>
+<td class="Formal"><a name="445387"></a> 
+
+<p class="TB">Returns the REF of the TDO for the type, if the argument type is an object</p>
+</td>
+<td class="Formal"><a name="445389"></a> 
+
+<p class="TB">OCIRef *</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445392"></a> 
+
+<p class="TB">OCI_ATTR_CHARSET_ID</p>
+</td>
+<td class="Formal"><a name="445394"></a> 
+
+<p class="TB">Returns the character set ID if the argument is of a string/character type</p>
+</td>
+<td class="Formal"><a name="445396"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="445398"></a> 
+
+<p class="TB">OCI_ATTR_CHARSET_FORM</p>
+</td>
+<td class="Formal"><a name="445400"></a> 
+
+<p class="TB">Returns the character set form if the argument is of a string/character type</p>
+</td>
+<td class="Formal"><a name="445403"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<a name="440341"></a> <!--TOC=h2-"440341"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">List Attributes</font></h3>
+
+<!--/TOC=h2-->
+<a name="439120"></a> 
+
+<p class="BP">When a parameter is for a list of columns, arguments, or subprograms (type OCI_PTYPE_LIST), it has the following type specific attributes and handles (parameters):</p>
+
+<a name="448155"></a> 
+
+<p class="BP">The list has an OCI_ATTR_LIST_TYPE attribute which designates the list type. The possible values and their lower bounds when traversing the list are:</p>
+
+<a name="448180">List</a> 
+
+<h5 class="TTW"><a name="448180"></a><a name="448162"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-15 List Attributes &nbsp;</em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="448168"></a> <font face="Arial, Helvetica, sans-serif"><strong>List Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="448170"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="448172"></a> <font face="Arial, Helvetica, sans-serif"><strong>Lower Bound</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448175"></a> 
+
+<p class="TB">OCI_LTYPE_COLUMN</p>
+</td>
+<td class="Formal"><a name="448177"></a> 
+
+<p class="TB">Column list</p>
+</td>
+<td class="Formal"><a name="448179"></a> 
+
+<p class="TB">1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448192"></a> 
+
+<p class="TB">OCI_LTYPE_ARG_PROC</p>
+</td>
+<td class="Formal"><a name="448194"></a> 
+
+<p class="TB">Procedure argument list</p>
+</td>
+<td class="Formal"><a name="448196"></a> 
+
+<p class="TB">1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448198"></a> 
+
+<p class="TB">OCI_LTYPE_ARG_FUNC</p>
+</td>
+<td class="Formal"><a name="448200"></a> 
+
+<p class="TB">Function argument list</p>
+</td>
+<td class="Formal"><a name="448202"></a> 
+
+<p class="TB">0</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448204"></a> 
+
+<p class="TB">OCI_LTYPE_SUBPRG</p>
+</td>
+<td class="Formal"><a name="448206"></a> 
+
+<p class="TB">Subprogram list</p>
+</td>
+<td class="Formal"><a name="448208"></a> 
+
+<p class="TB">0</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448210"></a> 
+
+<p class="TB">OCI_LTYPE_TYPE_ATTR</p>
+</td>
+<td class="Formal"><a name="448212"></a> 
+
+<p class="TB">Type attribute list</p>
+</td>
+<td class="Formal"><a name="448214"></a> 
+
+<p class="TB">1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448216"></a> 
+
+<p class="TB">OCI_LTYPE_TYPE_METHOD</p>
+</td>
+<td class="Formal"><a name="448218"></a> 
+
+<p class="TB">Type method list</p>
+</td>
+<td class="Formal"><a name="448220"></a> 
+
+<p class="TB">1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448222"></a> 
+
+<p class="TB">OCI_LTYPE_TYPE_ARG_PROC</p>
+</td>
+<td class="Formal"><a name="448224"></a> 
+
+<p class="TB">Type method without result argument list</p>
+</td>
+<td class="Formal"><a name="448226"></a> 
+
+<p class="TB">0</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448308"></a> 
+
+<p class="TB">OCI_LTYPE_TYPE_ARG_FUNC</p>
+</td>
+<td class="Formal"><a name="448310"></a> 
+
+<p class="TB">Type method without result argument list</p>
+</td>
+<td class="Formal"><a name="448312"></a> 
+
+<p class="TB">1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448314"></a> 
+
+<p class="TB">OCI_LTYPE_SCH_OBJ</p>
+</td>
+<td class="Formal"><a name="448316"></a> 
+
+<p class="TB">Object list within a schema</p>
+</td>
+<td class="Formal"><a name="448318"></a> 
+
+<p class="TB">0</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448320"></a> 
+
+<p class="TB">OCI_LTYPE_DB_SCH</p>
+</td>
+<td class="Formal"><a name="448322"></a> 
+
+<p class="TB">Schema list within a database</p>
+</td>
+<td class="Formal"><a name="448324"></a> 
+
+<p class="TB">0</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<ul class="LB1">
+<li class="LB1" type="disc"><a name="442269"></a>The list has an OCI_ATTR_NUM_PARAMS attribute, which tells the number of elements in the list.</li>
+
+<li class="LB1" type="disc"><a name="442715"></a>Each list has LowerBound .. OCI_ATTR_NUM_PARAMS parameters. LowerBound is the value in the Lower Bound column of <a href="oci06des.htm#448162">Table&nbsp;6-15, "List Attributes"</a>. In the case of a function argument list, position 0 has a parameter for the return value (type OCI_PTYPE_ARG).</li>
+</ul>
+
+<a name="444115"></a> <!--TOC=h2-"444115"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Schema Attributes</font></h3>
+
+<!--/TOC=h2-->
+<a name="444117"></a> 
+
+<p class="BP">When a parameter is for a schema type (type OCI_PTYPE_SCHEMA), it has the attributes listed in <a href="oci06des.htm#444134">Table&nbsp;6-16</a>:</p>
+
+<a name="446619"></a> 
+
+<h5 class="TTW"><a name="446619"></a><a name="444134"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-16 Attributes Specific to Schemas &nbsp;</em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="444140"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="444142"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="444144"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute Datatype</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="444161"></a> 
+
+<p class="TB">OCI_ATTR_LIST_OBJECTS</p>
+</td>
+<td class="Formal"><a name="444163"></a> 
+
+<p class="TB">List of objects in the schema</p>
+</td>
+<td class="Formal"><a name="444165"></a> 
+
+<p class="TB">text*</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<a name="444119"></a> <!--TOC=h2-"444119"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Database Attributes</font></h3>
+
+<!--/TOC=h2-->
+<a name="444490"></a> 
+
+<p class="BP">When a parameter is for a database type (type OCI_PTYPE_DATABASE), it has the attributes listed in <a href="oci06des.htm#448435">Table&nbsp;6-17</a>:</p>
+
+<a name="448539"></a> 
+
+<h5 class="TTW"><a name="448539"></a><a name="448435"></a> <strong><font face="Arial, Helvetica, sans-serif"><em>Table 6-17 Attributes Specific to Databases &nbsp;</em></font></strong></h5>
+
+<table summary="" class="FormalWide" border="1" frame="HSIDES" rules="GROUPS" width="100%" cellpadding="3" cellspacing="0" dir="ltr" title="">
+<thead>
+<tr class="Formal">
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="448441"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="448443"></a> <font face="Arial, Helvetica, sans-serif"><strong>Description</strong></font></th>
+<th class="Formal" align="left" valign="bottom" scope="col"><a name="448445"></a> <font face="Arial, Helvetica, sans-serif"><strong>Attribute Datatype</strong></font></th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448448"></a> 
+
+<p class="TB">OCI_ATTR_VERSION</p>
+</td>
+<td class="Formal"><a name="448450"></a> 
+
+<p class="TB">Database version</p>
+</td>
+<td class="Formal"><a name="448452"></a> 
+
+<p class="TB">text*</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448455"></a> 
+
+<p class="TB">OCI_ATTR_CHARSET_ID</p>
+</td>
+<td class="Formal"><a name="448457"></a> 
+
+<p class="TB">Database character set Id from the server handle</p>
+</td>
+<td class="Formal"><a name="448459"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448462"></a> 
+
+<p class="TB">OCI_ATTR_NCHARSET_ID</p>
+</td>
+<td class="Formal"><a name="448464"></a> 
+
+<p class="TB">Database character set Id from the server handle</p>
+</td>
+<td class="Formal"><a name="448466"></a> 
+
+<p class="TB">ub2</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448469"></a> 
+
+<p class="TB">OCI_ATTR_LIST_SCHEMAS</p>
+</td>
+<td class="Formal"><a name="448471"></a> 
+
+<p class="TB">List of schemas (type OCI_PTYPE_SCHEMA) in the database</p>
+</td>
+<td class="Formal"><a name="448473"></a> 
+
+<p class="TB">OCI_PTYPE_LIST</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448476"></a> 
+
+<p class="TB">OCI_ATTR_MAX_PROC_LEN</p>
+</td>
+<td class="Formal"><a name="448478"></a> 
+
+<p class="TB">Maximum length of a procedure name</p>
+</td>
+<td class="Formal"><a name="448480"></a> 
+
+<p class="TB">ub4</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448483"></a> 
+
+<p class="TB">OCI_ATTR_MAX_COLUMN_LEN</p>
+</td>
+<td class="Formal"><a name="448485"></a> 
+
+<p class="TB">Maximum length of a column name</p>
+</td>
+<td class="Formal"><a name="448487"></a> 
+
+<p class="TB">ub4</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448490"></a> 
+
+<p class="TB">OCI_ATTR_CURSOR_COMMIT_BEHAVIOR</p>
+</td>
+<td class="Formal"><a name="448492"></a> 
+
+<p class="TB">How a COMMIT operation affects cursors and prepared statements in the database. Values are: <a name="448493"></a></p>
+
+<p class="TB">OCI_CURSOR_OPEN - preserve cursor state as before the commit operation <a name="448494"></a></p>
+
+<p class="TB">OCI_CURSOR_CLOSED - cursors are closed on COMMIT, but the application can still reexecute the statement without re-preparing it</p>
+</td>
+<td class="Formal"><a name="448496"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448499"></a> 
+
+<p class="TB">OCI_ATTR_MAX_CATALOG_NAMELEN</p>
+</td>
+<td class="Formal"><a name="448501"></a> 
+
+<p class="TB">Maximum length of a catalog (database) name</p>
+</td>
+<td class="Formal"><a name="448503"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448506"></a> 
+
+<p class="TB">OCI_ATTR_CATALOG_LOCATION</p>
+</td>
+<td class="Formal"><a name="448508"></a> 
+
+<p class="TB">Position of the catalog in a qualified table. Values are OCI_CL_START and OCI_CL_END</p>
+</td>
+<td class="Formal"><a name="448510"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448513"></a> 
+
+<p class="TB">OCI_ATTR_SAVEPOINT_SUPPORT</p>
+</td>
+<td class="Formal"><a name="448515"></a> 
+
+<p class="TB">Does database support savepoints? Values are OCI_SP_SUPPORTED and OCI_SP_UNSUPPORTED</p>
+</td>
+<td class="Formal"><a name="448517"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448520"></a> 
+
+<p class="TB">OCI_ATTR_NOWAIT_SUPPORT</p>
+</td>
+<td class="Formal"><a name="448522"></a> 
+
+<p class="TB">Does database support the nowait clause? Values are OCI_NW_SUPPORTED and OCI_NW_UNSUPPORTED</p>
+</td>
+<td class="Formal"><a name="448524"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448527"></a> 
+
+<p class="TB">OCI_ATTR_AUTOCOMMIT_DDL</p>
+</td>
+<td class="Formal"><a name="448529"></a> 
+
+<p class="TB">Is autocommit mode required for DDL statements? Values are OCI_AC_DDL and OCI_NO_AC_DDL</p>
+</td>
+<td class="Formal"><a name="448531"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+
+<tr class="Formal" align="left" valign="top">
+<td class="Formal"><a name="448534"></a> 
+
+<p class="TB">OCI_ATTR_LOCKING_MODE</p>
+</td>
+<td class="Formal"><a name="448536"></a> 
+
+<p class="TB">Locking mode for the database. Values are OCI_LOCK_IMMEDIATE and OCI_LOCK_DELAYED</p>
+</td>
+<td class="Formal"><a name="448538"></a> 
+
+<p class="TB">ub1</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<a name="448549"></a> <!--TOC=h2-"448549"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Character Length Semantics Support in Describing</font></h3>
+
+<!--/TOC=h2-->
+<a name="448550"></a> 
+
+<p class="BP">Starting with release Oracle9<em class="Italic">i</em>, query and column information are supported with character length semantics.</p>
+
+<a name="448552"></a> 
+
+<p class="BP">These attributes of describe handles support character length semantics:</p>
+
+<a name="448554"></a> 
+
+<p class="BP">OCI_ATTR_CHAR_SIZE, gets the column character length which is the number of characters allowed in the column. It is the counterpart of OCI_ATTR_DATA_SIZE which gets the byte length;</p>
+
+<a name="448557"></a> 
+
+<p class="BP">OCI_ATTR_CHAR_USED, gets the type of length semantics of the column. 0 means byte-length semantics and 1 means character length semantics.</p>
+
+<a name="448558"></a> 
+
+<p class="BP">An application may describe a select-list (query) either implicitly or explicitly through <code>OCIStmtExecute()</code>. Other schema elements must be described explicitly through <code>OCIDescribeAny()</code>.</p>
+
+<a name="448559"></a> <!--TOC=h3-"448559"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Implicit Describing</font></h4>
+
+<!--/TOC=h3-->
+<a name="448560"></a> 
+
+<p class="BP">If the database column was created using character length semantics, then the implicit describe information will contain both the character length and the byte length and a flag saying how the database column was created. That is, OCI_ATTR_CHAR_SIZE is the character length of the column or expression. The OCI_ATTR_CHAR_USED flag is a 1 in this case, indicating that the column or expression was created with the character length semantics.</p>
+
+<a name="448561"></a> 
+
+<p class="BP">The OCI_ATTR_DATA_SIZE value will be always large enough to hold all the data, as many as OCI_ATTR_CHAR_SIZE number of characters. The OCI_ATTR_DATA_SIZE will be usually set to the OCI_ATTR_CHAR_SIZE times the client's max bytes for each character value.</p>
+
+<a name="448562"></a> 
+
+<p class="BP">If the database column was created with byte length semantics, then the implicit describe will behave exactly as it does before release 9.0. That is, the OCI_ATTR_DATA_SIZE value returned will be the column's byte length times the maximum conversion ratio between the client and server's character set, that is, column byte length divided by the server's max bytes for each character multiplied by the client's max bytes for each character. The OCI_ATTR_CHAR_USED value is 0 and the OCI_ATTR_CHAR_SIZE value will be set to the same value as OCI_ATTR_DATA_SIZE.</p>
+
+<a name="448563"></a> <!--TOC=h3-"448563"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Explicit Describing</font></h4>
+
+<!--/TOC=h3-->
+<a name="448564"></a> 
+
+<p class="BP">Explicit describes of tables will have an attribute OCI_ATTR_DATA_SIZE that gets the column's size in bytes (as it appears in the server), the length in characters in OCI_ATTR_CHAR_SIZE, and a flag OCI_ATTR_CHAR_USED that indicates how the column was created.</p>
+
+<a name="448565"></a> 
+
+<p class="BP">When inserting, if the OCI_ATTR_CHAR_USED flag is set you may set the OCI_ATTR_MAXCHAR_SIZE (to be explained in binds) in the bind handle to the value returned by OCI_ATTR_CHAR_SIZE in the parameter handle from the explicit describe. This will assure you that you never violate the size constraint for the column.</p>
+
+<a name="448577"></a> 
+
+<div align="center">
+<table class="NoteAlso" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="NoteAlso">
+<td class="NoteAlso"><a name="448568"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="448576"></a> 
+
+<p class="NB"><em class="Italic"><a href="oci05bnd.htm#431220">"In Binds"</a></em><a href="oci05bnd.htm#431220"></a></p>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="448578"></a> 
+
+<p class="BP">Another way to do explicit describe is through function <code>OCIDescribeAny(),</code> which is a generic describe call for existing schema objects: tables, views, synonyms, procedures, functions, packages, sequences, types, schemas, and databases. This call also describes subschema objects, such as a column in a table. This call populates the describe handle with the object-specific attributes which can be obtained through an <code>OCIAttrGet()</code> call.</p>
+
+<a name="448579"></a> 
+
+<p class="BP">Calling <code>OCIAttrGet()</code> on the parameter descriptor returns the specific attributes of a stored procedure or function parameter, or a table column descriptor. These subsequent calls do not need an extra round trip to the server because the entire schema object description is cached on the client side by <code>OCIDescribeAny()</code>.</p>
+
+<a name="448580"></a> 
+
+<p class="BP">When an application describes a table, it can then retrieve information about that table's columns. Additionally, <code>OCIDescribeAny()</code> can directly describe subschema objects such as columns of a table, packages of a function, or fields of a type if the user knows the name of the subschema object. In all cases, the specific information about columns and datatypes is retrieved by reading handle attributes.</p>
+
+<a name="448581"></a> 
+
+<p class="BP">After a SQL statement is executed, information about the select-list is available as an attribute of the statement handle. No explicit describe call is needed. To retrieve information about select-list items from the statement handle, the application must call <code>OCIParamGet()</code> once for each position in the select-list to allocate a parameter descriptor for that position.</p>
+
+<a name="448582"></a> 
+
+<p class="BP">Once a parameter descriptor has been allocated for a position in the select-list, the application can retrieve specific information by calling <code>OCIAttrGet()</code> on the parameter descriptor. Information available from the parameter descriptor includes the datatype and maximum size of the parameter.</p>
+
+<a name="448583"></a> <!--TOC=h3-"448583"-->
+<h4 class="H3"><font face="Arial, Helvetica, sans-serif" color="#330099">Client and Server Compatibility Issues for Describing</font></h4>
+
+<!--/TOC=h3-->
+<a name="448584"></a> 
+
+<p class="BP">When an Oracle9<em class="Italic">i</em> or later client talks to an Oracle8<em class="Italic">i</em> or earlier server, it will behave as if the database is only using byte length semantics;</p>
+
+<a name="448585"></a> 
+
+<p class="BP">When an Oracle8<em class="Italic">i</em> or earlier client talks to a Oracle9<em class="Italic">i</em> or later server, the attributes OCI_ATTR_CHAR_SIZE and OCI_ATTR_CHAR_USED are not available on the client side.</p>
+
+<a name="448586"></a> 
+
+<p class="BP">In either case, the character length semantics cannot be described when either the server or client has an Oracle8<em class="Italic">i</em> or earlier software release.</p>
+
+<a name="448546"></a> <!--TOC=h1-"448546"-->
+<h2 class="H1"><font face="Arial, Helvetica, sans-serif" color="#330099">Examples Using OCIDescribeAny()</font></h2>
+
+<!--/TOC=h1-->
+<a name="448543"></a> 
+
+<p class="BP">The following examples demonstrate the use of <code>OCIDescribeAny()</code> for describing different types of schema objects. For a more detailed code sample, see the demonstration program <code>cdemodsa.c</code> included with your Oracle installation.</p>
+
+<a name="446886"></a> 
+
+<div align="center">
+<table class="NoteAlso" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="NoteAlso">
+<td class="NoteAlso"><a name="446883"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="446885"></a> 
+
+<p class="NB">For additional information on the demonstration programs, see <a href="ociabdem.htm#430289">Appendix&nbsp;B, "OCI Demonstration Programs"</a></p>
+</td>
+</tr>
+</table>
+</div>
+
+<a name="441255"></a> <!--TOC=h2-"441255"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Retrieving Column Data Types For a Table</font></h3>
+
+<!--/TOC=h2-->
+<a name="441256"></a> 
+
+<p class="BP">This example illustrates the use of an explicit describe. Let us take an example application, which needs to retrieve the column datatypes for a table. The following code fragment shows how an application would be able to use the describe interface:</p>
+
+<pre class="CE">
+<a name="441257"></a>...
+<a name="447131"></a>text objptr[] = "tablename";
+<a name="447586"></a>OCIParam     *mypard;
+<a name="447587"></a>ub4          counter;
+<a name="447588"></a>ub2          dtype;
+<a name="447589"></a>text         *col_name;
+<a name="447584"></a>ub4          counter, col_name_len, char_semantics, col_width;
+<a name="447132"></a>ub4 objp_len = strlen("tablename");
+<a name="447133"></a>OCIParam *parmh;         /* parameter handle */
+<a name="443616"></a>OCIParam *collsthd;      /* handle to list of columns */
+<a name="443618"></a>OCIParam *colhd;         /* column handle */
+<a name="446513"></a>OCIDescribe *dschp;      /* describe handle */
+<a name="441262"></a>
+<a name="446519"></a>...
+<a name="441263"></a><code>/* get the describe handle for the table */
+</code><a name="441264"></a><code>if (</code>OCIDescribeAny<code>(svch, errh, objptr, objp_len, OCI_OTYPE_NAME, 0, 
+</code><a name="443620"></a> <code>OCI_PTYPE_TABLE, dschp))
+</code><a name="442110"></a> <code>return error;
+</code><a name="441266"></a>/* get the parameter handle */
+<a name="441267"></a>if (OCIAttrGet(dschp, OCI_HTYPE_DESCRIBE, &amp;parmh, 0, OCI_ATTR_PARAM,
+<a name="443622"></a>     errh))
+<a name="442116"></a>    return error;
+<a name="441269"></a>/* The type information of the object, in this case, OCI_PTYPE_TABLE,
+<a name="443624"></a>is obtained from the parameter descriptor returned by the OCIAttrGet(). */
+<a name="441271"></a>/* get the number of columns in the table */
+<a name="441272"></a>if (OCIAttrGet(parmh, OCI_DTYPE_PARAM, &amp;numcols, 0, 
+<a name="443626"></a>     OCI_ATTR_NUM_COLS, errh))
+<a name="442119"></a>    return error;
+<a name="441274"></a><code>/* get the handle to the column list of the table */
+</code><a name="441275"></a><code>if (</code>OCIAttrGet<code>(parmh, OCI_DTYPE_PARAM, &amp;collsthd, 0,
+</code><a name="443628"></a> <code>OCI_ATTR_LIST_COLUMNS, errh)==OCI_NO_DATA)
+</code><a name="441276"></a> <code>return error;
+</code><a name="441278"></a><code>/* go through the column list and retrieve the data-type of each column,
+</code><a name="443630"></a><code>and then recursively describe column types. */
+</code><a name="441279"></a>
+<a name="441280"></a>for (i = 1; i &lt;= numcols; i++)
+<a name="441281"></a>{
+<a name="441282"></a>    /* get parameter for column i */
+<a name="441283"></a> <code>if (</code>OCIParamGet<code>(collsthd, OCI_DTYPE_PARAM, errh, &amp;colhd, i))
+</code><a name="442122"></a> <code>  return error;
+</code><a name="441285"></a>    /* for example, get data type for ith column */
+<a name="441286"></a>    if (OCIAttrGet(colhd, OCI_DTYPE_PARAM, &amp;datatype[i-1], 0,
+<a name="443632"></a>       OCI_ATTR_DATA_TYPE, errh))
+<a name="442125"></a>        return error;
+<a name="447599"></a>/* Retrieve the length semantics for the column */
+<a name="447600"></a>OCIAttrGet((dvoid*) mypard, (ub4) OCI_DTYPE_PARAM, 
+<a name="447601"></a>                 (dvoid*) &amp;char_semantics,(ub4 *) 0, (ub4) OCI_ATTR_CHAR_USED, 
+<a name="447602"></a>                (OCIError *) errhp  );
+<a name="447603"></a>if (char_semantics)
+<a name="447604"></a>    /* Retrieve the column width in characters */
+<a name="447605"></a>    OCIAttrGet((dvoid*) mypard, (ub4) OCI_DTYPE_PARAM, 
+<a name="447606"></a>                 (dvoid*) &amp;col_width, (ub4 *) 0, (ub4) OCI_ATTR_CHAR_SIZE, 
+<a name="447607"></a>                (OCIError *) errhp  );
+<a name="447608"></a>else
+<a name="447609"></a>    /* Retrieve the column width in bytes */
+<a name="447610"></a>    OCIAttrGet((dvoid*) mypard, (ub4) OCI_DTYPE_PARAM, 
+<a name="447611"></a>                 (dvoid*) &amp;col_width,(ub4 *) 0, (ub4) OCI_ATTR_DATA_SIZE, 
+<a name="447597"></a>                (OCIError *) errhp  );
+<a name="441287"></a>}
+<a name="446520"></a>...
+</pre>
+
+<a name="441313"></a> <!--TOC=h2-"441313"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Describing the Stored Procedure</font></h3>
+
+<!--/TOC=h2-->
+<a name="441314"></a> 
+
+<p class="BP">Let us consider a stored procedure or a function.The difference between a procedure and a function is that the latter has a return type at position 0 in the argument list, while the former has no argument associated with position 0 in the argument list. The steps required to describe type methods (also divided into functions and procedures) are identical to that of regular PL/SQL functions and procedures. Note that procedures and functions can take default types of objects as arguments. Let us consider the following procedure:</p>
+
+<pre class="CE">
+<a name="441315"></a>P1 (arg1 emp.sal%type, arg2 emp%rowtype)
+<a name="443496"></a>
+</pre>
+
+<a name="441316"></a> 
+
+<p class="BP">Furthermore, let us assume that each row in emp table has two columns: <code>name(VARCHAR2(20))</code>, and <code>sal(NUMBER)</code>. Thus, in the argument list for <code>P1</code>, we have two arguments, <em><code>arg1</code></em> and <em><code>arg2</code></em>, at positions 1 and 2 respectively at level 0, and arguments name and <code>sal</code> at positions 1and 2 respectively at level 1. Description of <code>P1</code> returns the number of arguments as two while returning the higher level (&gt; 0) arguments as attributes of the 0 zero level arguments.</p>
+
+<a name="441317"></a> 
+
+<p class="BP">The following code fragment explains the description of P1.</p>
+
+<pre class="CE">
+<a name="441318"></a>...
+<a name="446537"></a>text objptr[] = "P1";      /* procedure name */
+<a name="443634"></a>ub4 objp_len = strlen("P1");
+<a name="443636"></a>OCIParam *parmh;           /* parameter handle */
+<a name="443638"></a>OCIParam *arglst;          /* list of args */
+<a name="443640"></a>OCIParam *arg;             /* argument handle */
+<a name="446523"></a>OCIDescribe *dschp;      /* describe handle */
+<a name="446521"></a>
+<a name="443642"></a>ub2 numargs, pos, level; 
+<a name="443644"></a>text *name;
+<a name="443646"></a>ub4 namelen;
+<a name="443648"></a>
+<a name="446526"></a>...
+<a name="443650"></a>/* get the describe handle for the table */
+<a name="443652"></a><code>if (</code>OCIDescribeAny<code>(svch, errh, objptr, objp_len, OCI_OTYPE_NAME, 0, 
+</code><a name="443654"></a> <code>OCI_PTYPE_PROC, dschp))
+</code><a name="442128"></a> <code>return error;
+</code><a name="443656"></a>
+<a name="443658"></a>/* get the parameter handle */
+<a name="443660"></a>if (OCIAttrGet(dschp, OCI_HTYPE_DESCRIBE, &amp;parmh, 0, OCI_ATTR_PARAM, 
+<a name="443662"></a>    errh))
+<a name="442131"></a>    return error;
+<a name="443664"></a>
+<a name="443666"></a>/* Get the number of arguments and the arg list */
+<a name="443668"></a>if (OCIAttrGet (parmh, OCI_DTYPE_PARAM, &amp;arglst, 
+<a name="443670"></a>0, OCI_ATTR_LIST_ARGUMENTS, errh))
+<a name="442134"></a>    return error;
+<a name="442138"></a>if (OCIAttrGet (parmh, OCI_DTYPE_PARAM, &amp;numargs, 0, 
+<a name="443672"></a>    OCI_ATTR_NUM_PARAMS, errh))
+<a name="442139"></a>    return error;
+<a name="443674"></a>
+<a name="443676"></a>/* For a procedure, we begin with i = 1; for a 
+<a name="443678"></a>function, we begin with i = 0. */
+<a name="443680"></a>
+<a name="443682"></a>for (i = 1; i &lt; numargs; i++) {
+<a name="443684"></a>OCIParamGet (arglst, OCI_DTYPE_PARAM, errh, &amp;arg, i);
+<a name="443686"></a>OCIAttrGet (arg, OCI_DTYPE_PARAM, &amp;name, &amp;namelen, OCI_ATTR_NAME, 
+<a name="443688"></a>        errh);
+<a name="443690"></a>...
+<a name="442148"></a>/* to print the attributes of the argument of type record 
+<a name="443692"></a>(arguments at the next level), traverse the argument list */
+<a name="443694"></a>
+<a name="443696"></a>OCIAttrGet (arg, OCI_DTYPE_PARAM, &amp;arglst1, 0,
+<a name="443698"></a>OCI_ATTR_LIST_ARGUMENTS, erh);
+<a name="443700"></a>
+<a name="443702"></a>/* check if the current argument is a record. For arg1 in P1
+<a name="443704"></a>arglst1 is NULL. */
+<a name="443706"></a>
+<a name="443708"></a>  if (arglst1) {
+<a name="443710"></a>    OCIAttrGet (arg, OCI_DTYPE_PARAM, &amp;numargs1,0, OCI_ATTR_NUM_PARAMS, 
+<a name="443712"></a>        errh);
+<a name="443714"></a>
+<a name="443716"></a>/* Note that for both functions and procedures,the next higher level 
+<a name="443718"></a>arguments start from index 1. For arg2 in P1, the number of arguments at 
+<a name="443720"></a>the level 1 would be 2 */
+<a name="443722"></a>
+<a name="443724"></a>    for (i = 1; i &lt; numargs1, i++) {
+<a name="443726"></a>      OCIParamGet (arglst1, OCI_DTYPE_PARAM, errh, &amp;arg1, i);
+<a name="443732"></a>    OCIAttrGet (arg1, OCI_DTYPE_PARAM, &amp;name1, &amp;namelen1, 
+<a name="443733"></a>        OCI_ATTR_NAME, errh);
+<a name="442230"></a>    ...
+<a name="442143"></a>    }
+<a name="443734"></a>  }
+<a name="443735"></a>}
+<a name="446527"></a>...
+</pre>
+
+<a name="441373"></a> <!--TOC=h2-"441373"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Retrieving Attributes of an Object Type</font></h3>
+
+<!--/TOC=h2-->
+<a name="446904"></a> 
+
+<p class="BP">This example illustrates the use of an explicit describe on a named object type. We illustrate how you can describe an object by its name or by its object reference (<strong class="Bold">OCIRef</strong>). The following code fragment attempts to retrieve the datatype value of each of the object type's attributes.</p>
+
+<a name="446910"></a> 
+
+<div align="center">
+<table class="NoteAlso" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="NoteAlso">
+<td class="NoteAlso"><a name="446907"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="446909"></a> 
+
+<p class="NB">It is very similar to the first example in the section <a href="oci06des.htm#441255">"Retrieving Column Data Types For a Table"</a><a href="oci06des.htm#441255"></a></p>
+</td>
+</tr>
+</table>
+</div>
+
+<pre class="CE">
+<a name="441378"></a>...
+<a name="446528"></a>text type_name[] = "typename";
+<a name="443736"></a>ub4 type_name_len = strlen("typename");
+<a name="443737"></a>OCIRef *type_ref = ...;
+<a name="443738"></a>un4 numattrs;
+<a name="443739"></a>OCIDescribe *dschp;      /* describe handle */
+<a name="443740"></a>OCIParam *parmh;         /* parameter handle */
+<a name="443741"></a>OCIParam *attrlsthd;     /* handle to list of attrs */
+<a name="443742"></a>OCIParam *attrhd;        /* attribute handle */
+<a name="443743"></a>...
+<a name="443744"></a>/* allocate describe handle */
+<a name="443745"></a><code>if (OCIHandleAlloc((dvoid *)envh, (dvoid **)&amp;dschp,
+</code><a name="443746"></a> <code>            (ub4)OCI_HTYPE_DESCRIBE, (size_t)0, (dvoid **)0))
+</code><a name="443747"></a> <code>return error;
+</code><a name="443748"></a>
+<a name="443749"></a><code>/* get the describe handle for the type */
+</code><a name="443750"></a>if (describe_by_name)
+<a name="443751"></a> <code>if (</code>OCIDescribeAny<code>(svch, errh, (dvoid*)type_name, type_name_len, 
+</code><a name="443752"></a> <code> OCI_OTYPE_NAME, 0, OCI_PTYPE_TYPE, dschp))
+</code><a name="442226"></a> <code> return error;
+</code><a name="443753"></a>else
+<a name="443754"></a> <code>if (</code>OCIDescribeAny<code>(svch, errh, (dvoid*)type_ref, 0, OCI_OTYPE_REF, 
+</code><a name="443755"></a> <code>  0, OCI_PTYPE_TYPE, dschp))
+</code><a name="442229"></a> <code>  return error;
+</code><a name="443756"></a>
+<a name="443757"></a>/* get the parameter handle */
+<a name="443758"></a>if (OCIAttrGet(dschp, OCI_HTYPE_DESCRIBE, &amp;parmh, 0, OCI_ATTR_PARAM, 
+<a name="443759"></a>    errh))
+<a name="442223"></a>    return error;
+<a name="443760"></a>
+<a name="443761"></a>/* The type information of the object, in this case, OCI_PTYPE_TYPE, is 
+<a name="443762"></a>obtained from the parameter descriptor returned by the OCIAttrGet */
+<a name="443763"></a>
+<a name="443764"></a>/* get the number of attributes in the type */
+<a name="443765"></a>if (OCIAttrGet(parmh, OCI_DTYPE_PARAM, &amp;numattrs, 0, 
+<a name="443766"></a>    OCI_ATTR_NUM_TYPE_ATTRS, errh))
+<a name="442166"></a>    return error;
+<a name="443767"></a>
+<a name="443768"></a><code>/* get the handle to the attribute list of the type */
+</code><a name="443769"></a><code>if (</code>OCIAttrGet<code>(parmh, OCI_DTYPE_PARAM, (dvoid *)&amp;attrlsthd, 0, 
+</code><a name="443770"></a> <code>OCI_ATTR_LIST_TYPE_ATTRS, errh)==OCI_NO_DATA)
+</code><a name="443771"></a> <code>return error;
+</code><a name="443772"></a>
+<a name="443773"></a><code>/* go through the attribute list and retrieve the data-type of each attribute, 
+and then recursively describe attribute types. */
+</code><a name="443774"></a>
+<a name="443775"></a>for (i = 1; i &lt;= numattrs; i++)
+<a name="443776"></a>{
+<a name="443777"></a>/* get parameter for attribute i */
+<a name="443778"></a><code>if (</code>OCIParamGet<code>(attrlsthd, OCI_DTYPE_PARAM, errh, &amp;attrhd, i))
+</code><a name="443779"></a> <code>return error;
+</code><a name="443780"></a>
+<a name="443781"></a>/* for example, get data type and typecode for attribute; note that 
+OCI_ATTR_DATA_TYPE returns the SQLT code, while OCI_ATTR_TYPECODE returns the 
+Oracle Type System typecode. */
+<a name="442153"></a>if (OCIAttrGet(attrhd, OCI_DTYPE_PARAM,&amp;datatype[i-1], 0, 
+<a name="443782"></a>      OCI_ATTR_DATA_TYPE,errh))
+<a name="442158"></a>    return error;
+<a name="442154"></a>/* for example, get data type for attribute*/
+<a name="443783"></a>if (OCIAttrGet(attrhd, OCI_DTYPE_PARAM,&amp;typecode[i-1], 0, 
+<a name="443784"></a>      OCI_ATTR_TYPECODE, errh))
+<a name="442169"></a>    return error;
+<a name="443785"></a>
+<a name="443786"></a>/* if attribute is an object type, recursively describe it */
+<a name="443787"></a>if (typecode[i-1] == OCI_TYPECODE_OBJECT)
+<a name="443788"></a>{
+<a name="443789"></a>OCIRef *attr_type_ref;
+<a name="443790"></a>OCIDescribe *nested_dschp;
+<a name="443791"></a>
+<a name="443792"></a>/* allocate describe handle */
+<a name="443793"></a><code>if (</code>OCIHandleAlloc<code>((dvoid *)envh,(dvoid**)&amp;dschp,
+</code><a name="443794"></a><code>(ub4)OCI_HTYPE_DESCRIBE,(size_t)0, (dvoid **)0))
+</code><a name="443795"></a><code>return error;
+</code><a name="443796"></a>
+<a name="443797"></a>if (OCIAttrGet(attrhd, OCI_DTYPE_PARAM,
+<a name="443798"></a>          &amp;attr_type_ref, 0, OCI_ATTR_REF_TDO,errh))
+<a name="442172"></a>      return error;
+<a name="442173"></a>      OCIDescribeAny(<code>svch, errh,(dvoid*)attr_type_ref, 0, 
+</code><a name="443799"></a> <code>    OCI_OTYPE_REF, 0, OCI_PTYPE_TYPE, nested_dschp);
+</code><a name="442155"></a>/* go on describing the type... */
+<a name="443800"></a>    }
+<a name="443801"></a>}
+</pre>
+
+<a name="441447"></a> <!--TOC=h2-"441447"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Retrieving the Collection Element's Data Type of a Named Collection Type</font></h3>
+
+<!--/TOC=h2-->
+<a name="441448"></a> 
+
+<p class="BP">This example illustrates the use of an explicit describe on a named collection type. We illustrate how you can describe an object by its name or by its object reference (<strong class="Bold">OCIRef</strong>). The following code fragment attempts to retrieve the data type value of each of the object type's attributes.</p>
+
+<a name="446935"></a> 
+
+<div align="center">
+<table class="NoteAlso" border="0" width="80%" cellpadding="0" cellspacing="0" dir="ltr" summary="This is a layout table to format a note" title="This is a layout table to format a note">
+<tr class="NoteAlso">
+<td class="NoteAlso"><a name="446932"></a><font face="Arial, Helvetica, sans-serif"><strong class="NH">See Also:</strong></font> <a name="446934"></a> 
+
+<p class="NB">It is very similar to the first example in section <a href="oci06des.htm#441255">"Retrieving Column Data Types For a Table"</a><a href="oci06des.htm#441255"></a></p>
+</td>
+</tr>
+</table>
+</div>
+
+<pre class="CE">
+<a name="441452"></a><code>...
+</code><a name="446532"></a><code>text type_name[] = "typename";
+</code><a name="443802"></a>ub4 type_name_len = strlen("typename");
+<a name="443803"></a>OCIRef *type_ref = ...;
+<a name="443804"></a>un4 numattrs;
+<a name="443805"></a>OCIDescribe *dschp;     /* describe handle */
+<a name="443806"></a>OCIParam *parmh;        /* parameter handle */
+<a name="443807"></a>OCIParam *attrlsthd;    /* handle to list of attrs */
+<a name="443808"></a>OCIParam *attrhd;       /* attribute handle */
+<a name="443809"></a>...
+<a name="443810"></a>/* allocate describe handle */
+<a name="443811"></a><code>if (OCIHandleAlloc((dvoid *)envh, (dvoid **)&amp;dschp,
+</code><a name="443812"></a> <code>            (ub4)OCI_HTYPE_DESCRIBE, (size_t)0, (dvoid **)0))
+</code><a name="443813"></a> <code>return error;
+</code><a name="443814"></a>
+<a name="443815"></a><code>/* get the describe handle for the type */
+</code><a name="443816"></a>if (describe_by_name)
+<a name="443817"></a> <code>if (</code>OCIDescribeAny<code>(svch, errh, (dvoid*)type_name, type_name_len, 
+</code><a name="443818"></a> <code>OCI_OTYPE_NAME, 0, OCI_PTYPE_TYPE, dschp))
+</code><a name="442176"></a> <code>return error;
+</code><a name="443819"></a>else
+<a name="443820"></a> <code>if (</code>OCIDescribeAny<code>(svch, errh, (dvoid*)type_ref, 0, OCI_OTYPE_REF, 0, 
+</code><a name="443821"></a> <code>OCI_PTYPE_TYPE, dschp))
+</code><a name="442179"></a> <code>return error;
+</code><a name="443822"></a>
+<a name="443823"></a>/* get the parameter handle */
+<a name="443824"></a>if (OCIAttrGet(dschp, OCI_HTYPE_DESCRIBE, &amp;parmh, 0, OCI_ATTR_PARAM, 
+<a name="443825"></a>    errh))
+<a name="442182"></a>    return error;
+<a name="443826"></a>
+<a name="443827"></a>/* get the Oracle Type System type code of the type to determine that this is a 
+collection type */
+<a name="443828"></a>if (OCIAttrGet(attrhd, OCI_DTYPE_PARAM,&amp;typecode, 0, OCI_ATTR_TYPECODE, 
+<a name="443829"></a>    errh))
+<a name="442185"></a>    return error;
+<a name="443830"></a>
+<a name="443831"></a>/* if typecode is OCI_TYPECODE_NAMEDCOLLECTION,
+<a name="443832"></a>  proceed to describe collection element */
+<a name="443833"></a>if (typecode == OCI_TYPECODE_NAMEDCOLLECTION)
+<a name="443834"></a>{
+<a name="443835"></a>  /* get the collection's type: ie, OCI_TYPECODE_VARRAY or OCI_TYPECODE_TABLE */
+<a name="442190"></a>
+<a name="442838"></a>if (OCIAttrGet(parmh, OCI_DTYPE_PARAM, (dvoid *)&amp;collection_typecode, 0, 
+OCI_ATTR_COLLECTION_TYPECODE, errh))
+<a name="442196"></a>    return error;
+<a name="443885"></a>
+<a name="442197"></a>/* get the collection element; you MUST use this to further retrieve information 
+about the collection's element */
+<a name="442200"></a>if (OCIAttrGet(parmh, OCI_DTYPE_PARAM, &amp;collection_element_parmh, 0, 
+OCI_ATTR_COLLECTION_ELEMENT, errh))
+<a name="442204"></a>    return error;
+<a name="443883"></a>
+<a name="443884"></a>/* get the number of elements if collection is a VARRAY; not valid for nested 
+tables */
+<a name="443836"></a>if (collection_typecode == OCI_TYPECODE_VARRAY)
+<a name="443837"></a>    if OCIAttrGet(collection_element_parmh, OCI_DTYPE_PARAM,
+<a name="443838"></a>      (dvoid *)&amp;num_elements, 0, OCI_ATTR_NUM_ELEMENTS, errh))
+<a name="442208"></a>      return error;
+<a name="443881"></a>
+<a name="442216"></a>/* now use the collection_element parameter handle to retrieve information about 
+the collection element */
+<a name="443839"></a>if OCIAttrGet(collection_element_parmh, OCI_DTYPE_PARAM, 
+<a name="443840"></a>    (dvoid *)&amp;element_typecode, 0, OCI_ATTR_TYPECODE, errh))
+<a name="442212"></a>    return error;
+<a name="443882"></a>
+<a name="442189"></a>/* do the same to describe additional collection element information; this is 
+very similar to describing type attributes */
+<a name="446533"></a>...
+</pre>
+
+<a name="448601"></a> <!--TOC=h2-"448601"-->
+<h3 class="H2"><font face="Arial, Helvetica, sans-serif" color="#330099">Describing with Character Length Semantics</font></h3>
+
+<!--/TOC=h2-->
+<a name="448602"></a> 
+
+<p class="BP">The following sample code shows a loop that retrieves the column names and data types corresponding to a query following query execution. The query was associated with the statement handle by a prior call to <code>OCIStmtPrepare()</code>.</p>
+
+<pre class="CE">
+<a name="448603"></a>...
+<a name="448604"></a>OCIParam     *mypard;
+<a name="448605"></a>ub4          counter;
+<a name="448606"></a>ub2          dtype;
+<a name="448607"></a>text         *col_name;
+<a name="448608"></a>ub4          counter, col_name_len, char_semantics, col_width;
+<a name="448609"></a>sb4          parm_status;
+<a name="448610"></a>...
+<a name="448611"></a>/* Request a parameter descriptor for position 1 in the select-list */
+<a name="448612"></a>counter = 1;
+<a name="448613"></a>parm_status = OCIParamGet(stmthp, OCI_HTYPE_STMT, errhp, &amp;mypard, 
+<a name="448614"></a>           (ub4) counter);
+<a name="448615"></a>/* Loop only if a descriptor was successfully retrieved for
+<a name="448616"></a>   current position, starting at 1 */
+<a name="448617"></a>while (parm_status == OCI_SUCCESS) {
+<a name="448618"></a>   /* Retrieve the data type attribute */
+<a name="448619"></a>   checkerr(errhp, OCIAttrGet((dvoid*) mypard, (ub4) OCI_DTYPE_PARAM, 
+<a name="448620"></a>           (dvoid*) &amp;dtype,(ub4 *) 0, (ub4) OCI_ATTR_DATA_TYPE, 
+<a name="448621"></a>           (OCIError *) errhp  ));
+<a name="448622"></a>   /* Retrieve the column name attribute */
+<a name="448623"></a>   checkerr(errhp, OCIAttrGet((dvoid*) mypard, (ub4) OCI_DTYPE_PARAM, 
+<a name="448624"></a>           (dvoid**) &amp;col_name, (ub4 *) &amp;col_char_len, (ub4) OCI_ATTR_NAME,
+<a name="448625"></a>           (OCIError *) errhp ));
+<a name="448626"></a>   /* Retrieve the length semantics for the column */
+<a name="448627"></a>   checkerr(errhp, OCIAttrGet((dvoid*) mypard, (ub4) OCI_DTYPE_PARAM, 
+<a name="448628"></a>           (dvoid*) &amp;char_semantics,(ub4 *) 0, (ub4) OCI_ATTR_CHAR_USED, 
+<a name="448629"></a>           (OCIError *) errhp  ));
+<a name="448630"></a>   if (char_semantics)
+<a name="448631"></a>       /* Retrieve the column width in characters */
+<a name="448632"></a>       checkerr(errhp, OCIAttrGet((dvoid*) mypard, (ub4) OCI_DTYPE_PARAM, 
+<a name="448633"></a>               (dvoid*) &amp;col_width, (ub4 *) 0, (ub4) OCI_ATTR_CHAR_SIZE, 
+<a name="448634"></a>               (OCIError *) errhp  ));
+<a name="448635"></a>   else
+<a name="448636"></a>       /* Retrieve the column width in bytes */
+<a name="448637"></a>       checkerr(errhp, OCIAttrGet((dvoid*) mypard, (ub4) OCI_DTYPE_PARAM, 
+<a name="448638"></a>               (dvoid*) &amp;col_width,(ub4 *) 0, (ub4) OCI_ATTR_DATA_SIZE, 
+<a name="448639"></a>               (OCIError *) errhp  ));
+<a name="448640"></a>   printf("column=%s  datatype=%d, char semantics=%d, width=%d\n\n", col_name,
+<a name="448641"></a>               dtype, char_semantics, col_width);
+<a name="448642"></a>   fflush(stdout);
+<a name="448643"></a>   /* increment counter and get next descriptor, if there is one */
+<a name="448644"></a>   counter++;
+<a name="448645"></a>   parm_status = OCIParamGet(stmthp, OCI_HTYPE_STMT, errhp, &amp;mypard,
+<a name="448646"></a>                 (ub4) counter);
+<a name="448647"></a>   }
+<a name="448648"></a>...
+<a name="443841"></a>
+</pre>
+
+<!-- Start Footer -->
+</div>
+
+<div class="OUTD">
+<hr>
+<table summary="" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td valign="bottom" width="33%">
+<table summary="" cellspacing="0" cellpadding="0">
+<tr>
+<td align="center"><a href="oci05bnd.htm"><img src="../../dcommon/gifs/larrow.gif" alt="Go to previous page" border="0"></a></td>
+<td align="center"><a href="oci07lob.htm"><img src="../../dcommon/gifs/rarrow.gif" alt="Go to next page" border="0"></a></td>
+</tr>
+</table>
+</td>
+<td align="center" width="34%"><a href="../../dcommon/html/cpyr.htm"><img src="../../dcommon/gifs/oracle.gif" alt="Oracle" border="0"><br>
+<font size="-2">Copyright &copy; 1996, 2002 Oracle Corporation.</font></a><br>
+<font size="-2">All Rights Reserved.</font></td>
+<td valign="bottom" align="right" width="33%">
+<table summary="" cellspacing="0" cellpadding="0" width="144">
+<tr>
+<td align="center" valign="top" width="16%"><a href="../../index.htm"><img src="../../dcommon/gifs/prodicon.gif" alt="Go To Documentation Library" border="0"><br>
+<font size="-2">Home</font></a></td>
+<td align="center" valign="top" width="17%"><a href="../../nav/docindex.htm"><img src="../../dcommon/gifs/bookicon.gif" alt="Go To Product List" border="0"><br>
+<font size="-2">Book List</font></a></td>
+<td align="center" valign="top" width="17%"><a href="toc.htm"><img src="../../dcommon/gifs/conticon.gif" alt="Go To Table Of Contents" border="0"><br>
+<font size="-2">Contents</font></a></td>
+<td align="center" valign="top" width="20%"><a href="index.htm"><img src="../../dcommon/gifs/indxicon.gif" alt="Go To Index" border="0"><br>
+<font size="-2">Index</font></a></td>
+<!--  mix  -->
+<td align="center" valign="top" width="17%"><a href="../../mix.920/a96625/toc.htm"><img src="../../dcommon/gifs/mix.gif" alt="" border="0"><br>
+<font size="-2">Master Index</font></a></td>
+<!--  fdbk  -->
+<td align="center" valign="top" width="17%"><a href="../../dcommon/html/feedback.htm"><img src="../../dcommon/gifs/feedback.gif" alt="" border="0"><br>
+<font size="-2">Feedback</font></a></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</div>
+</body>
+</html>
+

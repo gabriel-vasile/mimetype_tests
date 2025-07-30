@@ -1,0 +1,148 @@
+PRO XY_BILIN,P,X1,Y1,VAL
+;+
+; NAME:
+;	XY_BILIN
+; PURPOSE:
+;	Bilinear interpolation routine for arrays.
+; CATEGORY:
+;	Image analysis.
+; CALLING SEQUENCE:
+;	XY_BILIN,P,X1,Y1,VAL
+; INPUTS:
+;	P = array.
+;	X1,Y1 = required points.
+; OPTIONAL INPUT PARAMETERS:
+;	NONE
+; OUTPUTS:
+;	VAL = value at point.
+; OPTIONAL OUTPUT PARAMETERS:
+;	NONE
+; COMMON BLOCKS:
+;	NONE
+; SIDE EFFECTS:
+;	NONE
+; RESTRICTIONS:
+;	NONE
+; PROCEDURE:
+;	TRIVIAL
+; MODIFICATION HISTORY:
+;	3-3-87 NT
+;	10-6-1987  REVISED TO SET MISSING PIXELS TO -32768  NT
+;	28-1-88  NT REVISED
+;	11-3-88 revised because of possible errors caused by large array
+;		manipulation.  NT
+;-
+
+
+
+; ---------------------------------------------------------------------------
+;       XY_BILIN ---   VERSION 1.1  ---  20:00  11-3-88  ---  NT
+; ---------------------------------------------------------------------------
+
+
+
+
+IF N_PARAMS(0) NE 4 THEN BEGIN
+PRINT,' '
+PRINT,'  XY_BILIN:  BAD INPUT PARAMETERS.  EXIT.'
+RETURN
+ENDIF
+
+X=X1
+Y=Y1
+
+Z=SIZE(P)
+ZX=SIZE(X)
+ZY=SIZE(Y)
+
+
+IF ((ZX(0) NE ZY(0)) OR (ZX(0) NE 2)) THEN BEGIN
+PRINT,' '
+PRINT,'  XY_BILIN:  BAD INPUT PARAMETERS.  EXIT.'
+RETURN
+ENDIF
+
+IF (ZX(1) NE ZY(1)) OR (ZX(2) NE ZY(2)) THEN BEGIN
+PRINT,' '
+PRINT,'  XY_BILIN:  BAD INPUT PARAMETERS.  EXIT.'
+RETURN
+ENDIF
+
+
+AL=WHERE((X EQ 0.) AND (Y EQ 0.))
+
+
+C_1=WHERE(X GT Z(1)-1.)
+IF C_1(0) NE -1 THEN BEGIN
+    X(C_1)=0.
+    Y(TEMPORARY(C_1))=0.
+ENDIF
+
+C_2=WHERE(X LT 0.)
+IF C_2(0) NE -1 THEN BEGIN
+    X(C_2)=0.
+    Y(TEMPORARY(C_2))=0.
+ENDIF
+
+C_3=WHERE(Y GT Z(2)-1.)
+IF C_3(0) NE -1 THEN BEGIN
+    X(C_3)=0.
+    Y(TEMPORARY(C_3))=0.
+ENDIF
+
+C_4=WHERE(Y LT 0.)
+IF C_4(0) NE -1 THEN BEGIN
+    X(C_4)=0.
+    Y(TEMPORARY(C_4))=0.
+ENDIF
+
+
+
+; Average of two values obtained by linear interpolation across box.
+
+; Interpolation.
+G1=(FLOAT(P(FIX(X)+FIX(Y+1.)*Z(1)))-P(FIX(X)+FIX(Y)*Z(1)))
+G1=TEMPORARY(G1)*(Y-FIX(Y))
+G1=TEMPORARY(G1)+P(FIX(X)+FIX(Y)*Z(1))
+
+VAL2=FLOAT(P(FIX(X+1.)+FIX(Y+1.)*Z(1)))
+VAL2=VAL2-P(FIX(X+1.)+FIX(Y)*Z(1))
+VAL2=VAL2*(Y-FIX(Y))
+VAL2=VAL2+P(FIX(X+1.)+FIX(Y)*Z(1))
+VAL2=VAL2-G1
+VAL2=VAL2*(X-FIX(X))
+VAL2=VAL2+TEMPORARY(G1)
+
+; Interpolation.
+G2=(FLOAT(P(FIX(X+1.)+FIX(Y)*Z(1)))-P(FIX(X)+FIX(Y)*Z(1)))
+G2=TEMPORARY(G2)*(X-FIX(X))
+G2=TEMPORARY(G2)+P(FIX(X)+FIX(Y)*Z(1))
+
+VAL=FLOAT(P(FIX(X+1.)+FIX(Y+1.)*Z(1)))
+VAL=VAL-P(FIX(X)+FIX(Y+1.)*Z(1))
+VAL=VAL*(X-FIX(X))
+VAL=VAL+P(FIX(X)+FIX(Y+1.)*Z(1))
+VAL=VAL-G2
+VAL=VAL*(Y-FIX(Y))
+VAL=VAL+TEMPORARY(G2)
+
+VAL=(TEMPORARY(VAL2)+TEMPORARY(VAL))/2.
+
+
+;VAL=(((((FLOAT(P(FIX(X+1.)+FIX(Y+1.)*Z(1)))-P(FIX(X+1.)+FIX(Y)*Z(1)))*$
+;(Y-FIX(Y))+P(FIX(X+1.)+FIX(Y)*Z(1)))-G1)*(X-FIX(X))+G1+(((FLOAT(P(FIX(X+1.)+$
+;FIX(Y+1.)*Z(1)))-P(FIX(X)+FIX(Y+1.)*Z(1)))*(X-FIX(X)) $
+;+P(FIX(X)+FIX(Y+1.)*Z(1)))-G2)*(Y-FIX(Y))+G2))/2.
+
+TEMP=WHERE((TEMPORARY(X) EQ 0.) AND (TEMPORARY(Y) EQ 0.))
+IF TEMP(0) NE -1 THEN BEGIN
+    VAL(TEMPORARY(TEMP))=-32768.
+ENDIF
+
+NUM=P(0,0)
+IF AL(0) NE -1 THEN VAL(TEMPORARY(AL))=NUM
+
+;STOP
+
+RETURN
+END

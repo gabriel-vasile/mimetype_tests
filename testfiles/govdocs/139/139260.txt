@@ -1,0 +1,303 @@
+                                                            March   12, 2002 upd 
+							    October 17, 1996	 
+Brief information about OCS
+___________________________
+  
+  All OCS products are located in directory $OCS781_DIR.
+
+  OCS scripts are located in $OCS781_BIN directory:
+
+             ocs_fill_maker
+             ocs_incl_maker 
+             ocs_init            
+             ocs_make_master
+             ocs_prin_all_maker             
+             ocs_select        
+             ocs_assempble_table
+
+  OCS sources  are located in $OCS781_SRC directory.
+
+  OCS includes are located in $OCS781_INC directory:
+  
+             ftabbk.inc          - internal only
+             ocsbk.inc           - internal only
+             ocs_cbk.inc         - internal/user
+             ocs_tab_version.inc - internal/user
+                           
+  All OCS routines compiled into library $OCS781_LIB/libocs.a (libocs_g.a - debug).
+
+  Examples of code initially developed by P.Cooper and extended by V.I.Rud can
+  be found in $OCS781_EXA directory as files/routines
+
+             ocs_usage_min.F   - minimal OCS example
+             GNU_ocs_makefile  - make file to run it
+  
+             ocs_test.F        - Main for Example-2
+             event_analysis.F
+             test_ocs.F        - basic example
+             test2_ocs.F
+             GNU_ocs2_makefile - make file to run it
+             
+             peter_bin         - sample binary file (='binary' table)			  
+             scaler_cbk.inc    - include for users table 'scaler' 
+             
+             README
+
+  README file contains references to OCS routines/actions - where to find them.
+  
+  Copy files into your local directory and run 'gmake -f GNU_ocs_makefile' for
+  minimal OCS example and execute 'ocs_usage_min.exe'. Routine 'ocs_usage_min.F'
+  shows how to initiate OCS, load tables and print them out. For complete 
+  example run 'gmake -f GNU_ocs2_makefile' and execute 'ocs_test.exe'.
+                                     
+  Basic OCS tables are located in directory $CON781_DIR, they will be taken 
+  by OCS automatically using following environment variables: 
+  
+   $OCS781_TABLES - pointer to general DB 'tables' file; 
+   $OCS781_MASTER - pointer to general DB 'master' file;
+   $OCS781_DDL    - string with pathes to nonlocal OCS table includes 
+   
+  which usually are setting by 'setup' command ('setup off781', for example).   
+   
+  Example:
+           printenv OCS781_DDL 
+           OCS781_DDL=$OCS781_INC/:$E781MC_DIR/include/:/home/rud/ocs/ocs/print/
+   
+How to run OCS  
+______________
+
+1.Set up OCS and its environment variables:
+
+  setup ocs781
+  setup off781 # application example
+
+2.Initialize OCS in your running directory by command
+
+  ocs_init
+  
+  This call should be done everytime when you modified your *.ocs files.
+    
+  'ocs_init' executes following calls:
+  
+      ocs_make_master      # generates 'master' and 'tables' files
+      ocs_fill_maker       # generates 'ocs_fill.F'     routine
+      ocs_prin_all_maker   # generates 'ocs_prin_all.F' routine
+
+
+  If your running directory really contains *.ocs files with your user tables,
+  then command
+  
+      ocs_make_master 
+     
+  creates OCS user 'master' and 'tables' files in your current directory.
+
+3.You may get help for some scripts invoking them with '-h' argument:
+
+  ocs_make_master -h
+  ocs_select -h
+  ocs_assempble_table -h
+
+4.To create your own standard OCS tables/includes do following for each table:
+
+    - define field names and types for your table,
+    - generate include file by 'ocs_incl_maker' script (see explanations in 
+      manual on our Web in section /Computing/Database/'Man pages for OCS' or 
+      in scripts body),
+    - create <your_name>.ocs file and fill in tables in accord with OCS rules 
+      (see manual).
+                
+5.Using OCS in your code (see $OCS781_EXA/ftn):
+       
+  a) define to compiler location of OCS includes (-I$OCS781_INC);
+  
+  b) define to loader OCS library (-L$OCS781_LIB -locs);
+  
+  c) at initialization stage set 'ocs_key_changed = .true.':
+  
+#include "ocs_cbk.inc"
+     .....
+     ocs_key_changed = .true.     ! user key
+     ocs_run         = 10783      ! current OCS run number
+     
+     Remember, that selection on 'ocs_run' works so that tables with last_run=0
+     will be used for all runs with run numbers greater or equal than first_run.
+     
+  d) to initialize OCS and to read standard form tables in memory include in 
+     your code:
+     
+     ocs_prt_unit=10
+     open(unit=ocs_prt_unit,status='unknown',    ! open file to store 
+    *     file='OCS_OUTPUT')                     ! OCS printout
+                                                                
+     ocs_class_main  = 'anal'         ! main CLASS                       (optional)
+     ocs_class_out   = 'test mc'      ! CLASSes which should be rejected (optional)
+     ocs_class_get   = 'aa'           ! CLASSes which should be stored   (optional)
+
+     CALL OCS_UPDATE                  ! main call to OCS
+     
+     That is enough to initialize OCS and read standard OCS tables in memory.
+
+     All OCS prints are going into two streams - to standard output and to 
+     'ocs_prt_unit'. If you will NOT specify 'ocs_prt_unit' then its default 
+     value (6) will be taken and you will see double prints on your standard 
+     output.
+     
+  e) to registrate to OCS your owned/used tables and to have ability to manage by
+     OCS nonstandard tables, include in your code following call to 'ocs_register' 
+     (see '$OCS781_EXA/test_ocs.F' as the best example):
+*     
+*-------OCS  includes:
+*
+#include "ftabbk.inc"                   !
+#include "ocs_cbk.inc"                  ! for use with OCS routines
+#include "ocsbk.inc"                    !
+*
+*-------User includes:
+*
+#include "scaler_cbk.inc"               ! a constant table I own
+#include "spec_pos_cbk.inc"             ! a constant table I use
+ .......
+*                                       ! initialization section
+        if( ocs_register(ocs_id ,       ! the id OCS will give me
+     *       'test_ocs'         ,       ! my (routine) name
+     *       'scaler user',             ! the tables I own
+     *       'spec_pos') )  then        ! the tables I use but don't own
+*Stop:
+         print *, 'TEST_OCS: bad OCS_REGISTER result for routine '//
+     *            'test_ocs. Stop'
+         STOP 
+        endif   
+       
+  f) to print out from your code standard OCS table call 'ocs_prin_all':
+     
+      call ocs_prin_all('spec_pos','user routine') ! print table 'spec_pos'
+              
+  g) to include in your code printout of ALL loaded standard OCS tables, 
+     add in your code after 'call ocs_update' call to 'ocs_prin_all' with
+     empty first argument:
+    
+      call ocs_update
+ .....         
+      call ocs_prin_all(' ','after OCS_UPDATE') ! print ALL standard tables
+
+  i) to get info about current status of any active table use 'ocs_tab_version':
+
+#include "ocs_tab_version.inc" ! for 'class,version,f_run,l_run,modes,n_out'
+ .....
+
+      call ocs_tab_version(table,class,version,f_run,l_run,modes, n_out)
+c                          in    out   out     out   out   out    out
+c                          c12   c8    c8      i4    i4    c8(20) i4
+
+     In 'class' you will get class of currently active 'table', in 'version' -
+     its version, in 'f_run' - first run for the table, in 'l_run' - last run 
+     for the table, 'modes' will have list of present modes for the table. 
+                                                                  
+     'n_out' > 1 if 'mod' was used in addition to 'fill' for the table and it 
+     will be the number of 'modes' filled.
+     
+     'n_out=0' if requested table does not exist.
+
+6.Table refilling can be done by user for any particulary table or by OCS 
+  itself in data driven mode if run number ('ocs_run') was changed.
+
+  To refill particulary table user needs to call:
+
+      call ocs_load_table(table, class, version, first_run, last_run, ierr)
+c                         in     in     in       in         in        out
+c                         c12    c8     c8       i4         i4        i4
+
+  This routine will force OCS to load requested version of table (its 'fill'
+  and 'mod' parts), if 'class' is allowed by previous requests, 'table' available
+  with requested 'version' and 'first_run' and 'last_run' (ierr=1 if requested 
+  table not found).
+   
+  In data driven mode user should use second call to 'ocs_update'
+  
+      ocs_run = <new run number>
+      call ocs_update
+  
+  to reload those tables which are not valid anymore for new run number.
+  
+  At first call 'ocs_update' creates internal metatables and loads all tables
+  in accord with automatic class/version/run selection procedure.
+    
+  At any next calls 'ocs_update' will reload only those tables which versions 
+  are not valid for current 'ocs_run' value. Actually in this case 'ocs_update'
+  calls function 'ocs_ntab_reload' with key=1 (user may use it directly):
+  
+      n_tables=ocs_ntab_reload(key, tables,  classes, versions, first_runs, 
+                                                                 last_runs)
+c              out             in   out      out      out        out
+c              i4              i4   c12(*)   c8(*)    c8(*)      i4(*)
+
+                               * - max number of tables (=mftab in 'ocs_reload')
+                             
+  In the case of key=0 and for given run number 'ocs_run' (see 'ocs_cbk.inc') 
+  this function will produce list of tables (in 'tables' array) with those 
+  classes, versions and first/last-run numbers (in 'classes', 'versions', 
+  'first_runs', and 'last_runs' arrays) which need to be refilled ('n_tables' -
+  number of refilling tables; if 'n_tables = 0' - NO tables for refilling). 
+  After that user is free to change class/version for each table before  
+  reloading it by yourself with 'ocs_load_table'.
+
+  In the case of key=1 'ocs_ntab_reload' internally calls 'ocs_load_table'
+  for each table to load new version of a table (with the same class) using 
+  standard OCS version selection procedure.
+    
+  Also user may (re)load all tables of given class choosing versions
+  which are .le.'version' in OCS sense by call to 'ocs_load_version':
+    
+      call ocs_load_version(class, version, ierr)
+                            in     in       out 
+                            c8     c8       i4
+       
+  For each table those version will be taken which is mostly close to
+  'version' but not "older" than it. ierr=1 if no one table found for 
+  reloading.
+
+7.To link one OCS table to another one use
+
+      call ocs_link_tables(table1, name1,  
+     *                     table2, name2, link2, c1, c2)
+c                          in      in      out    in  in
+c                          c12     c12     i4     i4  i4
+
+  where 
+       table1 -  name of table-1, 
+       table2 -  name of table-2,
+       name1  -  table-1 name fields,
+       name2  -  table-2 name fields,
+       link2  -  link in table-2 to table-1 (row number),
+       c1     -  string region to match - first symbol,
+       c2     -  string region to match - last  symbol.
+
+  "Link" means that for each record 'name2' in 'table2' routine scans for a 
+  character match with 'name1'(c1:c2) ('name' field) and stores the index of the
+  matched 'name1' record in 'table2' variable 'link2'.
+  
+  Example:
+  
+#include "spec_pos_cbk.inc"             ! a constant table I own
+#include "mag_pos_cbk.inc"              ! a constant table I own
+ .......  
+
+      call            !  link 'mag_pos'  to  'spec_pos'
+     *       ocs_link_tables('spec_pos', name_spec_pos,
+     *                        'mag_pos', name_mag_pos,
+     *                  lkspec_mag_pos,  1, 2)
+    
+
+8.Simple OCS rules:
+
+   - each table included in *.ocs file should have appropriate include file;
+
+   - there are 2 levels of tables selection:
+
+     - OCS selects only those tables which satisfy class/version/run number
+       conditions and usually takes the latest table version;
+       
+     - 'ocs_fill.F' actually is a filter - only those tables will be loaded
+       in the memory for which you call 'ocs_fill_table.F' in it.
+
+                                 - x -

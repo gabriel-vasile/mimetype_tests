@@ -1,0 +1,335 @@
+
+Date:      14 Sep 1994
+To:        D. Muhonen
+From:      SOHO FOT
+Subject:   CDS - FOT Meeting Minutes
+Ref. #:    SH-FOT-MN-940914-018
+
+
+CDS - FOT MEETING MINUTES
+
+
+##########################################################
+
+SUMMARY
+
+CDS is a complex instrument that may make use of all the 
+different methods of commanding. The sub-commutation of 
+their VC0 telemetry is based on modulo(4) of the packet 
+counter. They will provide database layouts, telemetry 
+layouts, critical parameters to monitor, Procedure 
+sequencing and details for GSCT.
+
+
+###########################################################
+
+ACTION ITEMS
+
+CDS-1 - To provide database layout information
+-- Document provided.  AI closed.
+
+CDS-2 - To provide screen layouts for telemetry parameters 
+to be displayed by POCC.
+-- Document provided.  AI closed.
+
+CDS-3 - To provide the subset of critical parameters to be 
+monitored by the FOT.
+
+CDS-4 - To provide the sequencing and details of the 
+Procedures for GSCT's
+
+
+
+###########################################################
+
+
+PURPOSE
+--To define Flight Operations Team (FOT) activities for 
+TESTING.
+
+INSTRUMENT:  CDS
+ATTENDEES:  Jeff Payne (CDS-RAL), Eric Sawyer (CDS-RAL), L. 
+Sanchez (ESA), S. Vaghi (ESA), G. Escande (Matra), K. 
+Walyus (NASA), E. Larduinat (NASA-SOC), C. Cazeau (NASA-
+FOT), C. St.Cyr (NASA-EOF)
+DATE:  14 Sep 94
+LOCATION:  The PortaCabine, Matra, Toulouse.
+
+
+##########################################################
+
+BACKGROUND
+
+We request that each experimenter provide the following at 
+these meetings:
+
+-- Suggested screen layout for all VC0 mnemonics for this 
+instrument
+
+-- "English language" versions of each procedure that the 
+FOT will send during testing (ELISA procedures may also be 
+provided as reference material)
+
+There are three tests scheduled between the spacecraft and 
+the NASA Ground System:
+- Ground System Compatibility Test #2 in Jan 95 with SOHO 
+at Matra 
+- Ground System Compatibility Test #3 in April 95 with SOHO 
+at Matra 
+- Launch Site Test in July 95 with SOHO at Cape Canaveral.
+
+The time allocated for these tests is extremely limited.  
+The POCC can only command a single experiment at a time -- 
+there is no provision for simultaneously running procedures 
+for all instruments, as is done during an SFT.  Therefore, 
+the purpose of these two tests will not be to recreate an 
+SFT.  Instead, the goal of this testing is to insure that 
+the ground system can successfully command and monitor the 
+spacecraft and payload.
+
+The ELISA Procedures for the instruments are scheduled for 
+delivery to NASA in the December 1994 Spacecraft Users' 
+Manual (SUM).  Therefore, we must rely on the experimenters 
+to provide input for any Ground System testing activities.  
+We address these activities through this questionnaire.
+
+
+##########################################################
+
+
+(1) Will this instrument participate in these tests?  
+
+-- Yes.
+
+
+(2) TELEMETRY PROCESSING ACTIVITIES
+
+
+(a) Describe any super-commutation or sub-commutation in 
+VC0 telemetry.
+
+-- It is decommutated as one of four (4) templates.  The 
+packet counter (0-256) is used to define the template.  The 
+sub-commutation depends on the value of the packet counter 
+Modulo 2 or Modulo 4.  The condition field in the SDB 
+(MOCON) is used to specify the validity of each parameter 
+in the packet.
+
+
+(b) Define the telemetry page(s) layout you would like to 
+see on the POCC system.
+
+-- CDS would like to reproduce their EGSE Housekeeping 
+pages (approximately 6).
+
+
+(c) Define the subset of telemetry points that the FOT will 
+monitor for this instrument.  What is the mnemonic?  Are 
+the limits that the POCC will receive in the SDB accurate 
+for test?  What action should be taken by the FOT in "out-
+of-limits" situation?
+
+-- TBD.  Will be provided.
+
+
+(d) Describe differences in the limits in the SDB between 
+test and flight.
+
+-- The ³test limits² specified in the SDB should be used as 
+the initial set of flight limits.
+
+
+(3) COMMANDING ACTIVITIES
+
+
+(a) Activity requests to the FOT will be via a SOHO 
+Activity Request form (see example)
+
+-- Discussed.
+
+
+(b) Define each TSTOL Procedure that the FOT will send for 
+this instrument.  (See Appendix to Flight Operations Plan 
+"TSTOL Style Guide")
+
+-- The experiment has the following modes: OFF, SNOOZE, 
+STANDBY, READY-GIS, READY-VDS, READY-BOTH, EXEC-GIS, EXEC-
+VDS.  Mode changes except OFF to/from SNOOZE can be 
+performed via OBDH Block from the EOF
+
+
+Procedure Names:
+
+POWER OFF To SNOOZE MODE 
+RECOVERY-returns to SNOOZE mode from any condition
+
+EMERGENCY-quick way to turn-off
+
+SAFE-
+
+SNOOZE to Power OFF
+
+- Description of Approval Cycle and Configuration 
+Management for Procedures
+
+-- Description of Procedure testing
+Proc will be syntax and logic-checked in POCC system.
+Proc will be run against Ground System Simulator to insure 
+consistency with database.
+**Simulator does not provide any fidelity for instruments**
+
+Procedure name for Test will be X_TS_XXXXXXXX
+
+English language script (or clearly commented ELISA code) 
+will be required.
+
+For each TSTOL Procedure:
+Are there system or instrument constraints to be monitored 
+before sending this Procedure?
+What telemetry points can be monitored to verify the 
+response of this Procedure?
+Does a representative from your instrument need to be 
+present in order to send this Procedure?
+
+-- TBD
+
+
+(c) Describe the instrument activities to be performed 
+using the EOF near-realtime throughput (NRT) commanding 
+channel.
+
+-- Discussed.  NRT commanding will be used.  Details are 
+TBD.
+
+
+Will the Remote Procedure Request (RPR) be used?  
+
+-- Yes.  TBD.
+
+
+Will the Remote Command Request (RCR) be used?  
+
+-- Yes. TBD.
+
+
+(d) Describe the instrument activities to be performed 
+using Delayed Commanding.
+
+-- TBD. Most commanding will be performed during NRT.
+
+
+(e) Describe any use of the Background Queue (for large 
+table loads).
+
+-- Possible use. TBD.
+
+
+OTHER TOPICS:
+
+Hazardous commands discussion.  
+
+-- 
+
+
+(4) OTHER POSSIBLE TEST ACTIVITIES
+
+
+(a) Describe any constraints of switching telemetry modes 
+(Low, Medium, High).
+
+-- None known.
+
+
+(b) Describe any constraints of switching between High rate 
+telemetry modes.
+
+-- None known.
+
+
+(c) Describe any constraints of switching telemetry sub-
+modes.
+
+-- As it now stands, the EGSE operator will have to be 
+notified. CDS will investigate changing its own EGSE 
+software to handle accepting all possible APIDs that they 
+may produce.
+
+
+(d) Describe any constraints associated with the OBT 
+distribution
+
+-- None identified.  CDS only requires the LOBT 
+distribution at Power Up (TBC)
+
+
+(e) Describe any constraints of the Inter-Instrument Data 
+Exchange.
+
+-- This will have to be coordinated during the daily 
+planning meeting so that CDS will have the correct software 
+loaded to act as either Master or Receiver prior to FOT 
+commanding.
+
+
+(f) Describe any constraints of using the Daily Pulse.
+
+-- The daily pulse is ignored by CDS.
+
+
+(5) FUTURE ACTIVITIES FOR FLIGHT
+
+(a) Any necessary modifications to (1) through (4).
+
+-- 
+
+(b) Describe the state of the Experiment Operations Manual 
+(EOM).
+
+-- The only current version is quite old (the Green Book).
+
+
+(c) Describe the timeline for commissioning activities of 
+this instrument.
+
+-- Submitted to Project Scientist's office.
+
+
+(d) Describe any constraints associated with Thruster 
+Operations.
+
+-- CDS will close aperture door and probably change power 
+dissipation to insure thermal stability.
+
+
+(e) Describe any known jitter created by this instrument.
+
+-- CDS pointing system does cause jitter according to 
+models (possibly as much as 0.2-0.3 arc sec for other 
+instruments).  The experiment is sensitive to jitter 
+produced by other experiments.
+
+
+(f) Describe any special pointing accuracy requirements for 
+this instrument.
+
+-- All observations require nominal pointing.
+
+
+(g) Can this instrument provide relevant information to 
+Flight Dynamics regarding - absolute pitch, yaw, or roll?
+
+-- Yes for pitch and yaw (within ~10 arc sec) 
+simultaneously reported every 8 seconds.
+
+
+(h) Describe any anticipated power dissipation changes for 
+this instrument.
+
+-- Should always be within EID-B specifications.  It varies 
+from mode-to-mode, and within a mode. An example was 
+identified above as door closed during maneuvers. This 
+should not be a concern for other experiments since CDS is 
+isostatically-mounted.
+
+
+#########################################################

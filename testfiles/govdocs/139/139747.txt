@@ -1,0 +1,1174 @@
+;+
+; NAME:
+;	ROUTINE_NAME
+;
+; PURPOSE:
+;	Tell what your routine does here.  I like to start with the words:
+;	"This function (or procedure) ..."
+;	Try to use the active, present tense.
+;
+; CATEGORY:
+;	Put a category (or categories) here.  For example:
+;	Widgets.
+;
+; CALLING SEQUENCE:
+;	Write the calling sequence here. Include only positional parameters
+;	(i.e., NO KEYWORDS). For procedures, use the form:
+;
+;	ROUTINE_NAME, Parameter1, Parameter2, Foobar
+;
+;	Note that the routine name is ALL CAPS and arguments have Initial
+;	Caps.  For functions, use the form:
+;
+;	Result = FUNCTION_NAME(Parameter1, Parameter2, Foobar)
+;
+;	Always use the "Result = " part to begin. This makes it super-obvious
+;	to the clueless user that this routine is a function!
+;
+; INPUTS:
+;	Parm1:	Describe the positional input parameters here. Note again
+;		that positional parameters are shown with Initial Caps.
+;
+; OPTIONAL INPUTS:
+;	Parm2:	Describe optional inputs here. If you don't have any, just
+;		delete this section.
+;
+; KEYWORD PARAMETERS:
+;	KEY1:	Document keyword parameters like this. Note that the keyword
+;		is shown in ALL CAPS!
+;
+;	KEY2:	Yet another keyword. Try to use the active, present tense
+;		when describing your keywords.  For example, if this keyword
+;		is just a set or unset flag, say something like:
+;		"Set this keyword to use foobar subfloatation. The default
+;		 is foobar superfloatation."
+;
+; OUTPUTS:
+;	Describe any outputs here.  For example, "This function returns the
+;	foobar superflimpt version of the input array."  This is where you
+;	should also document the return value for functions.
+;
+; OPTIONAL OUTPUTS:
+;	Describe optional outputs here.  If the routine doesn't have any,
+;	just delete this section.
+;
+; COMMON BLOCKS:
+;	BLOCK1:	Describe any common blocks here. If there are no COMMON
+;		blocks, just delete this entry.
+;
+; SIDE EFFECTS:
+;	Describe "side effects" here.  There aren't any?  Well, just delete
+;	this entry.
+;
+; RESTRICTIONS:
+;	Describe any "restrictions" here.  Delete this section if there are
+;	no important restrictions.
+;
+; PROCEDURE:
+;	You can describe the foobar superfloatation method being used here.
+;	You might not need this section for your routine.
+;
+; EXAMPLE:
+;	Please provide a simple example here. An example from the PICKFILE
+;	documentation is shown below.
+;
+;	Create a PICKFILE widget that lets users select only files with
+;	the extensions 'pro' and 'dat'.  Use the 'Select File to Read' title
+;	and store the name of the selected file in the variable F.  Enter:
+;
+;		F = PICKFILE(/READ, FILTER = ['pro', 'dat'])
+;
+; MODIFICATION HISTORY:
+; 	Written by:	Richard Schwartz
+;	July, 1994	Any additional mods get described here.  Remember to
+;			change the stuff above if you add a new keyword or
+;			something!
+;       Oct, 1994       ras, added background bands buttons
+;       Oct, 1994       ras, save_event and restore_event buttons
+;	Version 2, 	ras, restore_dflts command expanded
+;	Version 3, 	ras, changed from PS to SPS because of SSW conflict, 12-apr-1997
+;	Version 4, 	richard.schwartz@altavista.net, fixed bug in batse flare number. 22-mar-1999.
+;-
+
+
+
+PRO PDMENU3_Event, Event
+
+
+  CASE Event.Value OF
+
+
+  'SPECIAL.SHOW CURRENT OPTIONS': com ='/'
+  'SPECIAL.OPTION FILE.READ':     com ='restore_dflts'
+  'SPECIAL.OPTION FILE.WRITE':    com = 'save_dflts'
+  'SPECIAL.SHOW DATA FILES ONLINE': com ='online'
+  'SPECIAL.PREVIEW DATA FILE': com ='preview'
+  'SPECIAL.ANALYSIS SCRIPTS.SHOW': com ='idl,help,name="scr*"'
+  'SPECIAL.ANALYSIS SCRIPTS.RUN': com = 'script'
+  'SPECIAL.ENTER BATSE ARCHIVE MENU.SHOW ORBITAL PLOTS': com = 'batse_menu,2'
+  'SPECIAL.ENTER BATSE ARCHIVE MENU.SHOW FLARE PLOTS': com = 'batse_menu,3'
+  'SPECIAL.ENTER BATSE ARCHIVE MENU.INTERACTIVE PLOTS': com = 'batse_menu,4'
+  'SPECIAL.SEND LAST PLOT FILE.TO PRINTER': com = 'hard'
+  'SPECIAL.SEND LAST PLOT FILE.TO PREVIEWER': com = 'pspreview'
+  'SPECIAL.SEND LAST PLOT FILE.TO MAIL': com = 'idl,printx,"No mail option yet"'
+  ENDCASE
+spex_proc, input_line=com, /gui
+END
+
+; Code after this line may be destroyed
+; DO NOT REMOVE THIS COMMENT: END PDMENU3
+; DO NOT REMOVE THIS COMMENT: BEGIN PDMENU15
+;
+; Put your comments here
+;
+
+
+PRO PDMENU15_Event, Event
+
+
+  CASE Event.Value OF
+
+
+  'TIME HISTORY.SHOW CURRENT OPTIONS': com = '/time'
+  'TIME HISTORY.USE BATSE SHER ONLY': com = 'idl,files(0)=files(1)&files(1)=""'
+  'TIME HISTORY.PLOT LIGHT CURVE (READ).ONE TRACE': com ='time_history'
+  'TIME HISTORY.PLOT LIGHT CURVE (READ).MULTI-TRACE': com = 'graph'
+  'TIME HISTORY.BACKGROUND.SELECT INTERVALS': com='background'
+  'TIME HISTORY.BACKGROUND.DISPLAY INTERVALS': com='background,display'
+  'TIME HISTORY.BACKGROUND.CLEAR BACKGROUND': com='background,clear'
+  'TIME HISTORY.BACKGROUND.USE CURRENT BACKGROUND': com='background,old'
+  'TIME HISTORY.BACKGROUND.SET BACKGROUND TO 0.0': com='idl, backi=0.0*fcheck(backi,0.0)'
+  'TIME HISTORY.BACKGROUND.SELECT INTERVAL FOR ENERGY BAND.0': $
+     com='idl,use_band=0!! background !!idl,use_band=-1'
+  'TIME HISTORY.BACKGROUND.SELECT INTERVAL FOR ENERGY BAND.1': $
+     com='idl,use_band=1!! background !!idl,use_band=-1'
+  'TIME HISTORY.BACKGROUND.SELECT INTERVAL FOR ENERGY BAND.2': $
+     com='idl,use_band=2!! background !!idl,use_band=-1'
+  'TIME HISTORY.BACKGROUND.SELECT INTERVAL FOR ENERGY BAND.3': $
+     com='idl,use_band=3!! background !!idl,use_band=-1'
+  'TIME HISTORY.SEND LAST PLOT.TO FILE': com='create'
+  'TIME HISTORY.SEND LAST PLOT.TO FILE AND PRINTER': com='create!!hard'
+  'TIME HISTORY.SEND LAST PLOT.TO FILE AND PREVIEWER': com='create!!pspreview'
+  'TIME HISTORY.SEND LAST PLOT.TO PRINTER': com='hard'
+  'TIME HISTORY.SEND LAST PLOT.TO MAIL': com = 'idl,printx,"No mail option yet"'
+  'TIME HISTORY.FIT INTERVALS.SELECT': com='select'
+  'TIME HISTORY.FIT INTERVALS.DISPLAY': com='display'
+  'TIME HISTORY.FIT INTERVALS.CLEAR': com='idl,need.select=1 & ifirst=0 & ilast=0'
+  'TIME HISTORY.RESETS.SYSTEM VARIABLES': com='kleanplot'
+  'TIME HISTORY.RESETS.UTPLOT DEFAULTS': com='clear'
+  'TIME HISTORY.RESETS.DATAFILE': com='reset'
+  'TIME HISTORY.ZOOM IN TIME': com='zoom'
+  ENDCASE
+spex_proc, input_line=com, /gui
+END
+
+; Code after this line may be destroyed
+; DO NOT REMOVE THIS COMMENT: END PDMENU15
+; DO NOT REMOVE THIS COMMENT: BEGIN PDMENU16
+;
+; Put your comments here
+;
+
+
+PRO PDMENU16_Event, Event
+
+
+  CASE Event.Value OF
+
+
+  'SPECTRAL FITS.SHOW CURRENT OPTIONS': com = '/fit'
+  'SPECTRAL FITS.SPECTRAL PLOTS.PHOTONS': com = 'photon_spectrum'
+  'SPECTRAL FITS.SPECTRAL PLOTS.COUNTS': com = 'count_spectrum'
+  'SPECTRAL FITS.SPECTRAL PLOTS.BACKGROUND': com = 'bspectrum'
+  'SPECTRAL FITS.SPECTRAL PLOTS.CALIBRATION CHECK': com = 'photon_spectrum,cal_test'
+  'SPECTRAL FITS.SEND LAST PLOT.TO FILE': com = 'create'
+  'SPECTRAL FITS.SEND LAST PLOT.TO FILE AND PRINTER': com='create!!hard'
+  'SPECTRAL FITS.SEND LAST PLOT.TO FILE AND PREVIEWER': com='create!!pspreview'
+  'SPECTRAL FITS.SEND LAST PLOT.TO PRINTER':com = 'hard'
+  'SPECTRAL FITS.SEND LAST PLOT.TO MAIL': com = 'idl,printx,"No mail option yet"'
+  'SPECTRAL FITS.FIT.FIT AND PLOT': com = 'fitting'
+  'SPECTRAL FITS.FIT.FIT ONLY': com = 'fitting,fit'
+  'SPECTRAL FITS.FIT.PLOT ONLY': com = 'fitting,plot'
+  'SPECTRAL FITS.FIT.SELECT ENERGY RANGE': com ='enrange'
+  'SPECTRAL FITS.SELECT T. HIST. BANDS': com = 'ch_bands'
+  'SPECTRAL FITS.SPEC. PLOT BINNING.SELECT': com = 'spec_bands'
+  'SPECTRAL FITS.SPEC. PLOT BINNING.CLEAR': com = 'nospec_bands'
+  'SPECTRAL FITS.RESPONSE FUNCTION.SHOW CURRENT OPTIONS': com = '/drm'
+  'SPECTRAL FITS.RESPONSE FUNCTION.READ MATRIX FILE': com = 'read_drm'
+  'SPECTRAL FITS.RESPONSE FUNCTION.READ CALIBRATION FILE': com = 'cal_restore'
+  'SPECTRAL FITS.RESPONSE FUNCTION.WRITE CALIBRATION FILE': com = 'cal_save'
+  'SPECTRAL FITS.RESPONSE FUNCTION.RECALIBRATE DATA': com = 'recalibrate'
+  'SPECTRAL FITS.RESPONSE FUNCTION.BUILD MATRIX': com = 'build_drm'
+  ENDCASE
+spex_proc, input_line=com, /gui
+END
+
+
+PRO PDMENU17_Event, Event
+
+
+  CASE Event.Value OF
+
+
+  'SUMMARY.SHOW CURRENT OPTIONS': BEGIN
+    com = '/summary'
+    ;PRINT, 'Event for SUMMARY.SHOW CURRENT OPTIONS'
+    END
+  'SUMMARY.WRITE SUMMARY FILE': BEGIN
+    com = 'save_event'
+    ;PRINT, 'Event for SUMMARY.SAVE OPTIONS, INTERVALS, AND FITS'
+    END
+  'SUMMARY.RESTORE SUMMARY FILE': BEGIN
+    com = 'restore_event'
+    END
+  'SUMMARY.PLOT FIT PARAMETERS (SEE OPTIONS)': BEGIN
+    PRINT, 'Event for SUMMARY.PLOT FIT PARAMETERS (SEE OPTIONS)'
+    END
+  'SUMMARY.SEND LAST PLOT.TO FILE ': BEGIN
+    PRINT, 'Event for SUMMARY.SEND LAST PLOT.TO FILE '
+    END
+  'SUMMARY.SEND LAST PLOT.TO FILE AND PRINTER': com='create!!hard'
+  'SUMMARY.SEND LAST PLOT.TO FILE AND PREVIEWER': com='create!!pspreview'
+  'SUMMARY.SEND LAST PLOT.TO PRINTER': com = 'hard'
+  'SUMMARY.SEND LAST PLOT.TO MAIL': BEGIN
+  	com = 'idl,printx,"No mail option yet"'
+    PRINT, 'Event for SUMMARY.SEND LAST PLOT.TO MAIL'
+    END
+  ENDCASE
+spex_proc, input_line=com, /gui
+END
+
+
+
+PRO PDMENU37_Event, Event
+
+if strpos(event.value, 'SPECIAL.DETECTOR #') ne -1 then begin
+    pos = strpos(event.value, '#.') +2
+    spex_proc, input='det_id,'+strmid( event.value, pos, 2),/gui
+endif
+
+   idflare = "(where(prm_spex.nam eq 'FLARE'))(0)"
+   if strpos( event.value, 'BATSE') ne -1 then call_procedure, 'batse_read_cat', max_batse_flare_num
+
+  CASE Event.Value OF
+
+  'SPECIAL.OPTION FILE': BEGIN
+   option_changer, 'Option File','dflts_file'
+    END
+  'SPECIAL.DATA TYPE.BATSE.CONT': BEGIN
+   spex_proc, input = 'idl, prm_spex('+idflare+').max=max_batse_flare_num'+$
+   "  !!  data,batse,cont  !!  _1file,''",/gui
+    END
+  'SPECIAL.DATA TYPE.BATSE.DISCLA': BEGIN
+   spex_proc, input = 'idl, prm_spex('+idflare+').max=max_batse_flare_num'+$
+   "  !!  data,batse,discla  !!  _1file,''",/gui
+    END
+  'SPECIAL.DATA TYPE.BATSE.MERGED.CONT & DISCSP': BEGIN
+   spex_proc, input = 'idl, prm_spex('+idflare+').max=max_batse_flare_num'+$
+   "  !!  merge_batse  !!  _1file,''",/gui
+    END
+  'SPECIAL.DATA TYPE.BATSE.MERGED.EDIT MERGE_LIST': BEGIN
+   spex_proc, input = "merge_batse,edit ",/gui
+    END
+  'SPECIAL.DATA TYPE.BATSE.MERGED.RUN MERGE_LIST': BEGIN
+   spex_proc, input = "merge_batse,current ",/gui
+    END
+  'SPECIAL.DATA TYPE.BATSE.DISCSP': BEGIN
+   spex_proc, input = 'idl, prm_spex('+idflare+').max=max_batse_flare_num'+$
+   "  !!  data,batse,discsp  !!  _1file,''",/gui
+    END
+  'SPECIAL.DATA TYPE.BATSE.SHER AND SHERB': BEGIN
+   spex_proc, input = 'idl, prm_spex('+idflare+').max=max_batse_flare_num'+$
+   "  !!  data,batse,shers  !!  _1file,''",/gui
+    END
+  'SPECIAL.DATA TYPE.BATSE.HER AND HERB': BEGIN
+   spex_proc, input = 'idl, prm_spex('+idflare+').max=max_batse_flare_num'+$
+   "  !!  data,batse,hers  !!  _1file,''",/gui
+    END
+  'SPECIAL.DATA TYPE.YOHKOH.HXT': BEGIN
+   spex_proc, input='data,yohkoh,hxt',/gui
+   spex_proc, input='_1file,hda*.*',/gui
+    END
+  'SPECIAL.DATA TYPE.YOHKOH.HXS': BEGIN
+   spex_proc, input='data,yohkoh,hxs',/gui
+   spex_proc, input='_1file,wda*.*',/gui
+    END
+  'SPECIAL.DATA TYPE.YOHKOH.SXS': BEGIN
+   spex_proc, input='data,yohkoh,sxs',/gui
+   spex_proc, input='_1file,wda*.*',/gui
+    END
+  'SPECIAL.DATA TYPE.YOHKOH.GRS': BEGIN
+   spex_proc, input='data,yohkoh,grs',/gui
+   spex_proc, input='_1file,wda*.*',/gui
+    END
+  'SPECIAL.DATA TYPE.SMM.HXRBS': BEGIN
+   spex_proc, input = 'idl, prm_spex('+idflare+').max=12776',/gui  ;  +$
+   spex_proc, input='data,smm,hxrbs  !! flare,0 ',/gui
+    END
+  'SPECIAL.DATA TYPE.SMM.GRS': BEGIN
+   printx,'SMM GRS not integrated yet'
+    END
+  'SPECIAL.DATA TYPE.SMM.GRSX': BEGIN
+   printx,'SMM GRS Xray detectors not integrated yet'
+    END
+  'SPECIAL.DATA TYPE.HIREX': BEGIN
+   spex_proc, input = 'data,hirex,germanium',/gui
+;   spex_proc, input = '_1file,hirex.fits',/gui		;taken care of by spex_preview
+;   spex_proc, input = 'directory,SSWDB_SPEX',/gui
+    END
+  'SPECIAL.EVENT ID.ARCHIVE FLARE #': BEGIN
+    datatipe = strupcase(spex_current('data_tipe'))
+    option_changer, arr2str(datatipe,delim=' ')+' Flare Number; ', 'flare',/snu
+    END
+  'SPECIAL.EVENT ID.BATSE BURST #': BEGIN
+    PRINTx, 'Search by Burst # not implemented.'
+    printx, 'Use idl,printx,burst_flare(burst_no,/burst) from COMMAND LINE'
+    END
+  'SPECIAL.EVENT ID.TIME': BEGIN
+    PRINTx, 'Search by Time not implemented yet.'
+    printx, 'Use BATSE ARCHIVE MENU Action'
+    printx, 'Use Option 1. Display flare catalog entries.'
+    printx, 'For Yohkoh data, append the date to the _1FILE option.'
+    printx, 'e.g. for 15 November 1991, set _1FILE to hda911115*.*'
+    END
+  'SPECIAL.DATA FILE 1': option_changer, 'Data File 1', '_1file'
+  'SPECIAL.DATA FILE 2': option_changer, 'Data File 2', '_2file'
+  'SPECIAL.DATA DIRECTORY': BEGIN
+    PRINTx, 'This is should only be changed if using data outside of'
+    printx, 'the normal default databases.  Only change this if you'
+    printx, 'really know what you are doing.'
+    END
+  'SPECIAL.POSTSCRIPT FORMAT.PORTRAIT': spex_proc, input='psstyle,portrait',/gui
+  'SPECIAL.POSTSCRIPT FORMAT.FULLPAGE PORTRAIT': spex_proc, input='psstyle,fullportrait',/gui
+  'SPECIAL.POSTSCRIPT FORMAT.LANDSCAPE': spex_proc, input='psstyle,landscape',/gui
+  'SPECIAL.POSTSCRIPT FORMAT.COLOR': spex_proc, input='idl,sps,color=1 & x',/gui
+  'SPECIAL.POSTSCRIPT FORMAT.NOCOLOR': spex_proc, input='idl,sps,color=0 & x',/gui
+  'SPECIAL.POSTSCRIPT FORMAT.ENCAPSULATED': $
+	spex_proc, input='idl,sps,encapsulated=1 & x',/gui
+  'SPECIAL.POSTSCRIPT FORMAT.NOENCAPSULATED': $
+	spex_proc, input='idl,sps,encapsulated=0 & x',/gui
+  'SPECIAL.POSTSCRIPT FORMAT.GIF': spex_proc, input='psstyle,gif',/gui
+  'SPECIAL.QUIET.SET': spex_proc, input='quiet,1' ,/gui
+  'SPECIAL.QUIET.NOSET': spex_proc, input='quiet,0' ,/gui
+  ELSE:
+  ENDCASE
+END
+
+
+
+PRO PDMENU40_Event, Event
+
+
+  CASE Event.Value OF
+
+
+  'TIME HISTORY.START': begin
+   option_changer,'Start Time','uts',/twidget
+   spex_proc,/gui,input='idl,setut, uts=uts'
+   end
+  'TIME HISTORY.END':  begin
+   option_changer,'End Time','ute',/twidget
+   spex_proc,/gui,input='idl,setut, ute=ute'
+   end
+;  'TIME HISTORY.BACK. ENERGY RANGE.FULL RANGE': $
+;  'TIME HISTORY.BACK. ENERGY RANGE.SUB-RANGE': $
+  'TIME HISTORY.SAMPLE AVERAGE': $
+	option_changer,'Time History Sample Average','tavg',/incommon,/snu,dig=2
+  'TIME HISTORY.ENERGY BANDS (MULTI-TRACE)': BEGIN
+	option_changer, 'Time History Energy Bands (MULTI-TRACE)','ENERGY_BANDS'
+    END
+  'TIME HISTORY.SCALE FOR BANDS': BEGIN
+        option_changer, 'Scale Factors for Energy Bands (MULTI_TRACE)','SCALE_BANDS'
+    END
+  'TIME HISTORY.YRANGE': BEGIN
+        option_changer, 'Yrange for Time History Plot','TH_YRANGE'
+    END
+  'TIME HISTORY.Y UNITS.COUNTS/SEC': BEGIN
+	spex_proc, input='t_hist_mode,COUNTS',/GUI
+    END
+  'TIME HISTORY.Y UNITS.COUNTS/SEC/CM^2/KEV': BEGIN
+	spex_proc, input='t_hist_mode,FLUX',/GUI
+    END
+  'TIME HISTORY.BACKGROUND FIT ORDER': BEGIN
+        option_changer, 'Polynomial for Background Fit In Each Energy Band', 'BACK_ORDER'
+;        option_changer, ['Polynomial for Background Fit','In Each Energy Band', $
+;         'First is Global'], 'BACK_ORDER'
+    END
+;  'TIME HISTORY.BACKGROUND ORDER.1 LINEAR': BEGIN
+;        spex_proc, /gui, input='idl,back_order(use_band+1)=1'
+;    END
+;  'TIME HISTORY.BACKGROUND ORDER.2 QUADRATIC': BEGIN
+;        spex_proc, /gui, input='idl,back_order(use_band+1)=2'
+;    END
+  'TIME HISTORY.YAXIS.LINEAR': BEGIN
+	spex_proc, /gui, input='th_ytype,0'
+    END
+  'TIME HISTORY.YAXIS.LOG': BEGIN
+	spex_proc, /gui, input='th_ytype,1'
+    END
+  'TIME HISTORY.Y ERROR BARS.HIDE': BEGIN
+	spex_proc, /gui, input='eplots,0'
+    END
+  'TIME HISTORY.Y ERROR BARS.SHOW': BEGIN
+	spex_proc, /gui, input='eplots,1'
+    END
+  ENDCASE
+END
+
+; Code after this line may be destroyed
+; DO NOT REMOVE THIS COMMENT: END PDMENU40
+; DO NOT REMOVE THIS COMMENT: BEGIN SPCLOPT
+;
+; Put your comments here
+;
+
+
+PRO SPCLOPT_Event, Event
+
+
+  CASE Event.Value OF
+
+
+  'SPECTRAL FITS.FIT PARAMETERS': BEGIN
+    option_changer, 'FIT PARAMETERS', 'apar'
+    spex_proc,input='force',/gui
+    END
+  'SPECTRAL FITS.FREE/FIX': BEGIN
+     option_changer, 'Fit Parameter FREE(1) or FIX(0)','free',/toggle
+    END
+  'SPECTRAL FITS.LOWER BOUNDS': BEGIN
+     option_changer, 'Lower Bounds for Fit Parameters','RANGE_LO'
+        END
+  'SPECTRAL FITS.UPPER BOUNDS': BEGIN
+     option_changer, 'Upper Bounds for Fit Parameters','RANGE_HI'
+    END
+  'SPECTRAL FITS.VALID FITTING ENERGIES': BEGIN
+	option_changer,  'Valid Energy Range for Fitting','erange'
+    END
+ ;  'SPECTRAL FITS.RESPONSE MATRIX OPTIONS.DEFAULT MATRIX.USE': BEGIN
+  'SPECTRAL FITS.RESPONSE MATRIX OPTIONS.DEFAULT MATRIX': BEGIN
+ ;    ioff = 4
+ ;   test = ''
+ ;  while test ne 'USE' do begin
+ ;      widget_control, ioff+event.id, get_val=test
+ ;      ioff = ioff+1
+ ;   endwhile
+ ;     for i=0,6 do widget_control, ioff+event.id+1+i, sensit=0
+     spex_proc,input_line='test_drm,0 !! idl,need.drm=1 &need.read=1',/gui
+    END
+ ; 'SPECTRAL FITS.RESPONSE MATRIX OPTIONS.DEFAULT MATRIX': BEGIN
+ ;   ioff = 4
+ ;   test = ''
+ ;   while test ne 'USE' do begin
+ ;      widget_control, ioff+event.id, get_val=test
+ ;      ioff = ioff+1
+ ;   endwhile
+ ;     for i=0,6 do widget_control, ioff+event.id+1+i, sensit=1
+ ;   END
+  'SPECTRAL FITS.RESPONSE MATRIX OPTIONS.DIRECT MATRIX FILE': BEGIN
+    option_changer,'DIRECT DRM FILE','DFILE'
+    END
+  'SPECTRAL FITS.RESPONSE MATRIX OPTIONS.SCATTER MATRIX FILE': BEGIN
+    option_changer,'SCATTER DRM FILE','SFILE'
+    END
+  'SPECTRAL FITS.RESPONSE MATRIX OPTIONS.DIRECTORY': BEGIN
+    option_changer,'DRM DIRECTORY','DDIRECTORY'
+    END
+  'SPECTRAL FITS.RESPONSE MATRIX OPTIONS.GAIN FACTOR': BEGIN
+    option_changer,'GAIN FACTOR','GAIN_MULT'
+    END
+  'SPECTRAL FITS.RESPONSE MATRIX OPTIONS.GAIN OFFSET': BEGIN
+    option_changer,'GAIN OFFSET','GAIN_OFFSET'
+    END
+  'SPECTRAL FITS.RESPONSE MATRIX OPTIONS.BUILD HIGH ENERGY MATRIX': BEGIN
+    option_changer,'Use High Energy DRMs','HIGH_DRM'
+    END
+  'SPECTRAL FITS.RESPONSE MATRIX OPTIONS.DEVELOPMENT DRM': BEGIN
+     spex_proc,input_line='test_drm,2!!idl,need.drm=1&need.read=1',/gui
+    END
+  'SPECTRAL FITS.RESPONSE MATRIX OPTIONS.PENDLETON EDGES FOR BATSE CONT': BEGIN
+     spex_proc,input_line='cont_pendleton,1 !! idl,need.drm=1&need.read=1',/gui
+    END
+  'SPECTRAL FITS.RESPONSE MATRIX OPTIONS.DEFAULT EDGES FOR BATSE CONT': BEGIN
+     spex_proc,input_line='cont_pendleton,2 !! idl,need.drm=1&need.read=1',/gui
+    END
+  'SPECTRAL FITS.CURRENT INTERVAL.NEXT INTERVAL': BEGIN
+    nint = n_elements(spex_current('wint'))
+    ifirst = (spex_current('ifirst') + 1 )< (nint-1)
+    spex_proc,/gui,input='ifirst, '+string(ifirst)+'!! ilast, '+string(ifirst)
+    END
+  'SPECTRAL FITS.CURRENT INTERVAL.PREV. INTERVAL': BEGIN
+    ifirst = (spex_current('ifirst') - 1 )> 0
+    spex_proc,/gui,input='ifirst, '+string(ifirst)+'!! ilast, '+string(ifirst)
+    END
+  'SPECTRAL FITS.CURRENT INTERVAL.FIRST INTERVAL #': BEGIN
+    option_changer,'First Interval to Fit','IFIRST',dig=3,/snu
+    END
+  'SPECTRAL FITS.CURRENT INTERVAL.LAST INTERVAL #': BEGIN
+    option_changer,'Last Interval to Fit','ILAST',dig=3,/snu
+    END
+  'SPECTRAL FITS.MIN. UNCERTAINTY': $
+    option_changer,'Systematic Fit Uncertainty','UNCERT'
+  'SPECTRAL FITS.PLOT XRANGE': BEGIN
+    option_changer,'Spectral Plots XRANGE','spxrange'
+    END
+  'SPECTRAL FITS.PLOT YRANGE': BEGIN
+    option_changer,'Spectral Plots YRANGE','spyrange'
+    END
+  'SPECTRAL FITS.SOURCE FOR INIT. PARAMS..PREVIOUS INTERVAL': BEGIN
+     spex_proc,input_line='sumfit,0',/gui
+    END
+  'SPECTRAL FITS.SOURCE FOR INIT. PARAMS..LAST FIT TO CURRENT INTERVAL': BEGIN
+     spex_proc,input_line='sumfit,1',/gui
+    END
+  'SPECTRAL FITS.XAXIS TYPE.LOG': BEGIN
+     spex_proc,input_line='sp_xtype,1',/gui
+    END
+  'SPECTRAL FITS.XAXIS TYPE.LINEAR': BEGIN
+     spex_proc,input_line='sp_xtype,0',/gui
+    END
+  'SPECTRAL FITS.YAXIS TYPE.LOG': BEGIN
+     spex_proc,input_line='sp_ytype,1',/gui
+    END
+  'SPECTRAL FITS.YAXIS TYPE.LINEAR': BEGIN
+     spex_proc,input_line='sp_ytype,0',/gui
+    END
+  'SPECTRAL FITS.MODEL FUNCTION.THERM + BR. P-LAW': BEGIN
+    spex_proc,/gui, input_line="f_model,f_vth_bpow "
+    END
+  'SPECTRAL FITS.MODEL FUNCTION.2THERM + P-LAW': BEGIN
+    spex_proc,/gui, input_line="f_model,f_2therm_pow "
+    END
+  'SPECTRAL FITS.MODEL FUNCTION.2THERM + BR. P-LAW': BEGIN
+    spex_proc,/gui, input_line="f_model,f_multi_spec"
+    END
+  'SPECTRAL FITS.MODEL FUNCTION.USE STIFF PL FUNCTION': BEGIN
+    spex_proc,/gui, input_line="idl, temp=f_bpow(50.,[1.,3.,30.,4.],'bpow')"
+    END
+  'SPECTRAL FITS.MODEL FUNCTION.USE SMOOTH PL FUNCTION': BEGIN
+    spex_proc,/gui, input_line="idl, temp=f_bpow(50.,[1.,3.,30.,4.],'bpow_taper')"
+    END
+  'SPECTRAL FITS.MODEL FUNCTION.LINE + BR. P-LAW': BEGIN
+    spex_proc,/gui, input_line="f_model,f_line_bpow "
+    END
+  'SPECTRAL FITS.MODEL FUNCTION.TRIPLE P-LAW': BEGIN
+    spex_proc,/gui, input_line="f_model, f_3pow "
+    END
+'SPECTRAL FITS.MODEL FUNCTION.BR. P-LAW + 5LINE': BEGIN
+    spex_proc,/gui, input_line="f_model, f_bpow_nline "
+    END
+
+  'SPECTRAL FITS.MODEL FUNCTION.OTHER': BEGIN
+    option_changer,'Model Fitting Function','f_model'
+    END
+  'SPECTRAL FITS.MORE INFO.SET': BEGIN
+    spex_proc,input_line='more_info,1',/gui
+    END
+  'SPECTRAL FITS.MORE INFO.RESET': BEGIN
+    spex_proc,input_line='more_info,0',/gui
+    END
+  ENDCASE
+END
+
+; Code after this line may be destroyed
+; DO NOT REMOVE THIS COMMENT: END SPCLOPT
+; DO NOT REMOVE THIS COMMENT: BEGIN PDMENU42
+;
+; Put your comments here
+;
+
+
+PRO PDMENU42_Event, Event
+
+
+  CASE Event.Value OF
+
+
+  'SUMMARY.SUMMARY FILE NAME.AUTONAME': BEGIN
+    spex_proc, input_line='sumfile,auto',/gui
+    END
+  'SUMMARY.SUMMARY FILE NAME.CHANGE': BEGIN
+    option_changer,'SUMMARY FILE NAME','SUMFILE'
+    END
+  'SUMMARY.SUMMARY FILE DIRECTORY': BEGIN
+    printx,'ONLY LOCAL DIRECTORY ALLOWED FOR NOW'
+;    option_changer,'SUMMARY FILE DIRECTORY','SUMDIRECTORY'
+    END
+  'SUMMARY.PARAMETERS TO PLOT.ON XAXIS.TIME ': BEGIN
+    PRINT, 'Event for SUMMARY.PARAMETERS TO PLOT.ON XAXIS.TIME '
+    END
+  'SUMMARY.PARAMETERS TO PLOT.ON XAXIS.PARAMETER #': BEGIN
+    PRINT, 'Event for SUMMARY.PARAMETERS TO PLOT.ON XAXIS.PARAMETER #'
+    END
+  'SUMMARY.PARAMETERS TO PLOT.ON XAXIS.CHISQUARE': BEGIN
+    PRINT, 'Event for SUMMARY.PARAMETERS TO PLOT.ON XAXIS.CHISQUARE'
+    END
+  'SUMMARY.PARAMETERS TO PLOT.ON XAXIS.SHOW ERRORS': BEGIN
+    PRINT, 'Event for SUMMARY.PARAMETERS TO PLOT.ON XAXIS.SHOW ERRORS'
+    END
+  'SUMMARY.PARAMETERS TO PLOT.ON XAXIS.HIDE ERRORS': BEGIN
+    PRINT, 'Event for SUMMARY.PARAMETERS TO PLOT.ON XAXIS.HIDE ERRORS'
+    END
+  'SUMMARY.PARAMETERS TO PLOT.ON YAXIS.PARAMETER #': BEGIN
+    PRINT, 'Event for SUMMARY.PARAMETERS TO PLOT.ON YAXIS.PARAMETER #'
+    END
+  'SUMMARY.PARAMETERS TO PLOT.ON YAXIS.CHISQUARE': BEGIN
+    PRINT, 'Event for SUMMARY.PARAMETERS TO PLOT.ON YAXIS.CHISQUARE'
+    END
+  'SUMMARY.PARAMETERS TO PLOT.ON YAXIS.SHOW ERRORS': BEGIN
+    PRINT, 'Event for SUMMARY.PARAMETERS TO PLOT.ON YAXIS.SHOW ERRORS'
+    END
+  'SUMMARY.PARAMETERS TO PLOT.ON YAXIS.HIDE ERRORS': BEGIN
+    PRINT, 'Event for SUMMARY.PARAMETERS TO PLOT.ON YAXIS.HIDE ERRORS'
+    END
+  ENDCASE
+END
+
+; Code after this line may be destroyed
+; DO NOT REMOVE THIS COMMENT: END PDMENU42
+; DO NOT REMOVE THIS COMMENT: BEGIN MAIN2
+;
+; Put your comments here
+;
+
+
+PRO MAIN2_Event, Event
+
+
+  WIDGET_CONTROL,Event.Id,GET_UVALUE=Ev
+
+  CASE Ev OF
+
+  'BGROUP73': BEGIN
+      IF Event.Select THEN Sel = 'On' ELSE Sel = 'Off'
+      CASE Event.Value OF
+      0: Print,'Button CLEAR Turned ', Sel
+      1: begin
+	Print,'Button SPEX OVERVIEW Turned ', Sel
+	xdisplayfile,loc_file(path=[path_dir('spex'),'SSWDB_SPEX'], 'spex_manual.txt'), $
+	title='SPEX OVERVIEW'
+	end
+      2: begin
+	 Print,'Button DISPLAY SPEX SUMMARY Turned ', Sel
+	xdisplayfile,loc_file(path=[path_dir('spex'),'SSWDB_SPEX'], 'spex_manual_summary.txt'), $
+	title='SPEX SUMMARY'
+	end
+     3: begin
+	PRINT, 'Button HELP ON ACTION AND OPTIONS Turned ', Sel
+	xdisplayfile, loc_file(path=[path_dir('spex'),'SSWDB_SPEX'],'help_spex.txt'), $
+	title='SPEX HELP'
+	end
+      ENDCASE
+      END
+  'BGROUP77': BEGIN
+      IF Event.Select THEN Sel = 'On' ELSE Sel = 'Off'
+      CASE Event.Value OF
+      0: Print,'Button HELP ON ACTION BUTTON Turned ', Sel
+      1: Print,'Button HELP ON OPTION BUTTON Turned ', Sel
+      ELSE: Message,'Unknown button pressed'
+      ENDCASE
+      END
+  ; Event for SPECIAL ACTIONS
+  'SPECIAL_ACTION': PDMENU3_Event, Event
+  ; Event for TIME HISTORY
+  'TIME HISTORY': PDMENU15_Event, Event
+  ; Event for SPECTRAL FITS
+  'SPECTRAL FITS': PDMENU16_Event, Event
+  ; Event for SUMMARY
+  'SUMMARY': PDMENU17_Event, Event
+  ; Event for SPECIAL OPTIONS
+  'SPECIAL_OPTIONS': PDMENU37_Event, Event
+  ; Event for THIST_PAR
+  'THIST_PAR': PDMENU40_Event, Event
+  ; Event for SPEC_FITS
+  'SPEC_FITS': SPCLOPT_Event, Event
+  ; Event for SUMMARY_OPT
+  'SUMMARY_OPT': PDMENU42_Event, Event
+  'FIELD111':   spex_proc, input_line=event.value, /gui
+  'TEXTDISPLAY': BEGIN
+      Print, 'Event for TEXTDISPLAY'
+      END
+  'exit_group': BEGIN
+      CASE Event.Value OF
+      0: widget_control, event.top, /destroy
+      1: Print,'Button   SPEX    Pressed'
+      2: Print,'Button     IDL      Pressed'
+      ELSE: Message,'Unknown button pressed'
+      ENDCASE
+      END
+  ENDCASE
+END
+
+PRO wspex, GROUP=Group, bfont=bfont, info_font=dfont
+
+;-- check user FONT/SIZE requirements
+
+dfont=''
+mk_dfont,bfont=bfont
+xdoc_font=getenv('XDOC_FONT')
+if datatype(font) eq 'STR' then xdoc_font=font
+if trim(xdoc_font) ne '' then dfont=(get_dfont(xdoc_font))(0)
+info_font =dfont
+text_font = dfont
+
+common wspex_common, main2, info_base, new1, new2, new3, new4
+checkvar, bfont, '-adobe-courier-bold-r-normal--*-100-*-*-m-*-iso8859-1'
+
+
+  IF N_ELEMENTS(Group) EQ 0 THEN GROUP=0
+
+  junk   = { CW_PDMENU_S, flags:0, name:'' }
+
+
+;Position the control widget
+	device, get_screen=ssiz
+
+  MAIN2 = WIDGET_BASE(GROUP_LEADER=Group, $
+      COLUMN=1, $
+      MAP=1, $
+      xoffset= .5*ssiz(0), $
+      yoffset= .5*ssiz(1), $
+      TITLE='SPEX CONTROL PANEL', $
+      UVALUE='MAIN2')
+
+
+
+
+  BASE2 = WIDGET_BASE(MAIN2, $
+      ROW=1, $
+      MAP=1, $
+      TITLE='ACTIONS', $
+      UVALUE='BASE2')
+
+  LABEL186 = WIDGET_LABEL( BASE2, $
+      UVALUE='LABEL186', $
+      VALUE='ACTIONS:')
+
+  MenuDesc680 = [ $
+      { CW_PDMENU_S,       3, 'SPECIAL' }, $ ;        0
+        { CW_PDMENU_S,       0, 'SHOW CURRENT OPTIONS' }, $ ;        1
+        { CW_PDMENU_S,       1, 'OPTION FILE' }, $ ;        2
+          { CW_PDMENU_S,       0, 'READ' }, $ ;        3
+          { CW_PDMENU_S,       2, 'WRITE' }, $ ;        4
+      { CW_PDMENU_S,       0, 'SHOW DATA FILES ONLINE' }, $ ;        5
+      { CW_PDMENU_S,       0, 'PREVIEW DATA FILE' }, $ ;        6
+      { CW_PDMENU_S,       1, 'ANALYSIS SCRIPTS' }, $ ;        7
+        { CW_PDMENU_S,       0, 'SHOW' }, $ ;        8
+        { CW_PDMENU_S,       2, 'RUN' }, $ ;        9
+      { CW_PDMENU_S,       1, 'ENTER BATSE ARCHIVE MENU' }, $ ;       10
+        { CW_PDMENU_S,       0, 'SHOW ORBITAL PLOTS' }, $ ;        10a
+        { CW_PDMENU_S,       0, 'SHOW FLARE PLOTS' }, $ ;        10b
+        { CW_PDMENU_S,       2, 'INTERACTIVE PLOTS' }, $ ;        10c
+      { CW_PDMENU_S,       3, 'SEND LAST PLOT FILE' }, $ ;       11
+        { CW_PDMENU_S,       0, 'TO PREVIEWER' }, $ ;       11A
+        { CW_PDMENU_S,       0, 'TO PRINTER' }, $ ;       12
+        { CW_PDMENU_S,       2, 'TO MAIL' } $  ;     13
+  ]
+
+
+  PDMENU3 = CW_PDMENU( BASE2, MenuDesc680, /RETURN_FULL_NAME, $
+      UVALUE='SPECIAL_ACTION', font=bfont)
+
+
+  MenuDesc685 = [ $
+      { CW_PDMENU_S,       3, 'TIME HISTORY' }, $ ;        0
+        { CW_PDMENU_S,       0, 'SHOW CURRENT OPTIONS' }, $ ;        1
+        { CW_PDMENU_S,       0, 'USE BATSE SHER ONLY' }, $ ;        2
+        { CW_PDMENU_S,       1, 'PLOT LIGHT CURVE (READ)' }, $ ;        3
+          { CW_PDMENU_S,       0, 'ONE TRACE' }, $ ;        4
+          { CW_PDMENU_S,       2, 'MULTI-TRACE' }, $ ;        5
+      { CW_PDMENU_S,       1, 'BACKGROUND' }, $ ;        6
+        { CW_PDMENU_S,       0, 'SELECT INTERVALS' }, $ ;        7
+      { CW_PDMENU_S,       1, 'SELECT INTERVAL FOR ENERGY BAND' }, $ ;       12
+        { CW_PDMENU_S,       0, '0' }, $ ;       13
+        { CW_PDMENU_S,       0, '1' }, $ ;       14
+        { CW_PDMENU_S,       0, '2' }, $ ;       15
+        { CW_PDMENU_S,       2, '3' }, $ ;       16
+        { CW_PDMENU_S,       0, 'DISPLAY INTERVALS' }, $ ;        8
+        { CW_PDMENU_S,       0, 'CLEAR BACKGROUND' }, $ ;        9
+        { CW_PDMENU_S,       0, 'USE CURRENT BACKGROUND' }, $ ;       10
+        { CW_PDMENU_S,       2, 'SET BACKGROUND TO 0.0' }, $ ;       11
+      { CW_PDMENU_S,       1, 'SEND LAST PLOT' }, $ ;       12
+        { CW_PDMENU_S,       0, 'TO FILE' }, $ ;       13
+        { CW_PDMENU_S,       0, 'TO FILE AND PRINTER' }, $ ;       13A
+        { CW_PDMENU_S,       0, 'TO FILE AND PREVIEWER' }, $ ;       13B
+        { CW_PDMENU_S,       0, 'TO PRINTER' }, $ ;       14
+        { CW_PDMENU_S,       2, 'TO MAIL' }, $ ;       15
+      { CW_PDMENU_S,       1, 'FIT INTERVALS' }, $ ;       16
+        { CW_PDMENU_S,       0, 'SELECT' }, $ ;       17
+        { CW_PDMENU_S,       0, 'DISPLAY' }, $ ;       18
+        { CW_PDMENU_S,       2, 'CLEAR' }, $ ;       19
+      { CW_PDMENU_S,       1, 'RESETS' }, $ ;       20
+        { CW_PDMENU_S,       0, 'SYSTEM VARIABLES' }, $ ;       21
+        { CW_PDMENU_S,       0, 'UTPLOT DEFAULTS' }, $ ;       22
+        { CW_PDMENU_S,       2, 'DATAFILE' }, $ ;       23
+      { CW_PDMENU_S,       2, 'ZOOM IN TIME' } $  ;     24
+  ]
+
+
+  PDMENU15 = CW_PDMENU( BASE2, MenuDesc685, /RETURN_FULL_NAME, $
+      UVALUE='TIME HISTORY',font=bfont)
+
+  MenuDesc692 = [ $
+      { CW_PDMENU_S,       3, 'SPECTRAL FITS' }, $ ;        0
+        { CW_PDMENU_S,       0, 'SHOW CURRENT OPTIONS' }, $ ;        1
+        { CW_PDMENU_S,       1, 'SPECTRAL PLOTS' }, $ ;        2
+          { CW_PDMENU_S,       0, 'PHOTONS' }, $ ;        3
+          { CW_PDMENU_S,       0, 'COUNTS' }, $ ;        4
+          { CW_PDMENU_S,       0, 'CALIBRATION CHECK' }, $ ;        4
+          { CW_PDMENU_S,       2, 'BACKGROUND' }, $ ;        5
+      { CW_PDMENU_S,       1, 'SEND LAST PLOT' }, $ ;        6
+        { CW_PDMENU_S,       0, 'TO FILE' }, $ ;        7
+        { CW_PDMENU_S,       0, 'TO FILE AND PRINTER' }, $ ;       7A
+        { CW_PDMENU_S,       0, 'TO FILE AND PREVIEWER' }, $ ;     7B
+        { CW_PDMENU_S,       0, 'TO PRINTER' }, $ ;        8
+        { CW_PDMENU_S,       2, 'TO MAIL' }, $ ;        9
+      { CW_PDMENU_S,       1, 'FIT' }, $ ;       10
+        { CW_PDMENU_S,       0, 'FIT AND PLOT' }, $ ;       11
+        { CW_PDMENU_S,       0, 'FIT ONLY' }, $ ;       12
+        { CW_PDMENU_S,       0, 'PLOT ONLY' }, $ ;       13
+        { CW_PDMENU_S,       2, 'SELECT ENERGY RANGE' }, $ ;       14
+      { CW_PDMENU_S,       0, 'SELECT T. HIST. BANDS' }, $ ;       15
+      { CW_PDMENU_S,       1, 'SPEC. PLOT BINNING' }, $ ;       16
+        { CW_PDMENU_S,       0, 'SELECT' }, $ ;       17
+        { CW_PDMENU_S,       2, 'CLEAR' }, $ ;       18
+      { CW_PDMENU_S,       3, 'RESPONSE FUNCTION' }, $ ;       19
+        { CW_PDMENU_S,       0, 'SHOW CURRENT OPTIONS' }, $ ;       20
+        { CW_PDMENU_S,       0, 'READ MATRIX FILE' }, $ ;       21
+        { CW_PDMENU_S,       0, 'WRITE CALIBRATION FILE' }, $ ;       21
+        { CW_PDMENU_S,       0, 'READ CALIBRATION FILE' }, $ ;       21
+        { CW_PDMENU_S,       0, 'RECALIBRATE DATA' }, $ ;       21
+        { CW_PDMENU_S,       2, 'BUILD MATRIX' } $  ;     22
+  ]
+
+
+  PDMENU16 = CW_PDMENU( BASE2, MenuDesc692, /RETURN_FULL_NAME, $
+      UVALUE='SPECTRAL FITS',font=bfont)
+
+  MenuDesc699 = [ $
+      { CW_PDMENU_S,       3, 'SUMMARY' }, $ ;        0
+        { CW_PDMENU_S,       0, 'SHOW CURRENT OPTIONS' }, $ ;        1
+        { CW_PDMENU_S,       0, 'WRITE SUMMARY FILE' }, $ ;        2
+        { CW_PDMENU_S,       0, 'RESTORE SUMMARY FILE' }, $ ;        2A
+        { CW_PDMENU_S,       0, 'PLOT FIT PARAMETERS (SEE OPTIONS)' }, $ ;        3
+        { CW_PDMENU_S,       3, 'SEND LAST PLOT' }, $ ;        4
+          { CW_PDMENU_S,       0, 'TO FILE ' }, $ ;        5
+        { CW_PDMENU_S,       0, 'TO FILE AND PRINTER' }, $ ;       5A
+        { CW_PDMENU_S,       0, 'TO FILE AND PREVIEWER' }, $ ;     5B
+          { CW_PDMENU_S,       0, 'TO PRINTER' }, $ ;        6
+          { CW_PDMENU_S,       2, 'TO MAIL' } $  ;      7
+  ]
+
+
+  PDMENU17 = CW_PDMENU( BASE2, MenuDesc699, /RETURN_FULL_NAME, $
+      UVALUE='SUMMARY',font=bfont)
+
+
+  BASE31 = WIDGET_BASE(MAIN2, $
+      ROW=1, $
+      MAP=1, $
+      TITLE='OPTIONS', $
+      UVALUE='BASE31')
+
+  LABEL32 = WIDGET_LABEL( BASE31, $
+      UVALUE='XOPTIONS', $
+      VALUE='OPTIONS:')
+
+  MenuDesc704 = [ $
+      { CW_PDMENU_S,       3, 'SPECIAL' }, $ ;        0
+        { CW_PDMENU_S,       0, 'OPTION FILE' }, $ ;        1
+        { CW_PDMENU_S,       1, 'DATA TYPE' }, $ ;        2
+          { CW_PDMENU_S,       1, 'BATSE' }, $ ;        3
+            { CW_PDMENU_S,       0, 'CONT' }, $ ;        4
+            { CW_PDMENU_S,       0, 'DISCSP' }, $ ;        4a
+            { CW_PDMENU_S,       0, 'DISCLA' }, $ ;        4b
+            { CW_PDMENU_S,       1, 'MERGED' }, $
+            { CW_PDMENU_S,       0, 'CONT & DISCSP' }, $
+            { CW_PDMENU_S,       0, 'EDIT MERGE_LIST' }, $
+            { CW_PDMENU_S,       2, 'RUN MERGE_LIST' }, $
+            { CW_PDMENU_S,       0, 'SHER AND SHERB' }, $ ;        5
+            { CW_PDMENU_S,       2, 'HER AND HERB' }, $ ;        6
+        { CW_PDMENU_S,       1, 'YOHKOH' }, $ ;        7a
+          { CW_PDMENU_S,       0, 'HXT' }, $ ;        8
+          { CW_PDMENU_S,       0, 'HXS' }, $ ;        9
+          { CW_PDMENU_S,       0, 'GRS' }, $ ;       10
+          { CW_PDMENU_S,       2, 'SXS' }, $ ;       11
+        { CW_PDMENU_S,       1, 'SMM' }, $ ;        7b
+          { CW_PDMENU_S,       0, 'HXRBS' }, $ ;        8
+          { CW_PDMENU_S,       0, 'GRS' }, $ ;        9
+          { CW_PDMENU_S,       2, 'GRSX' }, $ ;       10
+        { CW_PDMENU_S,       2, 'HIREX' }, $ ;        7C
+      { CW_PDMENU_S,       1, 'DETECTOR #' }, $ ;       12
+        { CW_PDMENU_S,       0, '0' }, $ ;       13
+        { CW_PDMENU_S,       0, '1' }, $ ;       14
+        { CW_PDMENU_S,       0, '2' }, $ ;       15
+        { CW_PDMENU_S,       0, '3' }, $ ;       16
+        { CW_PDMENU_S,       0, '4' }, $ ;       17
+        { CW_PDMENU_S,       0, '5' }, $ ;       18
+        { CW_PDMENU_S,       0, '6' }, $ ;       19
+        { CW_PDMENU_S,       2, '7' }, $ ;       20
+      { CW_PDMENU_S,       1, 'EVENT ID' }, $ ;       21
+        { CW_PDMENU_S,       0, 'ARCHIVE FLARE #' }, $ ;       22
+        { CW_PDMENU_S,       0, 'BATSE BURST #' }, $ ;       23
+        { CW_PDMENU_S,       2, 'TIME' }, $ ;       24
+      { CW_PDMENU_S,       0, 'DATA FILE 1' }, $ ;       25
+      { CW_PDMENU_S,       0, 'DATA FILE 2' }, $ ;       26
+      { CW_PDMENU_S,       0, 'DATA DIRECTORY' }, $ ;       27
+      { CW_PDMENU_S,       1, 'POSTSCRIPT FORMAT' }, $ ;       28
+      { CW_PDMENU_S,       0, 'PORTRAIT' }, $ ;       28
+      { CW_PDMENU_S,       0, 'FULLPAGE PORTRAIT' }, $ ;       28A
+      { CW_PDMENU_S,       0, 'LANDSCAPE' }, $ ;       28B
+      { CW_PDMENU_S,       0, 'COLOR' }, $ ;       28C
+      { CW_PDMENU_S,       0, 'NOCOLOR' }, $ ;       28D
+      { CW_PDMENU_S,       0, 'ENCAPSULATED' }, $ ;       28C
+      { CW_PDMENU_S,       0, 'NOENCAPSULATED' }, $ ;       28D
+      { CW_PDMENU_S,       2, 'GIF' }, $ ;       28D
+      { CW_PDMENU_S,       1, 'QUIET' }, $  ;     29
+      { CW_PDMENU_S,       0, 'SET' }, $  ;     30
+      { CW_PDMENU_S,       2, 'NOSET' } $  ;     31
+  ]
+
+
+  PDMENU37 = CW_PDMENU( BASE31, MenuDesc704, /RETURN_FULL_NAME, $
+      UVALUE='SPECIAL_OPTIONS',font=bfont)
+
+  MenuDesc711 = [ $
+      { CW_PDMENU_S,       3, 'TIME HISTORY' }, $ ;        0
+        { CW_PDMENU_S,       0, 'START' }, $ ;        1
+        { CW_PDMENU_S,       0, 'END' }, $ ;        2
+        $ ;{ CW_PDMENU_S,       1, 'BACK. ENERGY RANGE' }, $ ;        3
+        $ ;  { CW_PDMENU_S,       0, 'FULL RANGE' }, $ ;        4
+        $  ;{ CW_PDMENU_S,       2, 'SUB-RANGE' }, $ ;        5
+      { CW_PDMENU_S,       0, 'SAMPLE AVERAGE' }, $ ;        6
+      { CW_PDMENU_S,       0, 'ENERGY BANDS (MULTI-TRACE)' }, $ ;        7
+      { CW_PDMENU_S,       0, 'SCALE FOR BANDS' }, $ ;        8
+      { CW_PDMENU_S,       0, 'YRANGE' }, $ ;        9
+      { CW_PDMENU_S,       1, 'Y UNITS' }, $ ;       10
+        { CW_PDMENU_S,       0, 'COUNTS/SEC' }, $ ;       11
+        { CW_PDMENU_S,       2, 'COUNTS/SEC/CM^2/KEV' }, $ ;       12
+      { CW_PDMENU_S,       0, 'BACKGROUND FIT ORDER' }, $ ;       13
+      $;  { CW_PDMENU_S,       0, '0 CONSTANT' }, $ ;       14
+      $;  { CW_PDMENU_S,       0, '1 LINEAR' }, $ ;       15
+      $;  { CW_PDMENU_S,       2, '2 QUADRATIC' }, $ ;       16
+      { CW_PDMENU_S,       1, 'YAXIS' }, $ ;       17
+        { CW_PDMENU_S,       0, 'LINEAR' }, $ ;       18
+        { CW_PDMENU_S,       2, 'LOG' }, $ ;       19
+      { CW_PDMENU_S,       3, 'Y ERROR BARS' }, $ ;       20
+        { CW_PDMENU_S,       0, 'HIDE' }, $ ;       21
+        { CW_PDMENU_S,       2, 'SHOW' } $  ;     22
+  ]
+
+
+  PDMENU40 = CW_PDMENU( BASE31, MenuDesc711, /RETURN_FULL_NAME, $
+      UVALUE='THIST_PAR', font=bfont)
+
+
+  MenuDesc718 = [ $
+      { CW_PDMENU_S,       3, 'SPECTRAL FITS' }, $ ;        0
+        { CW_PDMENU_S,       0, 'FIT PARAMETERS' }, $ ;        1
+        { CW_PDMENU_S,       0, 'FREE/FIX' }, $ ;        2
+        { CW_PDMENU_S,       0, 'LOWER BOUNDS' }, $ ;        3
+        { CW_PDMENU_S,       0, 'UPPER BOUNDS' }, $ ;        4
+        { CW_PDMENU_S,       0, 'VALID FITTING ENERGIES' }, $ ;        5
+        { CW_PDMENU_S,       1, 'RESPONSE MATRIX OPTIONS' }, $ ;        6
+          { CW_PDMENU_S,       0, 'DEFAULT MATRIX' }, $ ;        7
+          $ ;{ CW_PDMENU_S,       1, 'DEFAULT MATRIX' }, $ ;        7
+            $ ;{ CW_PDMENU_S,       0, 'USE' }, $ ;        8
+            $ ;{ CW_PDMENU_S,       2, 'OTHER' }, $ ;        9
+        { CW_PDMENU_S,       0, 'GAIN FACTOR' }, $ ;       10
+        { CW_PDMENU_S,       0, 'GAIN OFFSET' }, $ ;       10
+        { CW_PDMENU_S,       0, 'DIRECT MATRIX FILE' }, $ ;       10
+        { CW_PDMENU_S,       0, 'SCATTER MATRIX FILE' }, $ ;       11
+        { CW_PDMENU_S,       0, 'DRM DIRECTORY' }, $ ;       12
+        { CW_PDMENU_S,       0, 'DEVELOPMENT DRM' }, $ ;       12
+        { CW_PDMENU_S,       0, 'PENDLETON EDGES FOR BATSE CONT' }, $ ;       12
+        { CW_PDMENU_S,       0, 'DEFAULT EDGES FOR BATSE CONT' }, $ ;       12
+        { CW_PDMENU_S,       2, 'BUILD HIGH ENERGY MATRIX' }, $ ;       13
+      { CW_PDMENU_S,       1, 'CURRENT INTERVAL' }, $ ;       14
+      { CW_PDMENU_S,       0, 'NEXT INTERVAL' }, $ ;       14
+      { CW_PDMENU_S,       0, 'PREV. INTERVAL' }, $ ;       14
+      { CW_PDMENU_S,       0, 'FIRST INTERVAL #' }, $ ;       14
+      { CW_PDMENU_S,       2, 'LAST INTERVAL #' }, $ ;       15
+      { CW_PDMENU_S,       0, 'MIN. UNCERTAINTY' }, $ ;       16
+      { CW_PDMENU_S,       0, 'PLOT XRANGE' }, $ ;       17
+      { CW_PDMENU_S,       0, 'PLOT YRANGE' }, $ ;       18
+      { CW_PDMENU_S,       1, 'SOURCE FOR INIT. PARAMS.' }, $ ;       19
+        { CW_PDMENU_S,       0, 'PREVIOUS INTERVAL' }, $ ;       20
+        { CW_PDMENU_S,       2, 'LAST FIT TO CURRENT INTERVAL' }, $ ;       21
+      { CW_PDMENU_S,       1, 'XAXIS TYPE' }, $ ;       22
+        { CW_PDMENU_S,       0, 'LOG' }, $ ;       23
+        { CW_PDMENU_S,       2, 'LINEAR' }, $ ;       24
+      { CW_PDMENU_S,       1, 'YAXIS TYPE' }, $ ;       25
+        { CW_PDMENU_S,       0, 'LOG' }, $ ;       26
+        { CW_PDMENU_S,       2, 'LINEAR' }, $ ;       27
+      { CW_PDMENU_S,       1, 'MODEL FUNCTION' }, $ ;       28
+        { CW_PDMENU_S,       0, 'THERM + BR. P-LAW' }, $ ;       29
+        $ ;{ CW_PDMENU_S,       0, 'LINE + BR. P-LAW' }, $ ;       29
+        { CW_PDMENU_S,       0, '2THERM + P-LAW' }, $ ;       30
+        { CW_PDMENU_S,       0, '2THERM + BR. P-LAW' }, $ ;       30
+        { CW_PDMENU_S,       0, 'TRIPLE P-LAW' }, $ ;       30
+        { CW_PDMENU_S,       0, 'USE STIFF PL FUNCTION' }, $ ;       30
+        { CW_PDMENU_S,       0, 'USE SMOOTH PL FUNCTION' }, $ ;       30
+        {CW_PDMENU_S,        0, 'BR. P-LAW + 5LINE'},  $
+        { CW_PDMENU_S,       2, 'OTHER' }, $ ;       31
+      { CW_PDMENU_S,       3, 'MORE INFO' }, $ ;       32
+        { CW_PDMENU_S,       0, 'SET' }, $ ;       33
+        { CW_PDMENU_S,       2, 'RESET' } $  ;     34
+  ]
+
+
+
+  SPCLOPT_PD = CW_PDMENU( BASE31, MenuDesc718, /RETURN_FULL_NAME, $
+      UVALUE='SPEC_FITS', font=bfont, ids=spclopt_id)
+ ;     ioff = 4
+ ;   test = ''
+ ;   while test ne 'USE' do begin
+ ;      widget_control, ioff+spclopt_id(0), get_val=test
+ ;      ioff = ioff+1
+ ;   endwhile
+ ;      for i=0,6 do widget_control, ioff+spclopt_id(0)+1+i, sensit=0
+
+  MenuDesc727 = [ $
+      { CW_PDMENU_S,       3, 'SUMMARY' }, $ ;        0
+        { CW_PDMENU_S,       1, 'SUMMARY FILE NAME' }, $ ;        1
+        { CW_PDMENU_S,       0, 'AUTONAME' }, $ ;        1
+        { CW_PDMENU_S,       2, 'CHANGE' }, $ ;        1
+        { CW_PDMENU_S,       0, 'SUMMARY FILE DIRECTORY' }, $ ;        2
+        { CW_PDMENU_S,       3, 'PARAMETERS TO PLOT' }, $ ;        3
+          { CW_PDMENU_S,       1, 'ON XAXIS' }, $ ;        4
+            { CW_PDMENU_S,       0, 'TIME ' }, $ ;        5
+            { CW_PDMENU_S,       0, 'PARAMETER #' }, $ ;        6
+            { CW_PDMENU_S,       0, 'CHISQUARE' }, $ ;        7
+            { CW_PDMENU_S,       0, 'SHOW ERRORS' }, $ ;        8
+            { CW_PDMENU_S,       2, 'HIDE ERRORS' }, $ ;        9
+      { CW_PDMENU_S,       3, 'ON YAXIS' }, $ ;       10
+        { CW_PDMENU_S,       0, 'PARAMETER #' }, $ ;       11
+        { CW_PDMENU_S,       0, 'CHISQUARE' }, $ ;       12
+        { CW_PDMENU_S,       0, 'SHOW ERRORS' }, $ ;       13
+        { CW_PDMENU_S,       2, 'HIDE ERRORS' } $  ;     14
+  ]
+
+
+  PDMENU42 = CW_PDMENU( BASE31, MenuDesc727, /RETURN_FULL_NAME, $
+      UVALUE='SUMMARY_OPT', font=bfont)
+
+
+ BASE71 = WIDGET_BASE(MAIN2, $
+      row=1, $
+      FRAME=1, $
+      MAP=1, $
+      TITLE='DIALOG BOX', $
+      UVALUE='BASE71')
+
+  Btns738 = [   ' EXIT ']
+  BGROUP187 = CW_BGROUP( BASE71, Btns738, $
+      ROW=1, $
+      FRAME=4,$
+      FONT=bfont,ysiz=80, $
+      $ ;LABEL_LEFT='TO EXIT:', $
+      UVALUE='exit_group')
+
+  FIELD111 = CW_FIELD( base71, $
+      ROW=1, $
+      STRING=1, $
+      RETURN_EVENTS=1, $
+      FRAME=2, $
+      TITLE='                          COMMAND LINE for SPEX                          ', /column, $
+      UVALUE='FIELD111' )  ;XSIZE=43)
+
+  BASE70 = WIDGET_BASE(MAIN2, $
+      ROW=1, $
+      FRAME=1, $
+      MAP=1, $
+      TITLE='HELP', $
+      UVALUE='BASE70')
+
+  LABEL80 = WIDGET_LABEL( BASE70, $
+      FONT=text_font, $
+      UVALUE='HELP:', $
+      VALUE='HELP:')
+
+  Btns674 = [ $
+    'CLEAR','SPEX OVERVIEW', $
+    'DISPLAY SPEX SUMMARY', 'HELP ON ACTIONS AND OPTIONS' ]
+  BGROUP73 = CW_BGROUP( BASE70, Btns674, $
+      COLUMN=1, EXCLUSIVE=1, $
+      LABEL_TOP='SELECT ONE', $
+      UVALUE='BGROUP73')
+
+;  Btns676 = [ $
+;    'HELP ON ACTION BUTTON', $
+;    'HELP ON OPTION BUTTON' ]
+;  BGROUP77 = CW_BGROUP( BASE70, Btns676, $
+;      COLUMN=1, $
+;      NONEXCLUSIVE=1, $
+;      LABEL_TOP='SPECIFIC', $
+;      UVALUE='BGROUP77')
+
+
+
+  TextVal736 = [ $
+    '', $
+    '', $
+    '', $
+    'Spectral Plot and Fit Parameters:', $
+    '', $
+    'F_MODEL            f_vth_bpow', $
+    'APAR               1.00000e-05  1.00000      3.92000      2.66000', $
+    '400.000      1.93000', $
+    'FREE               0            0            1            1', $
+    '0            0', $
+    'UNCERT             0.0500000', $
+    'IFIRST             0', $
+    'ILAST              0', $
+    'RANGE_LO           1.00000e-07  0.500000     1.00000e-10  1.00000', $
+    '12.0000      1.00000', $
+    'RANGE_HI           1000.00      20.0000      1.00000e+10  12.0000', $
+    '1500.00      12.0000', $
+    'ERANGE             30.0000      100.000', $
+    'SUMFIT             0', $
+    'SP_XTYPE           1', $
+    'SP_YTYPE           1', $
+    'SPXRANGE           0.000000     0.000000', $
+    'SPYRANGE           0.000000     0.000000', $
+    'MORE_INFO          0', $
+    '' ]
+ INFO_BASE = WIDGET_BASE( group_leader=main2, $
+      COLUMN=1, $
+      FRAME=1, $
+      MAP=1, $
+      yoffset= .5*ssiz(1), $
+      xoffset=  10, $
+      TITLE='INFO BOX', $
+      UVALUE='INFO_BASE')
+
+  LABEL82 = WIDGET_LABEL( INFO_BASE, $
+      UVALUE='INFOBOX', $
+      VALUE='SPEX INFORMATION BOX')
+
+  TEXT214 = WIDGET_TEXT( INFO_BASE,VALUE=TextVal736, $
+      FONT=info_font, $
+      $ ;FONT='-bigelow & holmes-menu-medium-r-normal--12-120-75-75-p-70-iso8859-1', $
+      UVALUE='TEXTDISPLAY', $
+      /scroll, $
+      XSIZE=80, $
+      YSIZE=24)
+
+  printx, base = text214
+
+  WIDGET_CONTROL, MAIN2, /REALIZE, /hourglass
+  widget_control, info_base, /realize
+
+  spex_proc, /gui, bang_out= bang
+  XMANAGER, 'INFO_BASE', INFO_BASE, /just_reg
+  XMANAGER, 'MAIN2', MAIN2
+  xmanager			;helps user resume using on retall
+  ;restore system variables to outside world
+  if keyword_set(bang) then begin
+	!p= bang.p
+	!x= bang.x
+	!y= bang.y
+	!z= bang.z
+  endif
+  printx, base=-1	;disable printing to text widget
+END

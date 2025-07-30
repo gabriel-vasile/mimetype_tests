@@ -1,0 +1,1371 @@
+  xlf(1)                            IBM XL Fortran Enterprise Edition                           xlf(1)
+
+
+
+  NAME
+         xlf, xlf90, xlf95, xlf_r, xlf90_r, xlf95_r, f90, f95, xlf_r7, xlf90_r7, xlf95_r7, f77, fort77
+         - invoke the IBM XL Fortran compiler
+
+  SYNTAX
+         xlf [ option | file ] ...
+         xlf90 [ option | file ] ...
+         xlf95 [ option | file ] ...
+         xlf_r [ option | file ] ...
+         xlf90_r [ option | file ] ...
+         xlf95_r [ option | file ] ...
+         xlf_r7 [ option | file ] ...
+         xlf90_r7 [ option | file ] ...
+         xlf95_r7 [ option | file ] ...
+         f90[ option | file ]...
+         f95[ option | file ]...
+         f77 [ option | file ] ...
+         fort77 [ option | file ] ...
+
+  DESCRIPTION
+         xlf and related invocation commands compile Fortran source files.  They also process
+         assembler source files and object files. Unless you specify the -c option, these commands
+         call the link editor to produce a single object file.
+
+         The name of an input file indicates the type of file, as follows:
+           -.f suffix: Fortran source file
+           -.o or .a suffix: object file for ld command
+           -.s suffix: assembler source file
+           -.F suffix: Fortran source file with cpp preprocessor directives
+
+         The main difference between these commands is that they use different default options (which
+         are set in the configuration file /etc/xlf.cfg).  See the XL Fortran Enterprise Edition
+         User's Guide for more information on these invocation commands.
+
+  OPTIONS
+         You can select compiler behavior by using compiler options on the command line.  Options can
+         be flag options or keyword options.
+
+         Keyword options are specified in one of the following ways:
+
+         -q<option>
+         -q<option>=<suboption>
+         -q<option>=<suboption>:<suboption>
+
+         Keyword options with no suboptions represent switches that may be either on or off.  -qx
+         turns the switch on, and -qnox turns the switch off.  For example, -qsource tells the
+         compiler to produce a source listing and -qnosource tells the compiler not to produce a
+         source listing.
+
+  Options that control input to the compiler
+         -I<dir>
+                Adds a directory to the search path for include files and .mod files.  Searches in
+                directory <dir> for #include files that do not start with an absolute path, and for
+                the .mod files of any modules used.  Default: The following directories are searched,
+                in the following order:
+                1) The current directory
+                2) The directory where the source file is located
+                3) /usr/include.
+
+         -k     This option is the short form for -qfree=f90.  States that Fortran code is in free
+                source form input format.
+
+         -qci=<num1>[:<num2>[: ... [:<numn>]]]
+                Activates the specified INCLUDE lines.  Specifies identification numbers (from 1 to
+                255) of conditional includes.
+
+         -qcr | -qnocr
+                Allows you to control how the compiler interpretes the CR (carriage return) character.
+                This allows you to compile code written using a Mac OS or DOS/Windows editor.  The
+                default is -qcr.
+
+         -qdirective[=<directives>] | -qnodirective[=<directives>]
+                Specifies target strings to be recognized in a comment directive.  -qdirective with no
+                strings turns on the default trigger constant IBM* if it has been turned off by a
+                previous -qnodirective.  The default is -qnodirective.
+
+         -qfixed[=<num>]
+                States that Fortran code is in free source form, and optionally specifies the maximum
+                line length.
+
+                For the xlf, xlf_r, xlf_r7, f77, and fort77 commands, the default is -qfixed=72.  For
+                the xlf90, xlf90_r, f90, xlf95, xlf95_r and f95 commands, the default is -qfixed=f90.
+
+         -qfree[=f90|ibm]
+                States that Fortran code is in either Fortran 90 free source form (-qfree or
+                -qfree=f90) or IBM free source form (-qfree=ibm).
+
+                For the xlf, xlf_r, xlf_r7, f77, and fort77 commands, the default is -qfixed=72.  For
+                the xlf90, xlf90_r, f90, xlf95, xlf95_r, xlf90_r7, xlf95_r7 and f95 commands, the
+                default is -qfree=f90.
+
+         -qmbcs | -qnombcs
+                Indicates that character or Hollerith constants, H edit or character string edit
+                descriptors can contain Multi-Byte Character Set (MBCS) or Unicode characters.  The
+                default is -qnombcs.
+
+         -qmixed | -qnomixed
+                The long form of the -U option.  Makes the compiler case sensitive for names.  The
+                default is -qnomixed.
+
+         -qsuffix=<option>=<suffix>
+                Specifies the source-file suffix on the command line instead of in the .cfg file.
+                Options include:
+
+                f=<suffix>
+                     Where <suffix> is the new source-file suffix.
+                o=<suffix>
+                     Where <suffix> is the new object-file suffix.
+                s=<suffix>
+                     Where <suffix> is the new assembler source-file suffix.
+                cpp=<suffix>
+                     Where <suffix> is the new preprocessor source-file suffix.
+
+         -U     Makes the compiler case sensitive for names.  Suppresses lowercase folding of Fortran
+                code.
+
+  Options that Specify the location of output files
+         -d     Keeps temporary files produced by C preprocessor (cpp), instead of deleting them. By
+                default temporary files produced by cpp are deleted.
+
+         -o <name>
+                Specifies a name for the output object, executable, or assembler source file.  If this
+                option is not specified, the default name is a.out.
+
+         -qmoddir=<directory>
+                Specifies the location for any .mod files that the compiler writes. By default .mod
+                files are placed in the current directory.
+
+  Options for Performance Optimization
+         -O     Optimizes code (currently the same as -O2).
+
+         -O0    Performs very few optimizations (the same as -qnoopt).
+
+         -O2    Optimizes code.
+
+         -O3    Performs the -O level optimizations and performs additional optimizations that are
+                memory or compile-time intensive.
+
+         -O4    Aggressively optimizes the source program, trading off additional compile time for
+                potential improvements in the generated code.  This option implies the following
+                options: -qarch=auto -qcache=auto -qhot -qipa -qtune=auto -O3.
+
+         -O5    Same as -O4, but also implies the -qipa=level=2 option.
+
+         -P{v|k}[!]
+                Invokes the selected optimizing preprocessor. Adding '!'  prevents the compilation
+                step from following preprocessing.  The default is set to no preprocessing.
+
+         -p, -pg
+                Sets up the object file for profiling.  The default is no profiling.
+
+         -Q, -Q!, -Q+<names>, -Q-<names>
+                Specifies whether internal procedures are inlined or only the internal procedures
+                identifed in <names>, are inlined or are exempt from inlining.  <names> is a list of
+                internal procedure names that are separated by colons.  You must specify at least an
+                optimization level of -O2 for inlining to take effect with -Q. To turn on inline
+                expansion for calls to procedures in different scopes, you must also use the
+                -qipa=inline. The default is no inlining.
+
+         -qalias=<suboption>
+                Indicates whether a program contains certain categories of aliasing to determine
+                whether certain optimizations are performed.  Suboptions include:
+
+                aryovrlp
+                     Program contains array assignments of overlapping or storage-associated arrays.
+                     This is the default.
+                noaryovrlp
+                     Program does not contain array assignments of overlapping or storage-associated
+                     arrays; it can produce significant performance improvements for array language.
+                intptr
+                     Program contains integer pointer declarations.
+                nointptr
+                     Program does not contain integer pointer declarations.  This is the default.
+                pteovrlp
+                     Program contains pointee variables that refer to non-pointee variables, or two
+                     pointee variables that refer to the same storage location.  This is the default.
+                nopteovrlp
+                     Program does not contain pointee variables that refer to non-pointee variables or
+                     two pointee variables that refer to the same storage location.
+                std
+                     Program contains only standard-conforming aliasing.  This is the default.
+                nostd
+                     Program contains some non-standard aliasing.  (-qalias=nostd replaces the
+                     obsolete -qxflag=xalias option.)
+                The default is -qalias=aryovrlp:nointptr:pteovrlp:std for the xlf90, xlf90_r7, xlf95,
+                xlf95_r, xlf95_r7, f90 and f95 and -qalias= aryovrlp:intptr:pteovrlp:std for the xlf,
+                xlf_r, xlf_r7, f77, and fort77 commands.
+
+         -qalign=<suboption>
+                Specifies the alignment of data objects in storage to avoid performance problems with
+                misaligned data.  Suboptions include:
+
+                4k
+                     Indicates that large arrays and structures (at least 4096 bytes in size) will be
+                     aligned on a 4K (4096-byte or page) boundary.  Use of this option may help to
+                     improve the performance of programs using data striping.
+                no4k
+                     Indicates not to align large data objects on page (4k) boundary.
+                bindc={suboption}
+                     Specifies that the alignment and padding for an XL Fortran derived type with the
+                     BIND(C) attribute is compatible with a C struct type that is compiled with the
+                     corresponding XL C alignment option. The compatible alignment options include:
+                     -qalign=bindc=bit_packed, the corresponding XL C option is -qalign=bit_packed.
+                     -qalign=bindc=full|power
+                     -qalign=bindc=packed
+                     -qalign=bindc=twobyte|mac68k (It is valid only in 32-bit mode).
+                     -qalign=bindc=natural
+                struct=natural
+                     Objects of a derived type declared using a STRUCTURE declaration are stored such
+                     that each component of each element is stored on its natural alignment boundary,
+                     unless storage association requires otherwise.
+                struct=packed
+                     Objects of a derived type declared using a STRUCTURE declaration are stored with
+                     no space between components, other than any padding represented by %FILL
+                     components.
+                struct=port
+                     Storage padding is the same as described above for the struct=natural suboption,
+                     except that the alignment of components of type complex is the same as the
+                     alignment of components of type real of the same kind.  The padding for an object
+                     that is immediately followed by a union is inserted at the beginning of the first
+                     map component for each map in that union.
+
+                -qalign=no4k:struct=natural:bindc=power.
+
+         -qarch=<suboption>
+                Specifies which instructions the compiler can generate.  Suboptions include:
+
+                auto
+                     Automatically detects the specific architecture of the compiling machine.  It
+                     assumes that the execution environment will be the same as the compilation
+                     environment.
+                com
+                     Produces an object that contains instructions that run on all POWER and PowerPC
+                     hardware platforms.  This is the default.
+                p2sc
+                     The executable file can be executed on any POWER2 Super Chip hardware platform.
+                ppc
+                     Produces an object that contains instructions that run on any of the 32-bit
+                     PowerPC hardware platforms. Using -q64 with ppc upgrades the architecture to
+                     ppc64.
+                ppcgr
+                     In 32-bit mode, produces object code containing optional graphics instructions
+                     for PowerPC hardware platforms.  In 64-bit mode, produces object code containing
+                     optional graphics instructions that will run on 64-bit PowerPC platforms, but not
+                     on 32-bit-only platforms.  Using -q64 with ppcgr upgrades the architecture to
+                     ppc64gr.
+                ppc64
+                     Produces object code that will run on any 64-bit PowerPC hardware platform. When
+                     compiled in 32-bit mode, the resulting object code may include instructions that
+                     are not recognized or behave differently when run on 32-bit PowerPC platforms.
+                ppc64gr
+                     Produces object code that will run on any 64-bit PowerPC hardware platform that
+                     supports the optional graphics instructions.
+                ppc64grsq
+                     Produces object code that will run on any 64-bit PowerPC hardware platform that
+                     supports the optional graphics and square root instructions.  This is the default
+                     option.
+                pwr
+                     Produces an object that contains instructions that run on any of the POWER or
+                     POWER2 hardware platforms.
+                pwr2s
+                     The executable file can be executed on any desktop implementation of the POWER2
+                     chip.
+                pwr2/pwrx
+                     Produces an object that contains instructions that run on the POWER2 hardware
+                     platforms.
+                pwr3
+                     Produces an object that contains instructions that run on the POWER3 hardware
+                     platforms.
+                pwr4
+                     Produces an object that contains instructions that run on the POWER4 hardware
+                     platforms.
+                pwr5
+                     Produces an object that contains instructions that run on the POWER5 hardware
+                     platforms.
+                rs64a
+                     Produces an object that contains instructions that run on an RS64I hardware
+                     platform.
+                rs64b
+                     Produces an object that contains instructions that run on an RS64II hardware
+                     platform.
+                rs64c
+                     Produces an object that contains instructions that run on an RS64III hardware
+                     platform.
+                601
+                     Produces an object that contains instructions that run on PowerPC 601 systems.
+                603
+                     Produces an object that contains instructions that run on PowerPC 603 systems.
+                604
+                     Produces an object that contains instructions that run on PowerPC 604 systems.
+                ppc970
+                     Generates instructions specific to PowerPC 970 processors.
+
+         -qassert={deps|nodeps|itercnt=<n>}
+                Provides information about the program to help fine-tune optimizations. Suboptions
+                include:
+
+                deps
+                     Loops can contain loop-carried dependencies.
+                nodeps
+                     No loops contain any loop-carried dependencies.
+                itercnt=<n>
+                     The iteration count of a typical loop is <n>.
+                The default is -qassert=deps:itercnt=1024.
+
+         -qcache=<subopt1>[=<val1>][:...:<suboptN>[=<valN>]]
+                Specifies the cache configuration for a specific execution machine. Suboptions
+                include:
+
+                assoc=<num>
+                     Specifies the set associativity of the cache:
+                     0   = Directly-mapped cache
+                     1   = Fully associative cache
+                     n>1 = n-way set-associative cache
+                auto
+                     Automatically detects the specific cache configuration of the compiling machine.
+                     It assumes that the execution environment will be the same as the compilation
+                     environment.
+                cost=<cycles>
+                     Specifies the performance penalty resulting from a cache miss.
+                level=<level>
+                     Specifies which level of cache is affected:
+                     1 = Basic cache.
+                     2 = Level-2 cache, or the table lookaside buffer (TLB) if the machine has no
+                     level-2 cache.
+                     3 = TLB, in a machine that does have a level-2 cache.
+                line=<bytes>
+                     Specifies the line size of the cache.
+                size=<Kbytes>
+                     Specifies the total size of the cache.
+                type=<type> Specifies the type of cache that the
+                     settings apply to:
+                     C or c = Combined data and instruction cache
+                     D or d = Data cache
+                     I or i = Instruction cache
+
+         -qcompact | -qnocompact
+                Reduces optimizations that increase code size.  The default is -qnocompact.
+
+         -qdirectstorage | -qnodirectstorage
+                Specifies that a given compilation unit might reference write-through-enabled or
+                cache-inhibited storage.  The default is -qnodirectstorage.
+
+         -qessl | -qnoessl
+                Specifies that, if either -lessl or -lesslsmp are also specified, then Engineering and
+                Scientific Subroutine Library (ESSL) routines should be used in place of some Fortran
+                90 intrinsic procedures when there is a safe opportunity to do so.  The default is
+                -qnoessl.
+
+         -qfdpr | -qnofdpr
+                Provides object files with information that the AIX Feedback Directed Program
+                Restructuring (fdpr) performance-tuning utility needs to optimize the resulting
+                executable file.  The default is -qnofdpr.
+
+         -qhot[=<suboptions>] | -qnohot
+                Performs high-order transformations on loops during optimization, and optionally
+                padding array dimensions and data objects to avoid cache misses. Suboptions include:
+
+                arraypad
+                     The compiler will pad any arrays where it infers there may be a benefit.
+                arraypad=<n>
+                     The compiler will pad every array in the code.  The pad amount must be a positive
+                     integer value.
+                vector | novector
+                     The compiler converts certain operations in a loop that apply to successive
+                     elements of an array into a call to a routine that is in the libxlopt.a library.
+                     If you specify -qhot=novector, the compiler performs optimizations on loops and
+                     arrays, but avoids replacing certain code with calls to vector library routines.
+                novector
+                     The compiler will avoid replacing code by calls to vector library routines.
+                vector
+                     Allows the compiler to optimize by replacing code with calls to vector library
+                     routines.
+                If -qhot is specified without parameters, the default is -qhot=vector.
+
+                The default is -qnohot.
+
+         -qipa[=<suboptions>]  | -qnoipa
+                Enhances -O optimization by doing detailed analysis across procedures.  Optimization
+                level -O2 or higher is required when using -qipa.  Regular expressions are supported
+                when specifying <procedure_names> on the -qipa=exits, -qipa=inline, -qipa=lowfreq,
+                -qipa=noinline, -qipa=pure, -qipa=safe and -qipa=unknown suboptions.
+
+                Suboptions include:
+
+                exits=<procedure_names>
+                     Specifies a selected set of procedures which always end the program.
+                inline=<inline-options>
+                     The "ipa=inline=" command can take a colon-separated list of inline options,
+                     which are as follows:
+                     inline={auto|noauto}
+                          Specifies whether to automatically inline expansion.  The default is auto.
+                     inline=<procedure_names>
+                          Specifies a comma-separated list of procedures to try to inline.
+                     inline=limit=<num>
+                          Changes the size limits that determine how much inline expansion to do.
+                          <num> is the optimizer's approximation of the number of bytes of code which
+                          will be generated. This argument is implemented only when inline=auto is on.
+                     inline=threshold=<num>
+                          Specifies the upper size limit on procedures to inline.  <num> is defined as
+                          for inline=limit.  This argument is implemented only when inline=auto is on.
+                isolated=<procedure_names>
+                     Specifies a comma-separated list of procedures that are not compiled with -qipa
+                     and do not directly refer to any global variable.
+                level=<level>
+                     Determines the amount of IPA analysis and optimization performed:
+                     0
+                          Does only minimal interprocedural analysis and optimization.
+                     1
+                          Turns on inlining, limited alias analysis, and limited call-site tailoring.
+                     2
+                          Full interprocedural data flow and alias analysis.
+                     The default level is 1.
+                list=[<filename>|short|long]
+                     Specifies an output listing file name during the link phase, in the event that an
+                     object listing has been requested using the -qlist or -qipa=list option.  The
+                     default name is "a.lst".  The suboptions short and long determine which listing
+                     sections will be included.  The default is short.
+                lowfreq=<procedure_names>
+                     Specifies a comma-separated list of procedures that are likely to be called
+                     infrequently during the course of a typical program run.
+                missing={unknown|safe|isolated|pure}
+                     Specifies the default assumption for procedures not compiled with -qipa.  The
+                     default is unknown.
+                noinline=<procedure_names>
+                     Specifies a comma-separated list of procedures which are not to be inlined.
+                object | noobject
+                     Includes standard object code in the object files.  This is the default. If
+                     noobject option is specified, it speeds up compilation, but the object files
+                     cannot be used in non-IPA compilations.
+                partition={small|medium|large}
+                     Specifies the size of program sections that are analyzed together.  Larger
+                     partitions may produce better analysis but require more storage.  The default is
+                     medium.
+                pdfname=<filename>
+                     Specifies the name of the profile data file that contains the PDF profiling
+                     information. If you do not specify a filename, the default file name is __pdf.
+                pure=<procedure_names>
+                     Specifies a comma-separated list of procedures not compiled with -qipa and that
+                     are "isolated", "safe", and do not modify any data objects that are visible to
+                     the caller.
+                safe=<procedure_names>
+                     Specifies a comma-separated list of procedures not compiled with -qipa and that
+                     do not call any other part of the program.
+                stdexits | nostdexits
+                     Specifies that compiler-defined exit routines can be optimized as with the
+                     "exits" suboption.  The procedures are abort, exit, _exit, and _assert.  The
+                     default is nostdexits.
+                nothreads
+                     Don't run parallel processes. Equivalent to running one serial process.
+                threads[=N]
+                     Run as many parallel processes as are available, or N processes.  N must be a
+                     positive integer.
+                unknown=<procedure_names>
+                     Specifies a comma-separated list of procedures not compiled with -qipa and that
+                     may update global variables and dummy arguments and call other parts of the
+                     program compiled with -qipa.
+
+                The default is -qnoipa.
+
+                The following options are intended for use by the link-time phase of -qipa:
+
+                -qlibansi | -qnolibansi
+                     Assumes that all functions with the name of an ANSI C defined library function
+                     are, in fact, the library functions.  The default is -qnolibansi.  -qthreaded
+                     Assumes that the compiler will attempt to generate thread-safe code.
+                -qlibessl | -qnolibessl
+                     Assumes that all functions with the name of an ESSL defined library functions
+                     are, in fact, the library functions.  The default is -qnolibessl.
+                -qlibposix | -qnolibposix
+                     Assumes that all functions with the name of an IEEE 1003.1-2001 (POSIX) defined
+                     library function are, in fact, the system functions.  The default is
+                     -qnolibposix.
+                -qthreaded
+                     Assumes that the compiler will attempt to generate thread-safe code.
+
+         -qkeepparm | -qnokeepparm
+                Specifying the -qkeepparm compiler option ensures that the incoming parameters are
+                stored on the stack even when optimizing. This may negatively impact execution
+                performance. This option then provides access to the values of incoming parameters to
+                tools, such as debuggers, simply by preserving those values on the stack. The default
+                is -qnokeepparm.
+
+         -qlargepage | -qnolargepage
+                Indicates that a program, designed to execute in a large page memory environment, can
+                take advantage of large 16 MB pages provided on POWER4 or follow-on CPUs.  The default
+                is -qnolargepage.
+
+         -qlibansi | -qnolibansi
+                See the -qlibansi link-time option under -qipa.  The default is -qnolibansi.
+
+         -qlibessl | -qnolibessl
+                See the -qlibessl link-time option under -qipa.  The default is -qnolibessl.
+
+         -qlibposix | -qnolibposix
+                See the -qlibposix link-time option under -qipa.  The default is -qnolibposix.
+
+         -qmaxmem=<kbytes>
+                Limits the amount of memory that the compiler allocates while performing specific,
+                memory-intensive optimizations to the specified number of kilobytes. A value of -1
+                allows optimization to take as much memory as it needs without checking for limits.
+
+         -qobject | -qnoobject
+                Specifies whether to produce an object file or to stop immediately after checking the
+                syntax of the source files.  The default is -qobject.
+
+         -qoptimize[=<level>] | -qnooptimize
+                The long form of the -O option.  The default is -qnooptimize. Level can be one of 0,
+                2, 3, 4, or 5.
+
+         -qpdf1 | -qnopdf1
+                Produces an object that is instrumented to collect run-time execution information.
+                This is phase 1 of the profile-directed feedback optimization process.  The default is
+                -qnopdf1.
+
+         -qpdf2 | -qnopdf2
+                Tunes application performance using the data generated by running a program compiled
+                with -qpdf1.  This is phase 2 of the profile-directed feedback optimization process.
+                The default is -qnopdf2.
+
+         -qprefetch | -qnoprefetch
+                Automatically inserts prefetch instructions.  The default is -qprefetch.
+
+         -qsaveopt | -qnosaveopt
+                Saves the command-line options used for compiling a source file in the corresponding
+                object file.  The default is -qnosaveopt.
+
+         -qshowpdf | -qnoshowpdf
+                Adds additional call and block count profiling information to an executable. This
+                option is used together with the -qpdf1 option.  The default is -qnoshowpdf.
+
+         -qsmallstack | -qnosmallstack
+                Minimizes stack usage, where possible.  The default is -qnosmallstack.
+
+         -qsmp[=<suboption1>[:...:<suboptionN>]] | -qnosmp
+                Specifies that code should be produced for an SMP system.  Suboptions include:
+
+                auto | noauto
+                     This suboption controls automatic parallelization. The default is auto.
+                nested_par | nonested_par
+                     If nested_par is specified, prescriptive nested parallel constructs are
+                     parallelized by the compiler. The default is nonested_par.
+                omp | noomp
+                     If you specify -qsmp=omp, the compiler enforces compliance with the OpenMP
+                     Fortran API. The default is noomp.
+                opt | noopt
+                     If -qsmp=noopt suboption is specified, the compiler will do the least amount of
+                     optimization that is required to parallelize the code. The default is opt.
+                rec_locks | norec_locks
+                     If -qsmp=norec_locks is specified, recursive locks will not be used to implement
+                     critical sections. The default is norec_locks.
+                schedule=<suboptions>
+                     The schedule suboption can take any of the following subsuboptions.  For their
+                     descriptions see the User's Guide:
+                     affinity[=n]
+                     dynamic[=n]
+                     guided[=n]
+                     run-time
+                     static[=n]
+                threshold[=n]
+                     Controls the amount of automatic loop parallelization that occurs.  The value of
+                     n represents the lower limit allowed for parallelization of a loop, based on the
+                     level of "work" present in a loop.
+                The default is -qnosmp.
+
+         -qspillsize=<bytes>
+                The long form of -NS.  See the -N Option.
+
+         -qstrict | -qnostrict
+                Ensures that optimizations done by the -O3, -O4, -O5, -qhot, and -qipa options, and
+                optionally with the -O2 option, do not alter the semantics of a program.  For -O3,
+                -O4, -O5, -qhot, and -qipa, the default is -qnostrict.  For -O2, the default is
+                -qstrict.  This option is ignored for -qnoopt.
+
+         -qstrictieeemod | -qnostrictieeemod
+                Specifies that the compiler will adhere to the Fortran 2003 IEEE arithmetic rules for
+                the ieee_arithmetic and ieee_exceptions intrinsic modules.  The default is
+                -qstrictieeemod.
+
+         -qstrict_induction | -qnostrict_induction
+                Prevents the compiler from performing induction (loop counter) variable optimizations
+                that could alter the semantics of a program.  The default is -qnostrict_induction.
+
+         -qthreaded
+                Specifies that the compiler must generate thread-safe code.  -qthreaded is the default
+                for the xlf90_r, xlf90_r7, xlf95_r, xlf95_r7, xlf_r, and xlf_r7 commands.
+
+         -qtune=<suboption>
+                Tunes instruction selection, scheduling, and other implementation-dependent
+                performance enhancements for a specific implementation of a hardware architecture.
+                Suboptions are as follows:
+
+                auto
+                     Automatically detects the specific processor type of the compiling machine and
+                     produces an object optimized for that processor.
+                601
+                     Produces an object optimized for all the PowerPC 601 processors.
+                603
+                     Produces an object optimized for all the PowerPC 603 processors.
+                604
+                     Produces an object optimized for all the PowerPC 604 processors.
+                pwr
+                     Produces an object optimized for the POWER hardware platforms.
+                p2sc
+                     The optimizations are tuned for the POWER2 Super Chip.
+                pwr2/pwrx
+                     Produces an object optimized for the POWER2 hardware platforms.
+                pwr2s
+                     Produces an object optimized for a subset of POWER2 hardware platforms, the
+                     desktop models with narrow memory bandwidth.
+                pwr3
+                     Produces an object optimized for the POWER3 hardware platforms.
+                pwr4
+                     Produces an object optimized for the POWER4 hardware platforms.
+                pwr5
+                     Produces an object optimized for the POWER5 hardware platforms.
+                rs64a
+                     Produces an object optimized for the PowerPC RS64I processor.
+                rs64b
+                     Produces an object optimized for the PowerPC RS64II processor.
+                rs64c
+                     Produces an object optimized for the PowerPC RS64III processor.
+                ppc970
+                     Produces an object optimized for PowerPC 970 processors.
+                The compiler uses -qtune setting that is compatible with the target archictecture,
+                which is controlled by the -qarch, -q32, and -q64 options.
+
+         -qunroll[=<suboption>] | -qnounroll
+                Specifies whether unrolling a DO loop is allowed in a program.  Unrolling is allowed
+                on outer and inner DO loops.  Suboptions include:
+
+                auto
+                     The compiler performs basic loop unrolling.
+                yes
+                     The compiler looks for more opportunities to perform loop unrolling than is done
+                     with the -qunroll=auto option.
+
+                The default is -qunroll=auto.
+
+         -qunwind | -qnounwind
+                Specifies that the compiler will preserve the default behavior for saves and restores
+                to volatile registers during a procedure call.  If you specify -qnounwind, the
+                compiler rearranges subprograms to minimize saves and restores to volatile registers.
+                The default is -qunwind.
+
+         -qversion | -qnoversion
+                Displays the version and release of the compiler.  The default is -qnoversion.
+
+         -qzerosize | -qnozerosize
+                Improves performance of some programs by preventing checking for zero-sized character
+                strings and arrays.
+                For the xlf90, xlf90_r, xlf90_r7, xlf95, xlf95_r, xlf95_r7, f90, and f95 commands, the
+                default is -qzerosize.  For the xlf, xlf_r, f77, and fort77 commands, the default is
+                -qnozerosize.
+
+  Options for Error Checking and Debugging
+         -C     Checks each reference to an array element, array section, or character substring for
+                correctness.
+
+         -D     Specifies whether the compiler compiles fixed source form lines with a D in column 1
+                or treats them as comments.
+
+         -g     Generates debug information for use by a symbolic debugger.
+
+         -qcheck | -qnocheck
+                The long form of the -C option.  The default is -qnocheck.
+
+         -qdbg | -qnodbg
+                The long form of the -g option.  The default is -qnodbg.
+
+         -qdlines | -qnodlines
+                The long form of the -D option.  The default is -qnodlines.
+
+         -qdpcl | -qnodpcl
+                Generates symbols that tools based on the Dynamic Probe Class Library (DPCL) API can
+                use to see the structure of an executable file.  The default is -qnodpcl.
+
+         -qextchk | -qnoextchk
+                Performs procedure interface checking as well as detection of mismatched common
+                blocks.  The default is -qnoextchk.
+
+         -qflttrap=<suboption1>[:...:<suboptionN>] | -qnoflttrap
+                Determines what types of floating-point exception conditions to detect at run time.
+                The program receives a SIGFPE signal when the corresponding exception occurs.
+                Suboptions include:
+
+                enable
+                     Turn on checking for the specified exceptions in the main program.
+                imprecise
+                     Only check for the specified exceptions on subprogram entry and exit.
+                inexact
+                     Detect and trap on floating-point inexact, if exception checking is enabled.
+                invalid
+                     Detect and trap on floating-point invalid operations.
+                nanq
+                     Detect and trap all quiet not-a-number (NaN) values.
+                overflow
+                     Detect and trap on floating-point overflow.
+                underflow
+                     Detect and trap on floating-point underflow.
+                zerodivide
+                     Detect and trap on floating-point division by zero.
+
+                The default is -qnoflttrap.
+
+         -qfullpath | -qnofullpath
+                Records the full, or absolute, path names of source and include files in object files
+                compiled with debugging information (-g option).  The default is -qnofullpath.
+
+         -qhalt=<sev>
+                Stops before producing any object, executable, or assembler source files if the
+                maximum severity of compile-time messages equals or exceeds the specified severity.
+                Severity levels include:
+                i - Informational messages
+                l - Language-level messages
+                w - Warning messages
+                e - Error messages
+                s - Severe error messages
+                u - Unrecoverable error messages
+                q - Do not halt, even for unrecoverable errors
+
+                The default is -qhalt=s.
+
+         -qinitauto[=<hex_value>] | -qnoinitauto
+                Initializes each byte or word of storage for automatic variables to either zero or the
+                specified hexadecimal value (typically 00 or FF), to help locate variables that are
+                referenced before being defined.  The default is -qnoinitauto. If you specify
+                -qinitauto without a <hex_value>, the compiler initializes the value of each byte of
+                automatic storage to zero.
+                The default is -qnoinitauto.
+
+         -qlanglvl=<suboption>
+                Determines which language standard (or superset or subset of a standard) to check
+                against for nonconformance.  Suboptions include:
+
+                77std
+                     Accepts the language specified by the ANSI Fortran 77 standard.
+                90std
+                     Accepts the language specified by the ISO Fortran 90 standard.
+                90pure
+                     Same as 90std, except that it reports errors for any obsolescent Fortran 90
+                     features used.
+                90ext
+                     Obsolete suboption that is equivalent to extended.
+                95std
+                     Accepts the language specified by the ISO Fortran 95 standard.
+                95pure
+                     Same as 95std, except that it also reports errors for any obsolescent Fortran 95
+                     features used.
+                extended
+                     Accepts the full Fortran 95 language standard and all extensions, effectively
+                     turning off language-level checking.
+                The default is -qlanglvl=extended.
+
+         -qsaa | -qnosaa
+                Checks for conformance to the SAA Fortran language definition.  It identifies
+                nonconforming source code and also options that allow such nonconformances.  The
+                default is -qnosaa.
+
+         -qsigtrap[=<trap_handler>]
+                Installs xl__trce or the specified trap handler in a main program.  The default is
+                that no trap handler is installed, program core dumps when a trap instruction is
+                executed.
+
+         -qtbtable=<suboption>
+                Specifies how much traceback information to include in object files, which can reduce
+                file size but limit debugging and profiling.  Suboptions include:
+
+                none
+                     Includes no traceback information.
+                small
+                     Includes  traceback information but not the names of procedures or information
+                     about procedure parameters.
+                full
+                     Includes complete traceback information.
+                The default is full traceback information in the object file when compiling non-
+                optimized (without -O) or for debugging (with -g).  Otherwise, a small amount of
+                traceback information is included in the object file.
+
+         -qxlines | -qnoxlines
+                Specifies whether fixed source form lines with a X in column 1 are compiled or treated
+                as comments.  The default is -qnoxlines.
+
+  Options that Control Listings and Messages
+         -#     Generates information on the progress of the compilation without actually running the
+                individual components.
+
+         -qattr[=full] | -qnoattr
+                Specifies whether to produce the attribute component of the attribute and cross-
+                reference section of the listing.  The listing contains all identifiers (-qattr=full)
+                or only the names that are referenced (-qattr).  The default is -qnoattr.
+
+         -qflag=<listing_severity>:<terminal_severity>
+                Limits the diagnostic messages to those of a specified level or higher.  Only messages
+                with severity <listing_severity> or higher are written to the listing file. Only
+                messages with severity <terminal_severity> or higher are written to the terminal.
+                Severity levels include:
+                i - Informational messages
+                l - Language-level messages
+                w - Warning messages
+                e - Error messages
+                s - Severe error messages
+                u - Unrecoverable error messages
+                q - No messages
+
+                Note that both listing_severity and terminal_severity must be specified.  The default
+                is -qflag=i:i.
+
+         -qlist | -qnolist
+                Specifies whether to produce the object section of the listing.  The default is
+                -qnolist.
+
+         -qlistopt | -qnolistopt
+                Determines whether to show the setting of every compiler option in the listing file or
+                only selected options. These selected options include those specified on the command
+                line or directives plus some that are always put in the listing.  The default is
+                -qnolistopt.
+
+         -qnoprint
+                Prevents the compiler from creating the listing file, regardless of the settings of
+                other listing options.
+
+         -qphsinfo | -qnophsinfo
+                Determines whether timing information is displayed on the terminal for each compiler
+                phase.  The output takes the form number1/number2 for each phase where number1
+                represents the CPU time used by the compiler and number2 represents the total of the
+                compiler time and the time that the CPU spends handling system calls.  The default is
+                -qnophsinfo.
+
+         -qreport[=<suboptions>] | -qnoreport
+                Determines whether to produce transformation reports showing how the program is
+                parallelized and how loops are optimized.  Suboptions include:
+
+                hotlist
+                     Produces a report showing how loops are transformed.
+                smplist
+                     Produces a report showing how the program is parallelized.
+
+                The default is -qnoreport.
+
+         -qsource | -qnosource
+                Determines whether to produce the source section of the listing.  The default is
+                -qnosource.
+
+         -qsuppress[=nnnn-mmm[:nnnn-mmm ...] | cmpmsg] | -qnosuppress
+                Determines which messages to suppress from the output stream.  Suboptions include:
+
+                <nnnn-mmm>
+                     A 7 digit compiler message number. To indicate several messages, separate each
+                     message number with a colon as follows: <nnnn-mmm>:<nnnn-mmm>:<nnnn-mmm>...
+                cmpmsg
+                     Suppresses the informational messages that report compilation progress and a
+                     successful completion.
+                The default is -qnosuppress.
+
+         -qxref[=full] | -qnoxref
+                Determines whether to produce the cross-reference component of the attribute and
+                cross-reference section of the listing.  If you specify only -qxref, only identifiers
+                that are used are reported. If you specify -qxref=full, the listing contains
+                information about all identifiers that appear in the program, whether they are used or
+                not.  The default is -qnoxref.
+
+         -S     Produces one or more .s files, showing equivalent assembler source for each Fortran
+                source file. The default is to not produce assembler source files.
+
+         -V     Traces the progress of the compilation by displaying the name and parameters of each
+                compiler component that is executed by the invocation command.  These are displayed in
+                a shell-executable format.  By default no progress messages are produced.
+
+         -v     Traces the progress of the compilation by displaying the name and parameters of each
+                compiler component that is executed by the invocation command.  By default no progress
+                message are produced.
+
+         -w     Suppresses informational, language-level, and warning messages.
+
+  Options for Compatibility
+         -1     Executes each DO loop in the compiled program at least once if its DO statement is
+                executed, even if the iteration count is 0. This is the short form of the -qonetrip
+                option.
+
+         -qautodbl=<setting>
+                Converts single-precision floating-point calculations to double-precision or converts
+                double-precision calculations to extended-precision.  Settings include:
+
+                none
+                     Does not promote or pad any objects that share storage.
+                dbl4
+                     Promotes floating-point objects that are single precision or are composed of such
+                     objects.
+                dbl8
+                     Promotes floating-point objects that are double precision or are composed of such
+                     objects.
+                dbl
+                     Combines the promotions done by dbl4 and dbl8.
+                dblpad4
+                     Performs the same promotions as dbl4, and also pads objects of other types
+                     (except CHARACTER) if they could possibly share storage with promoted objects.
+                dblpad8
+                     Performs the same promotions as dbl8, and also pads objects of other types
+                     (except CHARACTER) if they could possibly share storage with promoted objects.
+                dblpad
+                     Combines the promotions done by dblpad4 and dblpad8, and also pads objects of
+                     other types (except CHARACTER) if they could possibly share storage with promoted
+                     objects.
+                The default is -qautodbl=none.
+
+         -qcclines | -qnocclines
+                Enables recognition of conditional compilation lines.  The default is -qcclines if
+                -qsmp=omp is specified.  Otherwise, the default is -qnocclines.
+
+         -qctyplss[=<suboption>] | -qnoctyplss
+                Specifies whether character constant expressions are allowed wherever typeless
+                constants may be used.
+
+                arg
+                     This suboption provides the same behavior as the -qctyplss option with no
+                     suboptions, with the exception that if a Hollerith constant is used as an actual
+                     argument, it is passed to the procedure as if it were an integer actual argument.
+                noarg
+                     This suboption provides the same behavior as the -qctyplss option with no
+                     suboptions.
+
+                The default is -qnoctyplss.
+
+         -qddim | -qnoddim
+                Specifies that the bounds of pointee arrays are re-evaluated each time the arrays are
+                referenced and removes some restrictions on the bounds expressions for pointee arrays.
+                The default is -qnoddim.
+
+         -qdpc[=e] | -qnodpc
+                Increases the precision of real constants, for maximum accuracy when assigning real
+                constants to DOUBLE PRECISION variables.  -qdpc=e also promotes constants with an e
+                exponent.  The default is -qnodpc.
+
+         -qescape | -qnoescape
+                Specifies whether the backslash is treated as an escape character in character
+                strings, Hollerith constants, H edit descriptors, and character string edit
+                descriptors.  The default is -qescape.
+
+         -qextern=<name1>[:<name2>[: ... [:<namen>]]]
+                Allows user-written procedures to be called instead of XL Fortran intrinsics. The
+                suboption is a list of procedure names separated by colons.  The procedure names are
+                treated as if they appear in an EXTERNAL statement in each compilation unit being
+                compiled.
+
+         -qextname[=<name1>[:...<namen>]] | -qnoextname
+                Adds a trailing underscore to the names of the specified global entities (external
+                names).  If no names are specified, -qextname adds an underscore to the names of all
+                global entities except for main program names.  The default is -qnoextname.
+
+         -qinit=f90ptr
+                Makes the initial association status of pointers disassociated instead of undefined.
+                The default association status of pointers is undefined.
+
+         -qintlog | -qnointlog
+                Allows mixture of INTEGER and LOGICAL values in expressions and statements.  The
+                default is -qnointlog.
+
+         -qintsize=<bytes>
+                Sets the size of default INTEGER and LOGICAL values.  The default is -qintsize=4.
+
+         -qlog4 | -qnolog4
+                Specifies whether the result of a logical operation with logical operands is a
+                LOGICAL(4) or is a LOGICAL with the maximum length of the operands.  The default is
+                -qnolog4.
+
+         -qmodule=mangle81
+                Provides compatibility for module files that are compiled with Version 9.1 compiler to
+                be linked to an existing set of object files compiled with the Version 8.1 compiler or
+                earlier.  The naming convention is not compatible with that used by previous versions
+                of the compiler.
+
+         -qnullterm | -qnonullterm
+                Appends a null character to each character expression that is passed as a dummy
+                argument.  The default is -qnonullterm.
+
+         -qonetrip | -qnoonetrip
+                The long form of the -1 option.  The default is -qnoonetrip.
+
+         -qport=<suboption> | -qnoport
+                Increases flexibility when porting programs to XL Fortran, providing a number of
+                options to accommodate other Fortran language extensions.  Suboptions include:
+
+                hexint | nohexint
+                     If you specify this option, typeless constant hexadecimal strings are converted
+                     to integers when passed as actual arguments to the INT intrinsic function.
+                     Typeless constant hexadecimal strings not passed as actual arguments to INT
+                     remain unaffected.  The default is nohexint.
+                mod |nomod
+                     Specifying this option relaxes existing constraints on the MOD intrinsic
+                     function, allowing two arguments of the same data type parameter to be of
+                     different kind type parameters. The result will be of the same type as the
+                     argument, but with the larger kind type parameter value.  The default is nomod.
+                nullarg | nonullarg
+                     For an external or internal procedure reference, specifying this option causes
+                     the compiler to treat an empty argument, which is delimited by a left parenthesis
+                     and a comma, two commas, or a comma and a right parenthesis, as a null argument.
+                     This suboption has no effect if the argument list is empty.  The default is
+                     nonullarg.
+                sce | nosce
+                     By default, the compiler performs short circuit evaluation in selected logical
+                     expressions using XL Fortran rules. Specifying sce allows the compiler to use
+                     non-XL Fortran rules. The compiler will perform short circuit evaluation if the
+                     current rules allow it.  The default is nosce.
+                typestmt | notypestmt
+                     The TYPE statement, which behaves in a manner similar to the PRINT statement, is
+                     supported whenever this option is specified.  The default is notypestmt.
+                typlssarg | notyplssarg
+                     Converts all typeless constants to default integers if the constants are actual
+                     arguments to an intrinsic procedure whose associated dummy arguments are of
+                     integer type. Dummy arguments associated with typeless actual arguments of
+                     noninteger type remain unaffected by this option.  The default is notyplssarg.
+
+                The default is -qnoport.
+
+         -qposition={appendold|appendunknown}
+                Positions the file pointer at the end of the file when data is written after an OPEN
+                statement with no POSITION= specifier, and the corresponding STATUS= value (OLD or
+                UNKNOWN) is specified.  Default depends on the I/O specifiers in the OPEN statement
+                and on the compiler invocation command.  The default is -qposition=appendold for the
+                xlf, xlf_r, xlf_r7, and f77/fort77 commands and the defined Fortran 90 and Fortran 95
+                behaviors for the xlf90, xlf90_r, xlf90_r7, xlf95, xlf95_r, xlf95_r7, f90 and f95
+                commands.
+
+         -qqcount | -qnoqcount
+                Accepts the character-count Q edit descriptor(Q) as well as the extended-precision Q
+                edit descriptor (Qw.d). With -qnoqcount, all Q edit descriptors are interpreted as the
+                extended-precision Q edit descriptor.  The default is -qnoqcount.
+
+         -qrealsize=<bytes>
+                Sets the default size of REAL, DOUBLE PRECISION, COMPLEX and DOUBLE COMPLEX values.
+                The allowed values for <bytes> are 4 and 8.  The default is -qrealsize=4.
+
+         -qsave[=<suboption>] | -qnosave
+                Specifies the default storage class for local variables.  Suboptions include:
+
+                all
+                     The default storage class for all local variables is STATIC.  Specifying this
+                     suboption is the same as specifying the -qsave option without any suboptions.
+                defaultinit
+                     The default storage class is STATIC for local variables of derived type that have
+                     default initialization specified.
+                -qnosave sets the default storage class to AUTOMATIC.  The default is -qnosave.
+                Note: -qsave is turned on by default for xlf, xlf_r, xlf_r7, f77, or fort77 to
+                duplicate the behaviour of FORTRAN77 commands.
+
+         -qsclk=<suboption>
+                Specifies the resolution that the SYSTEM_CLOCK intrinsic procedure uses in a program.
+                The default is centisecond resolution (qsclk=centi).  Suboptions include:
+
+                centi
+                     Uses centisecond resolution for the values returned.
+                micro
+                     Uses microsecond resolution.
+                The default is -qsclk=centi.
+
+         -qswapomp | -qnoswapomp
+                Specifies that the compiler should reorganize and substitute OpenMP routines in XL
+                Fortran programs.  The default is -qswapomp.
+
+         -qundef | -qnoundef
+                The long form of the -u Option.  The default is -qnoundef.
+
+         -qwarn64 | -qnowarn64
+                Assists in porting code from a 32-bit environment to a 64-bit environment by detecting
+                the truncation of an 8-byte integer to 4 bytes.  Statements which may cause problems
+                will be identified through informational messages.  The default is -qnowarn64.
+
+         -qxflag=oldtab
+                For fixed source form programs, interprets a tab in columns 1 to 5 as a single
+                character.
+
+         -qxlf77=<settings>
+                Provides compatibility with Fortran 77 aspects of language semantics and I/O data
+                format that have changed. Most of these changes are required by the Fortran 90
+                standard.  Suboptions include:
+
+                blankpad | noblankpad
+                     Pads an internal or direct-access file if the format requires more characters
+                     than the record contains.  The default is blankpad.
+                gedit77 | nogedit77
+                     Uses Fortran 77 semantics for the output of REAL objects with the G edit
+                     descriptor.  The default is nogedit77.
+                intarg | nointarg
+                     Converts all the integer arguments of an intrinsic procedure to the kind of the
+                     longest argument, if they are of different kinds.  The default is nointarg.
+                intxor | nointxor
+                     Treats .XOR. as a logical binary intrinsic operator rather than a defined
+                     operator.  The default is nointxor.
+                leadzero | noleadzero
+                     Produces a leading zero in real output under the D, E, F and Q edit descriptors.
+                     The default is leadzero.
+                oldboz | nooldboz
+                     Turns blanks into zeros for data read by B, O, and Z edit descriptors, regardless
+                     of the BLANK= specifier or any BN or BZ control edit descriptors.  The default is
+                     nooldboz.
+                persistent | nopersistent
+                     Saves the addresses of arguments to subprograms with ENTRY statements in static
+                     storage.  The default is nopersistent.
+                softeof | nosofteof
+                     Allows READ and WRITE operations when a unit is positioned after its endfile
+                     record, unless that position is the result of executing an ENDFILE statement.
+                     The default is nosofteof for the xlf90, xlf90_r, xlf90_r7, xlf95, xlf95_r,
+                     xlf95_r7 and f95 commands and are the exact opposite for the xlf, xlf_r, xlf_r7,
+                     and f77/fort77 commands.
+
+         -qxlf90=<settings>
+                Determines whether the compiler provides the Fortran 90 or the Fortran 95 level of
+                support for certain aspects of the language.  Suboptions include:
+
+                signedzero | nosignedzero
+                     Determines how the SIGN(A,B) function handles signed real 0.0. In addition,
+                     determines  whether negative internal values will be prefixed with a minus when
+                     formatted output would produce a negative sign zero.
+                autodealloc | noautodealloc
+                     Determines whether the compiler deallocates allocatable arrays that are declared
+                     locally without either the SAVE or the STATIC attribute, and have a status of
+                     currently allocated when the subprogram terminates.
+                The default suboptions are signedzero and autodealloc for the xlf95, xlf95_r, xlf95_r7
+                and f95 invocation commands. For all other invocation commands, the default suboptions
+                are nosignedzero and noautodealloc.
+
+         -u     Specifies that no implicit typing of variable names is permitted.  It has the same
+                effect as using the IMPLICIT NONE statement in each scope that allows implicit
+                statements.
+
+  Options for Floating-Point Processing
+         -qfloat=<suboption1>[:<suboption2>[:...:<suboptionN>]]
+                Determines different strategies for speeding up or improving the accuracy of floating-
+                point calculations.  Suboptions include:
+
+                fltint | nofltint
+                     For floating-point-to-integer conversion, uses faster inline code, which does not
+                     check for overflow.  The default is nofltint.
+                fold | nofold
+                     Evaluates constant floating-point expressions at compile time.  The default is
+                     fold.
+                hsflt | nohsflt
+                     Never rounds single-precision expressions, and doesn't perform range checking for
+                     floating-point-to-integer conversions.  The default is nohsflt.
+                hssngl | nohssngl
+                     Rounds single-precision expressions only when the results are stored into REAL(4)
+                     memory locations.  The default is nohssngl.
+                maf | nomaf
+                     Generates multiply-add instructions where appropriate.  The default is maf.
+                nans | nonans
+                     Detects operations involving signaling NaN values.  The default is nonans.
+                rndsngl | norndsngl
+                     Ensures strict adherence to IEEE standard.  That is, all operations on single-
+                     precision values produce results that remain in single precision.  The default is
+                     norndsngl.
+                rrm | norrm
+                     Specifies run-time rounding mode.  Compile with this option if the run-time
+                     rounding mode is round toward minus infinity, round toward positive infinity, or
+                     not known.  The default is norrm.
+                rsqrt | norsqrt
+                     Changes a division by the result of a square root operation into a multiply by
+                     the reciprocal of the square root.  The default is norsqrt.
+                strictnmaf | nostrictmaf
+                     Ensures that the compiler does not perform optimizations that introduce multiply-
+                     add operations that do not preserve the sign of a zero value.  The default is
+                     nostrictmaf.
+
+         -qieee=<suboption>
+                Specifies the rounding mode for the compiler to use when evaluating constant floating-
+                point expressions at compile time.  <suboption> is one of:
+
+                Near
+                     Round to nearest representable number.
+                Minus
+                     Round toward minus infinity.
+                Plus
+                     Round toward plus infinity.
+                Zero
+                     Round toward zero.
+                The default is -qieee=near.
+
+         -y<x>  Specifies compile-time rounding of constant floating-point expressions. It is
+                equivalent to the -qieee option.  Where <x> can be one of the following:
+
+                n
+                     Round to nearest.
+                m
+                     Round toward minus infinity.
+                p
+                     Round toward positive infinity.
+                z
+                     Round toward zero.
+                The default is -yn.
+
+  Options that Control Linking
+         -b64   The option is only available on AIX 4.3 and above.  In 64-bit mode, the -b64 linker
+                option is used to instruct the ld command to bind with 64-bit objects.
+
+         -bdynamic
+                This option is only available on AIX 4.2 and above.  It is used to control the
+                processing of -l options and the way that shared objects are processed.  When this
+                option, the default, is in effect, shared objects are linked dynamically.  See also
+                -bstatic.
+
+         -bhalt:<error_level>
+                Specifies the maximum error level for linker (ld) command processing to continue.  The
+                default value is 4, as specified in the configuration file.
+
+         -bloadmap:<name>
+                Requests that a log of linker actions and messages be saved in file <name>.
+
+         -bmaxdata:<bytes>
+                Specifies the maximum amount of space to reserve for the program data segment for
+                programs where the size of these regions is a constraint.
+
+         -bmaxstack:<bytes>
+                Specifies the maximum amount of space to reserve for the program stack segment for
+                programs where the size of these regions is a constraint.
+
+         -brtl  This option is only available on AIX 4.2 and above.  It determines which algorithm
+                will be used to find libraries (specified with the -l option).  If -brtl is specified,
+                run-time linking is enabled.
+
+         -bshared
+                Synonymous with -bdynamic.
+
+         -bstatic
+                This option is only available on AIX 4.2 and above.  It is used to control the
+                processing of -l options and the way that shared objects are processed.  Shared
+                objects are statically linked into the output file.  See also -bdynamic.
+
+         -c     Produces an object file instead of an executable file.  Prevents the completed object
+                file from being sent to the ld command for link-editing. With this option, the output
+                is a .o file for each source file.
+
+         -L<dir>
+                Searches in directory <dir> for files specified by -l<key>.
+
+         -l<key>
+                Search the specified library file, where <key> selects the library lib<key>.a.
+
+         -qpic[<=suboption>] | -qnopic
+                Generates Position Independent Code (PIC) that can be used in shared libraries.
+                -qnopic does not generate Position Independent Code.
+
+                Suboptions include:
+
+                large
+                     Allows the size of the Global Offset Table to be larger than 64K. This suboption
+                     allows for more addresses to be stored in the Global Offset Table and generates
+                     larger code.
+                small
+                     Assumes that the size of the Global Offset Table can be at most, 64K.
+                The default is -qpic=small.
+
+  Options That Control Other Compiler Operations
+         -B<prefix>
+                Determines a substitute path name for executable files used during compilation.
+                <prefix> is the name of a directory where the alternative executable files reside. It
+                is added to the beginning of the standard program names and must end in a / (slash).
+
+         -F[<x>][:<stanza>]
+                Specifies an alternative configuration file, which stanza to use within the
+                configuration file, or both.  The default stanza depends on the name of the command
+                used to invoke the compiler.
+
+         -NS<bytes>
+                Specifies the size of internal program storage areas, in bytes.  The default is
+                -NS512.
+
+         -q32   Enables 32-bit compilation bit mode support in a 64-bit environment.  The -q32 option
+                indicates the compilation bit mode and, together with the -qarch option, determines
+                the target machines that the 32-bit executable will run on.
+
+         -q64[=<suboption>]
+                Indicates the 64-bit compilation bit mode and, together with the -qarch option,
+                determines the target machines on which the 64-bit executable will run. The -q64
+                option indicates that the object module will be created in 64-bit object format and
+                that the 64-bit instruction set will be generated. Note that you may compile in a
+                32-bit environment to create 64-bit objects, but you must link them in a 64-bit
+                environment with the -q64 option.
+
+                largetype
+                     The object file will use the new 64-bit Large Data Type (LDT) ABI.  This object
+                     file may only be used on versions of AIX greater than or equal to 5.0.
+                nolargetype
+                     The object file will use the old 64-bit non-LDT ABI.  This object file may only
+                     be used on versions of AIX less than 5.0.
+
+         -qlm | -qnolm
+                Enables license management.  The default is -qlm.
+
+         -t<component>
+                Applies the prefix from the -B option to the specified program <components>, where
+                <components> can be one or more of the following:
+
+                Component                <x>           Program Name
+                assembler                 a               as
+                C preprocessor            F               cpp
+                VAST-2 preprocessor       p               fpp
+                KAP preprocessor          p               fppk
+                compiler front end        c               xlfentry
+                array language optimizer  h               xlfhot
+                IPA/loop optimizer        I (uppercase i) ipa
+                code generator            b               xlfcode
+                binder                    z               bolt
+                linker                    l (lowercase L) ld
+                disassembler              d               dis
+
+         -W<component>,<option1>[,<option2>[,
+         Sends <option> to component <component>, where <component> can be one of the following:
+
+         Component                <x>           Program Name
+         assembler                 a               as
+         C preprocessor            F               cpp
+         VAST-2 preprocessor       p               fpp
+         KAP preprocessor          p               fppk
+         compiler front end        c               xlfentry
+         array language optimizer  h               xlfhot
+         IPA/loop optimizer        I (uppercase i) ipa
+         code generator            b               xlfcode
+         binder                    z               bolt
+         linker                    l (lowercase L) ld
+         disassembler              d               dis
+
+  Options that Control Preprocessing
+         -P     Invokes the -Pv preprocessor before the compiler.
+
+         -Pv    Invokes the -Pv preprocessor before the compiler.
+
+         -Pk    Invokes the -Pk preprocessor before the compiler.
+
+         -P!    Invokes the -Pv preprocessor only.
+
+         -Pv!   Invokes the -Pv preprocessor only.
+
+         -Pk!   Invokes the -Pk preprocessor only.
+
+  Options that are Obsolete or Not Recommended
+         -qcharlen=<length>
+                Obsolete.  It is still accepted but has no effect.
+
+         -qrecur | -qnorecur
+                Not recommended.  Specifies whether external subprograms may be called recursively.
+                The default is -qnorecur.
+
+
+  SEE ALSO
+         xlfndi(1), showpdf(1), cleanpdf(1), mergepdf(1), resetpdf(1)
+
+         You can refer to the following Web sites for more information:
+         www.ibm.com/software/awdtools/fortran/xlfortran/library/
+         www.ibm.com/software/awdtools/fortran/xlfortran/support/
+
+  COPYRIGHT
+         IBM(R) XL Fortran Enterprise Edition V9.1
+
+         Licensed Materials - Property of IBM
+
+         (C) Copyright IBM Corp. 1990, 2004.   All Rights Reserved.
+
+         IBM is a trademark or registered trademark of IBM Corp. in the U.S., other countries or both.
+
+         US Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP
+         Schedule Contract with IBM Corp.
+
+
+
+  IBM                                        September 2004                                     xlf(1)
+
+

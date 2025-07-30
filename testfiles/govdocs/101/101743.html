@@ -1,0 +1,2683 @@
+<html>
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+
+
+<link rel=File-List href="gsa-final_files/filelist.xml">
+<link rel=Edit-Time-Data href="gsa-final_files/editdata.mso">
+<link rel=OLE-Object-Data href="gsa-final_files/oledata.mso">
+<!--[if !mso]>
+<style>
+v\:* {behavior:url(#default#VML);}
+o\:* {behavior:url(#default#VML);}
+w\:* {behavior:url(#default#VML);}
+.shape {behavior:url(#default#VML);}
+</style>
+<![endif]-->
+<title>XML Schema Validation Process for CORE.gov</title>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="PostalCode"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="State"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="PlaceName"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="PlaceType"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="country-region"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="place"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="City"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="date"/>
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>kcm</o:Author>
+  <o:Keywords>XML Schema development</o:Keywords>
+  <o:LastAuthor>kcm</o:LastAuthor>
+  <o:Revision>2</o:Revision>
+  <o:TotalTime>181</o:TotalTime>
+  <o:LastPrinted>2004-07-07T15:41:00Z</o:LastPrinted>
+  <o:Created>2004-12-15T14:57:00Z</o:Created>
+  <o:LastSaved>2004-12-15T14:57:00Z</o:LastSaved>
+  <o:Pages>1</o:Pages>
+  <o:Words>6641</o:Words>
+  <o:Characters>38651</o:Characters>
+  <o:Company>National Institute of Standards and Technology</o:Company>
+  <o:Lines>666</o:Lines>
+  <o:Paragraphs>239</o:Paragraphs>
+  <o:CharactersWithSpaces>45053</o:CharactersWithSpaces>
+  <o:Version>10.2625</o:Version>
+ </o:DocumentProperties>
+ <o:CustomDocumentProperties>
+  <o:_AdHocReviewCycleID dt:dt="float">2063633756</o:_AdHocReviewCycleID>
+  <o:_EmailSubject dt:dt="string">my final edit</o:_EmailSubject>
+  <o:_AuthorEmail dt:dt="string">kcm@nist.gov</o:_AuthorEmail>
+  <o:_AuthorEmailDisplayName dt:dt="string">KC Morris</o:_AuthorEmailDisplayName>
+  <o:_PreviousAdHocReviewCycleID dt:dt="float">-1461228549</o:_PreviousAdHocReviewCycleID>
+  <o:_ReviewingToolsShownOnce dt:dt="string"></o:_ReviewingToolsShownOnce>
+  <o:_ReviewCycleID dt:dt="float">2090204123</o:_ReviewCycleID>
+ </o:CustomDocumentProperties>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <w:WordDocument>
+  <w:ActiveWritingStyle Lang="EN-US" VendorID="64" DLLVersion="131077"
+   NLCheck="1">1</w:ActiveWritingStyle>
+  <w:ActiveWritingStyle Lang="EN-US" VendorID="64" DLLVersion="131078"
+   NLCheck="1">1</w:ActiveWritingStyle>
+  <w:DoNotShowRevisions/>
+  <w:DoNotPrintRevisions/>
+  <w:DoNotShowMarkup/>
+  <w:Compatibility>
+   <w:FootnoteLayoutLikeWW8/>
+   <w:ShapeLayoutLikeWW8/>
+   <w:AlignTablesRowByRow/>
+   <w:ForgetLastTabAlignment/>
+   <w:LayoutRawTableWidth/>
+   <w:LayoutTableRowsApart/>
+   <w:UseWord97LineBreakingRules/>
+  </w:Compatibility>
+  </xml><![endif]--><!--[if !mso]><object
+ classid="clsid:38481807-CA0E-42D2-BF39-B33AF135CC4D" id=ieooui></object>
+<style>
+st1\:*{behavior:url(#ieooui) }
+</style>
+<![endif]-->
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:Wingdings;
+	panose-1:5 0 0 0 0 0 0 0 0 0;
+	mso-font-charset:2;
+	mso-generic-font-family:auto;
+	mso-font-pitch:variable;
+	mso-font-signature:0 268435456 0 0 -2147483648 0;}
+@font-face
+	{font-family:"MS Mincho";
+	panose-1:2 2 6 9 4 2 5 8 3 4;
+	mso-font-alt:"\FF2D\FF33 \660E\671D";
+	mso-font-charset:128;
+	mso-generic-font-family:modern;
+	mso-font-pitch:fixed;
+	mso-font-signature:-1610612033 1757936891 16 0 131231 0;}
+@font-face
+	{font-family:Tahoma;
+	panose-1:2 11 6 4 3 5 4 4 2 4;
+	mso-font-charset:0;
+	mso-generic-font-family:swiss;
+	mso-font-pitch:variable;
+	mso-font-signature:1627421319 -2147483648 8 0 66047 0;}
+@font-face
+	{font-family:BatangChe;
+	mso-font-alt:"Arial Unicode MS";
+	mso-font-charset:129;
+	mso-generic-font-family:roman;
+	mso-font-pitch:fixed;
+	mso-font-signature:-1342176593 1775729915 48 0 524447 0;}
+@font-face
+	{font-family:"\@MS Mincho";
+	panose-1:2 2 6 9 4 2 5 8 3 4;
+	mso-font-charset:128;
+	mso-generic-font-family:modern;
+	mso-font-pitch:fixed;
+	mso-font-signature:-1610612033 1757936891 16 0 131231 0;}
+@font-face
+	{font-family:"TimesNewRoman\,Italic";
+	panose-1:0 0 0 0 0 0 0 0 0 0;
+	mso-font-charset:0;
+	mso-generic-font-family:roman;
+	mso-font-format:other;
+	mso-font-pitch:auto;
+	mso-font-signature:3 0 0 0 1 0;}
+@font-face
+	{font-family:"\@BatangChe";
+	mso-font-charset:129;
+	mso-generic-font-family:roman;
+	mso-font-pitch:fixed;
+	mso-font-signature:-1342176593 1775729915 48 0 524447 0;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin-top:3.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	font-size:11.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;}
+h1
+	{mso-style-next:Normal;
+	margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:.25in;
+	text-indent:-.25in;
+	mso-pagination:widow-orphan;
+	page-break-after:avoid;
+	mso-outline-level:1;
+	mso-list:l9 level1 lfo3;
+	tab-stops:list .25in;
+	font-size:14.0pt;
+	mso-bidi-font-size:16.0pt;
+	font-family:Arial;
+	mso-font-kerning:16.0pt;
+	mso-fareast-language:EN-US;}
+h2
+	{mso-style-next:Normal;
+	margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:.6in;
+	text-indent:-.35in;
+	mso-pagination:widow-orphan;
+	page-break-after:avoid;
+	mso-outline-level:2;
+	mso-list:l9 level2 lfo3;
+	tab-stops:list .6in;
+	font-size:14.0pt;
+	font-family:Arial;
+	mso-fareast-language:EN-US;
+	font-style:italic;}
+h3
+	{mso-style-next:Normal;
+	margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:.5in;
+	text-indent:-.5in;
+	mso-pagination:widow-orphan;
+	page-break-after:avoid;
+	mso-outline-level:3;
+	mso-list:l9 level3 lfo3;
+	tab-stops:list .5in;
+	font-size:13.0pt;
+	font-family:Arial;
+	mso-fareast-language:EN-US;}
+h4
+	{mso-style-next:Normal;
+	margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:.15in;
+	text-indent:-.15in;
+	mso-pagination:widow-orphan;
+	page-break-after:avoid;
+	mso-outline-level:4;
+	mso-list:l9 level4 lfo3;
+	tab-stops:list .75in;
+	font-size:14.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-language:EN-US;}
+h5
+	{mso-style-next:Normal;
+	margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:.7in;
+	text-indent:-.7in;
+	mso-pagination:widow-orphan;
+	mso-outline-level:5;
+	mso-list:l9 level5 lfo3;
+	tab-stops:list .7in;
+	font-size:13.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-language:EN-US;
+	font-style:italic;}
+h6
+	{mso-style-next:Normal;
+	margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:.8in;
+	text-indent:-.8in;
+	mso-pagination:widow-orphan;
+	mso-outline-level:6;
+	mso-list:l9 level6 lfo3;
+	tab-stops:list .8in;
+	font-size:11.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-language:EN-US;}
+p.MsoHeading7, li.MsoHeading7, div.MsoHeading7
+	{mso-style-next:Normal;
+	margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:.9in;
+	text-indent:-.9in;
+	mso-pagination:widow-orphan;
+	mso-outline-level:7;
+	mso-list:l9 level7 lfo3;
+	tab-stops:list .9in;
+	font-size:11.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;}
+p.MsoHeading8, li.MsoHeading8, div.MsoHeading8
+	{mso-style-next:Normal;
+	margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:1.0in;
+	text-indent:-1.0in;
+	mso-pagination:widow-orphan;
+	mso-outline-level:8;
+	mso-list:l9 level8 lfo3;
+	tab-stops:list 1.0in;
+	font-size:11.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;
+	font-style:italic;}
+p.MsoHeading9, li.MsoHeading9, div.MsoHeading9
+	{mso-style-next:Normal;
+	margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:1.1in;
+	text-indent:-1.1in;
+	mso-pagination:widow-orphan;
+	mso-outline-level:9;
+	mso-list:l9 level9 lfo3;
+	tab-stops:list 1.1in;
+	font-size:11.0pt;
+	font-family:Arial;
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;}
+p.MsoToc1, li.MsoToc1, div.MsoToc1
+	{mso-style-update:auto;
+	mso-style-noshow:yes;
+	mso-style-next:Normal;
+	margin-top:3.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	font-size:11.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;}
+p.MsoToc2, li.MsoToc2, div.MsoToc2
+	{mso-style-update:auto;
+	mso-style-noshow:yes;
+	mso-style-next:Normal;
+	margin-top:3.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:11.0pt;
+	mso-pagination:widow-orphan;
+	font-size:11.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;}
+p.MsoNormalIndent, li.MsoNormalIndent, div.MsoNormalIndent
+	{margin-top:6.0pt;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:0in;
+	text-indent:.5in;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	layout-grid-mode:char;
+	mso-layout-grid-align:none;
+	font-size:11.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:Arial;
+	mso-fareast-font-family:"Times New Roman";
+	mso-bidi-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;}
+p.MsoFootnoteText, li.MsoFootnoteText, div.MsoFootnoteText
+	{mso-style-noshow:yes;
+	margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	layout-grid-mode:char;
+	mso-layout-grid-align:none;
+	font-size:10.0pt;
+	font-family:Arial;
+	mso-fareast-font-family:BatangChe;
+	mso-bidi-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;}
+p.MsoCommentText, li.MsoCommentText, div.MsoCommentText
+	{mso-style-noshow:yes;
+	margin-top:3.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;}
+p.MsoHeader, li.MsoHeader, div.MsoHeader
+	{margin-top:3.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	tab-stops:center 3.0in right 6.0in;
+	font-size:14.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:Arial;
+	mso-fareast-font-family:"Times New Roman";
+	mso-bidi-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;
+	font-weight:bold;
+	mso-bidi-font-weight:normal;}
+p.MsoFooter, li.MsoFooter, div.MsoFooter
+	{margin-top:3.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	tab-stops:center 3.0in right 6.0in;
+	font-size:11.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;}
+p.MsoCaption, li.MsoCaption, div.MsoCaption
+	{mso-style-noshow:yes;
+	mso-style-next:Normal;
+	margin-top:6.0pt;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:0in;
+	text-align:center;
+	mso-pagination:widow-orphan;
+	font-size:11.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;
+	font-weight:bold;}
+span.MsoFootnoteReference
+	{mso-style-noshow:yes;
+	vertical-align:super;}
+span.MsoCommentReference
+	{mso-style-noshow:yes;
+	mso-ansi-font-size:8.0pt;
+	mso-bidi-font-size:8.0pt;}
+p.MsoListBullet, li.MsoListBullet, div.MsoListBullet
+	{mso-style-update:auto;
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:.25in;
+	text-indent:-.25in;
+	mso-pagination:widow-orphan;
+	mso-list:l2 level1 lfo7;
+	tab-stops:list .25in;
+	layout-grid-mode:char;
+	mso-layout-grid-align:none;
+	font-size:11.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:BatangChe;
+	mso-fareast-language:EN-US;}
+p.MsoListNumber, li.MsoListNumber, div.MsoListNumber
+	{margin-top:3.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:.25in;
+	text-indent:-.25in;
+	mso-pagination:widow-orphan;
+	mso-list:l1 level1 lfo4;
+	tab-stops:list .25in;
+	font-size:11.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;}
+p.MsoListBullet2, li.MsoListBullet2, div.MsoListBullet2
+	{mso-style-update:auto;
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:.5in;
+	text-indent:-.25in;
+	mso-pagination:widow-orphan;
+	mso-list:l0 level1 lfo8;
+	tab-stops:list .5in;
+	layout-grid-mode:char;
+	mso-layout-grid-align:none;
+	font-size:11.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:BatangChe;
+	mso-bidi-font-family:Arial;
+	mso-fareast-language:EN-US;}
+p.MsoTitle, li.MsoTitle, div.MsoTitle
+	{margin-top:3.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	text-align:center;
+	mso-pagination:widow-orphan;
+	font-size:16.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;}
+p.MsoBodyText, li.MsoBodyText, div.MsoBodyText
+	{margin-top:3.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	font-size:11.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;
+	font-weight:bold;}
+p.MsoBodyTextIndent, li.MsoBodyTextIndent, div.MsoBodyTextIndent
+	{margin-top:3.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:27.0pt;
+	mso-pagination:widow-orphan;
+	font-size:11.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;
+	font-weight:bold;}
+p.MsoBodyText2, li.MsoBodyText2, div.MsoBodyText2
+	{margin-top:3.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	font-size:11.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	color:red;
+	mso-fareast-language:EN-US;}
+p.MsoBodyText3, li.MsoBodyText3, div.MsoBodyText3
+	{margin-top:3.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	mso-layout-grid-align:none;
+	text-autospace:none;
+	font-size:11.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	color:black;
+	mso-fareast-language:EN-US;}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;
+	text-underline:single;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;
+	text-underline:single;}
+p.MsoDocumentMap, li.MsoDocumentMap, div.MsoDocumentMap
+	{mso-style-noshow:yes;
+	margin-top:3.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	background:navy;
+	font-size:11.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:Tahoma;
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;}
+pre
+	{margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Courier New";
+	mso-fareast-font-family:"MS Mincho";}
+p.MsoCommentSubject, li.MsoCommentSubject, div.MsoCommentSubject
+	{mso-style-noshow:yes;
+	mso-style-parent:"Comment Text";
+	mso-style-next:"Comment Text";
+	margin-top:3.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;
+	font-weight:bold;}
+p.FigureLabel, li.FigureLabel, div.FigureLabel
+	{mso-style-name:"Figure Label";
+	mso-style-next:"Normal Indent";
+	margin:0in;
+	margin-bottom:.0001pt;
+	text-align:center;
+	mso-pagination:widow-orphan;
+	tab-stops:.25in .5in .75in;
+	font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;
+	layout-grid-mode:line;}
+p.Address, li.Address, div.Address
+	{mso-style-name:Address;
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.7in;
+	margin-bottom:.0001pt;
+	text-align:center;
+	line-height:12.0pt;
+	mso-line-height-rule:exactly;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;
+	layout-grid-mode:line;}
+p.Default, li.Default, div.Default
+	{mso-style-name:Default;
+	mso-style-parent:"";
+	margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	mso-layout-grid-align:none;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"TimesNewRoman\,Italic";
+	mso-fareast-font-family:"Times New Roman";
+	mso-bidi-font-family:"Times New Roman";
+	mso-fareast-language:EN-US;}
+span.moz-txt-citetags
+	{mso-style-name:moz-txt-citetags;}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.25in 1.0in 1.25in;
+	mso-header-margin:.5in;
+	mso-footer-margin:.5in;
+	mso-header:url("gsa-final_files/header.htm") h1;
+	mso-footer:url("gsa-final_files/header.htm") f1;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+ /* List Definitions */
+ @list l0
+	{mso-list-id:-125;
+	mso-list-type:simple;
+	mso-list-template-ids:-2104560666;}
+@list l0:level1
+	{mso-level-number-format:bullet;
+	mso-level-style-link:"List Bullet 2";
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l1
+	{mso-list-id:-120;
+	mso-list-type:simple;
+	mso-list-template-ids:-1928553454;}
+@list l1:level1
+	{mso-level-style-link:"List Number";
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;}
+@list l2
+	{mso-list-id:-119;
+	mso-list-type:simple;
+	mso-list-template-ids:1338819442;}
+@list l2:level1
+	{mso-level-number-format:bullet;
+	mso-level-style-link:"List Bullet";
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l3
+	{mso-list-id:-2;
+	mso-list-type:simple;
+	mso-list-template-ids:-1;}
+@list l3:level1
+	{mso-level-start-at:0;
+	mso-level-text:*;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:0in;
+	text-indent:0in;}
+@list l4
+	{mso-list-id:69934704;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-1760807384 -1646876672 67698713 67698715 67698703 67698713 67698715 67698703 67698713 67698715;}
+@list l4:level1
+	{mso-level-start-at:2;
+	mso-level-tab-stop:.75in;
+	mso-level-number-position:left;
+	margin-left:.75in;
+	text-indent:-.5in;}
+@list l5
+	{mso-list-id:170605494;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-600244270 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l5:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l6
+	{mso-list-id:220097059;
+	mso-list-type:hybrid;
+	mso-list-template-ids:1232271758;}
+@list l6:level1
+	{mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;}
+@list l7
+	{mso-list-id:244533174;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l7:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l8
+	{mso-list-id:272328001;
+	mso-list-type:hybrid;
+	mso-list-template-ids:2091521220 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l8:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l9
+	{mso-list-id:506674764;
+	mso-list-template-ids:-209257786;}
+@list l9:level1
+	{mso-level-style-link:"Heading 1";
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;}
+@list l9:level2
+	{mso-level-style-link:"Heading 2";
+	mso-level-text:"%1\.%2\.";
+	mso-level-tab-stop:.6in;
+	mso-level-number-position:left;
+	margin-left:.6in;
+	text-indent:-.35in;}
+@list l9:level3
+	{mso-level-style-link:"Heading 3";
+	mso-level-text:"%1\.%2\.%3\.";
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	margin-left:.5in;
+	text-indent:-.5in;}
+@list l9:level4
+	{mso-level-style-link:"Heading 4";
+	mso-level-text:"%1\.%2\.%3\.%4";
+	mso-level-tab-stop:.75in;
+	mso-level-number-position:left;
+	margin-left:.15in;
+	text-indent:-.15in;}
+@list l9:level5
+	{mso-level-style-link:"Heading 5";
+	mso-level-text:"%1\.%2\.%3\.%4\.%5";
+	mso-level-tab-stop:.7in;
+	mso-level-number-position:left;
+	margin-left:.7in;
+	text-indent:-.7in;}
+@list l9:level6
+	{mso-level-style-link:"Heading 6";
+	mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6";
+	mso-level-tab-stop:.8in;
+	mso-level-number-position:left;
+	margin-left:.8in;
+	text-indent:-.8in;}
+@list l9:level7
+	{mso-level-style-link:"Heading 7";
+	mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7";
+	mso-level-tab-stop:.9in;
+	mso-level-number-position:left;
+	margin-left:.9in;
+	text-indent:-.9in;}
+@list l9:level8
+	{mso-level-style-link:"Heading 8";
+	mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8";
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	margin-left:1.0in;
+	text-indent:-1.0in;}
+@list l9:level9
+	{mso-level-style-link:"Heading 9";
+	mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9";
+	mso-level-tab-stop:1.1in;
+	mso-level-number-position:left;
+	margin-left:1.1in;
+	text-indent:-1.1in;}
+@list l10
+	{mso-list-id:524170323;
+	mso-list-template-ids:806143848;}
+@list l10:level1
+	{mso-level-start-at:3;
+	mso-level-text:%1;
+	mso-level-tab-stop:20.25pt;
+	mso-level-number-position:left;
+	margin-left:20.25pt;
+	text-indent:-20.25pt;}
+@list l10:level2
+	{mso-level-start-at:4;
+	mso-level-text:"%1\.%2";
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	margin-left:.5in;
+	text-indent:-.5in;}
+@list l10:level3
+	{mso-level-text:"%1\.%2\.%3";
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	margin-left:.5in;
+	text-indent:-.5in;}
+@list l10:level4
+	{mso-level-text:"%1\.%2\.%3\.%4";
+	mso-level-tab-stop:.75in;
+	mso-level-number-position:left;
+	margin-left:.75in;
+	text-indent:-.75in;}
+@list l10:level5
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5";
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	margin-left:1.0in;
+	text-indent:-1.0in;}
+@list l10:level6
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6";
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	margin-left:1.0in;
+	text-indent:-1.0in;}
+@list l10:level7
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7";
+	mso-level-tab-stop:1.25in;
+	mso-level-number-position:left;
+	margin-left:1.25in;
+	text-indent:-1.25in;}
+@list l10:level8
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8";
+	mso-level-tab-stop:1.25in;
+	mso-level-number-position:left;
+	margin-left:1.25in;
+	text-indent:-1.25in;}
+@list l10:level9
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9";
+	mso-level-tab-stop:1.5in;
+	mso-level-number-position:left;
+	margin-left:1.5in;
+	text-indent:-1.5in;}
+@list l11
+	{mso-list-id:721904222;
+	mso-list-type:hybrid;
+	mso-list-template-ids:94154208;}
+@list l11:level1
+	{mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;}
+@list l12
+	{mso-list-id:877204013;
+	mso-list-type:hybrid;
+	mso-list-template-ids:1327559334;}
+@list l12:level1
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;}
+@list l12:level2
+	{mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;}
+@list l13
+	{mso-list-id:973676761;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-1305448192 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l13:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l14
+	{mso-list-id:1029136556;
+	mso-list-template-ids:-946592284;}
+@list l14:level1
+	{mso-level-start-at:3;
+	mso-level-text:%1;
+	mso-level-tab-stop:20.25pt;
+	mso-level-number-position:left;
+	margin-left:20.25pt;
+	text-indent:-20.25pt;}
+@list l14:level2
+	{mso-level-start-at:4;
+	mso-level-text:"%1\.%2";
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	margin-left:.5in;
+	text-indent:-.5in;}
+@list l14:level3
+	{mso-level-text:"%1\.%2\.%3";
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	margin-left:.5in;
+	text-indent:-.5in;}
+@list l14:level4
+	{mso-level-text:"%1\.%2\.%3\.%4";
+	mso-level-tab-stop:.75in;
+	mso-level-number-position:left;
+	margin-left:.75in;
+	text-indent:-.75in;}
+@list l14:level5
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5";
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	margin-left:1.0in;
+	text-indent:-1.0in;}
+@list l14:level6
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6";
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	margin-left:1.0in;
+	text-indent:-1.0in;}
+@list l14:level7
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7";
+	mso-level-tab-stop:1.25in;
+	mso-level-number-position:left;
+	margin-left:1.25in;
+	text-indent:-1.25in;}
+@list l14:level8
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8";
+	mso-level-tab-stop:1.25in;
+	mso-level-number-position:left;
+	margin-left:1.25in;
+	text-indent:-1.25in;}
+@list l14:level9
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9";
+	mso-level-tab-stop:1.5in;
+	mso-level-number-position:left;
+	margin-left:1.5in;
+	text-indent:-1.5in;}
+@list l15
+	{mso-list-id:1420754968;
+	mso-list-template-ids:-1721496442;}
+@list l15:level1
+	{mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;}
+@list l15:level2
+	{mso-level-text:"%1\.%2\.";
+	mso-level-tab-stop:.35in;
+	mso-level-number-position:left;
+	margin-left:.35in;
+	text-indent:-.35in;}
+@list l15:level3
+	{mso-level-text:"%1\.%2\.%3\.";
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	margin-left:.5in;
+	text-indent:-.5in;}
+@list l15:level4
+	{mso-level-text:"%1\.%2\.%3\.%4";
+	mso-level-tab-stop:.75in;
+	mso-level-number-position:left;
+	margin-left:.15in;
+	text-indent:-.15in;}
+@list l15:level5
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5";
+	mso-level-tab-stop:.7in;
+	mso-level-number-position:left;
+	margin-left:.7in;
+	text-indent:-.7in;}
+@list l15:level6
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6";
+	mso-level-tab-stop:.8in;
+	mso-level-number-position:left;
+	margin-left:.8in;
+	text-indent:-.8in;}
+@list l15:level7
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7";
+	mso-level-tab-stop:.9in;
+	mso-level-number-position:left;
+	margin-left:.9in;
+	text-indent:-.9in;}
+@list l15:level8
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8";
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	margin-left:1.0in;
+	text-indent:-1.0in;}
+@list l15:level9
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9";
+	mso-level-tab-stop:1.1in;
+	mso-level-number-position:left;
+	margin-left:1.1in;
+	text-indent:-1.1in;}
+@list l16
+	{mso-list-id:1455438091;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l16:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l17
+	{mso-list-id:1504197449;
+	mso-list-type:hybrid;
+	mso-list-template-ids:562856400 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l17:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l18
+	{mso-list-id:1574895874;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-692135306;}
+@list l18:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l19
+	{mso-list-id:1890803395;
+	mso-list-template-ids:-209257786;}
+@list l19:level1
+	{mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;}
+@list l19:level2
+	{mso-level-text:"%1\.%2\.";
+	mso-level-tab-stop:.35in;
+	mso-level-number-position:left;
+	margin-left:.35in;
+	text-indent:-.35in;}
+@list l19:level3
+	{mso-level-text:"%1\.%2\.%3\.";
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	margin-left:.5in;
+	text-indent:-.5in;}
+@list l19:level4
+	{mso-level-text:"%1\.%2\.%3\.%4";
+	mso-level-tab-stop:.75in;
+	mso-level-number-position:left;
+	margin-left:.15in;
+	text-indent:-.15in;}
+@list l19:level5
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5";
+	mso-level-tab-stop:.7in;
+	mso-level-number-position:left;
+	margin-left:.7in;
+	text-indent:-.7in;}
+@list l19:level6
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6";
+	mso-level-tab-stop:.8in;
+	mso-level-number-position:left;
+	margin-left:.8in;
+	text-indent:-.8in;}
+@list l19:level7
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7";
+	mso-level-tab-stop:.9in;
+	mso-level-number-position:left;
+	margin-left:.9in;
+	text-indent:-.9in;}
+@list l19:level8
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8";
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	margin-left:1.0in;
+	text-indent:-1.0in;}
+@list l19:level9
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9";
+	mso-level-tab-stop:1.1in;
+	mso-level-number-position:left;
+	margin-left:1.1in;
+	text-indent:-1.1in;}
+@list l20
+	{mso-list-id:1918899348;
+	mso-list-template-ids:-209257786;}
+@list l20:level1
+	{mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;}
+@list l20:level2
+	{mso-level-text:"%1\.%2\.";
+	mso-level-tab-stop:.35in;
+	mso-level-number-position:left;
+	margin-left:.35in;
+	text-indent:-.35in;}
+@list l20:level3
+	{mso-level-text:"%1\.%2\.%3\.";
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	margin-left:.5in;
+	text-indent:-.5in;}
+@list l20:level4
+	{mso-level-text:"%1\.%2\.%3\.%4";
+	mso-level-tab-stop:.75in;
+	mso-level-number-position:left;
+	margin-left:.15in;
+	text-indent:-.15in;}
+@list l20:level5
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5";
+	mso-level-tab-stop:.7in;
+	mso-level-number-position:left;
+	margin-left:.7in;
+	text-indent:-.7in;}
+@list l20:level6
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6";
+	mso-level-tab-stop:.8in;
+	mso-level-number-position:left;
+	margin-left:.8in;
+	text-indent:-.8in;}
+@list l20:level7
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7";
+	mso-level-tab-stop:.9in;
+	mso-level-number-position:left;
+	margin-left:.9in;
+	text-indent:-.9in;}
+@list l20:level8
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8";
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	margin-left:1.0in;
+	text-indent:-1.0in;}
+@list l20:level9
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9";
+	mso-level-tab-stop:1.1in;
+	mso-level-number-position:left;
+	margin-left:1.1in;
+	text-indent:-1.1in;}
+@list l21
+	{mso-list-id:2085839366;
+	mso-list-type:hybrid;
+	mso-list-template-ids:1007576916;}
+@list l21:level1
+	{mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;}
+@list l22
+	{mso-list-id:2119831988;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-1892627086 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l22:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l22:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l23
+	{mso-list-id:2133473237;
+	mso-list-type:hybrid;
+	mso-list-template-ids:547365202 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l23:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l3:level1 lfo11
+	{mso-level-number-format:bullet;
+	mso-level-numbering:continue;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	mso-level-legacy:yes;
+	mso-level-legacy-indent:.25in;
+	mso-level-legacy-space:0in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+ol
+	{margin-bottom:0in;}
+ul
+	{margin-bottom:0in;}
+-->
+</style>
+<!--[if gte mso 10]>
+<style>
+ /* Style Definitions */
+ table.MsoNormalTable
+	{mso-style-name:"Table Normal";
+	mso-tstyle-rowband-size:0;
+	mso-tstyle-colband-size:0;
+	mso-style-noshow:yes;
+	mso-style-parent:"";
+	mso-padding-alt:0in 5.4pt 0in 5.4pt;
+	mso-para-margin:0in;
+	mso-para-margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Times New Roman";}
+</style>
+<![endif]--><!--[if gte mso 9]><xml>
+ <o:shapedefaults v:ext="edit" spidmax="2050"/>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <o:shapelayout v:ext="edit">
+  <o:idmap v:ext="edit" data="1"/>
+ </o:shapelayout></xml><![endif]-->
+</head>
+
+<body lang=EN-US link=blue vlink=purple style='tab-interval:.5in'>
+		<div class=Section1 align="center">
+			<p class=MsoTitle><span style='font-size:14.0pt;layout-grid-mode:line'>White
+Paper<o:p></o:p></span></p>
+			<p class=MsoTitle><b style="mso-bidi-font-weight:normal"><span style="layout-grid-mode:line">XML Schema Validation Process for CORE.GOV
+						<o:p></o:p>
+					</span></b></p>
+			<table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 style="border-collapse:collapse;mso-padding-alt:0in 5.75pt 0in 5.75pt">
+				<tr style="mso-yfti-irow:0;page-break-inside:avoid;height:31.95pt">
+					<td width=578 colspan=3 valign=top style="width:433.25pt;padding:0in 5.75pt 0in 5.75pt; height:31.95pt">
+						<p class=MsoNormal align=center style="margin:0in;margin-bottom:.0001pt; text-align:center"><span style="font-size:10.0pt;mso-bidi-font-size:12.0pt">
+								<o:p>
+									 
+								</o:p>
+							</span></p>
+						<p class=MsoNormal align=center style="margin:0in;margin-bottom:.0001pt; text-align:center"><span style="font-size:10.0pt;mso-bidi-font-size:12.0pt">KC Morris, Serm Kulvatunyou, Simon Frechette, Josh Lubell, Puja Goyal
+								<o:p></o:p>
+							</span></p>
+						<p class=MsoNormal align=center style="margin:0in;margin-bottom:.0001pt; text-align:center"><span style="font-size:10.0pt;mso-bidi-font-size:12.0pt">
+								<o:p>
+									 
+								</o:p>
+							</span></p>
+					</td>
+				</tr>
+				<tr style="mso-yfti-irow:1;page-break-inside:avoid;height:11.45pt">
+					<td width=578 colspan=3 valign=top style="width:433.25pt;padding:0in 5.75pt 0in 5.75pt; height:11.45pt">
+						<p class=FigureLabel style="tab-stops:.5in"><span style="layout-grid-mode: both">Manufacturing Systems Integration Division,
+								<o:p></o:p>
+							</span></p>
+						<p class=FigureLabel style="tab-stops:.5in">National 
+							<st1:place>
+								<st1:PlaceType>
+									Institute
+								</st1:PlaceType>
+								 of 
+								<st1:PlaceName>
+									Standards
+								</st1:PlaceName>
+							</st1:place>
+							 and Technology</p>
+						<p class=MsoNormal align=center style="margin:0in;margin-bottom:.0001pt; text-align:center">
+							<st1:place>
+								<st1:City>
+									<span style="font-size:10.0pt; mso-bidi-font-size:12.0pt">Gaithersburg</span>
+								</st1:City>
+								<span style="font-size:10.0pt;mso-bidi-font-size:12.0pt">, </span>
+								<st1:State>
+									<span style="font-size:10.0pt;mso-bidi-font-size:12.0pt">MD</span>
+								</st1:State>
+								<span style="font-size:10.0pt;mso-bidi-font-size:12.0pt"> </span>
+								<st1:PostalCode>
+									<span style="font-size:10.0pt;mso-bidi-font-size:12.0pt">20899-8260</span>
+								</st1:PostalCode>
+							</st1:place>
+							<span style="font-size:10.0pt;mso-bidi-font-size:12.0pt">, U.S.A
+								<o:p></o:p>
+							</span></p>
+					</td>
+				</tr>
+				<tr style="mso-yfti-irow:2;page-break-inside:avoid;height:11.45pt">
+					<td width=158 valign=top style="width:118.25pt;padding:0in 5.75pt 0in 5.75pt; height:11.45pt">
+						<p class=MsoNormal align=center style="margin:0in;margin-bottom:.0001pt; text-align:center"><span style="font-size:10.0pt;mso-bidi-font-size:12.0pt">
+								<o:p>
+									 
+								</o:p>
+							</span></p>
+					</td>
+					<td width=216 valign=top style="width:2.25in;padding:0in 5.75pt 0in 5.75pt; height:11.45pt">
+						<p class=MsoNormal align=center style="margin:0in;margin-bottom:.0001pt; text-align:center"><span style="font-size:10.0pt;mso-bidi-font-size:12.0pt">
+								<o:p>
+									 
+								</o:p>
+							</span></p>
+					</td>
+					<td width=204 valign=top style="width:153.0pt;padding:0in 5.75pt 0in 5.75pt; height:11.45pt">
+						<p class=MsoNormal align=center style="margin:0in;margin-bottom:.0001pt; text-align:center"><span style="font-size:10.0pt;mso-bidi-font-size:12.0pt">
+								<o:p>
+									 
+								</o:p>
+							</span></p>
+					</td>
+				</tr>
+				<tr style="mso-yfti-irow:3;mso-yfti-lastrow:yes;page-break-inside:avoid; height:11.45pt">
+					<td width=158 valign=top style="width:118.25pt;padding:0in 5.75pt 0in 5.75pt; height:11.45pt">
+						<p class=MsoNormal align=center style="margin:0in;margin-bottom:.0001pt; text-align:center"><span style="font-size:10.0pt;mso-bidi-font-size:12.0pt">
+								<o:p>
+									 
+								</o:p>
+							</span></p>
+					</td>
+					<td width=216 valign=top style="width:2.25in;padding:0in 5.75pt 0in 5.75pt; height:11.45pt">
+						<p class=MsoNormal align=center style="margin:0in;margin-bottom:.0001pt; text-align:center"><span style="font-size:10.0pt;mso-bidi-font-size:12.0pt">
+								<o:p>
+									 
+								</o:p>
+							</span></p>
+					</td>
+					<td width=204 valign=top style="width:153.0pt;padding:0in 5.75pt 0in 5.75pt; height:11.45pt">
+						<p class=MsoNormal align=center style="margin:0in;margin-bottom:.0001pt; text-align:center"><span style="font-size:10.0pt;mso-bidi-font-size:12.0pt">
+								<o:p>
+									 
+								</o:p>
+							</span></p>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class=Section1>
+			<p class=MsoHeader><span style='layout-grid-mode:line'>Abstract
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoNormal><span style='layout-grid-mode:line'>Many integration
+projects today rely on shared semantic models based on standards represented
+using Extensible Mark up Language (XML) technologies. Shared semantic models
+typically evolve and require maintenance. In addition, to promote interoperability
+and reduce integration costs, the shared semantics should be reused as much as
+possible. The GSA Component Organization and Registration Environment
+(CORE.GOV) initiative is an effort to promote the sharing and reuse of
+components to reduce the acquisition costs of software needed by government. To
+be effective, CORE.GOV components must be consistent and valid in terms of
+agreed upon standards and guidelines. In this paper, we describe an activity
+model for validation of shared semantic models that is coherent and supports
+efficient enterprise integration. We then use this activity model to frame our
+research and the development of tools to support those activities. Overviews of
+these supporting tools are described primarily in the context of the W3C XML
+Schema. At the present, we focus our work on the W3C XML Schema as the
+representation of choice, due to its extensive adoption by industry. We believe
+this validation model and associated tools could serve as the basis for a
+CORE.GOV validation and acceptance process.
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoNormal><span style='layout-grid-mode:line'>
+					<o:p>
+						&nbsp;
+					</o:p>
+				</span></p>
+			<p class=MsoHeader><span style='layout-grid-mode:line'>Table of Contents
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoToc1 style='tab-stops:24.0pt right dotted 431.5pt'><!--[if supportFields]><span
+style='layout-grid-mode:line'><span style='mso-element:field-begin'></span><span
+style='mso-spacerun:yes'> </span>TOC \o &quot;1-3&quot; \h \z \u <span
+style='mso-element:field-separator'></span></span><![endif]--><span
+class=MsoHyperlink><span style='mso-no-proof:yes'><a href="#_Toc89663120"><span
+style='layout-grid-mode:line'>1.</span><span style='font-size:12.0pt;
+mso-fareast-font-family:"MS Mincho";color:windowtext;mso-fareast-language:JA;
+text-decoration:none;text-underline:none'><span style='mso-tab-count:1'>     </span></span><span
+style='layout-grid-mode:line'>Introduction</span><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-tab-count:1 dotted'>. </span></span><!--[if supportFields]><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-element:field-begin'></span></span><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'> PAGEREF _Toc89663120 \h </span><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-separator'></span></span><![endif]--><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'>2</span><span style='color:windowtext;display:none;
+mso-hide:screen;text-decoration:none;text-underline:none'><!--[if gte mso 9]><xml>
+ <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000D0000005F0054006F006300380039003600360033003100320030000000</w:data>
+</xml><![endif]--></span><!--[if supportFields]><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-end'></span></span><![endif]--></a></span></span><span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";mso-fareast-language:
+JA;mso-no-proof:yes'>
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoToc1 style='tab-stops:24.0pt right dotted 431.5pt'><span
+class=MsoHyperlink><span style='mso-no-proof:yes'><a href="#_Toc89663121"><span
+style='layout-grid-mode:line'>2.</span><span style='font-size:12.0pt;
+mso-fareast-font-family:"MS Mincho";color:windowtext;mso-fareast-language:JA;
+text-decoration:none;text-underline:none'><span style='mso-tab-count:1'>     </span></span><span
+style='layout-grid-mode:line'>Model Development Life Cycle</span><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-tab-count:1 dotted'>. </span></span><!--[if supportFields]><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-element:field-begin'></span></span><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'> PAGEREF _Toc89663121 \h </span><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-separator'></span></span><![endif]--><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'>2</span><span style='color:windowtext;display:none;
+mso-hide:screen;text-decoration:none;text-underline:none'><!--[if gte mso 9]><xml>
+ <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000D0000005F0054006F006300380039003600360033003100320031000000</w:data>
+</xml><![endif]--></span><!--[if supportFields]><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-end'></span></span><![endif]--></a></span></span><span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";mso-fareast-language:
+JA;mso-no-proof:yes'>
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoToc1 style='tab-stops:24.0pt right dotted 431.5pt'><span
+class=MsoHyperlink><span style='mso-no-proof:yes'><a href="#_Toc89663122">3.<span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";color:windowtext;
+mso-fareast-language:JA;text-decoration:none;text-underline:none'><span
+style='mso-tab-count:1'>     </span></span>Activities of the Model Development
+Life Cycle<span style='color:windowtext;display:none;mso-hide:screen;
+text-decoration:none;text-underline:none'><span style='mso-tab-count:1 dotted'>. </span></span><!--[if supportFields]><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-element:field-begin'></span></span><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'> PAGEREF _Toc89663122 \h </span><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-separator'></span></span><![endif]--><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'>4</span><span style='color:windowtext;display:none;
+mso-hide:screen;text-decoration:none;text-underline:none'><!--[if gte mso 9]><xml>
+ <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000D0000005F0054006F006300380039003600360033003100320032000000</w:data>
+</xml><![endif]--></span><!--[if supportFields]><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-end'></span></span><![endif]--></a></span></span><span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";mso-fareast-language:
+JA;mso-no-proof:yes'>
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoToc2 style='tab-stops:48.0pt right dotted 431.5pt'><span
+class=MsoHyperlink><span style='mso-no-proof:yes'><a href="#_Toc89663123">3.1.<span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";color:windowtext;
+mso-fareast-language:JA;text-decoration:none;text-underline:none'><span
+style='mso-tab-count:1'>       </span></span>Model Requirements<span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-tab-count:1 dotted'>. </span></span><!--[if supportFields]><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-element:field-begin'></span></span><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'> PAGEREF _Toc89663123 \h </span><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-separator'></span></span><![endif]--><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'>6</span><span style='color:windowtext;display:none;
+mso-hide:screen;text-decoration:none;text-underline:none'><!--[if gte mso 9]><xml>
+ <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000D0000005F0054006F006300380039003600360033003100320033000000</w:data>
+</xml><![endif]--></span><!--[if supportFields]><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-end'></span></span><![endif]--></a></span></span><span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";mso-fareast-language:
+JA;mso-no-proof:yes'>
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoToc2 style='tab-stops:48.0pt right dotted 431.5pt'><span
+class=MsoHyperlink><span style='mso-no-proof:yes'><a href="#_Toc89663124">3.2.<span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";color:windowtext;
+mso-fareast-language:JA;text-decoration:none;text-underline:none'><span
+style='mso-tab-count:1'>       </span></span>Model Discovery<span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-tab-count:1 dotted'>. </span></span><!--[if supportFields]><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-element:field-begin'></span></span><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'> PAGEREF _Toc89663124 \h </span><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-separator'></span></span><![endif]--><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'>7</span><span style='color:windowtext;display:none;
+mso-hide:screen;text-decoration:none;text-underline:none'><!--[if gte mso 9]><xml>
+ <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000D0000005F0054006F006300380039003600360033003100320034000000</w:data>
+</xml><![endif]--></span><!--[if supportFields]><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-end'></span></span><![endif]--></a></span></span><span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";mso-fareast-language:
+JA;mso-no-proof:yes'>
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoToc2 style='tab-stops:48.0pt right dotted 431.5pt'><span
+class=MsoHyperlink><span style='mso-no-proof:yes'><a href="#_Toc89663125">3.3.<span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";color:windowtext;
+mso-fareast-language:JA;text-decoration:none;text-underline:none'><span
+style='mso-tab-count:1'>       </span></span>Model Validation<span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-tab-count:1 dotted'>. </span></span><!--[if supportFields]><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-element:field-begin'></span></span><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'> PAGEREF _Toc89663125 \h </span><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-separator'></span></span><![endif]--><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'>9</span><span style='color:windowtext;display:none;
+mso-hide:screen;text-decoration:none;text-underline:none'><!--[if gte mso 9]><xml>
+ <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000D0000005F0054006F006300380039003600360033003100320035000000</w:data>
+</xml><![endif]--></span><!--[if supportFields]><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-end'></span></span><![endif]--></a></span></span><span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";mso-fareast-language:
+JA;mso-no-proof:yes'>
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoToc2 style='tab-stops:48.0pt right dotted 431.5pt'><span
+class=MsoHyperlink><span style='mso-no-proof:yes'><a href="#_Toc89663126">3.4.<span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";color:windowtext;
+mso-fareast-language:JA;text-decoration:none;text-underline:none'><span
+style='mso-tab-count:1'>       </span></span>Model Piloting<span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-tab-count:1 dotted'>. </span></span><!--[if supportFields]><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-element:field-begin'></span></span><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'> PAGEREF _Toc89663126 \h </span><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-separator'></span></span><![endif]--><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'>11</span><span style='color:windowtext;display:none;
+mso-hide:screen;text-decoration:none;text-underline:none'><!--[if gte mso 9]><xml>
+ <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000D0000005F0054006F006300380039003600360033003100320036000000</w:data>
+</xml><![endif]--></span><!--[if supportFields]><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-end'></span></span><![endif]--></a></span></span><span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";mso-fareast-language:
+JA;mso-no-proof:yes'>
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoToc2 style='tab-stops:48.0pt right dotted 431.5pt'><span
+class=MsoHyperlink><span style='mso-no-proof:yes'><a href="#_Toc89663127">3.5.<span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";color:windowtext;
+mso-fareast-language:JA;text-decoration:none;text-underline:none'><span
+style='mso-tab-count:1'>       </span></span>Model Registration<span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-tab-count:1 dotted'>. </span></span><!--[if supportFields]><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-element:field-begin'></span></span><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'> PAGEREF _Toc89663127 \h </span><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-separator'></span></span><![endif]--><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'>12</span><span style='color:windowtext;display:none;
+mso-hide:screen;text-decoration:none;text-underline:none'><!--[if gte mso 9]><xml>
+ <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000D0000005F0054006F006300380039003600360033003100320037000000</w:data>
+</xml><![endif]--></span><!--[if supportFields]><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-end'></span></span><![endif]--></a></span></span><span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";mso-fareast-language:
+JA;mso-no-proof:yes'>
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoToc2 style='tab-stops:48.0pt right dotted 431.5pt'><span
+class=MsoHyperlink><span style='mso-no-proof:yes'><a href="#_Toc89663128">3.6.<span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";color:windowtext;
+mso-fareast-language:JA;text-decoration:none;text-underline:none'><span
+style='mso-tab-count:1'>       </span></span>Model Integration<span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-tab-count:1 dotted'>. </span></span><!--[if supportFields]><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-element:field-begin'></span></span><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'> PAGEREF _Toc89663128 \h </span><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-separator'></span></span><![endif]--><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'>13</span><span style='color:windowtext;display:none;
+mso-hide:screen;text-decoration:none;text-underline:none'><!--[if gte mso 9]><xml>
+ <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000D0000005F0054006F006300380039003600360033003100320038000000</w:data>
+</xml><![endif]--></span><!--[if supportFields]><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-end'></span></span><![endif]--></a></span></span><span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";mso-fareast-language:
+JA;mso-no-proof:yes'>
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoToc1 style='tab-stops:24.0pt right dotted 431.5pt'><span
+class=MsoHyperlink><span style='mso-no-proof:yes'><a href="#_Toc89663129">4.<span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";color:windowtext;
+mso-fareast-language:JA;text-decoration:none;text-underline:none'><span
+style='mso-tab-count:1'>     </span></span>Supporting Tools and Functionalities<span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-tab-count:1 dotted'>. </span></span><!--[if supportFields]><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-element:field-begin'></span></span><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'> PAGEREF _Toc89663129 \h </span><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-separator'></span></span><![endif]--><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'>14</span><span style='color:windowtext;display:none;
+mso-hide:screen;text-decoration:none;text-underline:none'><!--[if gte mso 9]><xml>
+ <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000D0000005F0054006F006300380039003600360033003100320039000000</w:data>
+</xml><![endif]--></span><!--[if supportFields]><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-end'></span></span><![endif]--></a></span></span><span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";mso-fareast-language:
+JA;mso-no-proof:yes'>
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoToc1 style='tab-stops:24.0pt right dotted 431.5pt'><span
+class=MsoHyperlink><span style='mso-no-proof:yes'><a href="#_Toc89663130">5.<span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";color:windowtext;
+mso-fareast-language:JA;text-decoration:none;text-underline:none'><span
+style='mso-tab-count:1'>     </span></span>Summary<span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-tab-count:1 dotted'>. </span></span><!--[if supportFields]><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-element:field-begin'></span></span><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'> PAGEREF _Toc89663130 \h </span><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-separator'></span></span><![endif]--><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'>16</span><span style='color:windowtext;display:none;
+mso-hide:screen;text-decoration:none;text-underline:none'><!--[if gte mso 9]><xml>
+ <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000D0000005F0054006F006300380039003600360033003100330030000000</w:data>
+</xml><![endif]--></span><!--[if supportFields]><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-end'></span></span><![endif]--></a></span></span><span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";mso-fareast-language:
+JA;mso-no-proof:yes'>
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoToc1 style='tab-stops:24.0pt right dotted 431.5pt'><span
+class=MsoHyperlink><span style='mso-no-proof:yes'><a href="#_Toc89663131">6.<span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";color:windowtext;
+mso-fareast-language:JA;text-decoration:none;text-underline:none'><span
+style='mso-tab-count:1'>     </span></span>Disclaimer<span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-tab-count:1 dotted'> </span></span><!--[if supportFields]><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-element:field-begin'></span></span><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'> PAGEREF _Toc89663131 \h </span><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-separator'></span></span><![endif]--><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'>17</span><span style='color:windowtext;display:none;
+mso-hide:screen;text-decoration:none;text-underline:none'><!--[if gte mso 9]><xml>
+ <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000D0000005F0054006F006300380039003600360033003100330031000000</w:data>
+</xml><![endif]--></span><!--[if supportFields]><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-end'></span></span><![endif]--></a></span></span><span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";mso-fareast-language:
+JA;mso-no-proof:yes'>
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoToc1 style='tab-stops:24.0pt right dotted 431.5pt'><span
+class=MsoHyperlink><span style='mso-no-proof:yes'><a href="#_Toc89663132">7.<span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";color:windowtext;
+mso-fareast-language:JA;text-decoration:none;text-underline:none'><span
+style='mso-tab-count:1'>     </span></span>References<span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-tab-count:1 dotted'>. </span></span><!--[if supportFields]><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'><span style='mso-element:field-begin'></span></span><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'> PAGEREF _Toc89663132 \h </span><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-separator'></span></span><![endif]--><span
+style='color:windowtext;display:none;mso-hide:screen;text-decoration:none;
+text-underline:none'>17</span><span style='color:windowtext;display:none;
+mso-hide:screen;text-decoration:none;text-underline:none'><!--[if gte mso 9]><xml>
+ <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000D0000005F0054006F006300380039003600360033003100330032000000</w:data>
+</xml><![endif]--></span><!--[if supportFields]><span style='color:windowtext;
+display:none;mso-hide:screen;text-decoration:none;text-underline:none'><span
+style='mso-element:field-end'></span></span><![endif]--></a></span></span><span
+style='font-size:12.0pt;mso-fareast-font-family:"MS Mincho";mso-fareast-language:
+JA;mso-no-proof:yes'>
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoNormal><!--[if supportFields]><span style='layout-grid-mode:line'><span
+style='mso-element:field-end'></span></span><![endif]--><span style='layout-grid-mode:
+line'>
+					<o:p>
+						&nbsp;
+					</o:p>
+				</span></p>
+			<h1><a name="_Toc89663120">
+					<![if !supportLists]>
+					<span style='mso-fareast-font-family:
+Arial;layout-grid-mode:line'><span style='mso-list:Ignore'>1.<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp; </span></span></span>
+					<![endif]>
+					<span
+style='layout-grid-mode:line'>Introduction</span></a><span style='layout-grid-mode:
+line'>
+					<o:p></o:p>
+				</span></h1>
+			<p class=MsoNormal>The Federal Enterprise Architecture Agency (FEA) Project’s
+Component Organization and Registration Environment, CORE.GOV, is a newly
+created resource intended to provide a collaborative environment for component
+development, registration, and reuse. CORE.GOV defines a “component” to be a
+“self-contained business process or service with predetermined functionality
+that may be exposed through a business or technology interface.” It provides a
+place to search for the components you need or to submit components for use by
+others. Reusability of components is the key to CORE.GOV and offers the
+potential to reduce software acquisition costs by leveraging work across
+multiple agencies. CORE.GOV is a private-public effort that grew out of the FEA
+Project Management Office. It was developed with the assistance of Collab.net
+and uses Collab.net's SourceCast tool, which <span lang=EN style='mso-ansi-language:
+EN'>provides a Sourceforge.net-like, open-source community for US government
+organizations starting with Federal agencies and including state and local
+entities. Although still in development, CORE.GOV could become a necessary
+infrastructural element for creating cost effective, interoperable, and
+reusable standards-based software solutions for Federal government agencies.
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoNormal>Reuse is one of the most compelling features of the World
+Wide Web Consortium’s <span style='mso-spacerun:yes'> </span>(W3C) [W3C] XML<span
+style='layout-grid-mode:line'> (Extensible Mark up Language)</span> [XML] technologies
+because it has the potential to save so much time. Developing new information
+elements in multiple contexts can consume countless hours. Component management
+solves that problem by allowing XML documents to reuse content across
+documents.[Nicholson] This is made possible by creating standardized and
+interchangeable parts with XML and employing a component management technique
+to provide intelligent access to components. In order to provide consistent,
+effective, reusable components, it will be necessary for CORE.GOV to provide
+some degree of component validation based on accepted standards, rules, and
+practices. This paper is an effort to develop a lifecycle model for XML schemas
+with emphasis on validation and approval activities; and tools to support those
+activities.</p>
+			<h1><a name="_Toc89663121">
+					<![if !supportLists]>
+					<span style='mso-fareast-font-family:
+Arial;layout-grid-mode:line'><span style='mso-list:Ignore'>2.<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp; </span></span></span>
+					<![endif]>
+					<span
+style='layout-grid-mode:line'>Model Development Life Cycle</span></a><span
+style='layout-grid-mode:line'>
+					<o:p></o:p>
+				</span></h1>
+			<p class=MsoNormal>In this section, we describe the highest-level activity
+model, called the <i>Model Development Life Cycle</i>, with particular
+attention to the inputs and outputs of this activity. They indicate the main
+objective of this activity and all subactivities (described in subsequent
+sections). The input is the <i>Data exchange requirements</i> and the output is
+the <i>Library of semantically coherent XML schemas</i> and <i
+style='mso-bidi-font-style:normal'>change requests.</i></p>
+			<p class=MsoNormal>The <i>data exchange requirements </i>input includes all
+documentation that capture the detailed information requirements for
+integration. At this high-level, several kinds of models, such as use case
+models, integration activity models, object/information models, process models,
+etc., are considered part of the <i>data exchange requirements</i>.</p>
+			<p class=MsoNormal>The <i>library of semantically coherent XML schemas</i>
+output is a collection of data interchange terms and data structures
+represented as XML Schemas. These terms and data structures shall either have
+individually unique semantics or overlapping semantics and shall contain no
+duplicates. Those overlapping terms and structures should be related such as by
+extension, restriction, redefinition, or subsumption. The library may incorporate
+XML-based content standards and will include new XML content models. The
+resulting library also should contain supporting data to help maximize the
+reusability of these terms and data structures. These supporting data include
+but are not limited to classification schemes for categorization, the models
+provided in the information exchange requirements, sample instance data, more
+expressive semantic models, and documentation.</p>
+			<p class=MsoNormal>The <i style='mso-bidi-font-style:normal'>change requests</i>
+output is reflective of the cyclical nature of a life cycle. The other output,
+the XML schemas library, may incorporate XML content models, which are owned by
+external entities. In some circumstances one of the results of the model
+development life cycle will be requests to the owning entity to modify their model
+in order to fully cover requirements or maintain consistency. The result is the
+evolution of the library.</p>
+			<p class=MsoNormal>The figures in this paper are drawn using IDEF0 [IDEF0].
+Included in the diagram from the top are constraints or control data used in
+the activity and from the bottom are tools and mechanisms supporting the
+activities. These control data and tools are briefly described below and will
+be expanded upon again in the subactivities.</p>
+			<p class=MsoNormal><i>XML Schema specification</i> controls the syntactical and
+grammatical representation of terms and data structures for the data exchange
+specification. It also limits the expressiveness in which the relationships
+between overlapping data structures can be modeled.</p>
+			<p class=MsoNormal><i>XML Schema design guidelines</i> enforce the resulting
+XML Schemas compliance to a selected set of design principles. These design
+principles can be ways of utilizing the XML Schema specification when
+alternatives exist, common data structure patterns, or required meta-data.
+While some of the guidelines appear to be mere stylistic options, their
+consistent use is critical to supporting schema reuse. These design guidelines
+bring bottom level consistency to the resulting schema and support ease of
+analysis, usability, extensibility, maintainability, automatability, and model
+expressiveness.</p>
+			<p class=MsoNormal>
+				<o:p>
+					&nbsp;
+				</o:p>
+			</p>
+		</div>
+		<div class=Section1 align="center">
+			<p class=MsoNormal style="text-align:center"><!--[if gte vml 1]><v:shapetype
+ id="_x0000_t75" coordsize="21600,21600" o:spt="75" o:preferrelative="t"
+ path="m@4@5l@4@11@9@11@9@5xe" filled="f" stroked="f">
+ <v:stroke joinstyle="miter"/>
+ <v:formulas>
+  <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+  <v:f eqn="sum @0 1 0"/>
+  <v:f eqn="sum 0 0 @1"/>
+  <v:f eqn="prod @2 1 2"/>
+  <v:f eqn="prod @3 21600 pixelWidth"/>
+  <v:f eqn="prod @3 21600 pixelHeight"/>
+  <v:f eqn="sum @0 0 1"/>
+  <v:f eqn="prod @6 1 2"/>
+  <v:f eqn="prod @7 21600 pixelWidth"/>
+  <v:f eqn="sum @8 21600 0"/>
+  <v:f eqn="prod @7 21600 pixelHeight"/>
+  <v:f eqn="sum @10 21600 0"/>
+ </v:formulas>
+ <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+ <o:lock v:ext="edit" aspectratio="t"/>
+</v:shapetype><v:shape id="_x0000_i1025" type="#_x0000_t75" style='width:391.5pt;
+ height:309pt' o:ole="">
+ <v:imagedata src="gsa-final_files/image001.emz" o:title="" croptop="8704f"
+  cropbottom="22886f" cropleft="15140f" cropright="19934f"/>
+ <w:bordertop type="single" width="4"/>
+ <w:borderleft type="single" width="4"/>
+ <w:borderbottom type="single" width="4"/>
+ <w:borderright type="single" width="4"/>
+</v:shape><![endif]-->
+				<![if !vml]>
+				<img src="gsa-final_files/image002.gif">
+				<![endif]>
+				<!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Visio.Drawing.11" ShapeID="_x0000_i1025"
+  DrawAspect="Content" ObjectID="_1164609797">
+ </o:OLEObject>
+</xml><![endif]--></p>
+		</div>
+		<div class=Section1>
+			<p class=MsoCaption>Figure <!--[if supportFields]><span style='mso-element:
+field-begin'></span><span style='mso-spacerun:yes'> </span>SEQ Figure \* ARABIC
+<span style='mso-element:field-separator'></span><![endif]--><span style="mso-no-proof:yes">1</span><!--[if supportFields]><span style='mso-element:
+field-end'></span><![endif]-->: Activity A0 – Model Development Life Cycle</p>
+			<p class=MsoNormal><i style="mso-bidi-font-style:normal">Supporting material </i>is the collection of source material for understanding the systems and data involved in the integration. It may include implementation documentation that clarifies the intent of the data, business rules for use of the data, classification schemas again clarifying the intent of the data, and external ontologies.</p>
+			<p class=MsoNormal>Although <i>sample data</i> may be viewed as part of the <i>data exchange requirements </i>input, the purpose here is as reference data to support requirement satisfaction and compatibility analyses.</p>
+			<p class=MsoNormal><i>XML tools</i> encompass tools that implement the XML Schema specification. These include XML schema validators, XML parsers and validators, XML editors, and other tools that implement utility standards related to XML such as the XML Path language [XPATH] and the Extensible Stylesheet Transformation Language [XSLT].</p>
+			<p class=MsoNormal><i>Rule based engines</i> are mechanisms to support the analysis of schemas conformance to design guidelines and other conformance testing requirements. Schematron is a specific example of a rule-based engine that is widely used with XML Schema.</p>
+			<p class=MsoNormal><i>Semantic analysis tools</i> are quantitative and qualitative measures to enhance reuse of the semantic model or XML Schemas. They may support discovery, harmonization, and library management and maintenance.</p>
+			<p class=MsoNormal>One important note throughout this paper is that the activity names in the activity model are generic to semantic model representation. However, to keep our work focused all discussions are based on XML Schema as the semantic model representation mechanism and is indicated in the input, output, control, and mechanism labels. This does not preclude incorporating other semantic model representations into our research to assist in other activities.</p>
+			<h1><a name="_Toc89663122">
+					<![if !supportLists]>
+					<span style="mso-fareast-font-family: Arial"><span style="mso-list:Ignore">3.<span style='font:7.0pt "Times New Roman"'>    </span></span></span>
+					<![endif]>
+					Activities of the Model Development Life Cycle</a></h1>
+			<p class=MsoNormal><!--[if gte vml 1]><v:line id="_x0000_s1029" style='position:absolute;
+ z-index:2' from="-45pt,462.6pt" to="513pt,462.6pt"/><![endif]-->
+				<![if !vml]>
+				<span style="mso-ignore:vglayout;position:absolute;z-index:2;margin-left:-61px; margin-top:616px;width:746px;height:2px"><img src="gsa-final_files/image003.gif"></span>
+				<![endif]>
+				The Model Development Life Cycle Activity <i>A0</i> is broken down into the six sub activities shown in Figure 2. These activities, <i style="mso-bidi-font-style: normal">A1</i> – <i style="mso-bidi-font-style:normal">Model Requirements,</i> <i>A2 – Model Discovery</i>, <i>A3 – Model Validation</i>, <i>A4 - Model Piloting</i>, <i>A5 - Model Registration</i>, and <i>A6 – Model Integration</i>, are described in this section.</p>
+			<p class=MsoNormal>
+				<o:p>
+					 
+				</o:p>
+			</p>
+			<p class=MsoNormal>
+				<o:p>
+					 
+				</o:p>
+			</p>
+		</div>
+		<div class=Section1 align="center">
+			<p class=MsoCaption style="margin:0in;margin-bottom:.0001pt;page-break-before: always;page-break-after:avoid"><!--[if gte vml 1]><o:wrapblock><v:shape id="_x0000_s1027"
+  type="#_x0000_t75" style='position:absolute;left:0;text-align:left;
+  margin-left:-1in;margin-top:-18pt;width:579.15pt;height:405.4pt;z-index:1;
+  mso-position-vertical-relative:margin'>
+  <v:imagedata src="gsa-final_files/image004.emz" o:title="" cropbottom="4107f"/>
+  <w:wrap type="topAndBottom" anchory="margin"/>
+ </v:shape><![if gte mso 9]><o:OLEObject Type="Embed" ProgID="Visio.Drawing.11"
+  ShapeID="_x0000_s1027" DrawAspect="Content" ObjectID="_1164609799">
+ </o:OLEObject>
+ <![endif]><![endif]-->
+				<![if !vml]>
+				<img src="gsa-final_files/image005.gif">
+				<![endif]>
+				<!--[if gte vml 1]></o:wrapblock><![endif]--><br style="mso-ignore:vglayout" clear=ALL>
+				Figure 2: Decomposition of the Model Development Life Cycle</p>
+		</div>
+		<div class=Section1>
+			<p class=MsoNormal>
+				<o:p>
+					 
+				</o:p>
+			</p>
+			<p class=MsoNormal>
+				<o:p>
+					 
+				</o:p>
+			</p>
+			<p class=MsoNormal>
+				<o:p>
+					 
+				</o:p>
+			</p>
+			<p class=MsoNormal>For the purpose of this paper we are considering the activities surrounding systems integration through data exchange using XML. We consider authoring of XML Schemas and requirements gathering as it relates to integration. We do not consider interactive systems integration, implementation of translators, model evolution, or retirement. The focus in this paper is on issues surrounding model reuse and validation in the context of a given integration project.</p>
+			<p class=MsoNormal>It is important to realize the following regarding model development:</p>
+			<p class=MsoListBullet>
+				<![if !supportLists]>
+				<span style="font-family:Symbol; mso-fareast-font-family:Symbol;mso-bidi-font-family:Symbol"><span style="mso-list:Ignore">·<span style='font:7.0pt "Times New Roman"'>         </span></span></span>
+				<![endif]>
+				An XML Schema is mainly a syntactic device. It is not capable of representing the entire model’s semantics. In order to represent semantics, the schema must be augmented with additional information. This information may take the form of rules, visual models, ontologies, supporting documentation, as well as the programming logic of an implementation of the model.</p>
+			<p class=MsoListBullet>
+				<![if !supportLists]>
+				<span style="font-family:Symbol; mso-fareast-font-family:Symbol;mso-bidi-font-family:Symbol"><span style="mso-list:Ignore">·<span style='font:7.0pt "Times New Roman"'>         </span></span></span>
+				<![endif]>
+				XML validation and the processing of an XML instance document are distinct from one another. Furthermore, the processing of instance data can be independent of a given schema language, i.e., XML Schema. In other words, an XML document can be validated against multiple schemas, perhaps specified using languages other than XML Schema (e.g., Schematron, RELAX NG). In fact, validation can be thought of as a pipeline of various steps, where an application or user processes the XML document after it has completed all of its validation steps.</p>
+			<p class=MsoListBullet>
+				<![if !supportLists]>
+				<span style="font-family:Symbol; mso-fareast-font-family:Symbol;mso-bidi-font-family:Symbol"><span style="mso-list:Ignore">·<span style='font:7.0pt "Times New Roman"'>         </span></span></span>
+				<![endif]>
+				XML validation refers to the validation of instance data represented in an XML document but model validation refers to validating an XML Schema against the requirements of the system or systems to be integrated.</p>
+			<p class=MsoNormal>These ideas form the basis of the Document Schema Definition Languages (DSDL) project (<a href="http://xml.coverpages.org/dsdl.html">http://xml.coverpages.org/dsdl.html</a>). DSDL is a project under ISO/IEC JTC1/SC34 Information Technology — Document Description and Processing Languages whose objective is to “create a framework within which multiple validation tasks of different types can be applied to an XML document in order to achieve more complete validation results than just the application of a single technology.” DSDL allows for a multi-step validation process that not only can involve multiple schema languages, but can also include transformations of the schemas as part of validation.</p>
+			<p class=MsoNormal>The idea of manipulating an XML Schema as part of validation is very powerful. This approach offloads the responsibility for ensuring interoperability from the schema developer onto the validation process itself. However, validation then becomes a more challenging task involving the pipelining and management of multiple steps. For an application with a large schema, validation resembles the building of software distributions from source code.</p>
+			<h2>
+				<![if !supportLists]>
+				<span style="mso-fareast-font-family:Arial"><span style="mso-list:Ignore">3.1.<span style='font:7.0pt "Times New Roman"'> </span></span></span>
+				<![endif]>
+				<span style="mso-spacerun:yes"> </span><a name="_Toc89663123">Model Requirements</a></h2>
+			<p class=MsoNormal>
+				<o:p>
+					 
+				</o:p>
+			</p>
+			<p class=MsoNormal><i style="mso-bidi-font-style:normal">Model Requirements</i> marks the beginning of the Model Development Life Cycle. Identifying and documenting the business rules and data requirements are a necessary precursor to any piloting or implementation activities. The functionalities of the product or services to be integrated are outlined at this stage in order to capture the correct information. If this planning process is thorough in the beginning, it can save much time and energy when creating the actual schemas and instance data. Figure 3 illustrates the sub-activities of <i style="mso-bidi-font-style:normal">Model Requirements</i>.</p>
+			<p class=MsoNormal>In the <i style="mso-bidi-font-style:normal">Define Business Procedure A 1.1</i> sub-activity, business processes, systems, and transactions required of the model will be identified. <i style="mso-bidi-font-style:normal">Identify and Gather Data A1.2</i> supplies data based on the business processes defined. In this activity the data elements, definitions, data types, data model, and other information are gathered for the data analysis matrix. The relevant data structures are also recognized.</p>
+			<p class=MsoNormal>
+				<o:p>
+					 
+				</o:p>
+			</p>
+		</div>
+		<div class=Section1 align="center">
+			<p class=MsoNormal style="margin:0in;margin-bottom:.0001pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1026" type="#_x0000_t75" style='width:486.75pt;height:291pt'
+ o:ole="">
+ <v:imagedata src="gsa-final_files/image006.emz" o:title="" croptop="10010f"
+  cropbottom="12326f" cropleft="4119f" cropright="2708f"/>
+ <w:bordertop type="single" width="4"/>
+ <w:borderleft type="single" width="4"/>
+ <w:borderbottom type="single" width="4"/>
+ <w:borderright type="single" width="4"/>
+</v:shape><![endif]-->
+				<![if !vml]>
+				<img src="gsa-final_files/image007.gif">
+				
+				<![endif]>
+				<!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Visio.Drawing.11" ShapeID="_x0000_i1026"
+  DrawAspect="Content" ObjectID="_1164609801">
+ </o:OLEObject>
+</xml><![endif]--></p>
+		</div>
+		<div class=Section1>
+			<p class=MsoCaption style="margin:0in;margin-bottom:.0001pt">Figure 3: Activity A1 – Model Requirements</p>
+			<p class=MsoNormal style="margin:0in;margin-bottom:.0001pt">
+				<o:p>
+					 
+
+				</o:p>
+			</p>
+			<p class=MsoNormal>Once the data requirements have been identified and documented, data models representing this information are created as shown in sub-activity <i style="mso-bidi-font-style:normal">Develop</i> <i style="mso-bidi-font-style:normal">Data Requirements A1.3</i>. Here we also identify the practice of adopting The Environmental Data Standards Council (EDSC) and Environmental Data Registry (EDR) standards, as well as Core Components Technical Specification’s (CCTS) and Core Reference Model’s (CRM) methodologies. These various specifications encourage developers to use standard development practices and procedures which include setting data standards, assigning hierarchies in a matrix, and the naming of terms within an XML schema. The data models constructed are not necessarily in XML Schema format but contain the information needed to create the XML Schemas.</p>
+			<p class=MsoNormal>To ensure the data is represented comprehensively and accurately, sub-activity <i style="mso-bidi-font-style:normal">Requirements Verification A1.4</i> verifies this data analysis with subject-matter experts. The final output of this activity are what we call qualified requirements– requirements that showcase the agreed upon version of the desired business rules and data. If any changes or additions are to be made anywhere from the business processes definition down to the data model, they are identified in this final sub-activity and the process is reiterated.</p>
+			<h2><a name="_Toc89663124">
+					<![if !supportLists]>
+					<span style="mso-fareast-font-family: Arial"><span style="mso-list:Ignore">3.2.<span style='font:7.0pt "Times New Roman"'> </span></span></span>
+					<![endif]>
+					
+					Model Discovery</a></h2>
+			<p class=MsoNormal>Typically integration projects first try to identify existing XML Schemas that support their scope. If none are found, they may make the decision to build their own XML Schemas. Figure 4 depicts the activities of <i style="mso-bidi-font-style:normal">Model Discovery</i>. The initial activity is <i style="mso-bidi-font-style:normal">Model Selection</i>. This is either followed by <i style="mso-bidi-font-style:normal">Model Extension </i>when a suitable model has been found or <i style="mso-bidi-font-style:normal">Model Creation</i> when it is determined that an appropriate model is not available.</p>
+			<p class=MsoNormal>
+				<o:p>
+					 
+
+				</o:p>
+			</p>
+		</div>
+		<div class=Section1 align="center">
+			<p class=MsoNormal style="text-align:center"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1027" type="#_x0000_t75" style='width:426pt;height:312pt' o:ole="">
+ <v:imagedata src="gsa-final_files/image008.emz" o:title="" croptop="4755f"
+  cropbottom="15158f" cropleft="3283f" cropright="14473f"/>
+ <w:bordertop type="single" width="4"/>
+ <w:borderleft type="single" width="4"/>
+ <w:borderbottom type="single" width="4"/>
+ <w:borderright type="single" width="4"/>
+</v:shape><![endif]-->
+				<![if !vml]>
+				<img src="gsa-final_files/image009.gif">
+				
+				<![endif]>
+				<!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Visio.Drawing.11" ShapeID="_x0000_i1027"
+  DrawAspect="Content" ObjectID="_1164609803">
+ </o:OLEObject>
+</xml><![endif]--></p>
+		</div>
+		<div class=Section1>
+			<p class=MsoCaption>Figure 4: Activity A2 - Model Discovery</p>
+			<p class=MsoNormal><i style="mso-bidi-font-style:normal">Model Selection</i> involves finding a pre-existing model which meets the needs of the integration project. It can be a difficult process and integration projects may be tempted to skip it and create their own models; however, this conflicts with the goal of achieving interoperability with other systems. If a suitable model is available, it should be used to avoid integration problems with systems using it. The first activity under model discover should always be to find an integration model that fits the scope of the project and supplement or improve on it to meet the specific needs of the project as captured in activity <i style="mso-bidi-font-style:normal">A1 Model Requirements</i>.</p>
+			<p class=MsoNormal>To make the discovery process less difficult we envision a tool called a <i style="mso-bidi-font-style:normal">Semantic Lookup Assistant</i>. The semantic look up assistant would operate on schemas registered in a model registry using one or more classification schemes (see <i style="mso-bidi-font-style: normal">Model Registration </i>below). A semantic look up assistant provides a search capability that goes beyond keyword search. For instance, it may provide a guided search based on question and answer interaction with the user. The questions asked would be based on the artifacts stored in the registry and the contexts used to drive the semantics associated with the schemas.</p>
+			<p class=MsoNormal>When models have been identified for use in the integration project, some of them may be selected for reuse “as is” but often they will need to be extended to support the full scope of the integration as seen in activity A2.2. The need for extension can be determined by analyzing the extent to which the selected model covers the data exchange requirements for the project. During this activity implementation documentation will also guide the processes of extending the schemas.</p>
+			<p class=MsoNormal>Activity A2.3 <i style="mso-bidi-font-style:normal">Model Creation</i> is relatively straightforward and can be done using several publicly available tools. Some of these tools may be customized to tightly integrate with the schema design guidelines to assist the schema developer. Both the <i style="mso-bidi-font-style:normal">Model Creation</i> and <i style="mso-bidi-font-style:normal">Model Extension</i> activities result in new XML Schema files, which should then be validated as described below.</p>
+			<h2><a name="_Toc89663125">
+					<![if !supportLists]>
+					<span style="mso-fareast-font-family: Arial;font-style:normal"><span style="mso-list:Ignore">3.3.<span style='font:7.0pt "Times New Roman"'> </span></span></span>
+					<![endif]>
+					
+					Model Validation</a><span style="mso-bookmark:_Toc89663125"></span><span style="font-style:normal">
+
+					<o:p></o:p>
+				</span></h2>
+			<p class=MsoNormal>The <i style="mso-bidi-font-style:normal">Model Validation</i> activity takes as input an initial information specification, e.g., the XML schema, produced by the <i style="mso-bidi-font-style:normal">Model Discovery</i> activity. Just as with other types of software, before the schema is deployed it should be tested. Releasing a schema that is not of a high enough quality will result in frustration for both the users and the software developers and could result in failure of the entire project. However, unlike other types of software an XML Schema at this stage has no execution requirements; therefore, the <i style="mso-bidi-font-style:normal">Model Validation </i>activity includes tests for quality of design. Figure 5 illustrates the sub-activities of <i style="mso-bidi-font-style:normal">Model Validation</i>.</p>
+			<p class=MsoNormal>
+				<o:p>
+					 
+
+				</o:p>
+			</p>
+		</div>
+		<div class=Section1 align="center">
+			<p class=MsoNormal style="text-align:center"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1028" type="#_x0000_t75" style='width:436.5pt;height:364.5pt'
+ o:ole="">
+ <v:imagedata src="gsa-final_files/image010.emz" o:title="" croptop="3567f"
+  cropbottom="4904f" cropleft="2048f" cropright="15019f"/>
+ <w:bordertop type="single" width="4"/>
+ <w:borderleft type="single" width="4"/>
+ <w:borderbottom type="single" width="4"/>
+ <w:borderright type="single" width="4"/>
+</v:shape><![endif]-->
+				<![if !vml]>
+				<img src="gsa-final_files/image011.gif">
+				
+				<![endif]>
+				<!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Visio.Drawing.11" ShapeID="_x0000_i1028"
+  DrawAspect="Content" ObjectID="_1164609805">
+ </o:OLEObject>
+</xml><![endif]--></p>
+		</div>
+		<div class=Section1>
+			<p class=MsoCaption>Figure 5: Activity A3 - Model Validation</p>
+			<p class=MsoNormal><i style="mso-bidi-font-style:normal">Model Validation</i> involves two types of quality validations. The first validation, represented in activity A3.1, is schema qualification. In this activity an XML Schema is tested against the standard specification for XML Schemas, xml-schema.xsd [XSD]. The XML schema is also checked for compliance with the project’s design rules and naming conventions. This step ensures that modeling practices are used consistently which enhances the specification’s intelligibility tremendously, thereby avoiding confusion during the piloting and implementation phase of the integration project. Naming conventions may be viewed as a form of design guidelines. However, their importance should not be underestimated and they, therefore, are called out. Modeling guidelines (including naming guidelines) should be established, documented, and enforced as early as possible in model development in order to avoid rework.</p>
+			<p class=MsoNormal>To support quality validation NIST has prototyped the three tools described below. Each of these tools represents a proof-of-concept prototype. Some work has been completed in designing enhancements to the tools based on our experiences.</p>
+			<p class=MsoNormal><b style="mso-bidi-font-weight:normal">Naming Assister. </b><span style="mso-spacerun:yes"> </span>One result of the <i style="mso-bidi-font-style: normal">schema qualification</i> activity is a table of terms to be used for naming in the XML schema. An initial table may have been provided by the <i style="mso-bidi-font-style:normal">Model Discovery</i> process. NIST has prototyped a tool, known as the <i style="mso-bidi-font-style:normal">Naming Assister</i>, to help with naming. The Naming Assister specifically aids in creating consistent compound names by verifying the construction of these names against a table of allowable terms. The table is based on extensions to the International Standardization Organization (ISO) -11179’s recommended naming convention developed for the Automated Equipment Exchange (AEX) [AEX] Testbed. The tool was originally created to identify naming inconsistencies within the AEX Testbed’s XML schemas and to assist in establishing a table of standard terms.</p>
+			<p class=MsoFooter style="tab-stops:.5in"><b>Schema Quality Assessment Tool.<span style="mso-spacerun:yes">   </span></b>The XML <i>Schema Quality Assessment Tool</i> provides a repository of rules and a framework to publish and execute design rules. The repository has been loaded with an initial set of rules based on published “Best Practice” [Best Practices] guidelines for XML authoring resulting in a diagnostic tool for checking an XML Schema for compliance with the encoded guidelines. This experience has shown the possibility of extending the tool to support a larger set of rules, more complex rules, and the capability of creating an extensible rule set which can be tailored to the requirements for specific projects.<b>
+
+					<o:p></o:p>
+				</b></p>
+			<p class=MsoFooter style="tab-stops:.5in"><b>XML Validation Page.<span style="mso-spacerun:yes">  </span></b>NIST prototyped an XML Validation page [Goyal] which would allow a user to upload XML instance files and have them validated against the content of a particular set of XML Schemas files using a selection of XML tools. This tool is similar to web pages made available by others with the important distinction being that it operates over a repository of XML Schema files for a specific project, NIST’s AEX Testbed.</p>
+			<p class=MsoNormal>Activities A3.2-A3.4 represent the second type of validation that ensures that the model meets the original information requirements. The most direct way of doing this is to analyze the relationship between an XML schema and the application data. Activity A3.2 gathers instance data. Activity A3.3 maps that data into the XML Schema checking for complete coverage of both the data by the schema and the schema by the data. This is a manual process usually accomplished with the use of a spreadsheet to map from data fields in the systems to be integrated into the XML schema, and vice versa. The output from this activity is a requirement gap analysis that is fed back into <i style="mso-bidi-font-style:normal">Model</i> <i style="mso-bidi-font-style: normal">Discovery</i> and the process is reiterated. Activity A3.4 validates the data with the XML schema, and thereby validates that the XML schema meets the requirements represented by the data. In this phase of the model development life cycle when problems are uncovered in validating the instance data with the XML schema, the problems are often indicative of the problems in XML schema or its supporting material and not just in the instance data. Resolution of the problems should result in improvements to either the integration schema or the supporting documentation to clarify the intention.</p>
+			<p class=MsoNormal><i style="mso-bidi-font-style:normal">Model Validation</i> is an iterative activity the end result of which is a valid schema meeting a given set of quality criteria along with documentation describing the schema and how it is to be used including reference data. Reference data and naming conventions are extremely important to the success of a project. Therefore, we’ve made them required accompaniments to the XML schema at the end of the <i style="mso-bidi-font-style:normal">Model Validation</i> activity, as is illustrated by the three input arrows to Activity A5 <i style="mso-bidi-font-style: normal">Model Registration</i>. (Model Registration will be discussed further below.)</p>
+			<h2><a name="_Toc89663126">
+					<![if !supportLists]>
+					<span style="mso-fareast-font-family: Arial"><span style="mso-list:Ignore">3.4.<span style='font:7.0pt "Times New Roman"'> </span></span></span>
+					<![endif]>
+					
+					Model Piloting</a></h2>
+			<p class=MsoNormal><i style="mso-bidi-font-style:normal">Model Piloting</i> focuses on how an integration model will be used in a given context. It involves supplementing an XML Schema with additional usage criteria specific to the processes to be integrated. It may also involve a simplification of the XML schema to make it more usable in the implementation context. This activity is especially important when the source of the implementation schema is external to the project (i.e., a standard schema used across an industry.)</p>
+			<p class=MsoNormal>Often when the time comes to use the integration models for integration, the implementers do not have freedom to modify the models directly for a variety of reasons. In this situation they often devise workarounds for addressing implementation issues. In this case, while the integration schema presumably covers most of the needs for the project, there may be either extensions that are necessary, conventions that need to be followed in the instance data, or the project may choose to modify the schema in a systematic way.</p>
+		</div>
+		<div class=Section1 align="center">
+			<p class=MsoNormal style="text-align:center"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1029" type="#_x0000_t75" style='width:411.75pt;height:360.75pt'
+ o:ole="">
+ <v:imagedata src="gsa-final_files/image012.emz" o:title="" croptop="2378f"
+  cropbottom="15009f" cropleft="2252f" cropright="21299f"/>
+ <w:bordertop type="single" width="4"/>
+ <w:borderleft type="single" width="4"/>
+ <w:borderbottom type="single" width="4"/>
+ <w:borderright type="single" width="4"/>
+</v:shape><![endif]-->
+				<![if !vml]>
+				<img src="gsa-final_files/image013.gif">
+				
+				<![endif]>
+				<!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Visio.Drawing.11" ShapeID="_x0000_i1029"
+  DrawAspect="Content" ObjectID="_1164609807">
+ </o:OLEObject>
+</xml><![endif]--></p>
+		</div>
+		<div class=Section1>
+			<p class=MsoCaption>Figure 6: Activity A4 – Model Piloting</p>
+			<p class=MsoNormal>Figure 6 illustrates the three subactivities of <i style="mso-bidi-font-style:normal">Model Piloting</i>. The first subactivity A4.1 <i style="mso-bidi-font-style:normal">Model Comprehension</i> involves developing an understanding of the integration schema. Several types of tools, which generate various views of an XML schema, can assist a user to better understand an XML Schema. For example, one such tool can be used to create HTML pages that connect the various definitions in the schema through hyperlinked text [XSDDOC]. Another tool can be used to produce class diagrams of the structures defined in the schema [hyperModel].</p>
+			<p class=MsoNormal>Activity A4.2 addresses how to augment a model to specify business rules to be enforced during an exchange. These types of rules may not be generally applicable either across the industry nor during different types of transactions, yet there may be a requirement to enforce them at various times and for various purposes. For example, while a request for quote and a quote document share many of the same components, the former would not contain pricing information whereas the latter must. The <i style="mso-bidi-font-style: normal">Model Augmentation </i>activity captures and codifies these rules and how they are to be applied. NIST has prototyped a tool, known as the <i style="mso-bidi-font-style:normal">Content Checking tool</i>, to assist in this process in our B2B Testbed [B2BTtestbed]. The result of this activity is a test suite including the implementation schema, instance data, additional rules for validating the data based on the context, and guidance on how to use the schema in a given context.</p>
+			<p class=MsoNormal>Finally, activity A4.3 addresses <i style="mso-bidi-font-style: normal">Model Transformation</i>. During <i style="mso-bidi-font-style:normal">Model Transformation</i> an XML Schema can be transformed in a systematic way to support the needs for a particular implementation environment. Examples of when this may be desirable include the following scenarios:</p>
+			<ul style="margin-top:0in" type=disc>
+				<li class=MsoNormal style="mso-list:l17 level1 lfo22;tab-stops:list .5in">A project replaces the names used in a standard by terms more common to the businesses involved in the integration.
+				
+				<li class=MsoNormal style="mso-list:l17 level1 lfo22;tab-stops:list .5in">An implementation group decides to use a single namespace or a namespace other than the one defined in the standard; this can also be accomplished through a transformation.
+				
+				<li class=MsoNormal style="mso-list:l17 level1 lfo22;tab-stops:list .5in">An implementation group may prefer to work with a language other than XML Schema, such as DTDs.
+			
+			</ul>
+			<p class=MsoNormal>Transformations may be performed on both schema and instance data resulting in a revised schema suitable for a specific implementation, which we will call an implementation schema, and revised data that corresponds to that schema.</p>
+			<p class=MsoNormal>The <i style="mso-bidi-font-style:normal">Model Piloting</i> activities may or may not result in changes to the original XML schemas; however, they should surely result in improved artifacts, such as better documentation, better and more robust instance data, and guidelines on how to use the XML Schema in a given business context. Changes to the original schemas may be indicated if shortcomings of those schemas are uncovered.</p>
+			<h2>
+				<![if !supportLists]>
+				<span style="mso-fareast-font-family:Arial"><span style="mso-list:Ignore">3.5.<span style='font:7.0pt "Times New Roman"'> </span></span></span>
+				<![endif]>
+				<span style="mso-spacerun:yes"> </span><a name="_Toc89663127">Model Registration</a></h2>
+			<p class=MsoNormal>The <i style="mso-bidi-font-style:normal">Model Registration</i> activity organizes the schemas and related materials according to one or more classification schemes within a registry and stores the material in a repository so that it is accessible to other activities. Multiple classification schemes provide different perspectives of schemas just like the multiple Federal Enterprise Architecture (FEA) reference models. This supports a multi-dimensional and structured search of the registry; hence, discovery of the schemas is more efficient. The registry should not be viewed just as a versioning tool but a repository of stable and usable versions as shown in Figure 7.</p>
+			<p class=MsoNormal>An envisioned tool to help support the <i style="mso-bidi-font-style: normal">Model Registration</i> activity is the classification assistant. Placing a schema into one or more classifications can be a tedious and error prone task. This task requires that the person understands the semantics of the classification schemas as well as his/her own schemas. Placing a schema in a wrong node in a classification not only makes the schema less accessible but also has a risk of misinterpretation by other users. In addition, placing a schema in too generic a node makes the <i style="mso-bidi-font-style:normal">Model Discovery A2 </i>activity less efficient by inundating the user with too many schemas. The classification assistant would use technology like a semantic similarity measure to provide suggestions for classification nodes to the user.</p>
+			<p class=MsoNormal>
+				<o:p>
+					 
+
+				</o:p>
+			</p>
+		</div>
+		<div class=Section1 align="center">
+			<p class=MsoNormal style="margin:0in;margin-bottom:.0001pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1030" type="#_x0000_t75" style='width:440.25pt;height:213pt'
+ o:ole="">
+ <v:imagedata src="gsa-final_files/image014.emz" o:title="" croptop="7382f"
+  cropbottom="32693f" cropleft="10942f" cropright="14931f"/>
+ <w:bordertop type="single" width="4"/>
+ <w:borderleft type="single" width="4"/>
+ <w:borderbottom type="single" width="4"/>
+ <w:borderright type="single" width="4"/>
+</v:shape><![endif]-->
+				<![if !vml]>
+				<img src="gsa-final_files/image015.gif">
+				
+				
+				<![endif]>
+				<!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Visio.Drawing.11" ShapeID="_x0000_i1030"
+  DrawAspect="Content" ObjectID="_1164609810">
+ </o:OLEObject>
+</xml><![endif]--></p>
+		</div>
+		<div class=Section1>
+			<p class=MsoCaption style="margin:0in;margin-bottom:.0001pt">Figure 7: Activity A5 – Model Registration</p>
+			<p class=MsoFooter style="margin:0in;margin-bottom:.0001pt;tab-stops:.5in">
+				<o:p>
+					 
+
+				</o:p>
+			</p>
+			<h2><a name="_Toc89663128">
+					<![if !supportLists]>
+					<span style="mso-fareast-font-family: Arial"><span style="mso-list:Ignore">3.6.<span style='font:7.0pt "Times New Roman"'> </span></span></span>
+					<![endif]>
+					
+					
+					Model Integration</a></h2>
+			<p class=MsoNormal>The <i style="mso-bidi-font-style:normal">Model Integration</i> activity is critical to supporting the evolution of an interoperability project. The objective of <i style="mso-bidi-font-style:normal">Model Integration</i> is to ensure that new schemas and extensions are semantically coherent in the growing schema registry and repository. The general procedure for model integration is depicted in Figure 8. The first subactivity is to identify new terms and data structures that are semantic duplicates and/or overlaps. The second and third subactivities address how to resolve the duplicates and overlaps. The ultimate goal of model integration is to eliminate duplicates by requesting changes to the original schemas as shown in A6.2; however, when elimination is not desirable, such as when one or more of the schemas is already in use or is a standard controlled by an outside party, one must find alternative ways to handle the duplication such as by creating cross link annotations.<span style="mso-spacerun:yes">  </span>Similarly in activity A6.3, the preferred approach to resolving overlaps would be to establish relationships within the schemas; however, that may not be a desirable or an achievable solution for similar reasons. In such case, cross-links between the overlaps should be annotated to ensure that the relationships could be identified and managed. Annotation tools based on XML Linking Language (XLink) [XLink] and Resource Description Framework (RDF) [RDF] may be used to allow computer interpretation.</p>
+			<p class=MsoNormal><i style="mso-bidi-font-style:normal">Model Integration</i> can be complex particularly when there is semantic ambiguity in the model or when part of the model needs to be restructured to accommodate a new relationship in the overlapping semantics. The tools we’ve conceptualized for the <i style="mso-bidi-font-style:normal">Model Integration</i> activity include a <i style="mso-bidi-font-style:normal">semantic similarity measure</i> and a <i style="mso-bidi-font-style:normal">semantic alignment algorithm</i>. The semantic similarity measure provides assistance in activity A6.1 described above, while the semantic alignment algorithm supports activities A6.3. The semantic similarity measure assists in identifying the semantic duplication and overlaps by providing quantitative guidelines to the semantic proximity of terms. The semantic alignment algorithm could suggest the relationships between the new terms or structures and the existing ones and could also suggest how the existing model should be changed to accommodate the new relationship. Ongoing research such as Stuckenschmidt and Visser (2000), Peng et al. (2002), and Ambite and Knoblock (1995) provides a basis for these two tools.</p>
+			<p class=MsoNormal>
+				<o:p>
+					 
+
+				</o:p>
+			</p>
+		</div>
+		<div class=Section1 align="center">
+			<p class=MsoNormal style="margin:0in;margin-bottom:.0001pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1031" type="#_x0000_t75" style='width:6in;height:287.25pt' o:ole="">
+ <v:imagedata src="gsa-final_files/image016.emz" o:title="" croptop="9511f"
+  cropbottom="14564f" cropleft="2048f" cropright=".3125"/>
+ <w:bordertop type="single" width="4"/>
+ <w:borderleft type="single" width="4"/>
+ <w:borderbottom type="single" width="4"/>
+ <w:borderright type="single" width="4"/>
+</v:shape><![endif]-->
+				<![if !vml]>
+				<img src="gsa-final_files/image017.gif">
+				
+				
+				<![endif]>
+				<!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Visio.Drawing.11" ShapeID="_x0000_i1031"
+  DrawAspect="Content" ObjectID="_1164609812">
+ </o:OLEObject>
+</xml><![endif]--></p>
+		</div>
+		<div class=Section1>
+			<p class=MsoCaption style="margin:0in;margin-bottom:.0001pt"><span style="mso-bidi-font-size:12.0pt">Figure 8: Activity A6 - Model Integration
+
+					<o:p></o:p>
+				</span></p>
+			<p class=MsoNormal style="margin:0in;margin-bottom:.0001pt">
+				<o:p>
+					 
+
+				</o:p>
+			</p>
+			<h1><a name="_Toc89663129">
+					<![if !supportLists]>
+					<span style="mso-fareast-font-family: Arial"><span style="mso-list:Ignore">4.<span style='font:7.0pt "Times New Roman"'>    </span></span></span>
+					<![endif]>
+					
+					
+					Supporting Tools and Functionalities</a></h1>
+			<p class=MsoNormal>The supporting software useful in the Model Development Validation Process is summarized in Table 1 and described below. Table 1 lists the tools needed by the process, the stage of development of those tools, and the source for the tools. The four stages of development in order of increasing maturity are research, prototype, beta, and production. Tools in the research stage are conceptualizations and may include some understanding of a basic design. Prototypes are proof-of-concept implementations of the tool. A beta stage tool is one that has been used by outside groups and NIST would be able to make source code available or support a limited number of users in some other way. Production tools are more available for mass consumption.</p>
+			<p class=MsoNormal>
+				<o:p>
+					 
+
+				</o:p>
+			</p>
+			<p class=MsoNormal>
+				<o:p>
+					 
+
+				</o:p>
+			</p>
+			<p class=MsoNormal>
+				<o:p>
+					 
+
+				</o:p>
+			</p>
+			<p class=MsoFooter style="tab-stops:.5in">
+				<o:p>
+					 
+
+				</o:p>
+			</p>
+			<p class=MsoFooter style="tab-stops:.5in">
+				<o:p>
+					 
+
+				</o:p>
+			</p>
+			<p class=MsoFooter style="tab-stops:.5in">
+				<o:p>
+					 
+
+				</o:p>
+			</p>
+			<p class=MsoFooter style="tab-stops:.5in">
+				<o:p>
+					 
+
+				</o:p>
+			</p>
+			<p class=MsoFooter style="tab-stops:.5in">
+				<o:p>
+					 
+
+				</o:p>
+			</p>
+			<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0 style="border-collapse:collapse;border:none;mso-border-alt:solid windowtext .5pt; mso-yfti-tbllook:480;mso-padding-alt:0in 5.75pt 0in 5.75pt;mso-border-insideh: .5pt solid windowtext;mso-border-insidev:.5pt solid windowtext">
+				<tr style="mso-yfti-irow:0;page-break-inside:avoid">
+					<td width=197 valign=top style="width:2.05in;border:solid windowtext 1.0pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal><b style="mso-bidi-font-weight:normal">Tool
+
+								<o:p></o:p>
+							</b></p>
+					</td>
+					<td width=122 valign=top style="width:91.8pt;border:solid windowtext 1.0pt; border-left:none;mso-border-left-alt:solid windowtext .5pt;mso-border-alt: solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal><b style="mso-bidi-font-weight:normal">Stage
+
+								<o:p></o:p>
+							</b></p>
+					</td>
+					<td width=271 valign=top style="width:203.4pt;border:solid windowtext 1.0pt; border-left:none;mso-border-left-alt:solid windowtext .5pt;mso-border-alt: solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal><b style="mso-bidi-font-weight:normal">Source
+
+								<o:p></o:p>
+							</b></p>
+					</td>
+				</tr>
+				<tr style="mso-yfti-irow:1;page-break-inside:avoid">
+					<td width=197 valign=top style="width:2.05in;border:solid windowtext 1.0pt; border-top:none;mso-border-top-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt; padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>XML Schema tools</p>
+					</td>
+					<td width=122 valign=top style="width:91.8pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Varied</p>
+					</td>
+					<td width=271 valign=top style="width:203.4pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Commercial and public domain</p>
+					</td>
+				</tr>
+				<tr style="mso-yfti-irow:2;page-break-inside:avoid">
+					<td width=197 valign=top style="width:2.05in;border:solid windowtext 1.0pt; border-top:none;mso-border-top-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt; padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>XML Validation page</p>
+					</td>
+					<td width=122 valign=top style="width:91.8pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Varied</p>
+					</td>
+					<td width=271 valign=top style="width:203.4pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Numerous generic pages; NIST has a prototype linking the validation feature with a repository of AEX schemas</p>
+					</td>
+				</tr>
+				<tr style="mso-yfti-irow:3;page-break-inside:avoid">
+					<td width=197 valign=top style="width:2.05in;border:solid windowtext 1.0pt; border-top:none;mso-border-top-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt; padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Schematron engines</p>
+					</td>
+					<td width=122 valign=top style="width:91.8pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Production</p>
+					</td>
+					<td width=271 valign=top style="width:203.4pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Public domain</p>
+					</td>
+				</tr>
+				<tr style="mso-yfti-irow:4;page-break-inside:avoid">
+					<td width=197 valign=top style="width:2.05in;border:solid windowtext 1.0pt; border-top:none;mso-border-top-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt; padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Schematron Editor</p>
+					</td>
+					<td width=122 valign=top style="width:91.8pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Beta</p>
+					</td>
+					<td width=271 valign=top style="width:203.4pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>NIST</p>
+					</td>
+				</tr>
+				<tr style="mso-yfti-irow:5;page-break-inside:avoid">
+					<td width=197 valign=top style="width:2.05in;border:solid windowtext 1.0pt; border-top:none;mso-border-top-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt; padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>
+							<o:p>
+								 
+
+							</o:p>
+						</p>
+					</td>
+					<td width=122 valign=top style="width:91.8pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>
+							<o:p>
+								 
+
+							</o:p>
+						</p>
+					</td>
+					<td width=271 valign=top style="width:203.4pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>
+							<o:p>
+								 
+
+							</o:p>
+						</p>
+					</td>
+				</tr>
+				<tr style="mso-yfti-irow:6;page-break-inside:avoid">
+					<td width=197 valign=top style="width:2.05in;border:solid windowtext 1.0pt; border-top:none;mso-border-top-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt; padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Naming Assister</p>
+					</td>
+					<td width=122 valign=top style="width:91.8pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Prototype</p>
+					</td>
+					<td width=271 valign=top style="width:203.4pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>NIST</p>
+					</td>
+				</tr>
+				<tr style="mso-yfti-irow:7;page-break-inside:avoid">
+					<td width=197 valign=top style="width:2.05in;border:solid windowtext 1.0pt; border-top:none;mso-border-top-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt; padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Content checking tool</p>
+					</td>
+					<td width=122 valign=top style="width:91.8pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Prototype</p>
+					</td>
+					<td width=271 valign=top style="width:203.4pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>NIST</p>
+					</td>
+				</tr>
+				<tr style="mso-yfti-irow:8;page-break-inside:avoid">
+					<td width=197 valign=top style="width:2.05in;border:solid windowtext 1.0pt; border-top:none;mso-border-top-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt; padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Schema Quality Assessment Tool</p>
+					</td>
+					<td width=122 valign=top style="width:91.8pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Prototype</p>
+					</td>
+					<td width=271 valign=top style="width:203.4pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>NIST</p>
+					</td>
+				</tr>
+				<tr style="mso-yfti-irow:9;page-break-inside:avoid">
+					<td width=197 valign=top style="width:2.05in;border:solid windowtext 1.0pt; border-top:none;mso-border-top-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt; padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Model transformation tool</p>
+					</td>
+					<td width=122 valign=top style="width:91.8pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Prototype</p>
+					</td>
+					<td width=271 valign=top style="width:203.4pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>NIST</p>
+					</td>
+				</tr>
+				<tr style="mso-yfti-irow:10;page-break-inside:avoid">
+					<td width=197 valign=top style="width:2.05in;border:solid windowtext 1.0pt; border-top:none;mso-border-top-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt; padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Classification assistant</p>
+					</td>
+					<td width=122 valign=top style="width:91.8pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Research</p>
+					</td>
+					<td width=271 valign=top style="width:203.4pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>NIST and academia</p>
+					</td>
+				</tr>
+				<tr style="mso-yfti-irow:11;page-break-inside:avoid">
+					<td width=197 valign=top style="width:2.05in;border:solid windowtext 1.0pt; border-top:none;mso-border-top-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt; padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Semantic lookup assistant</p>
+					</td>
+					<td width=122 valign=top style="width:91.8pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Research</p>
+					</td>
+					<td width=271 valign=top style="width:203.4pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>NIST</p>
+					</td>
+				</tr>
+				<tr style="mso-yfti-irow:12;page-break-inside:avoid">
+					<td width=197 valign=top style="width:2.05in;border:solid windowtext 1.0pt; border-top:none;mso-border-top-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt; padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Semantic integrity measure</p>
+					</td>
+					<td width=122 valign=top style="width:91.8pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Research</p>
+					</td>
+					<td width=271 valign=top style="width:203.4pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>NIST and academia</p>
+					</td>
+				</tr>
+				<tr style="mso-yfti-irow:13;mso-yfti-lastrow:yes;page-break-inside:avoid">
+					<td width=197 valign=top style="width:2.05in;border:solid windowtext 1.0pt; border-top:none;mso-border-top-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt; padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Semantic alignment algorithm</p>
+					</td>
+					<td width=122 valign=top style="width:91.8pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>Research</p>
+					</td>
+					<td width=271 valign=top style="width:203.4pt;border-top:none;border-left: none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt; mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt; mso-border-alt:solid windowtext .5pt;padding:0in 5.75pt 0in 5.75pt">
+						<p class=MsoNormal>NIST and academia</p>
+					</td>
+				</tr>
+			</table>
+			<p class=MsoFooter style="margin:0in;margin-bottom:.0001pt;tab-stops:.5in">
+				<o:p>
+					 
+
+				</o:p>
+			</p>
+			<p class=MsoNormal align=center style="margin:0in;margin-bottom:.0001pt; text-align:center"><b style="mso-bidi-font-weight:normal">Table 1:<span style="mso-spacerun:yes">  </span>Tools supporting the Model Development Life Cycle
+
+					<o:p></o:p>
+				</b></p>
+			<p class=MsoFooter style="margin:0in;margin-bottom:.0001pt;tab-stops:.5in"><span style="mso-bidi-font-weight:bold">
+					<o:p>
+						 
+
+					</o:p>
+				</span></p>
+			<ul style="margin-top:0in" type=disc>
+				<li class=MsoNormal style="mso-list:l5 level1 lfo18;tab-stops:list .5in">XML Schema editors, parsers, validators, and related tools (XSLT engine) – these are readily available as both public domain and commercial tools.
+				
+				
+				<li class=MsoNormal style="mso-list:l5 level1 lfo18;tab-stops:list .5in">XML Validation page – numerous generic pages are available but these have limitations; NIST has a prototype linking the validation feature with a repository of AEX schemas. This supports both XML instance data validation and XML Schema extension.
+				
+				
+				<li class=MsoNormal style="mso-list:l5 level1 lfo18;tab-stops:list .5in">Schematron and the Schematron Editor – Schematron is a publicly available tool / language that we have found useful in augmenting information contained in XML Schema files. NIST has prototyped an editor for writing Schematron scripts.
+				
+				
+				<li class=MsoNormal style="mso-list:l5 level1 lfo18;tab-stops:list .5in">Naming Assister – a Naming Assister is under development at NIST with a prototype complete. This tool was originally written to identify naming inconsistencies within the AEX Testbed’s XML schemas, and to assist in establishing a table of terms.
+				
+				
+				<li class=MsoNormal style="mso-list:l5 level1 lfo18;tab-stops:list .5in">Semantic checking tool – NIST has prototyped a tool (available through the Web) for specifying constraints on data and testing XML instance files against those constraints. This tool addresses concerns of interoperability between partners using different systems for enforcing constraints in their data. [b2btestbed]
+				
+				
+				<li class=MsoNormal style="mso-list:l5 level1 lfo18;tab-stops:list .5in">Schema Quality Assessment Tool – NIST has prototyped a quality of design tool which checks an XML Schema for use based on recommended design patterns [Kulvatunyou 2004]. This tool is diagnostic based on a number of “best practice”[Best Practices] guidelines for XML Schema. Rule-based engines are used to specify and execute the design guidelines. We have used JESS [Friedman-Hill 2002] and Schematron [Jelliffe 2003] for prototyping activities.
+				
+				
+				<li class=MsoNormal style="mso-list:l5 level1 lfo18;tab-stops:list .5in">Model transformation tool – A tool called the Simplifier is being developed to transform schemas and test data according to proscribed design patterns. For example, the Simplifier “flattens” schema definitions using multiple namespaces into a single namespace. This is useful for exposing potential naming conflicts and inconsistencies. The Simplifier was originally developed to create a parallel set of schemas and data for schemas used in the AEX Testbed. Work is ongoing to make the Simplifier more generic so that it can be used for other applications.
+				
+				
+				<li class=MsoNormal style="mso-list:l5 level1 lfo18;tab-stops:list .5in">Classification assistant – NIST is actively researching the concepts for this tool and evaluating the requirements and complexity.
+				
+				
+				<li class=MsoNormal style="mso-list:l5 level1 lfo18;tab-stops:list .5in">Semantic lookup assistant – From monitoring business content specification forums and from interactions with implementers NIST has gathered requirements for the semantic lookup assistant tool. We see a significant need for a tool to assist users in identifying the appropriate XML constructs for their requirements and how to use those constructs in their own context.
+				
+				
+				<li class=MsoNormal style="mso-list:l5 level1 lfo18;tab-stops:list .5in">Semantic similarity measure – NIST has funded a few academic researches in this area and is still promoting the advancement of this technology. The initial research produced a quantitative measure for similarity between terms in object classifications.
+				
+				
+				<li class=MsoNormal style="mso-list:l5 level1 lfo18;tab-stops:list .5in">Semantic alignment algorithm – NIST is in the initial stages of investigating the potential of this technology. Most of the existing works today is in the academic arena.
+			
+			
+			</ul>
+			<h1><a name="_Toc89663130">
+					<![if !supportLists]>
+					<span style="mso-fareast-font-family: Arial"><span style="mso-list:Ignore">5.<span style='font:7.0pt "Times New Roman"'>    </span></span></span>
+					<![endif]>
+					
+					
+					Summary</a></h1>
+			<p class=MsoNormal>NIST researchers are working to formalize the model development lifecycle with emphasis on testing and technological advancement to assist and mange the evolution and consolidation of large inter-organizational integration projects. NIST also has experience relevant to the FEA and CORE.GOV in several yet-to-be-addressed research areas including:</p>
+			<ul style="margin-top:0in" type=disc>
+				<li class=MsoNormal style="mso-list:l13 level1 lfo20;tab-stops:list .5in">Testing methods and frameworks
+				
+				
+				<li class=MsoNormal style="mso-list:l13 level1 lfo20;tab-stops:list .5in">XML validation/transformation frameworks
+				
+				
+				<li class=MsoNormal style="mso-list:l13 level1 lfo20;tab-stops:list .5in">Schema quality tools
+				
+				
+				<li class=MsoNormal style="mso-list:l13 level1 lfo20;tab-stops:list .5in">Semantic web technologies (metadata standards, inferencing, rule-based systems)
+				
+				
+				<li class=MsoNormal style="mso-list:l13 level1 lfo20;tab-stops:list .5in">Emerging semantic integration technologies
+			
+			
+			</ul>
+			<p class=MsoNormal>Additionally NIST has experience with and interest in industry outreach to promote reuse and interoperability within and across industries and government.</p>
+			<p class=MsoNormal>NIST is developing the tools described above on a small scale and with limited scope but plans to extend these to the larger community. We are also interested in finding the linkage between the model development life cycle and its software implementation counterpart in the pursuit of automating the change propagation from the schemas to associated software implementation.</p>
+			<p class=MsoNormal>In addition to the aforementioned tools, NIST is conducting research in automating the implementation phase of systems integration. NIST's AMIS (Automated Methods for Integrating Systems) project seeks to reduce the cost of integration where traditional standards-based approaches are inappropriate or ineffective. Algorithms and tools being developed for AMIS infer interaction models for incompatible systems via the systems' published interface specifications. Interaction models may in some circumstances be used to generate &quot;glue code&quot; needed to achieve integration. An AMIS prototype has been implemented to show automated integration for a Request for Quotation and Quotation Response scenario between a customer using CIDX (Chemical Industry Data Exchange Specification) and a supplier using OAGIS (Open Applications Group Integration Specification) [Libes 2004].</p>
+			<h1><a name="_Toc89663131">
+					<![if !supportLists]>
+					<span style="mso-fareast-font-family: Arial"><span style="mso-list:Ignore">6.<span style='font:7.0pt "Times New Roman"'>    </span></span></span>
+					<![endif]>
+					
+					
+					Disclaimer</a></h1>
+			<p class=MsoNormal>Certain commercial software products are identified in this paper. These products were used only for demonstrations purposes. This use does not imply approval or endorsement by NIST, nor does it imply that these products are necessarily the best available for the purpose.</p>
+			<h1><a name="_Toc89663132">
+					<![if !supportLists]>
+					<span style="mso-fareast-font-family: Arial"><span style="mso-list:Ignore">7.<span style='font:7.0pt "Times New Roman"'>    </span></span></span>
+					<![endif]>
+					
+					
+					References</a></h1>
+			<p class=MsoNormal style="margin-top:12.0pt">[AEX]<span style="mso-spacerun:yes">  </span>For a description of the Automated Equipment Exchange (AEX) project see <a href="http://www.fiatech.org/projects/idim/aex.htm">http://www.fiatech.org/projects/idim/aex.htm</a>.</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[Ambite and Knoblock 1995] Ambite, J.L. and 
+				<st1:place>
+					<st1:City>
+						Knoblock
+
+					</st1:City>
+					, 
+					<st1:country-region>
+						C.A.
+
+					</st1:country-region>
+				</st1:place>
+					, Reconciling distributed information sources. In Working Notes of the AAAI Spring Symposium on Information Gathering in Distributed Heterogeneous Environments, Palo Alto, CA (1995).</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[b2btestbed] B2B Interoperability Testbed: Content Checker Tool; National 
+				<st1:place>
+					<st1:PlaceType>
+						Institute
+
+					</st1:PlaceType>
+					of 
+					<st1:PlaceName>
+						Standards
+
+					</st1:PlaceName>
+				</st1:place>
+				 and Technology. Available online at <a href="http://www.mel.nist.gov/msid/b2btestbed/semantic_checking.html"><span style="color:windowtext;text-decoration:none;text-underline:none">http://www.mel.nist.gov/msid/b2btestbed/semantic_checking.html</span></a> (accessed December 2004).</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[CCTS] Core Components Technical Specification’s. Internet Web Site. Available online via <a href="http://xml.coverpages.org/CCTSv190-2002.pdf">http://xml.coverpages.org/CCTSv190-2002.pdf </a><span style="mso-spacerun:yes"> </span>(accessed June 2004).</p>
+			<p class=MsoNormal style="margin-top:12.0pt"><span style="mso-spacerun:yes"> </span>[Collabnet] Collaborative Software Development on Demand. Available online via <a href="http://www.collab.net/"><span style="color:windowtext;text-decoration:none;text-underline:none">http://www.collab.net/</span></a>.</p>
+			<p class=MsoNormal style="margin-top:12.0pt"><span style="mso-spacerun:yes"> </span>[CRM] Core Reference Model, Internet Web Site. Available online via &lt;http://www.getf.org/file/wiser/2958.pdf &gt;.</p>
+			<p class=MsoNormal style="margin-top:12.0pt"><span style="mso-spacerun:yes"> </span>[EDR] Environmental Data Registry, Internet Web Site. Available online via &lt;http://www.epa.gov/edr&gt;.</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[EDSC] Environmental Data Standards Council, Internet Web Site. Available online via &lt;http://www.envdatastandards.net&gt;(accessed June 2004).</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[FEA] Federal 
+				<st1:City>
+					<st1:place>
+						Enterprise
+
+					</st1:place>
+				</st1:City>
+				Architecture; Federal 
+				<st1:City>
+					<st1:place>
+						Enterprise
+
+					</st1:place>
+				</st1:City>
+				 Architecture Program Management Office. Available online at <a href="http://www.feapmo.gov/"><span style="color:windowtext;text-decoration: none;text-underline:none">http://www.feapmo.gov/</span></a>.</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[Friedman-Hill 2002] Friedman-Hill, E., Jess the Rule Engine for the JavaTM Platform Version 6.0a8. Internet web site available online via <a href="http://herzberg.ca.sandia.gov/jess/"><span style="color:windowtext; text-decoration:none;text-underline:none">&lt;http://herzberg.ca.sandia.gov/jess/&gt;</span></a> (accessed July 2002).</p>
+			<p class=MsoNormal>[Goyal]<span style="mso-spacerun:yes">  </span>Goyal, P., <a href="http://www.mel.nist.gov/msidlibrary/doc/NISTIR7143.pdf">An XML Schema Naming Assister for Elements and Types</a>, NISTIR 7143, (2004).
+
+				<o:p></o:p>
+			</p>
+			<p class=MsoNormal style="margin-top:12.0pt"><span lang=DE style="mso-ansi-language: DE">[hyperModel] XMLmodeling.com, HyperModel, Internet Web Site. </span>Available online via <a href="http://www.xmlmodeling.com/">http://www.xmlmodeling.com/</a>.</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[IDEF0] <a href="http://www.itl.nist.gov/fipspubs/idef02.doc">Integration Definition for Function Modeling (IDEF0), Draft Federal Information Processing Standards Publication 183</a>, National 
+				<st1:place>
+					<st1:PlaceType>
+						Institute
+
+					</st1:PlaceType>
+					of 
+					<st1:PlaceName>
+						Standards
+
+					</st1:PlaceName>
+				</st1:place>
+				 and Technology, December 1993. See also <a href="http://www.idef.com/"><span style="color:windowtext; text-decoration:none;text-underline:none">http://www.idef.com</span></a>/.</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[Jelliffe 2003] Jelliffe, R., The Schematron Assertion Language 1.5, Academia Sinica Computing Center. Internet web site available online via &lt;http://www.ascc.net/xml/resource/schematron/Schematron2000.html&gt;.</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[Kulvatunyou 2004] Kulvatunyou, B.S., Ivezic, N., Jeong, B. (July 2004), Testing Requirements to Manage Data Exchange Specifications in 
+				<st1:City>
+					<st1:place>
+						Enterprise
+
+					</st1:place>
+				</st1:City>
+				Integration – A Schema Design Quality Focus. The 8th World Multi-conference on Systemics, Cybernetics, and Informatics, 
+				<st1:place>
+					<st1:City>
+						Orlando
+
+					</st1:City>
+					, 
+					<st1:State>
+						FL
+
+					</st1:State>
+					, 
+					<st1:country-region>
+						USA
+
+					</st1:country-region>
+				</st1:place>
+					.</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[Libes 2004] Libes, et.al, &quot;The AMIS Approach to Systems Integration: An Overview,&quot; NISTIR 7101, May 2004.</p>
+			<p class=MsoNormal style="margin-top:12.0pt">Nicholson, Simon, &quot;The XML Assembly Line: Better Living Through Reuse,&quot; XML Europe 99, 
+				<st1:City>
+					<st1:place>
+						Granada
+
+					</st1:place>
+				</st1:City>
+					, 1999 <a href="http://www.infoloom.com/gcaconfs/WEB/TOC/granada99toc.HTM"><span style="color:windowtext;text-decoration:none;text-underline:none">http://www.infoloom.com/gcaconfs/WEB/TOC/granada99toc.HTM</span></a></p>
+			<p class=MsoNormal style="margin-top:12.0pt">[Peng 2002] Peng, Y., Zou, Y., Luan, X., Ivezic, N., Gruninger, M., and Jones, A., Towards semantic-based integration for e-business, International Symposium on manufacturing and Applications, 
+				<st1:place>
+					<st1:City>
+						Orlando
+
+					</st1:City>
+					, 
+					<st1:State>
+						FL
+
+					</st1:State>
+				</st1:place>
+				 (June 2002).</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[RDF] World Wide Web Consortium. RDF Specification Development page. Internet Web Site, accessed 
+				<st1:date Year="2004" Day="14" Month="6">
+					June 14, 2004
+
+				</st1:date>
+				. Available online via &lt;http://www.w3.org/RDF/#specs&gt;.</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[RelaxNG] ISO/IEC 19757-2:2003 Information technology -- Document Schema Definition Language (DSDL) -- Part 2: Regular-grammar-based validation -- RELAX NG; <a href="http://www.iso.org/"><span style="color:windowtext;text-decoration:none;text-underline:none">ISO - International Organization for Standardization. </span></a><span style="mso-spacerun:yes"> </span>See also <a href="http://relaxng.org"><span style="color:windowtext;text-decoration:none;text-underline:none">http://relaxng.org</span></a>.</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[Stuckenschmidt 2000] Stuckenschmidt, H. and Visser, U., Semantic translation based on approximate re-classification. Proceedings of the Workshop &quot;Semantic Approximation, Granularity and Vagueness, KR'00 (2000).</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[W3C] The World Wide Web Consortium. Online at <a href="http://www.w3.org/">http://www.w3.org</a>.</p>
+			<p class=MsoNormal style="margin-top:12.0pt"><span style="mso-spacerun:yes"> </span>[XML] XML is a project of the World Wide Web Consortium. Available online at <a href="http://www.w3.org/XML">http://www.w3.org/XML</a>.</p>
+			<p class=MsoNormal style="margin-top:12.0pt"><span style="mso-spacerun:yes"> </span>[XSD] XML Schema is a project of the World Wide Web Consortium. Available online at <a href="http://www.w3.org/XML/Schema"><span style="color:windowtext;text-decoration:none;text-underline:none">http://www.w3.org/XML/Schema</span></a>.</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[XLink] World Wide Web Consortium. XML Linking LanguageRecommendation 1.0 (June 2001). Available online via &lt;http://www.w3.org/RF/2001/REC-xlink-20010626/&gt;.</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[XPATH] <a name="_Ref41064597">World Wide Web Consortium. XML PATH Language Version 1.0 (November 1999). Available online via &lt;http://www.w3.org/TR/xpath&gt;.</a></p>
+			<p class=MsoNormal style="margin-top:12.0pt">[XSDDOC] Bluetetra Software, XSDdoc 2.0, Internet Web Site. Available online via &lt;http://www.bluetetra.com/xsddoc/&gt;.</p>
+			<p class=MsoNormal style="margin-top:12.0pt">[BestPractices] <b style="mso-bidi-font-weight:normal">The following references are sources for “Best Practices” guidelines for XML Schema:
+
+					<o:p></o:p>
+				</b></p>
+			<p class=MsoNormal style="margin-top:12.0pt">ASC X12C Communications and Controls Subcommittee (October 2002). <i style="mso-bidi-font-style:normal">ASC X12 Reference Model for XML Design</i>. ASC X12C/2002-61</p>
+			<p class=MsoNormal style="margin-top:12.0pt">ebXML <i style="mso-bidi-font-style: normal">Technical Architecture Specification v1.0.4</i>, 
+				<st1:date Year="200" Day="16" Month="2">
+					16 February 200
+
+				</st1:date>
+				, available as http://www.ebxml.org/specs/ebTA.pdf.
+
+				<o:p></o:p>
+			</p>
+			<p class=MsoNormal style="margin-top:12.0pt">Korean Institute for Electronic Commerce. <i style="mso-bidi-font-style:normal">Guidelines for Development of XML Electronic Messages in </i>
+				<st1:country-region>
+					<st1:place>
+						<i style="mso-bidi-font-style:normal">Korea</i>
+
+					</st1:place>
+				</st1:country-region>
+				(March 2003). Available online via &lt;www.xeni.co.kr/support/KIECGuidelineFinal_english_.pdf&gt;.</p>
+			<p class=MsoNormal style="margin-top:12.0pt">Lockheed Martin Federal Systems (October 2002). <i style="mso-bidi-font-style:normal">Global Combat And Support System – Air Force BOD Developer's Guide Draft Version 1.1</i>. Department of Air the Force Headquarters Materiel Systems Group (MSG).</p>
+			<p class=MsoNormal style="margin-top:12.0pt">OASIS UBL Naming and Design Rules Subcommittee (November 2003). <i style="mso-bidi-font-style:normal">Universal Business Language (UBL) Naming and Design Rules</i>.<span style="mso-spacerun:yes">  </span>Available online via http://www.oasis-open.org/committees/ubl/ndrsc/.
+
+				<o:p></o:p>
+			</p>
+			<p class=MsoNormal style="margin-top:12.0pt">Roger Costello XML Schemas: Best Practices. Available online via &lt;<a href="http://www.xfront.com/BestPracticesHomepage.html"><span style="color: windowtext;text-decoration:none;text-underline:none">http://www.xfront.com/BestPracticesHomepage.html</span></a>&gt;</p>
+			<p class=MsoNormal style="margin-top:12.0pt">Roger Costello XML Schema Versioning. Available online via &lt;<a href="http://www.xfront.com/Versioning.pdf"><span style="color:windowtext; text-decoration:none;text-underline:none">http://www.xfront.com/Versioning.pdf</span></a>&gt;</p>
+			<p class=MsoNormal style="margin-top:12.0pt">Rowell, M., Feblowitz, M. (2002). <i style="mso-bidi-font-style:normal">OAGIS 8 Design Document</i> (Draft 0.93), available online from http://www.openapplications.org/oagis/.
+
+				<o:p></o:p>
+			</p>
+			<p class=MsoNormal style="margin-top:12.0pt">US Federal CIO Council Architecture and Infrastructure Committee, XML Working Group (April 2002). <i style="mso-bidi-font-style:normal">Draft Federal XML Developer's Guide</i>.<span style="mso-spacerun:yes">  </span>Available online via http://xml.gov/documents/in_progress/developersguide.pdf.
+
+				<o:p></o:p>
+			</p>
+			<p class=MsoNormal style="margin-top:12.0pt">Last Modified: March 10, 2005</p>
+		</div>
+	</body>
+
+</html>

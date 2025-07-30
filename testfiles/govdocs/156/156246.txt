@@ -1,0 +1,2182 @@
+December 1965
+~ ~~~ ~ ~
+S. Manabe, J. Smagorinsky, and R. F. Strickler 769
+SIMULATEDCLIMATOLOGY OF A GENERALCIRCULATIONMODEL
+WITH A HYDROLOGIC CYCLE
+SYUKURO MANABE, JOSEPH SMAGORINSKY, AND ROBERT F. STRICKLER
+Geophysical Fluid Dynamics Laboratory, Environmental Science Services Administration, Washington, D.C.
+ABSTRACT
+A numerical experiment with a general circulation model with a simple hydrologic cycle is performed. The basic
+framework of this model is identical with that adopted for the previous study [35] except for the incorporation of a
+simplified hydrologic cycle which consists of the advection of water vapor by large-scale motion, evaporation from t.he
+surface, precipitation, and a n artificial adjustment to simulate the process of moist convection. This adjustment is
+performed only when the relative humidity reaches 100 percent and the lapse rate exceeds the moist adiabatic lapse
+rate. The radiative flux is computed for the climatological distribution of water vapor instead of using the distri-
+bution calculated by the prognostic equation of water vapor. A completely wet surface without any heat capacity
+is chosen as the.lower boundary. The initial conditions consist of a completely dry and isothermal atmosphere.
+A state of quasi-equilibrium is obtained as a result of the time integration of 187 days. A preliminary analysis of
+the result is performed for the 40-day period from 148th day to 187th day.
+According to this analysis, the hemispheric mean of the rate of precipitation is about 1.06 m./yr. which is close
+to the estimate of the annual mean rainfall obtained by Budyko [5]. I n t h e Tropics rainfall exceeds evaporation and
+in the subtropics the latter exceeds the former in qualitative agreement with observation. The difference betwcen
+thcm, however, is too exaggerated, and an extremcly large export of water vapor from the dry subtropics into the
+wet Tropics by the meridional circulation takes place. I n t h e tropospherc, relative humidity increases with dc-
+creasing altitude. In the stratosphere it is very low except at the tropical tropopause, and thc mixing ratio of water
+vapor is extremcly small in qualitative agreement with observation. Although water vapor is transported from thc
+troposphere into the stratosphere, i t is then transported toward low lntitudca and condenses at the tropical tropopause
+where the temperature is very low and the relative humidity is high.
+Bmed upon a harmonic analysis of the flowfield and the surface pressure field, i t is concluded that thc cffcct
+of condensation tends to increase the wave number of the tropospheric flow and surfacc prcssurc field. Also, thc
+incorporation of the moist process in the model seems to incrcasc the intcnsity of meridional circulation in the
+Tropics. As a result of this increase, the transport of momentum and heat by the meridional circulation in the
+Tropics is much larger than that obtained from the previous study. In middle latitudes, the poleward transport
+of total cnergy in thc moist-model atmosphere is less than that in the dry-model atmosphere because of the
+effect of the poleward transport of latent energy or the heat of condensation.
+The latitudinal distributions of radiative fluxes at the top of the atmosphere and at the earth's surface coincide
+very well with those obtained by London [17] for the actual atmosphere. Bowen's ratio increases with increasing
+latitude and its magnitude coincides reasonably well with that obtained by Budyko [5] or Jacobs [I l l for thc ocean
+surface.
+CONTENTS 8. Synoptic Manifestation- -. - __ ___ - __ ___ _- - -- --- -- ---
+Abstract ______ - ____ _~_ ___ __ __ __ __ __ __ ___ __ __ __ __ 769 9. Kinetic Energy Field-" ___ ____ - __ ___ -- -. - --- -- -- ---
+1. Introduction - - - - - - - - - - - - - - 770 10. Moisture Balance- - - - - - - - - - - - - - - - - - - - - - - - . - - - - - - - - -
+2. Model Equations- ___ .............................. 770 A. Hemispheric Moisture Balance ______ - _- -- - --- -- -
+A. Prognostic Equations .......................... 770B. Latitudinal Distribution of Moisture Balance"---
+B. Lower Boundary Conditions .................... 771 C. Latitude-Height Distribution of Moisture Balance-
+C. Radiative Transfer ____ _____ __ ___ - __ __ - __~__ __ - 771 D. Moisture Balance of the Stratosphere ____.-----.-
+3. Condensation and Convection- - - - - - - - -
+A. Non-Convective Condensation ____ __ ___ __ __ ____ 771 771 11. Energy Budget of the Earth's Surface ____________----
+B. Convective Adjustment ___" __ ______ __ - __ ___ __ - 772 12. Heat Balance- __ ..................................
+c. Detailed Description of the Scheme- __ __ -~ ____ 772 A. Hemispheric Heat Balance _____.______.--------
+4. Initial Conditions and Time Integration ______________ 773 B. Latitudinal Distribution of Heat Balance- - - - - - - -
+5. Mean Temperature Field ............................ 774 C. Latitude-Hcight Distribution of Heat Balance--. -
+6. Mean Flow Field- ................................ 775 13. Allgular Momentum Balance _________________-.---. -
+7.. Mean Moisture Field ............................... 776 14. Concluding Remarks __________________----.----.-. -
+Appendix-Non-Convective Condensation (Iterative Method) - -
+I Results of this investigation were presented at the annual joint meeting of the Amer-
+ican Meteorological Societyand the AmericanGeophysical Union, Washington, D.C., Acknow'edgment""""""""""""-~~"""""- '
+April 1&22, 1965. References______________________________~-----.-------
+779
+782
+785
+785
+785
+786
+787
+789
+790
+790
+790
+792
+794
+795
+797
+797
+797
+1 . INTRODUCTION
+Two of the major objectives of this numerical experi-
+ment are the simulation of the hydrologic cycle and the
+investigation of its role in the general circulation of the
+atmosphere. The extensive studies of the water budget
+of the earth-atmosphere system (e.g., Peixoto [27] and
+Budyko [5]) and the careful measurements of stratospheric
+and upper tropospheric water vapor (e.g., Murgatroyd
+[21], Mastenbrook [19], and Houghton [lo]) enable us t o
+compare the results of our model with the features of the
+hydrologic cycle in the actual atmosphere and to discuss
+some of the factors essential in maintaining the moisture
+distribution in the atmosphere.
+In the previous study [35], we performed the integration
+of a model without the hydrologic cycle. The stabilizing
+effect of moist convection, however, was incorporated in
+the model, i.e., the lapse rate was adjusted to the moist
+adiabatic lapse rate whenever it exceeded this lapse rate.
+In the present study, the effects of evaporation, condensa-
+tion, advection of water vapor, and moist convection are
+incorporated in the model. The basic framework of this
+model is identical to the previous model except for the
+hydrologic cycle. Hereafter we shalI call the previous
+model the “dry general circulation model’’ and the present
+model the “moist general circulation model” for con-
+venience of identification. By comparing these two
+models, i t is possible to discuss the effects of the meridional
+transport of latent energy and condensation on the general
+circulation of the atmosphere.
+The basic framework of predicting large-scale precipita-
+tion was first proposed by Smagorinsky and Collins [31]
+and by the staff members of Tokyo University [37]. In
+these studies, the so-called geostrophic approximation was
+adopted and the effect of heat released by condensation
+on the large-scale flowfield and temperature fieldwas
+neglected. Following these studies Smagorinsky [32] has
+shown that an extremely large vertical motion emerges
+and the scale of upward motion decreases as a result of the
+decrease of effective static stability if one incorporates the
+effect of heat of condensation. According to the results
+of scale-analysis, such an intense vertical motion is in-
+consistent with the basic assumptions used for the geo-
+strophic approximation. (See, for example, the recent
+comprehensive review by Phillips [28].) Also, the geo-
+strophic model is not capable of representing the flow in
+low latitudes, and it completely neglects the convergence
+of water into the precipitation region by the ageostrophic
+wind component near the earth’s surface. Therefore, it
+is necessary to use the so-called “primitive equations” for
+a moist model as proposed by Smagorinsky [33].
+Recent numerical studies of convect,ion performed ,by
+‘Lilly [lG], Kasahara [12], and Ogura and Charney [23]
+have shown that because of convective instability, intense
+grid-scale convection develops exponentially in the area
+where the lapse rate is unstable. Since the grid-scale
+convection cqnnot be resolved by the grid itself, the
+7 70 MONTHLY WEATHER REVIEW Vol. 93, No. 12
+computation quickly deteriorates. Therefore, it is desir-
+able to design a scheme of convection such that the grid-
+scale convection does not develop. In connection with the
+problem of the genesis of hurricanes, Ooyama [25], Charney
+and Eliassen [7], and Ogura [22] proposed a system which
+successfully controlled the abnormal growth of hurricanes
+by using a concept of “balanced wind” and by cutting
+the direct link between vertical motion and condensation.
+Recently Kuo [14] and Leith [15] proposed rather sophis-
+ticated schemes of convection for studying a similar
+problem. However, further observational as well as
+theoretical studies of the macroscopic behavior of moist
+convection seem necessary to reach a satisfactory scheme
+for treating this process. In view of our ignorance in
+this matter, we used a very simple scheme of convective
+adjustment depending upon both relative humidity and
+the lapse rate and successfully avoided the abnormal
+growth of grid-scale convection. It is hoped that the
+results obtained by using this simple scheme can provide
+the basis for the computation of a more exact and better
+scheme of convection.
+In order to avoid a sudden increase in the degrees of
+freedom of the model, the climatological distribution of
+water vapor instead of the distribution obtained from the
+prognostic equation of water vapor is adopted for the
+computation of radiative transfer only. It is our inten-
+tion to eliminate this constraint in a future study.
+In order to understand the role of topography and that
+of the distribution of land and sea, it is desirable to per-
+form first a numerical integration of the model without
+these factors and to realize the importance of the missing
+factors by comparing the features of the model atmosphere
+with those of the actual atmosphere. Therefore, we
+adopted a completely wet and flat earth’s surface without
+any heat capacity instead of adopting more realistic
+boundary conditions. The temperature of the earth’s
+surface is determined as the balance of various thermal
+components such as long-wave radiation, solar radiation,
+sensible heat flux, and evaporation.
+The next natural research step following this study is the
+numerical integration of a model with the actual dis-
+tributions of land, sea, and mountains. I t is’ expected
+that the inter-comparison among the results of the two
+models and the features of the actual atmosphere will
+greatly improve the understanding of the role of these
+factors in the general circulation of the atmosphere.
+I. MODELEQUATIONS
+A. PROGNOSTICEQUATIONS
+The prognostic equations for temperature and the
+mixing ratio of water vapor on the stereographic projec-
+tion are:
+December 1965 S. Manabe, J. Srnagorinsky, and R. F. Strickler 771
+in the
+here.
+r :
+C:
+pRA0:
+q c :
+P* :
+t:
+X :
+Y:
+U:
+V:
+T:
+Q: Q:
+w :
+R:
+C,:
+K,:
+KV:
+P ,.
+773 :
+K .*
+previous paper [35], we shall not describe them
+Following are the notations used in the equations.
+Mixing ratio of water vapor to dry air.
+Rate of change of r due to condensation.
+Rate of radiative heating.
+Rate of heating due to condensation and con-
+Surface pressure.
+Time.
+Abscissa of stereographic rectangular coordinate.
+Ordinate of stereographic rectangular coordinate.
+Wind velocity relative to the earth in X-direction.
+Wind velocity relative to the earth in Y-direction.
+Temperature.
+PIP,, where P is pressure.
+d &/at.
+dP/dt.
+Gas constant of air.
+Specific heat of air under constant pressure.
+Horizontal mixingcoefficient as defined by equa-
+Vertical mixing coefficient as defined by equation
+Density of air.
+Magnification factor of stereographic projection,
+Rlc,.
+vection.
+tion (2B8) in previous paper [35].
+(2Bl1) in previous paper [35].
+For further explanation refer to previous paper [35].
+8. LOWERBOUNDARYCONDITIONS
+The temperature of the earth's surface T* is determined
+such that it satisfies the requirement of the heat balance at
+the earth's surface. Because of the incorporation of the
+effect of evaporation, the balance equation is different
+from the previous study [35]. Therefore, we shall de-
+scribe it here.
+If we assume that the heat capacity of the earth is
+zero, the balance equation of heat is
+S*+(DLR)*=~T~,+(VH),=I+(VLH),=, (2.7)
+where S* and (DLR)* are the net downward solar inso-
+lhtion and the downward long-wave radiation at the
+earth's surface, respectively; u is the Stefan-Boltzman
+constant. The sensible heat flux at the earth's surface
+(V r n Q =1 is
+(~H),,~=~(~).c,.QD(~).IV(~)I. (2.8)
+The flux of latent energy (VLH)Q,l at the earth's surface is
+(vLH),=,=p(h).L.QD(h).IV(h)l.(r,(T,)--r(h)) (2.9)
+where the earth's surface is assumed to be wet every-
+where, L is the latent heat of evaporation, r,(T*) is the
+saturation mixing ratio of water at T*, (V(h) I is the mag-
+nitude of wind velocity at height h, QD(h) is the drag
+coefficient for the wind velocity at height h, Q(h) is the
+Q-value at height h, and T*- T(h)/&l(h) is the approxi-
+mate difference between the potential temperature of the
+earth's surface and that at height h. For further illustra-
+tions, refer t o previous paper [35].
+C. RADIATIVETRANSFER
+The methods of calculating the temperature change in
+this study are described in detail by Manabe and Strickler
+[18]. A brief description of the scheme is also given in the
+previous paper. The distributions of gaseous absorbers
+and cloud used in this study are identical with those used
+in the previous work [35]. As we explained in the intro-
+duction, we do not use the distribution of water vapor,
+which is obtained from the prognostic equation of water
+vapor, for the computation of radiative transfer. In-
+stead, we use the climatological distribution of water
+vapor as wellas that of carbon dioxide, and of ozone.
+In short, we eliminate some part of the interaction be-
+tween the hydrologic cycle and the radiative transfer.
+By avoiding a sudden increase in the degrees of freedom
+of the model this way, it is possible t o compa.re the present
+result with the previous result [35] and t o discuss the
+reasons for the differences.
+3. CONDENSATION AND CONVECTION
+A. NON-CONVECTIVECONDENSATION
+The rate of non-convective precipitation is computed
+a. If, and only if, the relative humidity reaches 1, i.e.
+b. Relative humidity never exceeds 1, i.e., 100 percent.
+c. The liquid water storage capacity of the atmosphere
+is zero, and all the water vapor which is condensed pre-
+cipitates instantaneously.
+using the following assumptions.
+100 percent, condensation may take place.
+772 MONTHLY Vol. 93, No. 12
+The amount of precipitation for each time step is a. When the lapse rate of an unsaturated layer tends to
+determined so that the requirements described above are exceed the dry adiabatic lapse rate, the intensity of free
+satisfied, including the release of latent heat. convection is strong enough to maintain a neutral lapse
+b. The kinetic energy created by convection is dis- .B. CONVECTIVE ADJUSTMENT
+rate of potential temperahre.
+Two important processes which play a major role in the
+general circulation of the atmosphere are the moist and
+dry convection. Unfort?unately, we know very little about
+the dynamical and thermodynamical aspects of the macro-
+scopic behavior of moist convection. Our ignorance on
+this subject does not seem to warrant the incorporation
+of a very sophisticated scheme of the convective process
+a.t this stage of the study of the general circulation by use
+of a numerical model. Therefore, weused a simple con-
+vective adjustment of temperature and water vapor as a
+substitute for the actual convective process.
+If one uses this scheme, moist convective condensation
+takes place only when the lapse rate tends to become
+super-moist-adiabatic and the relative humidity tends to
+exceed 100 percent. It isweii known, however, that
+convective rainfall takes place even when the large-scale
+humidity is below 100 percent. Therefore, i t is obvious
+that the simple adjustment process which we used here is
+insufficient for simulating the macroscopic behavior of
+convection in the actual atmosphere. Also, the upward
+transport of momentum due to free convection, which
+may not be negligible a t all, is neglected because of our
+ignorance in this matter. This adjustment scheme,
+however, not only prevents the abnormal growth of grid-
+scale convection discussed in the introduction but also
+simulates some of the essential features of free convection
+in the atmosphere, Le., 1. i t prevents the appearance of
+a supercritical lapse rate, and 2. as a result. i t transfers
+effectively both heat and water vapor upward and causes
+condensation.
+We shall list the basic assumptions involved in the
+(1) Dry Convective Adjustment.-The basic assumptions
+process of convective adjustment.
+used for the dry convective adjustment are as follows:
+sipated and converted into heat, instantaneously, i.e.,
+the total potential energy is invariant by this adjustment.
+c. The adjustment is not applied to the logarithmic
+boundary layer where forced convection predominates.
+(2) Moist Convective Adjustment.-The assumptions
+adopted are:
+a. When the lapse rate of a saturated area tends to
+exceed the moist adiabatic lapse rate, the intensity of free
+convection is strong enough to maintain a neutral lapse
+rate of the equivalent potential temperature.
+b. The relative humidity never exceeds 1 by this
+moist convective process.
+c. The kinetic energy of very-small-scale eddies created
+by this convection is dissipated instantaneously and
+converted into heat energy.
+d. All the water condensed by this moist convective
+process precipitates instantaneously.
+The rate of convective precipitation is determined as
+the consequence of satisfying all the requirements men-
+tioned above.
+C. DETAILED DESCRIPTION OF THE SCHEME
+The actual computations of the amount of precipitation
+and the convective adjustments are performed in the
+following way.
+(1) Compute the changes of temperature and the
+mixing ratio of water vapor for one time increment, At,
+neglecting the effect of condensation.
+(2) Compute the distributions of relative humidity, h,
+and the lapse rate o€ temperature of the atmosphere
+obtained as a result of these changes.
+(3) Test the relative humidity, h, and the lapse rate,
+y , in the vertical column a t each grid point. The adjust-
+ment to be performed as a result of the test is indicated in
+table 3C.
+TABLE 3C.-Test for convective adjustment
+No condensation, no convection
+6 T=O 6r=0
+(No adjustment)
+Large-scale condensation only
+dr, 6 T from r+6r=rs(T+6T, P ) (3.3)
+c,QT+Ldr=O (3.4)
+I
+Dry convection only 1 Moist convection and large-scale condensation
+I 6r=0 I I I e.(T+6T, r+dr, P)=O (3.5)
+') 1 1 -g >y , 1 6r,GTfrom (3.6)
+ym-moist adiabatic lapse rate. y s d r y adiabatic lapse rate.
+6r-adjustment of t h e m i x i n g r a t i o of w a t e r v a p o r . h-relative humidity.
+Pr, P s p r e s s u r e a t top and base of a dry or moist unstable layer containing two or more y-acceleration of gravity. 6T"adjustment of t h e t e m p e r a t u r e . r .-s a t u r a t
+e.-equivalent-potential temperature @"potential temperature.
+contiguous levels of the model.
+~ ~~
+December 1965 S. Manabe, J. Srnagorinsky, and R . F. Strickler 773
+Further details of each adjustment are as follows.
+a. Largescalecondensationonly.-At each saturated
+level, 6r and 6T of table 3C are determined from equations
+(3.3) and (3.4) using an iteration procedure (refer to the
+Appendix for details). The amount of precipitation for
+the entire column is computed from
+b, Dry convection only.-For each dry unstable layer con-
+taining n contiguous levels of the model, 6T of table 3C
+can be computed a t each level by solving the n-1 equa-
+tions (3.1) simultaneously with equation (3.2).
+e. Moist convection and large-scalecondensation.-For
+each moist unstable layer containing n contiguous levels
+of the model, 6r and 6T of table 3C can be computed a t
+each level by solving the n- 1 equations (3.5) simultane-
+ously with the n equations (3.6) and with equation (3.7).
+It is assumed that the moist adiabatic lapse rate and the
+value of br,/bT at each level are unchanged by the adjust-
+ment. The procedure described in a., above, is then
+applied to the unadjusted levels. The total precipitation
+for the column can then be computed from equation (3.8).
+4. INITIALCONDITIONSANDTIMEINTEGRATION
+The initial condition adopted for the present numerica
+experiment is a completely calm, dry, and isothermal
+atmosphere of 289' K. As we explained in the introduc-
+tion, the annual mean distribution of water vapor instead
+of the distribution predicted by the equation of the mixing
+ratio of water is used for the computation of radiative
+transfer. The total period of integration is 187 days. In
+order to save computer time, the integration during the
+first 50 days was performed by a drastically coarse grid,
+(N=5). N is the number of grid intervals between the
+pole and equator. During the next 20 days the resolu-
+tion of N= 10 was adopted. After 70 days the integration
+was performed by use of an (N=20) grid.
+Figure 4.1 shows the time variation of both the total
+potential energy and the gross static stability (refer to
+Appendix I1 of previous paper) with time. The former
+describes the mean temperature of the atmosphere and the
+latter is the indicator of the static stability of the atmos-
+phere. The discontinuities of the curves a t 50 days are
+caused by the sudden change of resolution from (N=5)
+grid to (N= 10) grid. According to this figure the gross
+thermal structure approached a steady state at the end
+of the time integration. In figure 4.2 the evolution of
+the vertical distribution of temperature at 45' N. with
+time is shown. In the troposphere and upper stratosphere,
+where the absorption of solar radiation or heating by
+convection are important, the time for arriving at
+equilibrium is relatively short; whereas in the lower
+stratosphere, where both the effects of solar absorption
+and convection are smaller, it takes a very long time
+before we reach a state of equilibrium.
+FIGURE 4.1.-Variation of total potential energy and gross static
+stability with time.
+MB
+10-
+100-
+300
+500-
+700.
+850-
+30
+20
+15
+10
+5
+FIGURE 4.2,"Variation of the vertical distribution of temperature
+of the model atmosphere with time at 45" latitude.
+774 MONTHLY Vol. 93, No. 12
+LPRECIPITABLE WATER
+.,A/ \ ?PRECIPITATION
+FIGURE 4.3.-Variation of the hemispheric mean of precipitable
+water and hemispheric rates of precipitation and evaporation
+with time.
+Figure 4.3 shows the time variations of the hemispheric
+mean value of precipitable water. In the same figure the
+daily values of precipitation and evaporation are plotted
+with time. It is rather surprising that the precipitable
+water reached its maximum at about 40 days and started
+declining again. This result may be due to the fact that
+the atmosphere a t 40 days can- contain more water than
+in later days of integration because the temperature of the
+former is significantly higher than that of the latter. This
+curve of precipitable water almost levels off at about 150
+days.
+An examination of figures 4.1, 4.2, and 4.3 indicates that
+we reached a state sufficiently close to equilibrium except
+in the stratosphere where temperature still changed slowly
+with time. Therefore, we chose the last 40-day period
+(from 148th day to 187th day) for our analysis. The data
+are analyzed once a day and the results are averaged for
+this 40-day period.
+5. MEAN TEMPERATUREFIELD
+In figure 5.1 the latitude-height distributions of tem-
+perature that are obtained from our time integration
+are compared with that of the annual mean of the tem-
+perature of the actual atmosphere. In figure 5.3 a
+comparison is also made on the adiabatic diagram.
+According to these figures the agreement between the
+computed temperature and the observed annual mean is
+excellent. Since the thermal structure obtained from the
+dry general circulation model is also very similar to the
+observed distribution and discussed in the preceding
+paper 1351, i t may be preferable to discuss the present
+results in contrast with the previous results. In the lower
+half of figure 5.3 the latitudinal distributions of zonal
+mean temperatue a t the 500-mb. level that are obtained
+from both the dry and moist general circulation models
+are compared with the observed annual mean. According
+to this figure, the temperature gradient in middle latitude
+is smaller in the present results than in the previous
+results. This improvement in the temperature gradient
+is due to a modification in the distribution of heat sources
+I /
+"_ v \
+U
+FIGURE 5.1.-1n the upper and lower part, the latitude-height
+distribution of temperature of the model atmosphere and that of
+the acutal atmosphere (Peixoto [26], Oort [24], and Kochanski [13]),
+are shown respectively.
+resulting from t,he latitudinal transport of latent energy
+or the condensation process. For a detailed description of
+the distribution of heat of condensation refer to section 12.
+The latitudinal distributions of temperature a t level 2,
+(PIP, =0.074), obtained from the dry and moist general
+circulation models, are compared with the annual mean
+of the stratospheric temperature at the 75-mb. level in the
+upper half of figure 5.3. The increase of temperature
+with increasing latitude is larger and more realistic in
+the present results than in the previous results. As we
+discussed in the previous paper, a two-cell meridional
+circulation predominates in our model stratosphere. The
+tropical cell helps maintain the latitudinal increase of
+temperature inlow latitudes, whereas the polar cell
+tends to destroy the relatively warm area created
+by the large-scale eddies in high latitudes. Accord-
+ing to the comparison between the distributions of the
+zonal mean of vertical motion of the moist and dry general
+circulation models, the intensity of the polar cell at the
+second stratospheric level is much weaker for the moist
+December 1965 S. Manabe, J . Smagorinsky, and R. F. Strirkler 775
+30 MB
+10-
+25
+20
+l5 1
+1 C G
+- I Y
+- b I
+W P
+40 I
+300-
+500.
+.5
+700-
+TEMPERATURE (DEGREES KELVIN)
+KM
+30
+20
+10
+0
+model than for the dry model, and the tropical cell in the
+stratosphere of the moist model is almost as strong as that
+of the dry model. (Refer to figure 6.3 of this paper and
+figure 4B2 of previous paper.)
+Therefore, the increase of stratospheric temperature with
+increasing latitude is somewhat larger for the moist model
+atmosphere than for the dry model atmosphere. The
+temperature change due to the heat transport by the large-
+scale eddies tends to decrease the latitudinal increase of
+stratospheric temperature inlow latitudes (O'~35') as
+figure 5D6 of the previous paper [35] shows. This
+tendency is less pronounced in the moist model atmos-
+phere than in the dry model atmosphere (see fig. 5D3
+of previous paper and fig. 12C4 in sec. 12). This differrnce
+is partly responsible for the difference in the latitudinal
+increase of stratospheric temperature in the low latitudes.
+For a definitive evaluation of the effect of condensation
+on. the distribution of stratospheric temperature, it seems
+to be necessary to wait until a quantitatively successful
+simulation of the tropospheric hydrologic cycle is
+accomplished.
+6. MEAN FLOW FIELD
+Figure 6.1 shows the latitude-height distribution of the
+zonal mean of the zonal wind which emerged as a result
+of the time integration. I n t h e same figure the dis-
+tribution of the annual mean of zonal wind based upon
+data by Buch [4], Starr and White [38], and Oort [24], and
+the distributions of zonal wind during winter and summer
+obtained by Kochanski [131 are shown for comparison.
+The characteristic features of the present results are as
+follows:
+(1) The subtropical jet stream is very intense and is
+located in very low latitudes (25' N.).
+(2) In the stratosphere, the axis of the maximum zonal
+current tilts sharply, i.e., the latitude of maximum wind
+increases with increasing altitude.
+(3) A very weak easterly current appears in the upper
+stratosphere of the Tropics.
+(4) A surface easterly current appears at about 60' N.
+instead of in the polar region.
+The general features of our results are closer to those of
+7 76 MONTHLY WEATHER Vol. 93, No. 12
+~
+500 11 TLYPERATURE
+210'
+FIGURE 5.3-The latitudinal distribution of observed annual mean
+temperature and computed temperature at different levels of the
+atmosphere. The observed distributions at the 74-mb. a n d a t
+the 500-mb. levels are obtained from the results of Kochanski
+[13] and Peivoto [26] respectively.
+the zonal wind during winter than to those of the annual
+mean, though the modes of the computed distribution
+deviate to the south of those of the actual winter
+atmosphere.
+In figure 6.2 the latitudinal distributions of the zonal
+mean of the zonal wind at the stratosphere (level Ic=2,
+P/P+=O.O74) which are obtained from both the dry
+and moist, general circulation models, are compared with
+the annual mean distribution of the actual atmosphere at
+the 75-mb. level. In middle latitudes the intensity of zonal
+wind obtained from our present computation is signifi-
+cantly weaker than that which is obtained from the dry
+general circulation model. This improvement is con-
+sistent with the improvement of the temperature gradient
+in middle latitudes that we discussed in section 5.
+Figure 6.3 shows the latitude-height distribution of
+zonal mean vertical velocity. According to our compari-
+son between the present distribution and the resuIts
+obtained from the integration of the dry model, the fol-
+lowing features of the present results are noteworthy.
+(1) The upward-mc;ving branch of the tropical cell is
+very intense and narrow, and t,he downward-moving
+branch in the subtropics is wide.
+(2) The intensity of the cell in middle latitudes is
+weaker than in the previous result.
+The effects of the process of condensation on the merid-
+ional circulation described above seem to be reasonable
+qualitatively, but they may be exaggerated. This power-
+ful tropical cell causes a large equatonvard transport of
+latent energy and accordingly a very drastic tropical
+rain belt, as we shall describe later. Because of the
+complexity of the model, it is rather difficult to determine
+the reason such an intense meridional circulation emerges.
+We shall speculate on this problem later.
+7. MEAN MOISTURE FIELD
+Figure 7.1 shows the vertical distribution of the hemi-
+spheric mean of the mixing ratio of water vapor obtained
+as a result of integration. Based upon the data compiled
+by Peixoto [27] by using radiosonde measurements, the
+hemispheric mean values for the lower troposphere a.re
+computed and plotted in the same figure. For the upper
+troposphere the average mixing ratios for the latitude
+range of 0"-70"N. are computed from the results obtained
+by Murgatroyd [21] from aircraft measurements, and are
+added to the same figure. There have been many results
+which suggest the increase of water vapor with increasing
+altitude in the stratosphere. After a careful examination
+of his results, Mastenbrook [19] finally concluded that
+the increase is due to contamination from the balloon
+itself and that the stratosphere is very dry indeed. Two
+of his measurements are added to the figure after slight
+smoothing of his original data. The recent measure-
+ments performed by Houghton [lo] using the infrared
+spectrometer also suggest the existence of a dry strato-
+sphere. According to this comparison, the computed
+results are in reasonable agreement both in the tropo-
+sphere and in the stratosphere. The formation of a dry
+st*ratosphere in our model is very encouraging. We shall
+examine the stratospheric water budget in section 10.
+In the upper troposphere the coincidence between our
+results and the distribution of the area mean of the mixing
+ratio obtained by Murgatroyd is remarkable. Near the
+earth's surface the computed mixing ratio is significantly
+larger than the observed partly because of the assumption
+of a completely wet surface. As a result of this dis-
+crepancy the computed amount of precipitable wat'er is
+significantly larger than the observed amount. As figure
+7.2 shows, ,the computed precipitable water is as large as
+the observed precipitable water for summer although the
+general features of the computed latitudinal distribution
+compare favorably with the observed except i n t h e
+Tropics where the computed values sharply increase with
+decreasing latitude.
+The latitude-height distribution of relative humidity
+obtained from our computation and that of the actual
+atmosphere for the summer season are shown in the upper
+/
+December 1965 S. Manabe, J. Smagorinsky, and R. F. Strickler 777
+UTITUDE LATITUDE
+FIGURE 6.1.-Latitude-height distribution of the zonal mean of thc zonal mind. The cornputcd distribution and the observed annual
+mean, which is obtained from the results of Buch [4], Oort [24], are shown in the upper left and lower left, respectively. The distri-
+butions a t 80" W. obtained by Kochanski [13] for both January and .July are shown on the right-hand side of the figure.
+40 - ,fc-""
+/ I /
+30 -
+J .074 t
+s
+Y
+c 3
+20 - LI
+,189
+Y
+I
+10
+,336
+300
+,664
+1 I I I I I I I ,811
+80 70 60 50 40 30 20 10 0 ,926 .991 0
+90
+LATITUDE
+90 80 70' 60 50 40 30 20 10 0
+FIGURE 6.2.-Latitudinal distribut,ion of the zonal mean of thc LATITUDE
+zonal wind at the 2d model level (P/P*=0.074) are shown
+together with that at the 75-mb. level of the actual atmosphere FIGURE 6.3.-The latitude-height distribution of vertical component
+o b t a i n e d f r o m t h e r e s u l t s of Oort [24]. of wind of the model atmosphere. Units are cm./sec.
+778 MONTHLY WEATHER Vol. 93, No. 12
+COMPUTED
+sh\
+(PEIXOTO) WINTER>\
+I
+I
+1 s
+E i? Y
+lod 10-5 loJ 10~3 IO-* 10-1
+FIGURE 7.1.-The vertical distributions of the hemispheric mean of
+the mixing ratio of water vapor for the computed and the actual
+atmosphere. Data obtained by Mastenbrook [19], Murgatroyd
+[21] and Peixoto [27] are used.
+"
+MIXING RATIO br/p OF AIR)
+LATITUDE
+FIGURE 7.2.-Latitudinal distributions of precipitable water (cm.)
+contained in the model atmosphere and in the actual atmosphere.
+Observed distributions for summer, winter, and the annual mean
+are taken from the results of Peixoto [27].
+and lower parts of figure 7.3, respectively. The distri-
+bution of observed relative humidity in the lower tropo-
+sphere was compiled by Telegadas and London [39] using
+radiosonde observations, and that in the upper tropo-
+sphere was constructed by Murgatroyd [21] using aircraft
+observations. The reason we show the observed distri-
+bution for summer is that this is the only season For which
+LATITUOE
+15KM
+10KM
+9
+I
+5KM
+&N 7PN 6(PN 5W'N WN 3PN 2OON lOON
+UTIIUDE
+FIGURE 7.3.-1n the upper part of the figure, the latitude-height
+distribution of relative humidity (in percent) of the model atmos-
+phere is shown. I n t h e lower part is shown that of the actual
+atmosphere for summer season (by Murgatroyd [21], Telegadas
+and London [39]).
+we have the relative humidity data of Murgatroyd [21].
+There are many qualitative features which are common to
+both the computed and observed atmospheres. For
+example, the very dry stratosphere, the wet lower tropo-
+sphere, and the dry subtropics are common. In the upper
+troposphere in the Tropics, a relatively moist region emerges
+in qualitative agreement with the observation by Murga-
+troyd [all. This moist region is partly attributable to
+stronger radiative cooling at this level. Since the data
+compiled by Murgatroyd are based upon relatively few
+observations (except those performed over England),
+an exact quantitative compa.rison for the upper tropo-
+spheric region is not justified. The distributions obtained
+by Telegadas and London [39], on the other hand were
+compiled from many routine radiosonde observations.
+According to our comparison, the relative humidity near
+the earth's surface obtained from our computation is
+higher than that of the actual atmosphere. As we pointed
+out, this discrepancy is partly due to the assumption of a
+wet surface adopted For the present computation. How-
+ever, there may be other reasons for this difference because
+December 1965 S. Manabe, j. Smagorinsky, and R. F. Strickler 779
+90 80 70 60 50 40 30 20 10 0
+LATITUDE
+FIGURE 7.4.-The latitude-height distribution of the mixing ratio
+of water vapor in the model atmosphere. Units are gm./kg.
+of air.
+the computed humidity is about 95 percent and higher
+than the mean relative humidity on the ocean surface
+which is about 80 percent.
+One possible reason is the shortcoming of the moist-
+convective adjustment. According to the present scheme,
+moist convection takes place only when the lapse rate
+becomes superadiabatic and the relative humidity reaches
+100 percent, whereas in t,he actual atmosphere, moist
+convective condensation is usually observed when the
+large-scale distribution of humidity is much less than 100
+percent. Therefore, it is probable that the improvement
+of the criterion for the convective adjustment would
+increase the upward transport of water vapor due to the
+adjustment and, accordingly, improve the distribution of
+relative humidity in the model atmosphere.
+Another discrepancy is the appearance of a very humid
+region around the pole. This is caused by the upward
+branch of meridional circulation in the polar regiou where
+downward motion appears in the actual atmosphere.
+Also, the latitude of the subtropical dry belt obtained
+from our model is too low. Refer to figure 1OBl which
+shows the latitudinal distribution of evaporation and that
+of precipitation. According to this figure the latitudinal
+width of the tropical rain belt is very small and con-
+sequently the dry belt is also located at too low a latitude.
+Finally, the latitude-height distribution of the mixing
+ratio of air obtained as a result of the numerical inte-
+gration is shown in figure 7.4. Aswe mentioned,
+the mixing ratio is very small in the stratosphere. The
+mixing ratio of the tropical tropopause is about 3 X
+gm./gm. of air and increases with increasing latitude up
+to 60' N. In high latitudes, the mixing ratio in the
+stratosphere (k=2, P/P*=O.O74) is about 7?(10"j
+gm./gm. of ail. These values are not far from those
+obhined by Mastenbrook [19], Murgatroyd [21], and
+Houghton [IO] in this region of the actual atmosphere.
+P 9, "H = .500
+%
+FIGURE 8.1-Solid lines show the contour lines of the geopotential
+and dashed lines show those of the temperature on the iso-
+baric surface of P/z" =0.5. (175th day of integration.)
+In the upper stratosphere the computed mixing ratio is
+0.7-2.0X10-6 gm./gm. of air and is very dry.
+8. SYNOPTICMANIFESTATION
+In figure 8.1 an example of the map of the geopotential
+height and temperature of the 500-mb. surface is shown,
+and in figure 8.2 the map of surface pressure obta,ined
+from the present experiment is compared with that ob-
+tained from the dry general circulation model. According
+to this figure, the scale of the pressure field obtained from
+t,he moist general circulation model is significantly
+smaller than that obtained from the dry general circulation
+model. In other words, the heat of condensation tends to
+decrease the scale of the pressure field at the earth's
+surface and to increase the total number of Lows in the
+hemisphere. Note the clusters of small Lows that appear
+in figure 8.2. They remind us of a cyclone family in the
+actual atmosphere. An increase of resolution of the
+model seems to be highly desirable to resolve and describe
+sufficiently the pressure distribution accompanying the
+cyclone family or front.
+Figure 8.3 shows the vertical distributions of the hemi-
+spheric mean of the effective wave number ;ii which is
+defined by the following equation
+E= (Sn.dE(n))/SdE(n)
+where E(n) denotes the energy spectrum. In the samc
+figure, the corresponding distributions obtained from thc
+dry model are shown.
+780 MONTHLYWEATHERREVIEW Vol. 93, No. 12
+DRY G. C. MODEL MOIST G.C. MODEL
+FIGURE 8.2-Contour lines of surface pressure obtained from the moist general circulation model (175th day) and those obtained from
+the dry general circulation model (259th day) are shown in the right- and left-hand side of the figure (every 5 mb.) respectively.
+Dashed lines show the isotherms on the earth's surface (every 5' C.).
+EFFECTIVE WAVE NUMBER - 3 4 5 6 7 8 V
+.zoo -
+.m -
+I .wo J
+FIGURE 8.3.-The vertical distributions of the hem'sphsric mean
+of the effective wave number of eddies for both dry and moist
+general circulation models. The distributions of the meridional
+component of wind, of zonal component of wind, and of both
+components are shown together.
+-
+6000.
+E =
+FE 5000- W
+a W 2
+4000 -
+5 = 3000-
+2
+E 2000-
+W
+V
+Y w
+Y
+W
+1wo -
+I I I I 1 I I I
+80 70 m 50 40 30 20 10
+LATITUDE
+According to this comparison the wave number of the
+moist model is significantly larger than that of the dry
+model and increases with decreasing altitude in t,he
+troposphere except very near the earth's surface. The
+level of ma-dmum wave number is very close to t,he
+earth's surface and is a t about the 900-mb. level. Since
+the latitudinal distribution of eddy kinetic energy in the
+moist model atmosphere is much larger than that of t'he
+dry model atmosphere in the Tropics where the wave
+number is large (see fig.. 9.3). the comDarison between the
+FIGURE 8.4.-Latitudinal distributions of the pressure-weighted
+vertical mean of the effective wavelength (2ra cos e/;, where e is
+latitude and a the radius of the earth) for both the moist and
+the dry atmosphere.
+hemispheric mean wave numbers exaggerates the differ-
+ence. Therefore, figure 8.4, which shows the latitudinal
+distributions of the effective wavelength (=27ra cosO/Z)
+for both the moist and dry model atmospheres, is made.
+According to this figure the effective wavelength of the
+moist atmosphere is shorter than that of the dry a-tmos-
+DhereexceDt in the subtroDics and verv high latitudes v . Y I , I .I _
+December 1965 S. Manabe, 1. Smagorinsky, and R. F. Strickler 781
+SCALE: 4 MB/DAY
+I -,, = ,034 P -
+%
+SCALE: 100 MB/DAY r P 5 = .126
+!k
+SCALE: 100 MB/DAY l- 5 = .259 !i
+SCALE: 100 MB/DAY ' '
+r T., - .583
+"
+'f
+where the rate of condensation is very small. These
+results show that the heat released by condensation
+tends to produce small-scale motions, and is consistent
+with the effect of condensation on the surface pressure
+system which we described in the previous paragraph.
+Figure 8.5 shows the maps of the distribution of the
+vertical P-velocity (=P*.$) at P/P~=0.034,0.126,0.259,
+and 0.583 at the 175th day of integration. Note that the
+intervals of the isolines adopted for these maps are not the
+same. According to the comparison between the distri-
+bution of vertical P-velocityat P/P,=O.583 in this figure
+and that of the previous study [35] (see fig. 8.5a), the
+tropospheric vertical P-velocity obtained from the moist
+model has much stronger and smaller centers of upward
+motion in lower latitudes than does the dry model. In
+middle latitudes, the difference is not so pronounced.
+Figure 8.6 shows examples of the longitudinal distribution
+of vertical P-velocity at 41.5" N. for both the moist and
+782 MONTHLY WEATHER Vol. 9 3 , No. 12
+- .583 SCALE: lOOMB/DAY P -
+p*"
+FIGURE 8.5a.-Isolines of vertical P-velocity (P*Q.) a t P/P* =0.583
+which is transferred from figure 4C5 of previous paper [35].
+dry atmospheres. This figure shows that the scale of
+vertical motion obtained from the moist model issome-
+what smaller than that of the dry model because of the
+effect of heat released by condensation.
+Figure 8.7 shows the map of relative humidity at PIP, =
+0.074,0.811,0.926, and 0.991on the 175th day. Aswe
+discussed in section 7, the computed relative humidity
+generally increases with decreasing altitude. The vari-
+ability of the tropospheric relative humidity, on the other
+hand, increases with increasing altitude. The qualitative
+features of this result coincide with the observed features
+of relative humidity in the atmosphere, particularly over
+the ocean. The relative humidity of the lowest level
+(k=9, PIP, =0.991), however, is too high. In the second
+stratospheric level, (k=2, PIP* = 0.074) , the relative hu-
+midity is low in most of the hemisphere, but in the Tropics
+it has a large variability suggesting the influence of pene-
+trative convection to this level. We did not prepare a
+map for the first stratospheric level (k=1, PIP* =0.009).
+At this level the relative humidity is around 1 percent or
+less. (See fig. 7.3.)
+Since the scale of the pattern of relative humidity and
+that of vertical motion in the troposphere are very small,
+it is clear that the resolution adopted for our present cal-
+culation is not sufficient. The increase of resolution,
+therefore, could alter our result significantly.
+0" 90' 180" 270" 360" 0" 90" 180" 270" 360"
+LOWGITUOE LOMGITUOE
+FIQURE 8.6.-Longitudinal distributions of vertical P-velocity at
+various levels. Distributions on the 259th day in the dry atmos-
+phere and those on the 175th day in the moist atmosphere are
+shown on the left- and the right-hand side of the figure, respectively.
+9. KINETICENERGYFIELD
+Figure 9.1 shows the time variation of the latitudinal
+distribution of zonal kinetic energy obtained from the
+time integration. The maximum of the zonal kinetic
+energy corresponding to the subtropical jet stream is very
+large and is located a t too low a latitude (refer to fig. 6.1).
+It is noteworthy that a secondary maximum of the zonal
+kinetic energy appears at about 60" N. during a certain
+period. This feature did not appear in the dry model
+atmosphere (see fig. 4E4 of the previous paper [35]) and
+reminds us of the double maximum of zonal current which
+occurs in the actual atmosphere during certain periods of
+winter.
+The latitude-height distribution of eddy kinetic energy
+obtained from the present computation is shown in figure
+9.2. The level of maximum eddy kinetic energy is located
+at the third model level (PlP*=O.189) as it was in the pre-
+vious result and coincides with the level of the observed
+maximum. This distribution, however, is quite different
+from that obtained from the previous study [35]. In
+figure 9.3, the latitudinal distributions of eddy kinetic
+energy of both the dry and the moist general circulation
+models at the 500-mb. level are compared with that of the
+actual atmosphere obtained by Saltzman [30]. Based
+upon this figure we may make the following comments:
+1. Observed eddy kinetic energy in middle latitudes is
+larger than the eddy kinetic energy obtained from either
+the dry or moist model.
+2 . The eddy kinetic energy in middle latitudes is smaller
+for the present results than for the previous results.
+December 1965 S. Manabe, 1. Smagorinsky, and R. F. Strickler 783
+FIGURE 8.7.-The map distributions of the relative humidity on 175th day a t P/P*=O.O74, 0.811, 0.926 and 0.991. Dark shade, 80-100
+percent; medium shade, 20-80 percent; blank area, 0-20 percent.
+3. The distribution of the eddy kinetic energy obtained
+from the present moist general circulation model has two
+maxima; one in the middle latitudes, and the other in the
+Tropics.
+There are various possible reasons why in the middle
+and high latitudes the eddy kinetic energy of the actual
+atmosphere is larger than that obtained from our numer-
+ical integration. Aswe pointed out in the previous
+study [35], the lack of land and sea or mountains in our
+model may be one of the reasons for this discrepancy.
+According to our experience, the increase of the effective
+eddy Reynolds number resulting from further increase of
+resolution also increases the eddy kinetic energy. (Note
+that the horizontal mixing coefficient of the model is
+dependent upon the grid size.)
+The reason the eddy kinetic energy obtained from the
+784 MONTHLY Vol. 93, No. 12
+80 -------- -. -.
+"""
+"""""
+"""
+"""""""----""------"~""""""
+0 1 25 -----""
+I I 1
+1 50 160
+QAYS
+180
+FIGURE 9.1.-The variation of the latitudinal distribution of zonal
+kinetic energy with time. Unit is jouleom.?
+.009 L .5 " 30
+l k
+<" ""-
+"""
+.e
+.
+90 80 70 60 50 40 30 20 10 0
+LATITUDE
+FIGURE 9.2.--The latitude-height distribution of eddy kinetic
+energy in the model atmosphere. Unit is 10-3 joule cm.-2 mb."
+moist model is smaller than that obtained from the dry
+model in middle latitudes may be the difference in the
+degree of baroclinic instability caused by the difference
+in the vertical wind shear. According to the comparison
+between the vertical eddy flux of heat in the moist model
+atmosphere and that in the dry model atmosphere, the
+former is significantly smaller than t.he latter in middle
+latitudes. (See the upper part of fig. 5D4 of the previous
+paper 1351 and the lower part of fig. 12C4 of this paper.)
+This result implies that the release of potential energy in
+the moist model atmosphere is smaller than that in the
+dry model atmosphere in middle latitudes. Therefore,
+the eddy kinetic energy of the former is smaller than that
+of the latter in middle latitudes.
+I20
+EDDY KINETIC ENERGY AT %I MI L N E L
+LATITUDE
+FIGURE 9.3.-The latitudinal distributions of eddy kinetic energy
+at the 5th model level (P/P*=0.5) of both the dry and moist
+general circulation models and that at 500-mb. level of the actual
+atmosphere obtained by Saltzman [30].
+UM"
+5000.0
+1
+FIGURE 9.4.-The latitudinal distributions of source (-V - V+)
+and sink (V F) of kinetic energy in the model atmosphere.
+-I3
+"q
+The tropical maximum of eddy kinetic energy obtained
+from the present study is produced by the release of avail-
+able potential energy generated by the heat released by
+condensation in the Tropics. According to figure 12c4,
+the potential energy is released in the Tropics as well as
+in middle latitudes. Figure 9.4 shows the latitudinal
+distribution of the source (-V V4) and the sink
+(V * F) of kinetic energy (refer to equation 7B4 of the
+previous paper [35]). In the Tropics, the magnitude and
+the distribution of the source term are almost identical
+to those of the sink term. In other words, this figure shows
+that the kinetic energy produced in the Tropics is mostly
+-x -P
+-x -P
+December 1965
+~~~~~ ~ ~~~~~~
+S. Manabe, J. Srnagorinsky, and R. F. Strickler
+dissipated in the Tropics. Since the scale of tropical
+eddies is relatively small, the lifetime of these eddies is
+shorter than of those of the middle latitudes. This may be
+why the tropical eddies dissipate before the energy is
+transported elsewhere. It is rather doubtful that such a
+tropical maximum of eddy kinetic energy does exist in the
+actual atmosphere. According to our speculation, the
+simplified scheme of convection adopted for the present
+study may tend to create too much eddy available poten-
+tial energy of resolvable scale because of the shortcoming
+of the criterion for the onset of convection, whereas in the
+actual atmosphere the heat released by condensation
+creates cumulus-scale convection and the kinetic energy
+of the eddies of this scale quickly dissipates instead of
+producing larger-scale eddies and only occasionally large-
+scale eddies such as hurricanes may be produced. Further
+study of tropical convection and the actual distribution of
+eddies in the Tropics is desirable before It will be possible
+to engage in a thorough discussion of this subject.
+I O . MOISTURE BALANCE
+A. HEMISPHERICMOISTUREBALANCE
+As table 10A shows, the hemispheric means of the rates
+of precipitation and evaporation are about 1 m./yr. and
+coincide very well with the estimate of actual rainfall
+obtained by Meinardus [20] and Budyko 15, 61.
+In our model, the temperature of the earth's surface is
+determined by the condition of thermal equilibrium at the
+earth's surface. Therefore, the rate of evaporation and
+accordingly that of precipitation depend very much upon
+the radiative energy reaching the earth's surface. The
+successful simulation of the hemispheric mean rate of rain-
+fall is the natural consequence of the successful simula-
+tion of the heat regime a t the earth's surface which is dis-
+cussed in section 11.
+B. LATITUDINALDISTRIBUTION O F MOISTUREBALANCE
+In figure 10B1, the latitudinal distributions of precipita-
+tion and evaporation for our model atmosphere are com-
+pared with those for the actual atmosphere estimated by
+Budyko [5]. In the model atmosphere, the rainfall
+exceeds evaporation in the Tropics and in the middle
+latitudes, and the latter exceeds the former in the sub-
+tropics. These features are in excellent qualitative agree-
+ment with the observed features of the tropical rain belt,
+the subtropical desert area, and the rainy region of the
+middle latitudes. Quantitatively, these results are much
+more exaggerated in the model atmosphere than in the
+actual atmosphere. Particularly, the amount of rainfall
+in the Tropics far exceeds the annual mean of the observed,
+TABLE lOA.-Hernispheric water balance (from 148th dav to 187th dav)
+Rate of evaporation ...................................................... 105.9cm./yr.
+Rate of change of water vapor ........................................ ...- -5 cm./yr. Rate of precipitation ..__.._._.......
+~
+.................................... 105.4cm.lyr.
+785
+N 80' 60' 40' 20' 0' 20' 40' 60' 80' S ' ' 0
+LATITUDE
+FIGURE lOB1.-In the upper part of the figure, the latitudinal dis-
+tributions of precipitation and evaporation obtained from the
+model are shown, and in the lower part of the figure, observed
+distributions estimated by Budyko [5] are shown.
+and the width of the rain belt is very narrow. Also, the
+subtropical dry area is located in too low a latitude.
+In order to investigate the latitudinal distribution of
+water balance, figures 10B2 and 10B3 were made. Figure
+10B2. shows the latitudinal distributions of moisture
+transports due to large-scale eddies, meridional circuIa-
+tions, and horizontal subgrid-scale diffusion. The trans-
+ports by large-scale eddies obtained by.Peisoto [27] for
+the actual atmosphere are also plotted in the same fig ure.
+According to this figure and figure 12B3 the excess water
+produced by evaporation in the subtropics is exported to
+the Tropics by the meridional circulation a n d t o t h e
+middle latitudes by large-scale eddies in both the model
+and the actual atmosphere. The magnitude of the south-
+ward transport of water vapor due to the tropical merid-
+ional circulation cell, however, is much larger than that
+obtained by Peixoto [27] for the actual atmosphere because
+the exaggerated subtropical desert and the extremely
+sharp tropical rain belt, which emerged as a result of our
+time-integration, require a large transport of water from
+the subtropics into the Tropics. Figure 10B3 shows the
+latitudinal distributions of various water balance compo-
+nenh2 Note again that the extremely large sink of
+water due to condensation in the Tropics is compensated
+for by the supply of water from meridional circulation.
+It is rather difficult to pin down the exact causes for the
+extremely large rainfall in the Tropics a t the present
+786 MONTHLY WEATHER REVIEW Vol. 93, No. 12
+EDDY I
+-20 I I I I I I I I I
+90 80 70 M M 40 30 20 10 0
+LATITUDE
+FIGUBE 10B2.-The latitudinal distributions of poleward transport
+of water vapor due to the large-scale eddies (EDDY) the merid-
+ionalcirculation (M.C.), andsubgrid-scalediffusion (H.D.). The
+annual mean of the transport by the large-scale transient eddies in
+the actual atmosphere obtained by Peixoto [27] is also plotted.
+-.5
+- 1.0
+LATITUDE
+FIGURE 10B3.-The latitudinal distributions of the rate of change
+of precipitable waterdue to evaporation, precipitation, large-
+scale eddies (EDDY), meridional circulation, andhorizontal
+mixing by subgrid-scale turbulence (H.D.).
+stage of our investigation. We shall, however, list some
+of the possible causes:
+(1) It is well known that the latitude of the tropical
+rain belt varies with season. As a result of this variation,
+t.he observed maximum of the annual mean rainfall could
+be less pronounced than the maximum obtained from
+our model without seasonal variation.
+(2) As we expla,ined in the previous paper, the dis-
+tribution of the vertical mixing coefficient influences the
+eccent,ricity of the meridional circulation cell and accord-
+ingly the efficiency of the moisture transport due to
+meridional circulation. The thinner the planetary bonnd-
+ary layer is, the more efficient is the transport. The
+neglect of vertical mixing of momentum due to moist
+convection could exaggerate the eccentricity and increase
+the supply of water vapor into the Tropics.
+(3) The existence of the free-slip, insulated equatorial
+wall of our model fixes the latitude of maximum con-
+densation and causes a concentration of rainfall next to
+this wall. It is desirable to perform the simulation of
+the seasonal variation by using a model without an
+equatorial wall and then to compare the amount of
+rainfall with t.he observed annual rainfall.
+(4) As figure 12B3 shows, ocean currents transport
+heat away from the tropical region (refer to sec. 12).
+Since this process is missing in the present model, ex-
+cessive evaporation and accordingly excessive rainfall
+may occur in the tropics of the model atmosphere.
+C. LATITUDE-HEIGHTDISTRIBUTION OF MOISTUREBALANCE
+In figure 10Cl the latitude-height distribution of the
+northward transport of water vapor by large-scale eddies
+and that by both the meridional circulation and large-
+scale eddies are compared with the corresponding dis-
+tributions obtained by Peixoto [27] for the actual atmos-
+phere. In both the model atmosphere and the actual
+atmosphere most of the moisture transport is accomplished
+in the lowest 300-mb. layer of the atmosphere and the
+export of water vapor from the subtropics into the
+Tropics has a sharp maximum very near the earth's
+surface. This sharp maximum is caused mainly by the
+meridional circulation rind is much more pronounced in
+our results than in Peixoto's results for the actual at-
+mosphere. The eddy flus of water vapor is mostly
+positive in the troposphere but is negative in the strat-
+osphere where the mixing ratio of water vapor increases
+with increasing latitude.
+The latihde-height distributions of the vertical trans-
+port of water vapor by large-scale eddies, by the meridional
+circulation, and by both of these processes are shown in
+figure 10C2. One interesting feature of our results is
+that, the upward flux of water vapor due to large-scale
+eddies has two maxima-in the Tropics and in the sub-
+,tropics. The tropicaI maximum is caused by large-scale
+eddies created by the release of potential energy in the
+Tropics. As we discussed in section 9, it is highly
+questionable that such large-scale eddies predominate in
+December 1965 S. Manabe, 1. Smagorinsky, and R. F. Strickler
+EDDV TRANSPORT TOTALTRANSPORT
+787
+.30
+2o t 3
+k
+10 =
+P Y
+0
+500 500
+g 700 - 850 - 850 -
+700-
+1000 I I I I I 1000
+90 80 70 60 50 40 30 20 10 0 90 80 70 60 50 40 30 20 10 0
+LATITUDE LATITUOE
+FIGURE lOCl.-Upper part of the figure shows the latitude-height distributions of northward transport of water vapor by the large-scale
+eddies and that by both the large-scale eddies and the meridional circulation for the atmosphere. Lower part of the figure shows
+the corresponding distributions for the actual atmosphere obtained by Peixoto [27]. Unit is 10l2 gm. mb." day".
+the actual tropical atmosphere. Therefore, it may be
+desirable to improve the scheme of simulating moist
+convection in order to eliminate the excessive production
+of large-scale eddies in the Tropics. In order to evaluate
+the relative importance of the meridional circulation and
+the large-scale eddies in transporting the moisture up-
+ward, figure 10C3 was made to show t,he hemispheric
+mean of the vertical transports by these processes of
+the model atmosphere. From this figure, it is clear that
+the meridional circulation is much less important than
+large-scale eddies in transporting moisture upward. The
+same is true for heat transport, .though the meridional
+circulation transports heat downward as figure 5C2 of
+the previous paper [35] shows.
+The effects of large-scale motion described so far and
+those of horizontal diffusion compensate for the net change
+of water vapor caused by evaporation, condensation, and
+convection as shown in figure lOC4. According to this
+figure, the source region and sink region of water vapor
+due to these effects are located in the lower and the upper
+parts of the model troposphere, respectively. They must
+be compensated mainly by the effect of large-scale eddies
+as shown at the bottom of figure IOC2 and in figure 10C3.
+Note the sink region of water at the level of the tropical
+tropopause where the temperature is very low and relative
+humidity is high. As one would expect, there are no
+source or sink regions in the rest of the stratosphere be-
+cause of the lack of moist convection.
+D. MOISTURE BALANCE OF THESTRATOSPHERE
+According to figure 1Oc3, the water vapor is transported
+from the troposphere into the stratosphere mainly by the
+effect of large-scale eddies. As figure 10C2 shows, the
+water vapor whic.h is supplied from the troposphere is
+transported toward low latitudes by both the large-scale
+eddies and subgrid-scale mixing overshadowing the coun-
+teracting effect of the meridional circulation in the low
+latitudes. The water vapor condenses near the tropical
+tropopause where the temperature is low and the humidity
+is high. This condensation is the reason the relative
+humidity is so lorn in the rest of the stratosphere of our
+model. Figure l o l l is a schematic representation of eddy
+transport of water vapor in the stratosphere. In short,
+the large-scale eddies play a dominant role in transporting
+the water vapor into the model stratosphere. Our result
+is quite different from the meridional circulation model
+proposed by Dobson [8] and that proposed by Brewer [21
+for explaining the distribution of various substances in
+the stratosphere.
+At the 34-mb. level (k=1.5), the downward transport
+of mater vapor by the large-scale eddies predominates,
+and the mixing ratio of water vapor at the 9-mb. level
+788 MONTHLYWEATHERREVIEW Vol. 93, No. 12
+,009
+TRANSPORT- M.C. t EDDY -30
+.664
+,926
+90
+.DO9
+,074
+Q n
+I '189
+,336
+,500
+.664
+,926 .El1
+,991
+-m t
+E X
+I- S
+Y
+X
+CI
+10
+0
+LATITUDE
+TRANSPORT - M. C. -30
+TRANSPORT - URGE SCALE EDDY t 3 0
+90 80 70 60 50 40 30 20 10 0
+LATITUDE
+FIGURE lOCZ.-The latitude-height distributions of the vcrtical
+transport of water vapor by the large-scale eddies, by thc merid-
+ional circulation, and by both of these two effects are shown in thc
+lower, middle, and upper part of the figure, respectivcly. Units
+are 1 0 -5 gm. cm.? day".
+,034
+,126
+yp?*
+'
+,259
+,417
+,583
+,741
+,874
+I." ,966
+TRANSPORT OF WATER VAPOR (smm/cm2, day)
+FIGURE lOC3.-Vertical distributions of the hemispheric mean of
+vertical transport of water vapor by the meridional circulation
+(M.C.), by the large-scale eddies (EDDY), and by both of these
+two effects (EDDY + M.C.).
+90 EO 70 60 50 40 30 20 10 0
+LATITUDE
+FIGURE lOC4.-Latitude-height distribution of net source of water
+vapor due to evaporation, condensation, and convection. Units
+are (gm. of water vaporlgm. of &)/day.
+(k= 1) is significantly smaller than that at the 74-mb. level
+(k=2). It is not clear whether this counter-gradient
+transport is due to the truncation error of the interpolation
+o f the mixing ratio, which is performed to compute the
+vertical transport of water vapor, or to the genuine de-
+velopment of an inverse correlation between the absolute
+humidity and vertical motion. A further increase of verti-
+cal resolution is necessary before we can obtain a convinc-
+ing result.
+December 1965
+~~~ ~ ~~
+S. Manabe, J. Srnagorinsky, and R. F. Strickler 789
+WATER BUDGET OF THESTRATOSPHERE
+-Condensation
+(very cold and humid)
+pole equator
+FIGURE 10D.-Schematicrepresentation of watervaportransport
+in the stratosphere.
+11. ENERGY BUDGET OF THE EARTH'S SURFACE
+Figure 11.1 shows the latitudinal distributions of various
+heat balance components a t the earth's surface, i.e., the
+net upward solar radiation, the net upward long-wave
+radiation, and the sum of the turbulent eddy flux of
+sensible heat and of latent heat. The corresponding
+quantities obtained by London [17] for the actual atmos-
+phere are plotted in the same figure. According to our
+comparison, the coincidence between them is excellent.
+In figure 11.2 the latitudinal distributions of both sen-
+sible and latent heat flux from the earth's surface are
+compared with those obtained by Budyko [5] for land,
+sea, and the whole earth. According to this comparison,
+our results lie between his results for sea and for the
+whole earth. Since the relative humidity of the air over
+oceans which coexist with continents should be smaller
+than that of the air over the completely wet earth used
+for our model, these results are reasonable. Using the
+results given in figure 11.2, the latitudinal distribution of
+Bowen's ratio, i.e., the ratio of sensible heat flux to latent
+heat flux a t the surface, was computed and is shown in
+figure 11.3. The distribution of Bowen's ratio for very
+high latitudes is not computed because the latent energy
+flux, which is the denominator, tends to zero, and the
+sensible heat flux,which is the numerator, changes its
+sign in very high latitudes. I:n the same figure, Bowen's
+ratios obtained by Rudyko [5] and Jacobs [l l ] for the ocean
+are added for comparison. The agreement between the
+distribution of Bowen's ratio of the model atmosphere
+with a wet surface and that obtained for the actual ocean
+is satisfactory.
+In short, the energy budget of the earth's surface of our
+model is very similar to the actual budget obtained by
+London [17] and the partition of the turbulent energy
+transport into latent energy flux and sensible heat flux
+is reasonably close to the partition taking place at the
+actual ocean surface because of the assumption of the
+wet surface adopted for our model.
+LY/MIN
+' 3 f l
+FIQURE 11.1.-Latitudinal distributions of net upward solar radia-
+tion (NSRFX), of net upward long-wave radiation (NRLFX),
+and of upward flux of both latent and sensible heat due to turbu-
+lent eddies ((VSHFX) + (VLHFX)). The corresponding dis-
+tributions obtained by London[17]for the actual atmosphere
+are also plotted.
+4) 80 70 60 50 40 30 20 10 0 10 20 30 40 50 60 70 80 4)
+LY/MIN. NORTH LATITUDE SOUTH
+FIGURE 11.2.-Latitudinal distributions of latent and sensible heat
+fluxfrom the earth to the atmosphere. The distributions, which
+were obtained by Budyko [5] for land, sea, and the whole earth,
+are compared with the distributions obtained from our model.
+."
+.4 -
+s
+= .3 -
+c e
+U J
+B
+0 z *2 -
+m
+.l-
+L L 1( 80" MI' 40* 20' 0" 20" 40" MI" 80' 5
+LATITUDE
+FIGURE 11.3.-Latitudinal distributions of Bowen's ratio obtained
+by Budyko [5] and Jacobs [l l ] are compared with that obtained
+from our present results.
+790 MONTHLY Vol. 93, No. 12
+19. HEAT BALANCE
+A. HEMISPHERICHEATBALANCE
+Figure 12A shows the hemispheric mean of heat balance
+of our model atmosphere and that of the actual atmosphere
+obtained by London [17] and Budyko [5]. The agreement
+between the two results is excellent.
+B. LATITUDINALDISTRIBUTION OF HEATBALANCE
+In figure 12B1 the latitudinal distribution of the
+radiative fluxes a t the top of the model atmosphere are
+compared with those obtained by London [17] for the
+actual atmosphere. The agreement between them is
+excellent. The meridional transports of energy expected
+from the radiative imbalance for both dry and moist
+general circulation models are given in figure 12B2.
+The corresponding transports, which were obtained from
+the results of Houghton [9] and London [17], are also
+plotted in the same figure. The transport obtained from
+the moist general circulation model'
+I
+is closer to the
+observed transport than that from the dry model because
+of the improvement in the latitudinal gradient of tem-
+perature described in section 5.
+In the actual earth-atmosphere system, the meridional
+transport of energy required from radiative imbalance
+must be accomplished by the following three processes:
+(1) Northward transport of total energy (=c,T+4
++K) in the atmosphere. 4 is geopotential, and K is total
+kinetic energy per unit mass.
+(2) Northward transport of latent energy in the atmos-
+phere.
+(3) Northward tran,sport of total energy in the oceans.
+Figure 12B3 shows the latitudinal distributions of these
+three transports which are calculated by use of the resulk
+of Houghton [9] and Budyko [5],[SI? The transport of
+J The latitudinal distribution of rainfall is obtained from Budyko [ti].
+NSR
+MODEL ATMOSPHERE
+N L R N S R
+ACTUAL ATMOSPHERE
+N LR
+*""l I .330
+i
+.330 I .324
+I 1 .324 i
+I
+I !
+latent energy (2) is obtained by integrating the difference
+between evaporation and precipitation with respect to
+latitude. The transport of energy by the oceans (3) is
+computed by integrating the thermal imbalance a t the
+earth's surface. A similar computation was performed by
+Bryan 131. In order to perform theseintegrations,Budyko's
+data for the Northern Hemisphere and the Southern
+Hemisphere are averaged. The meridional transport of
+total energy in the atmosphere (1) is calculated as the
+difference between the transport expected from radiative
+imbalance and the net transport due to the two other
+effects (2, 3). The northward transport of latent energy
+which is computed by Peixoto [27] for the Northern
+LY/MIN
+I I I I 4a 30 20 IO 0
+LATITUDE
+FIGURE 12Bl.-Latitudinal distribution of net downward solar
+radiation (SR) and of net upward long-wave radiation (LW R) a t
+the top of the atmosphere.
+14.0
+13.0 HOUGHTON
+12.0
+t A LONDON
+10.0
+r-
++c .120 1 i
+I I I 1
+I I
++c (. 112)
+i I I I
+I NSR SH N S R
+i i I I i
+I
+Unit (\y/rnin.)
+FIGURE 12A.-Hemispheric mean of the heat balance of the model 'FIGURE 12B2.-Latitudinal distributions of meridional transport
+(left) and actual atmosphere (right). The heat balance com- of energy expected from the radiative imbalance of the earth-
+ponents of actual atmosphere are obtained by London [17] and atmosphere system. The results obtained from both dry and
+Budyko [5, 61. NLR=net long-wave radiation [17]. NSR=net moist general circulation models are compared with the corre-
+solar radiation [17]. SH=sensible heat flux [5]. C=heat of sponding distributions obtained by Houghton [91 and London
+condensation [5]. [17] for the actual situation.
+December 1965 S. Manabe, J. Smagorinsky, and R. F. Strickler 791
+Hemisphere is plotted in the same figure and agrees well
+with the corresponding flux estimated above.
+In figure 12B4 the latitudinal distribution of the merid-
+ional transport of total energy (c,T+~+K) and that of
+latent energy in the model atmosphere are shown. The
+energy transport in the ocean is missing because of the
+assumption of a wet land surface on the earth. According
+to this figure, in both the actual and model atmosphere,
+an equatorward transport of latent energy by the merid-
+ional circulation predominates in the low latitudes and
+a poleward transport by the large-scale eddies predom-
+inates in middle latitudes. The magnitude of these trans-
+ports in the model atmosphere, however, is larger than in
+the actual atmosphere. In order to compensste for the
+large southward transport of latent heat, an extremely
+large poleward transport of total energy appears in low
+latit,ltdes. Both of these transports are accomplished
+by the intense meridional circulation which predominates
+in the low latitudes of our model atmosphere. Because
+the northward transport of latent energy is by large-
+scale eddies in middle latitudes? the meridional transport
+of total energy (c,T+c#I+K) in middle latitudes is signs-
+cantly smaller than the net energy transport expected
+from radiative imbalance. In the dry model the merid-
+ional transport of total energy in the atmosphere, however,
+is identical with the net transport which is expected from
+radiative imbalance and is shown in figure 12R2. Figure
+12.0 ,
+LATENTHEAT TRANSPORT
+AOBIAINED BY PEIXOTO
+FIGURE 12B3.-The latitudinal distribution of poleward net energy
+transport of the earth-atmosphere system, which is expected from
+the radiative imbalance, is shown together with the transport of
+total energy (c,T+++K) and that of latent energy in the atmos-
+phere, and the transport of energy by ocean currents. The estimate
+of these transports was made by use of the data obtained by Budyko
+[5], [6] (average of values for both hemispheres) and Houghton [9].
+The meridional transport of latent energy obtained by Peixoto
+[27] is plotted for comparison.
+12B5 shows the comparison between the meridional trans-
+port of sensible heat by large-scale eddies in the moist
+atmosphere and in the dry atmosphere. The former is
+significantly smaller than the latter and iscloser to the
+transport obtained by Starr and White [38] for the actual
+atmosphere. This is why the temperature gradient in
+the middle latitudes obtained from the present model is
+somewhat smaller than that obtained from the dry general
+circulation model. For comparison, the latitudinal dis-
+tribution of the transport of latent energy is shown in the
+lower half of figure 12R5.
+In figure 12B6 the latitudinal distributions of the net
+thermal imbalance of the earth-atmosphere system of the
+model due to radiative transfer and condensation are
+compared with the corresponding imbalance in the actual
+atmosphere estimated by use of the results of Budyko
+[5], IS] and Houghton [9]. One of the characteristic
+features of the present result is the large excess of heating
+in the Tropics and the large deficit in the subtropics.
+Although this feature agrees qualitatively with observa-
+tion, the magnitude of the excess and the deficit are much
+larger than those of the actual atmosphere. This thermal
+10.0
+9.0
+8.0
+1.0 -
+TOTAL ENERGY TRANSPORT
+-2 5.0 -
+4.0 -
+x
+I I
+-1.0
+-5.0
+-6.0
+-1.0
+\
+\
+1
+\
+LATENT HEAT TRANSPORT,:
+\
+\
+\
+t \ \
+'1
+i
+I I I
+FIGURE 12B4.-The net energy transport expected from the radia-
+tive imbalance and the transport of total energy (c,T+qj+K) 1
+and latent energy in the model atmosphere. The flux of latent
+energy is computed by integrating the latitudinal distribution of
+the imbalance of water.
+792 MONTHLY Vol. 9 3 , No. 12
+I) STARR & WHIR S E N S I B L E H E A T
+5t
+X
+FIGURE 12B5.--In the upper part of the figure, the latitudinal
+distributions of the meridional transport of sensible heat by large-
+scale eddies, which are obtained from both dry and moist general
+circulation models, are shown together with that resulting from
+the subgrid-scale mixing (H.D.). Also, that of the sensible heat
+flux obtained by Starr and White [38] for the actual atmosphere
+is plotted for comparison. I n t h e lower part of the figure, the
+meridional transport of latent energy in the model atmosphere
+is compared with the corresponding distribution obtained by
+Peixoto [27] for the actual atmosphere.
+3ooc V HOUGHTON, BUDYKO
+I E
+MOIST 6.C. MMLL \
+m 0
+0
+1 I I I 1 I 60 50 40 30 20 10 0
+LATITUDE
+FIGURE 12B6.--l'he latitudinal distributions of the net thermal
+imbalance caused by the effect of condensation and radiation,
+and the transport of sensible heat from the earth's surface.
+Solid and dashed lines show the results of the moist and dry
+general circulation models, respectively. The corresponding dis-
+t,ribution for the actual atmosphere, which is computed from the
+results of Budyko [5], [6] and Houghton [9], is shown by triangles.
+CONDENSATION
+/ i I
+M.C. I
+"v:"- SENSIBLEHEAT FLUX /\,
+I
+EDDY "-"" / i '
+HORIZONTAL DIFFUSION /\
+I I I """"""
+*.".""".."-~-"-*~~ "*"" ""- RADIATION
+-"" "" I " .""*"C.-
+I I
+I
+I I I
+L
+I I I I I I I I 80 70 60 50 40 30 20 IO
+LATITUDE
+FIGURE 12137."The latitudinal distributions of the rate of temper-
+ature change in the model atmosphere by condensation, radiation,
+sensible heat flux from the earth's surface, the meridional circu-
+lation (M.C.), the large-scale eddies (EDDY), and horizontal
+subgrid-scale mixing (HORIZONTAL DIFFUSION).
+imbalance must be compensated for by the effect of
+large-scale motion. Figure 12B7 shows the latitudinal
+distribution of all the heat balance components obtained
+from the present results. According to this figure, the
+large amount of heat released by condensation in the
+Tropics is mainly compensated for by the cooling caused
+by the meridional circulation. In the subtropics the
+radiative cooling is compensated for by the sensible heat
+flux from the earth's surface and the heating caused by
+the downward branch of the meridional circulation; in
+middle latitudes the radiative cooling is mainly counter-
+acted by the heat of condensation; and in high latitudes it
+is compensated for by the heating caused by the con-
+vergence of heat transport from large-scale eddies and
+heat released by condensation.
+C. LATITUDE-HEIGHTDISTRIBUTION OF HEATBALANCE
+The lower part of figure 12C1 shows the latitude-heighL
+distribution of the rate of temperature change caused by
+convection and condensation obtained from the integra-
+tion of the moist general circulation model. For com-
+December 1965 S. Manabe, J. Smagorinsky, and R. F. Strickler 793
+FIGURE 12Cl.-In the upper part of the figure the latitude-height
+distribution of the rate of the net temperature change in OC./day
+caused by the sensible heat from the earth's surface and the
+moist convective adjustment in the dry general circulation model.
+In the lower part, that caused by the heat of condensation, the
+sensible heat flux from the earth's surface, and the vertical heat
+flux due to convection is shown for the moist model.
+parison the latitude-height distribution of the rate of
+temperature change due to moist convective adjustment
+and vertical mixing obtained from integration of the dry
+model is shown in the upper part of this figure. The
+former has two pronounced maxima; one is located in the
+Tropics, and the other in middle latitudes. On the other
+hand, the latter has only one maximum near the Tropics
+and the intensity of heating decreases monotonically
+with increasing latitude. The height of the tropical
+convective tower of the moist model atmosphere is taller
+than that of the dry model atmosphere. I n the sub-
+tropics, the convective activity of the moist model
+atmosphere is limited to the layer close to the earth's
+surface, whereas that of the dry model atmosphere
+reaches high altitudes. In high latitudes, the temperature
+change due to the heat of condensation in the moist model
+atmosphere is larger than that of t,he dry model atmos-
+phere because of the meridional transport of latent energy
+from middle latitudes. The general features of the
+latitude-height distribution of the rate of radiative
+temperature change for the moist model are very similar
+to those in the previous results. Figure 1.2C2 shows the
+latitude-height distribution of long-wave radiation and of
+solar radiation. Refer to the previous paper [35] and
+the paper by Manabe and Strickler [IS] for a detailed
+discussion of the distribution of the radiative temperature
+change.
+The computed distribution of the net rate of temper-
+ature change due to radiation, convection, and conden-
+sation are compared with a similar distribution obtained
+,991 I I I I I I I I I
+90 80 70 60 50 40 30 20 10 0
+LATITUDE
+.009
+30
+""p 0
+0
+FIGURE 12C2.-The latitude-height distribution of the rate of
+temperature change in "C./day due to solar radiation and that
+due to long-wave radiation are shown in the upper and lower
+part of the figure, respectively.
+by Albrecht [l] for the actual atmosphere in figure 12C3.
+Note the net destabilizing effect of the combination of
+these processes. This destabilizing effect must be com-
+pensated for by the meridional circulation and the large-
+scale eddies. For example, the meridional circulation is
+the major counteracting factor in the subtropics, and the
+large-scale eddies have a stabilizing effect in middle lat-
+itudes. Figure 12c4 shows the latitude-height distri-
+butions of both the northward and upward transport of
+heat due to large-scale eddies. According to the compas-
+ison between this figure and figures 5D3 and 5D4 of the
+previous paper, the magnitudes of both vertical and
+horizontal flux in middle latitudes are significantly smaller
+than those obtained from the dry general circulation
+model. It is noteworthy that in middle latitudes the
+baroclinic activity is less for the moist model than for the
+dry general circulation model. Another feature of interest
+is the maximum vertical eddy flux of heat in the Tropics
+which is caused by the heat of condensation. The result-
+794 MONTHLYWEATHERREVIEW Vol. 93, No. 12,
+- 30
+4 -20 - E
+-
+c = Lo Y
+-10 =
+0
+0991 90" 80' 70" 60' 50" 40" 30" 20" 10" 0" -
+UTITUDE
+d ,074
+.-.
+LATrmOE
+FIQURE 12C3.-The latitude-height distribution of the net rate of
+the change of temperature in OC./day d u e t o radiation, con-
+vection, and condensation for the model atmosphere and the actual
+atmosphere are shown in the upper and lower part of the figure.
+The latter is estimated by Albrecht [I]. Heavy line is observed
+tropopause.
+ant release of potential energy creates a tropical maximum
+of eddy kinetic energy. Refer to section 9 for a further
+discussion of this result.
+13. ANGULARMOMENTUM BALANCE
+In figure 13.1, the latitudinal distributions of the north-
+ward transport of momentum by various processes are
+shown. One of the characteristic feat,ures of this result
+is the large transport of momentum by the meridional
+circulation in low latitudes. This result is consistent with
+the very large transport of water vapor and of heat
+described in sections 10 and 12.
+I n figure 13.2, the latitudinal distribution of the trans-
+port of angular momentum by large-scale eddies obtained
+from the present computation is compared with that obtained
+from our previous computation. The northward trans-
+port in the actual atmosphere, as evaluated by Buch [4]
+and Starr and White [38],is plotted in the same figure.
+.926 4 1 ,991 I
+.. .
+-1
+1 I I I I I 1 0
+FIGURE 12C4.-Latitude-height distributions of the northward
+transport of heat (1017 joule mb-1 day-1) and that of the upward
+transport of heat (joule cm-2 day -1) by the large-scale eddies
+are shown in the upper and lower part, respectively.
+According to this figure, the actual eddy transport lies
+between the results of the dry and moist computations.
+As described in section 12, the heat transport by large-
+scale eddies is also less for the present result than for the
+previous result [35]. In short, the heat of condensation
+decreases the temperature gradient and the vertical wind
+shear in middle latitudes, decreases the eddy kinetic
+energy in middle latitudes, and accordingly decreases the
+northward fluxes of heat and momentum due to large-
+scale eddies. Recently, we performed an integration of
+the dry general circulation model with high resolution
+(N=40). As equation (2B8) of the previous paper [351
+shows, the coefficient of subgrid-scale diffusion of momen-
+tum and heat is proportional to the square of the grid size
+and to the absolute value of the deformation. According
+to our results the effective Reynolds number seems to
+increase with increasing resolution. The transport of
+heat and momentum by the large-scale eddies as well as
+December 1965 S. Manabe, 1. Smagorinsky, and R. F. Strickler 795
+-6.01
+'\ -I
+FIGURE 13.l.-Latitudinal distributions of poleward transport of
+angular momentum by the meridional circulation (M.C.), the
+large-scale eddies (EDDY), and the horizontal subgrid-scale
+mixing (HORIZONTAL DIFFUSION).
+the magnitude of the eddy kinetic energy are much larger
+for the (N=40) experiment than for the (N=20) experi-
+LATITUDE
+mente Smagorinsky and staff members [361 Performed a FIGURE 13.2.-Latitudinal distributions of the poleward transport
+series of forecasting experiments using the present moist of angular momentum by the large-scale eddies in the moist
+general circulation model and concluded that the increase model atmosphere and the dry model atmosphere.
+of resolution from (~~2 0 ) to (~=4 0 ) greatly improved obtained by Buch [41 and Starr and White [381 are also Plotted.
+%he results, especially in regwd to vertical motion and. pre-
+cipitation. It is therefore desirable to perform a numeri-
+cal general circulation experiment using the moist model
+with high resolution (N=40).
+In figure .13.3, the latitudinal distribution of surface
+torque obtained from the present integration is compared
+with that from the previous computation. In the same
+figure, the values of the stress on the actual earth's 6.0-
+surface, which were computed by Priestley [29] for both 5.0-
+winter and summer, are plotted as reference. According
+to this figure, the torque obtained from the present - 3.0-
+integration is smaller than that of the previous study. 4
+2.0-
+Another notable feature in the present result is the syste- -L
+matic shift of the mode of angular momentum exchange
+between the earth and the atmosphere toward the low 2
+latitudes. This result is consistent with the fact that the E -2.0-
+width of the upward-motion branch of the tropical 3 -3.0- WINTER
+meridional circulation cell in the model atmosphere is
+very small.
+DRY G.C. MODEL
+0 SUMMER (AFlER PRIESTLEY1
+-5.0 -
+-6.0 -
+14. CONCLUDING REMARKS 90 I 1 80 70 M I 50 I 40 I 30 I 20 I I 10
+IATITUDE
+model atmosphere the relative humidity is high and rainfall summer situation.
+796 MONTHLY Vol. 93, No. 12
+exceeds evaporation; and in the subtropics the relative
+humidity is low and the evaporation is higher than precipi-
+tation. The excess water vapor thus created in the
+subtropics is exported to the Tropics by the meridional
+circulation and to middle latitudes by the large-scale
+eddies. Generally speaking, the relative humidity de-
+creases with increasing altitude. In the stratosphere of
+our model atmosphere the relative humidity is very low
+except at the tropical tropopause and the mixing ratio of
+water vapor is very small in agreement with the actual
+atmosphere. The hemispheric mean of precipitation ob-
+tained from our computation is 1.06 m./yr. and agrees
+reasonably well with the value of 1 m./yr. estimated by
+Budyko [5] and Meinardus [20] for the actual atmosphere.
+At the top of the model atmosphere the latitudinal dis-
+tribution of the net solar radiation and long-wave radiation
+coincide very well with those estimated by London [17] for
+the actual atmosphere. At the earth’s surface the latitu-
+dinal distribution of the vertical turbulent flux of energy
+as well as that of the radiative fluxes also agrees with the
+results of London [17]. Bowen’s ratio at the wet earth’s
+surface adopted for the model agrees well with that
+obtained for the ocean surface by Budyko [5] and Jacobs
+Dl].
+Quantitatively, there are many features of the computed
+hydrologic cycle which disagree with the observed features.
+Both the rain belt in the Tropics and the dry belt in the
+subtropics are exaggerated too much. As a result, the
+southward transport of water vapor by the meridional
+circulation in the Tropics is extremely large. Generally
+speaking, the relative humidity of the moist layer at the
+earth’s surface is too large. Therefore, the model a t -
+mosphere has a significantly larger amount of precipi-
+table water than the annual mean amount of the actual
+atmosphere.
+Unfortunately, very little is known about the hydrologic
+cycle in the stratosphere because of the difficulty in
+performing routine measurements. In our model, water
+vapor is supplied from the troposphere into the strato-
+sphere mainly by the effectof large-scale eddies. It is
+then transported toward the tropical. tropopause, where
+the temperature is very low and relative humidity is high,
+and condenses. Because of this transport and condensa-
+tion a very dry stratosphere is maintained.
+There are many significant differences between the
+present results and those obtained from the integration
+of the dry general circulation model:
+(1) The intensity of the meridional circulation in the
+Tropics is larger in the present result than in the previous
+result because of the effect. of moist convection in the
+Tropics. Also the width of the upward motion branch of
+the cell is less for the present result. Because of this
+difference the meridional transport of momentum, heat,
+and water vapor by the meridional circulation in the
+Tropics is also very large in the present result,.Also,as
+a consequence of this strong cellwe get a very strong
+subtropical jet stream in the present result.
+(2) In the middle latitudes the poleward transport of
+total energy (c,T+++K) is significantly smaller for the
+moist model than for the dry model because of the meridi-
+onal transport of latent energy in the present model, and
+the latitudinal temperature gradient in t.he troposphere of
+middle latitudes is smaller for the former than for the
+,latter. Therefore, the intensity of the zonal current in
+middle latitudes obtained from the moist model is smaller
+and more realistic.
+(3) In the stratosphere, the latitudinal increase of
+temperature obtained from the present study is somewhat
+larger than that of the previous study. Accordingly, the
+latitude of the maximum zonal current in the stratosphere
+increases significantly with increasing altitude in qualita-
+tive agreement with the features of the actual atmosphere.
+(4) The heat of condensation tends to increase the wave
+number of the vertical motion significantly. Accordingly,
+it also increases the wave number of horizontal motion in
+the troposphere and that of the surface pressure field.
+(5 ) One of the characteristic features of our present
+result is the tropical maximum of the eddy kinetic energy
+caused by the release of eddy available potential energy.
+This available potential energy is created by heat released
+by convective condensation. Therefore, this tropical
+maximum of eddy kinetic energy is missing in the results
+of the dry model. Although this feature seems to be
+highly unrealistic, further study of convection in the
+Tropics is desirable before we will be able to determine how
+unrealistic or realistic this feature is.
+(6) The eddy kinetic energy in middle 1at.itudes is
+significantly smaller for the moist model than for the dry
+model. Consistent with this difference, the northward
+transport of momentum and heat due to large-scale
+eddies is smaller for the former than for the latter.
+As we mentioned earlier (sec. 13), the results ob-
+tained from the dry model wit,h high resolut’ion (N=40)
+are quite different from those obtained from the dry model
+with the resolution adopted for the present study (N=20).
+Moreover, the release. of heat of condensation tends
+to decrease the characterist,ic scale of motion, as we pointed
+out earlier. Accordingly, the moist model requires higher
+resolution than the, dry model. An examination of the
+maps of relative humidity and those of vertical velocity
+suggests that me need higher resolution to properly.repre-
+sent these fields. Therefore, the present result with a
+relatively coarse resolut,ion may be regarded as a pre-
+liminary result before me perform the integration of the
+model with higher resolution.
+Another shortcoming of the model is the existence of a
+free-slip insulated wall at the equator. This may be part
+of the reason me get an exaggerated tropical rain belt. I t
+is planned to perform an integrat,ion by use of a model
+without a tropical mall.
+December 1965 S. Manabe, J. Smagorinsky, and R. F. Strickler 797
+As mentioned in the introduction, we computed the rate
+of the temperature change due to radiation using the
+climatological distribut,ion of water vapor and clouds in-
+stead of the distribution obtained from the prognostic
+equation of water vapor. In order to study the complete
+interaction among the radiative transfer, the hydrologic
+cycle, the photochemistry of ozone, and the large-scale
+motion, it is necessary to eliminate this constraint and
+to calculate the radiative transfer based upon the distribu-
+tion of water vapor and ozone obtained from our model
+itself.
+APPENDIX-NON-CONVECTIVECONDENSATION
+(ITERATIVEMETHOD)
+As an example, we shall describe the iteration method
+used in computing the non-convective condensation at
+constant pressure. In our model the relative humidity h
+is defined as,
+h=r/r, (A-1)
+Linearizing equation (3.3), and replacing 6r and 6T by Ar
+and AT, respectively, we find the required change in r is
+approximately:
+Ar=r,(l-h)+ - AT
+(3
+where (dr,/bT), denotes the differentiation Gf r , wvith re-
+spect to T at constant pressure. Again replaccrig. .@r
+and 8T by Ar and AT, equation (3.4) may be written as
+AT=-L Ar
+C P
+Solving (A-2) and (A-3) simultaneously, we get
+(A-3)
+(A-4)
+ACKNOWLEDGMENT
+The authors are very grateful for the assist,ance and cooperation
+of many dedicated and conscientious people who made this research
+possible.
+We wish especially to thank Mr. J. Leith Holloway who very
+capably supervised most of the programing effort of this Laboratory.
+We are also grateful t.0 him for a number of useful suggestions
+which contributed to the analysis and understanding of t,he results.
+We are indebted to Mr. Roderick D. Graham who, having tested a
+preliminary primitive-equations moist model [34], was able to point
+out a t t h e beginning certain difficulties that we should expect to
+encounter.
+We are grateful to Dr. Kurt Spielberg of the Mathematics and
+Application Branch of IBM Corporation for his participation in the
+planning and writing of the original machine-language STRETCH
+computer program for the moist model.
+I n addition to Mr. Holloway and Mr. Graham we wish to acknowl-
+edge the substantial contribution of the following present or former
+members of this Laboratory: Drs. Kirk Bryan, Yoshio Kurihara,
+and Kikuro Miyakoda for their useful ideas which contributed
+greatly t o the course of the research; Mr. Howard H. Engelbrecht
+and his very capable staff for efficiently running the programs on the
+IBM STRETCH computer; Mrs. C. J. Hiland and Mrs. E. C.
+Arnold for writing the extensive diagnostic programs for the inter-
+pretation of the results; Mrs. Lou Ann Sangster for her very helpful
+assistance with the radiation codes; Mrs. Marylin Varnadore for
+efficiently making a great number of hand computations and for
+her help in analyzing the results; and Mrs. J. A. Snyder and Mr. E.
+W. Rayfield who assisted in the preparation of the manuscript and
+the figures, respectively.
+REFERENCES
+1. F. Albrecht, “Untersuchungen uber den Wiirmehaushalt der
+Erdatmosphiire and seine thermodynamische Bedeutung,”
+Berichte des Deutschen Wetterdienstes in der U.S. Zone, vol.
+17, 1950,70 pp.
+2. A. W. Brewer, “Evidence for a World Circulation Provided by
+the Measurements of Helium and Water Vapor Distribution
+in the Stratosphere,” Quarterly Journal of the Royal Meteoro-
+logical Society, vol. 75, No. 326, Oct. 1949, pp. 351-363.
+3. K. Bryan, “Measurements of Meridional Heat Transport by
+Ocean Currents,” Journal of Geophysical Research, vol. 67,
+NO. 9, Aug. 1962, pp. 3403-3414.
+4. H. S. Buch, “Hemispheric Wind Conditions During the Year
+1950.” Final Report, Part 2, under Contract No. AF 19-122-
+153, General Circulation Project, Department of Meteorology,
+Massachusetts Institute of Technology, 1954, 126 pp.
+5. M. I. Budyko, “Atlas Teplovogo Balansa Zemnogo Shara,”
+Mezhduvedomstvennyi Geofizicheskii Komitet pri Prizidium,
+AkademiG Nauk SSSR, GlavnaG GeofizicheskaG Observa-
+hrZi imennii A. E. Voeikova, Rezul’taty, 1964.
+6. M. I. Budyko, Teplovoi Balans Zemnoi Poverkhnosti, Gidro-
+meteorologicheskoe izdatel’stvo, Leningrad, 1956,255 pp.
+7. J. G. Charney and A. Eliassen, “On the Growth of the Hurricane
+Depression,” Journal of the Atmospheric Sciences, vol. 21,
+No. 1, Jan. 1964, pp. 68-75.
+8. G. M. B. Dobson, “Origin and Distribution of the Polyatomic
+Molecules in the Atmosphere,” Proceedings of the Royal
+Society, Series A, vol. 236, No. 1205, Aug. 2, 1956, pp. 187-193.
+9. H. G. Houghton, “On the Annual Heat Balance of the Northern
+Hemisphere,” Journal of Meteorology, vol. 11, NO. 1, Jan.
+10. J. T. Houghton, “Absorption in the Stratosphere by Some
+Water-Vapor Lines in the v 2 Band,” Quarterly Journal of the
+Royal Meteorological Society, vol. 89, 1963, pp. 332-338.
+11. W. C. Jacobs, “The Energy Exchange Between the Sea and
+Atmosphere and Some of Its Consequences,” Bulletin of the
+Scripps Institution of Oceanography, vol. 6, No. 2,1951, PP.
+1954, pp. 1-9.
+The approximate value of (&,/dT), is computed by using
+the definition of T , and the Clausius-Clapepon equation
+(A-5)
+where R* is the gas constant for water vapor, and e , is
+the saturation vapor pressure.
+(r+ Ar) and (T+ AT) are then put into equations (A-1)
+and (A-4) to obtain higher order increments AT and Ar.
+This cycle is repeated until h is sufficiently close t,o 1
+(100 percent). The process converges very rapidly, usu-
+ally requiring only one or two steps to bring h within 1
+percent of saturation.
+The 6r and 85” of equation (3.3) are.
+6r=Ar’+Ar2f . . . +Arn
+~T=AT+AT~+ . . . +ATn (-4-6)
+where Ar” and ATn denote the value of Ar and AT at the
+n t h 27-122.
+7913 MONTHLY WE ATHERREVIEW Vol. 9 3 , No. 12
+12. A. Kasahara, “A Numerical Experiment on the Development of
+a Tropical Cyclone,’’ Journal o j Meteorology, vol. 18, NO. 3,
+June 1961, pp. 259-282.
+13. A. Kochanski, “Cross Sections of the Mean Zonal Flow and
+Temperature Along 80” W.,” Journal of Meteorology, vol.
+12, No. 2, Apr. 1955, pp. 95-106.
+14. H. L. Kuo, “On Formation and Intensification of Tropical
+Cyclones Through Latent Heat Release by Cumulus Convec-
+tion,” Journal of the Atmospheric Sciences, vol. 22, No. 1, 1965,
+15. C. E. Leith, “Convection in a Six-Level Model Atmosphere,”
+Contract W-7405-eng-48, Lawrence Radiation Laboratory,
+University of California, Livermore, Calif., 1965.
+16. D. K. Lilly, “On the Numerical Simulation of Buoyant Con-
+vection,” Tellus, vol. 14, No. 2, May 1962, pp. 148-172.
+17, J. London, “A Study of the Atmospheric Heat Balance,”
+Final Report on Contract AF 19(122)-165 (AFCRC-TR-57-
+287), Department of Meteorology and Oceanography,
+New York University, 1957, 99 pp.
+18. S. Manabe and R. F. Strickler, “On the Thermal Equilibrium
+of the Atmosphere with a Convective Adjustment,” Journal
+of the Atmospheric Sciences, vol. 21, No. 4, July 1964, pp.
+19. H. J. Mastenbrook, “Frost-Point Hygrometer Measurements
+in the Stratosphere and the Problem of Moisture Contami-
+nation,” Humidity and Moisture (editor-in-chief A. WexIer) ,
+vol. 2 Applications (edited by E. J . Amdur), Reinhold Pub-
+lishing Gorp., New York, 1963, pp. 480-485.
+20. W. Meinardus, “Eine neue Niederschlagkarte der Erde,”
+Petermann’s Geographische Mitteilungen, vol. 80, 1934, pp. 1-4.
+21. R. J. Murgatroyd, “Some Recent Measurements by Aircraft
+of Humidity up to 50,000 feet in the Tropics and Their
+Relationship to Meridional Circulation,” Proceedings of the
+Symposium on Atmospheric: Ozone, Oxford, IUGG Monograph
+NO. 3, Paris, 1959, 30 pp.
+22. Y. Ogura, “Frictionally Controlled, Thermally Driven Circula-
+tions in a Circular Vortex with Application to Tropical
+Cyclones,” Journal of the Atmospheric Sciences, vol. 21, NO. 6,
+Nov. 1964, pp.’610-621.
+23. Y . Ogura and 5 . G. Charney, “A Numerical Model of Thermal
+Convection in the Atmosphere,,’ Proceedings of the Inter-
+national Symposium on Numerical Weather Prediction, Tokyo,
+1960, Meteorological Society of Japan, Tokyo, 1962, pp.
+24. A. H. Oort, “On the Energetics of the Mean and Eddy Circula-
+tions in the Lower Stratosphere,” Tellus, vol. 16, No. 4, 1964,
+25. K. Ooyama, “A Dynamic Model for the Study of Tropical
+Cyclone Developments,” Department of Meteorology and
+Oceanography, New York University, 1963, 26 pp.
+26. J. P. Peixoto, “Hemispheric Temperature Conditions During
+pp. 40-63.
+361-385.
+431-452.
+pp. 309-327.
+the Year 1950,” Scientific Report No. 4, Contract AF 19
+(604)-2242, Department of Meteorology, Massachusetts
+Institute of Technology, 1960, 142 pp.
+27. J. P. Peixoto, “Hemispheric Humidity Conditions During the
+Year 1950,” Scientijic Report No. 3, Contract AF 19(604)-
+6108, Department of Meteorology, Massachusetts Institute
+of Technology, 1958, 211 pp.
+28. N. A. Phillips, “Geostrophic Motion,” Reviews of Geophysics,
+vol. 1, No. 2, May 1963, pp. 123-176.
+29. C. H. B. Priestley, “A Survey of the Stress Between the Ocean
+and Atmosphere,” Australian Journal of Scienli$c Research,
+series A, vol. 4, No. 3, Sept. 1951, pp, 315-328.
+30. B. Saltzman, “Spectral Statistics of the Wind at 500 mb,”
+J O U ~Q ~ of the Atmospheric Sciences, vol. 19, No. 2, Mar.
+1962, pp. 195406.
+31. J. Smagorinsky and G. 0. Collins, “On the Numerical Pre-
+diction of Precipitation,” Monthly Weather Review, vol. 83,
+No. 3, Mar. 1955, pp. 53-68.
+32. J. Smagorinsky, “On the Inclusion of Moist Adiabatic Proc-
+esses in Numerical Prediction Models,” Berichte des Deut-
+schen Wetlerdienstes, Band 5, Nr. 38,1956, pp. 82-90.
+33. J. Smagorinsky, “On the Dynamical Prediction of Large-
+Scale Condensation by Numerical Methods,” “Physics of
+Precipitation”, Geophysical Monographs, No. 5, American
+Geophysical Union, 1960, pp. 71-78.
+34. J. Smagorinsky, “A Primitive Equation Model Including
+Condensation Processes,” Proceedings of the lnternational
+Symposium on Numerical Weather Prediction in Tokyo, 1980,
+Meteorological Society of Japan, Mar. 1962, p. 555.
+35. J. Smagorinsky, S. Manabe, and J. L. Holloway, “Numericd
+Results From a Nine-Level General Circulation Model of
+the Atmosphere,” Monthly Weather Review, vol. 93, No. 12,
+Dec. 1965, pp. 727-768.
+36. J . Smagorinsky and Staff Members, “Prediction Experiments
+with a General Circulation Model,” Proceedings of the Inter-
+national Sgmposium on Dynamics of Large-Scale Processes in
+the Atmosphere (I A M A P I WMO), Moscow, USSR, 1965.
+37. Staff Members of Tokyo University, “The Quantitative Fore-
+cast of Precipitation with the Numerical Prediction Method,”
+Journal of Meteorological Societ4 of Japan, Series 2, vol. 33,
+38. V. P. Starr and R. M. White, “Balance Requirements of the
+General Circulation,” Final Report, Part I, Contract AF
+19(122)-153, Department of Meteorology, Mmsachusetts
+Institute of Technology, 1954, pp. 186-242.
+39. K. Telegadas and J. London, “A Physical Model of the Northern
+Hemisphere Troposphere for Winter and Summer,” Scien-
+tific Report No. I, Contract AF 19(122)-165, Research Di-
+vision, College of Engineering, New York University, 1954,
+55 PP.
+NO. 5, 1955, pp. 25-36.
+[Received August 16, 1965; rewised October 28, 19651

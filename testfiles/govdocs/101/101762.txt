@@ -1,0 +1,113 @@
+representations of sentences.
+    Introduction of compound terms also complicates
+the task of discovery of various semantic relationships
+among them, including synonymy and subsumption. For
+example, the term natural language can he considered, in
+certain domains at least, to subsume any term denoting a
+specific human language, such as English. Therefore, a
+query containing the former may be expected to retrieve
+documents containing the latter. The same can he said
+about language and English, unless language is in fact a
+part of the compound term programming language in
+which case the association language - Fortran is
+appropriate. This is a problem because (a) it is a standard
+practice to include both simple and compound terms in
+document representation, and (1,) term associations have
+thus far been computed primarily at word level (includ-
+ing fixed phrases) and therefore care must he taken when
+such associations are used in term matching. This may
+prove particularly troublesome for systems that attempt
+term clustering in order to create "meta-terms" to he used
+in document representation.
+    The system presented here computes term associa-
+tions from text at word and fixed phrase level and then
+uses these associations in query expansion. A fairly
+primitive filter is employed to separate synonymy and
+subsumption relationships from others including anto-
+nymy and complementation, some of which are strongly
+domain-dependent. This process has led to an increased
+retrieval precision in experiments with both ad-hoc and
+routing queries for IREC-1 and ThEC-2 experiments.
+However, the actual improvement levels can vary sub-
+stantially hetween different databases, types of runs (ad-
+hoc vs. routing), as well as the degree of prior processing
+of the queries. We continue to study more advanced
+clustering methods along with the changes in interpreta-
+tion of resulting associations, as signaled in the previous
+paragraph.
+    In the remainder of this paper we discuss particu-
+lars of the present system and some of the observations
+made while processing TREC-2 data. The above coin-
+ments will provide the background for situating our
+present effort and the state-of-the-art with respect to
+where we should he in the future.
+
+
+OVERALL DESIGN
+    Our information retrieval system consists of a trad-
+itional statistical backbone (NIST's PRISE system; Har-
+man and Candela, 1989) auginented with various natural
+language processing components that assist the system in
+database processing (steiming, indexing, word and
+phrase clustering, selectional restrictions), and translate a
+user's information request into an effective query. This
+design is a careful compromise hetween purely statistical
+non-linguistic approaches and those requiring rather
+
+
+                                   124
+
+accomplished (and expensive) semantic analysis of data,
+often referred to as `conceptual retrieval'.
+    In our system the database text is first processed
+with a fast syntactic parser. Subsequendy certain types of
+phrases are extracted from the parse trees and used as
+compound indexing terms in addition to single-word
+terms. The extracted phrases are statistically analyzed as
+syntactic contexts in order to discover a variety of simi-
+larity links hetween smaller subphrases and words occur-
+ring in them. A further filtering process maps these simi-
+larity links onto semantic relations ~eneralization, spe-
+cialization, synonymy, etc.) after which they are used to
+transform a user's request into a search query.
+    The user's natural language request is also parsed,
+and all indexing terms occurring in it are identilied. Cer-
+tain highly ambiguous, usually single-word terms may he
+dropped, provided that they also occur as elements in
+some compound terms. For example, "natural" is deleted
+from a query already containing "natural language"
+because "natural" occurs in many unrelated contexts:
+"natural  numher",  "natural  logarithin",  "natural
+approach", etc. At the same time, other terms may he
+added, namely those which are linked to some query
+term through admissible similarity relations. For exam-
+ple, "unlawful activity" is added to a query ~EC topic
+055) containing the compound term "illegal activity via
+a synonymy link hetween "illegal" and "unlawful".
+    One of the striking observations made during the
+course of ThEC-2 was to note that removing low-quality
+terms from the queries is at least as important (and often
+more so) as adding synonyms and specializations. In
+some instances (e.g., routing runs) low-quality terms had
+to he removed (or inhibited) before sin:ular terms could
+he added to the query or else the effect of query expan-
+sion was all but drowned out by the increased noise.'
+    Mter the final query is constructed, the database
+search follows, and a ranked list of documents is
+returned. It should he noted that all the processing steps,
+those performed by the backbone system, and those per-
+formed by the natural language processing components,
+are fully automated, and no human intervention or
+manual encoding is required.
+
+
+FAST PARSING WITH TTP PARSER
+    TIP Cragged Text Parser) is based on the Linguis-
+tic String Grammar developed by Sager (1981). The
+parser currendy encompasses some 400 grammar pro-
+ductions, but it is by no means complete. The parser's
+output is a regularized parse tree representation of each
+
+    `We would like to thank Donna Hannan for tunling our attention
+to the importance of term weighting achemes, including term deletion.
+

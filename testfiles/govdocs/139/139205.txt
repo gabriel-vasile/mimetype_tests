@@ -1,0 +1,4530 @@
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.*;
+import java.awt.image.*;
+import java.util.*;
+import java.util.Properties;
+import java.io.*;
+import java.lang.*;
+import java.lang.reflect.*;
+import java.math.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.border.*;
+import javax.swing.text.*;
+
+import ij.*;
+import ij.plugin.filter.PlugInFilter;
+import ij.plugin.PlugIn;
+import ij.gui.*;
+import ij.process.*;
+import ij.measure.*;
+import ij.io.*;
+
+/*******************************************************************************
+** Straighten.java
+** ===============
+Eva Kocsis, November 2000
+BEPS/ORS/OD/NIH
+
+Straigths filamentous molecules. The user selects a set of nodes by mouse. 
+Non-uniform cubic Spline is fitted to these points, the filament is straigtened 
+along it. The width  of the filament can be changed interactively. The positions
+of nodes can be refined both interactively, and automatically.
+Diffraction pattern of the straightened filament is calculted. In case of 
+helical filaments the phase difference of the symmetrical points along the layer
+lines can be determined, too.
+
+August, 2002 - EK: 
+The option of reading in a stack is added. The very first image of the stack 
+appears in the straightening window. The user can do the straghtening on that
+image. When (s)he gets the final positions of nodes, the program automatically 
+fits the same nodes to each image in the stack, straighten them and creates a 
+new stack having all the straightened filaments in it.
+*******************************************************************************/
+
+public class Straighten_ implements PlugIn
+{  
+   public void run(String arg)
+   {
+//   System.out.print(System.getProperty("java.version"));
+      if (System.getProperty("java.version").startsWith("1.1")) {
+          IJ.showMessage("Straighten", "This plugin requires Java 2 (e.g. JDK 1.3).");
+          return;
+      }
+      ImagePlus imp1 = WindowManager.getCurrentImage();
+      if (imp1==null)
+      	{IJ.noImage(); return;}
+      ImageProcessor ip = null;
+      ImageStack stack = imp1.getStack();
+      if (imp1.getStackSize() == 1)
+      	ip = imp1.getProcessor();
+      else
+        ip = stack.getProcessor(1);
+      if (!(ip instanceof ByteProcessor) && !(ip instanceof FloatProcessor))  // (wsr)
+      	{IJ.error("8-, or 32-bit image required"); return;}
+      ip.setRoi(null);
+      ip = ip.crop(); // clone pixel data
+      String winTitle = "Straighten: "+ imp1.getTitle();
+      ImagePlus imp2 = new ImagePlus(winTitle, ip);
+      SplineImageCanvas sc = new SplineImageCanvas(imp2);
+      SplineWindow splineWin = new SplineWindow(imp2, sc, 21, stack);
+   }
+   
+     void showAbout() 
+     {	IJ.showMessage("About Straighten_...",
+            "This program is used for straightening filamentous particles. \n" +
+            "The user selects a set of nodes by mouse. \n" +
+            "Non-uniform cubic Spline is fitted to these points,\n" +
+            " the filament is straigtened along it. \n" +
+            "The width of the filament can be changed interactively.\n\n" +
+            "The algorithm is described in 'Kocsis, E., Trus, B.L., Steer, C.J., \n" +
+            "Bisher, M.E. and Steven, A.C (1991) J. Struct. Biol. 107, 6-14. \n\n"+
+            "Written by Eva Kocsis, NIH  <kocsise@mail.nih.gov> \n"+
+            "The FFT algorithm used here is written by M.J. McAuliffe & W. Gandler, NIH"
+	   );
+      }  
+}
+
+//==========================================================================================
+/** This class is an extended ImageWindow that displays images for Straightening. */
+class SplineWindow extends ImageWindow implements ActionListener, DocumentListener
+{  public SplineWindow(ImagePlus imp, SplineImageCanvas sc, int width, ImageStack stack)
+   {  super(imp, sc);
+      this.spIc = sc;
+      this.imp = imp;
+      straight = spIc.getHasParent();
+      filWidth = Integer.toString(width);
+      this.stack = stack;
+      stackSize = stack.getSize();
+      addPanel1();
+      addPanel2(stackSize);
+      addPanel3();
+      addPanel5();
+      addBottomPanel();
+      graphDial = new graphicsDialog(straight);
+      strOptDial = new strOptDialog(spIc);
+      nodeDial = new nodesDialog(spIc);
+      curvDial = new curvDialog(spIc);
+      pack();  
+   }
+   public void actionPerformed(ActionEvent evt)
+   {  Object source = evt.getSource();
+      if (source == graphButton)
+         graphDial.show();      
+      else
+      if (source == strOptButton)
+         strOptDial.show(); 
+      else
+      if (source == strButton)
+      {  spIc.doStraight(0); 
+         if (stackSize > 1)
+            stackButton.setEnabled(true);
+      }
+      else
+      if (source == resetButton)
+         spIc.reSet(); 
+      else
+      if (source == newButton)
+         spIc.deleteNodes();  
+      else
+      if (source == stackButton)
+         spIc.createStack(stack);    
+      else
+      if (source == insButton)
+         spIc.insertMode(true);      
+      else
+      if (source == delButton)
+         spIc.insertMode(false);      
+      else
+      if (source == nodesButton)
+         nodeDial.show(); 
+      else
+      if (source == curvButton)
+         curvDial.show(); 
+      else
+      if (source == listNodeButton)
+         spIc.listNodes();
+      else
+      if  (source == autRefButton)
+         spIc.autNodeRef();  
+      else
+      if (source == diffButton)
+         spIc.calcDiffPatt();
+      else
+      if (source == llfiltButton)
+         spIc.llFilter();
+      else
+      if (source == winfiltButton)
+         spIc.winFilter();
+   }
+   public void insertUpdate(DocumentEvent e)
+   {  int w = Integer.parseInt(tF.getText().trim());
+      spIc.setWidth(w);
+   }
+   public void removeUpdate(DocumentEvent e)
+   {  if (tF.getText().trim().equals(""))
+      {
+      }
+      else
+      {  int w = Integer.parseInt(tF.getText().trim());
+         spIc.setWidth(w);
+      }
+   }
+   public void changedUpdate(DocumentEvent e)
+   {
+   } 
+
+   void addPanel1() 
+   {  Panel panel = new Panel();
+
+      insButton = new JRadioButton("Insert");
+      insButton.addActionListener(this);
+      panel.add(insButton);
+      group.add(insButton);
+      delButton = new JRadioButton("Delete");
+      delButton.addActionListener(this);
+      panel.add(delButton);
+      group.add(delButton);
+      insButton.setSelected(true);
+      graphButton = new Button("Graphics...");
+      graphButton.addActionListener(this);
+      graphButton.setEnabled(true);
+      panel.add(graphButton);
+      if (!straight)
+      {  strOptButton = new Button("Panel options for straightened image...");
+      	 strOptButton.addActionListener(this);
+      	 strOptButton.setEnabled(true);
+      	 panel.add(strOptButton);
+      }
+      add(panel);
+   }
+   void addPanel2(int stackSize) 
+   {  Panel panel = new Panel();
+      panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+  
+      strButton.addActionListener(this);
+      strButton.setEnabled(false);
+      panel.add(strButton);
+      resetButton.addActionListener(this);
+      resetButton.setEnabled(false);
+      panel.add(resetButton);
+      if (!straight)
+      {  newButton.addActionListener(this);
+         newButton.setEnabled(false);
+         panel.add(newButton);
+	 if (stackSize > 1)
+	 {  stackButton.addActionListener(this);
+            stackButton.setEnabled(false);
+            panel.add(stackButton);
+	 }
+      }
+
+      add(panel);
+   }
+   void addPanel3() 
+   {  Panel panel = new Panel();
+      panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+      if (straight)
+      {  autRefButton = new Button("Automatic Node Refinement");
+         autRefButton.addActionListener(this);
+         autRefButton.setEnabled(true);
+         panel.add(autRefButton);
+      }
+      diffButton = new Button("Diffraction Pattern");
+      diffButton.addActionListener(this);
+      diffButton.setEnabled(true);
+      panel.add(diffButton);
+      winfiltButton = new Button("Window Filter");
+      winfiltButton.addActionListener(this);
+      winfiltButton.setEnabled(true);
+      panel.add(winfiltButton);
+      llfiltButton = new Button("Layer Line Filter");
+      llfiltButton.addActionListener(this);
+      llfiltButton.setEnabled(true);
+      panel.add(llfiltButton);
+      add(panel);
+   }
+   void addPanel4() 
+   {  Panel panel = new Panel();
+      panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+      listNodeButton = new Button("List Nodes");
+      listNodeButton.setEnabled(true);
+      listNodeButton.addActionListener(this);
+      panel.add(listNodeButton);
+
+      add(panel);
+   }
+   void addPanel5() 
+   {  Panel panel = new Panel();
+      panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+  
+      nodesButton = new Button(" Nodes... ");
+      nodesButton.addActionListener(this);
+      nodesButton.setEnabled(true);
+      panel.add(nodesButton);
+      if (!straight)
+      {  curvButton = new Button(" Curvature... ");
+         curvButton.addActionListener(this);
+         curvButton.setEnabled(true);
+         panel.add(curvButton);
+      }
+
+      add(panel);
+   }
+  
+   void addBottomPanel()
+   {  Panel p = new Panel();
+      GridBagLayout gbl = new GridBagLayout();
+      p.setLayout(gbl);
+      
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.fill = GridBagConstraints.NONE;
+      gbc.gridheight = 1;
+      gbc.weightx = 100;
+      gbc.weighty = 100;
+      
+      JLabel labelTxt1 = new JLabel("Width of Filament/Wide Line: ");
+      labelTxt1.setForeground(Color.black);
+      gbc.anchor = GridBagConstraints.EAST;
+      gbc.gridx = 0;
+      gbc.gridy = 0;
+      gbc.gridwidth = 1;
+      p.add(labelTxt1, gbc);
+      
+      tF = new JTextField(filWidth, 4);
+      tF.getDocument().addDocumentListener(this);
+      gbc.anchor = GridBagConstraints.EAST;
+      gbc.gridx = 1;
+      gbc.gridy = 0;
+      gbc.gridwidth = 1;
+      p.add(tF, gbc);
+      
+      JLabel labelTxt2 = new JLabel("  pixels ");
+      labelTxt2.setForeground(Color.black);
+      gbc.anchor = GridBagConstraints.WEST;
+      gbc.gridx = 2;
+      gbc.gridy = 0;
+      gbc.gridwidth = 2;
+      p.add(labelTxt2, gbc);
+      add(p);
+   }
+   public void changeButton(boolean val)
+   {  strButton.setEnabled(val);
+      resetButton.setEnabled(val);
+      if (!straight)
+         newButton.setEnabled(val);
+   }
+
+   private Button nodesButton, curvButton, graphButton, strOptButton;
+   private Button strButton = new Button("Straighten");
+   private Button newButton = new Button("New Curve");
+   private Button stackButton = new Button("Stack");
+   private Button resetButton = new Button("Reset");
+   private Button listNodeButton;
+   private Button diffButton, autRefButton, winfiltButton, llfiltButton;
+   private JRadioButton insButton, delButton;
+   private ButtonGroup group = new ButtonGroup();
+   private JTextField tF;
+   private String filWidth = "21";
+   private SplineImageCanvas spIc;
+   private ImagePlus imp;
+   private ImageStack stack = null;
+   private int stackSize;
+   private boolean straight = false;
+   private graphicsDialog graphDial;
+   private strOptDialog strOptDial;
+   private nodesDialog nodeDial;
+   private curvDialog curvDial;
+   private static final int MAXNPOINTS = 500;
+}
+//==========================================================================================
+class graphicsDialog extends JFrame implements ActionListener, DocumentListener
+{  public graphicsDialog(boolean str)
+   {  addWindowListener(new WindowAdapter()
+         {  public void windowActivated(WindowEvent e)
+            {  setSelections();
+            }
+         });
+      setTitle(" Graphics ");
+      setSize(560,400);
+      Container contentPane = getContentPane();
+      JPanel backPanel = new JPanel();
+      GridBagLayout gbl = new GridBagLayout();
+      backPanel.setLayout(gbl);
+      
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.fill = GridBagConstraints.HORIZONTAL;
+      gbc.weightx = 100;
+      gbc.weighty = 100;
+
+     // backPanel.setLayout(new GridLayout(2,0));
+      Label trlCLabel = makeLabel("Tranclucency :");
+      Label trlWLabel = makeLabel("Tranclucency :");
+      JPanel panel1 = new JPanel();
+      JPanel panel2 = new JPanel();
+      panel1.setBorder(BorderFactory.createTitledBorder(
+                       BorderFactory.createMatteBorder(2,2,2,2,Color.gray),
+                       " Center Line ", TitledBorder.CENTER, TitledBorder.TOP, 
+                       new Font("Monaco Regular", Font.BOLD, 12), Color.black));
+      panel2.setBorder(BorderFactory.createTitledBorder(
+                       BorderFactory.createMatteBorder(2,2,2,2,Color.gray),
+                       " Wide Line ", TitledBorder.CENTER, TitledBorder.TOP, 
+                       new Font("Monaco Regular", Font.BOLD, 12), Color.black));
+      panel1.setLayout(new GridLayout(3,0));
+      panel2.setLayout(new GridLayout(3,0));
+      JPanel panel1a = new JPanel();
+      JPanel panel1b = new JPanel();
+      JPanel panel1c = new JPanel();
+      JPanel panel2a = new JPanel();
+      JPanel panel2b = new JPanel();
+      JPanel panel2c = new JPanel();
+      panel1a.setLayout(new GridLayout(0,8));
+      panel1a.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+      panel1b.setLayout(new GridLayout(0,1));
+      panel1b.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+      panel1c.setLayout(new GridLayout(0,7));
+      panel1c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+      panel2a.setLayout(new GridLayout(0,8));
+      panel2a.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+      panel2b.setLayout(new GridLayout(0,1));
+      panel2b.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+      panel2c.setLayout(new GridLayout(0,7));
+      panel2c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+      centerYellow  = new JRadioButton(" yellow ");
+      addButtonPanel(centerYellow, panel1a, group1a);
+      centerOrange  = new JRadioButton(" orange ");
+      addButtonPanel(centerOrange, panel1a, group1a);
+      centerRed     = new JRadioButton(" red    ");
+      addButtonPanel(centerRed, panel1a, group1a);
+      centerPink    = new JRadioButton(" pink   ");
+      addButtonPanel(centerPink, panel1a, group1a);
+      centerMagenta = new JRadioButton(" magenta");
+      addButtonPanel(centerMagenta, panel1a, group1a);
+      centerCyan    = new JRadioButton(" cyan   ");
+      addButtonPanel(centerCyan, panel1a, group1a);
+      centerGreen   = new JRadioButton(" green  ");
+      centerGreen.setSelected(true);
+      addButtonPanel(centerGreen, panel1a, group1a);
+      centerBlue    = new JRadioButton(" blue   ");
+      addButtonPanel(centerBlue, panel1a, group1a);
+      panel1b.add(trlCLabel);   
+      center1       = new JRadioButton(" 1.0  ");
+      center1.setSelected(true);
+      addButtonPanel(center1, panel1c, group1b);
+      center55      = new JRadioButton(" 0.55 ");
+      addButtonPanel(center55, panel1c, group1b);
+      center45      = new JRadioButton(" 0.45 ");
+      addButtonPanel(center45, panel1c, group1b);
+      center35      = new JRadioButton(" 0.35 ");
+      addButtonPanel(center35, panel1c, group1b);
+      center25      = new JRadioButton(" 0.25 ");
+      addButtonPanel(center25, panel1c, group1b);
+      center15      = new JRadioButton(" 0.15 ");
+      addButtonPanel(center15, panel1c, group1b);
+      center0       = new JRadioButton(" 0.0  ");
+      addButtonPanel(center0, panel1c, group1b);
+      wideYellow  = new JRadioButton(" yellow ");
+      wideYellow.setSelected(true);
+      addButtonPanel(wideYellow, panel2a, group2a);
+      wideOrange  = new JRadioButton(" orange ");
+      addButtonPanel(wideOrange, panel2a, group2a);
+      wideRed     = new JRadioButton(" red    ");
+      addButtonPanel(wideRed, panel2a, group2a);
+      widePink    = new JRadioButton(" pink   ");
+      addButtonPanel(widePink, panel2a, group2a);
+      wideMagenta = new JRadioButton(" magenta");
+      addButtonPanel(wideMagenta, panel2a, group2a);
+      wideCyan    = new JRadioButton(" cyan   ");
+      addButtonPanel(wideCyan, panel2a, group2a);
+      wideGreen   = new JRadioButton(" green  ");
+      addButtonPanel(wideGreen, panel2a, group2a);
+      wideBlue    = new JRadioButton(" blue   ");
+      addButtonPanel(wideBlue, panel2a, group2a);
+      panel2b.add(trlWLabel);   
+      wide1       = new JRadioButton(" 1.0  ");
+      addButtonPanel(wide1, panel2c, group2b);
+      wide55      = new JRadioButton(" 0.55 ");
+      addButtonPanel(wide55, panel2c, group2b);
+      wide45      = new JRadioButton(" 0.45 ");
+      addButtonPanel(wide45, panel2c, group2b);
+      wide35      = new JRadioButton(" 0.35 ");
+      addButtonPanel(wide35, panel2c, group2b);
+      wide25      = new JRadioButton(" 0.25 ");
+      if (!str)
+         wide25.setSelected(true);
+      addButtonPanel(wide25, panel2c, group2b);
+      wide15      = new JRadioButton(" 0.15 ");
+      addButtonPanel(wide15, panel2c, group2b);
+      wide0       = new JRadioButton(" 0.0  ");
+      if (str)
+         wide0.setSelected(true);
+      addButtonPanel(wide0, panel2c, group2b);
+      panel1.add(panel1a);
+      panel1.add(panel1b);
+      panel1.add(panel1c);
+      panel2.add(panel2a);
+      panel2.add(panel2b);
+      panel2.add(panel2c);
+
+      JPanel panel3 = new JPanel();
+      Label markWLabel = makeLabel("Drawing Size of Nodes :");
+      panel3.add(markWLabel);
+      tF = new JTextField(markWidth, 3);
+      tF.getDocument().addDocumentListener(this);
+      panel3.add(tF);
+
+      gbc.gridx = 0;
+      gbc.gridy = 0;
+      backPanel.add(panel1, gbc);
+      gbc.gridy = GridBagConstraints.RELATIVE;
+      gbc.gridheight = GridBagConstraints.RELATIVE;
+      backPanel.add(panel2, gbc);
+      gbc.gridheight = GridBagConstraints.REMAINDER;
+      gbc.gridy = GridBagConstraints.RELATIVE;
+      backPanel.add(panel3, gbc);
+      contentPane.add(backPanel);
+   }
+   void addButtonPanel(JRadioButton b, JPanel p, ButtonGroup g)
+   {  b.addActionListener(this);
+      p.add(b);
+      g.add(b);
+   }
+   private Label makeLabel(String label) 
+   {	if (IJ.isMacintosh())
+    		label += " ";
+		Label lb = new Label(label);
+                lb.setFont(new Font("Monaco", Font.ITALIC, 11));
+                return lb;
+   }
+   public void actionPerformed(ActionEvent evt)
+   {  String arg = evt.getActionCommand();
+      Object source = evt.getSource();
+      if (source == centerYellow || source == centerOrange || source == centerRed ||
+          source == centerPink || source == centerMagenta || source == centerCyan ||
+          source == centerGreen || source == centerBlue)
+      {   spIc.CsetColor(arg);
+      }
+      else
+      if (source == wideYellow || source == wideOrange || source == wideRed ||
+          source == widePink || source == wideMagenta || source == wideCyan ||
+          source == wideGreen || source == wideBlue)
+      {   spIc.WsetColor(arg);
+      }
+      else
+      if (source == center1 || source == center55 || source == center45 || source == center35 ||
+          source == center25 || source == center15 || source == center0)
+      {   spIc.CsetTransl(arg);
+      }
+      else
+      if (source == wide1 ||source == wide55 || source == wide45 || source == wide35 ||
+          source == wide25 || source == wide15 || source == wide0)
+      {   spIc.WsetTransl(arg);
+      }
+   }
+   public void insertUpdate(DocumentEvent e)
+   {  int w = Integer.parseInt(tF.getText().trim());
+      spIc.setMarkWidth(w);
+   }
+   public void removeUpdate(DocumentEvent e)
+   {  if (tF.getText().trim().equals(""))
+      {
+      }
+      else
+      {  int w = Integer.parseInt(tF.getText().trim());
+         spIc.setMarkWidth(w);
+      }
+   }
+   public void changedUpdate(DocumentEvent e)
+   {
+   } 
+
+   public void setSelections()
+   {  this.spIc = (SplineImageCanvas)WindowManager.getCurrentWindow().getCanvas();
+      Color colorC = spIc.getColorC();
+      Color colorW = spIc.getColorW();
+      float aW = spIc.getAlphaW();
+      float aC = spIc.getAlphaC();
+      markWidth = Integer.toString(spIc.getmarkW());
+      tF.setText(markWidth);
+      if (colorC == Color.yellow)
+         centerYellow.setSelected(true);
+      else
+      if (colorC == Color.orange)
+         centerOrange.setSelected(true);
+      else
+      if (colorC == Color.red)
+         centerRed.setSelected(true);
+      else
+      if (colorC == Color.pink)
+         centerPink.setSelected(true);
+      else
+      if (colorC == Color.magenta)
+         centerMagenta.setSelected(true);
+      else
+      if (colorC == Color.cyan)
+         centerCyan.setSelected(true);
+      else
+      if (colorC == Color.green)
+         centerGreen.setSelected(true);
+      else
+      if (colorC == Color.blue)
+         centerBlue.setSelected(true);
+
+      if (colorW == Color.yellow)
+         wideYellow.setSelected(true);
+      else
+      if (colorW == Color.orange)
+         wideOrange.setSelected(true);
+      else
+      if (colorW == Color.red)
+         wideRed.setSelected(true);
+      else
+      if (colorW == Color.pink)
+         widePink.setSelected(true);
+      else
+      if (colorW == Color.magenta)
+         wideMagenta.setSelected(true);
+      else
+      if (colorW == Color.cyan)
+         wideCyan.setSelected(true);
+      else
+      if (colorW == Color.green)
+         wideGreen.setSelected(true);
+      else
+      if (colorW == Color.blue)
+         wideBlue.setSelected(true);
+
+      if (aC == 1.0f)
+         center1.setSelected(true);
+      else
+      if (aC == 0.55f)
+         center55.setSelected(true);
+      else
+      if (aC == 0.45f)
+        center45.setSelected(true);
+      else
+      if (aC == 0.35f)
+        center35.setSelected(true);
+      else
+      if (aC == 0.25f)
+        center25.setSelected(true);
+      else
+      if (aC == 0.15f)
+         center15.setSelected(true);
+      else
+      if (aC == 0.0f)
+         center0.setSelected(true);
+
+      if (aW == 1.0f)
+         wide1.setSelected(true);
+      else
+      if (aW == 0.55f)
+         wide55.setSelected(true);
+      else
+      if (aW == 0.45f)
+        wide45.setSelected(true);
+      else
+      if (aW == 0.35f)
+        wide35.setSelected(true);
+      else
+      if (aW == 0.25f)
+        wide25.setSelected(true);
+      else
+      if (aW == 0.15f)
+         wide15.setSelected(true);
+      else
+      if (aW == 0.0f)
+         wide0.setSelected(true);
+   }
+
+   private JRadioButton centerYellow, centerOrange, centerRed, centerPink, centerMagenta;
+   private JRadioButton centerCyan, centerGreen, centerBlue, center1, center25, center15;
+   private JRadioButton center35, center45, center55, center0; 
+   private JRadioButton wideCyan, wideGreen, wideBlue, wideYellow, wideOrange, wideRed;
+   private JRadioButton widePink, wideMagenta, wide1, wide25, wide15, wide0;
+   private JRadioButton wide35, wide45, wide55; 
+   private ButtonGroup group1a = new ButtonGroup();
+   private ButtonGroup group1b = new ButtonGroup();
+   private ButtonGroup group2a = new ButtonGroup();
+   private ButtonGroup group2b = new ButtonGroup();
+   private JTextField tF;
+   private String markWidth = "3";
+   private SplineImageCanvas spIc = new SplineImageCanvas(new ImagePlus());
+}
+//class nodesDialog
+//=================
+class nodesDialog extends JFrame implements ActionListener
+{  public nodesDialog(SplineImageCanvas sc)
+   {  this.spIc = sc;
+      setTitle("Nodes");
+      setSize(140,110);
+      Container contentPane = getContentPane();
+      JPanel panel = new JPanel();
+      panel.setLayout(new GridLayout(3,0));
+      panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+      readInNodes = new Button(" Read in Nodes ");
+      readInNodes.addActionListener(this);
+      readInNodes.setEnabled(true);
+      panel.add(readInNodes);
+      saveNodes = new Button(" Save Nodes ");
+      saveNodes.addActionListener(this);
+      saveNodes.setEnabled(true);
+      panel.add(saveNodes);
+      listNodes = new Button(" List Nodes ");
+      listNodes.addActionListener(this);
+      listNodes.setEnabled(true);
+      panel.add(listNodes);
+
+      contentPane.add(panel);
+   }
+   public void actionPerformed(ActionEvent evt)
+   {  Object source = evt.getSource();
+      if (source == readInNodes)
+      {  OpenDialog oF = new OpenDialog("", null);
+         String fName = oF.getDirectory() + oF.getFileName();
+         Nodes nodePoints = new Nodes(MAXNPOINTS);
+         try
+         {  BufferedReader in = new BufferedReader(new FileReader(fName));
+            nodePoints.readData(in);
+            spIc.readNodeNum(nodePoints.putNodeNum());
+            spIc.readNodes(nodePoints.putNodes());
+            in.close();
+         }
+         catch(IOException e)
+         {  System.out.print("Error: " + e);
+         }
+      }
+      else
+      if (source == saveNodes)
+      {  SaveDialog oF = new SaveDialog("Save Nodes", "n", ".txt");
+         String fName = oF.getDirectory() + oF.getFileName();
+         int numNodes = spIc.getNumNodes();
+         Nodes nodePoints = new Nodes(numNodes);
+         nodePoints.getNodes(spIc.getNodes());
+         try
+         {  PrintWriter out = new PrintWriter(new FileWriter(fName));
+            nodePoints.writeData(out);
+            out.close();
+         }
+         catch(IOException e)
+         {  System.out.print("Error: " + e);
+         }
+      }
+      else
+      if (source == listNodes)
+      {  spIc.listNodes();
+      }
+   }
+   private Button readInNodes, saveNodes, listNodes;
+   private SplineImageCanvas spIc;
+   private static final int MAXNPOINTS = 500;
+}
+//class curvDialog
+//================
+class curvDialog extends JFrame implements ActionListener
+{  public curvDialog(SplineImageCanvas sc)
+   {  this.spIc = sc;
+      setTitle("Curvature");
+      setSize(140,110);
+      Container contentPane = getContentPane();
+      JPanel panel = new JPanel();
+      panel.setLayout(new GridLayout(3,0));
+      panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+      listCurv = new Button(" List Curvature ");
+      listCurv.addActionListener(this);
+      listCurv.setEnabled(true);
+      panel.add(listCurv);
+      plotCurv = new Button(" Plot Curvature ");
+      plotCurv.addActionListener(this);
+      plotCurv.setEnabled(true);
+      panel.add(plotCurv);
+      saveCurv = new Button(" Save Curvature ");
+      saveCurv.addActionListener(this);
+      saveCurv.setEnabled(true);
+      panel.add(saveCurv);
+
+      contentPane.add(panel);
+   }
+   public void actionPerformed(ActionEvent evt)
+   {  Object source = evt.getSource();
+      if (source == listCurv)
+      {  spIc.listCurvatures();
+      }
+      else
+      if (source == plotCurv)
+      {  spIc.plotCurvatures();
+      }
+      else
+      if (source == saveCurv)
+      {  SaveDialog oF = new SaveDialog("Save Curvature", "n", ".txt");
+         String fName = oF.getDirectory() + oF.getFileName();
+         int numCurves = spIc.getNumCurves();
+         double[] curvePoints = new double[numCurves];
+         System.arraycopy(spIc.getCurvatures(), 0, curvePoints, 0, numCurves);
+         try
+         {  PrintWriter out = new PrintWriter(new FileWriter(fName));
+            for (int i = 1; i < numCurves; i++)
+                out.println(curvePoints[i]);
+            out.close();
+         }
+         catch(IOException e)
+         {  System.out.print("Error: " + e);
+         }   
+      }
+   }
+
+   private Button saveCurv, listCurv, plotCurv;
+   private SplineImageCanvas spIc;
+}
+//class strOptDialog
+//==================
+class strOptDialog extends JFrame implements ActionListener
+{  public strOptDialog(SplineImageCanvas sc)
+   {  this.spIc = sc;
+      setTitle("Win. Options");
+      setSize(200,100);
+      Container contentPane = getContentPane();
+      JPanel panel = new JPanel();
+      panel.setLayout(new GridLayout(2,0));
+      panel.setBorder(BorderFactory.createEmptyBorder(10,20,10,10));
+      plain = new JRadioButton(" Plain Window ");
+      addButtonPanel(plain, panel, group);
+      plain.setSelected(true);
+      controlP = new JRadioButton(" Window with Control Panel ");
+      addButtonPanel(controlP, panel, group);
+
+      contentPane.add(panel);
+   }
+   public void actionPerformed(ActionEvent evt)
+   {  Object source = evt.getSource();
+      if (source == plain)
+      {  spIc.strWindowOption(1);
+      }
+      else
+      if (source == controlP)
+      {  spIc.strWindowOption(2);
+      }
+   }
+   void addButtonPanel(JRadioButton b, JPanel p, ButtonGroup g)
+   {  b.addActionListener(this);
+      p.add(b);
+      g.add(b);
+   }
+
+   private JRadioButton plain, controlP; 
+   private ButtonGroup group = new ButtonGroup();
+   private SplineImageCanvas spIc;
+}
+//==========================================================================================
+class SplineImageCanvas extends ImageCanvas
+{  public SplineImageCanvas(ImagePlus imp)	//curved filaments
+   {  super(imp);
+      this.imp = imp;
+      imJ = IJ.getInstance();
+      magnification = 1.0;
+      imageWidth = imp.getWidth();
+      imageHeight = imp.getHeight();
+   }
+   public SplineImageCanvas(ImagePlus imp, double[] strNodes, int nN, Point2D[] p, 
+                            SplineImageCanvas splIc, int markW)
+   {  super(imp);				//straightened filaments
+      this.imp = imp;
+      imJ = IJ.getInstance();
+      markWidth = markW;
+      magnification = 1.0;
+      imageWidth = imp.getWidth();
+      imageHeight = imp.getHeight();
+      width = imageHeight;
+      double ny = (double)(width/2 + 1);
+      npoints = nN;
+      for (int i = 0; i < npoints; i++)
+      {   points[i] = new Point2D.Double(strNodes[i], ny);
+          drawingPoints[i] = new Point2D.Double(strNodes[i], ny);
+      }
+      savePoints();				//for reSet
+      parentIc = new SplineImageCanvas(imp);
+      parentIc = splIc;     
+      parentNumNod = nN;
+      for (int i = 0; i < parentNumNod; i++)
+      {    parentNodes[i] = new Point2D.Double(p[i].getX(), p[i].getY());
+         // System.out.println(" parentNodes["+i+"] = "+parentNodes[i]);
+      }
+      hasParentCanvas = true;
+      alphaW = 0.0f;			//no visible wide line
+   }
+   public boolean getHasParent()
+   {  return hasParentCanvas;
+   }
+   public void insertMode(boolean val)
+   {  iMode = val;
+   }
+   public void mousePressed(MouseEvent event)
+   {  if (imJ==null) return;
+       int toolID = Toolbar.getToolId();
+       SplineWindow win = (SplineWindow)imp.getWindow();
+       if (win.running && toolID!=Toolbar.MAGNIFIER) 
+       {  win.running = false;
+           return;
+       }
+      
+       int x = event.getX();
+       int y = event.getY();
+       
+       int flags = event.getModifiers();
+       if (toolID!=Toolbar.MAGNIFIER && (event.isPopupTrigger() || (flags & event.META_MASK)!=0)) 
+       {  PopupMenu popup = Menus.getPopupMenu();
+	  if (popup!=null) 
+	  {   add(popup);
+	      popup.show(this, x, y);
+	  }
+	  return;
+       }
+       
+       int ox = offScreenX(x);
+       int oy = offScreenY(y);
+       if (IJ.spaceBarDown()) {
+	 // temporarily switch to "hand" tool of space bar down
+	 xMouseStart = ox; yMouseStart = oy;
+	 xSrcStart = srcRect.x; ySrcStart = srcRect.y;
+	 return;
+       }
+       if ((flags&Event.ALT_MASK)!=0 && toolID!=Toolbar.MAGNIFIER && toolID!=Toolbar.DROPPER) {
+	 // temporarily switch to color tool alt/option key down
+	 setDrawingColor(ox, oy, false);
+	 return;
+       }
+       
+       switch (toolID) {
+	 case Toolbar.MAGNIFIER:
+		 if ((flags & (Event.ALT_MASK|Event.META_MASK|Event.CTRL_MASK))!=0)
+			zoomOut(x, y);
+		 else
+			zoomIn(x, y);
+		 break;
+	 case Toolbar.HAND:
+		 xMouseStart = ox;
+		 yMouseStart = oy;
+		 xSrcStart = srcRect.x;
+		 ySrcStart = srcRect.y;
+		 break;
+	 case Toolbar.DROPPER:
+		 setDrawingColor(ox, oy, IJ.altKeyDown());
+		 break;
+	 case Toolbar.CROSSHAIR:
+		 /* Select node points */
+		 current = find(ox, oy);
+                 if (current < 0)              // not inside a point
+                   add(ox, oy);
+		 break;
+	 case Toolbar.WAND:
+		 Roi roi = imp.getRoi();
+		 if (roi!=null && roi.contains(ox, oy)) {
+		 Rectangle r = roi.getBoundingRect();
+		 if (r.width==imageWidth && r.height==imageHeight)
+			imp.killRoi();
+		 else {
+                        handleRoiMouseDownThis(x, y);
+			return;
+			}
+		 }
+		 if (imp.getType()==ImagePlus.GRAY16 || imp.getType()==ImagePlus.GRAY32) {
+			IJ.error("The wand tool does not work with 16 and 32-bit grayscale images.");
+			return;
+		 }
+		 ImageProcessor ip = imp.getProcessor();
+		 Wand w = new Wand(ip);
+		 double t1 = ip.getMinThreshold();
+		 if (t1==ip.NO_THRESHOLD)
+			w.autoOutline(ox, oy);
+		 else
+			w.autoOutline(ox, oy, (int)t1, (int)ip.getMaxThreshold());
+		 if (w.npoints>0) {
+			roi = new PolygonRoi(w.xpoints, w.ypoints, w.npoints, imp, Roi.TRACED_ROI);
+			imp.setRoi(roi);
+		 }
+		 break;
+	  default:  /* Select node points with CROSSHAIR */
+		 Toolbar.getInstance().setTool(7);	//CROSSHAIR
+		 current = find(ox, oy);
+                 if (current < 0)              // not inside a point
+                    add(ox, oy);
+	 }
+   }
+	void handleRoiMouseDownThis(int sx, int sy) {
+		int ox = offScreenX(sx);
+		int oy = offScreenY(sy);
+		Roi roi = imp.getRoi();
+		if (roi!=null) {
+			Rectangle r = roi.getBoundingRect();
+			int type = roi.getType();
+			if (type==Roi.RECTANGLE && r.width==imp.getWidth() && r.height==imp.getHeight()) {
+				imp.killRoi();
+				return;
+			}
+			//if (roi.contains(ox, oy)) {
+			//	roi.handleMouseDown(sx, sy);
+			//	return;
+			//}
+			if ((roi.getType()==Roi.POLYGON || roi.getType()==Roi.POLYLINE)
+			&& roi.getState()==roi.CONSTRUCTING)
+				return;
+		}
+		imp.createNewRoi(ox,oy);
+	}
+   public void mouseClicked(MouseEvent event)
+   {  if (event.getClickCount() >= 2)	// delete node
+      {  if (iMode)
+            insert(current);
+         else
+            remove(current);
+      }
+   }
+      
+   public void mouseDragged(MouseEvent event)
+   {  if (Toolbar.getToolId()==Toolbar.HAND || IJ.spaceBarDown())
+      {  int x = event.getX();
+         int y = event.getY();
+	 Scroll(x, y);
+      }
+      else
+      {  if (current == -1) return;
+  
+         Point p = event.getPoint();
+         double px = p.getX();
+         double py = p.getY();
+         srcRect = getSrcRect();
+         int ox = srcRect.x + (int)(px/magnification);
+         int oy = srcRect.y + (int)(py/magnification);
+
+         if (ox<imageWidth && oy<imageHeight)	//shows mouse position in ImageJ window
+	    imp.getWindow().mouseMoved(ox, oy);
+         else
+	    IJ.showStatus("");
+
+         points[current].setLocation(ox, oy);
+         repaint();
+      }
+   }
+
+   public int find(int x, int y)
+   {  for (int i = 0; i < npoints; i ++)
+       if (  points[i].getX() - CLICKSIZE / 2 <= x &&
+             x <= points[i].getX() + CLICKSIZE /2 &&
+             points[i].getY() - CLICKSIZE /2 <= y &&
+             y <= points[i].getY() + CLICKSIZE /2    )
+         return i;
+
+      return -1;
+   }   
+
+   public void add(int x, int y)
+   {  if (npoints < MAXNPOINTS)
+      {  double dx = (double)x;
+         double dy = (double)y;
+         drawingPoints[npoints] = new Point2D.Double(dx, dy);
+         points[npoints] = new Point2D.Double(dx, dy);
+         npoints++;
+         current = -1;
+         repaint();
+      }
+   }
+   public void insert(int n)
+   {  if (n < npoints-1)	//splits the point to the right of it-> this case is "add"
+      {  double dx = (points[n].getX() + points[n+1].getX()) / 2.0;
+         double dy = (points[n].getY() + points[n+1].getY()) / 2.0;
+         npoints++;
+         drawingPoints[npoints-1] = new Point2D.Double(0.0, 0.0);
+         points[npoints-1] = new Point2D.Double(0.0, 0.0);
+         for (int i = npoints-1; i > n+1; i--)
+             points[i].setLocation(points[i-1]);
+         points[n+1].setLocation(dx, dy);
+      }
+      repaint();
+   }
+
+   public void remove(int n)
+   {  if (n < 0 || n >= npoints) return;
+      npoints--;
+      for (int i = n; i < npoints; i++)
+         points[i].setLocation(points[i+1]);
+      if (current == n) current = -1;
+      repaint();
+   }
+   
+   public void deleteNodes()
+   {  if (hasParentCanvas)	//this has meaning only on the original (not straightened) image
+      {  parentIc.deleteNodes();
+      }
+      else
+      {  for (int i = 0; i < npoints; i++)
+         {  points[i].setLocation(0.0,0.0);
+            drawingPoints[i].setLocation(0.0,0.0);
+         }
+         curveMakerDraw = null;
+         npoints = 0;
+         current = -1;
+         repaint();
+      }
+   }
+
+   public void Scroll(int sx, int sy) 
+   {  int x = xSrcStart + (int)(sx/magnification);  //convert to offscreen coordinates
+      int y = ySrcStart + (int)(sy/magnification);
+      int newx = xSrcStart + (xMouseStart-x);
+      int newy = ySrcStart + (yMouseStart-y);
+      if (newx<0) newx = 0;
+      if (newy<0) newy = 0;
+      srcRect = getSrcRect();
+      if ((newx+srcRect.width)>imageWidth) newx = imageWidth-srcRect.width;
+      if ((newy+srcRect.height)>imageHeight) newy = imageHeight-srcRect.height;
+      srcRect.x = newx;
+      srcRect.y = newy;
+      imp.draw();
+      Thread.yield();
+   }	
+   
+   public void paint(Graphics g) 
+   {	srcRect = getSrcRect();
+        Roi roi = imp.getRoi();
+        
+        magnification = super.getMagnification();
+        for (int i = 0; i < npoints; i++)
+        {  double pxM = (points[i].getX() - srcRect.x) * magnification; 
+           double pyM = (points[i].getY() - srcRect.y) * magnification;
+           drawingPoints[i].setLocation(pxM, pyM);
+        }
+        markWidthDraw = (int)((double)markWidth * magnification);
+
+	try {
+		if (imageUpdated) {
+		   imageUpdated = false;
+	           imp.updateImage();
+		}
+		Image img = imp.getImage();
+		if (img!=null)
+		   g.drawImage(img, 0, 0, (int)(srcRect.width*magnification), 
+                                (int)(srcRect.height*magnification),
+				srcRect.x, srcRect.y, srcRect.x+srcRect.width, 
+                                srcRect.y+srcRect.height, null);
+		if (roi != null) roi.draw(g);
+	 }
+	 catch(OutOfMemoryError e) {IJ.outOfMemory("Paint");}
+         Graphics2D g2 = (Graphics2D)g;              
+                   
+         if (splW == null)
+            splW = (SplineWindow)imp.getWindow();
+         if (npoints < 2) 
+            splW.changeButton(false);
+  
+         if (npoints == 0) return;
+                        
+         for (int i = 0; i < npoints; i++)
+         {  double x = drawingPoints[i].getX() - markWidthDraw / 2;
+            double y = drawingPoints[i].getY() - markWidthDraw / 2;
+              //g2.setColor(ColorCode(i));
+            g2.setColor(Color.red);
+            int cci = (i+1)%5;
+            if ((i+1)%5 == 0)
+               g2.setColor(ColorCode((i+1)/5));
+            g2.fill(new Rectangle2D.Double(x, y, markWidthDraw, markWidthDraw));
+         }
+         if (npoints < 2)
+            return;
+
+          splW.changeButton(true);
+          int drawingWidth = 1;
+          if (magnification > 1.0) 
+             drawingWidth = (int)magnification;
+          g2.setColor(colorC);
+          AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alphaC);
+          g2.setStroke(new BasicStroke(1));
+          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+          g2.setComposite(ac);
+          curveMakerDraw = new CubicCurveMaker(npoints, points);
+          curveDraw = curveMakerDraw.makeShape(magnification, srcRect);
+          g2.draw(curveDraw); 
+          if (alphaW > 0.0f)     
+          {  g2.setColor(colorW);
+             drawingWidth = (int) (width * magnification);
+             ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alphaW);
+             g2.setStroke(new BasicStroke(drawingWidth));
+             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+             g2.setComposite(ac);
+             g2.draw(curveDraw);
+          }
+
+          for (int i = 0; i < npoints; i++)
+          {  double x = drawingPoints[i].getX() - markWidthDraw / 2;
+             double y = drawingPoints[i].getY() - markWidthDraw / 2;
+            // g2.setColor(ColorCode(i));
+             g2.setColor(Color.red);
+             int cci = (i+1)%5;
+             if ((i+1)%5 == 0)
+                g2.setColor(ColorCode((i+1)/5));
+             g2.fill(new Rectangle2D.Double(x, y, markWidthDraw, markWidthDraw));
+          }
+   }  
+
+   public void setWidth(int w)
+   {  width = w;
+      repaint();
+   }
+   public void setMarkWidth(int mw)
+   {  markWidth = mw;
+      markWidthDraw = (int)((double)markWidth * magnification);
+      repaint();
+   }
+
+   public void CsetColor(String source)
+   {  if (source == " yellow ")
+      {  colorC = Color.yellow;
+         repaint();
+      }
+      else
+      if (source == " orange ")
+      { colorC = Color.orange;
+        repaint();
+      }
+      else
+      if (source == " red    ")
+      {  colorC = Color.red;
+        repaint();
+      }
+      else
+      if (source == " pink   ")
+      {  colorC = Color.pink;
+        repaint();
+      }
+      else
+      if (source == " magenta")
+      {  colorC = Color.magenta;
+        repaint();
+      }
+      else
+      if (source == " cyan   ")
+      {  colorC = Color.cyan;
+        repaint();
+      }
+      else
+      if (source == " green  ")
+      {  colorC = Color.green;
+        repaint();
+      }
+      else
+      if (source == " blue   ")
+      {  colorC = Color.blue;
+        repaint();
+      }
+   }
+   
+   public void WsetColor(String source)
+   {  if (source == " yellow ")
+      {  colorW = Color.yellow;
+         repaint();
+      }
+      else
+      if (source == " orange ")
+      { colorW = Color.orange;
+        repaint();
+      }
+      else
+      if (source == " red    ")
+      {  colorW = Color.red;
+        repaint();
+      }
+      else
+      if (source == " pink   ")
+      {  colorW = Color.pink;
+        repaint();
+      }
+      else
+      if (source == " magenta")
+      {  colorW = Color.magenta;
+        repaint();
+      }
+      else
+      if (source == " cyan   ")
+      {  colorW = Color.cyan;
+        repaint();
+      }
+      else
+      if (source == " green  ")
+      {  colorW = Color.green;
+        repaint();
+      }
+      else
+      if (source == " blue   ")
+      {  colorW = Color.blue;
+        repaint();
+      }
+   }
+   
+   public void CsetTransl(String source)
+   {  if (source == " 1.0  ")
+      {  alphaC = 1.0f;
+         repaint();
+      }
+      else
+      if (source == " 0.55 ")
+      {  alphaC = 0.55f;
+        repaint();
+      }
+      else
+      if (source == " 0.45 ")
+      { alphaC = 0.45f;
+        repaint();
+      }
+      else
+      if (source == " 0.35 ")
+      { alphaC = 0.35f;
+        repaint();
+      }
+      else
+      if (source == " 0.25 ")
+      { alphaC = 0.25f;
+        repaint();
+      }
+      else
+      if (source == " 0.15 ")
+      {  alphaC = 0.15f;
+        repaint();
+      }
+      else
+      if (source == " 0.0  ")
+      {  alphaC = 0.0f;
+        repaint();
+      }
+   }
+   
+   public void WsetTransl(String source)
+   {  if (source == " 1.0  ")
+      {  alphaW = 1.0f;
+         repaint();
+      }
+      else
+      if (source == " 0.55 ")
+      {  alphaW = 0.55f;
+        repaint();
+      }
+      else
+      if (source == " 0.45 ")
+      { alphaW = 0.45f;
+        repaint();
+      }
+      else
+      if (source == " 0.35 ")
+      { alphaW = 0.35f;
+        repaint();
+      }
+      else
+      if (source == " 0.25 ")
+      { alphaW = 0.25f;
+        repaint();
+      }
+      else
+      if (source == " 0.15 ")
+      {  alphaW = 0.15f;
+        repaint();
+      }
+      else
+      if (source == " 0.0  ")
+      {  alphaW = 0.0f;
+        repaint();
+      }
+   }
+   
+   public Color ColorCode(int n)
+   {  String sN = Integer.toString(n);
+      BigInteger nBI = new BigInteger(sN);
+      BigInteger eBI = new BigInteger("4"); 
+      int i = nBI.mod(eBI).intValue(); 
+      Color colorN = Color.orange;
+      switch(i)
+      {  case 1:
+             colorN = Color.blue;
+             break;
+          case 2:
+             colorN = Color.magenta;
+             break;
+          case 3:
+             colorN = Color.green;
+             break;
+      }  
+      return colorN;
+   }
+
+   public float getAlphaW()
+   {  return alphaW;
+   }
+
+   public float getAlphaC()
+   {  return alphaC;
+   }
+
+   public Color getColorW()
+   {  return colorW;
+   }
+
+   public Color getColorC()
+   {  return colorC;
+   }
+
+   public int getmarkW()
+   {  return markWidth;
+   }
+
+   public void relocateNodes(Point2D[] shift, int num, Point2D[] thisPoints, int tp)
+   { double sdist = 1.0;
+     double theta = Math.PI / 2.0;
+     boolean mu = true;
+
+     savePoints();
+     relocation = true;
+
+     if (tp > 0)
+     {  for (int j = 0; j < tp; j++)
+        {   points[j] = new Point2D.Double(thisPoints[j].getX(), thisPoints[j].getY());
+            drawingPoints[j] = new Point2D.Double(thisPoints[j].getX(), thisPoints[j].getY());
+          //  System.out.println(" points["+j+"] = "+points[j]);
+        }
+        npoints = tp;
+        CubicCurveMaker cM = new CubicCurveMaker(npoints, points);
+        Shape c = cM.makeShape(1.0, new Rectangle(0, 0, 0, 0));
+        Spline = cM.getSpline();
+        strNodes = new double[npoints];
+        strNodes = cM.getStrNodes();
+        int size = cM.getSlopeSize();
+        slope = new double[size];
+        slope = cM.getSlope();
+     }
+
+     int count = num;
+     if (num > npoints)		// Has the number of points changed?
+        count = npoints;
+      int hW= W/2 + 1;
+      for (int j = 0; j < num; j++)
+      {   int dxL = (int)shift[j].getX();
+          if (j == num-1)
+             dxL -= 1;		//slope is not defined at the very last point
+          double dyL = shift[j].getY() - (double)hW;
+          if (slope[dxL] == 0.0)
+             sdist = 1.0;
+          else
+             theta = Math.atan(-1.0 / slope[dxL]);
+          if (Math.abs(theta) < 0.001) 
+             mu = false;
+          if (mu)
+          {  sdist = 1.0;
+             if (slope[dxL] < 0.0)
+                sdist = -sdist;
+             if (Spline.get(dxL).getX() < Spline.get(dxL+1).getX())
+                sdist = -sdist;
+          }
+          double xL =  Spline.get(dxL).getX() + dyL * sdist * Math.cos(theta);
+          double yL =  Spline.get(dxL).getY() + dyL * sdist * Math.sin(theta);
+          if (j < count)
+          {  points[j].setLocation(xL, yL);
+             drawingPoints[j].setLocation(points[j].getX(), points[j].getY());
+          }
+          else		//there are additional nodes
+          {  points[j] = new Point2D.Double(xL, yL);
+             drawingPoints[j] = new Point2D.Double(points[j].getX(), points[j].getY());
+          }
+      }
+
+      npoints = num;
+      for (int i = 0; i < npoints; i++)
+      {   double px = points[i].getX();
+          double py = points[i].getY();
+          if (magnification != 1.0)
+          {  px = px * magnification;
+             py = py * magnification;
+          }
+          drawingPoints[i].setLocation(px, py);
+      }
+      repaint();
+   }
+
+   public void doStraight(int inDist) 
+   {  if (hasParentCanvas)	//positions of nodes are changed on the straightened image
+      { // parentIc.savePoints();
+	 if (firstTimeStr)
+         {  parentIc.relocateNodes(points, npoints, parentNodes, 0);
+            firstTimeStr = false;
+         }
+         else
+            parentIc.relocateNodes(points, npoints, parentNodes, parentNumNod);
+         parentIc.doStraight(inDist); 
+      }
+      else
+      {  if (relocation)	//points have been saved in relocateNodes()
+	    relocation = false;
+	 else
+	    savePoints();
+         ImageProcessor cIp = imp.getProcessor();         
+         CubicCurveMaker curveMaker = new CubicCurveMaker(npoints, points);
+         curve = curveMaker.makeShape(1.0, new Rectangle(0, 0, 0, 0));
+         Spline = curveMaker.getSpline();
+         strNodes = new double[npoints];
+         strNodes = curveMaker.getStrNodes();
+         int size = curveMaker.getSlopeSize();
+         slope = new double[size];
+         slope = curveMaker.getSlope();
+         length = size+1;
+         W = 2 * (width/2) + 1;
+         strArray = new float[length * W];
+         StraightArray makeStrArr = new StraightArray(W, Spline, slope);    
+         strArray = makeStrArr.calcStraight(cIp, imageWidth, strNodes);
+         dirs = makeStrArr.getDirs();		// for automatic refinement
+         numOfStr++;
+         text = "(" + numOfStr +") Straightened Filament ";
+         ImageProcessor ipStr = new FloatProcessor(length, W, strArray, cIp.getColorModel()); // (wsr)
+         ImagePlus strImp;
+         switch (winOpt) {
+	 case 1:
+  		 if (imp.getProcessor() instanceof ByteProcessor) // (wsr)
+  		     ipStr = ipStr.convertToByte(false);                 // (wsr)
+		 strImp = new ImagePlus(text, ipStr);
+		 strImp.show();
+		 break;
+	 case 2:
+                 strImp = new ImagePlus(text, ipStr);   // (wsr)
+                 ipStr.setRoi(null);
+                 ipStr = ipStr.crop(); 			// clone pixel data
+                 SplineImageCanvas sc = new SplineImageCanvas(strImp, strNodes, npoints,
+							      points, this, markWidth); 
+		 ImageStack dstack = new ImageStack(W,W);   //dummy stack for the next line    
+                 SplineWindow strWin = new SplineWindow(strImp, sc, W, dstack); 
+                 if (inDist > 0)
+                 {  numOfStr--;
+                    sc.autRef2(inDist);
+                    strWin.close();
+                 }
+		 break;
+         }
+      } 
+   }
+   
+   public void strWindowOption(int wo)
+   {  winOpt = wo;
+   }
+
+   public void createStack(ImageStack stack)
+   {	ImageStack strStack = new ImageStack(length, W);
+	ProgressBar pB = new ProgressBar(50,10);
+	int n=stack.getSize();
+	for (int i=1; i<=n; i++) { 
+	    pB.show(0.9);
+	    ImageProcessor ipStack = stack.getProcessor(i);
+	    StraightArray makeStrArr = new StraightArray(W, Spline, slope);
+	    strArray = new float[length * W];
+            strArray = makeStrArr.calcStraight(ipStack, imageWidth, strNodes);
+            ImageProcessor ip2 = new FloatProcessor(length, W, strArray, ipStack.getColorModel());
+  	    if (ipStack instanceof ByteProcessor) 			// (wsr)
+  	    	ip2 = ip2.convertToByte(false);                 	// (wsr)
+	    strStack.addSlice(stack.getSliceLabel(i), ip2);
+	}
+	text = "Straightened "+imp.getTitle();
+	ImagePlus impStr = new ImagePlus();
+
+        impStr.setStack(text, strStack);
+	impStr.show();
+   }
+
+   public void savePoints()
+   {  onp = npoints;
+      for (int i = 0; i < npoints; i++)
+          oldPoints[i] = new Point2D.Double(points[i].getX(), points[i].getY());
+   }
+
+   public void reSet()
+   {  npoints = onp;
+      for (int i = 0; i < npoints; i++)
+      {   points[i].setLocation(oldPoints[i]);
+          double px = points[i].getX();
+          double py = points[i].getY();
+          if (magnification != 1.0)
+          {  px = px * magnification;
+             py = py * magnification;
+          }
+          drawingPoints[i].setLocation(px, py);
+      }
+      if (hasParentCanvas)	//positions of nodes are changed on the straightened image
+         parentIc.reSet();
+ 
+      repaint();
+   }
+   public int getWidth()
+   {  return width;
+   }
+      
+   public int getNumNodes()
+   {  return npoints;
+   }
+   
+   public Point2D[] getNodes()
+   {  return points;
+   }
+   
+   public void readNodeNum(int n)
+   {  npoints = n;
+   }
+   
+   public void readNodes(Point2D[] p)
+   {  for (int i = 0; i < npoints; i++)
+      {   double px = p[i].getX();
+          double py = p[i].getY();
+          points[i] = new Point2D.Double(px, py);
+          if (magnification != 1.0)
+          {  px = px * magnification;
+             py = py * magnification;
+          }
+          drawingPoints[i] = new Point2D.Double(px, py);
+      }
+      repaint();
+   }
+   public void listNodes()
+   {  IJ.write(" *** Nodes (x, y) ***");
+      for (int i = 0; i < npoints; i++)
+          IJ.write(points[i].getX()+", "+points[i].getY());
+   }
+   public int getNumCurves()
+   {  int size;
+      if (curveMakerDraw != null)
+      {  size = curveMakerDraw.getSlopeSize();
+         curvature = new double[size];
+         curvature = curveMakerDraw.getCurvature();
+      }
+      else 
+         size = 0;
+      return size;
+   }
+   public void listCurvatures()
+   {  int s = getNumCurves();
+      if (s != 0)
+      {  IJ.write(" *** Curvatures (position: value) ***");
+         for (int i = 1; i < s; i++)
+             IJ.write(i+": "+curvature[i]);
+      }
+      else
+         IJ.write(" *** There is no curve drawn! ***");
+   }
+   public double[] getCurvatures()
+   {  return curvature;
+   }
+   public double getMaxCurvatures()
+   {  double maxC;
+      if (curveMakerDraw != null)
+         maxC = curveMakerDraw.getMaxCurv();
+      else 
+         maxC = 0.0;
+      return maxC;
+   }
+   public void plotCurvatures()
+   {  int s = getNumCurves();
+      double maxC = getMaxCurvatures();
+      if (maxC != 0.0)
+      {  ImageProcessor ipC = new ColorProcessor(s, 120);
+         ipC.setColor(java.awt.Color.white); ipC.fill();
+         ipC.setColor(java.awt.Color.black); 
+         double scale = 100.0 / maxC;
+         ipC.moveTo(0,120);
+         ipC.setColor(java.awt.Color.red);
+         for(int i = 1; i < s; i++)
+            ipC.lineTo(i, (int)(120-scale*curvature[i]));
+         IJ.showProgress(1.0);
+         new ImagePlus("Curvature",ipC).show();
+      }
+      else
+         IJ.write(" *** There is no curve drawn! ***");
+   }
+   public ImagePlus getImagePlus()
+   {  return imp;
+   }
+   public void calcDiffPatt()
+   {  int i, j;
+      int[] dimLengths = {0, 0};
+     //int[] newDimLengths = {0, 0};
+      int[] pow2len = {0, 0};
+      int[] start = {0, 0};
+      int[] cut = {0, 0};
+      int[] beg = {0, 0};
+      int newArrayLength = 1;
+      boolean calcNewDim = false;
+      int[] fS = {12, 12, 12, 12, 14};
+      String[] txt = {" The array dimensions have to be powers of 2. ",
+                      " The dimension of the image is "+imageWidth+" * "+imageHeight+" pixels.",
+                      " The program pads the array to the next higher powers of 2, or ",
+                      " You can pad/cut the array. ",
+                      " Do you want to define new dimensions? "};
+      String[] bTxt = {"Yes", "No"};
+      messageDialog dD = new messageDialog(splW, txt, fS, bTxt);
+      boolean doPad = dD.showDialog();
+      dimLengths[0] = imageWidth;
+      dimLengths[1] = imageHeight;
+      pow2len[0] = dimLengths[0];
+      pow2len[1] = dimLengths[1];
+      if (doPad)
+      {  paddingDialog dial = new paddingDialog(splW);
+       	 if (dial.showDialog())
+    	 {  newDimLengths[0] = dial.getLength();
+     	    newDimLengths[1] = dial.getWidth();
+            if (newDimLengths[0] >= dimLengths[0])
+ 	       start[0] = (newDimLengths[0] - dimLengths[0])/2 + 
+ 	   	          (newDimLengths[0] - dimLengths[0])%2;
+            else
+ 	    {  cut[0] = dimLengths[0] - newDimLengths[0];
+               beg[0] = cut[0]/2 + cut[0]%2;
+               pow2len[0] = newDimLengths[0];
+            }    
+            if (newDimLengths[1] >= dimLengths[1])
+ 	       start[1] = (newDimLengths[1] - dimLengths[1])/2 + 
+ 	                  (newDimLengths[1] - dimLengths[1])%2;
+            else
+ 	    {  cut[1] = dimLengths[1] - newDimLengths[1];
+               beg[1] = cut[1]/2 + cut[1]%2;
+               pow2len[1] = newDimLengths[1];
+            }     	 
+         }
+     	 else
+      	    return;
+      }
+      else
+      {  for (i = 0; i < 2; i++) 
+    	     newDimLengths[i] = dimLengths[i];
+      }
+      
+      // Check if the array's dimensions are powers of 2 to be sure
+      for (i = 0; i < 2; i++) 
+      {   //arrayLength *= dimLengths[i];
+  	  for (int dimTest = newDimLengths[i]; dimTest > 1; dimTest = dimTest/2)
+  	  {   if ((dimTest % 2) != 0) 
+   	      {  newDimLengths[i] = 1 + (int)(Math.log((double)pow2len[i])/
+    	   	                              Math.log(2.0));
+     	   	 newDimLengths[i] = java.lang.Math.round((float)
+    	   	                             (Math.pow(2.0,(double)newDimLengths[i])));
+                 if (newDimLengths[i] >= dimLengths[i])
+ 	   	    start[i] = (newDimLengths[i] - dimLengths[i])/2 + 
+ 	   	               (newDimLengths[i] - dimLengths[i])%2;
+                 else
+ 	         {  cut[i] = dimLengths[i] - newDimLengths[i];
+                    beg[i] = cut[i]/2 + cut[i]%2;
+                 }
+     	      }
+     	  }
+     	  newArrayLength  *= newDimLengths[i];
+       }
+      ImageProcessor cIp = imp.getProcessor();
+      int arrLen = imageWidth * imageHeight;
+      float[] strA = new float[arrLen];
+      if (cIp instanceof ByteProcessor)
+      {  byte[] barray = (byte[])cIp.getPixels();
+         for (i = 0; i < arrLen; i++)
+             strA[i] = (float)(barray[i]&255);
+      }
+      else
+      if (cIp instanceof FloatProcessor)
+         strA = (float[])cIp.getPixels();
+      else
+      {  IJ.error("8-, or 32-bit image required"); 
+         return;
+      }
+
+      // float array to 0 mean
+      float mean = 0.0f;
+      for (i = 0; i < arrLen; i++)
+	  mean += strA[i];
+      mean /= arrLen;
+      for (i = 0; i < arrLen; i++)
+	  strA[i] -= mean;
+
+      srcImage = new float[newArrayLength];
+      float[] diffPatt = new float[newArrayLength];
+      for (i = 0; i < newArrayLength; i++)
+   	       srcImage[i] = 0.0f;
+      /*
+         if (start[0] != 0 || start[1] != 0) || (cut[0] != 0 || cut[1] != 0)
+         zero pad / cut the data so that all dimensions are powers of 2
+ 	 The data is centered(within 1) in each dimension so that
+  	 equal numbers of zeros are on both sides of the dimension.
+      */
+      for (j = 0; j < dimLengths[1]-cut[1]; j++)
+ 	  for (i = 0; i < dimLengths[0]-cut[0]; i++)
+ 	      srcImage[i + start[0] + (start[1]+j) * newDimLengths[0]] = 
+                                                          strA[i+beg[0] + dimLengths[0]*(j+beg[1])];
+      if (cut[0] > 0 || cut[1] > 0)	//image is cut, show it
+      {  title = " Truncated image of " + imp.getTitle();    
+	 float trunc[] = new float[(dimLengths[0]-cut[0])*(dimLengths[1]-cut[1])];
+      	 for (j = 0; j < dimLengths[1]-cut[1]; j++)
+ 	     for (i = 0; i < dimLengths[0]-cut[0]; i++)
+ 	      	trunc[i+j* (dimLengths[0]-cut[0])] = strA[i+beg[0] + dimLengths[0]*(j+beg[1])];
+         new ImagePlus(title, new FloatProcessor((dimLengths[0]-cut[0]), (dimLengths[1]-cut[1]), 
+                                                 trunc, null)).show(); 
+      }
+
+      Fourier ff = new Fourier();
+      diffPatt = ff.diffractionPattern(srcImage, newDimLengths, true);  
+      title = " Diffraction P. of " + imp.getTitle();    
+      float [] phase = ff.getPhase();
+      diffPattWindow dpW = new diffPattWindow(newDimLengths[0], newDimLengths[1], diffPatt, phase, title);
+      diffPattExist = true;
+   }
+
+   public void winFilter()
+   {  if (!diffPattExist)
+      	  calcDiffPatt();
+      String title = "L. L. Filtration";
+      String[] labels = {" Number of windows : ", " Weight of 0 layer line : "};
+      String[] values = {"1", "0.5"};
+      GeneralDialog dialog = new GeneralDialog(title, labels, values, null, null);
+      if (dialog.showDialog())
+      {  int nW = (int)dialog.getValues(0);
+         float w0l = (float)dialog.getValues(1);
+	 int nWxy = 4*nW;
+	 String[] listLabel = new String[nWxy];
+	 String[] listLL = new String[nWxy];
+	 for (int i = 0; i < nW; i++)
+	 {   for (int j = 0; j < 4; j++)
+	        listLL[i*4+j] = "0";
+	     int ii = i+1;
+	     listLabel[i*4] = " Window "+ii+"   Upper Left x : ";
+	     listLabel[i*4+1] = "                   Upper Left y : ";
+	     listLabel[i*4+2] = "                 Lower Right x : ";
+	     listLabel[i*4+3] = "                 Lower Right y : ";
+	 }
+         title = "Positions of Windows";
+	 GeneralDialog list = new GeneralDialog(title, listLabel, listLL, null, null);
+         if (list.showDialog())
+         {  int[] winC = new int[nWxy];		//l.l. distances from the center of diff.patt.
+	    for (int i = 0; i < nWxy; i++)
+	        winC[i] = (int)list.getValues(i);
+            Fourier ff = new Fourier();
+     	    float[] diffPatt = new float[newDimLengths[0]*newDimLengths[1]];
+	    diffPatt = ff.diffractionPattern(srcImage, newDimLengths, true);
+     	    float[] filtImg = new float[newDimLengths[0]*newDimLengths[1]];
+	    filtImg = ff.windowFilter(winC, w0l);
+	    int start = (newDimLengths[1] - imageHeight) / 2 + 1;
+	    start *= newDimLengths[0];
+	    int len = newDimLengths[0]*imageHeight;
+	    float[] filtImgCut = new float[len];
+    	    System.arraycopy(filtImg, start, filtImgCut, 0, len);		
+            ImageProcessor cIp = imp.getProcessor(); 
+            ImageProcessor ipFilt = new FloatProcessor(newDimLengths[0], imageHeight, filtImgCut,
+								 cIp.getColorModel()); // (wsr)
+	    diffPatt = ff.winfiltDiffPatt();
+      	    float [] phase = ff.getPhase();
+	    title = "Filtered Diffraction P. of " + imp.getTitle();
+            diffPattWindow dpW = new diffPattWindow(newDimLengths[0], newDimLengths[1], diffPatt, phase, title);
+            String text = " Filtered Filament: " + imp.getTitle();
+            ImagePlus filtImp = new ImagePlus(text, ipFilt);
+	    filtImp.show();
+         }
+      }
+   }
+
+   public void llFilter()
+   {  if (!diffPattExist)
+      	  calcDiffPatt();
+      String title = "L. L. Filtration";
+      String[] labels = {" Number of layer lines : ", 
+			 " Maximum distance from meridian : ", 
+			 " Weight of 0 layer line : "};
+      String Rdist = new Integer(newDimLengths[1]/2-1).toString();
+      String[] values = {"1", Rdist, "0.5"};
+      GeneralDialog dialog = new GeneralDialog(title, labels, values, null, null);
+      if (dialog.showDialog())
+      {  int nll = (int)dialog.getValues(0);
+         int Rmax = (int)dialog.getValues(1);
+	 float w0l = (float)dialog.getValues(2);
+	 String[] listLabel = new String[nll];
+	 String[] listLL = new String[nll];
+	 String[][] optRadioBut = new String[nll][2];
+	 for (int i = 0; i < nll; i++)
+	 {   int j = i+1;
+	     listLabel[i] = " Layer line "+j+" ";
+	     listLL[i] = ""+j;
+	     optRadioBut[i][0] = "Upper ";
+	     optRadioBut[i][1] = "Lower ";
+	 }
+
+         title = "L. L. Distance from the 0 L. L. (pix)";
+	 GeneralDialog list = new GeneralDialog(title, listLabel, listLL, optRadioBut, null);
+         if (list.showDialog())
+         {  int[] llD = new int[nll];		//l.l. distances from the center of diff.patt.
+	    String[] side = new String[nll];		// Upper or Lower side of l.l.
+	    for (int i = 0; i < nll; i++)
+	    {   llD[i] = (int)list.getValues(i);
+		side[i] = list.getRadButOpt(i);
+	    }
+	    int start = (newDimLengths[1] - imageHeight) / 2 + 1;
+	    start *= newDimLengths[0];
+	    int len = newDimLengths[0]*imageHeight;
+	    float[] filtImgCut = new float[len];
+            ImageProcessor cIp = imp.getProcessor(); 
+ 	    //Side 1
+                Fourier ff = new Fourier();
+		float[] diffPatt = new float[newDimLengths[0]*newDimLengths[1]];
+	   	diffPatt = ff.diffractionPattern(srcImage, newDimLengths, true);
+		float[] filtImg = new float[newDimLengths[0]*newDimLengths[1]];
+	    	filtImg = ff.llFilter(llD, Rmax, w0l, side, 1);		//1 = front
+		System.arraycopy(filtImg, start, filtImgCut, 0, len);
+		ImageProcessor ipFilt1 = new FloatProcessor(newDimLengths[0], imageHeight, filtImgCut,
+								 cIp.getColorModel()); // (wsr)
+            	text = " Side 1 of the Filtered Filament: " + imp.getTitle();  	
+            	ImagePlus filtImp1 = new ImagePlus(text, ipFilt1);
+	    	filtImp1.show();
+	    diffPatt = ff.llfiltDiffPatt();
+      	    float [] phase = ff.getPhase();
+	    title = "Filtered Diffraction P. of side 1 of " + imp.getTitle();
+            diffPattWindow dpW = new diffPattWindow(newDimLengths[0], newDimLengths[1], diffPatt, phase, title);
+	    //Side 2
+                ff = new Fourier();
+	   	diffPatt = ff.diffractionPattern(srcImage, newDimLengths, true);
+	    	filtImg = ff.llFilter(llD, Rmax, w0l, side, 2);		//2 = back
+		System.arraycopy(filtImg, start, filtImgCut, 0, len);
+		ImageProcessor ipFilt2 = new FloatProcessor(newDimLengths[0], imageHeight, filtImgCut, 
+								cIp.getColorModel()); // (wsr)
+            	text = " Side 2 of the Filtered Filament: " + imp.getTitle();
+            	ImagePlus filtImp2 = new ImagePlus(text, ipFilt2);
+	    	filtImp2.show();
+         }
+      }
+   }
+
+   public void autNodeRef()
+   {  nodePopUp = new AutRefNodeDialog(splW, npoints);
+      if(nodePopUp.showDialog())
+      {  int numNodes = nodePopUp.getNumNodes();	//number of selected nodes
+         boolean in = false;
+         if (numNodes == npoints)
+            in = true;
+         if (popUp == null)
+            popUp = new AutRefOptionDialog(splW);
+         popUp.setInsNodes(in);
+         if(popUp.showDialog())
+         {  int[] listNodes = new int[numNodes];
+            listNodes = nodePopUp.getListNodes();	//list of selected nodes
+            int av = popUp.numAverCol();	// if not selected: av=0
+            if (av < 0)
+               av = 0;
+            int numSmooth = popUp.numOfSmooth();// if not selected: numSmooth = 0
+            if (numSmooth < 0)
+               numSmooth = 0;
+            float lpF = popUp.setlpF();		// if not selected: lpF = 0.0f
+            if (lpF < 2.0f)
+               lpF = 0.0f;
+            int minDist = popUp.inDistance();	// of not selected: minDist = 0
+            if (minDist < 0)
+               minDist = 0;
+            if (minDist > 0)			// save param for 2nd cycle
+            {  parentIc.setlpF(lpF);
+               parentIc.setnumSmooth(numSmooth);
+               parentIc.setnumAverCol(av);
+            }
+
+            float[] strPixels = (float[])imp.getProcessor().getPixels();
+            float[] strLine = new float[imageHeight];
+
+            for (int i = 1; i <= numSmooth; i++)	//FloatProcessor().filter(int type)
+            {   int len = imageHeight*imageWidth;
+                float[] pixels = new float[len];
+                float p1, p2, p3, p4, p5, p6, p7, p8, p9;
+	        int offset;
+                float sum1, sum2;
+                int rowOffset = imageWidth;
+	        for (int y=1; y<=imageHeight-2; y++) {
+			offset = 1 + y * imageWidth;
+			p1 = 0f;
+			p2 = strPixels[offset-rowOffset-1];
+			p3 = strPixels[offset-rowOffset];
+			p4 = 0f;
+			p5 = strPixels[offset-1];
+			p6 = strPixels[offset];
+			p7 = 0f;
+			p8 = strPixels[offset+rowOffset-1];
+			p9 = strPixels[offset+rowOffset];
+
+			for (int x=1; x<=imageWidth-2; x++) {
+				p1 = p2; p2 = p3;
+				p3 = strPixels[offset-rowOffset+1];
+				p4 = p5; p5 = p6;
+				p6 = strPixels[offset+1];
+				p7 = p8; p8 = p9;
+				p9 = strPixels[offset+rowOffset+1];
+				pixels[offset++] = (p1+p2+p3+p4+p5+p6+p7+p8+p9)/9f;
+			}
+		   }
+                   System.arraycopy(pixels, 0, strPixels, 0, len);
+            }
+
+// if lpF != 0:
+            int end = imageHeight-1;   // because the width of straight filament is always odd
+            int start = 0;
+            int newHeight = end;
+            if (lpF > 0.0f)
+            {  // Check if the array's dimension is power of 2 for the FFT-lowpass filter	
+    	       for (int dimTest = end; dimTest > 1; dimTest = dimTest/2)
+  	       {   if ((dimTest % 2) != 0) 
+   	           {  newHeight = 1 + (int)(Math.log((double)imageHeight)/
+    	   	                              Math.log(2.0));
+     	              newHeight = java.lang.Math.round((float)
+    	   	                             (Math.pow(2.0,(double)newHeight)));
+                      if (newHeight > imageHeight)
+ 	   	         start = (newHeight - imageHeight)/2 + 
+ 	   	                 (newHeight - imageHeight)%2;
+     	           }
+     	        }
+                if (newHeight >= imageHeight)
+                   end = imageHeight;
+            }
+            float[] srcImage = new float[newHeight];
+            float[] filtImage = new float[newHeight];
+// end if lpF != 0
+
+            boolean shift = false;
+            String txt2 = "";
+            int i = 0;
+            int nN = 0;
+            while (i < npoints && nN < numNodes)
+            {  if (listNodes[nN] == i+1)    
+               {   int ii = (int)Math.round(points[i].getX());
+                   if (av == 0)			// no average of col.s
+                   {  for (int j = 0; j < imageHeight; j++)
+                          strLine[j] = strPixels[ii+j*imageWidth];
+                   }
+                   else				// average neighbouring col.s
+                   {  for (int j = 0; j < imageHeight; j++)
+                          strLine[j] = 0.0f;
+                      for (int j = 0; j < imageHeight; j++)
+                      {   if (i == 0)
+                          for (int iw = 0; iw <= 2*av; iw++) 
+                              strLine[j] += strPixels[ii+iw+j*imageWidth];
+                          else
+                          if (i < npoints - 1)
+                          for (int iw = -av; iw <= av; iw++)
+                              strLine[j] += strPixels[ii+iw+j*imageWidth];
+                          else
+                          for (int iw = -2*av; iw <= 0; iw++)
+                              strLine[j] += strPixels[ii+iw+j*imageWidth];
+                          strLine[j] = strLine[j] / (float)(2*av + 1);
+                      }
+                   }
+
+                   if (lpF > 0.0f)
+                   {  for (int j = 0; j < newHeight; j++)		
+                      {   srcImage[j] = 0.0f;
+                          filtImage[j] = 0.0f;
+                      }
+                      for (int j = 0; j < end; j++)
+ 	                  srcImage[j + start] = strLine[j];
+                      Fourier ff = new Fourier();
+                      filtImage = ff.lowPassFilter(srcImage, newHeight, lpF);  
+                      // Strip image from the padding (if it was done)
+                      for (int j = 0; j < end; j++)		
+                          strLine[j] = filtImage[start+j];
+                      if (end == imageHeight-1)
+                         strLine[end] = 0.0f;
+                   }
+
+                   // "Edge detection" : edge = where the density>average first&last time
+                   double dif = 0.0;
+                   float sum = 0.0f;
+                   for (int j = 0; j < imageHeight; j++)
+ 	               if (j > 1 && j < imageHeight-2)
+                          sum += strLine[j];
+                   sum /= imageHeight-4;
+                   int beg = 2;
+                   int edge1 = 0;
+                   while (strLine[beg] <= sum)
+                   {     beg++;
+                         edge1++;
+                   }
+                   int edge2 = 0;
+                   int last = imageHeight-3;
+                   while (strLine[last] <= sum)
+                   {     last--;
+                         edge2++;
+                   }
+                   if (edge1 != edge2)	// node is not centered
+                   {  dif = (double)(edge1-edge2)/2.0;
+                      double nx = points[i].getX();
+                      double ny = points[i].getY() + dif;
+                      points[i].setLocation(nx, ny);
+                      shift = true;
+                      txt2 += " "+(i+1); 
+                   }
+                   nN++;
+                }
+                i++;
+/*
+// Plot them for Debugging
+         ImageProcessor ipC = new ColorProcessor(newHeight, 260);
+         ipC.setColor(java.awt.Color.white); ipC.fill();
+         ipC.setColor(java.awt.Color.black); 
+         ipC.moveTo(0,260);
+         ipC.setColor(java.awt.Color.red);
+          for (int j = 0; j < imageHeight; j++)
+              ipC.lineTo(j, (260-(int)strLine[j]));
+          ipC.setColor(java.awt.Color.green);
+          ipC.moveTo(0,260-(int)sum);
+ 	  ipC.lineTo(end, 260-(int)sum);
+          new ImagePlus("strLine:"+i,ipC).show();
+
+          float sumF = 0.0f;
+          for (int j = 0; j < imageHeight; j++)		
+          {   if (j > 1 && j < imageHeight-2)
+                 sumF += strLine[j];
+          }
+          sumF /= imageHeight-2;
+
+         ImageProcessor ipCf = new ColorProcessor(newHeight, 260);
+         ipCf.setColor(java.awt.Color.white); ipCf.fill();
+         ipCf.setColor(java.awt.Color.black); 
+         ipCf.moveTo(0,260);
+         ipCf.setColor(java.awt.Color.red);
+         for(int j = 1; j < imageHeight; j++)
+             ipCf.lineTo(j, (260-(int)strLine[j]));
+          ipCf.setColor(java.awt.Color.green);
+          ipCf.moveTo(0,260-(int)sumF);
+ 	  ipCf.lineTo(end, 260-(int)sumF);
+         IJ.showProgress(1.0);
+         new ImagePlus("filtImage:"+i,ipCf).show();
+//
+*/
+            }
+
+            String[] text = new String[2];
+            if (shift)
+               text[0] = "The following nodes were shifted: ";
+            else
+               text[0] = " There were no shifts of any nodes. ";
+            text[1] = txt2;
+            int[] fS = {12, 12};
+            String[] bT = {"OK"};
+            messageDialog mD = new messageDialog(splW, text, fS, bT);
+            boolean mes = mD.showDialog();   
+
+            if (firstTimeStr)
+            {  parentIc.relocateNodes(points, npoints, parentNodes, 0);
+               firstTimeStr = false;
+            }
+            else
+               parentIc.relocateNodes(points, npoints, parentNodes, parentNumNod);
+            repaint();
+            parentIc.doStraight(minDist); 
+         } // if (popUp)
+      } // if (nodePopUp)
+   }
+
+   public void autRef2(int minDist)
+   {  float lpF = parentIc.getlpF();
+      int numSmooth = parentIc.getnumSmooth();
+      int av = parentIc.getnumAverCol();
+
+      float[] strPixels = (float[])imp.getProcessor().getPixels();
+      float[] strLine = new float[imageHeight];
+
+      for (int i = 1; i <= numSmooth; i++)	//FloatProcessor().filter(int type)
+      {   int len = imageHeight*imageWidth;
+                float[] pixels = new float[len];
+                float p1, p2, p3, p4, p5, p6, p7, p8, p9;
+	        int offset;
+                float sum1, sum2;
+                int rowOffset = imageWidth;
+	        for (int y=1; y<=imageHeight-2; y++) {
+			offset = 1 + y * imageWidth;
+			p1 = 0f;
+			p2 = strPixels[offset-rowOffset-1];
+			p3 = strPixels[offset-rowOffset];
+			p4 = 0f;
+			p5 = strPixels[offset-1];
+			p6 = strPixels[offset];
+			p7 = 0f;
+			p8 = strPixels[offset+rowOffset-1];
+			p9 = strPixels[offset+rowOffset];
+
+			for (int x=1; x<=imageWidth-2; x++) {
+				p1 = p2; p2 = p3;
+				p3 = strPixels[offset-rowOffset+1];
+				p4 = p5; p5 = p6;
+				p6 = strPixels[offset+1];
+				p7 = p8; p8 = p9;
+				p9 = strPixels[offset+rowOffset+1];
+				pixels[offset++] = (p1+p2+p3+p4+p5+p6+p7+p8+p9)/9f;
+			}
+		   }
+                   System.arraycopy(pixels, 0, strPixels, 0, len);
+       }
+
+// if lpF != 0:
+       int end = imageHeight-1;   // because the width of straight filament is always odd
+       int start = 0;
+       int newHeight = end;
+       if (lpF > 0.0f)
+       {  // Check if the array's dimension is power of 2 for the FFT-lowpass filter	
+    	       for (int dimTest = end; dimTest > 1; dimTest = dimTest/2)
+  	       {   if ((dimTest % 2) != 0) 
+   	           {  newHeight = 1 + (int)(Math.log((double)imageHeight)/
+    	   	                              Math.log(2.0));
+     	              newHeight = java.lang.Math.round((float)
+    	   	                             (Math.pow(2.0,(double)newHeight)));
+                      if (newHeight > imageHeight)
+ 	   	         start = (newHeight - imageHeight)/2 + 
+ 	   	                 (newHeight - imageHeight)%2;
+     	           }
+     	        }
+                if (newHeight >= imageHeight)
+                   end = imageHeight;
+      }
+      float[] srcImage = new float[newHeight];
+      float[] filtImage = new float[newHeight];
+// end if lpF != 0
+
+      for (int i = 0; i < npoints-1; i++)     
+      {   int ii1 = (int)Math.round(points[i].getX());
+          int ii2 = (int)Math.round(points[i+1].getX());
+          int dii = ii2-ii1;
+          if ((dii) >= minDist) 
+          {        int ii = ii1 + dii/2;
+                   if (av == 0)			// no average of col.s
+                   {  for (int j = 0; j < imageHeight; j++)
+                          strLine[j] = strPixels[ii+j*imageWidth];
+                   }
+                   else				// average neighbouring col.s
+                   {  for (int j = 0; j < imageHeight; j++)
+                          strLine[j] = 0.0f;
+                      for (int j = 0; j < imageHeight; j++)
+                      {   if (i == 0)
+                          for (int iw = 0; iw <= 2*av; iw++) 
+                              strLine[j] += strPixels[ii+iw+j*imageWidth];
+                          else
+                          if (i < npoints - 1)
+                          for (int iw = -av; iw <= av; iw++)
+                              strLine[j] += strPixels[ii+iw+j*imageWidth];
+                          else
+                          for (int iw = -2*av; iw <= 0; iw++)
+                              strLine[j] += strPixels[ii+iw+j*imageWidth];
+                          strLine[j] = strLine[j] / (float)(2*av + 1);
+                      }
+                   }
+
+                   if (lpF > 0.0f)
+                   {  for (int j = 0; j < newHeight; j++)		
+                      {   srcImage[j] = 0.0f;
+                          filtImage[j] = 0.0f;
+                      }
+                      for (int j = 0; j < end; j++)
+ 	                  srcImage[j + start] = strLine[j];
+                      Fourier ff = new Fourier();
+                      filtImage = ff.lowPassFilter(srcImage, newHeight, lpF);  
+                      // Strip image from the padding (if it was done)
+                      for (int j = 0; j < end; j++)		
+                          strLine[j] = filtImage[start+j];
+                      if (end == imageHeight-1)
+                         strLine[end] = 0.0f;
+                   }
+
+                   // "Edge detection" : edge = where the density>average first&last time
+                   double dif = 0.0;
+                   float sum = 0.0f;
+                   for (int j = 0; j < imageHeight; j++)
+ 	               if (j > 1 && j < imageHeight-2)
+                          sum += strLine[j];
+                   sum /= imageHeight-4;
+                   int beg = 2;
+                   int edge1 = 0;
+                   while (strLine[beg] <= sum)
+                   {     beg++;
+                         edge1++;
+                   }
+                   int edge2 = 0;
+                   int last = imageHeight-3;
+                   while (strLine[last] <= sum)
+                   {     last--;
+                         edge2++;
+                   }
+                   if (edge1 != edge2)	// node is not centered
+                   {  dif = (double)(edge1-edge2)/2.0;
+                      npoints++;
+                      drawingPoints[npoints-1] = new Point2D.Double(0.0, 0.0);
+                      points[npoints-1] = new Point2D.Double(0.0, 0.0);
+                      for (int j = npoints-1; j > i+1; j--)
+                          points[j].setLocation(points[j-1]);
+                      double nx = (double)ii;
+                      double ny = points[i].getY() + dif;  //points[i].getY()=const. for all i
+                      points[i+1].setLocation(nx, ny);
+                   }
+           }
+       }
+       minDist = 0;
+       parentIc.relocateNodes(points, npoints, parentNodes, 0);
+       firstTimeStr = false;
+       parentIc.doStraight(minDist); 
+   }
+
+   public float getlpF()
+   {  return lF;
+   }
+
+   public int getnumSmooth()
+   {  return numSm;
+   }
+
+   public int getnumAverCol()
+   {  return avg;
+   }
+
+   public void setlpF(float lf)
+   {  lF = lf;
+   }
+
+   public void setnumSmooth(int nSh)
+   {  numSm = nSh;
+   }
+
+   public void setnumAverCol(int a)
+   {  avg = a;
+   }
+
+   //ImageJ needs the followings
+   protected ImagePlus imp;
+   private SplineImageCanvas parentIc;
+   private ImageJ imJ;
+   private int imageWidth, imageHeight;
+   private Rectangle srcRect = new Rectangle(0, 0, 0, 0);
+   private int xMouseStart = 0;
+   private int yMouseStart = 0;
+   private int xSrcStart = 0; 
+   private int ySrcStart = 0;
+   private int xMouse = -1;
+   private int yMouse = -1;
+   private int markWidth = 3;
+   private int markWidthDraw = 3;
+   private double magnification = 1.0;
+   private SplineWindow splW;
+   private boolean relocation = false;
+   //
+   private int current = -1;
+   private int npoints = 0;
+   private int onp = 0;
+   private int parentNumNod = 0;
+   private static final int CLICKSIZE = 10;
+   private static final int MAXNPOINTS = 500;
+   private static final int MAX_ITEMS = 10;
+   private Point2D[] points = new Point2D[MAXNPOINTS];
+   private Point2D[] drawingPoints = new Point2D[MAXNPOINTS];
+   private Point2D[] oldPoints = new Point2D[MAXNPOINTS];
+   private Point2D[] parentNodes = new Point2D[MAXNPOINTS];
+   private double[] strNodes;
+   private double[] slope, curvature;
+   private Point2DVector Spline = new Point2DVector();
+   private CubicCurveMaker curveMaker, curveMakerDraw;
+   private Shape curve, curveDraw;
+   private int width = 21;
+   private int length, W;
+   private float alphaW = 0.25f;
+   private float alphaC = 1.0f;
+   private Color colorW = Color.yellow;
+   private Color colorC = Color.green;
+   private float[] strArray, refArray, srcImage;
+   private int[] newDimLengths ={0,0};
+   private float[][] dirs;
+   private boolean hasParentCanvas = false;
+   private boolean firstTimeStr = true;
+   private boolean diffPattExist = false;
+   private int numOfStr = 0;
+   private boolean iMode = true;
+   private String text, title;
+   private int winOpt = 1;
+   private AutRefOptionDialog popUp = null;
+   private AutRefNodeDialog nodePopUp = null;
+   private int refWidth, refHeight;
+   private int avg, numSm;
+   private float lF;
+}   
+
+//==========================================================================================
+
+class StraightArray
+{  public StraightArray(int height, Point2DVector sPoints, double[] Slopes)
+   {  Len = sPoints.size();
+      Spline = new Point2D[Len];
+      sPoints.copyInto(Spline);
+      slope = new double[Len-1];
+      for (int i = 0; i < Len-1; i++)
+          slope[i] = Slopes[i];
+      Ht = height;    
+      rad = Ht / 2;
+      strArray = new float[Len*Ht];
+   }
+   
+   public StraightArray()
+   {
+   }
+   
+   public float[] calcStraight(ImageProcessor ip, int w, double[] nodes)
+   {  double sdist = 1.0;
+      double theta = Math.PI / 2.0;
+      boolean mu = true;
+      float x, y;
+      int np = nodes.length;
+      dirs = new float[np][2];
+
+      if (slope[0] < 0.0) 
+         sdist = -sdist;
+      if (Spline[0].getX() > Spline[1].getX()) 
+         sdist = -sdist;
+      
+      int k = 0;
+      int posNode = 0;
+      for (int i = 0; i < Len-1; i++)
+      {   theta = Math.PI / 2.0;
+          if (slope[i] == 0.0)
+             sdist = Math.abs(sdist);
+          else
+             theta = Math.atan(-1.0 / slope[i]);
+          if (Math.abs(theta) < 0.1) 
+             mu = false;
+          if (mu)
+          {  sdist = Math.abs(sdist);
+             if (slope[i] < 0.0)
+                sdist = -sdist;
+             if (Spline[i].getX() > Spline[i+1].getX())
+                sdist = -sdist;
+          }
+          for (int j = Ht; j > 0; j--)
+          {   x = (float)((j - rad - 1) * sdist * Math.cos(theta)) + 
+                     (float)Spline[i].getX();
+              y = (float)((j - rad - 1) * sdist * Math.sin(theta)) + 
+                     (float)Spline[i].getY();
+              strArray[(Ht - j )*Len + i] = Bilin(x, y, ip, w);
+          }
+          mu = true;
+         
+          if (i == posNode)
+          {  dirs[k][0] = (float)(sdist * Math.cos(theta));
+             dirs[k][1] = (float)(sdist * Math.sin(theta));
+             k++;
+             if (k < np)
+                posNode = (int)Math.round(nodes[k]);
+          }
+      }
+      
+      //the last point
+      for (int j = Ht; j > 0; j--)
+          {   x = (float)((j - rad - 1) * sdist * Math.cos(theta)) + 
+                     (float)Spline[Len-1].getX();
+              y = (float)((j - rad - 1) * sdist * Math.sin(theta)) + 
+                     (float)Spline[Len-1].getY();
+              strArray[(Ht - j)*Len+(Len-1)] = Bilin(x, y, ip, w);
+          }
+      
+      if (k == np-1)
+      {  dirs[k][0] = (float)(sdist * Math.cos(theta));
+         dirs[k][1] = (float)(sdist * Math.sin(theta));
+      }
+             
+      return strArray;
+   }
+   
+   public float Bilin(float x, float y, ImageProcessor ip, int w)
+   {  int ix = (int) x;
+      int iy = (int) y;
+      float delx = x - (float) ix;
+      float dely = y - (float) iy;
+      float r1 = 0.0f;
+      float r2 = 0.0f;
+      float r3 = 0.0f;
+      float r4 = 0.0f;
+      if (ip instanceof ByteProcessor)
+      {  byte[] array = (byte[])ip.getPixels();
+         r1 = (float)(array[iy*w+ix]&255);	//(ix,iy)	(wsr)
+         r2 = (float)(array[(iy+1)*w+ix]&255);	//(ix,iy+1)	(wsr)
+         r3 = (float)(array[iy*w+ix+1]&255);	//(ix+1,iy)	(wsr)
+         r4 = (float)(array[(iy+1)*w+ix+1]&255);	//(ix+1,iy+1)	(wsr)
+      }
+      else
+      if (ip instanceof FloatProcessor)
+      {  float[] array = (float[])ip.getPixels();
+         r1 = array[iy*w+ix];		
+         r2 = array[(iy+1)*w+ix];	
+         r3 = array[iy*w+ix+1];		
+         r4 = array[(iy+1)*w+ix+1];	
+      }
+      else
+      {  IJ.error("8-, or 32-bit image required"); 
+         return 0.0f;
+      }
+      float r12 = r1 + (r2-r1)*dely;
+      float r34 = r3 + (r4-r3)*dely;
+      float interp = r12 + (r34-r12)*delx;
+   
+      return interp;
+    }
+    
+    public float[][] getDirs()
+    {  return dirs;
+    }
+
+    private int Len, Ht, rad;
+    private float[] strArray;
+    private Point2D[] Spline;
+    private double[] slope;
+    private float[][] dirs;
+}
+//==========================================================================================
+class diffPattWindow implements MouseListener
+{  public diffPattWindow(int width, int height, float[] diffPatt, float[] p, String title)
+   {  ipDiff = new FloatProcessor(width, height, diffPatt, null);
+      diffImp = new ImagePlus(title, ipDiff);
+      diffImp.show();
+      ipDiff.snapshot();		//for reset() later
+      canvas = diffImp.getWindow().getCanvas();
+      canvas.addMouseListener(this);
+
+      this.width = width;
+      centerX = width/2;
+      centerY = height/2;
+      int len = p.length;
+      phases = new float[len];
+      System.arraycopy(p, 0, phases, 0, len);
+   }
+
+   public void mousePressed(MouseEvent e)
+   {  Point cursorLoc = canvas.getCursorLoc();
+      int x = (int)cursorLoc.getX();
+      int y = (int)cursorLoc.getY();
+      int toolID = Toolbar.getToolId();
+      if (toolID == Toolbar.CROSSHAIR)
+      {   int cx = x - centerX;
+      	  int cy = y - centerY;
+          int position = y*width + x;
+          int yM = centerY - cy;
+          int positionM = yM*width + x;
+          float pR = phases[position] * (float)(180.0 / java.lang.Math.PI);
+          float pRM = phases[positionM] * (float)(180.0 / java.lang.Math.PI);
+          float pD = pR - pRM;
+          IJ.write("Coordinate from center (x, R) : " + cx +", " + cy);
+          IJ.write("Phase(R) : " + pR + " (deg)");
+          IJ.write("Phase(-R):  " + pRM + ";      Phase difference: "+ pD + " (deg)");
+          ipDiff.reset();		//CROSSHAIR draws a black pixel to the clicked place
+      }
+   }
+
+   public void mouseClicked(MouseEvent e) {}
+   public void mouseReleased(MouseEvent e) {}
+   public void mouseEntered(MouseEvent e) {}
+   public void mouseExited(MouseEvent e) {}
+
+   private ImageProcessor ipDiff;
+   private ImagePlus diffImp;
+   private ImageCanvas canvas;
+   private float[] phases;
+   private int centerX, centerY;
+   private int width;
+}//==========================================================================================
+class Point2DVector
+{  public Point2DVector(int iC, int cI)
+   {  iCap = iC;
+      capI = cI;
+   }
+
+   public Point2DVector()
+   {  
+   }
+   
+   public void set(int n, double x, double y)
+   {  v.set(n, new Point2D.Double(x, y));
+   }
+   
+   public void add(double x, double y)
+   {  v.add(new Point2D.Double(x, y));
+   }
+   
+   public Point2D get(int n)
+   {  return ((Point2D)v.get(n));
+   }
+   
+   public int size()
+   {  return v.size();
+   }
+   
+   public void trimToSize()
+   {  v.trimToSize();
+   }
+   
+   public void copyInto(Point2D[] a)
+   {  v.copyInto(a);
+   }
+   
+   private int iCap;
+   private int capI;
+   private Vector v = new Vector(iCap, capI);
+} 
+
+class DoubleVector
+{  public DoubleVector(int iC, int cI)
+   {  iCap = iC;
+      capI = cI;
+   }
+
+   public void set(int n, double x)
+   {  v.set(n, new Double(x));
+   }
+   
+   public void add(double x)
+   {  v.add(new Double(x));
+   }
+   
+   public double get(int n)
+   {  return ((Double)v.get(n)).doubleValue();
+   }
+   
+   public int size()
+   {  return v.size();
+   }
+   
+   public void trimToSize()
+   {  v.trimToSize();
+   }
+   
+   public void copyInto(Double[] a)
+   {  v.copyInto(a);
+   }
+   
+   private int iCap;
+   private int capI;
+   private Vector v = new Vector(iCap, capI);
+} 
+
+class StringVector
+{  public StringVector(int iC, int cI)
+   {  iCap = iC;
+      capI = cI;
+   }
+   
+   public StringVector()
+   {  
+   }
+   
+   public void set(int n, String s)
+   {  v.set(n, new String(s));
+   }
+   
+   public void add(String s)
+   {  v.add(new String(s));
+   }
+   
+   public String get(int n)
+   {  return ((String)v.get(n));
+   }
+   
+   public int size()
+   {  return v.size();
+   }
+   
+   public void trimToSize()
+   {  v.trimToSize();
+   }
+   
+   public void copyInto(String[] a)
+   {  v.copyInto(a);
+   }
+   
+   private int iCap;
+   private int capI;
+   private Vector v = new Vector(iCap, capI);
+} 
+//==========================================================================================
+
+class CubicCurveMaker
+{  public CubicCurveMaker(int nps, Point2D[] points)
+   {  np = nps;
+      for (int i = 0; i < np; i++)
+          p[i] = new Point2D.Double(points[i].getX(), points[i].getY());
+
+      c = new Point2D[np][4];
+      ts = new double[np];
+      t = new double[np];
+      length = new double[np];
+   }
+
+   public void calCoeff(double[] tt) 
+   {  double dt, dtj, dtjp1, dtp;
+      if (np > 2 )
+      {  dtj = tt[1] - tt[0];
+         Point2D dj = new Point2D.Double(p[1].getX() - p[0].getX(),
+                                         p[1].getY() - p[0].getY());
+
+         Point2D djp1 = new Point2D.Double(0.0,0.0);
+         for (int j = 1; j < np - 1; j++)
+         {   dtjp1 = tt[j+1] - tt[j];
+             dtp = dtj + dtjp1;
+             djp1.setLocation(p[j+1].getX() - p[j].getX(),
+                              p[j+1].getY() - p[j].getY());
+             c[j][1] = new Point2D.Double(dtjp1/dtp, dtjp1/dtp);
+             c[j][2] = new Point2D.Double(1.0 - c[j][1].getX(), 1.0 - c[j][1].getY()); 
+             c[j][3] = new Point2D.Double(6.0 * (djp1.getX()/dtjp1 - dj.getX()/dtj) / dtp,
+                                          6.0 * (djp1.getY()/dtjp1 - dj.getY()/dtj) / dtp);
+             dtj = dtjp1;
+             dj.setLocation(djp1);
+          } 
+          c[0][1] = new Point2D.Double(0.0,0.0);
+          c[0][2] = new Point2D.Double(0.0,0.0);
+          c[0][3] = new Point2D.Double(0.0,0.0);
+          for (int j = 1; j < np - 1; j++)
+          {   Point2D pj = new Point2D.Double(c[j][2].getX() * c[j-1][1].getX() + 2.0,
+                                              c[j][2].getY() * c[j-1][1].getY() + 2.0);                                     
+              c[j][1].setLocation(-c[j][1].getX() / pj.getX(), -c[j][1].getY() / pj.getY());  
+              c[j][2].setLocation((c[j][3].getX() - c[j][2].getX() * c[j-1][2].getX()) / pj.getX(),  
+                                  (c[j][3].getY() - c[j][2].getY() * c[j-1][2].getY()) / pj.getY());
+          }                      
+          Point2D ppb = new Point2D.Double(0.0,0.0);
+          Point2D ppa = new Point2D.Double(0.0,0.0);
+          for (int i = 2; i <= np ; i++)
+          {   int j = np - i;
+              ppa.setLocation(c[j][1].getX() * ppb.getX() + c[j][2].getX(),
+                              c[j][1].getY() * ppb.getY() + c[j][2].getY());
+              dt = tt[j+1] - tt[j];
+              c[j][3].setLocation((ppb.getX() - ppa.getX()) / (6.0 * dt),
+                                  (ppb.getY() - ppa.getY()) / (6.0 * dt)); 
+              c[j][2].setLocation(ppa.getX() / 2.0, ppa.getY() / 2.0);
+              c[j][1].setLocation((p[j+1].getX() - p[j].getX()) / dt - 
+                                  (c[j][2].getX() + c[j][3].getX() * dt) * dt,
+                                  (p[j+1].getY() - p[j].getY()) / dt - 
+                                  (c[j][2].getY() + c[j][3].getY() * dt) * dt);
+              c[j][0] = new Point2D.Double(p[j].getX(), p[j].getY());
+              ppb.setLocation(ppa);
+          }
+      }
+      else
+      {  dt = tt[1] - tt[0];
+         c[0][0] = new Point2D.Double(p[0].getX(), p[0].getY());   
+         c[0][1] = new Point2D.Double((p[1].getX() - p[0].getX()) / dt, 
+                                      (p[1].getY() - p[0].getY()) / dt); 
+         c[0][2] = new Point2D.Double(0.0,0.0);   
+         c[0][3] = new Point2D.Double(0.0,0.0);    
+      }    
+   }
+   
+   public Point2D[][] getCoeff(double[] ts)
+   {  calCoeff(ts);
+   
+      return c;
+   }
+                    
+   public Shape makeShape(double magnification, Rectangle recT)
+   {  GeneralPath g = new GeneralPath();
+
+      calcSpline();
+
+      for (int i = 1; i <= (int)length[np-1]; i++)
+      {   Point2D xl = new Point2D.Double(magnification * (Spline.get(i-1).getX() - recT.x),
+                                          magnification * (Spline.get(i-1).getY() - recT.y));
+          Point2D yl =  new Point2D.Double(magnification * (Spline.get(i).getX() - recT.x),
+                                          magnification * (Spline.get(i).getY() - recT.y));
+          g.append(new Line2D.Double(xl, yl), false);
+      }            
+      return g;
+   }
+   
+   public void calcSlope(double pos, int nod)
+   {  der = new Point2D.Double(0.0,0.0);
+      dder = new Point2D.Double(0.0,0.0);
+      Point2D spp = new Point2D.Double(0.0,0.0);
+      double d;
+   
+      d = pos - length[nod];
+      if (d == 0.0)
+      {  der.setLocation(c[nod][1]);
+         dder.setLocation(2 * c[nod][2].getX(), 2 * c[nod][2].getY());
+      }
+      else
+      {  spp.setLocation(3.0 * c[nod][3].getX() * d + c[nod][2].getX(),
+                         3.0 * c[nod][3].getY() * d + c[nod][2].getY());
+         der.setLocation((spp.getX() + c[nod][2].getX()) * d + c[nod][1].getX(),
+                         (spp.getY() + c[nod][2].getY()) * d + c[nod][1].getY());
+         dder.setLocation(2 * spp.getX(), 2 * spp.getY());
+      }  
+   }
+   
+   public void calcSpline()
+   {  Function F = new Function(np, p, 0);
+      length = F.calcLength();
+      calCoeff(length);
+      Spline.add(p[0].getX(), p[0].getY());
+      calcSlope(0.0,0);
+      if (der.getX() == 0.0)
+      {  slope.add(1E308);
+      }
+      else
+      {  slope.add(der.getY() / der.getX());
+      }
+      double ln = 1.0;
+      double d;
+      double sx, sy;
+
+      for (int i = 0; i < np-1; i++)
+      {    while (ln < length[i+1])
+          {   calcSlope(ln, i);
+              if (der.getX() == 0.0)
+              {  slope.add(1E308);
+              }
+              else
+              {  slope.add(der.getY() / der.getX());
+              }
+              d = ln - length[i];
+              sx = ((c[i][3].getX() * d + c[i][2].getX()) * d + c[i][1].getX()) * d + c[i][0].getX();
+              sy = ((c[i][3].getY() * d + c[i][2].getY()) * d + c[i][1].getY()) * d + c[i][0].getY();
+              Spline.add(sx, sy);
+              ln += 1.0;
+          }
+      }
+      Spline.add(p[np-1].getX(), p[np-1].getY());
+   }
+   
+   public Point2DVector getSpline()
+   {  Spline.trimToSize();
+      return Spline;
+   }
+   
+   public int getSlopeSize()
+   {  slope.trimToSize();
+      slopeSize = slope.size();
+      
+      return slopeSize;
+   }
+   
+   public double[] getSlope()
+   {  Double[] slopeDarr = new Double[slopeSize];
+      slope.copyInto(slopeDarr);
+      double[] slopeArr = new double[slopeSize];
+      for (int i = 0; i < slopeSize; i++)
+          slopeArr[i] = slopeDarr[i].doubleValue();
+          
+      return slopeArr;
+   }
+   public void calcCurvature()
+   {  calcSlope(0.0,0);
+      double sqder = Math.pow((der.getX() * der.getX() + der.getY() * der.getY()), 1.5);
+      double cd = Math.abs(dder.getX() * der.getY() - dder.getY() * der.getX());
+      if (sqder == 0.0)
+      {  curve.add(1E308);
+      }
+      else
+      {  curve.add(cd / sqder);
+      }
+      double ln = 1.0;
+      for (int i = 0; i < np-1; i++)
+      {   while (ln < length[i+1])
+          {   calcSlope(ln, i);
+              sqder = Math.pow((der.getX() * der.getX() + der.getY() * der.getY()), 1.5);
+              cd = Math.abs(dder.getX() * der.getY() - dder.getY() * der.getX());
+              if (sqder == 0.0)
+              {  curve.add(1E308);
+              }
+              else
+              {  curve.add(cd / sqder);
+              }
+              ln += 1.0;
+          }
+       }
+       curvIsCalculated = true;
+    }
+   public double[] getCurvature()
+   {  if (!curvIsCalculated)
+         calcCurvature();
+      Double[] curveDarr = new Double[slopeSize];	//size of curve = size of slope
+      curve.copyInto(curveDarr);
+      double[] curveArr = new double[slopeSize];
+      maxCurv = 0.0;
+      for (int i = 0; i < slopeSize; i++)
+      {    curveArr[i] = curveDarr[i].doubleValue();
+           if (curveArr[i] > maxCurv)
+              maxCurv = curveArr[i];
+      }
+          
+      return curveArr;
+   }
+   
+   public double getMaxCurv()
+   {  return maxCurv;
+   }
+
+   public double[] getStrNodes()
+   {  return length;
+   }
+   
+   private int np;
+   private static final int MAXNPOINTS = 500;   
+   private Point2D[] p = new Point2D[MAXNPOINTS];
+
+   private Point2D[][] c;
+   private double[] ts;
+   private double[] t;
+   private double[] length;
+   private Point2DVector Spline = new Point2DVector(400,200);
+   private DoubleVector slope = new DoubleVector(400,200);
+   private DoubleVector curve = new DoubleVector(400,200);
+   private Point2D der;
+   private int slopeSize = 0;
+   private Point2D dder;
+   private boolean curvIsCalculated = false;
+   private double maxCurv;
+}
+
+class Integration
+{  public Integration(double beg, double end, int nint, int npoints, Point2D[] points)
+   {  a = beg;
+      b = end;
+      np = npoints;
+      for (int i = 0; i < np; i++)
+          p[i] = new Point2D.Double(points[i].getX(), points[i].getY());
+      ii = nint;
+      F = new Function(np, p, ii);
+   }
+
+   public double Romberg()
+   {  double ss;
+      double dss;
+      double[] s = new double[JMAXP];
+      double[] h = new double[JMAXP + 1];
+
+      h[1] = 1.0;
+      for (int j = 1; j <= JMAX; j++)
+      {   s[j] = Trapzd(j);
+          if (j >= K)
+          {  Interpolation Ip = new Interpolation(h, s, K, j-K+1, 0.0);
+             Ip.PolInt();
+             ss = Ip.getValue();
+             dss = Ip.getErrEst();
+             if (Math.abs(dss) <= EPS * Math.abs(ss)) return ss;
+          }
+          h[j + 1] = 0.25 * h[j];
+      }
+      
+      System.out.println(" Too many steps in Romberg Integration");
+      return 0.0;
+   }
+   
+   public double Trapzd(int n)
+   {  double x, tnm, sum, del;
+      
+      if (n == 1)
+      {  return (sT = 0.5 * (b - a) * 
+                     (F.getVal(a) + F.getVal(b)));
+      }
+      else
+      {  int it = 1;
+         for (int j = 1; j < n-1; j++) it <<= 1;
+         tnm = it;
+         del = (b-a) / tnm;
+         x = a + 0.5 * del;
+         sum = 0.0;
+         for (int j = 1; j <= it; j++, x += del) 
+         {   sum += F.getVal(x);
+         }
+         sT = 0.5 * (sT + (b - a) * sum / tnm);
+   
+         return sT;
+      }
+   }
+   
+   private static final double EPS = 1.0e-6;
+   private static final int JMAX  = 20;
+   private static final int JMAXP = JMAX + 1;
+   private double sT;
+   private static final int K = 5;
+   private double a;
+   private double b;
+   private int np;
+   private int ii;
+   private static final int MAXNPOINTS = 500;   
+   private Point2D[] p = new Point2D[MAXNPOINTS];
+
+   private Function F;
+}
+
+class Interpolation
+{  public Interpolation(double[] xarray, double[] yarray, int np, int beg, double xx)
+   {  n = np;
+      from = beg;
+      System.arraycopy(xarray,from,xa,1,n);
+      System.arraycopy(yarray,from,ya,1,n);
+      x = xx;
+   }
+
+   public void PolInt()
+   {  int   i, m, ns = 1;
+      double den, dif, dift, ho, hp, w;
+      
+      dif = Math.abs(x - xa[1]);
+      for (i = 1; i <= n; i++)
+      {   if ((dift = Math.abs(x - xa[i])) < dif)
+          {  ns = i;
+             dif = dift;
+          }
+          c[i] = ya[i];
+          d[i] = ya[i];
+      }
+      y = ya[ns--];
+      for (m = 1; m < n; m++)
+      {   for (i = 1; i <= n - m; i++)
+          {   ho = xa[i] - x;
+              hp = xa[i + m] - x;
+              w = c[i+1] - d[i];
+              if ((den = ho - hp) == 0.0)
+              {  System.out.println(" Error in PolInt!");
+                 System.exit(0);
+              }
+              den = w/den;
+              d[i] = hp * den;
+              c[i] = ho * den;
+          }
+          y += (dy = (2 * ns < (n - m) ? c[ns + 1] : d[ns--]));
+      }
+   }
+   
+   public double getValue()
+   {  return y;
+   }
+   
+   public double getErrEst()
+   {  return dy;
+   }
+   
+   private static final int MAXNINT = 6;	//K = 5 in Romberg
+   private double[] xa = new double[MAXNINT];
+   private double[] ya = new double[MAXNINT];
+   private double[] c  = new double[MAXNINT];
+   private double[] d  = new double[MAXNINT];
+   private int n;
+   private int from;
+   private double x;
+   private double y;
+   private double dy;
+}
+
+class Function
+{  public Function(int npoints, Point2D[] points, int ii)
+   {  np = npoints;
+      for (int i=0; i < np; i++)
+          p[i] = new Point2D.Double(points[i].getX(), points[i].getY());
+      t = new double[np];
+      ts = new double[np];
+      length = new double[np];
+      c = new Point2D[np][4];
+      CCM = new CubicCurveMaker(np, p);
+      nInt = ii;
+
+      ts[0] = 0.0;
+      for (int i = 1; i < np; i++)
+      {   t[i] = p[i].distance(p[i-1]);
+          ts[i] = ts[i-1] + t[i];
+      }
+      c = CCM.getCoeff(ts);
+   }   
+      
+   public double[] calcLength()
+   {  length[0] = 0.0;
+
+      for (int i = 1; i < np; i++)
+      {   FSnum = i - 1;
+          Integration iFS = new Integration(0.0, t[i], FSnum, np, p);
+          length[i] = length[i-1] + iFS.Romberg();
+      }
+
+      return length;
+   }
+   
+   public double getVal(double tt)
+   {  double ddx = (3 * c[nInt][3].getX() * tt + 2 * c[nInt][2].getX()) * tt + 
+                     c[nInt][1].getX();
+      double ddy = (3 * c[nInt][3].getY() * tt + 2 * c[nInt][2].getY()) * tt + 
+                     c[nInt][1].getY();
+
+      double Val = Math.sqrt(ddx * ddx + ddy * ddy);   
+           
+      return Val;
+   }
+
+   private static final int MAXNPOINTS = 500;
+   private int np;
+   private CubicCurveMaker CCM;
+   private Point2D[] p = new Point2D[MAXNPOINTS];
+   private double[] t;
+   private double[] ts;
+   private double[] length;
+   private Integration iFS;
+   private int FSnum, nInt;
+   private Point2D[][] c;
+}
+
+//==========================================================================================
+
+class Nodes
+{  public Nodes(int num)
+   {  numP = num;
+      nodeP = new Point2D[numP];
+   }
+   
+   public void getNodes(Point2D[] p)
+   {  for (int i = 0; i < numP; i++)
+          nodeP[i] = new Point2D.Double(p[i].getX(), p[i].getY());
+   }
+   
+   public Point2D[] putNodes()
+   {  return nodeP;
+   }
+   
+   public int putNodeNum()
+   {  return numP;
+   }
+   
+   public void writeData(PrintWriter out) throws IOException
+   {  for (int i = 0; i < numP; i++)
+          out.println(nodeP[i].getX() + "," + nodeP[i].getY());
+   }
+   
+   public void readData(BufferedReader in) throws IOException
+   {  String s;
+      int i = 0;
+      
+      while ((s = in.readLine()) != null)
+      {  StringTokenizer t = new StringTokenizer(s, ",");
+         nodeP[i]= new Point2D.Double(Double.parseDouble(t.nextToken()),
+                                      Double.parseDouble(t.nextToken()));
+         System.out.println(" nodeP["+i+"]: "+nodeP[i].getX()+","+nodeP[i].getY());
+         i++;
+      }
+      numP = i;
+   }
+   
+   private int numP;
+   private Point2D[] nodeP;
+}
+//==========================================================================================
+class Fourier
+{  public Fourier()
+   { 
+   }
+   public float[] diffractionPattern(float[] realArray, int[] dimLs, boolean logRep)
+   {  dimLengths[0] = dimLs[0];
+      dimLengths[1] = dimLs[1];
+      arrayLength = dimLengths[0] * dimLengths[1];
+      ndim = 2;
+      try { 
+            realData = new float[arrayLength];
+      }
+      catch (OutOfMemoryError e) {
+            realData = null;
+            System.gc();
+            System.out.println("AlgorithmFFT: Out of memory creating realData");
+            return realData;
+      }
+      System.arraycopy(realArray, 0, realData, 0, arrayLength);
+      
+      try {
+              imagData = new float[arrayLength];
+      }
+      catch (OutOfMemoryError e) {
+            imagData = null;
+            System.gc();
+            System.out.println("AlgorithmFFT: Out of memory creating imagData");
+            return realData;
+      }
+        
+      for (int i = 0; i < arrayLength; i++)
+          imagData[i] = 0.0f;
+      
+      transformDir = FORWARD;
+      calcFFT();
+      magnitude(logRep);
+      phase();
+      return magData;
+   }
+
+   public float[] getPhase()
+   {  return phaseData;
+   }
+   
+   public float[] lowPassFilter(float[] realArray, int dimLs, float limit)
+   {  //this is only for 1D case!
+      dimLengths[0] = dimLs;
+      dimLengths[1] = 0;
+      arrayLength = dimLengths[0];
+      ndim = 1;
+      try { 
+            realData = new float[arrayLength];
+      }
+      catch (OutOfMemoryError e) {
+            realData = null;
+            System.gc();
+            System.out.println("AlgorithmFFT: Out of memory creating realData");
+            return realData;
+      }
+      System.arraycopy(realArray, 0, realData, 0, arrayLength);
+      
+      try {
+              imagData = new float[arrayLength];
+      }
+      catch (OutOfMemoryError e) {
+            imagData = null;
+            System.gc();
+            System.out.println("AlgorithmFFT: Out of memory creating imagData");
+            return realData;
+      }
+        
+      for (int i = 0; i < arrayLength; i++)
+          imagData[i] = 0.0f;
+      
+      transformDir = FORWARD;
+      calcFFT();
+      lowpass(limit);
+      transformDir = INVERSE;
+      calcFFT();
+      return realData;
+   }
+
+   public float[] windowFilter(int[] winC, float w0l)
+   {  int nWlen = winC.length;
+      int nW = nWlen / 4;
+      float[] realD, imagD;
+      try { 
+            realD = new float[arrayLength];
+      }
+      catch (OutOfMemoryError e) {
+            realD = null;
+            System.gc();
+            System.out.println("AlgorithmFFT: Out of memory creating realD for l.l. filter");
+            return realD;
+      }
+      for (int i = 0; i < arrayLength; i++)
+          realD[i] = 0.0f;
+
+      try {
+              imagD = new float[arrayLength];
+      }
+      catch (OutOfMemoryError e) {
+            imagD = null;
+            System.gc();
+            System.out.println("AlgorithmFFT: Out of memory creating imagD for l.l. filter");
+            return imagD;
+      }
+        
+      for (int i = 0; i < arrayLength; i++)
+          imagD[i] = 0.0f;
+
+      int centX = dimLengths[0]/2;
+      for (int j = 0; j < dimLengths[1]; j++)		//0 l.l.
+      {   realD[j*dimLengths[0] + centX] = w0l * realData[j*dimLengths[0] + centX];
+          imagD[j*dimLengths[0] + centX] = w0l * imagData[j*dimLengths[0] + centX];
+      }
+
+      int xL, xR, yL, yU;
+      int xL2, xR2, yL2, yU2;
+      for (int i = 0; i < nW; i++)
+      {   xL = winC[i*4];		//right side of the 0 l.l.
+	  yU = winC[i*4+1];
+	  xR = winC[i*4+2];
+	  yL = winC[i*4+3];
+	  xR2 = dimLengths[0] - xL;	// left side of the 0 l.l.
+	  yL2 = dimLengths[0] - yU;
+	  xL2 = dimLengths[0] - xR;
+	  yU2 = dimLengths[0] - yL;
+          for (int j = yU2; j <= yL2; j++)
+          {  for (int k = xL2; k <= xR2; k++)
+	     {	realD[j*dimLengths[0] + k] = realData[j*dimLengths[0] + k];
+              	imagD[j*dimLengths[0] + k] = imagData[j*dimLengths[0] + k];
+             }
+ 	  }
+          for (int j = yU; j <= yL; j++)
+          {  for (int k = xL; k <= xR; k++)
+	     {	realD[j*dimLengths[0] + k] = realData[j*dimLengths[0] + k];
+              	imagD[j*dimLengths[0] + k] = imagData[j*dimLengths[0] + k];
+             }
+ 	  }
+      }
+      System.arraycopy(realD, 0, realData, 0, arrayLength);
+      System.arraycopy(imagD, 0, imagData, 0, arrayLength);
+
+      magnitude(false);
+      phase();
+
+      transformDir = INVERSE;
+      calcFFT();
+      return realData;
+   }
+
+   public float[] winfiltDiffPatt()
+   {  return magData;
+   }
+
+   public float[] llFilter(int[] llD, int Rmax, float w0l, String[] half, int side)
+   {  int nLL = llD.length;
+      float[] realD, imagD;
+      try { 
+            realD = new float[arrayLength];
+      }
+      catch (OutOfMemoryError e) {
+            realD = null;
+            System.gc();
+            System.out.println("AlgorithmFFT: Out of memory creating realD for l.l. filter");
+            return realD;
+      }
+      for (int i = 0; i < arrayLength; i++)
+          realD[i] = 0.0f;
+
+      try {
+              imagD = new float[arrayLength];
+      }
+      catch (OutOfMemoryError e) {
+            imagD = null;
+            System.gc();
+            System.out.println("AlgorithmFFT: Out of memory creating imagD for l.l. filter");
+            return imagD;
+      }
+        
+      for (int i = 0; i < arrayLength; i++)
+          imagD[i] = 0.0f;
+
+      int centX = dimLengths[0]/2;
+      int centY = dimLengths[1]/2;
+      for (int j = 0; j < dimLengths[1]; j++)		//0 l.l.
+      {   realD[j*dimLengths[0] + centX] = w0l * realData[j*dimLengths[0] + centX];
+          imagD[j*dimLengths[0] + centX] = w0l * imagData[j*dimLengths[0] + centX];
+      }
+
+      int xL, xR;
+      int yU=0, yL=0;
+      for (int i = 0; i < nLL; i++)	
+      {   xL = centX - llD[i];
+	  xR = centX + llD[i];
+	  if ((half[i].equals("Lower ") && side == 1) || (half[i].equals("Upper ") && side == 2))
+	  {  yU = centY;		
+     	     yL = centY + Rmax;
+             for (int j = yU; j < yL; j++)	//right from 0 ll
+             {   realD[j*dimLengths[0] + xR] = realData[j*dimLengths[0] + xR];
+                 imagD[j*dimLengths[0] + xR] = imagData[j*dimLengths[0] + xR];
+ 	     }
+	     yU = centY - Rmax;		
+     	     yL = centY;
+             for (int j = yU; j < yL; j++)	//left from 0 ll
+             {   realD[j*dimLengths[0] + xL] = realData[j*dimLengths[0] + xL];
+                 imagD[j*dimLengths[0] + xL] = imagData[j*dimLengths[0] + xL];
+ 	     }
+	  }
+	  if ((half[i].equals("Upper ") && side == 1) || (half[i].equals("Lower ") && side == 2))
+	  {  yU = centY - Rmax;		
+     	     yL = centY;
+             for (int j = yU; j < yL; j++)
+             {   realD[j*dimLengths[0] + xR] = realData[j*dimLengths[0] + xR];
+                 imagD[j*dimLengths[0] + xR] = imagData[j*dimLengths[0] + xR];
+ 	     }
+	     yU = centY;		
+     	     yL = centY + Rmax;
+             for (int j = yU; j < yL; j++)
+             {   realD[j*dimLengths[0] + xL] = realData[j*dimLengths[0] + xL];
+                 imagD[j*dimLengths[0] + xL] = imagData[j*dimLengths[0] + xL];
+ 	     }
+	  }
+     }
+      System.arraycopy(realD, 0, realData, 0, arrayLength);
+      System.arraycopy(imagD, 0, imagData, 0, arrayLength);
+
+      magnitude(false);
+      phase();
+
+      transformDir = INVERSE;
+      calcFFT();
+      return realData;
+   }
+
+   public float[] llfiltDiffPatt()
+   {  return magData;
+   }
+
+   public void calcFFT()
+   {/**
+     * This is the method that calculates the FFT
+     * Perform a data centering operation after the forward FFT
+     * Perform a data centering operation before the inverse FFT
+     */
+        double  TWO_PI  = 2*java.lang.Math.PI;
+        double  wt1Imag, wt1Real;
+        double  angle, delta;
+        float   imag, real, fTemp, fReal, fImag;
+        int     i, index1, index2, index3;
+        int     j1, j2, j3;
+        int     k1, k1Double;
+        int     iSwap, i1Swap, i2Swap, index, dim;
+        
+        if (transformDir == INVERSE) 
+           center();
+        j1   = 1;
+        dim  = 1;
+        for ( i = 0; i < ndim; i++ ) 
+        {   j1    *= dim;
+            dim    = dimLengths[i];
+            j2     = j1*dim;
+            j3     = j2*(arrayLength/(dim*j1));
+            
+            i1Swap  = 0;
+            for (index1 = 0; index1 < j2; index1 += j1) 
+            {   for(index2 = index1; (index2 < index1+j1) && (index1 < i1Swap); index2++)
+                {   for(index3 = index2; index3 < j3; index3 += j2)
+                    {   i2Swap = -index1 + index3 + i1Swap ;
+                        fTemp               = imagData[index3];
+                        imagData[index3]    = imagData[i2Swap];
+                        imagData[i2Swap]    = fTemp;
+                        fTemp               = realData[index3];
+                        realData[index3]    = realData[i2Swap];
+                        realData[i2Swap]    = fTemp;
+                    }
+                }
+                for (iSwap = j2/2; (iSwap >= j1) && (iSwap < i1Swap+1); iSwap >>= 1)
+                    i1Swap = i1Swap - iSwap;
+                i1Swap = i1Swap + iSwap;
+            }
+            for (k1 = j1; k1 < j2; k1 <<= 1) 
+            {   delta    = TWO_PI/(k1<<1)*transformDir*j1;
+                angle    = 0;
+                for (index1 = 0, angle = 0; index1 < k1; index1 += j1) 
+                {   wt1Imag = java.lang.Math.sin(angle);
+                    wt1Real = java.lang.Math.cos(angle);
+                    angle   += delta;
+                    for (index2 = index1; index2 < index1+j1; index2++) 
+                    {   k1Double = k1<<1;
+                        for (index3 = index2; index3 < j3; index3 += k1Double)
+                        {   index               =   index3 +  k1;
+                            fReal               =   realData[index];
+                            fImag               =   imagData[index];
+                            imag                =  (float)(fImag*wt1Real + fReal*wt1Imag);
+                            real                =  (float)(fReal*wt1Real - fImag*wt1Imag);
+                            imagData[index]     =  imagData[index3] - imag;
+                            realData[index]     =  realData[index3] - real;
+                            imagData[index3]    =  imagData[index3] + imag;
+                            realData[index3]    =  realData[index3] + real;
+                        }
+                    }
+                }
+            }
+        }
+        if (transformDir == FORWARD) 
+           center();
+           
+        if (transformDir == INVERSE)
+        {  for (i = 0; i < arrayLength; i++) 
+           {   realData[i] = realData[i]/arrayLength;
+               imagData[i] = imagData[i]/arrayLength;
+           }
+        }
+    
+   }
+   public void center() 
+   { /** center() is called after the forward fast fourier transform to enhance the display
+      *  center() is called before the inverse fast fourier transform to return the data
+      *  to its original ordering.
+      */
+        int     i,j, k;
+        int     xdim, ydim, zdim;
+        int     xnew, ynew, znew;
+        int     xdimHalf, ydimHalf, zdimHalf;
+        float[] centerData;
+    
+    // Perform a data centering operation
+    // Center 1D data
+        if (ndim == 1) {
+            centerData = new float [dimLengths[0]];
+            xdimHalf = dimLengths[0]/2;
+            for( i = 0; i < xdimHalf; i++){
+                xnew = i + xdimHalf;
+                centerData[xnew] = realData[i];
+            }
+            for( i = xdimHalf; i < dimLengths[0]; i++){
+                xnew = i - xdimHalf;
+                centerData[xnew] = realData[i];
+            }
+            for( i = 0; i < arrayLength; i++){
+                realData[i] = centerData[i];
+            }
+            
+            for( i = 0; i < xdimHalf; i++){
+                xnew = i + xdimHalf;
+                centerData[xnew] = imagData[i];
+            }
+            for( i = xdimHalf; i < dimLengths[0]; i++){
+                xnew = i - xdimHalf;
+                centerData[xnew] = imagData[i];
+            }
+            for( i = 0; i < arrayLength; i++){
+                imagData[i] = centerData[i];
+            }
+            
+        } // end of for ndim == 1
+        
+        // Center 2D data
+        else if (ndim == 2) {
+            centerData = new float [dimLengths[0] * dimLengths[1]]; 
+            						// Temp storage for centered
+            xdimHalf    = dimLengths[0]/2;
+            ydimHalf    = dimLengths[1]/2;
+            xdim        = dimLengths[0];
+            ydim        = dimLengths[1];
+            for( j = 0; j < ydimHalf; j++){
+                for( i = 0; i < xdimHalf; i++){
+                    xnew = i + xdimHalf;
+                    ynew = j + ydimHalf;
+                    centerData[dimLengths[0]*ynew + xnew] = 
+                                            realData[dimLengths[0]*j + i];
+                }
+            }
+            for( j = ydimHalf; j < dimLengths[1]; j++){
+                for( i = 0; i < xdimHalf; i++){
+                    xnew = i + xdimHalf;
+                    ynew = j - ydimHalf;
+                    centerData[dimLengths[0]*ynew + xnew] = 
+                                            realData[dimLengths[0]*j + i];
+                }
+            }
+            for( j = ydimHalf; j < dimLengths[1]; j++){
+                for( i = xdimHalf; i < dimLengths[0]; i++){
+                    xnew = i - xdimHalf;
+                    ynew = j - ydimHalf;
+                    centerData[dimLengths[0]*ynew + xnew] = 
+                                            realData[dimLengths[0]*j + i];
+                }
+            }
+            for( j = 0; j < ydimHalf; j++){
+                for( i = xdimHalf; i < dimLengths[0]; i++){
+                    xnew = i - xdimHalf;
+                    ynew = j + ydimHalf;
+                    centerData[dimLengths[0]*ynew + xnew] = 
+                                            realData[dimLengths[0]*j + i];
+                }
+            }
+            for( i = 0; i < arrayLength; i++){
+                realData[i] = centerData[i];
+            }
+            for( j = 0; j < ydimHalf; j++){
+                for( i = 0; i < xdimHalf; i++){
+                    xnew = i + xdimHalf;
+                    ynew = j + ydimHalf;
+                    centerData[dimLengths[0]*ynew + xnew] = 
+                                            imagData[dimLengths[0]*j + i];
+                }
+            }
+            for( j = ydimHalf; j < dimLengths[1]; j++){
+                for( i = 0; i < xdimHalf; i++){
+                    xnew = i + xdimHalf;
+                    ynew = j - ydimHalf;
+                    centerData[dimLengths[0]*ynew + xnew] = 
+                                            imagData[dimLengths[0]*j + i];
+                }
+            }
+            for( j = ydimHalf; j < dimLengths[1]; j++){
+                for( i = xdimHalf; i < dimLengths[0]; i++){
+                    xnew = i - xdimHalf;
+                    ynew = j - ydimHalf;
+                    centerData[dimLengths[0]*ynew + xnew] = 
+                                            imagData[dimLengths[0]*j + i];
+                }
+            }
+            for( j = 0; j < ydimHalf; j++){
+                for( i = xdimHalf; i < dimLengths[0]; i++){
+                    xnew = i - xdimHalf;
+                    ynew = j + ydimHalf;
+                    centerData[dimLengths[0]*ynew + xnew] = 
+                                            imagData[dimLengths[0]*j + i];
+                }
+            }
+            for( i = 0; i < arrayLength; i++){
+                imagData[i] = centerData[i];
+            }
+            
+        } // end of else if (ndim == 2)
+   }
+   public void magnitude(boolean logRep)
+   {  /**
+       *  Calculates magnitude from real and imaginary parts
+       *          magnitude = ( (realData)^2 + (imagData)^2 )^(1/2);
+       */
+        int i;
+        
+        try {
+            magData = new float[arrayLength];
+        }
+        catch (OutOfMemoryError e) {
+            magData = null;
+            System.gc();
+            System.out.println("AlgorithmFFT: Out of memory creating magData");
+            return;
+        }
+        for( i = 0; i < arrayLength; i++){
+            magData[i] = (float)java.lang.Math.sqrt(
+                                realData [i] * realData [i] +
+                                imagData [i] * imagData [i] );
+
+            if (logRep) 	// logarithmic representation (*15 to broaden the scale)
+               magData[i] = (float)(15.0*Math.log((double)magData[i]));
+        }
+   }
+   public void phase()
+   { /**
+      *  Calculates phase from real and imaginary parts
+      *             phase = arctan(imagData/realData);
+      */
+        int i;
+        
+        try {
+          phaseData = new float[arrayLength];
+        }
+        catch (OutOfMemoryError e) {
+            phaseData = null;
+            System.gc();
+            System.out.println("AlgorithmFFT: Out of memory creating phaseData");
+            return;
+        }
+        for( i = 0; i < arrayLength; i++){
+            phaseData[i] = (float)java.lang.Math.atan2(
+                              realData[i], imagData[i]);
+        }
+   }
+   public void lowpass(float limit)
+   {  // only 1D case
+      // Cosine fall-off from the limit
+      int nL = (int) ((float)arrayLength / limit);
+      int cent = arrayLength / 2;
+      int beg2 = cent + nL;	//array is: ((((0)))) (2-fold symmetrical)
+      int end1 = cent - nL;
+      for(int i = beg2; i < arrayLength; i++)
+      {  double x = (double)(i - beg2);
+         float coeff = 1.0f;
+         if (x <= java.lang.Math.PI)
+            coeff = 0.5f + (float)java.lang.Math.cos(x)/2.0f;
+         realData[i] = realData[i]*coeff;
+         imagData[i] = imagData[i]*coeff;
+      }
+      // 2-fold symmetry -> rotate it to the first half of the array
+      for (int i = 0; i < end1; i++)
+      {   int ii = arrayLength-1-i;
+          realData[i] = realData[ii];
+          imagData[i] = imagData[ii];
+      }
+   }
+       
+// @param transformDir indicates transform direction; 1 = forward FFT, -1 = inverse FFT
+   public final static int INVERSE = -1;
+   public final static int FORWARD =  1;
+   private int     ndim;                   	      // number of dimensions
+   private int[]   dimLengths = new int[2];           // dimension sizes
+   private int[]   newDimLengths = new int[2];        // zero padded dimension sizes
+   private int[]   originalDimLengths = new int[2];   // original dimension sizes
+   private int     arrayLength;            // size of buffers (realData and imagData)
+   private int     newArrayLength;         // size of zero padded buffers
+   private int     originalArrayLength;    // original size of buffers
+   private boolean doZeroPad = false;      // do zero padding
+   private boolean doEdgeStrip = false;    // do edge stripping
+   private int     transformDir;           // transform direction
+   private boolean logMagDisplay;          // if true display log10 of 1 + magnitude
+   private float[] realData;             // real data
+   private float[] imagData;             // imaginary data
+   private float[] magData;              // magnitude data
+   private float[] phaseData;            // phase data
+}
+//==========================================================================================
+class messageDialog extends JDialog
+   implements ActionListener
+{  public messageDialog(Frame parent, String[] text, int[] fsize, String[] but)
+   {  super(parent, " Padding ", true);
+      Toolkit tk = Toolkit.getDefaultToolkit();
+      Dimension d = tk.getScreenSize();
+      int screenHeight = d.height;
+      int screenWidth = d.width;
+      setLocation(screenWidth/4, screenHeight/4);
+      Container contentPane = getContentPane();
+      
+      JPanel backPanel = new JPanel();
+      int tL = text.length;
+      backPanel.setLayout(new GridLayout(tL+1,1));
+      backPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+      for (int i = 0; i < tL; i++)
+      {   JPanel p = new JPanel();
+          JLabel labelTxt = new JLabel(text[i]);
+          labelTxt.setFont(new Font("Monaco Regular", Font.BOLD, fsize[i]));
+          p.add(labelTxt);
+          backPanel.add(p);
+      }
+      
+      //define the yes/no button
+      
+      JPanel pB = new JPanel();
+      int bL = but.length;
+      yesButton = addButton(pB, but[0]);
+      if (bL == 1)
+         noButton = null;
+      else
+         noButton = addButton(pB, but[1]);  
+
+      backPanel.add(pB);
+      
+      contentPane.add(backPanel, "Center");
+      pack();
+   }
+   
+   JButton addButton(JPanel p, String name)
+   {   JButton button = new JButton(name);
+       button.setFont(new Font("Monaco Regular", Font.BOLD, 14));
+       button.addActionListener(this);
+       p.add(button);
+       return button;
+   }
+   
+   public void actionPerformed(ActionEvent evt)
+   {  Object source = evt.getSource();
+      if (noButton == null)
+         setVisible(false);
+      else
+      {  if (source == yesButton)
+         {  yes = true;
+            setVisible(false);
+         }
+         else
+         if (source == noButton)
+            setVisible(false);
+      }
+   }
+   
+   public boolean showDialog()
+   {  yes = false;
+      show();
+      
+      return yes;
+   }
+               
+   private JButton yesButton;
+   private JButton noButton;
+   private boolean yes;
+}     
+// class paddingDialog
+// ===================
+class paddingDialog extends JDialog
+   implements ActionListener
+{  public paddingDialog(Frame parent)
+   {  super(parent, " Padding ", true);
+      Container contentPane = getContentPane();
+      
+      JPanel backPanel = new JPanel();
+      backPanel.setLayout(new BorderLayout());
+      backPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+      JPanel p1 = new JPanel();
+      p1.setLayout(new GridLayout(0,1));
+      JLabel labelTxt1 = new JLabel(" Length of final array:   ");
+      txtField1 = new JTextField("0", 5);
+      p1.add(labelTxt1);
+      p1.add(txtField1);
+      
+      JLabel labelTxt2 = new JLabel(" Width of final array:   ");
+      txtField2 = new JTextField("0", 5);
+      p1.add(labelTxt2);
+      p1.add(txtField2);
+      backPanel.add("Center", p1);
+      
+      //define the ok button
+      
+      Panel p2 = new Panel();
+      cancelButton = addButton(p2, "Cancel");  
+      okButton = addButton(p2, "Ok");
+      backPanel.add("South", p2);
+      contentPane.add("Center", backPanel);
+      pack();
+   }
+   
+   Button addButton(Container c, String name)
+   {   Button button = new Button(name);
+       button.addActionListener(this);
+       c.add(button);
+       return button;
+   }
+   
+   public void actionPerformed(ActionEvent evt)
+   {  Object source = evt.getSource();
+      if (source == okButton)
+      {  ok = true;
+         setVisible(false);
+      }
+      else
+      if (source == cancelButton)
+         setVisible(false);
+   }
+   
+   public boolean showDialog()
+   {  ok = false;
+      show();
+      if (ok)
+      {  length = Integer.parseInt(txtField1.getText().trim());
+          width = Integer.parseInt(txtField2.getText().trim());
+      }
+      return ok;
+   }
+   
+   public int getLength()
+   {  return length;
+   }
+   
+   public int getWidth()
+   {  return width;
+   }
+               
+   private Button okButton;
+   private Button cancelButton;
+   private boolean ok;
+   private JTextField txtField1, txtField2;
+   private int length, width;
+}     
+
+// class AutRefNodeDialog - calls radioButtonDialog
+// ======================
+class AutRefNodeDialog
+{  public AutRefNodeDialog(Frame parent, int npoints)
+   {  String title = " Aut. Ref.: Node Selections ";
+      options[0] = " All Nodes ";
+      options[1] = " Selected Nodes : ";
+
+      selNum = npoints;
+      listNodes = new String[npoints];
+      nodes = new int[npoints];
+
+      for (int i = 1; i <= npoints; i++)
+      {    listNodes[i-1] = ""+i;
+           nodes[i-1] = i;
+      }
+      cP[0] = null;
+      cP[1] = new JCkBoxPanel(listNodes, BoxLayout.X_AXIS);
+      arDialog = new radioButtonDialog(parent, title, options, BoxLayout.Y_AXIS, cP);
+   }
+
+   public boolean showDialog()
+   {  if (arDialog.showDialog())
+      {  String opt = arDialog.getCommand();
+         if (opt == options[1])
+         {  selNum = cP[1].getSelNum();
+            listNodes = new String[selNum];
+            nodes = new int[selNum];
+            listNodes = cP[1].getlistNodes();
+            for (int i = 0; i < selNum; i++)
+                nodes[i] = Integer.parseInt(listNodes[i].trim());
+         }
+         ok = true;
+      }
+      return ok;
+   }
+
+   public int getNumNodes()
+   {  return selNum;
+   }
+
+   public int[] getListNodes()
+   {  return nodes;
+   }
+
+   private int[] nodes;
+   private int selNum;
+   private boolean ok = false;
+   private String[] options = new String[2];
+   private JCkBoxPanel[] cP = new JCkBoxPanel[2];
+   private radioButtonDialog arDialog = null;
+   private String[] listNodes;
+}
+
+class JCkBoxPanel extends JPanel
+   implements ActionListener
+{  public JCkBoxPanel(String[] opts, int axis)
+   {  setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+      setLayout(new BoxLayout(this, axis));
+   
+      oLen = opts.length;
+      options = new String[oLen];
+      System.arraycopy(opts, 0, options, 0, oLen);
+      cb = new JCheckBox[oLen];
+      selNum = oLen;
+      listNodes = new String[oLen];
+      for (int i = 0; i < oLen; i++)
+      {   cb[i] = new JCheckBox(options[i]);
+          cb[i].setSelected(false);
+          cb[i].addActionListener(this);
+          add(cb[i],"West");
+      }
+   }
+
+   public JCkBoxPanel()
+   {
+   }
+
+   public void enabled(boolean yes)
+   {  for (int i = 0; i < oLen; i++)
+      {   if (yes)
+             cb[i].setEnabled(true);
+          else  
+             cb[i].setEnabled(false);
+      }      
+   }
+   
+   public void actionPerformed(ActionEvent evt)
+   {  
+   }
+
+   public int getSelNum()
+   {  selNum = 0;
+      for (int i = 0; i < oLen; i++)
+          if (cb[i].isSelected())
+             listNodes[selNum++] = options[i];
+      return selNum;
+   }
+
+   public String[] getlistNodes()
+   {  return listNodes;
+   }
+
+   private JCheckBox[] cb;
+   private int selNum;
+   private int oLen;
+   private String[] options;
+   private String[] listNodes;
+}
+
+// class AutRefOptionDialog
+// ========================
+class AutRefOptionDialog extends JDialog
+   implements ActionListener
+{  public AutRefOptionDialog(Frame parent)
+   {  super(parent, " Automatic Refinement ", true);
+      Toolkit tk = Toolkit.getDefaultToolkit();
+      Dimension d = tk.getScreenSize();
+      int screenHeight = d.height;
+      int screenWidth = d.width;
+      setLocation(screenWidth/2, screenHeight/2);
+      
+      JPanel backPanel = new JPanel();
+      backPanel.setLayout(new BorderLayout());
+      backPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+
+      if (panel == null)
+         panel = new AutRefPanel();
+
+      backPanel.add(panel, "Center");
+
+      //define the ok & cancel buttons
+      
+      Panel p2 = new Panel();
+      cancelButton = addButton(p2, "Cancel");  
+      okButton = addButton(p2, "Ok");
+      backPanel.add(p2, "South");
+
+      getContentPane().add(backPanel, "Center");
+
+      pack();
+   }
+   
+   public void setInsNodes(boolean in)
+   {  panel.setInsNodes(in);
+   }
+
+   public void actionPerformed(ActionEvent evt)
+   {  Object source = evt.getSource();
+      if (source == okButton)
+      {  ok = true;
+         setVisible(false);
+      }
+      else
+      if (source == cancelButton)
+         setVisible(false);
+   }
+
+   public boolean showDialog()
+   {  ok = false;
+      show();
+      if (ok)
+      {  if (panel.getboolnSTxt())
+            nS = panel.getnSTxt();
+         else
+            nS =  0;
+         if (panel.getboolaverTxt())
+            averNum = panel.getaverTxt();
+         else 
+            averNum = 0;
+         if (panel.getboollpfTxt())
+            lpF = panel.getlpfTxt();
+         else
+            lpF = 0.0f;
+         if (panel.getboolinTxt())
+            inD = panel.getinTxt();
+         else
+            inD = 0;
+      }
+      return ok;
+   }
+
+   public int numAverCol()
+   {  return averNum;
+   }
+ 
+   public int numOfSmooth()
+   {  return nS;
+   }
+
+   public float setlpF()
+   {  return lpF;
+   }
+
+   public int inDistance()
+   {  return inD;
+   }
+
+   Button addButton(Container c, String name)
+   {   Button button = new Button(name);
+       button.addActionListener(this);
+       c.add(button);
+       return button;
+   }
+   
+   private AutRefPanel panel = null;
+   private int nS = 5;
+   private int averNum = 4;
+   private float lpF = 5.0f;
+   private int inD = 60;
+   private Button okButton;
+   private Button cancelButton;
+   private boolean ok;
+   private boolean in;
+}
+
+class AutRefPanel extends JPanel
+   implements ActionListener
+{  public AutRefPanel()
+   {  setBorder(BorderFactory.createEmptyBorder(0,0,20,0));
+      GridBagLayout gbl = new GridBagLayout();
+      setLayout(gbl);
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.fill = GridBagConstraints.NONE;
+      gbc.weightx = 0;
+      gbc.weighty = 0;
+      gbc.anchor = GridBagConstraints.WEST;
+   
+      sNum = new JCheckBox(" Smooth the Image");
+      gbc.gridx = 0;
+      gbc.gridy = 0;
+      gbc.gridwidth = 2;
+      add(sNum, gbc);
+      labelsN = new JLabel("    Number of Applications : ");
+      gbc.gridx = 0;
+      gbc.gridy = 1;
+      gbc.gridwidth = 1;
+      add(labelsN, gbc);
+      sNTxt = new JTextField("5", 3);
+      gbc.gridx = 1;
+      gbc.gridy = 1;
+      gbc.gridwidth = 1;
+      add(sNTxt, gbc);
+      sNum.setSelected(true);      
+      average = new JCheckBox(" Average Columns ");
+      gbc.gridx = 0;
+      gbc.gridy = 2;
+      gbc.gridwidth = 2;
+      add(average, gbc);
+      labelAv = new JLabel("    Num. of col.s +/- : ");
+      gbc.gridx = 0;
+      gbc.gridy = 3;
+      gbc.gridwidth = 1;
+      add(labelAv, gbc);
+      averTxt = new JTextField("4", 3);
+      gbc.gridx = 1;
+      gbc.gridy = 3;
+      gbc.gridwidth = 1;
+      add(averTxt, gbc);
+      average.setSelected(true);     
+      lpFilter = new JCheckBox(" Low-pass filter ");
+      gbc.gridx = 0;
+      gbc.gridy = 4;
+      gbc.gridwidth = 2;
+      add(lpFilter, gbc);
+      labelLp = new JLabel("    Limit :");
+      gbc.gridx = 0;
+      gbc.gridy = 5;
+      gbc.gridwidth = 1;
+      add(labelLp, gbc);
+      lpfTxt = new JTextField("5.0", 5);
+      gbc.gridx = 1;
+      gbc.gridy = 5;
+      gbc.gridwidth = 1;
+      add(lpfTxt, gbc);
+      labelLp.setEnabled(false);
+      lpfTxt.setEnabled(false);
+      lpFilter.setSelected(false);
+      insNode = new JCheckBox(" Insert Node Mode ");
+      gbc.gridx = 0;
+      gbc.gridy = 6;
+      gbc.gridwidth = 2;
+      add(insNode, gbc);
+      labelIn = new JLabel("    Min. dist. of adj. nodes :");
+      gbc.gridx = 0;
+      gbc.gridy = 7;
+      gbc.gridwidth = 1;
+      add(labelIn, gbc);
+      inTxt = new JTextField("60", 4);
+      gbc.gridx = 1;
+      gbc.gridy = 7;
+      gbc.gridwidth = 1;
+      add(inTxt, gbc);
+      labelIn.setEnabled(false);
+      inTxt.setEnabled(false);
+      
+      // Register a listener for the check boxes
+      sNum.addActionListener(this);
+      average.addActionListener(this);
+      lpFilter.addActionListener(this);
+      insNode.addActionListener(this);
+   }
+
+   public void setInsNodes(boolean in)
+   {  if (in)
+         insNode.setEnabled(true);
+      else 
+         insNode.setEnabled(false);
+   }
+   
+   public void actionPerformed(ActionEvent evt)
+   {  if (average.isSelected())
+      {   labelAv.setEnabled(true);
+          averTxt.setEnabled(true);
+      }
+      else 
+      {  labelAv.setEnabled(false);
+         averTxt.setEnabled(false);
+      }
+
+      if (lpFilter.isSelected())
+      {  labelLp.setEnabled(true);
+         lpfTxt.setEnabled(true);
+      }
+      else
+      {  labelLp.setEnabled(false);
+         lpfTxt.setEnabled(false);
+      }    
+
+      if (sNum.isSelected())
+      {  labelsN.setEnabled(true);
+         sNTxt.setEnabled(true);
+      }
+      else
+      {  labelsN.setEnabled(false);
+         sNTxt.setEnabled(false);
+      } 
+
+      if (insNode.isSelected())
+      {  labelIn.setEnabled(true);
+         inTxt.setEnabled(true);
+      }
+      else
+      {  labelIn.setEnabled(false);
+         inTxt.setEnabled(false);
+      }  
+   }
+
+   public boolean getboolnSTxt()
+   {  return sNTxt.isEnabled();
+   }
+
+   public boolean getboolaverTxt()
+   {  return averTxt.isEnabled();
+   }
+
+   public boolean getboollpfTxt()
+   {  return lpfTxt.isEnabled();
+   }
+
+   public boolean getboolinTxt()
+   {  return inTxt.isEnabled();
+   }
+
+   public int getnSTxt()
+   {  sN = Integer.parseInt(sNTxt.getText().trim());
+      return sN;
+   }
+
+   public int getaverTxt()
+   {  averNum = Integer.parseInt(averTxt.getText().trim());
+      return averNum;
+   }
+
+   public float getlpfTxt()
+   {  lpF = Float.parseFloat(lpfTxt.getText().trim());
+      return lpF;
+   }
+
+   public int getinTxt()
+   {  inD = Integer.parseInt(inTxt.getText().trim());
+      return inD;
+   }
+      
+   private JCheckBox average;
+   private JCheckBox lpFilter;
+   private JCheckBox sNum;
+   private JCheckBox insNode;
+   private JTextField averTxt;
+   private JTextField lpfTxt;
+   private JTextField sNTxt;
+   private JTextField inTxt;
+   private JLabel labelAv;
+   private JLabel labelLp;
+   private JLabel labelsN;
+   private JLabel labelIn;
+   private int sN = 5;
+   private int averNum = 4;
+   private float lpF = 5.0f;
+   private int inD = 60;
+}
+
+// class radioButtonDialog - with optional JCheckBox list (JCkBoxPanel)
+// =======================
+class radioButtonDialog extends JDialog
+   implements ActionListener
+{  public radioButtonDialog(Frame parent, String title, String[] options, 
+                            int axis, JCkBoxPanel[] cP)
+   {  super(parent, title, true);
+      Toolkit tk = Toolkit.getDefaultToolkit();
+      Dimension d = tk.getScreenSize();
+      int screenHeight = d.height;
+      int screenWidth = d.width;
+      setLocation(screenWidth/2, screenHeight/2);
+      Container contentPane = getContentPane();
+      
+      JPanel backPanel = new JPanel();
+      backPanel.setLayout(new BorderLayout());
+      backPanel.setBorder(BorderFactory.createEmptyBorder(20,10,10,10));
+
+      //define the radioButtons
+      
+      p1 = new ButtonPanel(options, axis, cP);
+      backPanel.add("Center", p1);
+      
+      //define the ok & cancel buttons
+      
+      Panel p2 = new Panel();
+      cancelButton = addButton(p2, "Cancel");  
+      okButton = addButton(p2, "Ok");
+      backPanel.add("South", p2);
+      
+      contentPane.add("Center", backPanel);
+
+      pack();
+   }
+   
+   Button addButton(Container c, String name)
+   {   Button button = new Button(name);
+       button.addActionListener(this);
+       c.add(button);
+       return button;
+   }
+   
+   public void actionPerformed(ActionEvent evt)
+   {  Object source = evt.getSource();
+      if (source == okButton)
+      {  ok = true;
+         setVisible(false);
+      }
+      else
+      if (source == cancelButton)
+         setVisible(false);
+   }
+   
+   public boolean showDialog()
+   {  ok = false;
+      show();
+      if (ok)
+      {  command = p1.getSelection();
+         cPselect = p1.getcP();
+      }
+
+      return ok;
+   }
+   
+   public String getCommand()
+   {  return command;
+   }
+
+   public JCkBoxPanel getcPanel()
+   {  return cPselect;
+   }
+               
+   private Button okButton;
+   private Button cancelButton;
+   private boolean ok;
+   private ButtonPanel p1;
+   private String command;
+   private JCkBoxPanel cPselect;
+}     
+
+// class ButtonPanel
+// =================
+class ButtonPanel extends JPanel   // list of (JRadioButton+JCkBoxPanel (if it is not null))
+   implements ActionListener
+{  public ButtonPanel(String[] opt, int axis, JCkBoxPanel[] cPan)
+   {  GridBagLayout gbl = new GridBagLayout();
+      setLayout(gbl);
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.fill = GridBagConstraints.NONE;
+      gbc.weightx = 0;
+      gbc.weighty = 0;
+      gbc.anchor = GridBagConstraints.WEST;
+      gbc.gridx = 0;
+      gbc.gridy = 0;
+
+      oLen = opt.length;
+      options = new String[oLen];
+      System.arraycopy(opt, 0, options, 0, oLen);
+      if (cPan != null)
+      {  cP = new JCkBoxPanel[cPan.length];
+         System.arraycopy(cPan, 0, cP, 0, cPan.length);
+      }
+      group = new ButtonGroup();
+      b = new JRadioButton[oLen];
+      op = options[0];
+      for (int i = 0; i < oLen; i++)
+      {   b[i] = new JRadioButton(options[i]);
+          b[i].setActionCommand(options[i]);
+          b[i].addActionListener(this);
+          add(b[i], gbc);
+          group.add(b[i]);
+          b[i].setSelected(i == 0);
+          if (cP[i] != null)
+          {  cPexist = true;
+             if (axis == BoxLayout.X_AXIS)
+                gbc.gridx++;
+             else
+                gbc.gridy++;
+             add(cP[i], gbc);
+             if (b[i].isSelected())
+                cP[i].enabled(true);
+             else
+                cP[i].enabled(false);
+          }
+          if (axis == BoxLayout.X_AXIS)
+             gbc.gridx++;
+          else
+             gbc.gridy++;    
+      }
+   }
+
+   public void actionPerformed(ActionEvent evt)
+   {  op = group.getSelection().getActionCommand();
+      selcP = null;
+      if (cPexist)
+      {  int i = 0;
+         while (i < oLen)
+         {  if (options[i] == op)
+            {  selcP = cP[i];
+               if (cP[i] != null)
+                  cP[i].enabled(true);
+            }
+            else
+               if (cP[i] != null)
+                  cP[i].enabled(false);
+            i++;
+         }
+      }
+   }
+
+   public String getSelection()
+   {  return op;
+   }
+
+   public JCkBoxPanel getcP()
+   {  return selcP;
+   }
+
+   private int oLen;
+   private String op;
+   private String[] options = null;
+   private ButtonGroup group;
+   private JRadioButton[] b;
+   private boolean cPexist = false;
+   private JCkBoxPanel[] cP = null;
+   private JCkBoxPanel selcP = new JCkBoxPanel();
+}
+
+// =============================================================================================
+// class GeneralDialog -- Each line has a Text label (JLabel) and a JTextField, 
+// ===================	  radiobutton panel, and a checkbox panel (these 2 are optional)
+//			  at the bottom there is an "OK" and a "Cancel" button
+
+class GeneralDialog extends JDialog
+   implements ActionListener
+{  public GeneralDialog(String title, String[] labels, String[] txts,
+			String[][] optRBut, JCkBoxPanel[][] cBoxPan)
+   {  super(new Frame(), title, true);
+      numLines = labels.length;
+      values = new float[numLines];
+      rbval = new String[numLines];
+      cbox = new JCkBoxPanel[numLines];
+      optRadioBut = optRBut;
+      cPan = cBoxPan;
+
+      Toolkit tk = Toolkit.getDefaultToolkit();
+      Dimension d = tk.getScreenSize();
+      int screenHeight = d.height;
+      int screenWidth = d.width;
+      setLocation(screenWidth/4, screenHeight/4);
+
+      JPanel backPanel = new JPanel();
+      backPanel.setLayout(new BorderLayout());
+      backPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+
+      if (panel == null)
+         panel = new DialPanel(labels, txts, optRadioBut, cPan);
+
+      backPanel.add(panel, "Center");
+
+      //define the ok & cancel buttons
+      
+      JPanel p2 = new JPanel();
+      cancelButton = addButton(p2, "Cancel");  
+      okButton = addButton(p2, "Ok");
+      okButton.setSelected(true);
+      backPanel.add(p2, "South");
+
+      getContentPane().add(backPanel, "Center");
+
+      pack();
+   }
+   
+   public void actionPerformed(ActionEvent evt)
+   {  Object source = evt.getSource();
+      if (source == okButton)
+      {  ok = true;
+         setVisible(false);
+      }
+      else
+      if (source == cancelButton)
+      {  ok = false;
+	 setVisible(false);
+      }
+   }
+
+   public boolean showDialogNoText()
+   {  ok = false;
+      show();
+      return ok;
+   }
+
+   public boolean showDialog()
+   {  ok = false;
+      show();
+      if (ok)
+      {  for (int i = 0; i < numLines; i++)
+	 {   values[i] = panel.getValues(i);
+	     if (optRadioBut != null)	//there are radio buttons
+	        rbval[i] = panel.getRBOpt(i);
+	     if (cPan != null)		//there are checkboxes
+		cbox[i] = panel.getCBox(i);
+	 }
+      }
+      return ok;
+   }
+
+   public float getValues(int num)
+   {  return values[num];
+   }
+
+   public String getRadButOpt(int num)
+   {  return rbval[num];
+   }
+
+   public JCkBoxPanel getChekBox(int num)
+   {  return cbox[num];
+   }
+
+   JButton addButton(Container c, String name)
+   {   JButton button = new JButton(name);
+       button.addActionListener(this);
+       c.add(button);
+       return button;
+   }
+   
+   private DialPanel panel = null;
+   private JButton okButton;
+   private JButton cancelButton;
+   private boolean ok;
+   private float[] values; 
+   private String[] rbval;
+   private JCkBoxPanel[] cbox;
+   private int numLines;
+   private String[][] optRadioBut;
+   private JCkBoxPanel[][] cPan;
+}
+
+// class DialPanel 
+// ===============
+class DialPanel extends JPanel
+{  public DialPanel(String[] labels, String[] values, String[][] optRadioBut, JCkBoxPanel[][] cPan)
+   {  setBorder(BorderFactory.createEmptyBorder(0,0,20,0));
+      GridBagLayout gbl = new GridBagLayout();
+      setLayout(gbl);
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.fill = GridBagConstraints.NONE;
+      gbc.weightx = 0;
+      gbc.weighty = 0;
+      gbc.gridwidth = 1;
+      gbc.anchor = GridBagConstraints.WEST;
+      gbc.gridx = 0;
+      gbc.gridy = 0;
+      setFont(new Font("SansSerif", Font.PLAIN, 13));
+
+      if (values != null)
+      { int numLines = values.length;
+        genTxt = new JTextField[numLines];
+        if (cPan == null)
+	   cPan = new JCkBoxPanel[numLines][2];
+        if (optRadioBut != null)
+           butPanel = new ButtonPanel[numLines];
+        for (int i = 0; i < numLines; i++)
+        {   add(new JLabel(labels[i]), gbc);
+            genTxt[i] = new JTextField(values[i], 10);
+            gbc.gridx = 1;
+            add(genTxt[i], gbc);
+	    if (optRadioBut != null) 
+	    {	gbc.gridx = 2;
+		if (cPan.equals(null))
+		   cPan[i] = null;
+		butPanel[i] = new ButtonPanel(optRadioBut[i], BoxLayout.X_AXIS, cPan[i]);
+		add(butPanel[i], gbc);
+ 	    }
+	    gbc.gridy++;
+            gbc.gridx = 0;
+        }
+      }
+      else
+      { int numLines = labels.length;
+        for (int i = 0; i < numLines; i++)
+        {   add(new JLabel(labels[i]), gbc);
+	    gbc.gridy++;
+        }
+      }
+   }
+
+   public float getValues(int num)
+   {  return Float.parseFloat(genTxt[num].getText().trim());
+   }
+
+   public String getRBOpt(int num)
+   {  return butPanel[num].getSelection();
+   }
+
+   public JCkBoxPanel getCBox(int num)
+   {  return butPanel[num].getcP();
+   }
+
+   private JTextField[] genTxt;
+   private ButtonPanel[] butPanel;
+}

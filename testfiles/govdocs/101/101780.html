@@ -1,0 +1,588 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Python WSRF Programmers' Tutorial</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="NEXT"
+TITLE="Introduction"
+HREF="f25.html"></HEAD
+><BODY
+CLASS="book"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="BOOK"
+><A
+NAME="progtutorial"
+></A
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="title"
+><A
+NAME="AEN2"
+>Python WSRF Programmers' Tutorial</A
+></H1
+><H3
+CLASS="author"
+><A
+NAME="AEN4"
+></A
+>Joshua Boverhof</H3
+><DIV
+CLASS="affiliation"
+><SPAN
+CLASS="orgname"
+>Lawrence Berkeley National Lab<BR></SPAN
+><SPAN
+CLASS="orgdiv"
+>Computational Research Department<BR></SPAN
+></DIV
+><P
+CLASS="copyright"
+>Copyright &copy; 2005 Joshua Boverhof</P
+><DIV
+CLASS="legalnotice"
+><P
+></P
+><A
+NAME="AEN13"
+></A
+><P
+>This tutorial is available for use and redistribution under the
+      terms of the <A
+HREF="http://www-unix.globus.org/toolkit/license.html"
+TARGET="_top"
+>Globus Toolkit
+      Public License</A
+>
+      <A
+NAME="AEN16"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+>&#13;    This tutorial is just an adaptation of Borja's GT4 Tutorial for the
+    pyGridWare framework, most of the contents were directly copied.
+      </P
+></BLOCKQUOTE
+>
+      </P
+><P
+></P
+></DIV
+><HR></DIV
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+><A
+HREF="f25.html"
+>Introduction</A
+></DT
+><DD
+><DL
+><DT
+>1. <A
+HREF="f25.html#pre_docs"
+>GT4 Prerequisite Documents</A
+></DT
+><DT
+>2. <A
+HREF="x59.html"
+>Audience</A
+></DT
+><DT
+>3. <A
+HREF="x62.html"
+>Assumptions</A
+></DT
+><DT
+>4. <A
+HREF="x83.html"
+>Related Documents</A
+></DT
+><DT
+>5. <A
+HREF="x109.html"
+>Document Conventions</A
+></DT
+><DD
+><DL
+><DT
+>5.1. <A
+HREF="x109.html#AEN112"
+>Code</A
+></DT
+><DT
+>5.2. <A
+HREF="x109.html#AEN121"
+>Inlined code</A
+></DT
+><DT
+>5.3. <A
+HREF="x109.html#AEN130"
+>Shell commands</A
+></DT
+><DT
+>5.4. <A
+HREF="x109.html#AEN135"
+>Notes</A
+></DT
+></DL
+></DD
+><DT
+>6. <A
+HREF="x150.html"
+>About the author &#38; acknowledgments</A
+></DT
+><DD
+><DL
+><DT
+>6.1. <A
+HREF="x150.html#AEN155"
+>Acknowledgments</A
+></DT
+></DL
+></DD
+></DL
+></DD
+><DT
+>I. <A
+HREF="p180.html"
+>Getting Started</A
+></DT
+><DD
+><DL
+><DT
+>1. <A
+HREF="c182.html"
+>Key Concepts</A
+></DT
+><DD
+><DL
+><DT
+>1.1. <A
+HREF="c182.html#AEN201"
+>OGSA, WSRF, and GT4</A
+></DT
+><DT
+>1.2. <A
+HREF="x284.html"
+>A short introduction to Web Services</A
+></DT
+><DT
+>1.3. <A
+HREF="x475.html"
+>WSRF: The Web Services Resource Framework</A
+></DT
+><DT
+>1.4. <A
+HREF="x570.html"
+>The Globus Toolkit 4</A
+></DT
+><DT
+>1.5. <A
+HREF="x606.html"
+>Where to learn Python &#38; XML</A
+></DT
+></DL
+></DD
+><DT
+>2. <A
+HREF="c622.html"
+>Installation</A
+></DT
+></DL
+></DD
+><DT
+>II. <A
+HREF="p674.html"
+>GT4 Core</A
+></DT
+><DD
+><DL
+><DT
+>3. <A
+HREF="c676.html"
+>Writing a NON-WSRF Stateful Web Service</A
+></DT
+><DD
+><DL
+><DT
+>3.1. <A
+HREF="c676.html#AEN716"
+>Step 1: Defining the interface in WSDL</A
+></DT
+><DT
+>3.2. <A
+HREF="x740.html"
+>Step 2: Create a New WSRF Site</A
+></DT
+><DT
+>3.3. <A
+HREF="x783.html"
+>Step 3: Implement the service</A
+></DT
+><DT
+>3.4. <A
+HREF="x831.html"
+>Step 4: Deploy the service</A
+></DT
+><DT
+>3.5. <A
+HREF="x856.html"
+>Barebones MathService client.</A
+></DT
+></DL
+></DD
+><DT
+>4. <A
+HREF="c887.html"
+>Writing a WS-RF Service with Multiple Resources</A
+></DT
+><DD
+><DL
+><DT
+>4.1. <A
+HREF="c887.html#AEN893"
+>The WS-Resource factory pattern</A
+></DT
+><DT
+>4.2. <A
+HREF="x918.html"
+>Implementing the WS-Resource factory pattern in pyGridWare</A
+></DT
+><DT
+>4.3. <A
+HREF="x963.html"
+>Create a New Site</A
+></DT
+><DT
+>4.4. <A
+HREF="x971.html"
+>Resource Creation, Modification, and Destruction</A
+></DT
+><DT
+>4.5. <A
+HREF="x1061.html"
+>Finished MathService Service</A
+></DT
+><DT
+>4.6. <A
+HREF="x1101.html"
+>MathService.wsdl: WSDL code for a WSRF service</A
+></DT
+><DT
+>4.7. <A
+HREF="x1105.html"
+>Installing the MathService.rpy script</A
+></DT
+><DT
+>4.8. <A
+HREF="x1124.html"
+>The ResourceHome and Persistence</A
+></DT
+><DT
+>4.9. <A
+HREF="x1129.html"
+>Sample Client using an <SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>EndpointReference</I
+></SPAN
+></A
+></DT
+></DL
+></DD
+><DT
+>5. <A
+HREF="c1168.html"
+>Resource Properties</A
+></DT
+><DD
+><DL
+><DT
+>5.1. <A
+HREF="c1168.html#sec_core_rp_closer"
+>A closer look at resource properties</A
+></DT
+><DT
+>5.2. <A
+HREF="x1239.html"
+>Extending The MathPortType:  A New WSDL file</A
+></DT
+><DT
+>5.3. <A
+HREF="x1289.html"
+>Create a New Site</A
+></DT
+><DT
+>5.4. <A
+HREF="x1296.html"
+>New MathService.rpy Script</A
+></DT
+><DT
+>5.5. <A
+HREF="x1303.html"
+>Client code</A
+></DT
+></DL
+></DD
+><DT
+>6. <A
+HREF="c1414.html"
+>Lifecycle Management</A
+></DT
+><DD
+><DL
+><DT
+>6.1. <A
+HREF="c1414.html#AEN1418"
+>Immediate destruction</A
+></DT
+><DT
+>6.2. <A
+HREF="x1523.html"
+>Scheduled destruction</A
+></DT
+><DT
+>6.3. <A
+HREF="x1635.html"
+>Immediate and Scheduled Termination MathService WSDL</A
+></DT
+></DL
+></DD
+><DT
+>7. <A
+HREF="c1661.html"
+>Notifications</A
+></DT
+><DD
+><DL
+><DT
+>7.1. <A
+HREF="c1661.html#AEN1665"
+>What are notifications?</A
+></DT
+><DT
+>7.2. <A
+HREF="x1713.html"
+>WS-Notifications</A
+></DT
+><DT
+>7.3. <A
+HREF="x1769.html"
+>Notifications in GT4</A
+></DT
+><DT
+>7.4. <A
+HREF="x1772.html"
+>Notifying changes in a resource property</A
+></DT
+><DT
+>7.5. <A
+HREF="x1886.html"
+>MathService WSDL NotificationProducer</A
+></DT
+></DL
+></DD
+></DL
+></DD
+></DL
+></DIV
+><DIV
+CLASS="LOT"
+><DL
+CLASS="LOT"
+><DT
+><B
+>List of Figures</B
+></DT
+><DT
+>1-1. <A
+HREF="c182.html#AEN205"
+>Relationship between OGSA, WSRF, and Web Services</A
+></DT
+><DT
+>1-2. <A
+HREF="c182.html#AEN252"
+>Relationship between OGSA, GT4, WSRF, and Web Services</A
+></DT
+><DT
+>1-3. <A
+HREF="c182.html#AEN278"
+>Layered diagram of OGSA, GT4, WSRF, and Web Services</A
+></DT
+><DT
+>1-4. <A
+HREF="x284.html#AEN302"
+>Web Services</A
+></DT
+><DT
+>1-5. <A
+HREF="x284.html#AEN327"
+>A typical Web Service invocation</A
+></DT
+><DT
+>1-6. <A
+HREF="x284.html#AEN356"
+>The Web Services architecture</A
+></DT
+><DT
+>1-7. <A
+HREF="x284.html#AEN410"
+>Client and server stubs are generated from the WSDL file</A
+></DT
+><DT
+>1-8. <A
+HREF="x284.html#AEN421"
+>A typical Web Service invocation (more detailed)</A
+></DT
+><DT
+>1-9. <A
+HREF="x284.html#AEN448"
+>The server side in a Web Services application</A
+></DT
+><DT
+>1-10. <A
+HREF="x475.html#AEN488"
+>A stateless Web Service invocation</A
+></DT
+><DT
+>1-11. <A
+HREF="x475.html#AEN497"
+>A stateful Web Service invocation</A
+></DT
+><DT
+>1-12. <A
+HREF="x475.html#AEN514"
+>The resource approach to statefulness</A
+></DT
+><DT
+>1-13. <A
+HREF="x475.html#AEN525"
+>A Web Service with several resources. Each resource represents a file.</A
+></DT
+><DT
+>1-14. <A
+HREF="x475.html#AEN534"
+>WS-Resource</A
+></DT
+><DT
+>1-15. <A
+HREF="x570.html#AEN578"
+>GT4 architecture</A
+></DT
+><DT
+>4-1. <A
+HREF="c887.html#fig_factorypattern"
+>The WS-Resource factory pattern</A
+></DT
+><DT
+>4-2. <A
+HREF="x918.html#fig_core_factory_resourcehome"
+>Relationships between the Factory Service, the Instance Service, the Resource Home, and the Resource</A
+></DT
+><DT
+>4-3. <A
+HREF="x971.html#fig_factory_creation"
+>Sequence diagram for resource creation</A
+></DT
+><DT
+>4-4. <A
+HREF="x971.html#fig_factory_invoke"
+>Sequence diagram for WS-Resource invocation</A
+></DT
+><DT
+>7-1. <A
+HREF="c1661.html#AEN1673"
+>Keeping track of changes using polling</A
+></DT
+><DT
+>7-2. <A
+HREF="c1661.html#AEN1696"
+>Keeping track of changes using notifications</A
+></DT
+><DT
+>7-3. <A
+HREF="x1713.html#fig_core_notif_ws-notif1"
+>A WS-Notification interaction where the subscriber and the consumer are different entities</A
+></DT
+><DT
+>7-4. <A
+HREF="x1713.html#fig_core_notif_ws-notif2"
+>A WS-Notification interaction where the subscriber and the consumer are different entities</A
+></DT
+><DT
+>7-5. <A
+HREF="x1713.html#fig_core_notif_ws-brokernotif"
+>A typical brokered WS-Notification interaction</A
+></DT
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="f25.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Introduction</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

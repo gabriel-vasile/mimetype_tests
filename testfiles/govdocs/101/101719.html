@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan* with significant contributions from:  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<html>
+<head>
+<title>Managing the Shared Database</title>
+<meta NAME="description" CONTENT="Managing the Shared Database">
+<meta NAME="keywords" CONTENT="paper">
+<meta NAME="resource-type" CONTENT="document">
+<meta NAME="distribution" CONTENT="global">
+
+<link REL="STYLESHEET" HREF="paper.css">
+<link REL="next" HREF="node21.html">
+<link REL="previous" HREF="node8.html">
+<link REL="up" HREF="paper.html">
+<link REL="next" HREF="node17.html">
+</head>
+<body>
+<!--Navigation Panel-->
+<a NAME="tex2html208" HREF="node17.html">
+<img WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="http://www-fp.mcs.anl.gov/~lusk/images/papers/next_motif.gif"></a> 
+<a NAME="tex2html206" HREF="paper.html">
+<img WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="http://www-fp.mcs.anl.gov/~lusk/images/papers/up_motif.gif"></a> 
+<a NAME="tex2html200" HREF="node15.html">
+<img WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="http://www-fp.mcs.anl.gov/~lusk/images/papers/previous_motif.gif"></a>   
+<br>
+<b> Next:</b> <a NAME="tex2html209" HREF="node17.html">Updating the Clause Sets</a>
+<b> Up:</b> <a NAME="tex2html207" HREF="paper.html">High-Performance Parallel Theorem Proving</a>
+<b> Previous:</b> <a NAME="tex2html201" HREF="node15.html">Analysis of Results</a>
+<br>
+<br>
+<!--End of Navigation Panel-->
+
+<h1><a NAME="SECTION00040000000000000000">
+Managing the Shared Database</a>
+</h1>
+
+<p>
+In this section we present some of the implementation details of
+ <small>ROO</small>, including updating the clause set and its indices and
+management of memory.  Careful management of updates is critical for
+three reasons. (1) The database is shared by all processes, (2)
+updates occur often, and (3) we wish to minimize locking the database
+or parts of the database.  Memory management is important, because the
+shared database can grow to be very large, and because much memory
+(new inferences) can be associated with individual processes.
+
+<p>
+All processes have access to to the shared database, which
+contains (among other things) of the following data.
+
+<p>
+<dl>
+<dd><p>
+<dt><strong><b>The pool of work to be done.</b></strong>
+<dd>The pool constists of
+Tasks A (inference), B (insertions into the shared database), C (back
+subsumption), and D (back demodulation).  Use of the pool is covered
+in Section ??.
+
+<p>
+<dt><strong><b>Permanent clauses.</b></strong>
+<dd>A permanent clause occurs in exactly
+one of the sets <i>Axioms</i>, <i>Set-of-support</i>, <i><i>Have-been-given</i></i>, <i>Demodulators</i>, and <i>Inactive</i>.  A permanent
+clause (the given clause) moves from <i>Set-of-support</i> to <i>Have-been-given</i>
+at the beginning of Task A, and a permanent clause is moved to
+Inactive if it is deleted by back subsumption or back demodulation.  A
+single lock serializes movement of all permanent clauses.
+
+<p>
+<dt><strong><b>Indices.</b></strong>
+<dd>The indices are used to find clauses based on
+unification properties.  There are three indices: <i>All-index</i>,
+<i>Clash-index</i>, and <i>Demod-index</i>.  <i>All-index</i> refers to all
+clauses except those in Inactive, and it is used to locate clauses for
+the forward subsumption, back subsumption, and unit conflict
+operations and to locate terms for back demodulation.  <i>Clash-index</i>
+refers to clauses in <i>Axioms</i> and <i>Have-been-given</i>, and it is used by
+Task A to complete inferences initiated with the given clause.
+<i>Demod-index</i> is used to locate clauses in <i>Demodulators</i> when
+demodulating clauses.  Each index has a lock for serializing updates.
+
+<p>
+<dt><strong><b>Process data.</b></strong>
+<dd>This is an array, indexed by processor
+identifier, of collections of data.  The data for each process (which
+is available to all other processes) contains a lock and a list for
+memory balancing (see Section <a HREF="node20.html#balancing"><img ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="http://www-fp.mcs.anl.gov/~lusk/images/papers/cross_ref_motif.gif" width="13" height="13"></a>), the time at which the process
+finished its most recent Task (see Section ??), and statistics for
+the process.
+
+<p>
+<dt><strong><b>Available nodes.</b></strong>
+<dd>See Section ??.
+
+<p>
+<dt><strong><b>Set of index nodes to be deleted.</b></strong>
+<dd>See Section ??.
+
+<p>
+</dl>
+<p>
+<br><hr>
+<!--Table of Child-Links-->
+<a NAME="CHILD_LINKS">&nbsp;</a>
+<ul>
+<li><a NAME="tex2html210" HREF="node17.html">Updating the Clause Sets and the Indices</a>
+<ul>
+<li><a NAME="tex2html211" HREF="node18.html">Index Insertions</a>
+<li><a NAME="tex2html212" HREF="node19.html">Index Deletions</a>
+</ul>
+<li><a NAME="tex2html213" HREF="node20.html">Balancing Memory Usage</a>
+</ul>
+<!--End of Table of Child-Links-->
+<hr>
+<!--Navigation Panel-->
+<a NAME="tex2html208" HREF="node17.html">
+<img WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="http://www-fp.mcs.anl.gov/~lusk/images/papers/next_motif.gif"></a> 
+<a NAME="tex2html206" HREF="paper.html">
+<img WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="http://www-fp.mcs.anl.gov/~lusk/images/papers/up_motif.gif"></a> 
+<a NAME="tex2html200" HREF="node15.html">
+<img WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="http://www-fp.mcs.anl.gov/~lusk/images/papers/previous_motif.gif"></a>   
+<br>
+<b> Next:</b> <a NAME="tex2html209" HREF="node17.html">Updating the Clause Sets</a>
+<b> Up:</b> <a NAME="tex2html207" HREF="paper.html">High-Performance Parallel Theorem Proving</a>
+<b> Previous:</b> <a NAME="tex2html201" HREF="node15.html">Analysis of Results</a>
+<!--End of Navigation Panel-->
+<address>
+<i>Karen D. Toonen</i>
+<br><i>1998-11-19</i>
+</address>
+</body>
+</html>

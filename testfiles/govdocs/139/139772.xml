@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XML Spy v4.1 (http://www.xmlspy.com) by Neil Marshall (User Technology Associates, Inc.) -->
+<xs:schema targetNamespace="http://www.loc.gov/TMD/" xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns="http://www.loc.gov/TMD/" elementFormDefault="qualified">
+	<!--============================================================
+
+  TEXTMD: Text Technical Metadata Extension Schema
+    
+  Initial Version:  TMD_020322.xsd (obtained from Carl's webpage on 03/27/2002)
+  
+  Changes 03/27/2002:
+  DKC- Removed "datetime_*" from the file element.
+  Changes 07/25/2002
+  DKC- Abstracted the root element in order to provide support for both analog 
+        and digital sources.
+     - Simplified the structure to eliminate the unecessary element references 
+        and complex types.
+
+============================================================-->
+	<xs:element name="TEXTMD" type="textType"/>
+	<xs:element name="TEXTSRC" type="textType"/>
+	<xs:element name="file_data" type="file_dataType"/>
+	<xs:element name="physical_data" type="physical_dataType"/>
+	<xs:element name="text_info" type="text_infoType"/>
+	<xs:element name="calibration_info" type="calibrationType"/>
+	<xs:annotation>
+		<xs:documentation>TEXTMD: LC-AV Text Metadata Extension Schema
+	      		TEXTMD contains technical metadata that describe a text file.  It is based upon metadata defined by LC 
+	      		M/B/RS.  TEXTMD contains 4 top-level elements.
+    		</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="textType">
+		<xs:annotation>
+			<xs:documentation>TEXTMDType: Complex Type for encapsulating within a single parent element the individual 
+				digital text archival object elements that describe an object or portion of an object.  But note that the individual 
+				digital text archival object elements that comprise the TEXTMD schema can be used independently of the 
+				schema element and directly under a METS mdSec.dmWrap element. The individual elements that comprise 
+				a digital text archival object element are documented under their corresponding types.
+				TEXTMDType has a single attribute,
+		        		ID (XML ID).
+      			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element ref="file_data" minOccurs="0"/>
+			<xs:element ref="physical_data" minOccurs="0"/>
+			<xs:element ref="text_info" minOccurs="0"/>
+			<xs:element ref="calibration_info" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="ID" type="xs:ID"/>
+		<xs:attribute name="ANALOGDIGITALFLAG" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:NMTOKEN">
+					<xs:enumeration value="Analog"/>
+					<xs:enumeration value="PhysDigital"/>
+					<xs:enumeration value="FileDigital"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="file_dataType">
+		<xs:annotation>
+			<xs:documentation>file_data: The file_data element is used to describe technical characteristics of a text 
+				file.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="byte_order" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>byte_order: This is the simple element which provides a place to store the 
+						order of bit significance in a byte from left to right  i.e. 0-least-to-most, 1-most-to-least.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:int">
+						<xs:enumeration value="0"/>
+						<xs:enumeration value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="checksum" type="checksumType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="encoding" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>encoding: This is the simple element which provides a place to store  the type of 
+						encoding used in an item or portion of an item.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="format_name" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>format_name: This is the simple element which provides a place to store the 
+						n-character name that corresponds to the standard file extension associated with the text 
+						format,  e.g.  html, xml, sgm etc...</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="format_version" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>format_version: This is the simple element which provides a place to store  the 
+						version of the text format specified in format_name   e.g. for format_name="htm" format_version="3.0".
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="markup" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>markup: This is the simple element which provides a place to store  the type of 
+						markup language used in an item or portion of an item.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="security" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>security: This is the simple element which provides a place to store  the type of 
+						security precautions applied to the file  e.g. password, encryption, hidden, etc.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="use" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>use: This is the simple element which provides a place to store  the use of a digital 
+						text file, e.g., Master, Service High, Service Low, Preview.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="Master"/>
+						<xs:enumeration value="Service"/>
+						<xs:enumeration value="Service_High"/>
+						<xs:enumeration value="Service_Low"/>
+						<xs:enumeration value="Preview"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="ID" type="xs:ID"/>
+	</xs:complexType>
+	<xs:complexType name="physical_dataType">
+		<xs:sequence/>
+	</xs:complexType>
+	<xs:complexType name="text_infoType">
+		<xs:annotation>
+			<xs:documentation>text_info: The text_info element is used to describe text characteristics of an object that not 
+				specific to either the physical object or a digital representation.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="note" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>note: This is the simple element which provides a place to store the general 
+						information about an item or portion of an item.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="calibrationType">
+		<xs:sequence/>
+	</xs:complexType>
+	<xs:complexType name="checksumType">
+		<xs:annotation>
+			<xs:documentation>checksumType: Complex Type for recording the type of checksum used for a digital audio file.
+				checksumType has 1 attribute and 3 elements. 
+	        		ID: (XML ID) 
+       	 		- checksum_datetime: datetime the checksum was calculated and applied; 
+        			- checksum_type: the type of checksum used;
+        			- checksum_value: the checksum value.
+	      		</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="checksum_datetime" type="xs:dateTime"/>
+			<xs:element name="checksum_type" type="xs:string"/>
+			<xs:element name="checksum_value" type="xs:string"/>
+		</xs:sequence>
+		<xs:attribute name="ID" type="xs:ID"/>
+	</xs:complexType>
+</xs:schema>

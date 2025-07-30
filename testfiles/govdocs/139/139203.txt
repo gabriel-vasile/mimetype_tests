@@ -1,0 +1,182 @@
+pro plot_gr_grid,win,minLat,maxLat,minLon,maxLon,msg 
+wset,win
+recDem=lonarr(55L,25L)
+demDir = "/var/www/html/IONJava/html_src/dem_grid/"
+openr,lun,/get_lun, demDir+'greenland_20.rec' , /swap_if_little_endian
+readu,lun,recDem
+free_lun,lun
+recDem01 = recDem
+
+; Max lon should be 180
+rot = 0
+if (minLat gt maxLat) then begin
+	tmp = maxLat 
+	maxLat = minLat
+	minLat = tmp 
+endif
+latCenter = 0.5*(minLat+maxLat)
+lonCenter = 0.5*(minLon+maxLon)
+discont = 0
+if (minLon gt 0 and maxLon lt 0) then begin
+        discont = 1
+        lonCenter  = minLon+0.5*((180-minLon)+(180+maxLon))
+        if (lonCenter gt 180) then lonCenter = maxLon+(lonCenter -180)
+endif
+if (minLon gt 0 and maxLon gt 0 and maxLon lt minLon) then begin
+        lonCenter = 0.5*(minLon+maxLon)-180.0
+endif
+
+if (minLon gt maxLon) then begin
+	discont = 1
+        lonCenter  = minLon+0.5*((180-minLon)+(180+maxLon))
+        if (lonCenter gt 180) then lonCenter = maxLon+(lonCenter -180)
+endif
+if minLon eq -180 and maxLon eq 180 and minLat eq -90 and maxLat eq -55 then begin
+        latCenter = -90.0
+        lonCenter = 0.0
+endif
+
+difLat=abs(minLat-maxLat)
+if (abs(minLat) gt 50 and abs(maxLat) gt 50 and difLat le 40) then projection='lambert' else projection='cylindrical'
+
+dLat = abs(LONG(ceil(maxLat) - floor(minLat)))
+if (discont eq 0) then dLon = abs(LONG(ceil(maxLon) - floor(minLon)))
+if (discont eq 1) then dLon = 180-floor(minLon)+180+ceil(maxLon) 
+
+minLatInd=floor(minLat-59.0)
+maxLatInd=ceil(maxLat-59.0)
+minLonInd=floor(minLon+70)
+maxLonInd=ceil(maxLon+70)
+;if maxLatInd eq 180 then maxLatInd=180-1
+;if maxLonInd eq 360 then maxLonInd=360-1
+String = 'minLat, maxLat, minLon, maxLon, lonCenter, projection= '+string(minLat)+' '+string(maxLat)+' '+string(minLon)+' '$
+	+string(maxLon)+' '+string(lonCenter)+' '+string(projection)
+	   
+String = 'minLatInd, maxLatInd, minLonInd, maxLonInd= '$
+		+string(minLatInd)+' '+string(maxLatInd)+' '+string(minLonInd)+' '+string(maxLonInd)  
+dd = max([dLat, dLon])
+map_file =strarr(7)
+block_size=intarr(7)
+dataFile =  'greenland_00.dem'
+index = strpos(dataFile, '00')
+map_file(0) = 'greenland_20.dem'
+
+block_size=[20, 10, 5]
+if (dd le 360) then i=0
+
+
+
+openr,lun,/get_lun, demDir+map_file(i), ERROR=err, /swap_if_little_endian 
+if (err lt 0) then begin
+    exit
+endif 
+Rec = assoc(lun, intarr(block_size(i), block_size(i)))
+ocean = -9999+intarr(block_size(i), block_size(i))
+n_lat = abs(LONG(maxLatInd) - LONG(minLatInd))  
+if (discont eq 0) then n_lon = abs(LONG(maxLonInd) - LONG(minLonInd)) 
+if (discont eq 1) then n_lon = maxLonInd + 360-minLonInd 
+if (n_lon lt 1) then n_lon = 1
+if(n_lat lt 1) then n_lat = 1
+i1 = block_size(i)*n_lon
+i2 = block_size(i)*n_lat
+datasmall = intarr(i1, i2)
+
+case block_size(i) of
+	20:  Dem = recDem01
+	else:
+endcase
+ii = 0
+;Check if the chosen zooming box is in the Dem range
+n=size(Dem)
+if (n(0) eq 0) then n=size(recDem01)
+print,'minLatInd,maxLatInd=',minLatInd,maxLatInd
+print,'minLonInd,maxLonInd=',minLonInd,maxLonInd
+print,'n=',n
+if (minLatInd gt n(2) or maxLatInd gt n(2) or minLatInd lt 0) then begin
+  msg = 'Area is out of range, Please choose the zoom area again!'
+  print,'Area is out of range, Please choose the zoom area again!'
+  return
+endif
+if (minLonInd gt n(1) or maxLonInd gt n(1) or minLonInd lt 0) then begin
+  msg = 'Area is out of range, Please choose the zoom area again!'
+  print,'Area is out of range, Please choose the zoom area again!'
+  return
+endif
+
+for i_loop= minLatInd, maxLatInd - 1 do begin
+		ii = ii + 1
+		jj = 0
+		for j = minLonInd, maxLonInd-1 do begin
+				jj = jj + 1
+				n_rec = LONG(55L*LONG(i_loop) + LONG(j))
+				if (block_size(i) eq 20 ) then begin 
+					if (Dem(j, i_loop) eq -1) then begin
+						tmp = ocean
+					endif else begin
+						tmp = Rec(Dem(j, i_loop))
+					endelse
+				endif else begin
+					tmp = Rec(n_rec)
+				endelse
+				i1 = LONG(block_size(i))*LONG(ii-1)
+				i2 = LONG(block_size(i))*LONG(ii)-1
+				j1 = LONG(block_size(i))*LONG(jj-1)
+				j2 = LONG(block_size(i))*LONG(jj) - 1
+				datasmall(j1:j2, i1:i2) = tmp
+		endfor	
+endfor
+String='min(data), max(data)='+string(min(datasmall))+' '+string(max(datasmall))
+;if (maxLat-minLat lt 1.0) then begin
+        tmp = size(datasmall)
+        length = tmp(2)
+	n = fix(0.001+length/block_size(i)) 
+        d = minLat-floor(minLat)
+        index = fix(block_size(i)*d)
+	dd = ceil(maxLat-0.0001) - maxLat
+	index1 = fix(block_size(i)*dd)
+        datasmall = datasmall(*, index:(block_size(i)*n-index1-1))
+
+        tmp = size(datasmall)
+        length = tmp(1)
+	n = fix(0.001+length/block_size(i)) 
+        d = minLon-floor(minLon)
+        index = fix(block_size(i)*d)
+	dd = ceil(maxLon-0.0001) - maxLon
+	index1 = fix(block_size(i)*dd)
+        datasmall = datasmall(index:(block_size(i)*n-index1-1),*)
+JUMP:
+
+loadct,0,bottom= 6               ; bw color map, saving the explict colors
+tvlct,0,0,155                   ; dark blue in 0
+!p.background = 0               ; use it for background
+
+set_shading, light=[0,0,1]
+;shade_surf,datasmall, image=image_shade, ax=90,az=0,zrange=[-500, max(datasmall)],min_value=-500
+shade_surf,datasmall, image=image_shade, ax=90,az=0,zrange=[-50, max(datasmall)],min_value=-50
+case projection of
+        'lambert': begin
+	    map_set, $
+                /continent, /lambert, /isotropic, $
+                latCenter, lonCenter, rot,$
+		limit=[minLat,minLon,maxLat,maxLon] , $
+                        e_continents={fill:1}
+	end  
+        'cylindrical': begin
+              map_set, $
+		/continent,  /isotropic, /cylindrical, $
+                latCenter, lonCenter, rot,$
+		limit=[minLat,minLon,maxLat,maxLon] , $
+                        e_continents={fill:1}
+	end  		
+        else:
+endcase
+if (discont eq 1) then  maxLon = minLon + dLon
+imagedem=map_image(image_shade,startx,starty,latmin=minLat,latmax=maxLat, $
+ 		   lonmin=minLon,lonmax=maxLon, compress=1, /bilin)
+
+tv,imagedem,startx,starty
+map_grid,LABEL=2 
+free_lun, lun
+return
+end
+

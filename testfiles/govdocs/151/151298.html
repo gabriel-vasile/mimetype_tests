@@ -1,0 +1,1303 @@
+<HTML>
+<BODY>
+<PRE>
+     _________________________________________________________________
+
+     <STRONG>NAME</STRONG>
+          blt_barchart - Create and manipulate barchart widgets
+
+     <STRONG>SYNOPSIS</STRONG>
+          <STRONG>blt_barchart</STRONG> <EM>pathName</EM> ?<EM>options</EM>?
+
+     <STRONG>STANDARD</STRONG> <STRONG>OPTIONS</STRONG>
+          <STRONG>background</STRONG>      <STRONG>cursor</STRONG>         <STRONG>foreground</STRONG>
+          <STRONG>borderWidth</STRONG>     <STRONG>font</STRONG>           <STRONG>relief</STRONG>
+
+          See the ``options'' manual entry for details on the standard
+          options.
+
+     <STRONG>WIDGET-SPECIFIC</STRONG> <STRONG>OPTIONS</STRONG>
+          <STRONG>bottomMargin</STRONG>    <STRONG>leftMargin</STRONG>     <STRONG>title</STRONG>
+          <STRONG>bufferElements</STRONG>  <STRONG>plotBackground</STRONG> <STRONG>topMargin</STRONG>
+          <STRONG>halo</STRONG>            <STRONG>plotBorderWidth</STRONG>                <STRONG>width</STRONG>
+          <STRONG>height</STRONG>          <STRONG>plotRelief</STRONG>
+          <STRONG>invertxy</STRONG>        <STRONG>rightMargin</STRONG>
+     _________________________________________________________________
+
+     <STRONG>DESCRIPTION</STRONG>
+          The <STRONG>blt_barchart</STRONG> command creates a new window (given by  the
+          <EM>pathName</EM>  argument)  and  makes  it into an barchart widget.
+          Additional options, described above, may be specified on the
+          command  line or in the option database to configure aspects
+          of the graph such as its colors and font.  The  <STRONG>blt_barchart</STRONG>
+          command  returns  its  <EM>pathName</EM>  argument.  At the time this
+          command is invoked, there must  not  exist  a  window  named
+          <EM>pathName</EM>, but <EM>pathName</EM>'s parent must exist.
+
+          The  <STRONG>blt_barchart</STRONG>  widget   plots   two-variable   data   as
+          rectangular  bars  in  a  window.   The  x-coordinate values
+          designate the position of the bar along  the  x-axis,  while
+          the   y-coordinate  values  designate  the  magnitude.   The
+          <STRONG>blt_barchart</STRONG> has of  several  components;  coordinate  axes,
+          crosshairs, a legend, and a collection of elements and tags.
+
+        <STRONG>COORDINATE</STRONG> <STRONG>AXES</STRONG>
+          The barchart widget has four axes, two standard  (x  and  y)
+          and  two alternate (x2 and y2).  Graph elements and tags are
+          mapped onto one x-axis and one y-axis (by default, they  are
+          mapped onto the standard axes).
+
+          Each axis consists of the axis  line  and  major  and  minor
+          ticks placed at set intervals.  At major ticks, labels (text
+          strings) representing the coordinate value of the  tick  are
+          drawn.   By  default,  the  tick  labels  are simply numeric
+          strings.  However, a Tcl procedure may be supplied to format
+          individually each tick label.
+          The scale of the axis is determined its minimum and  maximum
+          limits.   By  default,  each  axis  is auto-scaled using the
+          limits of the data.  However either  limit  can  be  set  to
+          manually scale the graph.
+
+        <STRONG>CROSSHAIRS</STRONG>
+          Crosshairs are a set of two lines (vertical and  horizontal)
+          which  intersect  on  the graph.  They are implemented using
+          XOR drawing primitives, so they do not require the graph  to
+          be redrawn when they are moved or redisplayed.
+
+        <STRONG>ELEMENTS</STRONG>
+          A graph element is a set of data  points  and  configuration
+          options  which  determine  how  the  bar is displayed in the
+          window.  Elements are created by the <STRONG>element</STRONG>  <STRONG>create</STRONG>  widget
+          command.   The configuration options may be specified as the
+          element is created or later by the <STRONG>element</STRONG> <STRONG>configure</STRONG>  widget
+          command.  There is an internal display list of element names
+          which  controls  the  drawing  order  of  the  elements.  By
+          default,  elements  are appended to the display list as they
+          are created.  The element display list can be managed by the
+          <STRONG>element</STRONG> <STRONG>show</STRONG> command.
+
+        <STRONG>LEGEND</STRONG>
+          The legend consists of a list of entries, where  each  entry
+          is  an  element symbol and label.  By default, the legend is
+          located in the right margin  of  the  graph.   However,  the
+          legend may appear anywhere in the plotting area of the graph
+          by specifying its window coordinates.
+
+        <STRONG>TAGS</STRONG>
+          Tags are simple  drawing  procedures  used  to  annotate  or
+          highlight  areas  of  the  graph. A tag may be either a text
+          string, bitmap, line, window, or  polygon.   A  tag  may  be
+          associated  with  a  particular  element, so that the tag is
+          displayed only if the element is displayed.   Tags  are  the
+          first  items  drawn  when  the  graph  is displayed, so that
+          elements, symbols, legend, and axes always appear  in  front
+          of them.
+
+          Tags differ from elements in that they  do  not  affect  the
+          auto-scaling of coordinate axes.  Furthermore, tags can have
+          <EM>elastic</EM> coordinates (specified by -Inf and Inf respectively)
+          which translate into the axis minimum or maximum limit.  For
+          example, to place a tag so it always remains  in  the  lower
+          left corner of the plot, use the coordinates -Inf,-Inf.
+
+     <STRONG>WIDGET</STRONG> <STRONG>COMMANDS</STRONG>
+          The <STRONG>blt_barchart</STRONG> command creates a  new  Tcl  command  whose
+          name  is  <EM>pathName</EM>.   This  command  may  be  used to invoke
+          various operations on the widget.  It has the general form:
+
+               <EM>pathName</EM> <EM>option</EM> ?<EM>arg</EM> <EM>arg</EM> ...?
+9          <EM>Option</EM> and the <EM>arg</EM>s determine  the  exact  behavior  of  the
+          command.   The following commands are valid for <STRONG>blt_barchart</STRONG>
+          widgets:
+
+          <EM>pathName</EM> <STRONG>configure</STRONG> ?<EM>options</EM>...?
+               Queries or modifies the configuration  options  of  the
+               widget. Valids options are described in
+
+          <EM>pathName</EM> <STRONG>crosshairs</STRONG> <STRONG>configure</STRONG> ?<EM>options</EM>...?
+               Queries or modifies the configuration  options  of  the
+               crosshairs.   This  command is similar to the <STRONG>configure</STRONG>
+               command, except that it applies to the options  of  the
+               crosshairs,  whereas  <STRONG>configure</STRONG>  applies to the options
+               for the graph as a whole.  See  for  a  description  of
+               valid options.
+
+          <EM>pathName</EM> <STRONG>crosshairs</STRONG> <STRONG>toggle</STRONG>
+               Toggles the current state of  the  crosshairs,  turning
+               them on or off.  This command returns an empty string.
+
+          <EM>pathName</EM> <STRONG>element</STRONG> <STRONG>append</STRONG> <EM>name</EM> <EM>coords</EM>
+               Appends pairs of  x,y  data  points  to  element  <EM>name</EM>.
+               <EM>coords</EM>  is  a  list  of  numeric expressions (x,y graph
+               coordinates) representing data points.  It returns  the
+               empty string.
+
+          <EM>pathName</EM> <STRONG>element</STRONG> <STRONG>configure</STRONG> <EM>name</EM> ?<EM>options</EM>...?
+               This command  is  similar  to  the  <STRONG>configure</STRONG>  command,
+               except  that it applies to the options of an individual
+               element, whereas <STRONG>configure</STRONG> applies to the  options  for
+               the  graph  as  a  whole.   <EM>Options</EM> may have any of the
+               values accepted by the <STRONG>element</STRONG> <STRONG>create</STRONG>  widget  command.
+               See for a description of valid options.
+
+          <EM>pathName</EM> <STRONG>element</STRONG> <STRONG>create</STRONG> <EM>name</EM> ?<EM>options</EM>...?
+               Creates a new element <EM>name</EM> in the graph.  Element names
+               must  be  unique,  so <EM>name</EM> can not already exist in the
+               graph.  If  additional  arguments  are  present,   they
+               specify any of the element options (see ).
+
+          <EM>pathName</EM> <STRONG>element</STRONG> <STRONG>delete</STRONG> <STRONG>?</STRONG><EM>name</EM> ...?
+               Deletes the element <EM>name</EM> from the  graph.  Returns  the
+               empty string.
+
+          <EM>pathName</EM> <STRONG>element</STRONG> <STRONG>names</STRONG>
+               Returns a list  of  all  elements.  This  differs  from
+               <STRONG>element</STRONG>  <STRONG>show</STRONG>  in  that  it  returns  the  names of all
+               elements, not just those in the element display list.
+
+          <EM>pathName</EM> <STRONG>element</STRONG> <STRONG>show</STRONG> ?<EM>names</EM>?
+               Queries or resets the element display list. The element
+               what order. <EM>Names</EM> is a  list  of  the  elements  to  be
+               displayed.   If there is no <EM>names</EM> argument, the list of
+               elements currently being displayed is returned.
+
+          <EM>pathName</EM> <STRONG>invtransform</STRONG> <EM>winX</EM> <EM>winY</EM>
+               Performs an inverse coordinate transformation,  mapping
+               x,y  window coordinates to graph coordinates (using the
+               standard x and y axes). Returns a  list  of  containing
+               the x and y graph coordinates.
+
+          <EM>pathName</EM> <STRONG>legend</STRONG> <STRONG>activate</STRONG> <EM>name</EM>...
+               Specifies that the legend entries of the named elements  |
+               should  be  drawn with the active legend background and  |
+               foreground colors.  The entries may also be drawn  with  |
+               a   different   relief  (using  the  <STRONG>-activerelief</STRONG>  and  |
+               <STRONG>-activeborderwidth</STRONG> options).  <EM>Name</EM> is the  name  of  an  |
+               element in the graph.
+
+          <EM>pathName</EM> <STRONG>legend</STRONG> <STRONG>configure</STRONG> ?<EM>options</EM>...?
+               This command  is  similar  to  the  <STRONG>configure</STRONG>  command,
+               except  that  it applies to the options for the legend,
+               whereas <STRONG>configure</STRONG> applies to the options for the  graph
+               as a whole.  See for a description of valid options.
+
+          <EM>pathName</EM> <STRONG>legend</STRONG> <STRONG>deactivate</STRONG> <EM>name</EM>...
+               Specifies that the legend enties of the named  elements  |
+               should   be   drawn  with  the  legend  background  and  |
+               foreground colors.  <EM>Name</EM> is the name of an  element  in  |
+               the graph.
+
+          <EM>pathName</EM> <STRONG>legend</STRONG> <STRONG>get</STRONG> <EM>string</EM>
+               Returns the name of the graph element  at  the  current  |
+               screen  position  in the legend.  <EM>String</EM> must be in the  |
+               form "@<STRONG>x</STRONG>,<STRONG>y</STRONG>", where <STRONG>x</STRONG> and <STRONG>y</STRONG> are the window  coordinates.  |
+               If  the  given  screen  coordinates  do  not lie over a  |
+               legend entry, the empty  string  is  returned.   for  a
+               description of valid options.
+
+          <EM>pathName</EM> <STRONG>postscript</STRONG> ?<EM>fileName</EM>? ?<EM>options</EM>...?
+               Generates PostScript commands to print the graph. If no
+               <EM>fileName</EM>  argument is present, the PostScript output is
+               returned.  Otherwise,  <EM>fileName</EM>  is  created  and  will
+               contain  the PostScript output.  In this case the empty
+               string is returned.   If  any  <EM>option</EM>-<EM>value</EM>  pairs  are
+               present, they set configuration options controlling how
+               the PostScript is generated. See for a  description  of
+               valid options.
+
+          <EM>pathName</EM> <STRONG>psconfigure</STRONG> ?<EM>options</EM>...?
+               Queries or  modifies  the  options  of  the  <STRONG>postscript</STRONG>
+               command (see ).
+
+               Reorders the tag display list  placing  the  first  tag
+               specified   after  the  second.   If  no  second  <EM>tagId</EM>
+               argument is specified, the tag is placed at the end  of
+               the list.  This command can be used to control how tags
+               are displayed since tags are drawn in the order of this
+               display list.  The empty string is returned.
+
+          <EM>pathName</EM> <STRONG>tag</STRONG> <STRONG>before</STRONG> <EM>tagId</EM> ?<EM>tagId</EM>?
+               Reorders the tag display list  placing  the  first  tag
+               specified  before  the  second.   If  no  second  <EM>tagId</EM>
+               argument  is  specified,  the  tag  is  placed  at  the
+               beginning  of  the  list.   This command can be used to
+               control how tags are displayed since tags are drawn  in
+               the  order  of  this display list.  The empty string is
+               returned.
+
+          <EM>pathName</EM> <STRONG>tag</STRONG> <STRONG>configure</STRONG> <EM>tagId</EM> ?<EM>options</EM>...?
+               Queries or modifies the configuration  options  of  the
+               particular   tag.   See  for  a  description  of  valid
+               options.
+
+          <EM>pathName</EM> <STRONG>tag</STRONG> <STRONG>coords</STRONG> <EM>tagId</EM> ?<EM>coords</EM>?
+               Queries or resets the coordinates of the tag designated
+               by  <EM>tagId</EM>.   If  <EM>coords</EM>  is  present,  it  is a list of
+               coordinate pairs representing the points  of  the  tag.
+               This  list  is  used  to  re-position  the tag.  If the
+               <EM>coords</EM> argument is not present,  the  current  list  of
+               coordinates for <EM>tagId</EM> is returned.
+
+          <EM>pathName</EM> <STRONG>tag</STRONG> <STRONG>create</STRONG> <EM>type</EM> ?<EM>coords</EM>? ?<EM>options</EM>...?
+               Creates a tag of the selected type. <EM>Type</EM> may be  either
+               text,  line,  bitmap,  polygon, or window.  <EM>coords</EM> is a
+               list of coordinate pairs of points used to position the
+               tag.  See for a description of options are valid.  This
+               command returns a unique tag identifier, which is  used
+               as the <EM>tagId</EM> argument in other tag-related commands.
+
+          <EM>pathName</EM> <STRONG>tag</STRONG> <STRONG>delete</STRONG> <EM>tagId</EM> ?<EM>tagId</EM>..?
+               Deletes each  of  the  specified  tags.   This  command
+               returns the empty string.
+
+          <EM>pathName</EM> <STRONG>tag</STRONG> <STRONG>ids</STRONG> ?<EM>pattern</EM>?
+               Returns a list of IDs of tags created.  If  <EM>pattern</EM>  is
+               supplied, only those tags whose IDs matching it will be
+               returned.
+
+          <EM>pathName</EM> <STRONG>tag</STRONG> <STRONG>type</STRONG> <EM>tagId</EM>
+               Returns the type of the tag given  by  <EM>tagId</EM>,  such  as
+               Line or Text. If <EM>tagId</EM> is not a valid a tag identifier,
+               the empty string is returned.
+
+
+               Transforms   the   graph   coordinates   into    window  |
+               coordinates,  by  mapping  the  <STRONG>x</STRONG> and <STRONG>y</STRONG> values onto the  |
+               standard axes (x and y).  Returns a list containing the  |
+               x  and  y  window  coordinates.  Please note that graph  |
+               coordinates far outside  of  the  axis  range  are  not  |
+               guarenteed to be accurate.
+
+          <EM>pathName</EM> <STRONG>xaxis</STRONG> <STRONG>configure</STRONG> ?<EM>options</EM>...?
+
+          <EM>pathName</EM> <STRONG>yaxis</STRONG> <STRONG>configure</STRONG> ?<EM>options</EM>...?
+
+          <EM>pathName</EM> <STRONG>x2axis</STRONG> <STRONG>configure</STRONG> ?<EM>options</EM>...?
+
+          <EM>pathName</EM> <STRONG>y2axis</STRONG> <STRONG>configure</STRONG> ?<EM>options</EM>...?
+               Queries or modifies the configuration  options  of  the
+               coordinate axis. The subsection describes which options
+               are valid.
+
+          <EM>pathName</EM> <STRONG>xaxis</STRONG> <STRONG>limits</STRONG>
+
+          <EM>pathName</EM> <STRONG>yaxis</STRONG> <STRONG>limits</STRONG>
+
+          <EM>pathName</EM> <STRONG>x2axis</STRONG> <STRONG>limits</STRONG>
+
+          <EM>pathName</EM> <STRONG>y2axis</STRONG> <STRONG>limits</STRONG>
+               Returns a list of two  graph  coordinates  representing
+               the  minimum  and  maximum  limits  of the x-axis.  The
+               format of the list returned is min max.
+
+
+     <STRONG>CONFIGURATION</STRONG> <STRONG>OPTIONS</STRONG>
+        <STRONG>WIDGET</STRONG> <STRONG>OPTIONS</STRONG>
+          The following widget options are  valid  for  the  <STRONG>configure</STRONG>
+          command.
+
+               <EM>pathName</EM> <STRONG>configure</STRONG> ?<EM>option</EM>? ?<EM>value</EM> <EM>option</EM> <EM>value</EM> ...?
+
+</PRE>
+<H2>9          The configure command queries or modifies the  configuration</H2><PRE>
+          options of the widget.  If no <EM>option</EM> is specified, returns a
+          list describing all of the available  options  for  <EM>pathName</EM>
+          (see  <STRONG>Tk_ConfigureInfo</STRONG> for information on the format of this
+          list). If <EM>option</EM>  is  specified  with  no  <EM>value</EM>,  then  the
+          command returns a list describing the one named option (this
+          list will be identical to the corresponding sublist  of  the
+          value  returned  if no <EM>option</EM> is specified).  If one or more
+          <EM>option</EM>-<EM>value</EM> pairs are specified, then the command  modifies
+          the  given  widget  option(s) to have the given value(s); in
+          this case the command returns the empty string.
+
+          <STRONG>-bottommargin</STRONG> <EM>pixels</EM>
+               Specifies the size of the margin from the  x-coordinate
+               axis  to the bottom of the window.  The x-axis title is
+
+               is less than one pixel, the the margin size is selected
+               automatically.
+
+          <STRONG>-bufferelements</STRONG> <EM>boolean</EM>
+               Specifies whether to use a pixmap to cache the  display  |
+               of  elements.  This is especially useful when there are  |
+               many data points or the graph  is  redrawn  frequently.  |
+               <STRONG>oolean</STRONG> is true <STRONG>by</STRONG> <STRONG>default.</STRONG>
+
+          <STRONG>-halo</STRONG> <EM>pixels</EM>
+               Specifies a threshold distance when searching  for  the
+               closest  data  point (see the <STRONG>element</STRONG> <STRONG>closest</STRONG> command).
+               Only data points within this distance are considered in
+               the  search.   <EM>Pixels</EM>  may  be  specified in any of the
+               forms described in <STRONG>Tk_GetPixels</STRONG>.  If this option  isn't
+               specified, it defaults to 0.5i.
+
+          <STRONG>-height</STRONG> <EM>pixels</EM>
+               Specifies a desired window  height  that  the  barchart
+               widget  should  request from its geometry manager.  The
+               default height is 400.
+
+          <STRONG>-invertxy</STRONG> <EM>boolean</EM>
+               Specifies that placement of the x and y axes should  be  |
+               inverted.   If <EM>boolean</EM> is true, the x-axis is exchanged  |
+               with the y-axis.  By default <EM>boolean</EM> is false.
+
+          <STRONG>-leftmargin</STRONG> <EM>pixels</EM>
+               Sets the size of the margin from the left edge  of  the
+               window  to the the y-coordinate axis.  The y-axis title
+               is displayed in this margin.  If <EM>pixels</EM>  is  less  than
+               one pixel, the margin size is selected automatically.
+
+          <STRONG>-plotbackground</STRONG> <EM>color</EM>
+               Sets the background color of the plotting area.
+
+          <STRONG>-plotborderwidth</STRONG> <EM>pixels</EM>
+               Sets the width of the 3-D border  to  draw  around  the
+               outside  of  the plotting area (if such border is being
+               drawn; the  <STRONG>plotrelief</STRONG>  option  determines  this).   By
+               default is the plot border width is 2.
+
+          <STRONG>-plotrelief</STRONG> <EM>string</EM>
+               Specifies the 3-D effect desired for the plotting area.
+               <EM>String</EM>  must  be in a form accepted by <STRONG>Tk_GetRelief</STRONG>. It
+               indicates how the interior of the plotting area  should
+               appear  relative  to  rest  of  the graph; for example,
+               raised means the plot should appear  to  protrude  from
+               the  graph,  relative  to the surface of the graph.  By
+               default, the plot relief is sunken.
+
+
+               right  edge  of  the window.  By default, the legend is
+               displayed in this margin. If Ipixels  is  than  1,  the
+               margin size is selected automatically.
+
+          <STRONG>-title</STRONG> <EM>string</EM>
+               Specifies the title of the graph.   If  <EM>string</EM>  is  the
+               empty string (the default), no title is displayed.
+
+          <STRONG>-topmargin</STRONG> <EM>pixels</EM>
+               Sets the size of the marging the top edge of the window
+               to  the plotting area.  The graph title is displayed in
+               this margin. If <EM>pixels</EM> is less than 1, the margin  size
+               is selected automatically.
+
+          <STRONG>-width</STRONG> <EM>pixels</EM>
+               Specifies a desired  window  width  that  the  barchart
+               widget should request from its geometry manager. <EM>Pixels</EM>
+               may be specified in  any  of  the  forms  described  in
+               <STRONG>Tk_GetPixels</STRONG>.  The default width is 400.
+
+
+        <STRONG>AXIS</STRONG> <STRONG>OPTIONS</STRONG>
+          The following options are valid  for  the  <STRONG>xaxis</STRONG>  <STRONG>configure</STRONG>,
+          <STRONG>yaxis</STRONG>  <STRONG>configure</STRONG>, <STRONG>x2axis</STRONG> <STRONG>configure</STRONG>, and the <STRONG>y2axis</STRONG> <STRONG>configure</STRONG>
+          commands.
+
+               <EM>pathName</EM> <STRONG>xaxis</STRONG> <STRONG>configure</STRONG> ?<EM>options</EM>...?
+
+               <EM>pathName</EM> <STRONG>yaxis</STRONG> <STRONG>configure</STRONG> ?<EM>options</EM>...?
+
+               <EM>pathName</EM> <STRONG>x2axis</STRONG> <STRONG>configure</STRONG> ?<EM>options</EM>...?
+
+               <EM>pathName</EM> <STRONG>y2axis</STRONG> <STRONG>configure</STRONG> ?<EM>options</EM>...?
+9          In addition, axis configuration options may  be  initialized
+          by  the <STRONG>option</STRONG> command.  The name fields in the <STRONG>blt_barchart</STRONG>
+          option database are prefixed by x, y, x2, or  y2  while  the
+          class  fields  are  prefixed  by Axis. The following example
+          sets the color of all axes to blue and the y-axis  scale  to
+          logarithmic.
+
+               option add *Blt_barchart.AxisColor blue
+               option add *Blt_barchart.yLogscale true
+9
+          <STRONG>-color</STRONG> <EM>color</EM>
+               Sets the color of the axis and its labels.  The default
+               color is black.
+
+          <STRONG>-command</STRONG> <EM>prefix</EM>
+               Specifies a Tcl command to be invoked  when  formatting
+
+
+
+               arguments (the path name of the barchart widget and the
+               numeric  value  of  the axis label) are appended to the
+               end of the command.  The procedure value  should  be  a
+               string  representing  the formatted label. If the value
+               is the empty string or if <EM>prefix</EM> is the  empty  string,
+               the  default axis label is displayed.  Please note that
+               this procedure is invoked during  the  display  of  the
+               graph.   Resetting  barchart configurations within this
+               procedure can cause unexpected results.
+
+          <STRONG>-descending</STRONG> <EM>boolean</EM>
+               Specifies  whether  the  values  along  the  axis   are  |
+               increasing  or decreasing. If <EM>boolean</EM> is true, the axis  |
+               values will decrease.   By  default,  the  axis  values  |
+               increase.
+
+          <STRONG>-font</STRONG> <EM>fontName</EM>
+               Specifies the font for axis labels. If  <EM>fontName</EM>  isn't
+               specified  then it defaults to *-Courier-Bold-R-Normal-
+               *-100-*.
+
+          <STRONG>-linewidth</STRONG> <EM>pixels</EM>
+               Set the line width of the  axis  and  its  ticks.   The
+               default line width is 0.
+
+          <STRONG>-logscale</STRONG> <EM>boolean</EM>
+               Sets  the  scale  of  the   coordinate   axis   (either
+               logarithmically  or linearly).  If <EM>boolean</EM> is true, the
+               axis will be displayed in logarithmic  scale.   <EM>Boolean</EM>
+               must   be  a  value  accepted  by  <STRONG>Tcl_GetBoolean</STRONG>.   By
+               default, the scale is linear.
+
+          <STRONG>-loose</STRONG> <EM>boolean</EM>
+               Indicates that when auto-scaling  the  axis,  the  axis
+               range  should fit loosely around the data points at the
+               outer tick intervals. Otherwise  the  axis  range  fits
+               tightly  at  the  limits  of  the  data  displayed.  By
+               default, the range is tight.
+
+          <STRONG>-mapped</STRONG> <EM>boolean</EM>
+               Specifies if the axis should be displayed. By  default,  |
+               the  standard axes are displayed (x and y), but not the  |
+               alternate (x2 and y2).
+
+          <STRONG>-max</STRONG> <EM>value</EM>
+               Sets the  maximum  limit  of  the  axis.   Data  points
+               exceeding  this  limit  are  clipped  at this value. If
+               <EM>value</EM> is the empty string (the default),  the  axis  is
+               auto-scaled  whereby  the  maximum  limit is determined
+
+
+
+               Sets the minimum limit of the axis.  Data  points  less
+               than this limit are clipped at this value.  If <EM>value</EM> is
+               the empty string (the default), the axis is auto-scaled
+               whereby  the  minimum limit is determined from the data
+               points of the displayed elements.
+
+          <STRONG>-rotate</STRONG> <EM>theta</EM>
+               Specifies the rotation of the axis labels.  <EM>Theta</EM> is  a
+               real  number  representing  the  angle  of  rotation in
+               degrees.  The default rotation is 0.0 degrees.
+
+          <STRONG>-showticks</STRONG> <EM>boolean</EM>
+               Indicates if axis ticks should be displayed. If <EM>boolean</EM>
+               is true (the default), ticks are displayed.
+
+          <STRONG>-stepsize</STRONG> <EM>value</EM>
+               Sets the step size between  major  axis  ticks.   <EM>Value</EM>
+               must be greater than zero and less than the axis range,
+               or the requested step size is ignored and the step size
+               is automatically calculated based upon the element data
+               points.
+
+          <STRONG>-subticks</STRONG> <EM>number</EM>
+               Sets the number of minor axis ticks  to  be  displayed.
+               By  default, the number of minor ticks is 5.  If <EM>number</EM>
+               is zero, no subticks will be displayed.
+
+          <STRONG>-ticklength</STRONG> <EM>pixels</EM>
+               Sets the length of the ticks and subticks (subticks are  |
+               one-half  <EM>pixels)</EM>.   If  <EM>pixels</EM> is negative, ticks will  |
+               point towards the plot, instead of away from  it.   The  |
+               tick length is 0.1i.
+
+          <STRONG>-title</STRONG> <EM>string</EM>
+               Sets the title of the axis.  If  <EM>string</EM>  is  the  empty
+               string, no axis title will be displayed.
+
+
+        <STRONG>CROSSHAIRS</STRONG> <STRONG>OPTIONS</STRONG>
+          The following options are valid for the <STRONG>crosshair</STRONG>  <STRONG>configure</STRONG>
+          command.
+
+               <EM>pathName</EM> <STRONG>crosshairs</STRONG> <STRONG>configure</STRONG> ?<EM>options</EM>...?
+9          In  addition,  crosshairs  configuration  options   may   be
+          initialized  by  the <STRONG>option</STRONG> command.  The name fields in the
+          <STRONG>blt_barchart</STRONG> option database are prefixed by by  xhairs  and
+          classfields  are  prefixed  by Xhairs. The following example
+          sets the line width of the crosshairs to 2.
+9
+
+
+     Page 10                                         (printed 3/15/96)
+               specified, then it defaults to black.
+
+          <STRONG>-dashes</STRONG> <EM>dashes</EM>
+               Sets the dash style of the crosshairs.  <EM>dashes</EM>  is  the
+               number  of alternatingly displayed pixels. If <EM>dashes</EM> is
+               0 (the default), the crosshairs  will  be  drawn  as  a
+               solid line.
+
+          <STRONG>-linewidth</STRONG> <EM>pixels</EM>
+               Set the line width of  crosshairs.   The  default  line
+               width is 0.
+
+          <STRONG>-mapped</STRONG> <EM>boolean</EM>
+               Specifies if the crosshairs  should  be  displayed.  By
+               default, the crosshairs are not displayed.
+
+          <STRONG>-position</STRONG> <EM>string</EM>
+               Specifies the position of the crosshairs.  <EM>String</EM>  must
+               be  in  the  format  "@<STRONG>x</STRONG>,<STRONG>y</STRONG>",  where  <STRONG>x</STRONG> and <STRONG>y</STRONG> are window
+               coordinates.
+
+
+        <STRONG>ELEMENT</STRONG> <STRONG>OPTIONS</STRONG>
+          The following options are valid for the <STRONG>element</STRONG>  <STRONG>create</STRONG>  and
+          <STRONG>element</STRONG> <STRONG>configure</STRONG> commands.  <EM>Name</EM> is the name of the element
+          to be configured.
+
+               <EM>pathName</EM> <STRONG>element</STRONG> <STRONG>create</STRONG> <EM>name</EM> ?<EM>options</EM>...?
+
+               <EM>pathName</EM> <STRONG>element</STRONG> <STRONG>configure</STRONG> <EM>name</EM> ?<EM>options</EM>...?
+9          In  addition,   element   configuration   options   may   be
+          initialized  by  the <STRONG>option</STRONG> command.  The name fields in the
+          <STRONG>blt_barchart</STRONG> option  database  are  prefixed  by  elem.  The
+          following  example  creates  a 3D effect for bars by setting
+          the relief and the borderwidth.
+
+               option add *Blt_barchart.elemBorderwidth 2
+               option add *Blt_barchart.Relief sunken
+9
+          <STRONG>-background</STRONG> <EM>color</EM>
+               Specifies the the fill color for the bar.  The  default
+               background color is white.
+
+          <STRONG>-borderwidth</STRONG> <EM>pixels</EM>
+               Sets the width of the 3-D border  to  draw  around  the
+               outside  of the bar (if such border is being drawn; the
+               <STRONG>relief</STRONG> option determines this).  <EM>Pixels</EM> may be  in  any
+
+
+9     Page 11                                         (printed 3/15/96)
+
+
+               valid  numeric  expressions.   It  this  option   isn't
+               specified, it defaults to the empty string.
+
+          <STRONG>-foreground</STRONG> <EM>color</EM>
+               Sets the foreground color of the bar.  If multiple  bar
+               segments  are  used,  <EM>color</EM>  may be list of color names
+               representing a  palette  colors  from  which  each  bar
+               segments  is  drawn.  The  default  foreground color is
+               black.
+
+          <STRONG>-label</STRONG> <EM>string</EM>
+               Sets the element label.  Labels are  displayed  in  the
+               legend  next  to  the element symbol.  If <EM>string</EM> is the
+               empty string, no legend entry will be displayed for the
+               element.   By  default,  the  label  is the name of the
+               element.
+
+          <STRONG>-mapx</STRONG> <EM>type</EM>
+               Specifies  which  x-axis  to  map  the   element's   x-  |
+               coordinates  onto.  <EM>Type</EM> must be either x, x2, or both.  |
+               The default axis is x.
+
+          <STRONG>-mapy</STRONG> <EM>type</EM>
+               Specifies  which  y-axis  to  map  the   element's   y-  |
+               coordinates  onto.  <EM>Type</EM> must be either y, y2, or both.  |
+               The default axis is y.
+
+          <STRONG>-relief</STRONG> <EM>string</EM>
+               Specifies the 3-D effect desired for the  bar.   <EM>String</EM>
+               may   be   any  value  accepted  by  <STRONG>Tk_GetRelief</STRONG>.   It
+               indicates how the bar should  appear  relative  to  the
+               graph;  for example, raised means the bar should appear
+               to protrude from the graph, relative to the surface  of
+               the graph.  By default, the legend relief is raised.
+
+          <STRONG>-stacked</STRONG> <EM>boolean</EM>
+               Indicates how the bar should be  displayed  if  it  has
+               multiple  y  data  points.   If  <EM>boolean</EM>  is  true (the
+               default), the bar is drawn in segments,  one  upon  the
+               other.
+
+          <STRONG>-stipple</STRONG> <EM>bitmap</EM>
+               Specifies a stipple pattern with which to draw the bar.
+               <EM>Bitmap</EM>  is  the  name of a bitmap in a form accepted by
+               <STRONG>Tk_GetBitmap</STRONG>.   If  multiple  bar  segments  are  used,
+               <EM>bitmap</EM>  may also be list of bitmap names representing a
+
+
+
+     Page 12                                         (printed 3/15/96)
+
+
+               must  be  a  valid  numeric expression.  It this option
+               isn't specified, it defaults to the empty string.
+
+          <STRONG>-ydata</STRONG> <EM>valueList</EM>
+               Specifies the y-coordinates of the data  points  to  be
+               plotted.  <EM>ValueList</EM>  must  be  a  valid list of numeric
+               expressions.   It  this  option  isn't  specified,   it
+               defaults to the empty string.
+
+
+        <STRONG>LEGEND</STRONG> <STRONG>OPTIONS</STRONG>
+          The following options are valid  for  the  <STRONG>legend</STRONG>  <STRONG>configure</STRONG>
+          command.
+
+               <EM>pathName</EM> <STRONG>legend</STRONG> <STRONG>configure</STRONG> ?<EM>options</EM>...?
+9          In addition, legend configuration options may be initialized
+          by  the <STRONG>option</STRONG> command.  The name fields in the <STRONG>blt_barchart</STRONG>
+          option database  are  prefixed  by  legend.   The  following
+          example  initializes  the legend foreground color to blue in
+          the option database.
+
+               option add *Blt_barchart.legendForeground blue
+9
+          <STRONG>-activebackground</STRONG> <EM>color</EM>
+               Sets the active background color of  the  legend.   All  |
+               legend  entries  marked  as active (see <STRONG>legend</STRONG> <STRONG>activate</STRONG>  |
+               command) are drawn with this background color.
+
+          <STRONG>-activeborderwidth</STRONG> <EM>pixels</EM>
+               Sets the width of the 3-D border  to  draw  around  the  |
+               outside of the each active legend entry (if such border  |
+               is being drawn;  the  <STRONG>-activerelief</STRONG>  option  determines  |
+               this).  By default is the active border width is 2.
+
+          <STRONG>-activeforeground</STRONG> <EM>color</EM>
+               Sets the active foreground color of  the  legend.   All  |
+               legend  entries  marked  as active (see <STRONG>legend</STRONG> <STRONG>activate</STRONG>  |
+               command) are drawn with this foreground color.
+
+          <STRONG>-activerelief</STRONG> <EM>string</EM>
+               Specifies the 3-D  effect  desired  for  active  legend  |
+               entries.    <EM>String</EM>  must  be  in  a  form  accepted  by  |
+               <STRONG>Tk_GetRelief</STRONG>. It indicates how   the  interior  of  the  |
+               entry   should  appear  relative  to  the  legend;  for  |
+               example,  raised  means  the  entry  should  appear  to  |
+
+
+
+     Page 13                                         (printed 3/15/96)
+
+
+
+               any  of  the  forms  accepted  by  <STRONG>Tk_GetAnchor</STRONG>.    For
+               example,  if  <EM>anchorPos</EM>  is  center  then the legend is
+               centered on the point;  if  <EM>anchorPos</EM>  is  n  then  the
+               legend  will be drawn such that the top center point of
+               the rectangular region occupied by the legend  will  be
+               at  the  positioning  point.   This  option defaults to
+               center.
+
+          <STRONG>-background</STRONG> <EM>color</EM>
+               Sets the background color of the legend.  If  <EM>color</EM>  is
+               the  empty  string,  no  background  rectangle  will be
+               drawn.
+
+          <STRONG>-borderwidth</STRONG> <EM>pixels</EM>
+               Sets the width of the 3-D border  to  draw  around  the
+               outside  of  the legend (if such border is being drawn;
+               the <STRONG>relief</STRONG> option determines this).  By default is  the
+               legend border width is 2.
+
+          <STRONG>-font</STRONG> <EM>fontName</EM>
+               <EM>FontName</EM> specifies a  font  to  use  when  drawing  the
+               labels of each element into the legend.  If this option
+               isn't specified then it defaults  to  *-Helvetica-Bold-
+               R-Normal-*-120-*.
+
+          <STRONG>-foreground</STRONG> <EM>color</EM>
+               Sets the foreground color of the element labels in  the
+               legend.   If  this  option  isn't  specified,  then  it
+               defaults to black.
+
+          <STRONG>-ipadx</STRONG> <EM>pixels</EM>
+               Sets the internal padding to the width of  the  legend.  |
+               Padding  will  be  added to both the left and right and  |
+               between the elements symbol and label.  By  default  is  |
+               the legend border width is 2.
+
+          <STRONG>-ipady</STRONG> <EM>pixels</EM>
+               Sets the internal padding to the height of the  legend.  |
+               Padding  will  be  added to both the top and bottom and  |
+               between the elements labels.  By default is the  legend  |
+               border width is 2.
+
+          <STRONG>-mapped</STRONG> <EM>boolean</EM>
+               Indicates if the legend should be displayed. If <EM>boolean</EM>
+               is true (the default), the legend will be mapped.
+
+
+
+     Page 14                                         (printed 3/15/96)
+
+
+
+
+          <STRONG>-position</STRONG> <EM>string</EM>
+               Sets the positioning point  of  the  legend  in  window
+               coordinates.   This  option  in  conjunction  with  the
+               <STRONG>-anchor</STRONG>  option,  determines  where   the   legend   is
+               positioned. The format of <EM>string</EM> is "@<STRONG>x</STRONG>,<STRONG>y</STRONG>", where <STRONG>x</STRONG> and
+               <STRONG>y</STRONG> are the window coordinate values.  If <EM>string</EM>  is  the
+               empty   string   (the  default),  the  legend  will  be
+               displayed in the right margin (which  is  automatically
+               extended to accommodate the legend).
+
+          <STRONG>-relief</STRONG> <EM>string</EM>
+               Specifies  the  3-D  effect  desired  for  the  legend.
+               <EM>String</EM>  must  be in a form accepted by <STRONG>Tk_GetRelief</STRONG>. It
+               indicates how  the interior of the legend should appear
+               relative  to  the  graph; for example, raised means the
+               legend  should  appear  to  protrude  from  the  graph,
+               relative  to the surface of the graph.  By default, the
+               legend relief is sunken.
+
+
+        <STRONG>TAG</STRONG> <STRONG>OPTIONS</STRONG>
+          The following options are valid for the <STRONG>tag</STRONG> <STRONG>create</STRONG>  and  <STRONG>tag</STRONG>
+          <STRONG>configure</STRONG>  commands. <EM>Tagid</EM> is the identifier returned by the
+          <STRONG>tag</STRONG> <STRONG>create</STRONG> command.
+
+               <EM>pathName</EM> <STRONG>tag</STRONG> <STRONG>create</STRONG> <EM>type</EM> ?<EM>coords</EM>? ?<EM>options</EM>...?
+
+               <EM>pathName</EM> <STRONG>tag</STRONG> <STRONG>configure</STRONG> <EM>tagId</EM> ?<EM>options</EM>...?
+
+</PRE>
+<H2>9          Tag configuration options may be initialized by  the  option</H2><PRE>
+          command.    The  name  fields  in  the  <STRONG>blt_barchart</STRONG>  option
+          database are prefixed by bmTag, textTag,  lineTag,  polyTag,
+          or  winTag  with  respect to the tag type.  Class fields are
+          prefixed by Tag. The following example sets  the  background
+          color  of  all  tags to blue and the foreground color of all
+          text tags to white.
+
+               option add *Blt_barchart.TagBackground blue
+               option add *Blt_barchart.textTagForeground white
+9          The description of tag options is  broken  into  subsections
+          for each tag type.
+
+
+        <STRONG>TEXT</STRONG> <STRONG>TAGS</STRONG>
+
+
+
+     <STRONG>Page</STRONG> <STRONG>15</STRONG>                                         <STRONG>(printed</STRONG> <STRONG>3/15/96)</STRONG>
+
+
+
+
+
+          After the  coordinate  list  there  may  be  any  number  of
+          <EM>option</EM>-<EM>value</EM>   pairs,   each   of  which  sets  one  of  the
+          configuration options for the tag.  These same  <EM>option</EM>-<EM>value</EM>
+          pairs may be used in the <STRONG>tag</STRONG> <STRONG>configure</STRONG> command to change the
+          tag's configuration.  The following  options  are  supported
+          for text tags:
+
+          <STRONG>-anchor</STRONG> <EM>anchorPos</EM>
+               <EM>AnchorPos</EM> tells how to position the  text  relative  to
+               the  positioning point for the text; it may have any of
+               the forms accepted by <STRONG>Tk_GetAnchor</STRONG>.   For  example,  if
+               <EM>anchorPos</EM>  is  center  then the text is centered on the
+               point; if <EM>anchorPos</EM> is n then the text  will  be  drawn
+               such  that  the  top  center  point  of the rectangular
+               region occupied by the text will be at the  positioning
+               point.  This option defaults to center.
+
+          <STRONG>-background</STRONG> <EM>color</EM>
+               Sets the background color of the text string. If  <EM>color</EM>
+               is   the   empty   string,   the   background  will  be
+               transparent.  If this option isn't  specified  then  it
+               defaults to white.
+
+          <STRONG>-font</STRONG> <EM>fontName</EM>
+               Specifies  the  text  font.   If  this   option   isn't
+               specified,   it  defaults  *-Helvetica-Bold-R-Normal-*-
+               120-*.
+
+          <STRONG>-foreground</STRONG> <EM>color</EM>
+               Sets the foreground color of the text. If  this  option
+               isn't specified then it defaults to black.
+
+          <STRONG>-element</STRONG> <EM>name</EM>
+               Associates the tag with the element <EM>name</EM>.  If  <EM>name</EM>  is
+               not   the  empty  string  (the  default),  the  tag  is
+               displayed only if <EM>name</EM> exists and  is  currently  being
+               displayed (see <STRONG>element</STRONG> <STRONG>show</STRONG>).
+
+          <STRONG>-mapx</STRONG> <EM>type</EM>
+               Specifies which x-axis to map the  tag's  x-coordinates  |
+               onto.  <EM>Type</EM> must be either x, x2, or both.  The default  |
+               axis is x.
+9
+
+
+     Page 16                                         (printed 3/15/96)
+
+
+
+
+
+               displayed according to its anchor position. The default
+               rotation is 0.0 degrees.
+
+          <STRONG>-text</STRONG> <EM>string</EM>
+               Sets the text string.  The exact way in which the  text
+               string  is  displayed  may be affected by other options
+               such as <STRONG>-anchor</STRONG> or <STRONG>-rotate</STRONG>.  This  option  defaults  to
+               the empty string.
+
+          <STRONG>-xoffset</STRONG> <EM>pixels</EM>
+               Specifies a x-coordinate offset (in window coordinates)
+               from the specified position.
+
+          <STRONG>-yoffset</STRONG> <EM>pixels</EM>
+               Specifies a y-coordinate offset (in window coordinates)
+               from the specified position.
+
+
+        <STRONG>LINE</STRONG> <STRONG>TAGS</STRONG>
+          A line tag displays one or more connected line  segments  on
+          the  graph.   Line  tags are created with widget commands in
+          the form:
+
+               <EM>pathName</EM> <STRONG>tag</STRONG> <STRONG>create</STRONG> <STRONG>line</STRONG> ?<EM>coords</EM>? ?<EM>options</EM>...?
+9          The argument <EM>coords</EM> specifies a list of numeric  expressions
+          representing  the  graph  coordinate  pairs  of  the  points
+          connecting the line.
+
+          After the <EM>coords</EM> there may be  any  number  of  <EM>option</EM>-<EM>value</EM>
+          pairs,  each  of which sets one of the configuration options
+          for the tag.  These same <EM>option</EM>-<EM>value</EM> pairs may be  used  in
+          the <STRONG>tag</STRONG> <STRONG>configure</STRONG> command to change the tag's configuration.
+          The following options are supported for line tags:
+
+          <STRONG>-background</STRONG> <EM>color</EM>
+               Sets the background color of the  line.   The  is  only
+               meaningful  when used with the <STRONG>-stipple</STRONG> option. If this
+               option isn't specified then it defaults to white.
+
+          <STRONG>-dashes</STRONG> <EM>dashes</EM>
+               Sets the dash style of the line. <EM>Dashes</EM> is  the  number
+               of  alternatingly displayed pixels. If <EM>dashes</EM> is 0 (the
+               default), the tag will be drawn as a solid line.
+
+
+9     Page 17                                         (printed 3/15/96)
+
+
+
+
+
+
+          <STRONG>-linewidth</STRONG> <EM>pixels</EM>
+               Sets the width of the lines.  The default width is 0.
+
+          <STRONG>-mapx</STRONG> <EM>type</EM>
+               Specifies which x-axis to map the  tag's  x-coordinates  |
+               onto.  <EM>Type</EM> must be either x, x2, or both.  The default  |
+               axis is x.
+
+          <STRONG>-mapy</STRONG> <EM>type</EM>
+               Specifies which y-axis to map the  tag's  y-coordinates  |
+               onto.  <EM>Type</EM> must be either y, y2, or both.  The default  |
+               axis is y.
+
+          <STRONG>-stipple</STRONG> <EM>bitmap</EM>
+               Indicates that the line should be drawn with a stippled
+               pattern rather than solid; <EM>bitmap</EM> specifies the stipple
+               pattern to use, may be in any of the forms accepted  by
+               <STRONG>Tk_GetBitmap</STRONG>.   If  <EM>bitmap</EM>  is  the  empty  string (the
+               default) then the line is drawn in a solid fashion.
+
+          <STRONG>-xoffset</STRONG> <EM>pixels</EM>
+               Specifies an offset in the x-coordinate  direction  (in
+               window  coordinates)  from the specified position.  The
+               default offset ifs 0.
+
+          <STRONG>-yoffset</STRONG> <EM>pixels</EM>
+               Specifies an offset in the y-coordinate  direction  (in
+               window  coordinates)  from the specified position.  The
+               default offset ifs 0.
+
+
+        <STRONG>BITMAP</STRONG> <STRONG>TAGS</STRONG>
+          A bitmap tag displays a bitmap on the  graph.   Bitmap  tags
+          are created with widget commands in the form:
+
+               <EM>pathName</EM> <STRONG>tag</STRONG> <STRONG>create</STRONG> <STRONG>bitmap</STRONG> ?<EM>coords</EM>? ?<EM>options</EM>...?
+9          The argument <EM>coords</EM> specifies a list  containing  the  graph
+          coordinates  of  a  point used to position the bitmap on the
+          display.  After the coordinate list there may be any  number
+          of  <EM>option</EM>-<EM>value</EM>  pairs,  each  of  which  sets  one  of the
+          configuration options for the tag.  These same  <EM>option</EM>-<EM>value</EM>
+          pairs may be used in the <STRONG>tag</STRONG> <STRONG>configure</STRONG> command to change the
+
+
+9     Page 18                                         (printed 3/15/96)
+
+
+
+
+
+
+     <STRONG>blt_barchart(1)</STRONG>           <STRONG>UNIX</STRONG> <STRONG>System</STRONG> <STRONG>V</STRONG>           <STRONG>blt_barchart(1)</STRONG>
+               positioning point.  This option defaults to center.
+
+          <STRONG>-background</STRONG> <EM>color</EM>
+               Sets the background color of the bitmap.  If  <EM>color</EM>  is
+               the   empty   string,  the  background  color  will  be
+               transparent.  The default background color is white.
+
+          <STRONG>-foreground</STRONG> <EM>color</EM>
+               Sets the foreground color of the  bitmap.  The  default
+               foreground color is black.
+
+          <STRONG>-bitmap</STRONG> <EM>bitmap</EM>
+               Specifies the bitmap to be displayed.  <EM>Bitmap</EM> may  have
+               any  of  the forms accepted by <STRONG>Tk_GetBitmap</STRONG>.  If <EM>bitmap</EM>
+               is the empty string (the default), the tag will not  be
+               displayed.
+
+          <STRONG>-element</STRONG> <EM>name</EM>
+               Associates the tag with the element <EM>name</EM>.  If  <EM>name</EM>  is
+               not   the  empty  string  (the  default),  the  tag  is
+               displayed only if <EM>name</EM> exists and is being plotted (see
+               <STRONG>element</STRONG> <STRONG>show</STRONG>).
+
+          <STRONG>-mapx</STRONG> <EM>type</EM>
+               Specifies which x-axis to map the  tag's  x-coordinates  |
+               onto.  <EM>Type</EM> must be either x, x2, or both.  The default  |
+               axis is x.
+
+          <STRONG>-mapy</STRONG> <EM>type</EM>
+               Specifies which y-axis to map the  tag's  y-coordinates  |
+               onto.  <EM>Type</EM> must be either y, y2, or both.  The default  |
+               axis is y.
+
+          <STRONG>-rotate</STRONG> <EM>theta</EM>
+               Sets the rotation of  the  bitmap.   <EM>Theta</EM>  is  a  real
+               number  representing  the angle of rotation in degrees.
+               The tag is first rotated and then placed  according  to
+               its anchor position.  The default rotation is 0.0.
+
+          <STRONG>-xoffset</STRONG> <EM>pixels</EM>
+               Specifies an offset in the x-coordinate  direction  (in
+
+
+
+     Page 19                                         (printed 3/15/96)
+
+
+
+
+
+
+     <STRONG>blt_barchart(1)</STRONG>           <STRONG>UNIX</STRONG> <STRONG>System</STRONG> <STRONG>V</STRONG>           <STRONG>blt_barchart(1)</STRONG>
+          more  connected line segments on the graph. Polygon tags are
+          created with the widget command:
+
+               <EM>pathName</EM> <STRONG>tag</STRONG> <STRONG>create</STRONG> <STRONG>polygon</STRONG> ?<EM>coords</EM>? ?<EM>options</EM>...?
+9          The argument <EM>coords</EM> specifies a list of numeric  expressions
+          representing  graph  coordinates  which  describe the closed
+          polygon.  It is  assumed  the  first  and  last  points  are
+          connected.
+
+          After the  coordinate  list  there  may  be  any  number  of
+          <EM>option</EM>-<EM>value</EM>   pairs,   each   of  which  sets  one  of  the
+          configuration options for the tag.  These same  <EM>option</EM>-<EM>value</EM>
+          pairs may be used in the <STRONG>tag</STRONG> <STRONG>configure</STRONG> command to change the
+          tag's configuration.  The following  options  are  supported
+          for polygon tags:
+
+          <STRONG>-background</STRONG> <EM>color</EM>
+               Sets the background color of the polygon.  The  default
+               background  color  is  white.   If  <EM>color</EM>  is the empty
+               string, no background color
+
+          <STRONG>-dashes</STRONG> <EM>dashes</EM>
+               Sets the dash style of the outline around the  polygon.  |
+               <EM>Dashes</EM> is the number of alternatingly displayed pixels.  |
+               If <EM>dashes</EM> is 0 (the default), the outline will be drawn  |
+               as a solid line.
+
+          <STRONG>-element</STRONG> <EM>name</EM>
+               Associates the tag with the element <EM>name</EM>.  If  <EM>name</EM>  is
+               not   the  empty  string  (the  default),  the  tag  is
+               displayed only if <EM>name</EM> exists and  is  currently  being
+               displayed (see <STRONG>element</STRONG> <STRONG>show</STRONG>).
+
+          <STRONG>-foreground</STRONG> <EM>color</EM>
+               Sets the foreground color of the polygon.  The  default
+               foreground color is black.
+
+          <STRONG>-linewidth</STRONG> <EM>pixels</EM>
+               Sets the width of the outline of the polygon. If <EM>pixels</EM>  |
+               is zero, no outline is drawn. The default width is 0.
+9
+
+
+     Page 20                                         (printed 3/15/96)
+
+
+
+
+
+
+     <STRONG>blt_barchart(1)</STRONG>           <STRONG>UNIX</STRONG> <STRONG>System</STRONG> <STRONG>V</STRONG>           <STRONG>blt_barchart(1)</STRONG>
+
+               stippled  pattern  rather  than  a  solid color; <EM>bitmap</EM>
+               specifies the stipple pattern to use,  in  any  of  the
+               forms accepted by <STRONG>Tk_GetBitmap</STRONG>.  If <EM>bitmap</EM> is the empty
+               string (the default), then the polygon is filled with a
+               solid (foreground) color.
+
+          <STRONG>-xoffset</STRONG> <EM>pixels</EM>
+               Specifies   an   x-coordinate   offset    (in    window
+               coordinates)  from  the specified position. The default
+               offset is 0.
+
+          <STRONG>-yoffset</STRONG> <EM>pixels</EM>
+               Specifies a y-coordinate offset (in window coordinates)
+               from the specified position. The default is offset 0.
+
+
+        <STRONG>WINDOW</STRONG> <STRONG>TAGS</STRONG>
+          A window  tag  displays  a  particular  window  at  a  given
+          position  on  the  graph.   Window tags are created with the
+          widget command:
+
+               <EM>pathName</EM> <STRONG>tag</STRONG> <STRONG>create</STRONG> <STRONG>window</STRONG> ?<EM>coords</EM>? ?<EM>options</EM>...?
+9          The argument <EM>coords</EM> specifies a list  containing  the  graph
+          coordinates  of  a  point used to position the window on the
+          display After <EM>coords</EM>, there may be  any  number  of  <EM>option</EM>-
+          <EM>value</EM>  pairs,  each  of  which sets one of the configuration
+          options for the tag.  These same <EM>option</EM>-<EM>value</EM> pairs  may  be
+          used  in  the  <STRONG>tag</STRONG>  <STRONG>configure</STRONG>  command  to  change the tag's
+          configuration.  The  following  options  are  supported  for
+          window tags:
+
+          <STRONG>-anchor</STRONG> <EM>anchorPos</EM>
+               <EM>AnchorPos</EM> tells how to position the window relative  to
+               the  positioning point for the window;  it may have any
+               of the forms accepted by <STRONG>Tk_GetAnchor</STRONG>.  For example, if
+               <EM>anchorPos</EM>  is center then the window is centered on the
+               point;  if <EM>anchorPos</EM> is  n  then  the  window  will  be
+               displayed  such  that  the  top  center  point  of  the
+               rectangular region occupied by the window  will  be  at
+               the positioning point.  This option defaults to center.
+
+
+9     Page 21                                         (printed 3/15/96)
+
+
+
+
+
+
+     <STRONG>blt_barchart(1)</STRONG>           <STRONG>UNIX</STRONG> <STRONG>System</STRONG> <STRONG>V</STRONG>           <STRONG>blt_barchart(1)</STRONG>
+
+
+               Specifies which x-axis to map the  tag's  x-coordinates  |
+               onto.  <EM>Type</EM> must be either x, x2, or both.  The default  |
+               axis is x.
+
+          <STRONG>-mapy</STRONG> <EM>type</EM>
+               Specifies which y-axis to map the  tag's  y-coordinates  |
+               onto.  <EM>Type</EM> must be either y, y2, or both.  The default  |
+               axis is y.
+
+          <STRONG>-width</STRONG> <EM>pixels</EM>
+               Specifies the width to assign to the tag's window.   If
+               this  option  isn't specified, or if it is specified as
+               the empty string, then the  window  is  given  whatever
+               width it requests internally.
+
+          <STRONG>-window</STRONG> <EM>pathName</EM>
+               Specifies the window to be managed by the  graph.   The
+               window  specified  by  <EM>pathName</EM>  must be a child of the
+               <STRONG>blt_barchart</STRONG> widget.
+
+          <STRONG>-xoffset</STRONG> <EM>pixels</EM>
+               Specifies   an   x-coordinate   offset    (in    window
+               coordinates)  from  the specified position. The default
+               offset is 0.
+
+          <STRONG>-yoffset</STRONG> <EM>pixels</EM>
+               Specifies a y-coordinate offset (in window coordinates)
+               from the specified position. The default offset is 0.
+
+
+        <STRONG>POSTSCRIPT</STRONG> <STRONG>OPTIONS</STRONG>
+          The following options are valid for  configuring  PostScript
+          output  using  either  the  <STRONG>postscript</STRONG>  or  the  <STRONG>psconfigure</STRONG>
+          command.
+
+               <EM>pathName</EM> <STRONG>postscript</STRONG> ?<EM>fileName</EM>? <EM>options</EM>...?
+
+               <EM>pathName</EM> <STRONG>psconfigure</STRONG> <STRONG>?</STRONG><EM>options</EM>...?
+99
+
+
+     Page 22                                         (printed 3/15/96)
+
+
+
+
+
+
+     <STRONG>blt_barchart(1)</STRONG>           <STRONG>UNIX</STRONG> <STRONG>System</STRONG> <STRONG>V</STRONG>           <STRONG>blt_barchart(1)</STRONG>
+
+
+
+          <STRONG>-colormode</STRONG> <EM>mode</EM>
+               Specifies how to output color information.   <EM>Mode</EM>  must
+               be  either <STRONG>color</STRONG> (for full color output), gray (convert
+               all colors to their  gray-scale  equivalents)  or  mono
+               (convert  foreground  colors  to  black  and background
+               colors to white).  The default mode is color.
+
+          <STRONG>-fontmap</STRONG> <EM>varName</EM>
+               <EM>VarName</EM> must be the name of  a  global  array  variable
+               that  specifies  a font mapping from the X font name to
+               PostScript.  Each element of <EM>varName</EM> must consist of  a
+               Tcl  list  with one or two elements, which are the name
+               and point size of a PostScript font.   When  outputting
+               PostScript commands for a particular font, Tk checks to
+               see if <EM>varName</EM> contains an element with the  same  name
+               as  the  specified  font.  If there is such an element,
+               then the font information contained in that element  is
+               used  in  the PostScript output.  (If the point size is
+               omitted from the list, the point size of the X font  is
+               used).   Otherwise the X font is examined in an attempt
+               to guess what PostScript font to use.  This works  only
+               for  fonts  whose  foundry  property  is <EM>Adobe</EM> (such as
+               Times, Helvetica, Courier, etc.).  If all of this fails
+               then the font defaults to Helvetica-Bold.
+
+          <STRONG>-landscape</STRONG> <EM>boolean</EM>
+               If <EM>boolean</EM> is true, this specifies the printed area  is
+               to  be rotated 90 degrees.  In non-rotated output the <STRONG>x</STRONG>
+               axis of the printed area runs along the short dimension
+               of  the  page  (``portrait''  orientation);  in rotated
+               output the <STRONG>x</STRONG> axis runs along the long dimension of  the
+               page (``landscape'' orientation).  Defaults to false.
+
+          <STRONG>-pageanchor</STRONG> <EM>anchor</EM>
+               Specifies which point of the  printed  area  should  be
+               appear over the positioning point on the page (which is
+               given by the <STRONG>-pagex</STRONG> and <STRONG>-pagey</STRONG> options).  For  example,
+               <STRONG>-pageanchor</STRONG>  <STRONG>n</STRONG> means that the top center of the printed
+
+
+
+     Page 23                                         (printed 3/15/96)
+
+
+
+
+
+
+     <STRONG>blt_barchart(1)</STRONG>           <STRONG>UNIX</STRONG> <STRONG>System</STRONG> <STRONG>V</STRONG>           <STRONG>blt_barchart(1)</STRONG>
+
+
+
+               Specifies  that  the  width  of  the  graph  drawn   in
+               PostScript.   The  graph  is <EM>not</EM> uniformly scaled since
+               this also scales the fonts.   <EM>Size</EM>  may  be  any  value
+               accepted by <STRONG>Tk_GetPixels</STRONG>.  The resulting pixel value is
+               then converted  to  postscript  printer  points.   This
+               means  that  a width <EM>6.5i</EM> will be properly converted to
+               6.5 inches. This options defaults to the width  of  the
+               graph window.
+
+          <STRONG>-pagex</STRONG> <EM>position</EM>
+               Specifies the  x-coordinate  of  the  page  positioning
+               point.   This  (with  the <STRONG>-pageanchor</STRONG> option) indicates
+               where the graph  is  placed  on  the  PostScript  page.
+               <EM>Position</EM> may be any value accepted by <STRONG>Tk_GetPixels</STRONG>. The
+               resulting pixel value is then converted  to  postscript
+               printer points.  The default is 1i.
+
+          <STRONG>-pagey</STRONG> <EM>position</EM>
+               Specifies the  y-coordinate  of  the  page  positioning
+               point.   This  (with  the <STRONG>-pageanchor</STRONG> option) indicates
+               where the graph  is  placed  on  the  PostScript  page.
+               <EM>Position</EM> may be any value accepted by <STRONG>Tk_GetPixels</STRONG>. The
+               resulting pixel value is then converted  to  postscript
+               printer points.  The default is 1i.
+
+     <STRONG>BINDINGS</STRONG>
+          There are no default bindings.
+
+     <STRONG>BUGS</STRONG>
+          Auto-scale routines do not use requested min/max  limits  as
+          boundaries when the axis is logarithmically scaled.
+
+          The needs to be a special mapping for  undefined  log  scale
+          values  (&gt;=  0.0). Possibly set up a "red zone" of undefined
+          values which divides the positive and negative values.
+
+          The PostScript output generated for polygons with more  than
+          1500  points  may  exceed  the  limits of some printers (See
+
+
+
+     Page 24                                         (printed 3/15/96)
+
+
+
+
+
+
+     <STRONG>blt_barchart(1)</STRONG>           <STRONG>UNIX</STRONG> <STRONG>System</STRONG> <STRONG>V</STRONG>           <STRONG>blt_barchart(1)</STRONG>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     Page 25                                         (printed 3/15/96)
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

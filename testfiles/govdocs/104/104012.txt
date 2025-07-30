@@ -1,0 +1,129 @@
+ECN bits and security:
+
+This is a summary and response to some email discussions about ECN and
+security concerns among a number of people, including Steve Bellovin,
+Jim Bound, Brian Carpenter, Paul Ferguson, Stephen Kent, Greg Minshall,
+Vern Paxson, and K. K. Ramakrishnan,
+
+ECN AND IP ENCAPSULATION:
+
+As discussed in the ECN internet draft, the most desirable scenario for
+handling the ECN bits during encapsulation is as follows:  the
+ECN-capable bit in the encapsulating ('outside') header would only be
+set if the ECN-capable bit is set in the encapsulated ('inside')
+header.  When the router at the end of the tunnel decapsulates the
+packet, if there is a '1' for the ECN bit in the encapsulating header,
+it should be copied into the encapsulated header.
+
+A viable but less desirable possibility would be for the ECN-capable
+bit never to be set in the encapsulating ('outside') header, and for
+the ECN bits in the encapsulated header to be unchanged during
+encapsulation and decapsulation.  In this case, if the encapsulated
+packet encountered congestion in the form of a RED queue with a
+moderate queue size, then it could be dropped at the router, as might
+any non-ECN-capable packet.
+
+In contrast, the currently-defined behavior of IPSEC would be to copy
+the ECN bits from the encapsulated header to the encapsulating header,
+and then to simply discard the ECN bits in the encapsulating header
+upon decapsulation.  This could result in a router setting the ECN bit
+in the encapsulating header of an ECN-capable packet, only to have that
+ECN bit later discarded upon decapsulation.  
+
+This change would have the effect of disabling ECN-based congestion
+control.  In this case, the application would not get the message that
+there was congestion in the network from the ECN bit, and the
+application might continue to increase its sending rate until either
+(1) some router was driven into a heavier state of congestion and began
+dropping packets rather than setting ECN bits; or (2) some router
+detected that this flow was not using conformant end-to-end congestion
+control, and began dropping packets from this flow.
+
+Thus, this could result in an unnecessary level of congestion in the
+network.  This could NOT drive the network to congestion collapse,
+because ECN-capable routers drop even ECN-capable packets when the
+level of congestion becomes sufficiently large.  This would not be any
+worse than operating the network with Drop Tail queues without ECN, as
+we do today.
+
+This would, however, be worse than operating the network with RED but
+without ECN.  With non-ECN-capable RED, congestion indications are in
+the form of packet drops, and therefore cannot be "masked" from the end
+nodes.  With ECN-capable RED in combination with IPSEC, indications of
+incipient congestion could be masked from the end nodes, driving the
+network into a slightly higher level of congestion.
+
+My own opinion is that while IPSEC remained with this behavior, the
+experimental deployment of ECN would be limited to environments known
+not to use IPSEC, with only very limited deployment by researchers in
+environments that could possibly deploy IPSEC.  As discussed above,
+this combination of ECN and IPSEC, if widely deployed, would be no
+worse than the current Drop-Tail behavior of the Internet.  However,
+instead of functionally turning ECN-capable RED queues into
+non-ECN-capable RED queues, it would functionally turn ECN-capable RED
+queues into something closer to Drop-Tail queues.  This would, in my
+opinion, be a strong disincentive to add ECN-capability to RED queues
+that might carry IPSEC traffic.  For those flows that **wanted** to
+hear about incipient congestion in order to avoid persistent
+congestion, this would also be a strong disincentive to add
+ECN-capability to flows that might be subject to IPSEC in the course of
+their journeys across the Internet.  
+
+---------------------------------------------------------------------
+
+APPENDIX:  ECN BITS AND DENIAL OF SERVICE ATTACKS:
+
+This section considers the issues when a router is operating,
+possibly maliciously, to change either of the bits related to ECN.
+We represent the ECN bits by the pair (ECN-Capable bit, ECN bit).
+
+SUBVERTING ECN-BASED CONGESTION CONTROL:
+
+First, we consider the changes that a router could make that would
+result in subverting ECN-based congestion control:
+
+(1, 1) -> (1, 0);
+(1, 1) -> (0, *);
+(0, 1) -> (1, 1);
+(0, 0) -> (1, 0);
+(0, 1) -> (1, 0);
+(0, 0) -> (1, 1);
+These changes would all have the effect of disabling ECN-based
+congestion control, as discussed above for the case of IPSEC.
+These changes consist of either turning off the ECN-bit, or
+setting the ECN-Capable bit then the end nodes might in fact
+not be ECN-Capable.
+
+FALSELY REPORTING CONGESTION:
+
+(1, 0) -> (1, 1):
+In other words, a router could set the ECN bit when the ECN-Capable bit
+was already set, even though there was not congestion.  This would be
+unfortunately, but less serious to the application that if the router
+had actually dropped the packet.  The application would cut down on its
+arrival rate unnecessarily.
+
+DISABLING ECN-CAPABILITY:
+
+(1, 0) -> (0, *):
+A router could turn off the ECN-Capable bit in a packet where the ECN
+bit was not set.  This means that if the packet encounters later
+congestion (e.g., arrives to a RED queue with a moderate average queue
+size), it will be dropped instead of marked.  This would be unfortunate
+for the application, but less of a nuisance than if the router had
+actually dropped the packet.
+
+NO EFFECT:
+
+(0, *) -> (0, *):
+The ECN bit is ignored in a packet that does not have the
+ECN-Capable bit set, so this would have no effect.
+
+
+TRANSPORT ISSUES:
+
+For TCP, an ECN-capable TCP receiver informs its TCP peer that it
+is ECN-capable at the TCP level, using information in the TCP header.
+Thus, routers at the IP level cannot interfere with this discussion.
+
+

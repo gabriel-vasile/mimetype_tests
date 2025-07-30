@@ -1,0 +1,218 @@
+
+/****** Object:  Table [APPLICATION]    Script Date: 12/23/02 2:47:24 PM ******/
+CREATE TABLE [APPLICATION] (
+	[AppId] [int] IDENTITY (1, 1) NOT NULL ,
+	[AppName] [varchar] (150) NOT NULL ,
+	[Version] [varchar] (15) NULL ,
+	[BarCode] [varchar] (50) NULL ,
+	[Language] [varchar] (150) NULL ,
+	[MfgCode] [varchar] (15) NOT NULL ,
+	[ApplicationType] [varchar] (50) NOT NULL ,
+	[PackagedWithin] [int] NULL ,
+	[Comment] [varchar] (250) NULL ,
+	[Location] [varchar] (50) NOT NULL ,
+	[CreateDate] [datetime] NOT NULL 
+) ON [PRIMARY]
+
+
+/****** Object:  Table [APPLICATION_TO_OS]    Script Date: 12/23/02 2:47:25 PM ******/
+CREATE TABLE [APPLICATION_TO_OS] (
+	[AppId] [int] NOT NULL ,
+	[OScode] [varchar] (15) NOT NULL ,
+	[CreateDate] [datetime] NOT NULL ,
+	[FromPackage] [varchar] (3) NOT NULL 
+) ON [PRIMARY]
+
+
+/****** Object:  Table [CONTACT]    Script Date: 12/23/02 2:47:25 PM ******/
+CREATE TABLE [CONTACT] (
+	[ContactId] [int] IDENTITY (1, 1) NOT NULL ,
+	[Name] [varchar] (150) NOT NULL ,
+	[ContactType] [varchar] (15) NOT NULL ,
+	[Email] [varchar] (80) NULL ,
+	[WebURL] [varchar] (150) NULL ,
+	[Telephone] [varchar] (40) NULL ,
+	[AddressLine1] [varchar] (50) NULL ,
+	[AddressLine2] [varchar] (50) NULL ,
+	[City] [varchar] (20) NULL ,
+	[StateProv] [varchar] (50) NULL ,
+	[PostalCode] [varchar] (10) NULL ,
+	[Country] [varchar] (50) NULL ,
+	[Comment] [varchar] (250) NULL ,
+	[CreateDate] [datetime] NOT NULL 
+) ON [PRIMARY]
+
+
+/****** Object:  Table [EVENT]    Script Date: 12/23/02 2:47:25 PM ******/
+CREATE TABLE [EVENT] (
+	[ReportTime] [datetime] NOT NULL ,
+	[AppId] [int] NOT NULL ,
+	[StaffCode] [varchar] (15) NOT NULL ,
+	[EventCode] [varchar] (15) NOT NULL ,
+	[ContactId] [int] NULL ,
+	[MediaId] [varchar] (50) NULL ,
+	[OScode] [varchar] (15) NULL ,
+	[EventTime] [datetime] NOT NULL ,
+	[Comment] [varchar] (250) NULL 
+) ON [PRIMARY]
+
+
+/****** Object:  Table [EVENT_TYPE]    Script Date: 12/23/02 2:47:25 PM ******/
+CREATE TABLE [EVENT_TYPE] (
+	[EventCode] [varchar] (15) NOT NULL ,
+	[EventName] [varchar] (50) NOT NULL ,
+	[EventOrder] [int] NOT NULL ,
+	[Description] [varchar] (250) NULL ,
+	[InputDate] [datetime] NOT NULL 
+) ON [PRIMARY]
+
+
+/****** Object:  Table [FILE_EXECUTE]    Script Date: 12/23/02 2:47:25 PM ******/
+CREATE TABLE [FILE_EXECUTE] (
+	[AppId] [int] NOT NULL ,
+	[MediaId] [varchar] (50) NOT NULL ,
+	[FileName] [varchar] (255) NOT NULL ,
+	[OScode] [varchar] (15) NOT NULL ,
+	[Multiplicity] [smallint] NOT NULL ,
+	[FilePath] [varchar] (50) NOT NULL ,
+	[FileExt] [varchar] (255) NULL ,
+	[FileType] [varchar] (15) NULL ,
+	[FileSize] [int] NOT NULL ,
+	[CreateDate] [datetime] NOT NULL ,
+	[SHA] [char] (40) NOT NULL ,
+	[MD4] [char] (32) NOT NULL ,
+	[MD5] [char] (32) NOT NULL ,
+	[CRC32] [char] (8) NOT NULL 
+) ON [PRIMARY]
+
+
+/****** Object:  Table [Lookup--SpecialCode]    Script Date: 12/23/02 2:47:25 PM ******/
+CREATE TABLE [Lookup--SpecialCode] (
+	[AppType] [varchar] (50) NOT NULL ,
+	[SpecialCode] [char] (1) NOT NULL 
+) ON [PRIMARY]
+
+
+/****** Object:  Table [MANUFACTURER]    Script Date: 12/23/02 2:47:25 PM ******/
+CREATE TABLE [MANUFACTURER] (
+	[MfgCode] [varchar] (15) NOT NULL ,
+	[MfgName] [varchar] (150) NOT NULL ,
+	[AddressLine1] [varchar] (50) NULL ,
+	[AddressLine2] [varchar] (50) NULL ,
+	[City] [varchar] (50) NULL ,
+	[StateProv] [varchar] (50) NULL ,
+	[PostalCode] [varchar] (10) NULL ,
+	[Country] [varchar] (50) NULL ,
+	[SubUnitOf] [varchar] (15) NULL ,
+	[InputDate] [datetime] NOT NULL 
+) ON [PRIMARY]
+
+
+/****** Object:  Table [MEDIA_INFO]    Script Date: 12/23/02 2:47:25 PM ******/
+CREATE TABLE [MEDIA_INFO] (
+	[AppId] [int] NOT NULL ,
+	[MediaId] [varchar] (50) NOT NULL ,
+	[Globalization] [varchar] (3) NULL ,
+	[MediaType] [varchar] (10) NOT NULL ,
+	[MediaSerialCode] [varchar] (50) NULL ,
+	[MfgDate] [datetime] NULL ,
+	[Comment] [varchar] (250) NULL ,
+	[CreateDate] [datetime] NULL 
+) ON [PRIMARY]
+
+
+/****** Object:  Table [OPERATING_SYSTEM]    Script Date: 12/23/02 2:47:26 PM ******/
+CREATE TABLE [OPERATING_SYSTEM] (
+	[OScode] [varchar] (15) NOT NULL ,
+	[Name] [varchar] (150) NOT NULL ,
+	[MfgCode] [varchar] (15) NOT NULL ,
+	[Version] [varchar] (15) NOT NULL ,
+	[Platform] [varchar] (150) NOT NULL ,
+	[Comment] [varchar] (250) NULL ,
+	[InputDate] [datetime] NOT NULL ,
+	[GeneralOSCode] [varchar] (15) NOT NULL 
+) ON [PRIMARY]
+
+
+/****** Object:  Table [STAFF]    Script Date: 12/23/02 2:47:26 PM ******/
+CREATE TABLE [STAFF] (
+	[StaffCode] [varchar] (15) NOT NULL ,
+	[ProjectRole] [varchar] (15) NOT NULL ,
+	[LastName] [varchar] (50) NOT NULL ,
+	[FirstName] [varchar] (50) NOT NULL ,
+	[Telephone] [varchar] (40) NULL ,
+	[Email] [varchar] (80) NULL ,
+	[Comment] [varchar] (250) NULL ,
+	[InputDate] [datetime] NOT NULL ,
+	[Active] [varchar] (10) NOT NULL ,
+	[MiddleName] [varchar] (50) NULL ,
+	[Password] [varchar] (50) NOT NULL ,
+	[HashPermissions] [varchar] (50) NOT NULL ,
+	[Administrator] [varchar] (10) NOT NULL 
+) ON [PRIMARY]
+
+
+
+
+/****** Object:  View RDSOS    Script Date: 12/23/02 2:47:26 PM ******/
+CREATE VIEW RDSOS
+AS
+SELECT OScode AS OpSystemCode, Name AS OpSystemName, 
+    Version AS OpSystemVersion, MfgCode
+FROM OPERATING_SYSTEM
+GROUP BY OScode, Name, MfgCode, Version
+
+
+
+/****** Object:  View RDSMfg    Script Date: 12/23/02 2:47:26 PM ******/
+CREATE VIEW RDSMfg
+AS
+SELECT MfgCode, MfgName
+FROM MANUFACTURER
+GROUP BY MfgCode, MfgName
+
+
+/****** Object:  View RDSProd    Script Date: 12/23/02 2:47:26 PM ******/
+CREATE VIEW RDSProd
+AS
+SELECT APPLICATION.AppId AS ProductCode, 
+    APPLICATION.AppName AS ProductName, 
+    APPLICATION.Version AS ProductVersion, 
+    APPLICATION_TO_OS.OScode AS OpSystemCode, 
+    APPLICATION.MfgCode, APPLICATION.Language, 
+    APPLICATION.ApplicationType
+FROM APPLICATION INNER JOIN
+    FILE_EXECUTE ON 
+    APPLICATION.AppId = FILE_EXECUTE.AppId LEFT OUTER JOIN
+    APPLICATION_TO_OS ON 
+    APPLICATION.AppId = APPLICATION_TO_OS.AppId
+GROUP BY APPLICATION.AppId, APPLICATION.AppName, 
+    APPLICATION.Version, APPLICATION_TO_OS.OScode, 
+    APPLICATION.MfgCode, APPLICATION.Language, 
+    APPLICATION.ApplicationType
+
+
+/****** Object:  View RDSFile    Script Date: 12/23/02 2:47:26 PM ******/
+CREATE VIEW RDSFile
+AS
+SELECT FILE_EXECUTE.SHA AS [SHA-1], 
+    FILE_EXECUTE.MD5, 
+    FILE_EXECUTE.CRC32, 
+    FILE_EXECUTE.FileName, 
+    FILE_EXECUTE.FileSize, 
+    FILE_EXECUTE.AppId AS ProductCode, 
+    OPERATING_SYSTEM.GeneralOSCode AS OpSystemCode, 
+    SpecialCode.SpecialCode
+FROM FILE_EXECUTE INNER JOIN
+    OPERATING_SYSTEM ON 
+    FILE_EXECUTE.OScode = OPERATING_SYSTEM.OScode INNER JOIN
+    SpecialCode ON 
+    FILE_EXECUTE.AppId = SpecialCode.AppId
+GROUP BY FILE_EXECUTE.SHA, 
+    FILE_EXECUTE.MD5, FILE_EXECUTE.CRC32, 
+    FILE_EXECUTE.FileName, 
+    FILE_EXECUTE.FileSize, FILE_EXECUTE.AppId, 
+    OPERATING_SYSTEM.GeneralOSCode, 
+    SpecialCode.SpecialCode
+
+

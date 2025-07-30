@@ -1,0 +1,61 @@
+;pro funct,x,a,f,pder
+;common ims,im,derim,dir,dim
+;  pder=intarr(dim,3)
+;  if (dir eq 1) then begin
+;    f=reform(bilin(im,0,a(0)),dim)
+;    pder(0,0)=reform(bilin(derim,0,a(0)),dim)*a(2)
+;  endif else begin
+;    f=reform(bilin(im,a(0),0),dim)
+;    pder(0,0)=reform(bilin(derim,a(0),0),dim)*a(2)
+;  endelse
+;  pder(0,1)=replicate(1.,dim)
+;  pder(0,2)=f
+;  f=f*a(2)+a(1)
+;return
+;end
+
+pro funct,x,a,f,pder
+common ims,im,derim,dir,dim
+  pder=intarr(dim,2)
+  if (dir eq 1) then begin
+    f=reform(bilin(im,0,a(0)),dim)
+    pder(0,0)=reform(bilin(derim,0,a(0)),dim)*a(1)
+  endif else begin
+    f=reform(bilin(im,a(0),0),dim)
+    pder(0,0)=reform(bilin(derim,a(0),0),dim)*a(1)
+  endelse
+  pder(0,1)=f
+  f=f*a(1)
+return
+end
+
+pro fitshift,img,refim,pos,disp
+common ims,im,derim,dir,dim
+  w=9 & l=70 ; half the width and length of extracted stripe
+  nop=(size(pos))(2) & disp=fltarr(6,nop)
+  imsize=size(img) & xmax=imsize(1) & ymax=imsize(2)
+  for p=0,nop-1 do begin
+    for dir=0,1 do begin
+      if (dir eq 1) then begin
+	xstrt=pos(0,p)-l & xend=pos(0,p)+l & ystrt=pos(1,p)-w & yend=pos(1,p)+w
+	if xstrt le 0 then xstrt=1 & if ystrt le 0 then ystrt=1
+	if xend ge xmax then xend=xmax-1 & if yend ge ymax then yend=ymax-1
+        im=img(xstrt:xend,ystrt:yend) & dim=n_elements(im)
+        ref=reform(refim(xstrt:xend,ystrt:yend),dim)
+        derim=im-shift(im,0,-1)
+      endif else begin
+	xstrt=pos(0,p)-w & xend=pos(0,p)+w & ystrt=pos(1,p)-l & yend=pos(1,p)+l
+	if xstrt le 0 then xstrt=1 & if ystrt le 0 then ystrt=1
+	if xend ge xmax then xend=xmax-1 & if yend ge ymax then yend=ymax-1
+        im=img(xstrt:xend,ystrt:yend) & dim=n_elements(im)
+        ref=reform(refim(xstrt:xend,ystrt:yend),dim)
+        derim=im-shift(im,-1,0)
+      endelse
+;      a=[0.,0.,1.] & x=intarr(dim) & wt=replicate(1,dim)
+      a=[0.,1.] & x=intarr(dim) & wt=replicate(1,dim)
+      newim=curvefit(x,ref,wt,a)
+;      disp(dir,p)=a(0) & disp(dir+2,p)=a(1) & disp(dir+4,p)=a(2)
+      disp(dir,p)=a(0) & disp(dir+2,p)=a(1)
+    endfor
+  endfor
+end

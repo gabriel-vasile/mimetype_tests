@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN"> 
+<html>
+  <head>
+    <title>Production at BNL</title>
+  </head>
+
+  <body>
+    <h1>Production at BNL</h1>
+    <h2>Reconstruction Production</h2>
+    See <a href="AtlasProduction.ppt"> slides from the Physics discussions talk</a>.  
+    <h2>Script to run your personal mini production</h2>
+    To run production you can use the following script<br>
+<pre>    
+cvs -d /afs/usatlas.bnl.gov/project/localcvs co -dscripts fisyak/scripts/athena_job
+scripts/athena_job -h
+============================================================
+Usage:  scripts/athena_job      [arguments]
+        -h      Show this message and exit.
+        -i      {input_file}    Set input file name (to be passed to magda_findfile)
+                 default is dc1.002002.lumi02.0346.hlt.pythia_jet_55.zebra
+        -j      {jobOption }    Set jobOption file
+                 default is /afs/usatlas.bnl.gov/users/fisyak/public/prod/6.0.3/eg9.lumi02.603.job
+        -n      {NoEvent   }    Set NoEvent to process
+                 default is 1000
+        -o      {output_file}   Set output file
+                 default is /usatlas/scratch/fisyak/results/dc1.002002.lumi02.recon.009.0346.hlt.pythia_jet_55.eg9.603.hbook
+        -s      {script    }    Set script to run
+                 default is /afs/usatlas.bnl.gov/users/fisyak/public/prod/6.0.3/recon.gen.v6.with603.bnl
+        -w      {workdir }    Set workdir file
+                 default is /usatlas/scratch/fisyak
+
+       [name]=[val]     Sets [name] to value [val] in the ARG hash
+                       (including above list of parameters and 
+                        environment variables)
+============================================================
+Job default environment variables
+        ATLAS_ROOT = /afs/usatlas.bnl.gov
+        CMTCONFIG = i686-rh73-gcc295
+        CMTROOT = /afs/usatlas.bnl.gov/cernsw/contrib/CMT/v1r13
+        CMTSITE = BNL
+        CMTVERS = v1r13
+============================================================
+</pre>
+    This script does for you the following: 
+<ul>
+      <li> it defines necessary environment variables if they are not defined;
+      <li> [-w] it sets up a working directory <b>workdir</b> (default is /usatlas/scratch/$USER);
+      <li> [-i] it fetches <b>input_file</b> via magda;
+      <li> [-o] it sets <b>output_file</b>;
+      <li> [-s] it runs <b>script</b> which has to setup ATLAS environment (via cmt) and all necessary data files;
+      <li> [-j] with <b>jobOption</b> file
+      <li> [-n] for <b>NoEvent</b> events
+      <li> if run would be successful then <b>output_file</b> will be stored, 
+	<b>input_file</b> will be released,
+	and <b>workdir</b> will be cleaned and removed.
+</ul>
+<h2> 2001.lumi10 production with Release 6.0.4 </h2>
+For the production it used the following directory structure
+(please note that all these directories are group writable)
+<pre>
+/usatlas/data04/fisyak/Production/6.0.4 : top level directory for 6.0.4 production
+Under the above directory there are 
+directories     with 
+ /scripts     : scripts
+ /jobs        : generated scripts
+ /archive     : submitted scripts
+ /log         : latest log files before parsing
+ /log/done    : parsed log files, information for jobs is in DB
+ /ntuple      : output hbook files                      
+ /ntuple/bad  : hbook files which have problems (after running Validata.pl script)
+Top level working directory is /usatlas/data04/dc1/work/6.0.4
+</pre>
+Scripts are in cvs
+<pre>
+cvs -d /afs/usatlas.bnl.gov/project/localcvs co -dscripts fisyak/scripts
+</pre>
+In directory <b>scripts</b>  there are 
+<ul>
+      <li>a package MySQLTable.pm with MySQLTable class which provides handling DB records in Production.jobdata table and scripts
+      <li> makeList.csh to create a list of input zebra files from magda <br>
+	makeList.csh dc1.002002.lumi02 | sort -u > zebra_files.list
+      <li>Registrate.pl create entry for output LFN in jobdata table from list <br>
+	Registrate.pl zebra_files.list
+      <li>makeJobs.pl  (should be run in <b>jobs</b> directory)
+	generate jobs form given selection (I edit selection by hands) <br>
+	... <br>
+	my $fetch_query = "SELECT * FROM jobdata WHERE (status='ABORTED' OR status='FAILED') AND release = ? AND dataset=?";<br>
+	...<br>
+	cd ../jobs<br>
+	../scripts/makeJobs.pl
+<li>    lsf.csh   (in <b>jobs</b> directory) 
+          submit jobs to lsf (keep partition number in job name) <br>
+	cd ../jobs<br>
+	../scripts/lsf.csh dc1*<br>
+	Jobs can be run on one per node. User account fisyak has limitation for <b>acas_long</b> queue one job per node.
+<b>at_cas_prod</b> queue has this limitation for all user allowed to use it (atlreco can use this queue)
+
+<li>   JobStatus.pl: Set job status via bjobs
+<li>  UpdateDb.pl: parse log files and update status of finished jobs<br>
+	UpdateDb.pl../log/*.log
+         
+<li>  Validata.pl:
+        Validate hbook files (in scripts directory)
+
+
+    <hr>
+    <address><a href="mailto:fisyak@bnl.gov">Yuri Fisyak</a></address>
+<!-- Created: Fri May 30 16:28:28 EDT 2003 -->
+<!-- hhmts start -->
+Last modified: Thu Jul 10 10:06:49 EDT 2003
+<!-- hhmts end -->
+  </body>
+</html>

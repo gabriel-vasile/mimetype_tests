@@ -1,0 +1,152 @@
+xwand is a program which reads data from DTK shared memory files and uses
+the data to send X windows mouse and button event.  What's the point?  This
+lets you use desktop GUIs in immersive systems such as a RAVE- the immersive
+system's wand can be used to emulate the X mouse.
+
+You'll find the following files here:
+
+xwand
+
+  this program loops with a sleep- each loop it reads from the shared memory
+  files named xwandJoystick and xwandButtons, which are used to create X
+  events for mouse movement and buttons.  The buttons are queued, so no
+  button presses are lost.  Only button presses are used- button releases
+  are ignored.  If any of the shared memory files don't exist they are
+  created.
+
+  xwand takes optional command-line parameters to override its default
+  settings which are in brackets:
+
+  (--verbose|-v)
+    send informational messages to standard output
+
+  (--mousePos|-p) x y [ 100 100 ]
+    the position to warp the mouse when xwand starts.  It gets warped back
+    to the initial position when xwand exits
+
+  (--mouseFunction|-f) s a [ .1  500]
+    mouse movements are generated from joystick values with the following
+    function- s represents an overall scale, and a represents an acceleration:
+      mouseX = s*(pow(a,joystickX)-1)
+      mouseY = -s*(pow(a,joystickY)-1)
+
+  (--display|-d) string [:0.0]
+    the X windows display to use for the mouse events
+
+  (--button0|-0) click|press|release|null [click]
+  (--button1|-1) click|press|release|null [press]
+  (--button2|-2) click|press|release|null [release]
+  (--button3|-3) click|press|release|null [null]
+    each button can be assigned a single action- these options let you remap
+    the mouse buttons.  These are currently the only implemented options
+
+  (--joystickSegment|-j) string [xwandJoystick]
+  (--buttonsSegment|-b) string [xwandButtons]
+    these are the segment names to use for getting xwand data
+
+  (--execute| -e) command [param ...]
+
+  indicates a command to be run when xwand is active.  The command is killed
+  when xwand becomes inactive.  IF SPECIFIED, THIS MUST BE THE LAST OPTION.
+
+xwandState [(--verbose|-v)] [(--stateSegment|-s) xwandState] [n]
+
+  this program sets the xwandState segment to n.  if n is omitted it just
+  prints the current value
+
+xwand-dtk-getTrackd 
+  --stateSegment [xwandState]
+  --joystickSegment string [xwandJoystick]
+  --buttonsSegment string [xwandButtons]
+    these are the segment names to use for getting xwand data
+
+  this program is a replacement for dtk-getTrackd.  it reads the xwandState
+  shared memory segment and if it is non-zero, copies trackd joystick and
+  button data to xwandJoystick and xwandButtons.  If xwandState is zero, it
+  copies the trackd joystick and button data to the segments joystick and
+  buttons.
+
+========================================================================
+to test if you don't have an immersive system:
+
+on a remote machine, ssh to the machine running xwand, and run:
+  env DTK_SHAREDMEM_DIR=/tmp/fakemouse dtk-caveDeviceSimulator --vrco &
+this will let you use the mouse on the remote system to write data into VRCO
+trackd memory, but won't mess with the default joystick & buttons
+
+then do:
+  xwand-dtk-getTrackd &
+this will read from VRCO shared memory and write into the default joystick &
+buttons shared memory files
+
+disable xwand by running:
+  xwandState 0
+
+run:
+  xwand -v
+
+then run:
+  xwandState 1 
+to turn enable xwand.  When xwand is enabled, use the 
+dtk-caveDeviceSimulator to set the buttons and move the mouse on the console
+
+you can monitor changes to trackd memory with:
+  dtk-readVRCOSysV
+
+you can monitor changes to the buttons and joystick with
+  dtk-readFloats -r joystick
+  dtk-readButtons -r buttons
+
+========================================================================
+to use it on your immersive system:
+
+1) replace dtk-getTrackd with xwand-dtk-getTrackd
+
+2) say you want a desktop GUI to appear when a certain event happens.  This
+   event would then issue a shell command like this:
+
+     xwandState 1; xwand -e GUIcommand; xwandState 0
+
+   "xwandState 1" causes joystick and button presses to be sent to xwand's DTK
+     shared memeory files 
+
+   "xwand -e GUIcommand" runs the GUI, and when it exits
+
+   "xwandState 0"  causes joystick and button presses to be sent to the usual
+     DTK shared memeory files
+
+========================================================================
+  Authors of this version:
+      John Kelso, Steve Satterfield
+      Scientific Applications & Visualization Group
+           SAVG web page: http://math.nist.gov/mcsd/savg/
+      Mathematical & Computational Science Division
+           MCSD web page: http://math.nist.gov/mcsd/
+      National Institute of Standards and Technology
+           NIST web page: http://www.nist.gov/
+
+  For information about this software contact John Kelso, kelso@nist.gov
+
+  Although this is a complete rewrite, previous versions of xwand were
+  written by Andrew Ray- anray2@vt.edu, and Lance Arsenault, author of the
+  DIVERSE ToolKit, lanceman@bev.net
+
+  The FakeMouse class was written by Robert Stein, currently at Visbox-
+  visit their web site at www.visbox.com!
+
+  xwand-dtk-getTrackd is based on dtk-getTrackd, part of the DIVERSE
+  ToolKit, and so is covered by the GNU General Public License (GPL) as
+  published by the Free Software Foundation; either version 2 of the
+  License, or any later version.  see xwand-dtk-getTrack.C for details.
+
+  "This software was developed at the National Institute of Standards and
+  Technology by employees of the Federal Government in the course of their
+  official duties. Pursuant to title 17 Section 105 of the United States
+  Code this software is not subject to copyright protection and is in the
+  public domain. This is an experimental system.  NIST assumes no
+  responsibility whatsoever for its use by other parties, and makes no
+  guarantees, expressed or implied, about its quality, reliability, or any
+  other characteristic.
+
+ We would appreciate acknowledgement if the software is used."
+

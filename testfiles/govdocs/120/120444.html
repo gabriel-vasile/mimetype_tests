@@ -1,0 +1,586 @@
+
+
+
+
+
+
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+
+  <head>
+    <link rel="stylesheet" href="../style/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../style/toxmap_styles.css" type="text/css" />
+
+    <title>TOXMAP - TRI and Superfund Environmental Maps</title>
+    <meta name="author" content="Aquilent, Inc. for the US National Library of Medicine" />
+    <meta name="keywords" content="Map, mapping, TOXMAP, environment, environmental health, toxins, chemicals, Benzene, Mercury, Toluene, Chlorine, Lead, Arsenic, Acetone, TRI, Toxics Release Inventory, Superfund, NPL, CERCLIS, National Priorities List, CERCLA, TOXLINE, risk assessment, toxicology, geographical information systems, GIS, NIH, NLM, SIS" />
+    <meta name="description" content="TOXMAP is a Geographic Information System (GIS) from the Division of Specialized Information Services of the US National Library of Medicine (NLM) that uses maps of the United States to help users visually explore data from the US Environmental Protection Agency (EPA)'s Toxics Release Inventory (TRI) and Superfund National Priorities List (NPL)." />
+    
+
+	<script type="text/javascript" src="../js/prototype-1.4.0.js"></script>
+	<script type="text/javascript" src="../js/scriptaculous.js"></script>
+	<script type="text/javascript" src="../js/overlibmws.js"></script>
+	<script type="text/javascript" src="../js/ajaxtags-1.2-beta2.js"></script>
+	<script type="text/javascript" src="../js/showHide.js"></script>
+
+    <script language="javascript" type="text/javascript">
+    
+    
+    function openTargetWindowOrg(filename, windowName, w, h, xy)
+    {
+       windowFeatures = 
+                'width=' + w + ',height=' + h + ','
+            +   'screenX=' + xy + ','
+            +   'screenY=' + xy + ','
+            +   'left=' + xy + ','
+            +   'top=' + xy + ','
+            +   'menubar=yes,toolbar=no,resizable=yes,scrollbars=yes,status=yes,location=no'
+       popupWin = window.open(filename, windowName, windowFeatures);
+       popupWin.focus();
+    }
+    
+    function openTargetWindow(filename, windowName, w, h, xy)
+    {
+       openTargetWindowOrg(filename, windowName, w, h, xy)
+       popupWin.location.reload();
+    }
+    
+<!--
+     self.name = 'toxmap';
+//-->   
+    </script>
+  </head>
+
+<body bgcolor="#ffffff">
+<center>
+<p style="font-size: 0px;margin:0px 0px;padding: 0px 0px;position: absolute;z-index: -2;"><a href="#mainnav" style="color:white;">Skip Main Navigation</a></p> 
+<p style="font-size: 0px;margin:0px 0px;padding: 0px 0px;position: absolute;z-index: -2;"><a href="#subnav" style="color:white;">Skip Sub Navigation</a></p> 
+
+<table width="10" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td height="1"><a href="#main"><img src="../images/space.gif" width="1" height="1" border="0" alt="skip to main content" style="verticallyTight" /></a></td>
+<td height="1"><a href="#list"><img src="../images/space.gif" width="1" height="1" border="0" alt="skip to list of facilities" style="verticallyTight" /></a></td>
+<td height="1"><a href="/toxmap/home/accessibility.jsp"><img src="../images/space.gif" width="1" height="1" border="0" alt="About TOXMAP Accessibility" style="verticallyTight" /></a></td>
+</tr>
+</table>
+  <table border="0" width="775">
+    <tr>
+  <td colspan="2"><link href="../style/styles.css" rel="stylesheet" type="text/css">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="197"><a href="http://www.nlm.nih.gov/"><img src="/toxmap/images/indhdr_nlmlogo.gif" width="197" height="52" border="0" title="National Library of Medicine" alt="National Library of Medicine"></a></td>
+    <td bgcolor="#338033"><a href="/toxmap/index.html"><img src="/toxmap/images/indhdr_toxmaptitle.gif" width="252" height="52" border="0" title="TOXMAP" alt="TOXMAP"></a></td>
+    <td width="205"><img src="/toxmap/images/indhdr_toxmapbg.gif" width="205" height="52" title="" alt=""></td>
+  </tr>
+</table></td>
+</tr>
+<tr>
+  <td colspan="2">
+    <table border="0" width="100%" cellpadding="0" cellspacing="0">
+        
+
+
+
+
+
+
+
+
+
+
+   
+  
+  <tr> 
+    <td valign="bottom">
+      <a name="mainnav"></a>
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td width="15%"><img src="../images/space.gif" width="76" height="2" border="0" alt=""></td>
+          <td width="70%"><table align="center" border="0" cellpadding="0" cellspacing="0" width="498">
+          <tr valign="bottom">
+            <td width="52"><a href="javascript:document.homeForm.submit()"><img src="../images/tabs/tHomeOn.jpg" alt="Home" title="Home" width="52" height="23" border="0"/></a><form name="homeForm" method="post" action="/toxmap/home/welcome.do;jsessionid=E9FA9B86AD6E2609E7BD6072E09922AF" class="verticallyTight"></form></td>
+            <td width="70"><a href="javascript:document.facilityForm.submit()"><img src="../images/tabs/tFacilityOff.jpg" alt="TRI Facilities Map" title="Toxics Release Inventory Facilities Map" width="96" height="23" border="0" /></a><form name="facilityForm" method="post" action="/toxmap/facilities/select.do;jsessionid=E9FA9B86AD6E2609E7BD6072E09922AF" class="verticallyTight">
+<input type="hidden" name="mapMinX" value="-6176421.59"/>
+<input type="hidden" name="mapMaxX" value="3371183.14"/>
+<input type="hidden" name="mapMinY" value="-3337988.34"/>
+<input type="hidden" name="mapMaxY" value="4463891.82"/></form></td>
+            <td width="73"><a href="javascript:document.releaseForm.submit()"><img src="../images/tabs/tReleaseOff.jpg" alt="TRI Releases Map" title="Toxics Release Inventory Chemical Releases Map" width="100" height="23" border="0" /></a><form name="releaseForm" method="post" action="/toxmap/releases/select.do;jsessionid=E9FA9B86AD6E2609E7BD6072E09922AF" class="verticallyTight">
+<input type="hidden" name="mapMinX" value="-6176421.59"/>
+<input type="hidden" name="mapMaxX" value="3371183.14"/>
+<input type="hidden" name="mapMinY" value="-3337988.34"/>
+<input type="hidden" name="mapMaxY" value="4463891.82"/></form></td>
+           <td width="59"><a href="javascript:document.trendForm.submit()"><img src="../images/tabs/tTrendOff.jpg" alt="TRI Trends Map" title="Toxics Release Inventory Chemical Release Trends Map" border="0" width="85" height="23" /></a><form name="trendForm" method="post" action="/toxmap/trends/select.do;jsessionid=E9FA9B86AD6E2609E7BD6072E09922AF" class="verticallyTight">
+<input type="hidden" name="mapMinX" value="-6176421.59"/>
+<input type="hidden" name="mapMaxX" value="3371183.14"/>
+<input type="hidden" name="mapMinY" value="-3337988.34"/>
+<input type="hidden" name="mapMaxY" value="4463891.82"/></form></td>
+		   <td width="80"><a href="javascript:document.superfundForm.submit()"><img src="../images/tabs/tSuperfundOff.jpg" alt="Superfund Map" title="Superfund Sites on the National Priorities List (NPL) Map" border="0" width="80" height="23" /></a><form name="superfundForm" method="post" action="/toxmap/superfund/select.do;jsessionid=E9FA9B86AD6E2609E7BD6072E09922AF" class="verticallyTight">
+<input type="hidden" name="mapMinX" value="-6176421.59"/>
+<input type="hidden" name="mapMaxX" value="3371183.14"/>
+<input type="hidden" name="mapMinY" value="-3337988.34"/>
+<input type="hidden" name="mapMaxY" value="4463891.82"/></form></td>
+           <td width="61"><a href="javascript:document.comboForm.submit()"><img src="../images/tabs/tComboOff.jpg" alt="Combo Map" title="TRI and Superfund Combination Maps" border="0" width="61" height="23" /></a><form name="comboForm" method="post" action="/toxmap/combo/customDefine.do;jsessionid=E9FA9B86AD6E2609E7BD6072E09922AF" class="verticallyTight">
+<input type="hidden" name="mapMinX" value="-6176421.59"/>
+<input type="hidden" name="mapMaxX" value="3371183.14"/>
+<input type="hidden" name="mapMinY" value="-3337988.34"/>
+<input type="hidden" name="mapMaxY" value="4463891.82"/></form></td>
+           <td width="59"><a href="javascript:document.searchForm.submit()"><img src="../images/tabs/tSearchOff.jpg" alt="Search" title="All Search Options" border="0" width="59" height="23" /></a><form name="searchForm" method="post" action="/toxmap/search/setupSearch.do;jsessionid=E9FA9B86AD6E2609E7BD6072E09922AF" class="verticallyTight">
+<input type="hidden" name="mapMinX" value="-6176421.59"/>
+<input type="hidden" name="mapMaxX" value="3371183.14"/>
+<input type="hidden" name="mapMinY" value="-3337988.34"/>
+<input type="hidden" name="mapMaxY" value="4463891.82"/></form></td>
+		   <td width="44"><a href="/toxmap/help/faq.jsp"><img src="../images/tabs/tHelpOff.jpg" alt="Help" title="TOXMAP Help" width="44" height="23" border="0" /></a></td>
+          </tr>
+        </table>
+		  </td>
+          <td width="15%" align="right"><a href="/toxmap/help/faq.jsp#15"><img src="../images/contactus.gif" width="76" height="25" border="0" alt="Contact Us" title="Contact Us"></a></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+        
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+  
+  <tr bgcolor="#3B5C7F" align="left"> 
+    <td><a name="subnav"></a>
+	<table border="0" cellpadding="0" cellspacing="0" width="248">
+			<tr>
+				<td width="100"><img src="../images/space.gif" height="1" width="100" alt="" /></td>
+				<td width="85"><img src="../images/tabs/stWelcomeOn.jpg" alt="Welcome" title="Welcome to TOXMAP" width="85" height="23" /></td>
+				<td width="55"><a href="/toxmap/home/news.jsp"><img src="../images/tabs/stNewsOff.jpg" alt="News" title="TOXMAP News" width="55" height="23" border="0" /></a></td>
+				<td width="89"><a href="/toxmap/home/accessibility.jsp"><img src="../images/tabs/stAccessibilityOff.jpg" alt="Accessibility" title="About TOXMAP Accessibility" width="89" height="23" border="0" /></a></td>
+				<td width="95" ><a href="http://www.nlm.nih.gov/pubs/factsheets/toxmap.html"><img src="../images/tabs/stFactSheetOff.jpg" title="TOXMAP Fact Sheet" alt="Fact Sheet" width="86" height="23" border="0"></a></td>
+				<td width="96"><a href="/toxmap/home/forTeachers.jsp"><img src="../images/tabs/stForTeachersOff.jpg" alt="For Teachers" title="TOXMAP: Resources for Teachers" width="96" height="23" border="0" /></a></td>
+				<td width="43" ><a href="/toxmap/tour/index.html"><img src="../images/tabs/stTourOff.jpg" title="Take a Tour of TOXMAP" alt="Tour" width="43" height="23" border="0"></a></td>
+				<td width="54"><a href="/toxmap/home/about.jsp"><img src="../images/tabs/stAboutOff.jpg" alt="About" title="About TOXMAP" width="54" height="23" border="0" /></a></td>
+				<td width="72"><a href="/toxmap/home/sitemap.jsp"><img src="../images/tabs/stSitemapOff.jpg" alt="Site Map" title="Site Map" width="72" height="23" border="0" /></a></td>
+			</tr>
+		</table>
+	</td>
+  </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+  <td width="140" valign="top">
+     
+
+
+
+
+
+
+
+
+
+ 
+<script language="JavaScript" type="text/javascript">
+function pressEnter ()
+{
+    if (window.event.keyCode==13) // pressed enter
+        document.quickSearchForm.submit();
+}
+</script>
+<table width="175" border="0" cellpadding="2" cellspacing="0">
+  <tr>
+    <td height="16" align="center" bgcolor="#FFCC66"><table width="150" border="0" cellspacing="0" cellpadding="1">
+      <tr>
+        <td height="16" align="center"><span class="titleSubSub"><strong>Quick Search</strong></span></td>
+      </tr>
+    </table>
+    </td>
+  </tr>
+</table>
+<table width="175" border="0" cellpadding="2" cellspacing="0" bgcolor="#3B5C7F">
+  <tr>
+    <td width="270">        
+    <form name="quickSearchForm" method="post" action="/toxmap/main/quickSearch.do;jsessionid=E9FA9B86AD6E2609E7BD6072E09922AF" class="verticallyTight">
+    <table width="150" border="0" cellpadding="1" cellspacing="0" bgcolor="#FFFFFF">
+      <tr align="center" valign="middle" bgcolor="#3B5C7F">
+      <td align=left width=146 height=21>
+          <span class=whitebodytext>Select Dataset(s):<br>
+          <input type="checkbox" name="searchTRI" value="on" checked="checked" id="searchTRI" /><a style="color: white" href="/toxmap/help/faq.jsp#47"><label for="searchTRI">TRI</label></a>
+          <input type="checkbox" name="searchNPL" value="on" checked="checked" id="searchNPL" /><a style="color: white" href="/toxmap/help/faq.jsp#67"><label for="searchNPL">Superfund NPL</label></a><br>
+          <label for="chemicalName">Chemical Name</label></span>
+            <br />
+          <input type="text" name="chemicalName" size="23" value="" id="chemicalName" />
+		<script type="text/javascript">
+new AjaxJspTag.Autocomplete(
+"/toxmap/ChemicalAutocomplete.view", {
+minimumCharacters: "1",
+parameters: "dbTRI=false,dbCERCLIS=false",
+target: "",
+className: "autocomplete",
+source: "chemicalName"
+});
+</script>
+
+
+
+            <span class="whitebodytext"><label for="city">City</label></span><br />
+          <input type="text" name="city" size="23" value="" id="city" />
+          <table width="100%" cellpadding="1" cellspacing="0">
+            <tr>
+                <td class="whitebodytext"><label for="state">State</label></td>
+                <td nowrap align="left"> <span class="whitebodytext"><label for="zip">ZIP</label> [<a target=_blank style="color: white" href="http://zip4.usps.com/zip4/welcome.jsp">Lookup</a>]</span></td>
+            </tr>
+            <tr>
+                <td>
+            
+                <select name="state" onkeypress="javascript:pressEnter()" id="state"><option value="">--</option>
+<option value="AK">AK</option>
+<option value="AL">AL</option>
+<option value="AR">AR</option>
+<option value="AS">AS</option>
+<option value="AZ">AZ</option>
+<option value="CA">CA</option>
+<option value="CO">CO</option>
+<option value="CT">CT</option>
+<option value="DC">DC</option>
+<option value="DE">DE</option>
+<option value="FL">FL</option>
+<option value="GA">GA</option>
+<option value="GU">GU</option>
+<option value="HI">HI</option>
+<option value="IA">IA</option>
+<option value="ID">ID</option>
+<option value="IL">IL</option>
+<option value="IN">IN</option>
+<option value="KS">KS</option>
+<option value="KY">KY</option>
+<option value="LA">LA</option>
+<option value="MA">MA</option>
+<option value="MD">MD</option>
+<option value="ME">ME</option>
+<option value="MI">MI</option>
+<option value="MN">MN</option>
+<option value="MO">MO</option>
+<option value="MP">MP</option>
+<option value="MS">MS</option>
+<option value="MT">MT</option>
+<option value="NC">NC</option>
+<option value="ND">ND</option>
+<option value="NE">NE</option>
+<option value="NH">NH</option>
+<option value="NJ">NJ</option>
+<option value="NM">NM</option>
+<option value="NV">NV</option>
+<option value="NY">NY</option>
+<option value="OH">OH</option>
+<option value="OK">OK</option>
+<option value="OR">OR</option>
+<option value="PA">PA</option>
+<option value="PR">PR</option>
+<option value="RI">RI</option>
+<option value="SC">SC</option>
+<option value="SD">SD</option>
+<option value="TN">TN</option>
+<option value="TX">TX</option>
+<option value="UM">UM</option>
+<option value="UT">UT</option>
+<option value="VA">VA</option>
+<option value="VI">VI</option>
+<option value="VT">VT</option>
+<option value="WA">WA</option>
+<option value="WI">WI</option>
+<option value="WV">WV</option>
+<option value="WY">WY</option></select>
+                </td>
+                <td>
+                    <input type="text" name="zip" size="14" value="" id="zip" />
+                </td>
+            </tr>
+            <!--
+            <script language="javascript" type="text/javascript">
+                document.quickSearchForm.chemicalName.focus();
+            </script>
+            -->
+          </table>
+        </td>
+
+        </tr>
+        <tr  bgcolor="#3B5C7F">
+        <td align="left"><table cellpadding="1">
+            <!--tr><td ><span class="whitebodytext"><a style="color: white" href="javascript:document.homeForm.submit()" alt="Clear search"  title="Clear search">Clear search</a></td></tr-->
+            <tr>
+              <td><input name="btnGo" type="submit" value="Search" style="width:6em"/></td>
+              <td><input name="btnClear" type="button" onclick="javascript:document.homeForm.submit()" value="Clear" /></td>
+            </tr>
+	    <tr align="left">
+	       <td colspan="2"><span class="whitebodytext"><a style="color: white" href="/toxmap/combo/promptRegion.do" alt="Choose a geographic region"  title="Choose a geographic region">Choose a region...</a></span></td>
+	    </tr>
+	    <tr align="left">
+	       <td colspan="2"><span class="whitebodytext"><a style="color: white" href="javascript:document.searchForm.submit()" alt="More search options"  title="More search options">More search options...</a></span></td>
+	    </tr>
+        </table></td>   
+        </tr>
+        </table>
+        </form>
+    </td>
+  </tr>
+</table> 
+<div align="left"><span class="smallbodytext"><a href="javascript:openTargetWindowOrg('http://toxnet.nlm.nih.gov/cgi-bin/sis/htmlgen?TRI', 'main', 800, 550, 100)">Search 
+  TOXNET TRI </a></span> </div>
+<p><img src="../images/orangehr.gif" alt="" width="150" height="3" /></p>
+
+<table width="130" border="0">
+  <tr>
+    <td width="20" align="center" valign="top"><img src="../images/question.gif" width="12" height="12" border="0" alt="" title="Question" /></td>
+    <td width="100" valign="top" class="realquestiontext" align="left"><a href='/toxmap/help/faq.jsp#17'>What is TOXMAP?</a></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><img src="../images/question.gif" width="12" height="12" border="0" alt="" title="Question" /></td>
+    <td width="100" valign="top" class="realquestiontext" align="left"><a href='/toxmap/help/faq.jsp#112'>What is the Toxics Release Inventory (TRI)?</a></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><img src="../images/question.gif" width="12" height="12" border="0" alt="" title="Question" /></td>
+    <td width="100" valign="top" class="realquestiontext" align="left"><a href='/toxmap/help/faq.jsp#64'>What is the "Superfund" Program?</a></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">&nbsp;</td>
+    <td valign="top" class="realquestiontext" align="left"><a href="/toxmap/help/faq.jsp">more...</a></td>
+  </tr>
+</table>
+
+<p><img src="../images/orangehr.gif" alt="" width="150" height="3" /></p>
+<table border="0" cellspacing="2" cellpadding="2" width="130">
+  <tr>
+    <td align="center" valign="top"><img src="../images/bullet.gif" width="4" height="4" alt="" /></td>
+    <td class="realquestiontext" align="left" valign="top"><a href="/toxmap/help/faq.jsp#50">Does TOXMAP show all sources of toxic chemicals released into or present in the environment?</a></td>
+  </tr>
+
+  <tr>
+    <td align="center" valign="top"><img src="../images/bullet.gif" width="4" height="4" alt="" /></td>
+    <td class="realquestiontext" align="left" valign="top"><a href='/toxmap/help/faq.jsp#63'>What data sources does TOXMAP use?</a></td>
+  </tr>
+
+  <tr>
+    <td align="center" valign="top"><img src="../images/bullet.gif" width="4" height="4" alt="" /></td>
+    <td class="realquestiontext" align="left" valign="top"><a href='/toxmap/help/faq.jsp#31'>What are some tips for reading maps critically?</a></td>
+  </tr>
+
+</table>
+  </td>
+  <td width="635" valign="top"  align="left">
+    <a name="main"></a>
+    
+
+
+ 
+
+
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="360">
+		<span class="title">Use Quick Search or click on a map</span><br />
+		<span class="bodytext">to explore on-site toxic releases and hazardous waste sites from the <a href="http://www.epa.gov/" target="_blank">EPA's</a> <a href="/toxmap/help/faq.jsp#112">Toxics Release Inventory (TRI)</a> and the <a href="/toxmap/help/faq.jsp#64">Superfund</a> <a href="/toxmap/help/faq.jsp#65">National Priorities List (NPL)</a>.</span><br/><br/>
+	</td>
+    <td width="10">&nbsp;
+	</td>
+    <td valign="top" class="bodytext">
+	 <center><a href="javascript:openTargetWindowOrg('/toxmap/home/TOXMAP Brochure.pdf', '_blank',800,600,0)"><img src="../images/brochure.gif" border="0" height="116" alt="Download TOXMAP Brochure" title="Download TOXMAP Brochure, PDF 2.07MB"/></a></center>
+	</td>
+  </tr>
+    <tr>
+    <td width="360" valign="top">
+		
+
+
+ 
+
+		<img src="../images/composite/composite_data.gif" width="351" height="252" border="0" usemap="#CompositeMap" alt="Composite image map showing TRI facilities in blue and Superfund NPL sites in red" /> 
+<map name="CompositeMap" id="CompositeMap">
+  <area shape="rect" coords="5,165,101,246" href="javascript:document.bodyWelcome_AKForm.submit()" alt="Alaska" title="Alaska" />
+  <area shape="rect" coords="104,198,176,247" href="javascript:document.bodyWelcome_HIForm.submit()" alt="Hawaii" title="Hawaii" />
+  <area shape="rect" coords="254,206,346,248" href="javascript:document.bodyWelcome_PRVIForm.submit()" alt="Puerto Rico &amp; US Virgin Islands" title="Puerto Rico &amp; US Virgin Islands" />
+  <area shape="rect" coords="181,217,250,247" href="javascript:document.bodyWelcome_ASForm.submit()" alt="American Samoa" title="American Samoa" />
+  <area shape="rect" coords="295,141,346,203" href="javascript:document.bodyWelcome_GUForm.submit()" alt="Guam" title="Guam" />
+  <area shape="rect" coords="320,20,346,138" href="javascript:document.bodyWelcome_MPForm.submit()" alt="Marianas" title="Marianas" />
+  <area shape="rect" coords="2,1,351,252" href="javascript:document.bodyWelcome_ContinentalUSForm.submit()" alt="Continental US" title="Continental US" />
+  </map>
+
+	<form name="bodyWelcome_AKForm" method="post" action="/toxmap/combo/select.do;jsessionid=E9FA9B86AD6E2609E7BD6072E09922AF">
+			
+<input type="hidden" name="mapMinX" value="-4830194.12"/>
+<input type="hidden" name="mapMaxX" value="-1901693.58"/>
+<input type="hidden" name="mapMinY" value="2065140.49"/>
+<input type="hidden" name="mapMaxY" value="4458181.57"/>
+<input type="hidden" name="place" value="AK"/>
+	</form>
+	<form name="bodyWelcome_HIForm" method="post" action="/toxmap/combo/select.do;jsessionid=E9FA9B86AD6E2609E7BD6072E09922AF">
+			
+<input type="hidden" name="mapMinX" value="-6346300.31901642"/>
+<input type="hidden" name="mapMaxX" value="-5596098.4402712"/>
+<input type="hidden" name="mapMinY" value="-584477.897417637"/>
+<input type="hidden" name="mapMaxY" value="131293.620122118"/>
+<input type="hidden" name="place" value="HI"/>
+	</form>
+	<form name="bodyWelcome_PRVIForm" method="post" action="/toxmap/combo/select.do;jsessionid=E9FA9B86AD6E2609E7BD6072E09922AF">
+		
+<input type="hidden" name="mapMinX" value="2934045.87"/>
+<input type="hidden" name="mapMaxX" value="3318822.63"/>
+<input type="hidden" name="mapMinY" value="-2160488.8"/>
+<input type="hidden" name="mapMaxY" value="-1845354.9"/>
+<input type="hidden" name="place" value="PR_VI"/>
+	</form>
+	<form name="bodyWelcome_ContinentalUSForm" method="post" action="/toxmap/combo/select.do;jsessionid=E9FA9B86AD6E2609E7BD6072E09922AF">
+		
+<input type="hidden" name="mapMinX" value="-2254225.84"/>
+<input type="hidden" name="mapMaxX" value="2143176.88"/>
+<input type="hidden" name="mapMinY" value="-1955401.35"/>
+<input type="hidden" name="mapMaxY" value="1637961.6"/>
+<input type="hidden" name="place" value="LO_48"/>
+	</form>
+	<form name="bodyWelcome_ASForm" method="post" action="/toxmap/combo/select.do;jsessionid=E9FA9B86AD6E2609E7BD6072E09922AF">
+		
+<input type="hidden" name="mapMinX" value="-9496115.89360586"/>
+<input type="hidden" name="mapMaxX" value="-9257681.72496653"/>
+<input type="hidden" name="mapMinY" value="-1940353.64764108"/>
+<input type="hidden" name="mapMaxY" value="-1702627.57003379"/>
+<input type="hidden" name="place" value="AS"/>
+	</form>
+	<form name="bodyWelcome_GUForm" method="post" action="/toxmap/combo/select.do;jsessionid=E9FA9B86AD6E2609E7BD6072E09922AF">
+		
+<input type="hidden" name="mapMinX" value="-1.01516135515689E7"/>
+<input type="hidden" name="mapMaxX" value="-1.00834181719855E7"/>
+<input type="hidden" name="mapMinY" value="4302153.72635055"/>
+<input type="hidden" name="mapMaxY" value="4389196.21755482"/>
+<input type="hidden" name="place" value="GU"/>
+	</form>
+	<form name="bodyWelcome_MPForm" method="post" action="/toxmap/combo/select.do;jsessionid=E9FA9B86AD6E2609E7BD6072E09922AF">
+		
+<input type="hidden" name="mapMinX" value="-1.00595277144354E7"/>
+<input type="hidden" name="mapMaxX" value="-9297195.67848003"/>
+<input type="hidden" name="mapMinY" value="4187111.39305111"/>
+<input type="hidden" name="mapMaxY" value="4587570.11417395"/>
+<input type="hidden" name="place" value="MP"/>
+	</form>
+<span class="titleSubSub"><a href="/toxmap/help/faq.jsp#112">TRI</a> facilities (blue) and <a href="/toxmap/help/faq.jsp#64">Superfund</a> <a href="/toxmap/help/faq.jsp#65">NPL</a> sites (red).</span>
+	</td>
+    <td width="10">&nbsp;
+	</td>
+    <td width="265" valign="top" class="bodytext">
+	 	
+<table border="0" cellspacing="2" cellpadding="2" width="100%">
+
+  <tr>
+    <td><img src="../images/bullet.gif" width="4" height="4" alt="" /></td>
+    <td class="bodytext"><a href="/toxmap/home/news.jsp#151"><strong>Improved user interface, updated mortality data, and addition of hospital locations in TOXMAP</strong></a></td>
+  </tr>
+
+  <tr>
+    <td><img src="../images/bullet.gif" width="4" height="4" alt="" /></td>
+    <td class="bodytext"><a href="/toxmap/home/TOXMAP Brochure.pdf">TOXMAP Brochure now available (PDF, 2.07MB)</a></td>
+  </tr>
+
+  <tr>
+    <td><img src="../images/bullet.gif" width="4" height="4" alt="" /></td>
+    <td class="bodytext"><a href="/toxmap/home/news.jsp#149">TOXMAP now includes 2006 Toxics Release Inventory (TRI) data</a></td>
+  </tr>
+</table>
+<br />
+<center><img src="../images/orangehr.gif" width="200" height="5" alt=""/></center>
+<br/>
+<table border="0" cellspacing="2" cellpadding="2" width="100%">
+  <tr>
+    <td><img src="../images/space.gif" width="4" height="1" alt="" /></td>
+    <td><a href="http://www.epa.gov/newsroom/rssfeeds.htm" target="_blank"><strong>Environmental News from EPA</strong></a>:</td>
+  </tr>
+</table>
+<script language="JavaScript"
+src="http://feed2js.org//feed2js.php?src=http%3A%2F%2Fpipes.yahoo.com%2Fpipes%2Fpipe.run%3F_id%3Df885306f91c5f5c89a7e4fac6b1eeb14%26_render%3Drss&amp;targ=rss&amp" type="text/javascript">
+</script>
+<noscript><br>News is only available if JavaScript is enabled in your browser.</noscript>
+<center><img src="../images/orangehr.gif" width="200" height="5" alt=""/></center>
+<br/>
+
+<table border="0" cellspacing="2" cellpadding="2" width="100%">
+  <tr>
+    <td><img src="../images/space.gif" width="4" height="1" alt="" /></td>
+    <td><strong>Related Biomedical References from <a href="http://www.ncbi.nlm.nih.gov/pubmed/" target="_blank">PubMed</strong></a>:</td>
+  </tr>
+</table>
+<script language="JavaScript"
+src="http://feed2js.org//feed2js.php?src=http%3A%2F%2Fpipes.yahoo.com%2Fpipes%2Fpipe.run%3F_id%3DOIpip0h13RGnMC4a1ZzWFw%26_render%3Drss&amp;targ=rss&amp" type="text/javascript">
+</script>
+<noscript><br>References are only available if JavaScript is enabled in your browser.</noscript>
+<table border="0" cellspacing="2" cellpadding="2" width="100%">
+  <tr>
+    <td><img src="../images/space.gif" width="4" height="1" alt="" /></td>
+    <td><a href="http://www.ncbi.nlm.nih.gov/pubmed?term=(Toxics+AND+Release+AND+Inventory)+OR+Superfund+AND+full+text[sb]+%22last+1+year%22[pdat]+English[la]+tox[sb]+%22last+90+days%22[edat]" target="rss">More references</a> from PubMed...</td>
+  </tr>
+</table>
+<br/>
+	</td>
+  </tr>
+</table>
+
+  <img src="../images/orangehr.gif" width="400" height="5" alt="" /><br/>
+
+<table border="0" cellpadding="3" cellspacing="3">
+  <tr>
+    <td width="150"><a href="http://sis.nlm.nih.gov/enviro.html"><img src="../images/toxnet.gif" width="219" height="98" border="0" alt="Portal to environmental health and toxicology resources" title="Portal to environmental health and toxicology resources"></a></td>
+	<td width="250"><A TARGET="_blank" HREF="http://www.hon.ch/HONcode/Conduct.html?HONConduct651494"> </A>
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td width="22%"><a target="_blank" href="http://www.hon.ch/HONcode/Conduct.html?HONConduct651494"><img src="https://www.hon.ch/HONcode/Seal/HONConduct651494.jpg" align="LEFT" border="0" title="We subscribe to the HONcode principles of the HON Foundation. Click to verify."></a></td>
+          <td width="78%"><span class="bodytext">We subscribe to the <a href="http://www.hon.ch/HONcode/Conduct.html?HONConduct651494" target="_blank">HONcode principles</a> of the <a href="http://www.hon.ch/" target="_blank">Health On the Net Foundation</a>.</span></td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+
+<p>
+</p>
+  </td>
+</tr>
+<tr>
+  <td colspan="2" align="center">
+    <p>
+<table border=0 width="770">
+  <img alt="" height="7"
+        src="/toxmap/images/sisHoroRule3b5c7f.gif" width="770"> <tbody>
+  <tr>
+    <td align=middle class=footerlinks width="100%">
+      <div align="center"><font size="1" color="#999999"><a
+            href="http://www.nlm.nih.gov/">US National Library of Medicine</a>,
+        8600 Rockville Pike, Bethesda, MD 20894,<br>
+        <a href="http://www.nih.gov/">National Institutes of Health</a>,
+		<a href="http://www.os.dhhs.gov/">Department of Health &amp; Human Services</a><br>
+		<a href="javascript:openTargetWindowOrg('/toxmap/main/metadata.htm', 'main', 600, 400, 100)">Metadata</a>,
+        <a href="http://www.nlm.nih.gov/copyright.html">Copyright</a>,
+		<a href="http://www.nlm.nih.gov/privacy.html">Privacy</a>,
+		<a href="http://www.nih.gov/icd/od/foia/index.htm">Freedom of Information Act</a>,
+		<a href="http://www.nlm.nih.gov/accessibility.html">Accessibility</a><br>
+        Customer Service: <a href="mailto:tehip@teh.nlm.nih.gov?subject=TOXMAP">tehip@teh.nlm.nih.gov</a><br>
+Last updated: 25 September 2008, TOXMAP 4.2_01<br>
+Data  obtained from <a href="javascript:openTargetWindowOrg('http://www.epa.gov/tri/', 'main', 600, 400, 100)">EPA: TRI</a> - 11 February 2008; <a href="javascript:openTargetWindowOrg('http://www.epa.gov/enviro/html/facility.html', 'main', 600, 400, 100)">EPA: FRS</a> - 11 February 2008; <a href="javascript:openTargetWindowOrg('http://www.epa.gov/superfund/', 'main', 600, 400, 100)">EPA: Superfund</a> - 23 July 2007<br>
+          </font></div>
+    </td>
+  </tr>
+  </tbody>
+</table>
+  </td>
+</tr>
+</table>
+</center>
+</body>
+</html>
+

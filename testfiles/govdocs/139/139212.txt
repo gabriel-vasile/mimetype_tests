@@ -1,0 +1,1488 @@
+HC010HSU.TXT File 
+
+This file contains information and sample SAS programs to create a permanent
+SAS dataset, for users who want to use SAS in processing the MEPS data
+provided in this PUF release.
+
+There are two ways to create a permanent SAS dataset, using either the SAS
+transport data file or the ASCII data file supplied in this PUF release. 
+Section A provides a sample SAS program for the first alternative, which is to
+convert the SAS transport data file to a regular SAS dataset, using the SAS
+PROCedure: XCOPY.  Section B provides a sample SAS program for the second
+alternative, which is to read data from the ASCII data file, using a SAS DATA
+step with INFILE, INPUT, and LABEL statements.  Section C explains
+format-related SAS statements that a user may optionally use when working with
+the SAS dataset.  Examples of SAS programs (DATA step or PROC) are provided in
+all three sections, primarily for the benefit of inexperienced users.  Section
+D contains complete SAS statements that must be used in the programs described
+in Sections B and C.
+
+******************************************************************************
+
+The sample SAS programs provided in Sections A and B show how to create a
+permanent SAS dataset from the data files provided in this PUF release.  The
+examples use File 1 of this MEPS PUF release and can be easily modified for
+use with File 2.
+
+A.     A Sample SAS Program for Converting the SAS Transport File to a
+Permanent SAS Dataset 
+
+The SAS transport file HC10HF1.SSP was created from a PC-SAS Version 6.12 data
+file, using PROC COPY.  This file has been tested for use with PC-SAS version
+6.10 or higher, or with mainframe SAS version 6.08 or higher.  This file may
+work with earlier versions of SAS, although it has not been tested with those
+versions. Users who are unable to use this SAS Transport file should instead
+convert the ASCII data file HC10HF1.DAT to a SAS data set as described in
+Section B.   
+
+The SAS PROCedure XCOPY will read a SAS transport data file and convert the
+data to regular SAS format, storing the output in a permanent SAS dataset. 
+This permanent SAS dataset can then be used for all future processing and
+analyses.
+
+Below is a sample PC-SAS program that can be used to convert the SAS transport
+file to a permanent PC SAS dataset (in a Windows environment, with SAS V6.12). 
+ 
+     LIBNAME PUFLIB 'C:\MEPS';
+     FILENAME IN1 'C:\MEPS\HC10HF1.SSP';
+
+     PROC XCOPY IN=IN1 OUT=PUFLIB IMPORT;
+     RUN;
+
+If the user wants a list of variables and a few sample records in the
+permanent SAS dataset, following are the SAS statements to accomplish these.
+
+     PROC CONTENTS DATA=PUFLIB.HC10HF1;
+     TITLE "List of Variables in MEPS HC10HF1 SAS Dataset";
+     RUN;
+
+     PROC PRINT DATA=PUFLIB.HC10HF1 (OBS=20);
+     TITLE "First 20 Observations in MEPS HC10HF1 SAS Dataset";
+     RUN;
+
+The LIBNAME statement tells SAS the location (directory name) to store the
+permanent SAS dataset which is output by PROC XCOPY.  The FILENAME statement
+tells SAS the location (complete directory and file name) of the input SAS
+transport data file. 
+
+NOTES:
+
+     1)  The names used in the LIBNAME and FILENAME statements shown
+     above (i.e., PUFLIB, IN1) are arbitrary; they are only temporary
+     aliases.
+
+     2)  The directory and file names used in the LIBNAME and FILENAME
+     statements shown above are Windows syntax and may need to be
+     modified for other operating systems such as UNIX, MAC/OS, VMS, or
+     OS/2.
+
+     3)  HC10HF1 is the internal SAS dataset name (also the PC file name,
+     without the extension) prior to the creation of the SAS transport data
+     file.  After running PROC XCOPY, the output SAS dataset assumes the same
+     dataset name (or file name).  Hence, in the example above, a file named
+     HC10HF1.SD2 will be created under the C:\MEPS directory when PROC
+     XCOPY runs successfully.
+
+
+
+B.     A Sample SAS Program for Converting the ASCII Data File to a Permanent
+SAS Dataset
+
+The complete SAS statements (INPUT and LABEL) included in Section D are
+intended to save time for those users wishing to create a permanent SAS
+dataset from the HC10HF1.DAT ASCII data  file.  These statements must be used
+in combination with other SAS statements to create the appropriate SAS
+program, as shown below.  To use the statements provided in Section D to
+create a SAS program, you will need an ASCII text editor.  If you are using an
+interactive form of SAS (Windows, UNIX, OS2, etc.), use the editor provided as
+part of the SAS software.  
+
+Following is a sample SAS program that will convert the ASCII data file to SAS
+format.
+
+     LIBNAME PUFLIB 'C:\MEPS';
+     FILENAME IN1 'C:\MEPS\HC10HF1.DAT';
+
+     DATA PUFLIB.HC10HF1;
+     INFILE IN1 LRECL=329;
+     INPUT .....; * to user: insert the complete INPUT statement that is
+provided in Section D;
+     LABEL .....; * to user: insert the complete LABEL statement that is
+provided in Section D;
+     RUN;
+
+Here is an explanation of the SAS statements used in the program above.
+
+LIBNAME statement: This tells SAS the location (directory name) of the
+permanent SAS dataset.
+
+FILENAME statement: This tells SAS the location of the input ASCII data file.
+
+DATA statement: This signifies the beginning of a SAS DATA step and specifies
+describes the output SAS dataset, referencing the LIBNAME entry (PUFLIB) and
+assigning an internal SAS dataset name (HC10HF1).  In the example, after the
+successful completion of the DATA step, a PC file named HC10HF1.SD2 would have
+been created in the C:\MEPS directory.
+
+INFILE statement: This tells SAS the location (directory and file name) of the
+input ASCII data file.  Also provided is the logical record length (329
+bytes), with the default of RECFM=V implied when this parameter is omitted. 
+LRECL and RECFM are optional parameters in the INFILE statement.  With regard
+to these options, please note the following: the ASCII data file HC10HF1.DAT
+contains a 2-byte carriage return/line feed at the end of each record.  When
+converting to a PC-SAS file, the LRECL option should be used to specify the
+record length to avoid use of a default record length by PC-SAS.  If the
+RECFM=V option is used, the LRECL option must be specified as the logical
+record length (e.g., 329 for HC10HF1.DAT).  If RECFM=F is used, then the LRECL
+value must  be specified as the logical record length plus 2 (331 for
+HC10HF1.DAT).  Note that if the RECFM option is omitted, then the default
+option of RECFM=V is automatically used, and LRECL should be specified as the
+logical record (329 for HC10HF1.DAT).
+
+INPUT statement: This specifies the input record layout, giving names and the
+beginning and ending column positions for data items (which become SAS
+variables) in the ASCII data file (HC10HF1.DAT).  Variable type (numeric or
+character) is also defined via the INPUT statement.
+
+LABEL statement: This associates descriptive names with the SAS variables.
+
+RUN statement: This tells SAS to execute all commands up to this point.
+
+
+C.     Optional Format-related SAS Statements
+
+If a user wants to use formats for the SAS variables, a SAS format library
+must first be created.  Below is a SAS program that will accomplish this.
+
+     LIBNAME PUFLIB 'C:\MEPS';
+     
+     PROC FORMAT LIBRARY=PUFLIB;
+     VALUE .....; * to user: insert the complete set of VALUE statements found
+in Section D;
+     VALUE .....;
+     .......... ;
+     RUN;
+
+
+Below is an example of how to use the SAS formats defined by the PROC FORMAT
+procedure.
+
+     LIBNAME PUFLIB 'C:\MEPS';
+     OPTIONS FMTSEARCH=(PUFLIB); 
+   
+     PROC FREQ DATA=PUFLIB.HC10HF1;
+     TABLES .... / LIST MISSING;
+     FORMAT varnam1 fmtnam1.  Varnam2 fmtnam2.  .... ;
+     * to user: substitute varnami and fmtnami with actual variable names and
+format names;
+     *     Insert the FORMAT statement provided in Section D, if you are using
+all the variables;
+     *     in the TABLES statement;
+     TITLE "Frequency Distributions ....";
+     RUN; 
+
+Here is an explanation of the SAS statements used above.
+
+LIBNAME statement: This tells SAS the location (directory name) of the SAS
+format library.  Please note that SAS datasets (file name extension is 'SD2')
+and format libraries (file name extension is 'SC2') can be stored under the
+same directory.
+
+OPTIONS FMTSEARCH=...: This specifies the SAS format library.
+
+PROC FORMAT statement: This identifies the SAS procedure that will make SAS
+formats according to VALUE statements.  Formats will be stored in a file named
+FORMATS.SC2.  Please note that the option 'LIBRARY=...' can be omitted, if the
+user does not want to create a permanent SAS format library.  When simply
+'PROC FORMAT;' is used, the formats are defined only for the duration of the
+batch SAS program or an interactive SAS session.
+
+VALUE statement: This gives a) names to formats; and b) descriptive labels for
+individual values, or range of values.  The format names can then be invoked
+using a FORMAT statement, if desired.
+
+PROC FREQ statement: This identifies the SAS procedure that will generate
+frequency distributions of variables specified in the TABLES statement,
+formatted if a FORMAT statement is used.  The input SAS dataset is specified
+in the 'DATA=' option.
+
+FORMAT statement: This associates existing formats with variables.  When using
+this statement, the formats must have already been created with a PROC FORMAT
+procedure. 
+
+RUN statement: This tells SAS to execute all commands up to this point.
+
+
+NOTES:
+
+     1)  Use of formats is entirely optional, and depends on the type
+     of analyses that you are doing.  It is recommended that you create
+     and use them as appropriate.
+
+     2)  The names used in the LIBNAME and FILENAME statements shown
+     above (i.e., PUFLIB, IN1) are arbitrary; they are only temporary
+     aliases.
+
+     3)  You only create the permanent SAS data set once.  Additional
+     analyses can be run using this permanent dataset.
+
+     4)  The file and directory specifications in the LIBNAME and
+     FILENAME statements are Windows syntax and may need to be modified
+     for other operating systems such as UNIX, MAC/OS, VMS, or OS/2.
+
+
+D.  SAS Statements
+
+This section contains SAS INPUT, LABEL, and FORMAT statements for use in
+converting the ASCII HC10HF1.DAT file and HC10HF2.DAT into SAS data sets, and
+VALUE statements for creating a SAS format library.   
+
+
+
+
+*INPUT, LABEL AND FORMAT STATEMENTS FOR HC10HF1;
+
+* INPUT STATEMENT;
+INPUT @1      DUID      5.0
+      @6      PID       2.0
+      @8      DUPERSID $8.0
+      @16     EVNTIDX  $12.0
+      @28     EVENTRN   1.0
+      @29     FFID11X  $11.0
+      @40     HHBEGYR   4.0
+      @44     HHBEGMM   2.0
+      @46     SELFAGEN  2.0
+      @48     HHTYPE    1.0
+      @49     CNA       2.0
+      @51     COMPANN   2.0
+      @53     DIETICN   2.0
+      @55     HHAIDE    2.0
+      @57     HOSPICE   2.0
+      @59     HMEMAKER  2.0
+      @61     IVTHP     2.0
+      @63     MEDLDOC   2.0
+      @65     NURPRACT  2.0
+      @67     NURAIDE   2.0
+      @69     OCCUPTHP  2.0
+      @71     PERSONAL  2.0
+      @73     PHYSLTHP  2.0
+      @75     RESPTHP   2.0
+      @77     SOCIALW   2.0
+      @79     SPEECTHP  2.0
+      @81     OTHRHCW   2.0
+      @83     NONSKILL  2.0
+      @85     SKILLED   2.0
+      @87     SKILLWOS $25.0
+      @112    OTHCW     2.0
+      @114    OTHCWOS  $25.0
+      @139    HOSPITAL  2.0
+      @141    VSTRELCN  2.0
+      @143    TREATMT   2.0
+      @145    MEDEQUIP  2.0
+      @147    DAILYACT  2.0
+      @149    COMPANY   2.0
+      @151    OTHSVCE   2.0
+      @153    OTHSVCOS $25.0
+      @178    FREQCY    2.0
+      @180    DAYSPWK   2.0
+      @182    DAYSPMO   2.0
+      @184    HOWOFTEN  2.0
+      @186    TMSPDAY   2.0
+      @188    HRSLONG   2.0
+      @190    MINLONG   2.0
+      @192    SAMESVCE  2.0
+      @194    HHDAYS    2.0
+      @196    NUMCOND   2.0
+      @198    FFHHTYPX  2.0
+      @200    FFHH96    2.0
+      @202    FFTOT96   2.0
+      @204    FFBEF96   2.0
+      @206    FFHH97    2.0
+      @208    FFTOT97   2.0
+      @210    HHSF96X   7.2
+      @217    HHMR96X   7.2
+      @224    HHMD96X   7.2
+      @231    HHPV96X   7.2
+      @238    HHVA96X   7.2
+      @245    HHCH96X   5.2
+      @250    HHOF96X   7.2
+      @257    HHSL96X   7.2
+      @264    HHWC96X   4.2
+      @268    HHOR96X   7.2
+      @275    HHOU96X   6.2
+      @281    HHOT96X   4.2
+      @285    HHXP96X   7.2
+      @292    HHTC96X   8.2
+      @300    IMPHHSLF  1.0
+      @301    IMPHHMCR  1.0
+      @302    IMPHHMCD  1.0
+      @303    IMPHHPRV  1.0
+      @304    IMPHHVA   1.0
+      @305    IMPHHCHM  1.0
+      @306    IMPHHOFD  1.0
+      @307    IMPHHSTL  1.0
+      @308    IMPHHWCP  1.0
+      @309    IMPHHOPR  1.0
+      @310    IMPHHOPU  1.0
+      @311    IMPHHOTH  1.0
+      @312    IMPHHCHG  1.0
+      @313    WTDPER96  12.6
+      @325    VARPSU96  2.0
+      @327    VARSTR96  3.0
+;
+
+
+* FORMAT STATEMENT;
+FORMAT DUID     DUID.
+       PID      PID.
+       DUPERSID $DUPERSI.
+       EVNTIDX  $EVNTIDX.
+       EVENTRN  EVENTRN.
+       FFID11X  $FFID11X.
+       HHBEGYR  HHBEGYR.
+       HHBEGMM  HHBEGMM.
+       SELFAGEN SELFAGEN.
+       HHTYPE   HHTYPE.
+       CNA      CNA.
+       COMPANN  COMPANN.
+       DIETICN  DIETICN.
+       HHAIDE   HHAIDE.
+       HOSPICE  HOSPICE.
+       HMEMAKER HMEMAKER.
+       IVTHP    IVTHP.
+       MEDLDOC  MEDLDOC.
+       NURPRACT NURPRACT.
+       NURAIDE  NURAIDE.
+       OCCUPTHP OCCUPTHP.
+       PERSONAL PERSONAL.
+       PHYSLTHP PHYSLTHP.
+       RESPTHP  RESPTHP.
+       SOCIALW  SOCIALW.
+       SPEECTHP SPEECTHP.
+       OTHRHCW  OTHRHCW.
+       NONSKILL NONSKILL.
+       SKILLED  SKILLED.
+       SKILLWOS $SKILLWO.
+       OTHCW    OTHCW.
+       OTHCWOS  $OTHCWOS.
+       HOSPITAL HOSPITAL.
+       VSTRELCN VSTRELCN.
+       TREATMT  TREATMT.
+       MEDEQUIP MEDEQUIP.
+       DAILYACT DAILYACT.
+       COMPANY  COMPANY.
+       OTHSVCE  OTHSVCE.
+       OTHSVCOS $OTHSVCO.
+       FREQCY   FREQCY.
+       DAYSPWK  DAYSPWK.
+       DAYSPMO  DAYSPMO.
+       HOWOFTEN HOWOFTEN.
+       TMSPDAY  TMSPDAY.
+       HRSLONG  HRSLONG.
+       MINLONG  MINLONG.
+       SAMESVCE SAMESVCE.
+       HHDAYS   HHDAYS.
+       NUMCOND  NUMCOND.
+       FFHHTYPX HHFFTYPE.
+       FFHH96   FFHH9F.
+       FFTOT96  FFTOT9F.
+       FFBEF96  FFBEF9F.
+       FFHH97   FFHH9G.
+       FFTOT97  FFTOT9G.
+       HHSF96X  HHSF96X.
+       HHMR96X  HHMR96X.
+       HHMD96X  HHMD96X.
+       HHPV96X  HHPV96X.
+       HHVA96X  HHVA96X.
+       HHCH96X  HHCH96X.
+       HHOF96X  HHOF96X.
+       HHSL96X  HHSL96X.
+       HHWC96X  HHWC96X.
+       HHOR96X  HHOR96X.
+       HHOU96X  HHOU96X.
+       HHOT96X  HHOT96X.
+       HHXP96X  HHXP96X.
+       HHTC96X  HHTC96X.
+       IMPHHSLF IMPHHSLF.
+       IMPHHMCR IMPHHMCR.
+       IMPHHMCD IMPHHMCD.
+       IMPHHPRV IMPHHPRV.
+       IMPHHVA  IMPHHVA.
+       IMPHHCHM IMPHHCHM.
+       IMPHHOFD IMPHHOFD.
+       IMPHHSTL IMPHHSTL.
+       IMPHHWCP IMPHHWCP.
+       IMPHHOPR IMPHHOPR.
+       IMPHHOPU IMPHHOPU.
+       IMPHHOTH IMPHHOTH.
+       IMPHHCHG IMPHHCHG.
+       WTDPER96 WTDPER9F.
+       VARPSU96 VARPSU9F.
+       VARSTR96 VARSTR9F.
+;
+
+
+* LABEL STATEMENT;
+LABEL DUID    ='DWELLING UNIT ID'
+      PID     ='PERSON NUMBER'
+      DUPERSID='PERSON ID (DUID+PID)'
+      EVNTIDX ='EVENT ID'
+      EVENTRN ='EVENT ROUND NUMBER'
+      FFID11X ='FLAT FEE ID'
+      HHBEGYR ='EVENT START DATE - YEAR'
+      HHBEGMM ='EVENT START DATE - MONTH'
+      SELFAGEN='DOES PROVIDER WORK FOR AGENCY OR SELF'
+      HHTYPE  ='HOME HEALTH EVENT TYPE'
+      CNA     ='TYPE OF HLTH CARE WRKR - CERT NURSE ASST'
+      COMPANN ='TYPE OF HLTH CARE WRKR - COMPANION'
+      DIETICN ='TYPE OF HLTH CARE WRKR - DIETITIAN/NUTRT'
+      HHAIDE  ='TYPE OF HLTH CARE WRKR - HOME CARE AIDE'
+      HOSPICE ='TYPE OF HLTH CARE WRKR - HOSPICE WORKER'
+      HMEMAKER='TYPE OF HLTH CARE WRKR - HOMEMAKER'
+      IVTHP   ='TYPE OF HLTH CARE WRKR - IV THERAPIST'
+      MEDLDOC ='TYPE OF HLTH CARE WRKR - MEDICAL DOCTOR'
+      NURPRACT='TYPE OF HLTH CARE WRKR - NURSE/PRACTR'
+      NURAIDE ='TYPE OF HLTH CARE WRKR - NURSES AIDE'
+      OCCUPTHP='TYPE OF HLTH CARE WRKR - OCCUP THERAP'
+      PERSONAL='TYPE OF HLTH CARE WRKR - PERS CARE ATTDT'
+      PHYSLTHP='TYPE OF HLTH CARE WRKR - PHYSICL THERAPY'
+      RESPTHP ='TYPE OF HLTH CARE WRKR - RESPIRA THERAPY'
+      SOCIALW ='TYPE OF HLTH CARE WRKR - SOCIAL WORKER'
+      SPEECTHP='TYPE OF HLTH CARE WRKR - SPEECH THERAPY'
+      OTHRHCW ='TYPE OF HLTH CARE WRKR - OTHER'
+      NONSKILL='TYPE OF HLTH CARE WRKR - NON-SKILLED'
+      SKILLED ='TYPE OF HLTH CARE WRKR - SKILLED'
+      SKILLWOS='SPECIFY TYPE OF SKILLED WORKER'
+      OTHCW   ='TYPE OF HLTH CARE WRKR - SOME OTHER'
+      OTHCWOS ='SPECIFY OTHER TYPE HEALTH CARE WORKER'
+      HOSPITAL='ANY HH CARE SVCE DUE TO HOSPITALIZATION'
+      VSTRELCN='ANY HH CARE SVCE RELATED TO HLTH COND'
+      TREATMT ='PERSON RECECIVED MDICAL TREATMENT'
+      MEDEQUIP='PERSON WAS TAUGHT USE OF MED EQUIPMT'
+      DAILYACT='PERSON WAS HELPED WI DAILY ACTIVITIES'
+      COMPANY ='PERSON RECEIVED COMPANIONSHIP SERVICES'
+      OTHSVCE ='PERSON RECEIVED OTH HOME CARE SERVICES'
+      OTHSVCOS='SPECIFY OTHER HOME CARE SRVCE RECEIVED'
+      FREQCY  ='PROVIDER HELPED EVERY WK/SOME WKS'
+      DAYSPWK ='# DAYS PER WEEK PROVIDER CAME (HA ONLY)'
+      DAYSPMO ='# DAYS PER MONTH PROVIDER CAME (HA ONLY)'
+      HOWOFTEN='PROV CAME ONCE PER DAY/MORE THAN ONCE'
+      TMSPDAY ='TIMES/DAY PROVIDER CAME HOME TO HELP'
+      HRSLONG ='HOURS EACH VISIT LASTED'
+      MINLONG ='MINUTES EACH VISIT LASTED'
+      SAMESVCE='ANY OTH MONS PER RECEIVED SAME SERVICES'
+      HHDAYS  ='DAYS PER MONTH IN HOME HEALTH, 1996'
+      NUMCOND ='TOTAL #COND RECORDS LINKED TO THIS EVENT'
+      FFHHTYPX='ED FLAT FEE STEM-LEAF INDICATOR'
+      FFHH96  ='TOTAL #HH EVENTS IN FF - 1996'
+      FFTOT96 ='#VISITS IN FLAT FEE (ALL EVENTS) - 1996'
+      FFBEF96 ='#VISITS IN FF (ALL EVENTS) BEFORE 1996'
+      FFHH97  ='#HH EVENTS IN FLAT FEE: RD3, 1997'
+      FFTOT97 ='#VISITS IN FF (ALL EVENTS) -1997 THRU R3'
+      HHSF96X ='AMOUNT PAID,FAMILY (IMPUTED)'
+      HHMR96X ='AMOUNT PAID,MEDICARE(IMPUTED)'
+      HHMD96X ='AMOUNT PAID,MEDICAID (IMPUTED)'
+      HHPV96X ='AMOUNT PAID,PRIVATE INSURANCE (IMPUTED)'
+      HHVA96X ='AMOUNT PAID,VETERANS(IMPUTED)'
+      HHCH96X ='AMOUNT PAID,CHAMPUS/CHAMPVA (IMPUTED)'
+      HHOF96X ='AMOUNT PAID,OTHER FEDERAL (IMPUTED)'
+      HHSL96X ='AMOUNT PAID,STATE & LOCAL GOV (IMPUTED)'
+      HHWC96X ='AMOUNT PAID,WORKERS CHHP (IMPUTED)'
+      HHOR96X ='AMOUNT PAID,OTHER PRIVATE (IMPUTED)'
+      HHOU96X ='AMOUNT PAID,OTHER PUBLIC (IMPUTED)'
+      HHOT96X ='AMOUNT PAID,OTHER INSURANCE (IMPUTED)'
+      HHXP96X ='SUM OF HHSF96X-HHOT96X (IMPUTED)'
+      HHTC96X ='HHLD REPORTED TOTAL CHARGE (IMPUTED)'
+      IMPHHSLF='IMPUTATION FLAG FOR HHSF96X'
+      IMPHHMCR='IMPUTATION FLAG FOR HHMR96X'
+      IMPHHMCD='IMPUTATION FLAG FOR HHMD96X'
+      IMPHHPRV='IMPUTATION FLAG FOR HHPV96X'
+      IMPHHVA ='IMPUTATION FLAG FOR HHVA96X'
+      IMPHHCHM='IMPUTATION FLAG FOR HHCH96X'
+      IMPHHOFD='IMPUTATION FLAG FOR HHOF96X'
+      IMPHHSTL='IMPUTATION FLAG FOR HHSL96X'
+      IMPHHWCP='IMPUTATION FLAG FOR HHWC96X'
+      IMPHHOPR='IMPUTATION FLAG FOR HHOR96X'
+      IMPHHOPU='IMPUTATION FLAG FOR HHOU96X'
+      IMPHHOTH='IMPUTATION FLAG FOR HHOT96X'
+      IMPHHCHG='IMPUTATION STATUS OF HHTC96X'
+      WTDPER96='POVERTY/MORTALITY ADJUSTED PERS LEVL WGT'
+      VARPSU96='VARIANCE ESTIMATION PSU 1996'
+      VARSTR96='VARIANCE ESTIMATION STRATUM 1996'
+;
+
+*INPUT, LABEL AND FORMAT STATEMENTS FOR HC10HF2;
+* INPUT STATEMENT;
+INPUT @1      DUID      5.0
+      @6      PID       2.0
+      @8      DUPERSID $8.0
+      @16     EVNTIDX  $12.0
+      @28     HHSFFIDX $10.0
+      @38     HHSF96H   7.2
+      @45     HHMR96H   7.2
+      @52     HHMD96H   7.2
+      @59     HHPV96H   7.2
+      @66     HHVA96H   6.2
+      @72     HHCH96H   5.2
+      @77     HHOF96H   6.2
+      @83     HHSL96H   7.2
+      @90     HHWC96H   5.2
+      @95     HHOT96H   5.2
+      @100    HHUC96H   5.2
+      @105    HHTC96H   8.2
+      @113    WTDPER96  12.6
+      @125    VARPSU96  2.0
+      @127    VARSTR96  3.0
+;
+
+
+* FORMAT STATEMENT;
+FORMAT DUID     DUID.
+       PID      PID.
+       DUPERSID $DUPERSI.
+       EVNTIDX  $EVNTIDX.
+       HHSFFIDX $HHSFFIX.
+       HHSF96H  HHSF96H.
+       HHMR96H  HHMR96H.
+       HHMD96H  HHMD96H.
+       HHPV96H  HHPV96H.
+       HHVA96H  HHVA96H.
+       HHCH96H  HHCH96H.
+       HHOF96H  HHOF96H.
+       HHSL96H  HHSL96H.
+       HHWC96H  HHWC96H.
+       HHOT96H  HHOT96H.
+       HHUC96H  HHUC96H.
+       HHTC96H  HHTC96H.
+       WTDPER96 WTDPER9F.
+       VARPSU96 VARPSU9F.
+       VARSTR96 VARSTR9F.
+;
+
+
+* LABEL STATEMENT;
+LABEL DUID    ='DWELLING UNIT ID'
+      PID     ='PERSON NUMBER'
+      DUPERSID='PERSON ID (DUID+PID)'
+      EVNTIDX ='EVENT ID'
+      HHSFFIDX='HOUSEHOLD REPORTED FLAT FEE ID'
+      HHSF96H ='HHLD RPTD AMT PD, FAMILY (PRE-IMPUTED)'
+      HHMR96H ='HHLD RPTD AMT PD, MEDICARE(PRE-IMPUTED)'
+      HHMD96H ='HHLD RPTD AMT PD, MEDICAID(PRE-IMPUTED)'
+      HHPV96H ='HHLD RPTD AMT PD, PRIV INS(PRE-IMPUTED)'
+      HHVA96H ='HHLD RPTD AMT PD, VETERANS(PRE-IMPUTED)'
+      HHCH96H ='HHLD RPTD AMT PD,CHMP/CHMPVA(PRE-IMPUTD)'
+      HHOF96H ='HHLD RPTD AMT PD, OTHER FED(PRE-IMPUTED)'
+      HHSL96H ='HHLD RPTD AMT PD, STATE&LOC(PRE-IMPUTED)'
+      HHWC96H ='HHLD RPTD AMT PD, WORK COMP(PRE-IMPUTED)'
+      HHOT96H ='HHLD RPTD AMT PD, OTH INSUR(PRE-IMPUTED)'
+      HHUC96H ='HHLD RPTD AMT PD,UNCOL LIAB(PRE-IMPUTED)'
+      HHTC96H ='HHLD REPORTED TOTAL CHARGE (PRE-IMPUTED)'
+      WTDPER96='POVERTY/MORTALITY ADJUSTED PERS LEVL WGT'
+      VARPSU96='VARIANCE ESTIMATION PSU 1996'
+      VARSTR96='VARIANCE ESTIMATION STRATUM 1996'
+;
+
+*VALUE STATEMENTS TO CREATE A FORMAT LIBRARY;
+
+VALUE CNA
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE COMPANN
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE COMPANY
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES, AT LEAST ONCE'
+    2 = '2 NO'
+    ;
+  VALUE DAILYACT
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES, AT LEAST ONCE'
+    2 = '2 NO'
+    ;
+  VALUE DAYSPMO
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 - 31 = '1 - 31 NUMBER OF DAYS PER MONTH'
+    ;
+
+  VALUE DAYSPWK
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 - 7 = '1 - 7 NUMBER OF DAYS PER WEEK'
+    ;
+  VALUE DIETICN
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+
+  VALUE DUID
+  13-10562='VALID ID';
+
+  VALUE $DUPERSI
+  "00013019"-"10562028"="VALID ID";
+
+  VALUE $EVNTIDX
+    '000130190064' - '105620280051' = 'VALID ID'
+    ;
+
+  VALUE EVENTN
+    10 - 2591 = '10 - 2591'
+    ;
+
+  VALUE EVENTRN
+    1 = '1 ROUND 1'
+    2 = '2 ROUND 2'
+    3 = '3 ROUND 3'
+    ;
+ 
+  VALUE FFBEF9F
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0 NO FLAT FEE VISITS PRIOR TO 1996'
+     8 = '8 # OF VISITS PRIOR TO 1996'
+    ;
+ 
+   VALUE FFHH9F
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    1 - 8 = '1 - 8 EVENTS'
+    ;
+  VALUE FFHH9G
+       -1 = '-1 INAPPLICABLE'
+        0 = '0'
+    1 - 3 = '1 - 3 EVENTS'
+    ;
+ 
+
+ VALUE $FFID11X
+   '-1'='-1 INAPPLICABLE'
+"0296302101"-"0993901901"="VALID ID";
+
+  VALUE $HHSFFIX
+   '-1'='-1 INAPPLICABLE'
+"0194502501"-"0993901901"="VALID ID";
+
+  VALUE FFTOT9F
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+     2 - 13 = '2 - 13 EVENTS'
+    ;
+  VALUE FFTOT9G
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+     1 - 4 = '1 - 4 EVENTS'
+    ;
+ 
+  VALUE FREQCY
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 EVERY WEEK'
+    2 = '2 SOME WEEKS'
+    3 = '3 ONLY CAME ONCE'
+    ;
+  VALUE HHAIDE
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+ 
+  VALUE HHBEGMM
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 - 12 = '1 - 12 MONTH'
+    ;
+  VALUE HHBEGYR
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1996 = '1996'
+    ;
+  VALUE HHDAYS
+    -9 = '-9 NOT ASCERTAINED'
+     0 = '0'
+     1 - 31 = '1 - 31 DAYS'
+    ;
+
+  VALUE HHFFTYPE
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 FLAT FEE STEM'
+    2 = '2 FLAT FEE LEAF'
+    ;
+
+  VALUE HHSF96X
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    3.07-40 ='$3.08 - $40.00'
+    40<-80='$40.01 - $80.00'
+    80<-460='$80.01 - $460.00'
+    460<-3000='$460.01 - $3000.00'
+   ;
+  VALUE HHMR96X
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    20-300='$20.00 - $300.00'
+    300<-723.38='$300.01 - $723.38'
+    723.38<-1480.87='$723.39 - $1480.87'
+    1480.87<-7184.44='$1480.88 - $7184.44'
+   ;
+  VALUE HHMD96X
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    11.5-139.2='$11.50 - $139.20'
+    139.20<-516.84='$139.21 - $516.84'
+    516.84<-1348.80='$516.85 - $1348.80'
+    1348.80<-5417.64='$1348.81 - $5417.64'
+   ;
+  VALUE HHPV96X
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    4.59-70='$4.60 - $70.00'
+    70< - 261.76='$70.01 - $261.76'
+    261.76< - 445='$261.77 - $445.00'
+    445< -6611.13='$445.01 - $6611.13'
+    ;
+  VALUE HHVA96X
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    16-187.5='$16.00 - $187.50'
+    187.50<-534.80='$187.51 - $534.80'
+    534.80<-939.12='$534.81 - $939.12'
+    939.12<-7184.44='$939.13 - $7184.44'
+   ;
+
+  VALUE HHCH96X
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    22.70-22.72='$22.71 - $22.72'
+     ;
+  VALUE HHOF96X
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    18.45-47.78='$18.46 - $47.78'
+    47.78<-187.50='$47.79 - $187.50'
+    187.50<-500.65='$187.51 - $500.65'
+    500.65<-2820.40='$500.66 - $2820.40'
+   ;
+  VALUE HHSL96X
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    22-135.5='$22.00 - $135.50'
+    135.50<-265.32='$135.51 - $265.32'
+    265.32<-549.99='$265.33 - $549.99'
+    549.99<-1439.34='$550.00 - $1439.34'
+   ;
+
+  VALUE HHWC96X
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    ;
+  VALUE HHOR96X
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    86.67-210='$86.67 - $210.00'
+    210< - 767.50='$210.01 - $767.50'
+    767.50<-1050='$767.51 - $1050.00'
+    1050< - 1100='$1050.01 - $1100.00'
+    ;
+  VALUE HHOU96X
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    9-11='$9.00 - $11.00'
+    11<-27.65='$11.01 - $27.65'
+    27.65<-249.30='$27.66 - $249.30'
+    249.30<-623.25='$249.31 - $623.25'
+    ;
+
+  VALUE HHOT96X
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    ;
+  VALUE HHXP96X
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    5-172='$5.00 - $172.00'
+    172<-600.84='$172.01 - $600.84'
+    600.84<-1324.87='$600.85 - $1324.87'
+    1324.87<-7184.44='$1324.88 - $7184.44'
+    ;
+  VALUE HHTC96X
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    5-232.32='$5.00 - $232.32'
+    232.32<-749.15='$232.33 - $749.15'
+    749.15<-1600  ='$749.16 - $1600.00'
+    1600<-17897.82='$1600.01 - 17897.82'
+   ;
+
+  VALUE HHCH96H
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    ;
+  VALUE HHMD96H
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    9-5417.64= '$9.00 - $5417.64'
+   ;
+  VALUE HHMR96H
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    32-7184.44= '$32.00 - $7184.44'
+   ;
+  VALUE HHOF96H
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    92-184= '$92.00 - $184.00'
+   ;
+  VALUE HHOT96H
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+   ;
+  VALUE HHPV96H
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    4.60-6611.13= '$4.60 - $6611.13'
+   ;
+  VALUE HHSF96H
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    3.08-3000= '$3.08 - $3000.00'
+   ;
+  VALUE HHSL96H
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    22-1439.34= '$22.00 - $1439.34'
+   ;
+  VALUE HHTC96H
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    5-17897.82= '$5.00 - 17897.82'
+   ;
+  VALUE HHUC96H
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+   ;
+  VALUE HHVA96H
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    200-200= '$200.00 - $200.00'
+   ;
+  VALUE HHWC96H
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+   ;
+
+  VALUE HHTYPE
+    -9 = '-9 NOT ASCERTAINED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 FRIEND/NEIGHBOR'
+    2 = '2 RELATIVE'
+    3 = '3 VOLUNTEER'
+    4 = '4 OTHER - PAID'
+    5 = '5 VOLUNTEERED: MEAL SERVICE DELIVERY'
+    ;
+
+  VALUE HMEMAKER
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE HOSPICE
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE HOSPITAL
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE HOWOFTEN
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 ONCE PER DAY'
+    2 = '2 MORE THAN ONCE PER DAY'
+    3 = '3 24 HOURS PER DAY'
+    ;
+  VALUE HRSLONG
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+     1 - 24 = '1 - 24 HOURS VISIT LASTED'
+    ;
+  VALUE IMPHHCHG
+    . = 'MISSING'
+    0 = '0 UNIMPUTED'
+    1 = '1 IMPUTED'
+    ;
+  VALUE IMPHHCHM
+    -1 = '-1 INAPPLICABLE'
+     0 = '0 UNIMPUTED'
+     1 = '1 IMPUTED'
+     . = 'MISSING'
+    ;
+
+  VALUE IMPHHMCD
+    -1 = '-1 INAPPLICABLE'
+    0 = '0 UNIMPUTED'
+    1 = '1 IMPUTED'
+    . = 'MISSING'
+    ;
+  VALUE IMPHHMCR
+    -1 = '-1 INAPPLICABLE'
+    0 = '0 UNIMPUTED'
+    1 = '1 IMPUTED'
+    . = 'MISSING'
+    ;
+  VALUE IMPHHOFD
+    -1 = '-1 INAPPLICABLE'
+    0 = '0 UNIMPUTED'
+    1 = '1 IMPUTED'
+    . = 'MISSING'
+    ;
+  VALUE IMPHHOTH
+    -1 = '-1 INAPPLICABLE'
+    0 = '0 UNIMPUTED'
+    1 = '1 IMPUTED'
+    . = 'MISSING'
+    ;
+  VALUE IMPHHOPR
+    -1 = '-1 INAPPLICABLE'
+    0 = '0 UNIMPUTED'
+    1 = '1 IMPUTED'
+    . = 'MISSING'
+    ;
+  VALUE IMPHHOPU
+    -1 = '-1 INAPPLICABLE'
+    0 = '0 UNIMPUTED'
+    1 = '1 IMPUTED'
+    . = 'MISSING'
+    ;
+  VALUE IMPHHPRV
+    -1 = '-1 INAPPLICABLE'
+    0 = '0 UNIMPUTED'
+    1 = '1 IMPUTED'
+    . = 'MISSING'
+    ;
+  VALUE IMPHHSLF
+    -1 = '-1 INAPPLICABLE'
+    0 = '0 UNIMPUTED'
+    1 = '1 IMPUTED'
+    . = 'MISSING'
+    ;
+  VALUE IMPHHSTL
+    -1 = '-1 INAPPLICABLE'
+    0 = '0 UNIMPUTED'
+    1 = '1 IMPUTED'
+    . = 'MISSING'
+    ;
+  VALUE IMPHHVA
+    -1 = '-1 INAPPLICABLE'
+    0 = '0 UNIMPUTED'
+    1 = '1 IMPUTED'
+    . = 'MISSING'
+    ;
+  VALUE IMPHHWCP
+    -1 = '-1 INAPPLICABLE'
+    0 = '0 UNIMPUTED'
+    1 = '1 IMPUTED'
+    . = 'MISSING'
+    ;
+  VALUE IVTHP
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE MEDEQUIP
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES, AT LEAST ONCE'
+    2 = '2 NO'
+    ;
+  VALUE MEDLDOC
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE MINLONG
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0'
+    1 - 50 = '1 - 50 MINUTES VISIT LASTED'
+    ;
+
+  VALUE NONSKILL
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE NUMCOND
+       0 = '0'
+     1-4 = '1 - 4 CONDS LINKED'
+    5-23 = '5 - 23 CONDS LINKED'
+    ;
+  VALUE NURAIDE
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE NURPRACT
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE OCCUPTHP
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+ 
+  VALUE OTHCW
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE OTHRHCW
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE OTHSVCE
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES, AT LEAST ONCE'
+    2 = '2 NO'
+    ;
+
+  VALUE $OTHCWOS
+    '-9' = '-9 NOT ASCERTAINED'
+    '-1' = '-1 INAPPLICABLE'
+    'BRINGS HEALTH SUPPLIES'='BRINGS HEALTH SUPPLIES'
+    'BY MAIL AIR FILTERS'   ='BY MAIL AIR FILTERS'
+    'EQUIPMENT TECHNICAN'   ='EQUIPMENT TECHNICAN'
+    'PRIVATE COMPANION'     ='PRIVATE COMPANION'
+    'PSYCHIATRIST'          ='PSYCHIATRIST'
+    'TECHNICIAN'            ='TECHNICIAN'
+   ;
+  VALUE $OTHSVCO
+    '-9' = '-9 NOT ASCERTAINED'
+    '-1' = '-1 INAPPLICABLE'
+    '1'  = '1'
+    'ADVICE ABOUT BREASTFEEDIN'  ='ADVICE ABOUT BREASTFEEDIN'
+    'ASSISTS WITH DIALYSIS'      ='ASSISTS WITH DIALYSIS'
+    'BATHING, DRESSING'          ='BATHING, DRESSING'
+    'BATHING, DRESSING, FEEDIN'  ='BATHING, DRESSING, FEEDIN'
+    'BLD SUGR, INSLN INJXNS'     ='BLD SUGR, INSLN INJXNS'
+    'BLIND ASSOCIATION'          ='BLIND ASSOCIATION'
+    'BLOOD SUGAR, INSLN INJXN'   ='BLOOD SUGAR, INSLN INJXN'
+    'BLOOD WORK'                 ='BLOOD WORK'
+    'BRING OXYGEN TANK'          ='BRING OXYGEN TANK'
+    'CARE OF BABY'               ='CARE OF BABY'
+    'CARE OF NEW BABY'           ='CARE OF NEW BABY'
+    'CARING FOR NEWBORN'         ='CARING FOR NEWBORN'
+    'CASE MGR, CKS ON R EACH M'  ='CASE MGR, CKS ON R EACH M'
+    'CHANGING COLOSTYME'         ='CHANGING COLOSTYME'
+    'CHILD CARE'                 ='CHILD CARE'
+    'CLEAN HOUSE'                ='CLEAN HOUSE'
+    'CLEANING WOUND& BANDAGE'    ='CLEANING WOUND& BANDAGE'
+    'COMATOSE TREATMENT'         ='COMATOSE TREATMENT'
+    'COOKING'                    ='COOKING'
+    'CUTS GRASS, REPAIRS LOCKS'  ='CUTS GRASS, REPAIRS LOCKS'
+    'DAILY ACTIVITIES'           ='DAILY ACTIVITIES'
+    'DAY CARE'                   ='DAY CARE'
+    'DISPENSE MEDICATIONS'       ='DISPENSE MEDICATIONS'
+    'DRAW BLOOD'                 ='DRAW BLOOD'
+    'DRAWING BLOOD EVERY 3 WKS'  ='DRAWING BLOOD EVERY 3 WKS'
+    'DRAWS BLOOD'                ='DRAWS BLOOD'
+    'DRESSED SURGERY'            ='DRESSED SURGERY'
+    'DRESSING WOUND'             ='DRESSING WOUND'
+    'DRIVES ME AROUND'           ='DRIVES ME AROUND'
+    'DRIVING,FOOD PREPARATION'   ='DRIVING,FOOD PREPARATION'
+    'EDUCATIONAL'                ='EDUCATIONAL'
+    'EVERYTHING'                 ='EVERYTHING'
+    'FED HER MEALS, DRIVING, H'  ='FED HER MEALS, DRIVING, H'
+    'GAVE ALLERGY SHOT'          ='GAVE ALLERGY SHOT'
+    'GIVES MEDICATION SOMETIME'  ='GIVES MEDICATION SOMETIME'
+    'HOME COMMUNIAN'             ='HOME COMMUNIAN'
+    'HOUSEWORK'                  ='HOUSEWORK'
+    'INFO ON FOODS TO EAT'       ='INFO ON FOODS TO EAT'
+    'INJECTIONS'                 ='INJECTIONS'
+    'MASSAGE THERAPY'            ='MASSAGE THERAPY'
+    'MEDS, INSULIN INJXNS, BS '  ='MEDS, INSULIN INJXNS, BS'
+    'PARAMEDIC TOOK RES TO HOS'  ='PARAMEDIC TOOK RES TO HOS'
+    'PARAMEDIC TOOK RESP TO HO'  ='PARAMEDIC TOOK RESP TO HO'
+    'PEDICURE'                   ='PEDICURE'
+    'PERSONALL CARE'             ='PERSONALL CARE'
+    'PHYSICAL THERAPY'           ='PHYSICAL THERAPY'
+    'PODIATRY CARE'              ='PODIATRY CARE'
+    'RELIGIOUS SERVICES'         ='RELIGIOUS SERVICES'
+    'SHOPPING, INSERT BATTERIE'  ='SHOPPING, INSERT BATTERIE'
+    'TAKING CARE OF KIDS'        ='TAKING CARE OF KIDS'
+    'TAUGHT STRENGTHING R HAND'  ='TAUGHT STRENGTHING R HAND'
+    'TOOK BLOOD PRESSURE'        ='TOOK BLOOD PRESSURE'
+    'WEIGHING AND MEASURING'     ='WEIGHING AND MEASURING'
+   ;
+  VALUE $PERSID
+    '10035010' - '20592020' = 'VALID ID'
+    ;
+
+  VALUE PERSONAL
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE PHYSLTHP
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE $PID
+    '010' - '093' = '010 - 093'
+    ;
+  VALUE PID
+    10 - 93 = '10 - 93'
+    ;
+  VALUE $PROVID
+    '100351A0012' - '205926A0055' = 'VALID ID'
+    ;
+  VALUE PROVN
+    12 - 319='12 - 319'
+    ;
+
+  VALUE RESPTHP
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE $RU
+    '0' = '0 NON-RESPONSE'
+    'A' = 'A FAMILY LETTER = A'
+    'B' = 'B FAMILY LETTER = B'
+    'C' = 'C FAMILY LETTER = C'
+    'D' = 'D FAMILY LETTER = D'
+    'E' = 'E FAMILY LETTER = E'
+    ;
+
+  VALUE $RUNTID
+    '100351A' - '205926A' = 'VALID ID'
+    ;
+  VALUE SAMESVCE
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -1 = '-1 INAPPLICABLE'
+     1 = '1 YES'
+     2 = '2 NO'
+   ;
+  VALUE SELFAGEN
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 WORK FOR AGENCY, HOSP, NURS HOME'
+    2 = '2 WORK FOR SELF'
+    ;
+  VALUE SKILLED
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE $SKILLWO
+    -9 = '-9 NOT ASCERTAINED'
+    -1 = '-1 INAPPLICABLE'
+    'BILIRUBIN LAMP TECHNICIAN' ='BILIRUBIN LAMP TECHNICIAN'
+    'BLOOD DRAW'                ='BLOOD DRAW'
+    'BROUGHT OXYGEN TANK'       ='BROUGHT OXYGEN TANK'
+    'CHILD COORDINATOR'         ='CHILD COORDINATOR'
+    'COMPUTER (MONITOR)'        ='COMPUTER (MONITOR)'
+    'COUNSELING'                ='COUNSELING'
+    'EMT AMBBULATORY SERVICE'   ='EMT AMBBULATORY SERVICE'
+    'HIRISK CASE MANAGER BILIN' ='HIRISK CASE MANAGER BILIN'
+    'HIRISK CASE MANAGER-BILIN' ='HIRISK CASE MANAGER-BILIN'
+    'LAB TECHNICIAN'            ='LAB TECHNICIAN'
+    'MENTAL HEALTH COUNSELOR'   ='MENTAL HEALTH COUNSELOR'
+    'PT AND OXYGEN ATTENDANT'   ='PT AND OXYGEN ATTENDANT'
+    'RESIDENT PODIATRIST'       ='RESIDENT PODIATRIST'
+    'TECHNICIAN'                ='TECHNICIAN'
+    'THERAPIST'                 ='THERAPIST'
+    'WORKS FOR DR.'         ='WORKS FOR DR.'
+   ;
+  VALUE SOCIALW
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE SPEECTHP
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+    ;
+  VALUE TMSPDAY
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 - 15 = '1 - 15 NUMBER OF TIMES PER DAY'
+    ;
+  VALUE TREATMT
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES, AT LEAST ONCE'
+    2 = '2 NO'
+    ;
+  VALUE VAPLACE
+    -8 = '-8 DK'
+    -1 = '-1 INAPPLICABLE'
+     0 = '0 NO'
+     2 = '2 NO'
+     1 = '1 YES'
+   ;
+  VALUE VARPSU9F
+     0 = '0'
+     1  - 43 = '1-43'
+    ;
+  VALUE VARSTR9F
+      0 ='0'
+      1  - 140 = '1-140'
+    ;
+  VALUE VSTRELCN
+    -9 = '-9 NOT ASCERTAINED'
+    -8 = '-8 DK'
+    -7 = '-7 REFUSED'
+    -1 = '-1 INAPPLICABLE'
+    1 = '1 YES'
+    2 = '2 NO'
+   ;
+  VALUE WTDPER9F
+     0 ='0'
+     1692.382491  - 53098.254784 = '1692.382491  - 53098.254784'
+    ;
+  VALUE      $ICD9COD
+          '-8'='-8 DK'
+           -9 = '-9 NOT ASCERTAINED'
+          '-1'='-1 INAPPLICABLE'
+   "001"-"139"=" 001-139"
+   "140"-"239"=" 140-239"
+   "240"-"279"=" 240-279"
+   "280"-"289"=" 280-289"
+   "290"-"319"=" 290-319"
+   "320"-"389"=" 320-389"
+   "390"-"459"=" 390-459"
+   "460"-"519"=" 460-519"
+   "520"-"579"=" 520-579"
+   "580"-"629"=" 580-629"
+   "630"-"677"=" 630-677"
+   "680"-"709"=" 680-709"
+   "710"-"739"=" 710-739"
+   "740"-"759"=" 740-759"
+   "760"-"779"=" 760-779"
+   "780"-"799"=" 780-799"
+   "800"-"999"=" 800-999"
+   "V00"-"V99"=" V00-V99"
+   ;
+
+   VALUE  $ICD9PRO
+        '-8'='-8 DK'
+        '-9'='-9 NOT ASCERTAINED'
+        '-1'='-1 INAPPLICABLE'
+   "01"-"05"=" 01-05"
+   "06"-"07"=" 06-07"
+   "08"-"16"=" 08-16"
+   "18"-"20"=" 18-20"
+   "21"-"29"=" 21-29"
+   "30"-"34"=" 30-34"
+   "35"-"39"=" 35-39"
+   "40"-"41"=" 40-41"
+   "42"-"54"=" 42-54"
+   "55"-"59"=" 55-59"
+   "60"-"64"=" 60-64"
+   "65"-"71"=" 65-71"
+   "72"-"75"=" 72-75"
+   "76"-"84"=" 76-84"
+   "85"-"86"=" 85-86"
+   "87"-"99"=" 87-99"
+  ;
+
+   VALUE $CCCODEX
+          '-9'='-9 NOT ASCERTAINED'
+          '-8'='-8 DK'
+          '-7'='-7 REFUSED'
+          '-1'='-1 INAPPLICABLE'
+   '001'-'260'=' 001-260'
+  ;
+

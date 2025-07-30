@@ -1,0 +1,200 @@
+# Metadata extensions for describing geologic time
+# suitable for use with the FGDC Content Standard for Digital
+# Geospatial Metadata and the Biological Profile of that
+# standard, which is being developed by the FGDC Biological
+# Data Working Group and the National Biological Information
+# Infrastructure.
+#
+# Formal grammar:
+#
+#	Single_Date/Time = [Calendar_Date + (Time_of_Day)] | Geologic_Age
+#
+#	Range_of_Dates/Times =
+#		[Beginning_Date + (Beginning_Time) +
+#		Ending_Date + (Ending_Time)] |
+#		[Beginning_Geologic_Age + Ending_Geologic_Age]
+#
+#	Beginning_Geologic_Age =
+#		Geologic_Age
+#
+#	Ending_Geologic_Age =
+#		Geologic_Age
+#
+#	Geologic_Age =
+#		Geologic_Time_Scale
+#		Geologic_Age_Estimate +
+#		0{Geologic_Age_Uncertainty}1 +
+#		Geologic_Age_Explanation +
+#		(1{Geologic_Citation}n)
+#
+#	Geologic_Citation =
+#		Citation_Information
+#
+# Version 1.1, 30-Aug-1999 Susan Stitt and Peter Schweitzer (USGS)
+
+Extension_Information:
+	Name: Beginning_Geologic_Age
+	Short_Name: beggeol
+	Type: Compound
+	Rule: Beginning_Geologic_Age = Geologic_Age
+	Parent: Range_of_Dates/Times
+	Child: Geologic_Age
+	Definition:
+		A name, code, or date for the beginning of an event or period
+		in geologic time.
+	Rationale:
+		To provide the capability to completely and accurately describe
+		the geologic dates relevant to a data set.
+	Source: National Biological Information Infrastructure, USGS Biological Resources Division, FGDC Biological Data Working Group
+
+Extension_Information:
+	Name: Ending_Geologic_Age
+	Short_Name: endgeol
+	Type: Compound
+	Rule: Ending_Geologic_Age = Geologic_Age
+	Parent: Range_of_Dates/Times
+	Child: Geologic_Age
+	Definition:
+		A name, code, or date for the end of an event or period in
+		geologic time.
+	Rationale:
+		To provide the capability to completely and accurately describe
+		the geologic dates relevant to a data set.
+	Source: National Biological Information Infrastructure, USGS Biological Resources Division, FGDC Biological Data Working Group
+
+Extension_Information:
+	Name: Geologic_Age
+	Short_Name: geolage
+	Type: Compound
+	Rule: Geologic_Age = Geologic_Time_Scale +  Geologic_Age_Estimate +  0{Geologic_Age_Uncertainty}1 +  0{Geologic_Age_Explanation}1 +  (1{Geologic_Citation}n)
+	Parent: Single_Date/Time
+	Parent: Beginning_Geologic_Age
+	Parent: Ending_Geologic_Age
+	Child: Geologic_Time_Scale
+	Child: Geologic_Age_Estimate
+	Child: Geologic_Age_Uncertainty
+	Child: Geologic_Age_Explanation
+	Child: Geologic_Citation
+	Definition:
+		A name, code, or date describing an event or period in geologic
+		time, expressed either as an absolute date calculated using a
+		named dating method, or as a relative date that is drawn from
+		stratigraphy or biostratigraphy.
+	Rationale:
+		To provide the capability to describe the geologic dates
+		relevant to a data set.  Calendar dates as provided in the ISO
+		8601 dating system used in the standard CSDGM are not adequate
+		to describe geologic time periods.  Absolute geologic time is
+		usually measured in "millions of years" before present, but may
+		use different units and relative base times.  Relative geologic
+		time is measured by subdivisions of the earth's geology in an
+		order based upon relative age, most commonly, vertical or
+		stratigraphic position.  The actual dating systems used in
+		geologic studies often tie relative times measured through
+		stratigraphy or biostratigraphy to a particular absolute time
+		using radioisotope dating techniques, among others.  As these
+		methods for absolute dating have improved, the estimates of the
+		dates for strata have changed, consequently, it would be
+		inaccurate to record absolute dates in situations where
+		relative dates were measured.  This structure is provided as an
+		optional alternative to the standard calendar dates provided by
+		ISO 8601.
+	Source: National Biological Information Infrastructure, USGS Biological Resources Division, FGDC Biological Data Working Group
+
+Extension_Information:
+	Name: Geologic_Time_Scale
+	Short_Name:geolscal
+	Type: text
+	Domain: "Absolute" "Geomagnetic Polarity Time Scale" "International Geological Time Scale" "Oxygen-Isotope" free text
+	Parent: Geologic_Age
+	Optionality: mandatory
+	Definition:
+		Name of a recognized geologic time scale.  This includes
+		"Absolute" as the name of the time scale for measuring geologic
+		dates before the present and names of geologic dating systems
+		that are arrangements of symbols or names in order of relative
+		geologic time.
+	Rationale:
+		To provide the capability to completely and accurately describe
+		the geologic dates relevant to a data set.
+	Source: National Biological Information Infrastructure, USGS Biological Resources Division, FGDC Biological Data Working Group
+
+Extension_Information:
+	Name: Geologic_Age_Estimate
+	Short_Name: geolest
+	Type: text
+	Domain: free text
+	Parent: Geologic_Age
+	Optionality: mandatory
+	Definition:
+		Either an absolute geologic date or a relative geologic age
+		name describing an event or period in geologic time based on
+		the Geologic_Time_Scale.  For example, "300 Ma" (300 million
+		years before present) is a Geologic_Age_Estimate based on the
+		"Absolute" Geologic_Time_Scale, "C28r" is a chron name from the
+		Geomagnetic Polarity Time Scale, and "Maastrichtian" and "
+		Jurassic" are names from the International Geological Time
+		Scale.  Since different relative geologic time scales are often
+		not aligned, multiple geologic dates may need to be specified.
+		For example, the Geomagnetic Polarity Time Scale chron "C29r",
+		at the K/T boundary lies in both the Maastrichtian and the
+		Danian stages from the International Geological Time Scale,
+		thus if you were documenting this event using the International
+		Geological Time Scale, both "Maastrichtian" and "Danian" should
+		be included here.
+	Rationale:
+		To provide the capability to completely and accurately describe
+		the geologic dates relevant to a data set.
+	Source: National Biological Information Infrastructure, USGS Biological Resources Division, FGDC Biological Data Working Group
+
+Extension_Information:
+	Name: Geologic_Age_Uncertainty
+	Short_Name:geolun
+	Type: text
+	Domain: free text
+	Parent: Geologic_Age
+	Optionality: mandatory if applicable
+	Definition:
+		The error estimate for the geologic time.  This should include
+		the units of measure, a description of what the error estimate
+		represents and how it was calculated.
+	Rationale:
+		To provide the capability to completely and accurately describe
+		the geologic dates relevant to a data set.
+	Source: National Biological Information Infrastructure, USGS Biological Resources Division, FGDC Biological Data Working Group
+
+Extension_Information:
+	Name: Geologic_Age_Explanation
+	Short_Name:geolexpl
+	Type: text
+	Domain: free text
+	Parent: Geologic_Age
+	Optionality: mandatory if applicable
+	Definition:
+		The name and/or description of the method used to calculate the
+		Geologic_Age_Estimate.  Detailed information about the method
+		may be provided through references contained in the
+		Geologic_Citation.
+	Rationale:
+		To provide the capability to completely and accurately describe
+		the geologic dates relevant to a data set.
+	Source: National Biological Information Infrastructure, USGS Biological Resources Division, FGDC Biological Data Working Group
+
+Extension_Information:
+	Name: Geologic_Citation
+	Short_Name: geolcit
+	Type: compound
+	Rule: Geologic_Citation = Citation_Information
+	Parent: Geologic_Age
+	Child: Citation_Information
+	Optionality: optional
+	Definition:
+		Citation for works providing detailed information about any
+		element of the Geologic_Age.  For example, a publication
+		describing the methodology used for carbon dating or describing
+		the basic geologic time scale in more detail could be cited
+		here.
+	Rationale:
+		To provide the capability to completely and accurately describe
+		the geologic dates relevant to a data set.
+	Source: National Biological Information Infrastructure, USGS Biological Resources Division, FGDC Biological Data Working Group

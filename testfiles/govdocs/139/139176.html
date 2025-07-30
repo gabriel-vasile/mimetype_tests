@@ -1,0 +1,255 @@
+pro plot_dem_map, win,minLat, maxLat, minLon, maxLon 
+print,'win=',win
+wset,win
+demDir = '/var/www/html/IONJava/html_src/dem'
+recDem=lonarr(360L,180L)
+openr,lun,/get_lun, demDir+'/global01min.rec' , /swap_if_little_endian
+readu,lun,recDem
+free_lun,lun
+recDem01 = recDem
+recDem=lonarr(360L,180L)
+openr,lun,/get_lun, demDir+'/global02min.rec',/swap_if_little_endian
+readu,lun,recDem
+free_lun,lun
+recDem02 = recDem
+
+; Max lon should be 180
+rot = 0
+if (minLat gt maxLat) then begin
+	tmp = maxLat 
+	maxLat = minLat
+	minLat = tmp 
+endif
+latCenter = 0.5*(minLat+maxLat)
+lonCenter = 0.5*(minLon+maxLon)
+discont = 0
+if (minLon gt 0 and maxLon lt 0) then begin
+        discont = 1
+        lonCenter  = minLon+0.5*((180-minLon)+(180+maxLon))
+        if (lonCenter gt 180) then lonCenter = maxLon+(lonCenter -180)
+endif
+if (minLon gt 0 and maxLon gt 0 and maxLon lt minLon) then begin
+        lonCenter = 0.5*(minLon+maxLon)-180.0
+endif
+
+if (minLon gt maxLon) then begin
+	discont = 1
+        lonCenter  = minLon+0.5*((180-minLon)+(180+maxLon))
+        if (lonCenter gt 180) then lonCenter = maxLon+(lonCenter -180)
+endif
+if minLon eq -180 and maxLon eq 180 and minLat eq -90 and maxLat eq -55 then begin
+        latCenter = -90.0
+        lonCenter = 0.0
+endif
+
+difLat=abs(minLat-maxLat)
+if (abs(minLat) gt 50 and abs(maxLat) gt 50 and difLat le 40) then projection='lambert' else projection='cylindrical'
+
+dLat = abs(LONG(ceil(maxLat) - floor(minLat)))
+if (discont eq 0) then dLon = abs(LONG(ceil(maxLon) - floor(minLon)))
+if (discont eq 1) then dLon = 180-floor(minLon)+180+ceil(maxLon) 
+
+minLatInd=floor(90.0+minLat)
+maxLatInd=ceil(90.0+maxLat)
+minLonInd=floor(180.0+minLon)
+maxLonInd=ceil(180.0+maxLon)
+;if maxLatInd eq 180 then maxLatInd=180-1
+;if maxLonInd eq 360 then maxLonInd=360-1
+String = 'minLat, maxLat, minLon, maxLon, lonCenter, projection= '+string(minLat)+' '+string(maxLat)+' '+string(minLon)+' '$
+	+string(maxLon)+' '+string(lonCenter)+' '+string(projection)
+	   
+String = 'minLatInd, maxLatInd, minLonInd, maxLonInd= '$
+		+string(minLatInd)+' '+string(maxLatInd)+' '+string(minLonInd)+' '+string(maxLonInd)  
+dd = max([dLat, dLon])
+map_file =strarr(7)
+block_size=intarr(7)
+dataFile =  demDir+'/global00min.dem'
+index = strpos(dataFile, '00min')
+if (demDir EQ '') then demDir = './DEM'
+map_file(0) = demDir+'/global.5min_min90_min60.dem' 
+name = dataFile
+strput, name, '01', index
+map_file(1) = name
+name = dataFile
+strput, name, '02', index
+map_file(2) = name
+name = dataFile
+strput, name, '05', index
+map_file(3) = name
+name = dataFile
+strput, name, '10', index
+map_file(4) = name
+name = dataFile
+strput, name, '20', index
+map_file(5) = name
+name = dataFile
+strput, name, '30', index
+map_file(6) = name
+
+block_size=[120, 60, 30, 12, 6, 3, 2]
+if (dd le 6) then i=0 
+if (dd gt 6 AND dd le 12) then i=1 
+if (dd gt 12 AND dd le 24) then i=2
+if (dd gt 24 AND dd le 60) then i=3
+if (dd gt 60 AND dd le 120) then i=4 
+if (dd gt 120 AND dd le 240) then i=5
+if (dd gt 240) then i=6
+
+
+openr,lun,/get_lun, map_file(i), ERROR=err, /swap_if_little_endian 
+if (err lt 0) then begin
+	i = i+1			
+	openr,lun,/get_lun, map_file(i), ERROR=err, /swap_if_little_endian
+	if (err lt 0) then begin
+		i = i+1
+		openr,lun,/get_lun, map_file(i), ERROR=err, /swap_if_little_endian
+		if (err lt 0) then begin
+        		return
+		endif
+	endif
+endif 
+if (i eq 0) then begin
+        free_lun, lun
+        highRes_to_plot, discont, minLon, maxLon, minLat, maxLat, minLonInd, maxLonInd, datasmall, err
+        if (err lt 0) then begin
+           return
+        endif
+        goto, JUMP
+endif
+Rec = assoc(lun, intarr(block_size(i), block_size(i)))
+ocean = -9999+intarr(block_size(i), block_size(i))
+n_lat = abs(LONG(maxLatInd) - LONG(minLatInd))  
+if (discont eq 0) then n_lon = abs(LONG(maxLonInd) - LONG(minLonInd)) 
+if (discont eq 1) then n_lon = maxLonInd + 360-minLonInd 
+if (n_lon lt 1) then n_lon = 1
+if(n_lat lt 1) then n_lat = 1
+i1 = block_size(i)*n_lon
+i2 = block_size(i)*n_lat
+datasmall = intarr(i1, i2)
+case block_size(i) of
+	60:  Dem = recDem01
+	30:  Dem = recDem02
+	else:
+endcase
+ii = 0
+for i_loop= minLatInd, maxLatInd - 1 do begin
+		ii = ii + 1
+		jj = 0
+		if (minLonInd gt maxLonInd) then begin
+			for j = minLonInd, 359 do begin
+				jj = jj + 1
+	 			n_rec = LONG(360L*LONG(i_loop) + LONG(j))
+                                if (block_size(i) eq 120 or block_size(i) eq 60 or block_size(i) eq 30) $
+                                                                                                then begin
+                                        if (Dem(j, i_loop) eq -1) then begin
+                                                tmp = ocean
+                                        endif else begin
+                                                tmp = Rec(Dem(j, i_loop))
+                                        endelse
+                                endif else begin
+                                        tmp = Rec(n_rec)
+                                endelse
+                                i1 = LONG(block_size(i))*LONG(ii-1)
+                                i2 = LONG(block_size(i))*LONG(ii)-1
+                                j1 = LONG(block_size(i))*LONG(jj-1)
+                                j2 = LONG(block_size(i))*LONG(jj) - 1
+                                datasmall(j1:j2, i1:i2) = tmp
+			endfor
+			for j = 0, maxLonInd-1 do begin
+				jj = jj + 1
+	 			n_rec = LONG(360L*LONG(i_loop) + LONG(j))
+                                if (block_size(i) eq 120 or block_size(i) eq 60 or block_size(i) eq 30) $
+                                                                                                then begin
+                                        if (Dem(j, i_loop) eq -1) then begin
+                                                tmp = ocean
+                                        endif else begin
+                                                tmp = Rec(Dem(j, i_loop))
+                                        endelse
+                                endif else begin
+                                        tmp = Rec(n_rec)
+                                endelse
+                                i1 = LONG(block_size(i))*LONG(ii-1)
+                                i2 = LONG(block_size(i))*LONG(ii)-1
+                                j1 = LONG(block_size(i))*LONG(jj-1)
+                                j2 = LONG(block_size(i))*LONG(jj) - 1
+                                datasmall(j1:j2, i1:i2) = tmp
+			endfor
+		endif else begin
+			for j = minLonInd, maxLonInd-1 do begin
+				jj = jj + 1
+				n_rec = LONG(360L*LONG(i_loop) + LONG(j))
+				if (block_size(i) eq 120 or block_size(i) eq 60 or block_size(i) eq 30) $
+												then begin
+					if (Dem(j, i_loop) eq -1) then begin
+						tmp = ocean
+					endif else begin
+						tmp = Rec(Dem(j, i_loop))
+					endelse
+				endif else begin
+					tmp = Rec(n_rec)
+				endelse
+				i1 = LONG(block_size(i))*LONG(ii-1)
+				i2 = LONG(block_size(i))*LONG(ii)-1
+				j1 = LONG(block_size(i))*LONG(jj-1)
+				j2 = LONG(block_size(i))*LONG(jj) - 1
+				datasmall(j1:j2, i1:i2) = tmp
+			endfor	
+		endelse
+endfor
+String='min(data), max(data)='+string(min(datasmall))+' '+string(max(datasmall))
+;if (maxLat-minLat lt 1.0) then begin
+        tmp = size(datasmall)
+        length = tmp(2)
+	n = fix(0.001+length/block_size(i)) 
+        d = minLat-floor(minLat)
+        index = fix(block_size(i)*d)
+	dd = ceil(maxLat-0.0001) - maxLat
+	index1 = fix(block_size(i)*dd)
+        datasmall = datasmall(*, index:(block_size(i)*n-index1-1))
+
+        tmp = size(datasmall)
+        length = tmp(1)
+	n = fix(0.001+length/block_size(i)) 
+        d = minLon-floor(minLon)
+        index = fix(block_size(i)*d)
+	dd = ceil(maxLon-0.0001) - maxLon
+	index1 = fix(block_size(i)*dd)
+        datasmall = datasmall(index:(block_size(i)*n-index1-1),*)
+JUMP:
+
+loadct,0,bottom= 6               ; bw color map, saving the explict colors
+tvlct,0,0,155                   ; dark blue in 0
+!p.background = 0               ; use it for background
+
+set_shading, light=[0,1,1]
+shade_surf,datasmall, image=image_shade, ax=90,az=0,zrange=[-500, max(datasmall)],min_value=-500
+case projection of
+        'lambert': begin
+	    map_set, $
+                /continent, /lambert, /isotropic, $
+                latCenter, lonCenter, rot,$
+		limit=[minLat,minLon,maxLat,maxLon] , $
+                        e_continents={fill:1}
+	end  
+        'cylindrical': begin
+              map_set, $
+		/continent,  /isotropic, /cylindrical, $
+                latCenter, lonCenter, rot,$
+		limit=[minLat,minLon,maxLat,maxLon] , $
+                        e_continents={fill:1}
+	end  		
+        else:
+endcase
+if (discont eq 1) then  maxLon = minLon + dLon
+imagedem=map_image(image_shade,startx,starty,latmin=minLat,latmax=maxLat, $
+		   lonmin=minLon,lonmax=maxLon, compress=2, /bilin)
+
+tv,imagedem,startx,starty
+;lats= [-90.,-80.,-70.,-60.,-50.]  
+;lons= [-180.,-160.,-140.,-120.,-100.,-80.,-60.,-40.,-20.,0.,20.,40.,60.,80.,100.,120.,140.,160.,180.]
+;map_grid,LABEL=2,LATS=lats,LONS=lons 
+map_grid,LABEL=2 
+free_lun, lun
+return
+end
+

@@ -1,0 +1,1292 @@
+The assurance in a CKRS compliant product can be achieved using the Common 
+Criteria Evaluation Assurance Level (EAL).  The Common Criteria defines seven 
+hierarchical assurance levels EAL1 through EAL7.  The Common Criteria assurance 
+levels may be overkill for the CKRS compliance validation program.
+
+Thus, the following is a tailored list of assurance requirements.  These 
+requirements are derived from the Common Criteria Part 3 (Assurance 
+Requirements).  Specifying assurance requirements in the common criteria 
+language will help in converting the FIPS into a Common Criteria Protection 
+Profile and in validating CKRS compliance products under the Common Criteria 
+(CC) Evaluation Methodology.
+
+For the sake of clarity, it should be noted that the CC structure for assurance 
+requirements is hierarchical follows.  At the highest level, the requirements 
+are categorized into classes.  The classes are further decomposed into families.  
+The families are decomposed into components.  Each component has three sets of 
+elements.  The first set of elements is the list of developer (vendor) actions 
+to satisfy the component.  The second set of elements are a list of contents and 
+presentation for the assurance evidence for that element.  The third and last 
+set of elements are what an independent evaluator should do to assess the 
+contents and presentation.
+
+A later section of this report also explains why the remaining Common Criteria 
+assurance requirements are not recommended.
+
+We have defined three assurance levels.  These levels are somewhat related to 
+the Common Criteria assurance levels, but not derived from the Common Criteria 
+assurance levels.  We term these assurance levels basic, enhanced, and delux.  
+The components in the assurance levels are listed in Table 1.  A later section 
+of the report describes these components and elements.
+
+The assurance can be applied commensurate with the CKRS component sensitivity.  
+For example the KRA must have high degree of assurance, where as the client may 
+have a lower degree of assurance.  The CKRS components for assurance purposes 
+can be broken down in the following areas: KRA, clients, other trusted 
+components such as CA, and other components such as registration agents.  Table 
+2 contains a matrix of which assurance levels make sense for each environment.  
+For entities such as the CA, if there are assurance and security requirements or 
+standards, these standards may (should) be used in lieu of the recommendations 
+in Table 2.  Furthermore, it does not make sense for clients and other 
+components to have higher assurance than the KRA and other trusted components 
+(e.g., CA).  Thus, the assurance for the KRA and CA should be equal to or 
+greater than assurance for the clients and other components.  Basic assurance is 
+not recommended for the KRA and CA.
+
+
+Table 1: CKRS Assurance Levels
+
+Assurance Class
+Assurance Family
+Basic
+Enhanced
+Delux
+Configuration Management
+ACM_CAP
+CM Capabilities
+
+1
+1
+
+ACM_SCP
+CM Scope
+
+
+2
+Delivery and Operation
+ADO_DEL
+Delivery
+
+
+2
+
+ADO_IGS
+Installation, Generation and Start-up
+1
+1
+1
+
+ADV_FSP
+Functional Specification
+1
+2
+2
+
+ADV_HLD
+High-Level Design
+1
+2
+2
+Development
+ADV_IMP
+Implementation Representation
+
+
+1
+
+ADV_LLD
+Low-Level Design
+
+
+1
+
+ADV_RCR
+Representation Correspondence
+
+
+1
+Guidance Documents
+AGD_ADM
+Administrator Guidance
+1
+1
+1
+
+AGD_USR
+User Guidance
+1
+1
+1
+Life Cycle Support
+ALC_FLR
+Flaw Remediation
+2
+2
+2
+
+ATE_COV
+Coverage
+1
+1
+1
+
+ATE_DPT
+Depth
+1
+1
+1
+Tests
+ATE_FUN
+Functional Tests
+1
+1
+1
+
+ATE_IND
+Independent Testing
+2
+2
+2
+Vulnerability Assessment
+AVA_VLA
+Vulnerability Analysis
+
+1
+1
+
+
+Table 2: Assurance for CKRS Components
+
+Component
+Basic
+Enhanced
+Delux
+KRA
+
+Yes
+Yes
+Other Trusted (e.g., CA)
+
+Yes
+Yes
+Client
+Yes
+Yes
+Yes
+Other
+Yes
+Yes
+Yes
+
+
+TABLE OF CONTENTS
+
+Configuration Management ACM_CAP - CM Capabilities	5
+ACM_CAP.1 Minimal support	5
+Configuration Management ACM_SCP - CM Scope	6
+ACM_SCP.2 Problem tracking CM coverage	6
+Delivery and Operation ADO_DEL - Delivery	7
+ADO_DEL.2 Detection of modification	7
+Delivery and Operation ADO_IGS - Installation, Generation, and Start-up	8
+ADO_IGS.1 Installation, generation, and start-up procedures	8
+Development ADV_FSP - Functional Specification	8
+ADV_FSP.1 Functional specification and security policy	9
+ADV_FSP.2 Informal security policy model	10
+Development ADV_HLD - High-Level Design	11
+ADV_HLD.1 Descriptive high-level design	12
+ADV_HLD.2 Security enforcing high-level design	13
+Development ADV_IMP - Implementation Representation	13
+ADV_IMP.1 Subset of the implementation	14
+Development ADV_LLD - Low-Level Design	15
+ADV_LLD.1 Descriptive low-level design	16
+Development ADV_RCR - Representation Correspondence	16
+ADV_RCR.1 Informal correspondence demonstration	17
+Guidance Documents AGD_ADM Administrator Guidance	17
+AGD_ADM.1 Administrator guidance	18
+Guidance Documents AGD_USR - User Guidance	19
+AGD_USR.1 User guidance	20
+Life Cycle Support ALC_FLR - Flaw Remediation	20
+ALC_FLR.2 Flaw reporting procedures	20
+Tests ATE_COV - Coverage	21
+ATE_COV.1 Complete coverage - informal	21
+Tests ATE_DPT - Depth	22
+ATE_DPT.1 Testing - functional specification	22
+Tests ATE_FUN - Functional Tests	23
+ATE_FUN.1 Functional testing	23
+Tests ATE_IND - Independent Testing	24
+ATE_IND.2 Independent testing - sample	24
+Vulnerability Assessment AVA_VLA - Vulnerability Analysis	25
+AVA_VLA.1 Developer vulnerability analysis	26
+
+
+Configuration Management ACM_CAP - CM Capabilities
+
+Objectives
+Configuration management (CM) is an aspect of establishing that the functional 
+requirements and specifications are realized in the implementation. CM meets 
+these objectives by requiring discipline and control in the processes of 
+refinement and modification of the product/system. CM systems are put in place 
+to ensure the integrity of the configuration items that they control, by 
+providing a method of tracking these configuration items, and by ensuring that 
+only authorized users are capable of changing them.
+
+The capabilities of the CM system address the likelihood that accidental or 
+unauthorized modifications of the configuration items will occur. The CM system 
+should ensure the integrity of the product/system from the early design stages 
+through all subsequent maintenance efforts.  The objectives of this assurance 
+requirement include the following: 
+
+1. ensuring that the product/system is correct and complete before it is sent to 
+the consumer; and
+2. ensuring that no configuration items are missed during evaluation.
+
+Clear identification of the product/system is required to determine those items 
+under 
+evaluation that are subject to the criteria requirements. 
+
+Application notes
+There is a requirement that a configuration list be provided. The configuration 
+list contains all configuration items which are maintained by the CM system. 
+ACM_CAP.1 Minimal support 
+
+Developer action elements:
+ACM_CAP.1.1D: The developer shall use a CM system.
+
+ACM_CAP.1.2D: The developer shall provide CM documentation.
+
+Content and presentation of evidence elements:
+ACM_CAP.1.1C: The CM documentation shall include a configuration list.
+
+ACM_CAP.1.2C: The configuration list shall describe the configuration items that 
+comprise the product.
+
+ACM_CAP.1.3C: The CM documentation shall describe the method used to uniquely 
+identify the product configuration items.
+
+Evaluator action elements:
+ACM_CAP.1.1E: The evaluator shall confirm that the information provided meets 
+all 
+requirements for content and presentation of evidence.
+Configuration Management ACM_SCP - CM Scope 
+
+Objectives
+Configuration management (CM) is an aspect of establishing that the functional 
+requirements and specifications are realized in the implementation. CM meets 
+these objectives by requiring discipline and control in the processes of 
+refinement and modification of the product/system. CM systems are put in place 
+to ensure the integrity of the configuration items that they control, by 
+providing a method of tracking these configuration items, and by ensuring that 
+only authorized users are capable of changing them.
+
+The objective is to ensure that all necessary configuration items are tracked by 
+the CM system. This helps to ensure that the integrity of these configuration 
+items is protected through the capabilities of the CM system.  The objectives of 
+this assurance requirement include the following:
+
+1. ensuring that the implementation representation (i.e., code) is tracked; and
+2. ensuring that all necessary documentation, including problem reports, are 
+tracked during development and operation.
+
+A CM system can control changes only to those items that have been placed under 
+CM.  The implementation representation, design, tests, user and administrator 
+documentation, security flaws, and CM documentation should be placed under CM.  
+The ability to track security flaws under CM ensures that security flaw reports 
+are not lost or forgotten, and allows a developer to track security flaws to 
+their resolution. 
+
+Application notes
+There is a requirement that the implementation representation be tracked by the 
+CM system.  The implementation representation refers to all hardware, software, 
+and firmware that comprise the physical product/system.  In the case of a 
+software-only product, the implementation representation may consist solely of 
+source and object code, but in other cases, the implementation representation 
+may refer to a combination of software, hardware, and firmware.  There is a 
+requirement that security flaws be tracked by the CM system. This requires that 
+information regarding previous security flaws and their resolution be 
+maintained, as well as details regarding current security flaws.
+ACM_SCP.2 Problem tracking CM coverage
+
+Developer action elements:
+ACM_SCP.2.1D: The developer shall provide CM documentation.
+
+Content and presentation of evidence elements:
+ACM_SCP.2.1C: As a minimum, the following shall be tracked by the CM system: the 
+implementation representation, design documentation, test documentation, user 
+documentation, administrator documentation, CM documentation, and security 
+flaws.
+
+ACM_SCP.2.2C: The CM documentation shall describe how configuration items are 
+tracked by the CM system.
+
+Evaluator action elements:
+ACM_SCP.2.1E: The evaluator shall confirm that the information provided meets 
+all requirements for content and presentation of evidence.
+
+Delivery and Operation ADO_DEL - Delivery
+
+Objectives
+The requirements for delivery call for system control and distribution 
+facilities and procedures that provide assurance that the recipient receives the 
+product that the sender intended to send, without any modifications.  For a 
+valid delivery, what is received must correspond precisely to the master copy, 
+thus avoiding any tampering with the actual version, or substitution of a false 
+version.
+
+Application notes
+This assurance requirement should be applied to sensitive components whose 
+modification can compromise security.
+ADO_DEL.2 Detection of modification
+
+Developer action elements:
+ADO_DEL.2.1D: The developer shall provide documentation about the procedures for 
+delivery of the product/system or parts of it to the user.
+
+ADO_DEL.2.2D: The developer shall use the delivery procedures.
+
+Content and presentation of evidence elements:
+ADO_DEL.2.1C: The delivery documentation shall describe the procedures to be 
+employed when distributing versions of the product/system to a user's site.
+
+ADO_DEL.2.2C: The delivery documentation shall state how the procedures are to 
+be employed to detect modifications.
+
+ADO_DEL.2.3C: The delivery documentation shall describe how the various 
+procedures and technical measures provide for the detection of modifications, or 
+any discrepancy between the developer's master copy and the version received at 
+the user site.
+
+ADO_DEL.2.4C: The delivery documentation shall describe how the various 
+procedures allow detection of attempted masquerading even in cases in which the 
+developer has sent nothing to the user's site.
+
+Evaluator action elements:
+ADO_DEL.2.1E: The evaluator shall confirm that the information provided meets 
+all requirements for content and presentation of evidence.
+
+Delivery and Operation ADO_IGS - Installation, Generation, and Start-up
+
+Objectives 
+Installation, generation, and start-up procedures are useful for ensuring that 
+the 
+product has been installed, generated, and started in a secure manner as 
+intended by 
+the developer. 
+
+Application notes 
+The generation requirements are applicable only to the products that provide the 
+ability to 
+generate an operational product from source or object code. 
+
+The installation, generation, and start-up procedures may exist as a separate 
+document, but would typically be grouped with other administrative guidance. 
+ADO_IGS.1 Installation, generation, and start-up procedures 
+
+Developer action elements:
+ADO_IGS.1.1D: The developer shall document procedures to be used for the secure 
+installation, generation, and start-up of the product/system.
+ 
+Content and presentation of evidence elements:
+ADO_IGS.1.1C: The documentation shall describe the steps necessary for secure 
+installation, generation, and start-up of the product/system.
+
+Evaluator action elements: 
+ADO_IGS.1.1E: The evaluator shall confirm that the information provided meets 
+all 
+requirements for content and presentation of evidence.
+Development ADV_FSP - Functional Specification
+
+Objectives 
+The functional specification is a high-level description of the user-visible 
+interface 
+and behavior of the product/system.  It is a refinement of the statement of 
+functional requirements for the product/system.  The functional specification 
+must show that all 
+defined functional requirements are addressed, and that the product/system 
+security policy is enforced by the system. 
+
+Application notes 
+In addition to the content indicated in the following requirements, the 
+functional 
+specification shall also include any additional specific detail specified by the 
+documentation notes in the related functional components.   For example, it 
+shall contain the specification of the interaction (protocol) among various 
+product/system components.
+
+The developer must provide evidence that the product/system is completely 
+represented by the functional specification. While a functional specification 
+for the entire product/system would allow an evaluator to determine the 
+product/system boundary, it is not necessary to require that specification when 
+other evidence could be provided to demonstrate the product/system boundary. 
+
+The evaluator of the product/system is expected to make determinations regarding 
+the relevance of the functional specification to the functional requirements. In 
+the course of the functional specification evaluation, there are essentially 
+three types of evaluator determination: specific functional requirements are met 
+and no further work (e.g., with a less abstract representation of the 
+product/system) is necessary; specific functional requirements are violated and 
+the product/system fails to meet its requirements; and 
+specific functional requirements have not been addressed and further analysis 
+(of 
+another product/system representation) is necessary.  Whenever additional 
+analysis is necessary, the evaluator is expected to carry that information 
+forward to the analysis of other product/system representations.  If 
+requirements are not addressed after the analysis of the last provided 
+product/system representation, this also represents a failure of the 
+product/system evaluation. 
+
+In all cases, it is important that the evaluator evaluate the product/system as 
+a unit since in many cases the security functions must cooperate to meet 
+specific functional requirements and also each security function must not 
+interfere with the operation 
+of any other security function.
+
+An informal security policy model can be representation of the security policy 
+in any notation, including a series of statements in the English Language.
+ADV_FSP.1 Functional specification and security policy
+
+Developer action elements: 
+ADV_FSP.1.1D: The developer shall provide a functional specification. 
+
+ADV_FSP.1.2D: The developer shall provide a product/system security policy. 
+
+Content and presentation of evidence elements:
+ADV_FSP.1.1C: The functional specification shall describe the product/system 
+using an informal style. 
+
+ADV_FSP.1.2C: The functional specification shall include an informal 
+presentation of syntax and semantics of all external product/system interfaces. 
+
+ADV_FSP.1.3C: The functional specification shall include evidence that 
+demonstrates that the product/system is completely represented. 
+
+Evaluator action elements:
+ADV_FSP.1.1E: The evaluator shall confirm that the information provided meets 
+all requirements for content and presentation of evidence.
+
+ADV_FSP.1.2E: The evaluator shall determine that the functional specification is 
+consistent with the product/system security policy.
+
+ADV_FSP.1.3E: The evaluator shall determine if the functional requirements are 
+addressed by the representation of the product/system, i.e., the functional 
+specification. 
+ADV_FSP.2 Informal security policy model 
+
+Developer action elements: 
+ADV_FSP.2.1D: The developer shall provide a functional specification. 
+
+ADV_FSP.2.2D: The developer shall provide a product/system security policy. 
+
+ADV_FSP.2.3D: The developer shall provide an informal security policy model. 
+
+ADV_FSP.2.4D: The developer shall provide a demonstration of correspondence 
+between the informal security policy model and the functional specification.
+
+Content and presentation of evidence elements:
+ADV_FSP.2.1C: The functional specification shall describe the product/system 
+using an informal style. 
+
+ADV_FSP.2.2C: The functional specification shall include an informal 
+presentation of syntax and semantics of all external product/system interfaces. 
+
+ADV_FSP.2.3C: The functional specification shall include evidence that 
+demonstrates that the product/system is completely represented. 
+
+ADV_FSP.2.4C: The demonstration of correspondence between the informal security 
+policy model and the functional specification shall describe how the functional 
+specification satisfies the informal security policy model. 
+
+ADV_FSP.2.5C: The demonstration of correspondence between the informal security 
+policy model and the functional specification shall show that there are no 
+security functions in the functional specification that conflict with the 
+informal security policy model.
+
+ADV_FSP.2.6C: The informal security policy model shall describe the rules and 
+characteristics of all policies of the product/system that can be modeled.
+
+ADV_FSP.2.7C: The informal security policy model shall include a rationale that 
+demonstrates that policies that are modeled are satisfied by the informal 
+security policy model.
+
+ADV_FSP.2.8C: The informal security policy model shall justify that all policies 
+that can be modeled are represented in the informal security policy model.
+
+Evaluator action elements:
+ADV_FSP.2.1E: The evaluator shall confirm that the information provided meets 
+all requirements for content and presentation of evidence.
+
+ADV_FSP.2.2E: The evaluator shall determine that the functional specification is 
+consistent with the product/system security policy.
+
+ADV_FSP.2.3E: The evaluator shall determine if the functional requirements are 
+addressed by the representation of the product/system, i.e., the functional 
+specification. 
+Development ADV_HLD - High-Level Design
+
+Objectives 
+The high-level design of a product/system provides a description of the 
+product/system in terms of major structural units (i.e., subsystems) and relates 
+these units to the functions that they contain. The high-level design provides 
+assurance that the product/system provides an architecture appropriate to 
+implement the claimed functional requirements.
+
+The high-level design refines the functional specification into subsystems. For 
+each 
+subsystem of the product/system, the high-level design describes its purpose and 
+function and identifies the security functions enforced by the subsystem. The 
+interrelationships 
+of all subsystems are also defined in the high-level design. These 
+interrelationships will be represented as external interfaces for data flow, 
+control flow, etc., as appropriate. 
+
+Application notes
+In addition to the content indicated in the following requirements, the high-
+level design shall also include any additional specific detail specified by the 
+documentation notes in the related functional components.
+
+The developer is expected to describe the design of the product/system in terms 
+of subsystems.  The term ``subsystem'' is used here to express the idea of 
+decomposing the product/system into a relatively small number of parts.  While 
+the developer is not required to actually have ``subsystems'', the developer is 
+expected to represent a similar level of decomposition.  For example, a design 
+may be similarly decomposed using ``layers'', ``domains'', or ``servers''.
+
+The evaluator of the product/system is expected to make determinations regarding 
+the functional requirements in the product relevant to the high-level design. In 
+the course of the high-level design evaluation, there are essentially three 
+types of evaluator determination: specific functional requirements are met and 
+no further work (e.g., with a less abstract representation of the 
+product/system) is necessary; specific functional requirements are violated and 
+the product/system fails to meet its requirements; and specific functional 
+requirements have not been addressed and further analysis (of another 
+product/system representation) is necessary. Whenever more analysis is 
+necessary, the evaluator is expected to carry that information forward to the 
+analysis of other product/system representations. If requirements are not 
+addressed after the analysis of the last provided product/system representation, 
+this also represents a failure of the product/system evaluation.
+
+In all cases, it is important that the evaluator evaluate the product/system as 
+a unit since in many cases the security functions must cooperate to meet 
+specific functional requirements and also each security function must not 
+interfere with the operation of any other security function.
+
+The term ``security functionality'' is used to represent operations that a 
+subsystem 
+performs that have some effect on the security functions implemented by the 
+product. 
+This distinction is made because design constructs, such as subsystems and 
+modules, do not necessarily relate to specific security functions. While a given 
+subsystem may correspond directly to a security function, or even multiple 
+security 
+functions, it is also possible that many subsystems must be combined to 
+implement 
+a single security function.
+
+The term ``security policy enforcing subsystems'' refers to a subsystem that 
+contributes to the enforcement of the security policy.
+ADV_HLD.1 Descriptive high-level design 
+
+Developer action elements :
+ADV_HLD.1.1D: The developer shall provide the high-level design of the 
+product/system. 
+
+Content and presentation of evidence elements:
+ADV_HLD.1.1C: The presentation of the high-level design shall be informal. 
+
+ADV_HLD.1.2C: The high-level design shall describe the structure of the 
+product/system in terms of subsystems.
+
+ADV_HLD.1.3C: The high-level design shall describe the security functionality 
+provided by each subsystem of the product/system.
+
+ADV_HLD.1.4C: The high-level design shall identify the interfaces of the 
+subsystems of the product/system.
+
+ADV_HLD.1.5C: The high-level design shall identify any underlying hardware, 
+firmware, and/or software required by the product/system with a presentation of 
+the functions provided by the supporting protection mechanisms implemented in 
+that hardware, firmware, or software.
+
+Evaluator action elements:
+ADV_HLD.1.1E: The evaluator shall confirm that the information provided meets 
+all requirements for content and presentation of evidence.
+
+ADV_HLD.1.2E: The evaluator shall determine if the functional requirements in 
+the product/system are addressed by the design. 
+ADV_HLD.2 Security enforcing high-level design 
+
+Developer action elements :
+ADV_HLD.2.1D: The developer shall provide the high-level design of the 
+product/system. 
+
+Content and presentation of evidence elements:
+ADV_HLD.2.1C: The presentation of the high-level design shall be informal. 
+
+ADV_HLD.2.2C: The high-level design shall describe the structure of the 
+product/system in terms of subsystems.
+
+ADV_HLD.2.3C: The high-level design shall describe the security functionality 
+provided by each subsystem of the product/system.
+
+ADV_HLD.2.4C: The high-level design shall identify the interfaces of the 
+subsystems of the product/system.
+
+ADV_HLD.2.5C: The high-level design shall identify any underlying hardware, 
+firmware, and/or software required by the product/system with a presentation of 
+the functions provided by the supporting protection mechanisms implemented in 
+that hardware, firmware, or software.
+
+ADV_HLD.2.6C: The high-level design shall describe the separation of the 
+product/system into security policy enforcing and other subsystems.
+
+Evaluator action elements:
+ADV_HLD.2.1E: The evaluator shall confirm that the information provided meets 
+all requirements for content and presentation of evidence.
+
+ADV_HLD.2.2E: The evaluator shall determine if the functional requirements in 
+the product/system are addressed by the design.
+Development ADV_IMP - Implementation Representation 
+
+Objectives 
+The description of the implementation in the form of source code, firmware, 
+hardware drawings, etc. captures the detailed internal workings of the product 
+in support of analysis. 
+
+Application notes
+The implementation representation is used to express the notion of the least 
+abstract representation of the product/system, specifically the one that is used 
+to create the product/system itself without further design refinement.  Source 
+code which is then compiled or a hardware drawing which is used to build the 
+actual hardware are examples of parts of an implementation representation. 
+
+The evaluator of the product/system is expected to make determinations regarding 
+the functional requirements in the ST relevant to the implementation.  In the 
+course of the implementation evaluation, there are essentially three types of 
+evaluator determination: specific functional requirements are met and no further 
+work (e.g., with a more abstract representation of the product/system) is 
+necessary; specific functional requirements are violated and the product/system 
+fails to meet its requirements; and specific functional requirements have not 
+been addressed and further analysis is necessary.
+
+However, since the implementation is the least abstract representation it is 
+likely that further analysis cannot be performed unless the product/system 
+representations have not been evaluated in the usual order (i.e., most abstract 
+to least abstract).  If requirements are not addressed after the analysis of all 
+product/system representations, this represents a failure of the product/system 
+evaluation.  Note that this more comprehensive failure determination requirement 
+is realized in the Representation correspondence (ADV_RCR) family.
+
+In all cases, it is important that the evaluator evaluates the product/system as 
+a unit since, in many cases, the security functions must cooperate to meet 
+specific functional requirements and each security function must not interfere 
+with the operation of any other security function.
+
+It is expected that evaluators will use the implementation to directly support 
+other evaluation activities (e.g., vulnerability analysis, test coverage 
+analysis).
+ADV_IMP.1 Subset of the implementation
+
+Application notes 
+The implementation representation needs to be provided for the security relevant 
+functions of the product/system.  Any hardware, software, and/or firmware that 
+does not contribute to the security need not be provided, analyzed, or tested.  
+However, an explanation must be provided, and the evaluator must agree that the 
+excluded items are not security relevant.
+
+Developer action elements: 
+ADV_IMP.1.1D: The developer shall provide the implementation representations for 
+a selected subset of the product/system.
+ 
+Content and presentation of evidence elements:
+ADV_IMP.1.1C: The implementation representations shall unambiguously define the 
+product/system to a level of detail such that it can be generated without 
+further design 
+decisions.
+
+Evaluator action elements:
+ADV_IMP.1.1E: The evaluator shall confirm that the information provided meets 
+all 
+requirements for content and presentation of evidence.
+
+ADV_IMP.1.2E: The evaluator shall determine if the CKRS functional requirements 
+are addressed by the representation of the product/system.
+Development ADV_LLD - Low-Level Design 
+
+Objectives
+The low-level design of a product/system provides a description of the internal 
+workings of the product/system in terms of modules and their interrelationships 
+and dependencies. The low-level design provides assurance that the subsystems 
+have been correctly and effectively refined.
+
+For each module of the product/system, the low-level design describes its 
+purpose, function, interfaces, dependencies, and the implementation of any 
+security policy enforcing functions.
+
+Application notes
+In addition to the content indicated in the following requirements, the low-
+level design shall also include any additional specific detail specified by the 
+documentation notes in the related functional components.
+
+The evaluator of the product/system is expected to make determinations regarding 
+the 
+functional requirements relevant to the low-level design.  In the course of the 
+low-level design evaluation, there are essentially three types of evaluator 
+determination: specific functional requirements are met and no further work 
+(e.g., with a less abstract representation of the product/system) is necessary; 
+specific functional requirements are violated and the product/system fails to 
+meet its requirements; and specific functional requirements have not been 
+addressed and further analysis (of another product/system representation) is 
+necessary.  Whenever more analysis is necessary, the evaluator is expected to 
+carry that information forward to the analysis of other product/system 
+representations.  If requirements are not addressed after the analysis of the 
+last provided product/system representation, this also represents a failure of 
+the product/system evaluation.  Note that this more comprehensive failure 
+determination requirement is realised in the Representation correspo!
+ ndence (ADV_RCR) family.
+
+In all cases, it is important that the evaluator evaluates the product/system as 
+a unit since, in many cases, the security functions must cooperate to meet 
+specific functional requirements and also each security function must not 
+interfere with the operation 
+of any other security function.
+ADV_LLD.1 Descriptive low-level design 
+
+Application notes
+Only representations for modules in the product/system need to be provided.
+
+Developer action elements:
+ADV_LLD.1.1D: The developer shall provide the low-level design of the 
+product/system.
+ 
+Content and presentation of evidence elements:
+ADV_LLD.1.1C: The presentation of the low-level design shall be informal.
+
+ADV_LLD.1.2C: The low-level design shall describe the product/system in terms of 
+modules.
+
+ADV_LLD.1.3C: The low-level design shall describe the purpose of each module.
+
+ADV_LLD.1.4C: The low-level design shall define the interrelationships between 
+the modules in terms of provided functionality and dependencies on other 
+modules.
+
+ADV_LLD.1.5C: The low-level design shall describe the implementation of all 
+security policy enforcing functions.
+
+ADV_LLD.1.6C: The low-level design shall describe the interfaces of each module 
+in terms of their syntax and semantics.
+
+ADV_LLD.1.7C: The low-level design shall provide a demonstration that the 
+product/system is completely represented.
+
+ADV_LLD.1.8C: The low-level design shall identify the interfaces of the modules 
+of the product/system visible at the external interface of the product/system.
+
+Evaluator action elements:
+ADV_LLD.1.1E: The evaluator shall confirm that the information provided meets 
+all requirements for content and presentation of evidence.
+
+ADV_LLD.1.2E: The evaluator shall determine if the functional requirements in 
+the CKRS are addressed by the representation of the product/system.
+Development ADV_RCR - Representation Correspondence 
+
+Objectives
+The correspondence between the various representations (i.e. functional 
+requirements expressed in the CKRS, functional specification, high-level design, 
+low-level design, implementation) addresses the correct and complete 
+instantiation of the requirements to the least abstract representation provided.  
+This conclusion is achieved by step-wise refinement and the cumulative results 
+of correspondence determinations between all adjacent abstractions of 
+representation.
+
+Application notes
+The developer must demonstrate to the evaluator that the most detailed, or least 
+abstract, representation of the product/system is an accurate, consistent, and 
+complete instantiation of the functions expressed as functional requirements in 
+the CKRS.  This is accomplished by showing correspondence between adjacent 
+representations at a commensurate level of rigor.
+
+The evaluator must analyze each demonstration of correspondence between 
+abstractions, as well as the results of the analysis of each product/system 
+representation, and then make a determination as to whether the functional 
+requirements in the CKRS have been satisfied.
+
+This family of requirements is not intended to address correspondence relating 
+to the security policy model.  Rather, it is intended to address correspondence 
+between the requirements in the CKRS as well as the product/system, functional 
+specification, high-level design, low-level design, and implementation 
+representation.
+ADV_RCR.1 Informal correspondence demonstration 
+
+Developer action elements:
+ADV_RCR.1.1D: The developer shall provide evidence that the least abstract 
+product/system representation provided is an accurate, consistent, and complete 
+instantiation of the functional requirements expressed in the CKRS.
+
+Content and presentation of evidence elements:
+ADV_RCR.1.1C: For each adjacent pair of product/system representations, the 
+evidence shall demonstrate that all parts of the more abstract representation 
+are refined in the less abstract representation.
+
+ADV_RCR.1.2C: For each adjacent pair of product/system representations, the 
+demonstration of correspondence between the representations may be informal.
+
+Evaluator action elements:
+ADV_RCR.1.1E: The evaluator shall confirm that the information provided meets 
+all requirements for content and presentation of evidence.
+
+ADV_RCR.1.2E: The evaluator shall analyze the correspondence between the 
+functional requirements expressed in the CKRS and the least abstract 
+representation provided to ensure accuracy, consistency, and completeness.
+Guidance Documents AGD_ADM Administrator Guidance 
+
+Objectives
+Administrator guidance refers to written material that is intended to be used by 
+those persons responsible for configuring, maintaining, and administering the 
+product/system in a correct manner for maximum security.  Because the secure 
+operation of the product/system is dependent upon the correct performance of the 
+product/system, persons responsible for performing these functions are trusted 
+by the product/system.  Administrator guidance is intended to help 
+administrators understand the security functions provided by the product/system, 
+including both those functions that require the administrator to perform 
+security-critical actions and those functions that provide security-critical 
+information.
+
+Application notes
+The requirements AGD_ADM.1.2C and AGD_ADM.1.11C encompass the aspect that any 
+warnings to the users of a product/system with regard to the product/system 
+security 
+environment and the security objectives described in the CKRS are appropriately 
+covered in the administrator guidance.
+
+Those topics that are relevant to administrator guidance for understanding and 
+proper application of the security functions should be considered for inclusion 
+in the administrator guidance requirements. An example of an administrator 
+guidance document is a reference manual.
+AGD_ADM.1 Administrator guidance 
+
+Developer action elements:
+AGD_ADM.1.1D: The developer shall provide administrator guidance addressed to 
+system administrative personnel.
+
+Content and presentation of evidence elements:
+AGD_ADM.1.1C: The administrator guidance shall describe how to administer the 
+product/system in a secure manner.
+
+AGD_ADM.1.2C: The administrator guidance shall contain warnings about functions 
+and privileges that should be controlled in a secure processing environment.
+
+AGD_ADM.1.3C: The administrator guidance shall contain guidelines on the 
+consistent and effective use of the security functions within the 
+product/system.
+
+AGD_ADM.1.4C: The administrator guidance shall describe the difference between 
+two types of functions: those which allow an administrator to control security 
+parameters, and those which allow the administrator to obtain information only.
+
+AGD_ADM.1.5C: The administrator guidance shall describe all security parameters 
+under the administrator's control.
+
+AGD_ADM.1.6C: The administrator guidance shall describe each type of security-
+relevant event relative to the administrative functions that need to be 
+performed, including changing the security characteristics of entities under the 
+control of the product/system.
+ 
+AGD_ADM.1.7C: The administrator guidance shall contain guidelines on how the 
+security functions interact.
+
+AGD_ADM.1.8C: The administrator guidance shall contain instructions regarding 
+how to configure the product/system.
+
+AGD_ADM.1.9C: The administrator guidance shall describe all configuration 
+options that may be used during the secure installation of the product/system.
+ 
+AGD_ADM.1.10C: The administrator guidance shall describe details, sufficient for 
+use, of procedures relevant to the administration of security.
+
+AGD_ADM.1.11C: The administrator guidance shall be consistent with all other 
+documents supplied for evaluation.
+
+Evaluator action elements:
+AGD_ADM.1.1E: The evaluator shall confirm that the information provided meets 
+all 
+requirements for content and presentation of evidence.
+
+AGD_ADM.1.2E: The evaluator shall confirm that the installation procedures 
+result in a secure configuration.
+Guidance Documents AGD_USR - User Guidance
+
+Objectives
+User guidance refers to written material that is intended to be used by non-
+administrative (human) users of the product/system.  User guidance describes the 
+security functions provided by the product/system and provides instructions and 
+guidelines, including warnings, for its secure use.
+
+The user guidance provides a basis for assumptions about the use of the 
+product/system and a measure of confidence that non-malicious users and 
+application providers will understand the secure operation of the product/system 
+and will use it as intended.
+
+Application notes
+The requirement AGD_USR.1.3.C and AGD_USR.1.5C encompass the aspect that any 
+warnings to the users of a product/system with regard to the product/system 
+security environment and the security objectives described in the CKRS are 
+appropriately covered in the user guidance.
+
+Those topics in CKRS that are relevant to user guidance aimed at the 
+understanding and proper use of the security functions should be considered for 
+inclusion in the user guidance requirements.  Examples of user guidance are 
+reference manuals, user guides, and on-line help.
+AGD_USR.1 User guidance 
+
+Developer action elements:
+AGD_USR.1.1D: The developer shall provide user guidance.
+
+Content and presentation of evidence elements:
+AGD_USR.1.1C: The user guidance shall describe the product/system and interfaces 
+available to the user.
+
+AGD_USR.1.2C: The user guidance shall contain guidelines on the use of security 
+functions provided by the product/system.
+
+AGD_USR.1.3C: The user guidance shall contain warnings about functions and 
+privileges that should be controlled in a secure processing environment.
+
+AGD_USR.1.4C: The user guidance shall describe the interaction between user-
+visible security functions.
+
+AGD_USR.1.5C: The user guidance shall be consistent with all other documentation 
+delivered for evaluation.
+
+Evaluator action elements:
+AGD_USR.1.1E: The evaluator shall confirm that the information provided meets 
+all 
+requirements for content and presentation of evidence.
+Life Cycle Support ALC_FLR - Flaw Remediation 
+
+Objectives
+Flaw remediation requires that discovered flaws be tracked and corrected by the 
+developer.  Although future compliance with flaw remediation procedures cannot 
+be 
+determined at the time of the product/system evaluation, it is possible to 
+evaluate the policies and procedures that a developer has in place to track and 
+correct flaws, and to 
+distribute the flaw information and corrections.
+
+Application notes
+None
+ALC_FLR.2 Flaw reporting procedures 
+
+Developer action elements:
+ALC_FLR.2.1D: The developer shall document the flaw remediation procedures.
+
+ALC_FLR.2.2D: The developer shall establish a procedure for accepting and acting 
+upon user reports of security flaws and requests for corrections to those flaws.
+
+Content and presentation of evidence elements:
+ALC_FLR.2.1C: The flaw remediation procedures documentation shall describe the 
+procedures used to track all reported security flaws in each release of the 
+product/system.
+ 
+ALC_FLR.2.2C: The flaw remediation procedures shall require that a description 
+of the nature and effect of each security flaw be provided, as well as the 
+status of finding a correction to that flaw.
+
+ALC_FLR.2.3C: The flaw remediation procedures shall require that corrective 
+actions be identified for each of the security flaws.
+
+ALC_FLR.2.4C: The flaw remediation procedures documentation shall describe the 
+methods used to provide flaw information and corrections to product/system 
+users.
+
+ALC_FLR.2.5C: The procedures for processing reported security flaws shall ensure 
+that any reported flaws are corrected and the correction issued to 
+product/system users.
+
+Evaluator action elements:
+ALC_FLR.2.1E: The evaluator shall confirm that the information provided meets 
+all requirements for content and presentation of evidence.
+Tests ATE_COV - Coverage 
+
+Objectives
+This family addresses those aspects of testing that deal with completeness of 
+testing.  That is, it addresses the extent to which the product/system security 
+functions are 
+tested, whether or not the testing is sufficiently extensive to demonstrate that 
+the product/system operates as specified, and whether or not the order in which 
+testing proceeds correctly accounts for functional dependencies between the 
+portions of the product/system being tested.
+
+Application notes
+The specific documentation required by the coverage components will be 
+determined, in most cases, by the documentation stipulated in the level of 
+ATE_FUN that is specified.
+ATE_COV.1 Complete coverage - informal 
+
+Objectives
+In this component, the objective is that testing completely address the security 
+functions.
+
+Application notes
+While the testing objective is to completely cover the product/system, there is 
+no more than informal explanation to support this assertion.
+
+Developer action elements:
+ATE_COV.1.1D: The developer shall provide an analysis of the test coverage.
+
+Content and presentation of evidence elements:
+ATE_COV.1.1C: The analysis of the test coverage shall demonstrate that the tests 
+identified in the test documentation cover the product/system. 
+
+Evaluator action elements:
+ATE_COV.1.1E: The evaluator shall confirm that the information provided meets 
+all requirements for content and presentation of evidence.
+Tests ATE_DPT - Depth 
+
+Objectives
+The components in this family deal with the level of detail to which the 
+product/system is tested.  Testing of security functions is based upon an 
+increasing depth of information derived from the analysis of the 
+representations.
+
+The objective is to counter the risk of missing an error in the development of 
+the product/system.  Additionally, the components of this family, especially as 
+testing is more concerned with the internals of the product/system, are more 
+likely to discover any malicious code that has been inserted.
+
+Application notes
+The specific amount and type of documentation and evidence will, in general, be 
+determined by that required by the level of ATE_FUN selected.
+ATE_DPT.1 Testing - functional specification
+
+Objectives
+The functional specification of a product/system provides a high level 
+description of the 
+external workings of the product/system.  Testing at the level of the functional 
+specification, in order to demonstrate the presence of any flaws, provides 
+assurance that the product/system functional specification has been correctly 
+realized.
+
+Application notes
+The functional specification representation is used to express the notion of the 
+most 
+abstract representation of the product/system.
+
+Developer action elements:
+ATE_DPT.1.1D: The developer shall provide the analysis of the depth of testing.
+
+Content and presentation of evidence elements:
+ATE_DPT.1.1C: The depth analysis shall demonstrate that the tests identified in 
+the test documentation are sufficient to demonstrate that the product/system 
+operates in accordance with the functional specification of the product/system.
+
+Evaluator action elements:
+ATE_DPT.1.1E: The evaluator shall confirm that the information provided meets 
+all requirements for content and presentation of evidence.
+Tests ATE_FUN - Functional Tests 
+
+Objectives
+Functional testing establishes that the product/system exhibits the properties 
+necessary to satisfy the functional requirements of CKRS.  Functional testing 
+provides assurance that the product/system satisfies at least the security 
+functional requirements, although it cannot establish that the product/system 
+does no more than what was specified.  The family ``Functional tests'' is 
+focused on the type and amount of documentation or support tools required, and 
+what is to be demonstrated through testing.
+
+This family contributes to providing assurance that the likelihood of 
+undiscovered 
+flaws is relatively small.
+
+Application notes
+Procedures for performing tests are expected to provide instructions for using 
+test programs and test suites, including the test environment, test conditions, 
+test data parameters and values.  The test procedures should also show how the 
+test results are 
+derived from the test inputs.
+
+The developer shall eliminate all security relevant flaws discovered during 
+testing.
+
+The developer shall test the product/system to determine that no new security 
+relevant flaws have been introduced as a result of eliminating discovered 
+security relevant flaws.
+
+Tests shall include examination of procedures and documents that assist in 
+implementing the product/system security policy.
+ATE_FUN.1 Functional testing
+
+Objectives
+The objective is for the developer to demonstrate that all security functions 
+perform as specified.  The developer is required to perform testing and to 
+provide test documentation.
+
+Developer action elements:
+ATE_FUN.1.1D: The developer shall test the product/system and document the 
+results.
+
+ATE_FUN.1.2D: The developer shall provide test documentation.
+
+Content and presentation of evidence elements:
+ATE_FUN.1.1C: The test documentation shall consist of test plans, test procedure 
+descriptions, and test results.
+
+ATE_FUN.1.2C: The test plans shall identify the security functions to be tested 
+and describe the goal of the tests to be performed.
+
+ATE_FUN.1.3C: The test procedure descriptions shall identify the tests to be 
+performed and describe the scenarios for testing each security function.
+
+ATE_FUN.1.4C: The test results in the test documentation shall show the expected 
+results of each test.
+
+ATE_FUN.1.5C: The test results from the execution of the tests by the developer 
+shall demonstrate that each security function operates as specified.
+
+Evaluator action elements:
+ATE_FUN.1.1E: The evaluator shall confirm that the information provided meets 
+all requirements for content and presentation of evidence.
+Tests ATE_IND - Independent Testing
+
+Objectives
+The objective is to demonstrate that the security functions perform as 
+specified.
+
+Additionally, an objective is to counter the risk of an incorrect assessment of 
+the test outcomes on the part of the developer which results in the incorrect 
+implementation of the specifications, or overlooks code that is non-compliant 
+with the specifications.
+
+Application notes
+The testing specified in this family can be performed by a party other than the 
+evaluator (e.g., an independent laboratory, an objective consumer organization).
+
+This family deals with the degree to which there is independent functional 
+testing of the product/system.  Independent functional testing may take the form 
+of repeating the developer's functional tests in whole or in part.  It may also 
+take the form of the augmentation of the developer's functional tests, either to 
+extend the scope or the depth of the developer's tests.
+ATE_IND.2 Independent testing - sample
+
+Objectives
+The objective is to demonstrate that the security functions perform as 
+specified.
+
+In this component, the objective is to select and repeat a sample of the 
+developer 
+testing.
+
+Application notes
+The suitability of the product/system for testing is based on the access to the 
+product/system, and the supporting documentation and information required to run 
+tests.  The need for documentation is supported by other assurance families 
+(e.g., ATE_FUN)
+
+Additionally, the suitability of the product/system for testing may be based on 
+other considerations (e.g., the version of the product/system submitted by the 
+developer is not the final version).
+
+The developer is required to perform testing and to provide test documentation 
+and test results. This is addressed by the ATE_FUN family.
+
+Testing may be selective and shall be based upon all available documentation.
+
+Developer action elements:
+ATE_IND.2.1D: The developer shall provide the product/system for testing.
+
+Content and presentation of evidence elements:
+ATE_IND.2.1C: The product/system shall be suitable for testing.
+
+Evaluator action elements:
+ATE_IND.2.1E: The evaluator shall confirm that the information provided meets 
+all requirements for content and presentation of evidence.
+
+ATE_IND.2.2E: The evaluator shall test the product/system to confirm that the 
+product/system operates as specified.
+
+ATE_IND.2.3E: The evaluator shall execute a sample of tests in the test 
+documentation to verify the developer test results.
+Vulnerability Assessment AVA_VLA - Vulnerability Analysis 
+
+Objectives
+Vulnerability analysis is an assessment to determine whether vulnerabilities 
+could allow malicious users to violate the security policy.  These 
+vulnerabilities will be identified during the evaluation by flaw hypotheses,
+
+Vulnerability analysis deals with the threats that a malicious user will be able 
+to discover flaws that will allow access to resources (e.g., data), allow the 
+ability to interfere with or alter the product/system, or interfere with the 
+authorized capabilities of other users.
+
+Application notes
+The vulnerability analysis should consider the contents of all the 
+product/system deliverables for the targeted evaluation assurance level.
+
+Obvious vulnerabilities are those that allow common attacks or those that might 
+be 
+suggested by the product/system interface description.  Obvious vulnerabilities 
+are those in the public domain, details of which should be known to a developer, 
+publicly available, or available from NIST.
+
+The evidence identifies all the product/system documentation upon which the 
+search for flaws was based.
+AVA_VLA.1 Developer vulnerability analysis 
+
+Objectives
+A vulnerability analysis is performed by the developer to ascertain the presence 
+of ``obvious'' security vulnerabilities.
+
+The objective is to confirm that no identified security vulnerabilities can be 
+exploited in the intended environment for the product/system.
+ 
+Application notes
+Obvious vulnerabilities are those which are open to exploitations which require 
+a minimum of understanding of the product/system, skill, technical 
+sophistication, and 
+resources.
+
+Developer action elements:
+AVA_VLA.1.1D: The developer shall perform and document an analysis of the 
+product/system deliverables searching for obvious ways in which a user can 
+violate the security policy.
+
+AVA_VLA.1.2D: The developer shall document the disposition of identified 
+vulnerabilities.
+
+Content and presentation of evidence elements:
+AVA_VLA.1.1C: The evidence shall show, for each vulnerability, that the 
+vulnerability cannot be exploited in the intended environment for the 
+product/system.
+
+Evaluator action elements:
+AVA_VLA.1.1E: The evaluator shall confirm that the information provided meets 
+all requirements for content and presentation of evidence.
+
+AVA_VLA.1.2E: The evaluator shall conduct penetration testing, based on the 
+developer 
+vulnerability analysis, to ensure that obvious vulnerabilities have been 
+addressed.
+
+
+This section contains the Common Criteria assurance requirements that are 
+recommended for exclusion.
+
+ADV_INT family relates to modularity, layering, information hiding, etc.  For 
+economic reasons, this family is applied to delux assurance level only.
+
+ALC_DVS (Developmental Security), ALC_LCD (Life Cycle Definition), and ALC_TAT 
+(Tools and Techniques) are excluded in order to provide vendors engineering 
+independence, spur commercial product development, and align assurance 
+requirements with the commercial practices.
+
+AVA_CCA (Covert Channel Analysis), AVA_SOF (Strength of Function, e.g., work 
+factor for cryptographic operation) are excluded since they are not particularly 
+relevant here.  AVA_CCA in non-discretionary policy environments can be 
+implemented using procedural controls such as executing trusted software only.  
+Cryptanalysis work factors will be provided or implied by the FIPS cryptographic 
+algorithms.
+
+AVA_MSU (Misuse Analysis) is excluded since obvious flaws and known flaws will 
+come under AVA_VLA (Vulnerability Analysis).  Given this is a standard for SBU 
+data, vulnerability analysis may be an overkill.
+
+

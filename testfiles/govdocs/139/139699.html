@@ -1,0 +1,522 @@
+<html><head>
+<link rel=stylesheet href="../../stylesheets/ccmbu_doc.css" type="text/css">
+<title>ClearCase Reference Manual, Release&nbsp;4.0, UNIX  
+</title></head>
+<body bgcolor=#ffffff>
+ 
+<a name="272"> </a>
+<h2 class=Command> describe</h2>
+<p class=Text><a name="2623"> </a>
+Describes an object</p>
+<a name="887460"> </a>
+<h4 class=Heading2> APPLICABILITY</h4>
+<p class=Text><a name="887461"> </a>
+ClearCase (cleartool subcommand), MultiSite (multitool subcommand), Attache (command)</p>
+<a name="274"> </a>
+<h4 class=Heading2> SYNOPSIS</h4>
+<ul><a name="889420"> </a>
+<li class=Bullet1>Describe objects in graphical format:
+<dl class="Opt">
+<dt><b class="LiteralIn Text">	des</b>&middot;<b class="LiteralIn Text">cribe</b> <b class="LiteralIn Text">-g</b>&middot;<b class="LiteralIn Text">raphical</b> { <var class="Variable Option&amp;Description">object-selector</var> | <var class="Variable Option&amp;Description">pname</var> } ...</dd></dl>
+<a name="889360"> </a>
+<li class=Bullet1>Describe objects in nongraphical format:
+<dl class="Opt">
+<dt><b class="LiteralIn Text">	des</b>&middot;<b class="LiteralIn Text">cribe</b> [ <b class="LiteralIn Text">-local</b> ] [ <b class="LiteralIn Text">-l</b>&middot;<b class="LiteralIn Text">ong</b> | <b class="LiteralIn Text">-s</b>&middot;<b class="LiteralIn Text">hort</b> | <b class="LiteralIn Text">-fmt</b> <var class="Variable Option&amp;Description">format-string</var> ] </dt><br><dd>[ <b class="LiteralIn Text">-ala</b>&middot;<b class="LiteralIn Text">bel</b> { <var class="Variable Option&amp;Description">label-type-selector</var> [,...] | <b class="LiteralIn Text">-all</b> } ] <br>[ <b class="LiteralIn Text">-aat</b>&middot;<b class="LiteralIn Text">tr</b> { <var class="Variable Option&amp;Description">attr-type-selector</var> [,...] | <b class="LiteralIn Text">-all</b> } ] <br>[ <b class="LiteralIn Text">-ahl</b>&middot;<b class="LiteralIn Text">ink</b> { <var class="Variable Option&amp;Description">hlink-type-selector</var> [,...] | <b class="LiteralIn Text">-all</b> } ] <br>{ [ <b class="LiteralIn Text">-cvi</b>&middot;<b class="LiteralIn Text">ew</b> ] [ <b class="LiteralIn Text">-ver</b>&middot;<b class="LiteralIn Text">sion</b> <var class="Variable Option&amp;Description">version-selector</var> | <b class="LiteralIn Text">-anc</b>&middot;<b class="LiteralIn Text">estor</b> ] <br>[ <b class="LiteralIn Text">-ihl</b>&middot;<b class="LiteralIn Text">ink</b> { <var class="Variable Option&amp;Description">hlink-type-selector</var> [,...] | <b class="LiteralIn Text">-all</b> } ] <br>[ <b class="LiteralIn Text">-pre</b>&middot;<b class="LiteralIn Text">decessor</b> ] [ <b class="LiteralIn Text">-pna</b>&middot;<b class="LiteralIn Text">me</b> ] <var class="Variable Option&amp;Description">pname</var> ... <br>| <b class="LiteralIn Text">-typ</b>&middot;<b class="LiteralIn Text">e</b> <var class="Variable Option&amp;Description">type-selector</var> ... <br> | -<b class="LiteralIn Text">cact</b> <br>| <var class="Variable Option&amp;Description">object-selector</var> ... <br>}</dd></dl>
+</ul><a name="887425"> </a>
+<h4 class=Heading2> DESCRIPTION</h4>
+<p class=Text><a name="887426"> </a>
+The <b class="LiteralIn Text">describe</b> command lists information about VOBs and the objects they contain. For example:</p>
+<ul><a name="906975"> </a>
+<li class=Bullet1>Attributes and/or version labels attached to a particular version
+<a name="310"> </a>
+<li class=Bullet1>Hyperlinks attached to a particular object
+<a name="312"> </a>
+<li class=Bullet1>Predecessor version of a particular version
+<a name="314"> </a>
+<li class=Bullet1>Views that have checkouts or unshared derived objects in a particular VOB (<b class="LiteralIn Text">describe -long vob:</b>)
+<a name="900820"> </a>
+<li class=Bullet1>Family feature level of a VOB or the replica feature level of a MultiSite VOB replica.
+</ul><p class=Text><a name="316"> </a>
+<b class="LiteralIn Text">describe</b> produces several kinds of listings:</p>
+<ul><a name="318"> </a>
+<li class=Bullet1><strong>File-system data</strong> - Provides information on elements, branches, versions, derived objects, and VOB symbolic links.
+<p class=List1NewParagraph>The description of an element (for example, <b class="LiteralIn Text">describe hello.h@@</b>) includes a listing of the storage pools to which the element is currently assigned. (See <b class=LiteralIn Text><a href="../ccref/mkpool.html">mkpool</a></b> and <b class=LiteralIn Text><a href="../ccref/chpool.html">chpool</a></b> for more information.)
+</p><p class=List1NewParagraph>A version's description includes the <i class="GlossaryTerm Text">version-ID</i> of its predecessor version.
+</p><p class=List1NewParagraph>An ordinary derived object is listed with <code>derived object</code> in its header. A derived object that has been checked in as a version of an element (<i class="GlossaryTerm Text">DO version</i>) is listed with <code>derived object version</code> in its header.
+</p><a name="326"> </a>
+<li class=Bullet1><strong>Type object</strong> - Provides information on a VOB's <i class="GlossaryTerm Text">type objects</i> (for example, on a specified list of label types). This form of the command displays the same information as <b class=LiteralIn Text><a href="../ccref/lstype.html">lstype</a></b> <b class="LiteralIn Text">-long</b>.
+<a name="328"> </a>
+<li class=Bullet1><strong>Hyperlink object</strong> - Provides information on a hyperlink object.
+<a name="330"> </a>
+<li class=Bullet1><strong>Storage pool</strong> - Provides information on a VOB's source, derived object, and cleartext storage pools. This form of the command displays the same information as <b class=LiteralIn Text><a href="../ccref/lspool.html">lspool</a></b> <code>-</code><b class="LiteralIn Text">long</b>.
+<a name="901218"> </a>
+<li class=Bullet1><strong>VOB object </strong>- Provides information on the object that represents the VOB itself. This includes such information as its storage area, creation date, owner, and related views. 
+<a name="889263"> </a>
+<li class=Bullet1><strong>VOB replica</strong> - Provides information on the object that represents a VOB <i class="GlossaryTerm Text">replica</i>, including the replica's mastering replica, host, mastership request setting, and feature level. For more information on replicas, see <i>ClearCase MultiSite Manual</i>.
+<a name="901449"> </a>
+<li class=Bullet1><strong>UCM objects</strong> - Provides information on UCM objects: activities, baselines, components, folders, projects, and streams. This form of the command displays  information similar to that displayed by the  UCM commands <b class=LiteralIn Text><a href="../ccref/lsactivity.html">lsactivity</a></b><b class="LiteralIn Text"> -long</b>, <b class=LiteralIn Text><a href="../ccref/lsbl.html">lsbl</a></b><b class="LiteralIn Text"> -long</b>, <b class=LiteralIn Text><a href="../ccref/lscomp.html">lscomp</a></b><b class="LiteralIn Text"> -long</b>, <b class=LiteralIn Text><a href="../ccref/lsfolder.html">lsfolder</a></b><b class="LiteralIn Text"> -long</b>, <b class=LiteralIn Text><a href="../ccref/lsproject.html">lsproject</a></b> <b class="LiteralIn Text">-long</b>, and <b class=LiteralIn Text><a href="../ccref/lsstream.html">lsstream</a></b><b class="LiteralIn Text"> -long</b>.
+</ul><a name="889264"> </a>
+<h5 class=Heading3>  Access Control Information</h5>
+<p class=Text><a name="889268"> </a>
+For an <i class="GlossaryTerm Text">MVFS object</i>, <b class="LiteralIn Text">describe</b> expands the output to include the object's access mode. (An access mode defines read, write, and execute privileges for the three user categories: owner, group, and others.) For more information on access control, see <i>Administering ClearCase</i>.</p>
+<a name="334"> </a>
+<h5 class=Heading3>  Unavailable Remote VOB</h5>
+<p class=Text><a name="336"> </a>
+File-system objects can be hyperlinked to objects in another VOB. If the other VOB is currently unavailable (perhaps it has been unmounted), <b class="LiteralIn Text">describe</b> tries to be helpful:</p>
+<p class=ExampleIndent><tt>cleartool: Error: Unable to locate versioned object base with object id:<br>
+ "51023fa9.68b711cc.b358.08:00:69:02:1d:c7".<br>
+.<br>
+.<br>
+.
+</tt></p><p class=ExampleIndent><tt>Hyperlinks:<br>
+@183@/usr/proj /usr/proj/elem2.c@@/main/2 -&gt; &lt;object not available&gt;
+</tt></p><a name="340"> </a>
+<h5 class=Heading3>  Versions Without Data</h5>
+<p class=Text><a name="342"> </a>
+The description of a version can include the annotation <code>[version has no data]</code>. A file element version can be created without data, using <b class=LiteralIn Text><a href="../ccref/checkin.html">checkin</a></b> <b class="LiteralIn Text">-cr</b>; an existing version's data can be removed with <b class=LiteralIn Text><a href="../ccref/rmver.html">rmver</a></b> <b class="LiteralIn Text">-data</b>.</p>
+<a name="346"> </a>
+<h5 class=Heading3>  Hyperlink Inheritance</h5>
+<p class=Text><a name="348"> </a>
+By default, a version inherits a hyperlink attached to any of its ancestor versions, on the same branch or on a parent branch. Inherited hyperlinks are listed only if you use the <b class="LiteralIn Text">-ihlink</b> option.</p>
+<p class=Text><a name="350"> </a>
+A hyperlink stops being passed down to its descendents if it is superseded by another hyperlink of the same type, explicitly attached to some descendent version. You can use a null-ended hyperlink (from-object, but no to-object ) as the superseding hyperlink to effectively cancel hyperlink inheritance.</p>
+<a name="893634"> </a>
+<h5 class=Heading3>  DOs in Unavailable Views</h5>
+<p class=Text><a name="893635"> </a>
+<b class="LiteralIn Text">describe</b> maintains a cache of tags of inaccessible views. For each view-tag, <b class="LiteralIn Text">describe</b> records the time of the first unsuccessful contact. Before trying to access a view, <b class="LiteralIn Text">describe</b> checks the cache. If the view's tag is not listed in the cache, <b class="LiteralIn Text">describe</b> tries to contact the view. If the view's tag is listed in the cache, <b class="LiteralIn Text">describe</b> compares the time elapsed since the last attempt with the time-out period specified by the <small class="AllCaps Text"><b>CCASE_DNVW_RETRY</b></small> environment variable. If the elapsed time is greater than the time-out period, <b class="LiteralIn Text">describe</b> removes the view-tag from the cache and tries to contact the view again.</p>
+<p class=Text><a name="893636"> </a>
+The default timeout period is 60 minutes. To specify a different time-out period, set <small class="AllCaps Text"><b>CCASE_DNVW_RETRY</b></small> to another integer value (representing minutes). To disable the cache, set <small class="AllCaps Text"><b>CCASE_DNVW_RETRY</b></small> to 0.</p>
+<p class=Text><a name="893640"> </a>
+For more information, see <a href="clearmake.html#979271"><i>CACHING UNAVAILABLE VIEWS</i></a> in the <b class=LiteralIn Text><a href="../ccref/clearmake.html">clearmake</a></b> reference page.</p>
+<a name="901277"> </a>
+<h5 class=Heading3>  ClearCase Objects in Replicated VOBs</h5>
+<p class=Text><a name="901289"> </a>
+The <b class="LiteralIn Text">describe</b> command shows additional information for objects in replicated VOBs:</p>
+<ul><a name="901278"> </a>
+<li class=Bullet1>For objects that have mastership, <b class="LiteralIn Text">describe</b> shows the mastering replica of the object. 
+<p class=List1NewParagraph><small class="AllCaps Text"><b>NOTE:</b></small> If the object is a local instance of a global type and you do not specify <b class="LiteralIn Text">-local</b>, <b class="LiteralIn Text">describe</b> shows the mastering replica of the global type. 
+</p><a name="901296"> </a>
+<li class=Bullet1>For attribute types, hyperlink types, and label types, <b class="LiteralIn Text">describe</b> shows the instance mastership of the type (whether the type's mastership can be shared by multiple replicas). 
+<a name="901297"> </a>
+<li class=Bullet1>For branches and branch types, <b class="LiteralIn Text">describe</b> shows the mastership request setting of the object. This setting controls whether users at other sites can request <i class="GlossaryTerm Text">mastership</i> of instances of the type.
+</ul><p class=Text><a name="901298"> </a>
+For more information about replicated VOBs, see <i>ClearCase MultiSite Manual</i>.</p>
+<a name="352"> </a>
+<h4 class=Heading2> PERMISSIONS AND LOCKS</h4>
+<p class=Text><a name="354"> </a>
+<i>Permissions Checking:</i> No special permissions required. <i>Locks:</i> No locks apply. </p>
+<a name="356"> </a>
+<h4 class=Heading2> OPTIONS AND ARGUMENTS</h4>
+<p class=Text><a name="889553"> </a>
+<small class="AllCaps Text"><b>DESCRIBING OBJECTS GRAPHICALLY.</b></small>&nbsp;<i>Default:</i> Describes objects in nongraphical form.</p>
+<dl class="Opt">
+<dt><b class="LiteralIn Text">-g</b>&middot;<b class="LiteralIn Text">raphical</b> </dt><br><dd>Starts a properties browser (<b class="LiteralIn Text">cleardescribe</b>) to describe objects.</dd></dl>
+<p class=Text><a name="901303"> </a>
+<small class="AllCaps Text"><b>DESCRIBING LOCAL COPIES OF GLOBAL TYPES.</b></small> <i>Default:</i> <b class="LiteralIn Text">describe</b> displays information about the global type object for the specified <var class="Variable Option&amp;Description">object-selector</var>. </p>
+<dl class="Opt">
+<dt><b class="LiteralIn Text">-local</b> </dt><br><dd>Displays information for the local copy of the specified <var class="Variable Option&amp;Description">object-selector</var>. For more information about global types, see <i>Administering ClearCase</i>.</dd></dl>
+<p class=Text><a name="889574"> </a>
+<small class="AllCaps Text"><b>REPORT FORMAT.</b></small>&nbsp; <i>Default:</i> Lists the object's name and some additional information.</p>
+<dl class="Opt">
+<dt><b class="LiteralIn Text">-l</b>&middot;<b class="LiteralIn Text">ong</dt><br><dd></b>Expands the listing. With <b class="LiteralIn Text">vob:</b>, for example, lists all views that have checkouts or unshared derived objects associated with the specified VOB. This listing includes the <i class="GlossaryTerm Text">UUIDs</i> of those views, which can be used with <b class=LiteralIn Text><a href="../ccref/rmview.html">rmview</a></b>.</dd></dl>
+<dl class="Opt">
+<dt><b class="LiteralIn Text">-s</b>&middot;<b class="LiteralIn Text">hort</dt><br><dd></b>Lists only an object's pathname. The effect is slightly different when used in combination with <b class="LiteralIn Text">-alabel</b>, <b class="LiteralIn Text">-aattr</b>, <b class="LiteralIn Text">-ahlink</b>, <b class="LiteralIn Text">-ihlink</b>, or <b class="LiteralIn Text">-predecessor</b>.</dd></dl>
+<dl class="Opt">
+<dt><b class="LiteralIn Text">-fmt</b> <var class="Variable Option&amp;Description">format-string</dt><br><dd></var>Lists information using the specified format string. See the <b class=LiteralIn Text><a href="../ccref/fmt_ccase.html">fmt_ccase</a></b> reference page for details on using this report-writing facility.</dd></dl>
+<p class=Text><a name="889551"> </a>
+<small class="AllCaps Text"><b>DESCRIBING OBJECTS IN OTHER VIEWS.</b></small>&nbsp; <i>Default:</i> If you use a view-extended pathname to specify an object in (or as seen through) another view, <b class="LiteralIn Text">describe</b> lists that view's name for the object:</p>
+<p class=ExampleIndent><tt>version: "/view/gamma/usr/project/src/util.c" 
+</tt></p><dl class="Opt">
+<dt><b class="LiteralIn Text">-cvi</b>&middot;<b class="LiteralIn Text">ew</dt><br><dd></b>Lists an object using the current view's name for it.</dd></dl>
+<dl class="Opt"><dt></dt>
+<dd><tt>version: "/usr/project/src/all_utils.c"</tt></dd></dl>
+<dl class="Opt"><dt></dt>
+<dd>This option is useful when different views select different directory versions, in which elements have been renamed.</dd></dl>
+<dl class="Opt">
+<dt><b class="LiteralIn Text">-cact </dt><br><dd></b>Describes the current activity for your view.</dd></dl>
+<p class=Text><a name="2391"> </a>
+<b class="LiteralIn Text"></b><small class="AllCaps Text"><b>EXCERPTING DESCRIPTION INFORMATION.</b></small>&nbsp; <i>Default:</i> <b class="LiteralIn Text">describe</b> lists the predecessor (if the object is a version), and reports on all of the object's version labels, attributes, and hyperlinks. With one or more of the following options, the report includes the extended pathname of the object and the requested information only-for example, only a listing of the predecessor version and version label.</p>
+<dl class="Opt">
+<dt><b class="LiteralIn Text">-ala</b>&middot;<b class="LiteralIn Text">bel</b> { <var class="Variable Option&amp;Description">label-type-selector</var>[,...] | <b class="LiteralIn Text">-all</b> } </dd></dl>
+<dl class="Opt">
+<dt><b class="LiteralIn Text">-aat</b>&middot;<b class="LiteralIn Text">tr</b> { <var class="Variable Option&amp;Description">attr-type-selector</var>[,...] | <b class="LiteralIn Text">-all</b> } </dd></dl>
+<dl class="Opt">
+<dt><b class="LiteralIn Text">-ahl</b>&middot;<b class="LiteralIn Text">ink</b> { <var class="Variable Option&amp;Description">hlink-type-selector</var>[,...] | <b class="LiteralIn Text">-all</b> } </dd></dl>
+<dl class="Opt">
+<dt><b class="LiteralIn Text">-ihl</b>&middot;<b class="LiteralIn Text">ink</b> { <var class="Variable Option&amp;Description">hlink-type-selector</var>[,...] | <b class="LiteralIn Text">-all</b> } </dd></dl>
+<dl class="Opt">
+<dt><b class="LiteralIn Text">-pre</b>&middot;<b class="LiteralIn Text">decessor</dt><br><dd></b>Specify one or more of these options to excerpt information from the overall description of an object. A list of names of type objects must be comma-separated, with no white space; you can use the special keyword <b class="LiteralIn Text">-all</b> to specify all types of a particular kind.</dd></dl>
+<dl class="Opt"><dt></dt>
+<dd>If you combine <b class="LiteralIn Text">-fmt</b> with any of these options, <b class=LiteralIn Text><a href="../ccref/describe.html">describe</a></b> uses the <var class="Variable Option&amp;Description">format-string</var> to construct and display the object's extended pathname.</dd></dl>
+<dl class="Opt"><dt></dt>
+<dd>For the <var class="Variable Option&amp;Description">type-selector</var> arguments, use one of the type selectors shown in the <var class="Variable Option&amp;Description">object-selector</var> description.</dd></dl>
+<dl class="Opt"><dt></dt>
+<dd>If you specify <b class="LiteralIn Text">-short</b> as well, the listing is restricted even further.</dd></dl>
+<p class=AnchorInline></p>
+<table Border="1"><tr valign="top"><td><p class=CellText>-predecessor </p>
+</td><td><p class=CellText>Only the version-ID of the predecessor version is listed.</p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><b class="LiteralIn Text">-alabel</b> </p>
+</td><td><p class=CellText>Only the version labels are listed.</p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><b class="LiteralIn Text">-aattr</b> </p>
+</td><td><p class=CellText>Only the attribute values are listed.</p>
+</td></tr>
+<tr valign="top"><td colspan=1 rowspan=3><p class=CellText><b class="LiteralIn Text">-ahlink</b> </p>
+</td><td><p class=CellText>The listing includes the pathnames of the objects hyperlinked to <var class="Variable Option&amp;Description">pname</var>, annotated with "<code>-&gt;</code>" (listed object is the to- object) or "<code>&lt;-</code>" (listed object is the from-object).</p>
+<p class=CellText>For example:</p>
+</td></tr>
+<tr valign="top"><td><p class=CellExample><tt class=CellExample>-&gt; /usr/proj/include/db.h@@/main/52<br>
+&lt;- /usr/proj/bin/vega@@/main/5
+</tt></p>
+</td></tr>
+<tr valign="top"><td><p class=CellText>Inherited hyperlinks are not included in this listing.</p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><b class="LiteralIn Text">-ihlink</b> </p>
+</td><td><p class=CellText>The listing includes the hyperlinks inherited by <var class="Variable Option&amp;Description">pname</var>, which must specify a version. Pathnames of the from-object and to- object are listed, one of which is an ancestor of <var class="Variable Option&amp;Description">pname</var>, or is <var class="Variable Option&amp;Description">pname</var> itself. (That is, <b class="LiteralIn Text">-ihlink</b> also includes hyperlinks that are attached to <var class="Variable Option&amp;Description">pname</var> itself.)</p>
+</td></tr>
+</table>
+
+
+<p class=Text><a name="41263"> </a>
+<small class="AllCaps Text"><b>SPECIFYING THE OBJECTS TO BE DESCRIBED.</b></small>&nbsp; <i>Default:</i> <b class="LiteralIn Text">describe</b> expects at least one argument that names an element, branch, version, VOB link, derived object, or hyperlink (<var class="Variable Option&amp;Description">pname</var>, <var class="Variable Option&amp;Description">DO-name</var>, or <var class="Variable Option&amp;Description">hlink-selector</var>). You can use <b class="LiteralIn Text">-version</b> or <b class="LiteralIn Text">-ancestor</b> to control the way <var class="Variable Option&amp;Description">pname</var> arguments are interpreted. </p>
+<dl class="Opt">
+<dt>[ <b class="LiteralIn Text">-pna</b>&middot;<b class="LiteralIn Text">me</b> ] <var class="Variable Option&amp;Description">pname</var> ...</dt><br><dd>One or more pathnames, indicating objects to be described: elements, branches, versions, or derived objects. If <var class="Variable Option&amp;Description">pname</var> has the form of an object selector, you must include the <b class="LiteralIn Text">-pname</b> option to indicate that <var class="Variable Option&amp;Description">pname</var> is a pathname.</dd></dl>
+<p class=AnchorInline></p>
+<table Border="1"><tr valign="top"><td colspan=2 rowspan=1><ul><li class=Bullet1>A standard or view-extended pathname to an element specifies the version selected by the view.
+</ul></td></tr>
+<tr valign="top"><td colspan=2 rowspan=1><ul><li class=Bullet1>A standard or view-extended pathname to a derived object specifies the DO in the view.
+</ul></td></tr>
+<tr valign="top"><td colspan=2 rowspan=1><ul><li class=Bullet1>An extended pathname specifies an element, branch, version, or derived object, different from the one selected by the view. For example:
+</ul></td></tr>
+</table>
+
+
+<p class=AnchorInline></p>
+<table Border="1"><tr valign="top"><td><p class=CellExample><tt class=CellExample>foo.c
+</tt></p>
+</td><td><p class=CellExample><tt class=CellExample><font size="-1"><i>(version of foo.c selected by current view)</i></font> 
+</tt></p>
+</td></tr>
+<tr valign="top"><td><p class=CellExample><tt class=CellExample>foo.o 
+</tt></p>
+</td><td><p class=CellExample><tt class=CellExample><font size="-1"><i>(derived object foo.o built in or winked in to 
+current view)</i></font> 
+</tt></p>
+</td></tr>
+<tr valign="top"><td><p class=CellExample><tt class=CellExample>/view/gamma/usr/proj/src/foo.c
+</tt></p>
+</td><td><p class=CellExample><tt class=CellExample><font size="-1"><i>(version of foo.c selected by another view; 
+however, the current view must select some 
+version of foo.c)</i></font> 
+</tt></p>
+</td></tr>
+<tr valign="top"><td><p class=CellExample><tt class=CellExample>/view/gamma/usr/proj/src/foo.o
+</tt></p>
+</td><td><p class=CellExample><tt class=CellExample><font size="-1"><i>(derived object foo.o built in another view)</i></font> 
+</tt></p>
+</td></tr>
+<tr valign="top"><td><p class=CellExample><tt class=CellExample>foo.c@@/main/5
+</tt></p>
+</td><td><p class=CellExample><tt class=CellExample><font size="-1"><i>(version 5 on main branch of foo.c)</i></font> 
+</tt></p>
+</td></tr>
+<tr valign="top"><td><p class=CellExample><tt class=CellExample>foo.o@@11-Nov.09:19.219 
+</tt></p>
+</td><td><p class=CellExample><tt class=CellExample><font size="-1"><i>(derived object, specified by DO-ID)</i></font> 
+</tt></p>
+</td></tr>
+<tr valign="top"><td><p class=CellExample><tt class=CellExample>foo.c@@/REL3
+</tt></p>
+</td><td><p class=CellExample><tt class=CellExample><font size="-1"><i>(version of foo.c with version label REL3; 
+however, the view must select some version of 
+foo.c)</i></font> 
+</tt></p>
+</td></tr>
+<tr valign="top"><td><p class=CellExample><tt class=CellExample>foo.c@@ 
+</tt></p>
+</td><td><p class=CellExample><tt class=CellExample><font size="-1"><i>(the element foo.c)</i></font> 
+</tt></p>
+</td></tr>
+<tr valign="top"><td><p class=CellExample><tt class=CellExample>foo.c@@/main 
+</tt></p>
+</td><td><p class=CellExample><tt class=CellExample><font size="-1"><i>(the main branch of element foo.c)</i></font> 
+</tt></p>
+</td></tr>
+</table>
+
+
+<dl class="Opt"><dt></dt>
+<dd>For versions, <b class="LiteralIn Text">-version</b> overrides these interpretations of <var class="Variable Option&amp;Description">pname</var>.</dd></dl>
+<dl class="Opt">
+<dt><b class="LiteralIn Text">-ver</b>&middot;<b class="LiteralIn Text">sion</b> <var class="Variable Option&amp;Description">version-selector</dt><br><dd></var>(For use with versions only) For each <var class="Variable Option&amp;Description">pname</var>, describes the version specified by <var class="Variable Option&amp;Description">version-selector</var>. This option overrides both version selection by the view and version-extended naming. See the <b class=LiteralIn Text><a href="../ccref/version_selector.html">version_selector</a></b> reference page for syntax details.</dd></dl>
+<dl class="Opt">
+<dt><b class="LiteralIn Text">-anc</b>&middot;<b class="LiteralIn Text">estor</dt><br><dd></b>(For use with elements and versions only) Describes the closest common ancestor version of all the <var class="Variable Option&amp;Description">pname</var> arguments, which must all be versions of the same element. See the <b class=LiteralIn Text><a href="../ccref/merge.html">merge</a></b> reference page for a information about closest common ancestors.</dd></dl>
+<dl class="Opt">
+<dt><b class="LiteralIn Text">-typ</b>&middot;<b class="LiteralIn Text">e</b> <var class="Variable Option&amp;Description">type-selector</var> ...</dt><br><dd>Lists information about the type objects specified by the <var class="Variable Option&amp;Description">type-name</var> arguments. If there are multiple types with the same name (for example, a label type and a hyperlink type are both named <b class="LiteralIn Text">REL3</b>), all of them are listed. Use one of the <var class="Variable Option&amp;Description">type-selectors</var> shown in the description of the <var class="Variable Option&amp;Description">object-selector</var> argument.</dd></dl>
+<dl class="Opt">
+<dt><var class="Variable Option&amp;Description">object-selector</var> ... </dt><br><dd>One or more <var class="Variable Option&amp;Description">object-selectors</var>, indicating objects to be described. Specify <var class="Variable Option&amp;Description">object-selector</var> in one of the following forms:</dd></dl>
+<p class=AnchorInline></p>
+<table Border="1"><tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">vob-selector</var> </p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">vob:</b><var class="Variable Option&amp;Description">pname-in-vob</var> </p>
+</td></tr>
+<tr valign="top"><td><p class=CellText></p>
+</td><td><p class=CellText></p>
+</td><td><p class=CellText><var class="Variable Option&amp;Description">pname-in-vob</var> can be the pathname of the VOB-tag (whether or not the VOB is mounted) or of any file-system object within the VOB (if the VOB is mounted). It cannot be the pathname of the VOB storage directory.</p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">attribute-type-selector</var> </p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">attype:</b><var class="Variable Option&amp;Description">type-name</var>[<b class="LiteralIn Text">@</b><var class="Variable Option&amp;Description">vob-selector</var>] </p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">branch-type-selector</var> </p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">brtype:</b><var class="Variable Option&amp;Description">type-name</var>[<b class="LiteralIn Text">@</b><var class="Variable Option&amp;Description">vob-selector</var>] </p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">element-type-selector</var> </p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">eltype:</b><var class="Variable Option&amp;Description">type-name</var>[<b class="LiteralIn Text">@</b><var class="Variable Option&amp;Description">vob-selector</var>] </p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">hyperlink-type-selector</var> </p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">hltype:</b><var class="Variable Option&amp;Description">type-name</var>[<b class="LiteralIn Text">@</b><var class="Variable Option&amp;Description">vob-selector</var>] </p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">label-type-selector</var> </p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">lbtype:</b><var class="Variable Option&amp;Description">type-name</var>[<b class="LiteralIn Text">@</b><var class="Variable Option&amp;Description">vob-selector</var>] </p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">trigger-type-selector</var> </p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">trtype:</b><var class="Variable Option&amp;Description">type-name</var>[<b class="LiteralIn Text">@</b><var class="Variable Option&amp;Description">vob-selector</var>] </p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">pool-selector</var> </p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">pool:</b><var class="Variable Option&amp;Description">pool-name</var>[<b class="LiteralIn Text">@</b><var class="Variable Option&amp;Description">vob-selector</var>] </p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">hlink-selector</var> </p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">hlink:</b><var class="Variable Option&amp;Description">hlink-id</var>[<b class="LiteralIn Text">@</b><var class="Variable Option&amp;Description">vob-selector</var>] </p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">oid-obj-selector</var> </p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">oid:</b><var class="Variable Option&amp;Description">object-oid</var>[<b class="LiteralIn Text">@</b><var class="Variable Option&amp;Description">vob-selector</var>]</p>
+</td></tr>
+<tr valign="top"><td><p class=CellText></p>
+</td><td><p class=CellText></p>
+</td><td><p class=CellText></p>
+</td></tr>
+<tr valign="top"><td colspan=3 rowspan=1><p class=CellText>The following object selector is valid only if you use MultiSite:</p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">replica-selector</var> </p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">replica:</b><var class="Variable Option&amp;Description">replica-name</var>[<b class="LiteralIn Text">@</b><var class="Variable Option&amp;Description">vob-selector</var>] </p>
+</td></tr>
+<tr valign="top"><td><p class=CellText></p>
+</td><td><p class=CellText></p>
+</td><td><p class=CellText></p>
+</td></tr>
+<tr valign="top"><td colspan=3 rowspan=1><p class=CellText>The following object selectors are valid only if you use UCM: </p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">activity-selector</var></p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">activity</b>:<var class="Variable Option&amp;Description">activity</var>-<var class="Variable Option&amp;Description">name</var>[@<var class="Variable Option&amp;Description">vob</var>-<var class="Variable Option&amp;Description">selector</var>]</p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">baseline</var>-<var class="Variable Option&amp;Description">selector</var></p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">baseline:</b><var class="Variable Option&amp;Description">baseline-name</var>[@<var class="Variable Option&amp;Description">vob-selector</var>]</p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">component</var>-<var class="Variable Option&amp;Description">selector</var></p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">component:</b><var class="Variable Option&amp;Description">component-name</var>[@<var class="Variable Option&amp;Description">vob-selector</var>]</p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">folder</var>-<var class="Variable Option&amp;Description">selector</var></p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">folder:</b><var class="Variable Option&amp;Description">folder-name</var>[@<var class="Variable Option&amp;Description">vob-selector</var>]</p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">project</var>-<var class="Variable Option&amp;Description">selector</var></p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">project:</b><var class="Variable Option&amp;Description">project-name</var>[@<var class="Variable Option&amp;Description">vob-selector</var>]</p>
+</td></tr>
+<tr valign="top"><td><p class=CellText><var class="Variable Option&amp;Description">stream</var>-<var class="Variable Option&amp;Description">selector</var> </p>
+</td><td colspan=2 rowspan=1><p class=CellText><b class="LiteralIn Text">stream</b><var class="Variable Option&amp;Description">:stream-name</var>[@<var class="Variable Option&amp;Description">vob-selector</var>]</p>
+</td></tr>
+<tr valign="top"><td><p class=CellText></p>
+</td><td><p class=CellText></p>
+</td><td><p class=CellText></p>
+</td></tr>
+</table>
+
+
+<a name="41265"> </a>
+<h4 class=Heading2> EXAMPLES</h4>
+<p class=Text><a name="927014"> </a>
+These examples are written for use in <b class="LiteralIn Text">csh</b>. If you use another shell, you may need to use different quoting and escaping conventions.  </p>
+<p class=Text><a name="927017"> </a>
+In <b class=LiteralIn Text><a href="../ccref/cleartool.html">cleartool</a></b> single-command mode, <u>cmd-context</u>&nbsp;represents the shell prompt. In <b class="LiteralIn Text">cleartool</b> interactive mode, <u>cmd-context</u>&nbsp;represents the interactive <b class="LiteralIn Text">cleartool</b> prompt. In Attache, <u>cmd-context</u>&nbsp;represents the workspace prompt.</p>
+<ul><a name="511"> </a>
+<li class=Bullet1>Describe the version of element <b class="LiteralIn Text">msg.c</b> selected by your view.
+</ul><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">describe msg.c</b> <br>
+version <strong>"msg.c@@/main/3"</strong> <br>
+&nbsp;created 08-Dec-98.12:12:55 by Chuck Jackson (test user) (cj.dvt@oxygen)<br>
+&nbsp;Element Protection:<br>
+&nbsp;&nbsp;&nbsp;User : sgd&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: r--<br>
+&nbsp;&nbsp;&nbsp;Group: user&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: r--<br>
+&nbsp;&nbsp;&nbsp;Other:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: r--<br>
+&nbsp;element type: c_source<br>
+&nbsp;predecessor version: /main/2<br>
+&nbsp;Labels:<br>
+&nbsp;&nbsp;REL6<br>
+&nbsp;&nbsp;REL1 
+</tt></blockquote><ul><a name="514"> </a>
+<li class=Bullet1>Describe a branch of an element, specifying it with an extended pathname.
+</ul><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">describe util.c@@/main/rel2_bugfix</b> <br>
+<u></u>branch "util.c@@/main/rel2_bugfix"<u><br>
+</u>&nbsp;created 08-Dec-98.12:15:40 by Bev Jackson (test user) (bev.dvt@oxygen)<br>
+&nbsp;branch type: rel2_bugfix<br>
+&nbsp;Element Protection:<br>
+&nbsp;&nbsp;&nbsp;User : sgd&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: r--<br>
+&nbsp;&nbsp;&nbsp;Group: user&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: r--<br>
+&nbsp;&nbsp;&nbsp;Other:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: r--<br>
+&nbsp;element type: text_file<br>
+&nbsp;branched from version: /main/31
+</tt></blockquote><ul><a name="517"> </a>
+<li class=Bullet1>Describe the label type <b class="LiteralIn Text">REL3</b>.
+</ul><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">describe lbtype:REL3</b> <br>
+label type "REL3"<br>
+&nbsp;created 08-Dec-98.12:13:36 by Bev Jackson (test user) (bev.dvt@oxygen)<br>
+&nbsp;owner: bev<br>
+&nbsp;group: dvt<br>
+&nbsp;scope: this VOB (ordinary type)<br>
+&nbsp;constraint: one version per branch
+</tt></blockquote><ul><a name="350803"> </a>
+<li class=Bullet1>Create a <b class="LiteralIn Text">Tested</b> attribute type and apply the attribute to the version of element <b class="LiteralIn Text">util.c</b> selected by your current view. Then, use <b class="LiteralIn Text">describe</b> to display the newly applied attribute value, and use the <b class="LiteralIn Text">-fmt</b> option to format the output.
+</ul><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">mkattype -nc -default '"TRUE"' Tested</b> 
+</tt></blockquote><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">mkattr -default Tested util.c</b> 
+</tt></blockquote><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">describe -aattr -all -fmt "Name: %Xn\nType of object: %m\n" util.c</b> <br>
+Name: util.c@@/main/CHECKEDOUT<br>
+Type of object: version<br>
+ Attributes:<br>
+ Tested = "TRUE" 
+</tt></blockquote><ul><a name="2237"> </a>
+<li class=Bullet1>Describe <b class="LiteralIn Text">ddft</b>, the current VOB's default derived object storage pool.
+</ul><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">describe pool:ddft</b> <br>
+pool "ddft"<br>
+&nbsp;created 15-Dec-98.09:34:00 by jenny.adm@oxygen<br>
+&nbsp;"Predefined pool used to store derived objects."<br>
+&nbsp;owner: jenny<br>
+&nbsp;group: dvt<br>
+&nbsp;kind: derived pool<br>
+&nbsp;pool storage global pathname 
+"/net/oxygen/usr/vobstore/tut/tut.vbs/d/ddft"<br>
+&nbsp;maximum size: 0 reclaim size: 0 age: 96 
+</tt></blockquote><ul><a name="528"> </a>
+<li class=Bullet1>Describe how the current view names an element that is named <b class="LiteralIn Text">hello.mod</b> in the <b class="LiteralIn Text">jackson_fix</b> view.
+</ul><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">describe -cview /view/jackson_fix/usr/hw/src/hello.mod</b> <br>
+<u></u>version "/usr/hw/src/hello.c@@/main/4"<br>
+&nbsp;created 08-Dec-98.12:16:29 by Chuck Jackson (test user) (cj.dvt@oxygen)<br>
+&nbsp;Element Protection:<br>
+&nbsp;&nbsp;&nbsp;User : sgd&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: r--<br>
+&nbsp;&nbsp;&nbsp;Group: user&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: r--<br>
+&nbsp;&nbsp;&nbsp;Other:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: r--<br>
+&nbsp;element type: text_file <br>
+&nbsp;predecessor version: /main/3 
+</tt></blockquote><ul><a name="531"> </a>
+<li class=Bullet1>Describe the VOB containing the current working directory. List views with checkouts or unshared derived objects in that VOB.
+</ul><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">describe -long</b> <b class="LiteralIn Text">vob:.</b> <br>
+versioned object base "/hw"<br>
+&nbsp;created 15-Dec-98.09:34:00 by jenny.adm@oxygen<br>
+ "VOB dedicated to development of "hello, world" program"<br>
+&nbsp;VOB family feature level: 2<br>
+&nbsp;VOB storage host:pathname "oxygen:/usr/vobstore/tut/tut.vbs"<br>
+&nbsp;VOB storage global pathname "/usr/vobstore/tut/tut.vbs"<br>
+&nbsp;VOB ownership:<br>
+&nbsp;&nbsp;&nbsp;owner jackson<br>
+&nbsp;&nbsp;&nbsp;group dvt<br>
+&nbsp;VOB holds objects from the following views:<br>
+&nbsp;&nbsp;&nbsp;oxygen:/usr/vobstore/tut/old.vws [uuid 
+249356fe.d50f11cb.a3fd.00:01:56:01:0a:4f] 
+</tt></blockquote><ul><a name="534"> </a>
+<li class=Bullet1>Describe a hyperlink.
+</ul><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">describe hlink:Merge@516262@/vobs/proj</b> <br>
+<u></u>hyperlink "Merge@516262@/vobs/proj"<br>
+&nbsp;created 14-Jul-98.16:43:35 by Bill Bo (bill.user@uranus)<br>
+&nbsp;Merge@516262@/vobs/proj /vobs/proj/lib/cvt/cvt_cmd.c@@/main/v1.1_port/8 
+-&gt;<br>
+ /vobs/proj/lib/cvt/cvt_cmd.c@@/main/71
+</tt></blockquote><ul><a name="928328"> </a>
+<li class=Bullet1>Describe a derived object in the current view.
+</ul><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">describe -cview util.o</b> <br>
+derived object "util.o@@11-Apr.12:03.33"<br>
+ created 11-Apr-98.12:03:33 by Anne Duvo (anne.dev@oxygen)<br>
+ references: 2 (shared)<br>
+ derived pool: ddft<br>
+ =&gt; saturn:/usr/anne/views/anne_main.vws<br>
+ =&gt; oxygen:/usr/jackson/views/jackson_proj2.vws 
+</tt></blockquote><ul><a name="900689"> </a>
+<li class=Bullet1>For a particular element, list its name, element type, attached triggers, and cleartext and source pools. 
+</ul><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">describe -fmt \<br>
+"%n\n\t%[type]p\n\t%[triggers]p\n\t%[pool]Cp,%[pool]p\n" file.txt@@</b> <br>
+file.txt@@<br>
+	text_file<br>
+	(CI_TRIG, CO_TRIG)<br>
+	cdft,sdft
+</tt></blockquote><ul><a name="901253"> </a>
+<li class=Bullet1>For a branch type in a replicated VOB, list the mastering replica of the branch type.
+</ul><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">describe -fmt "%n\t%[master]p\n" brtype:main</b> <br>
+main    lex@/vobs/dev 
+</tt></blockquote><ul><a name="900701"> </a>
+<li class=Bullet1>For the current VOB, list the OID, replication status, MS-DOS text mode setting, and creation comment.
+</ul><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">describe -fmt "%On\n%[vob_replication]p\n%[msdostext_mode]p\n%c" \ <br>
+vob:.</b> <br>
+46cf5bfd.240d11d3.a37e.00:01:80:7b:09:69<br>
+unreplicated<br>
+disabled<br>
+storage of header files
+</tt></blockquote><ul><a name="901326"> </a>
+<li class=Bullet1>Describe the local copy of global label type <b class="LiteralIn Text">REL6</b>.
+</ul><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">describe -local lbtype:REL6</b> <br>
+label type "REL6"<br>
+&nbsp;&nbsp;created 28-Jul-99.14:00:26 by Suzanne Gets (smg.user@neon)<br>
+&nbsp;&nbsp;"Automatically created label type from global definition in VOB 
+"/vobs/admin"."<br>
+&nbsp;&nbsp;owner: smg<br>
+&nbsp;&nbsp;group: user<br>
+&nbsp;&nbsp;scope: this VOB (local copy of global type)<br>
+&nbsp;&nbsp;constraint: one version per element<br>
+&nbsp;&nbsp;Hyperlinks:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;GlobalDefinition -&gt; lbtype:REL6@/vobs/admin
+</tt></blockquote><ul><a name="900840"> </a>
+<li class=Bullet1>Describe the current VOB, its hyperlinks being of particular interest.
+</ul><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">describe -long vob:.</b> 
+</tt></blockquote><blockquote><tt>versioned object base "/vobs/doc"<br>
+&nbsp;created 07-Nov-91.16:46:28 by ratl.user<br>
+&nbsp;"ClearCase documentation VOB."<br>
+&nbsp;VOB family feature level: 1<br>
+&nbsp;VOB storage host:pathname "mercury:/usr3/vobstorage/doc_vob"<br>
+&nbsp;VOB storage global pathname "/net/mercury/usr3/vobstorage/doc_vob"<br>
+VOB storage host:pathname mercury:\usr3\vobstorage\doc_vob<br>
+VOB storage global pathname \\mercury\usr3\vobstorage\doc_vob<br>
+&nbsp;VOB ownership:<br>
+&nbsp;&nbsp;owner ratl<br>
+&nbsp;&nbsp;group user<br>
+&nbsp;Hyperlinks:<br>
+&nbsp;&nbsp;AdminVOB -&gt; vob:/vobs/admin<br>
+
+</tt></blockquote><p class=List1NewParagraph>This VOB has a hyperlink named <b class="LiteralIn Text">AdminVOB</b>; it points from the current VOB to the VOB <b class="LiteralIn Text">vob:/vobs/admin</b>. If it were pointing to the current VOB, the listing would show
+</p><blockquote><tt>&nbsp;Hyperlinks:<br>
+&nbsp;&nbsp;AdminVOB &lt;- vob:/vobs/admin<br>
+
+</tt></blockquote><p class=List1NewParagraph>Now describe the hyperlink <b class="LiteralIn Text">AdminVOB</b>.
+</p><blockquote><tt><u>cmd-context</u>&nbsp;<b class="LiteralIn Text">describe hltype:AdminVOB</b> 
+</tt></blockquote><blockquote><tt>hyperlink type "AdminVOB"<br>
+created 07-Nov-91.16:46:28 by ratl.user<br>
+"Predefined hyperlink type used to link a VOB to another VOB with 
+administrative information."<br>
+owner: ratl<br>
+group: user<br>
+scope: this VOB (ordinary type)
+</tt></blockquote><a name="900951"> </a>
+<h4 class=Heading2> SEE ALSO</h4>
+<p class=Text><a name="350409"> </a>
+<b class=LiteralIn Text><a href="../ccref/chflevel.html">chflevel</a></b>,<b class=LiteralIn Text><a href="../ccref/ chpool.html"> chpool</a></b>, <b class=LiteralIn Text><a href="../ccref/fmt_ccase.html">fmt_ccase</a></b>, <b class=LiteralIn Text><a href="../ccref/lsactivity.html">lsactivity</a></b>,  <b class=LiteralIn Text><a href="../ccref/lsbl.html">lsbl</a></b>, <b class=LiteralIn Text><a href="../ccref/lscomp.html">lscomp</a></b>, <b class=LiteralIn Text><a href="../ccref/lsdo.html">lsdo</a></b>, <b class=LiteralIn Text><a href="../ccref/lshistory.html">lshistory</a></b>, <b class=LiteralIn Text><a href="../ccref/lspool.html">lspool</a></b>, <b class=LiteralIn Text><a href="../ccref/lsproject.html">lsproject</a></b>, <b class=LiteralIn Text><a href="../ccref/lsstream.html">lsstream</a></b>,  <b class=LiteralIn Text><a href="../ccref/lstype.html">lstype</a></b>, <b class=LiteralIn Text><a href="../ccref/merge.html">merge</a></b>, <b class=LiteralIn Text><a href="../ccref/mkpool.html">mkpool</a></b>, <b class=LiteralIn Text><a href="../ccref/rmview.html">rmview</a></b>, <b class=LiteralIn Text><a href="../ccref/version_selector.html">version_selector</a></b> </p>
+
+<br>
+ 
+<!-- * * * Start Rational Documentation Footer/Nav * * * -->
+<BR>
+<TABLE WIDTH="460" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR><TD ALIGN="center" VALIGN="TOP">
+<FONT SIZE="1">
+<A HREF="mailto:ccmbu_doc_feedback@rational.com">Feedback</A>
+ on the documentation in this site? We welcome any comments!
+<br>
+<A HREF="../../copyright/copyright.html">Copyright</A>
+ &#169; 1999 by Rational Software Corporation. All rights reserved.
+</FONT></TD></TR></TABLE>
+<!-- * * * * End Rational Documentation Footer/Nav * * * * -->
+</body>
+</html>

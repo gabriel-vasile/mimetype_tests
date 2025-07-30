@@ -1,0 +1,1044 @@
+
+
+<html>
+<head>
+  <title>NURP Multimedia Gallery: Search Engine</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <link href="http://data.nurp.noaa.gov/nurp03/Scripts/NURP.css" rel="stylesheet" type="text/css">
+  <script type="text/javascript" src="http://data.nurp.noaa.gov/nurp03/Scripts/menu.js"></script>
+  <script language=JavaScript>
+		
+  function setvalues() {
+    
+      document.query.Hab.value = "";
+    
+      document.query.CN.value = "";
+    
+      document.query.GS.value = "";
+    
+      document.query.Tech.value = "";
+    
+      document.query.BW.value = "";
+    
+      document.query.Keyword.value = "";
+    
+    document.query.SpatialSearch.checked = false
+  }
+
+  function resetquery() {
+      document.query.reset();
+  } 
+		
+		
+      function submitquery(){
+	document.query.action = 'MMList.asp';
+	document.query.submit();
+
+    }
+		
+      function submitnoquery(){
+	document.query.Hab.value = 'ALL';
+	document.query.BT.value = 'ALL';
+	document.query.CN.value = 'ALL';
+	document.query.GS.value = 'ALL';
+	document.query.Tech.value = 'ALL';
+	document.query.Keyword.value = '';
+	document.query.SpatialSearch.value = 'False';
+	document.query.action = 'MMList.asp';
+	document.query.submit();
+    }		
+
+      function keyHandler(e){
+        var pressedKey;
+        if (document.all)    { e = window.event; }
+        if (document.all)    { pressedKey = e.keyCode; }
+        if (pressedKey == 13) {
+	  document.query.action = 'MMList.asp';
+	  document.query.submit();
+      }
+  }
+
+  document.onkeypress = keyHandler;
+
+    var count = 1;
+	PanCtrl = new Array(8);
+	PanCtrlS = new Array(8);
+	
+	while (count < 9) {
+	  PanCtrl[count]=new Image;
+	  PanCtrl[count].src="MapTools/PanCtrl_0" + count + ".gif";
+	  PanCtrlS[count]=new Image;
+	  PanCtrlS[count].src="MapTools/PanCtrlS_0" + count + ".gif";
+	  count++;
+	}
+
+	ZButton=new Image;
+	ZButton.src="MapTools/ZButton.gif";
+	ZButtonS=new Image;
+	ZButtonS.src="MapTools/ZButtonS.gif";
+	ZFullButton=new Image;
+	ZFullButton.src="MapTools/ZFullButton.gif";
+	ZFullButtonS=new Image;
+	ZFullButtonS.src="MapTools/ZFullButtonS.gif";
+	ZInButton=new Image;
+	ZInButton.src="MapTools/ZInButton.gif";
+	ZInButtonS=new Image;
+	ZInButtonS.src="MapTools/ZInButtonS.gif";
+	ZOutButton=new Image;
+	ZOutButton.src="MapTools/ZOutButton.gif";
+	ZOutButtonS=new Image;
+	ZOutButtonS.src="MapTools/ZOutButtonS.gif";
+
+    function changeImage(iname,isrc) {
+      document[iname].src = eval(isrc + '.src');
+    }
+
+    function changeZImage(inum,itype) {
+	  if (inum != 2) {
+		document['ZLevel' + inum].src = eval('ZButton' + itype + '.src');
+	  }
+    }
+
+    function changeCSource(param) {
+      document.query.cSource.value = param;
+    }
+
+    function pan(param1,param2) {
+	  document.query.cSource.value = 'iPan';
+      document.query.mParam1.value = param1;
+      document.query.mParam2.value = param2;
+	  document.query.submit();
+   }
+   
+    function zoomby(param1) {
+	  var zLevel = (2 + param1);
+	  if ((zLevel > 0) & (zLevel < 9)) {
+	    document.query.cSource.value = 'iZoom';
+        document.query.zLevel.value = zLevel;
+        document.query.mParam1.value = param1;
+	    document.query.submit();
+	  }
+   }
+
+    function zoomto(param1) {
+	  var zDiff = (param1 - 2);
+	  if (zDiff != 0) {
+	    var mFactor = 1;
+	    if (zDiff < 0) {
+		  mFactor = -1;
+		  zDiff = zDiff * mFactor;
+		}
+		var zCount = 0;
+		var zVal = 0;
+		while (zCount < zDiff) {
+		  zVal = (zVal + zVal) + 1;
+		  zCount++;
+		}
+		zDiff = zVal * mFactor
+	    document.query.cSource.value = 'iZoom';
+        document.query.zLevel.value = param1;
+        document.query.mParam1.value = zDiff;
+	    document.query.submit();
+	  }
+   }
+
+    function zoomfull() {
+	  document.query.cSource.value = 'iZoom';
+      document.query.zLevel.value = 2;
+      document.query.mParam1.value = 0;
+	  document.query.submit();
+   }
+
+  </script>
+</head>
+
+<body bgcolor="#191970" TOPMARGIN=4>
+<table width="640" height="600" bgcolor="white" align="center" border="0" cellpadding="0" cellspacing="0">
+  <tr height="120">
+    <td width="640" align="center" colspan="3">
+      <img src="Images/Titles/MMGallery.gif" alt="Multimedia Gallery" border="0"></td>
+  </tr>
+  <tr height="50">
+    <td width="640" align="center" colspan="3" ><!-- #BeginLibraryItem "/Library/header_old.lbi" -->
+<MAP NAME="mainmenu"> 
+  <AREA SHAPE="rect" COORDS="2,1,57,19" HREF="http://www.nurp.noaa.gov/index.html" ALT="Home" TABINDEX="0" 
+    onmouseover="changeImages( /*CMP*/'submenu',/*URL*/'http://data.nurp.noaa.gov/NURP03/Images/menus/submenu_01.gif');return true" 
+    onmouseout="changeImages( /*CMP*/'submenu',/*URL*/'http://data.nurp.noaa.gov/NURP03/Images/menus/submenu.gif');return true">
+  <AREA SHAPE="rect" COORDS="56,1,117,19" HREF="http://www.nurp.noaa.gov/whatisnurp.html" ALT="About" TABINDEX="1" 
+    onmouseover="changeImages( /*CMP*/'submenu',/*URL*/'http://data.nurp.noaa.gov/NURP03/Images/menus/submenu_02.gif');return true" 
+    onmouseout="changeImages( /*CMP*/'submenu',/*URL*/'http://data.nurp.noaa.gov/NURP03/Images/menus/submenu.gif');return true">
+  <AREA SHAPE="rect" COORDS="117,1,201,19" HREF="http://data.nurp.noaa.gov/nurp03/research.asp" ALT="Research" TABINDEX="2" 
+    onmouseover="changeImages( /*CMP*/'submenu',/*URL*/'http://data.nurp.noaa.gov/NURP03/Images/menus/submenu_03.gif');return true" 
+    onmouseout="changeImages( /*CMP*/'submenu',/*URL*/'http://data.nurp.noaa.gov/NURP03/Images/menus/submenu.gif');return true">
+  <AREA SHAPE="rect" COORDS="201,1,303,19" HREF="http://www.nurp.noaa.gov/underseatechnologies.html" ALT="Technology" TABINDEX="3" 
+    onmouseover="changeImages( /*CMP*/'submenu',/*URL*/'http://data.nurp.noaa.gov/NURP03/Images/menus/submenu_04.gif');return true" 
+    onmouseout="changeImages( /*CMP*/'submenu',/*URL*/'http://data.nurp.noaa.gov/NURP03/Images/menus/submenu.gif');return true">
+  <AREA SHAPE="rect" COORDS="303,1,387,19" HREF="http://www.nurp.noaa.gov/undersearesearchcenters.html" ALT="Facilities" TABINDEX="4" 
+    onmouseover="changeImages( /*CMP*/'submenu',/*URL*/'http://data.nurp.noaa.gov/NURP03/Images/menus/submenu_05.gif');return true" 
+    onmouseout="changeImages( /*CMP*/'submenu',/*URL*/'http://data.nurp.noaa.gov/NURP03/Images/menus/submenu.gif');return true">
+  <AREA SHAPE="rect" COORDS="386,1,444,19" HREF="http://www.nurp.noaa.gov/news.html" ALT="News" TABINDEX="5" 
+    onmouseover="changeImages( /*CMP*/'submenu',/*URL*/'http://data.nurp.noaa.gov/NURP03/Images/menus/submenu_06.gif');return true" 
+    onmouseout="changeImages( /*CMP*/'submenu',/*URL*/'http://data.nurp.noaa.gov/NURP03/Images/menus/submenu.gif');return true">
+  <AREA SHAPE="rect" COORDS="444,1,520,19" HREF="http://www.nurp.noaa.gov/funding.html" ALT="Funding" TABINDEX="6" 
+    onmouseover="changeImages( /*CMP*/'submenu',/*URL*/'http://data.nurp.noaa.gov/NURP03/Images/menus/submenu_07.gif');return true" 
+    onmouseout="changeImages( /*CMP*/'submenu',/*URL*/'http://data.nurp.noaa.gov/NURP03/Images/menus/submenu.gif');return true">
+  <AREA SHAPE="rect" COORDS="520,1,598,19" HREF="http://www.nurp.noaa.gov/projects.html" ALT="Products" TABINDEX="7" 
+    onmouseover="changeImages( /*CMP*/'submenu',/*URL*/'http://data.nurp.noaa.gov/NURP03/Images/menus/submenu_08.gif');return true" 
+    onmouseout="changeImages( /*CMP*/'submenu',/*URL*/'http://data.nurp.noaa.gov/NURP03/Images/menus/submenu.gif');return true">
+</MAP>
+
+<TABLE WIDTH="640" HEIGHT="50" ALIGN="center" VALIGN="top" BORDER="0" CELLSPACING="0" CELLPADDING="0">
+  <TR HEIGHT="20"> 
+    <TD WIDTH="640" HEIGHT="20" ALIGN="center" VALIGN="middle">
+		<IMG SRC="http://data.nurp.noaa.gov/NURP03/Images/Menus/NURPmenu.gif" 
+			NAME="menu" ALT="menu" WIDTH="600" HEIGHT="20" USEMAP="#mainmenu" BORDER="0"></TD></TR>
+  <TR> 
+  	<TD WIDTH="640" HEIGHT="30" ALIGN="center" VALIGN="middle"> <IMG SRC="http://data.nurp.noaa.gov/NURP03/Images/Menus/submenu.gif" 
+			NAME="submenu" ALT="submenu" WIDTH="640" HEIGHT="30" BORDER="0"></TD></TR>
+</TABLE><!-- #EndLibraryItem --></td>
+  </tr>
+  <tr height="50">
+    <td width="640" align="center" colspan="3"><img src="Images/Welcome.gif" usemap="#Welcome" border="0"> 
+      <map name="Welcome">
+        <area shape="rect" coords="457,16,610,31" alt="Browse All" href="javascript:submitnoquery();">
+      </map>
+    </td>
+  </tr>
+  <tr height="50">
+    <td width="640" align="center" colspan="3"><img src="Images/Titles/ContentSearch.gif" alt="Content Search" border="0"
+      vspace="15"></td>
+  </tr>
+  <form name="query" action="http://data.nurp.noaa.gov/mmedia/mmsearch.asp#ssearch" method="post">
+  <tr>
+    <td width="640" align="center" colspan="3">
+      <table width="596" border="0" cellspacing="0" cellpadding="2" align="center">
+	<tr height="30">
+	  <td width="95" align="left"><img src="Images/Titles/Hab.gif"></td>
+	  <td width="195">
+	    <span class="B1">
+	    <select name="Hab" style="width: 195px; font-size: 8pt">
+	      <option value="ALL">ALL</option>
+	      
+              <option value="artificial reef" >artificial reef</option>                      
+	      
+              <option value="bank" >bank</option>                      
+	      
+              <option value="basin" >basin</option>                      
+	      
+              <option value="boulder reef" >boulder reef</option>                      
+	      
+              <option value="Georges Bank" >Georges Bank</option>                      
+	      
+              <option value="pueblo villiage" >pueblo villiage</option>                      
+	      
+              <option value="rocky subtidal" >rocky subtidal</option>                      
+	      
+              <option value="sanctuary" >sanctuary</option>                      
+	      
+              <option value="sand flat" >sand flat</option>                      
+	      
+              <option value="seagrass bed" >seagrass bed</option>                      
+	      
+              <option value="submarine canyon" >submarine canyon</option>                      
+	      
+	    </select>
+	    </span>
+	  </td>
+	  <td width="95" align="left"><img src="Images/Titles/BT.gif"></td>
+	  <td width="195">
+	    <span class="B1">
+	    <select name="BT" style="width: 195px; font-size: 8pt">
+	      <option value="ALL">ALL</option>
+	      
+              <option value="bedrock" >bedrock</option>                      
+	      
+              <option value="clay" >clay</option>                      
+	      
+              <option value="cobble/boulder" >cobble/boulder</option>                      
+	      
+              <option value="gravel/pebble" >gravel/pebble</option>                      
+	      
+              <option value="mixed" >mixed</option>                      
+	      
+              <option value="mud" >mud</option>                      
+	      
+              <option value="N/A" >N/A</option>                      
+	      
+              <option value="organic debris" >organic debris</option>                      
+	      
+              <option value="silt/sand" >silt/sand</option>                      
+	      
+	    </select>
+	    </span>
+	  </td>
+	</tr>
+	<tr height="30">
+	  <td width="95" align="left"><img src="http://data.nurp.noaa.gov/mmedia/Images/Titles/CN.gif"></td>
+	  <td width="195">
+	    <span class="B1">
+	    <select name="CN" style="width: 195px; font-size: 8pt">
+	      <option value="ALL">ALL</option>
+	      
+	      <option value='Acadian redfish'>
+		Acadian redfish</option>
+	      
+	      <option value='Amberjack'>
+		Amberjack</option>
+	      
+	      <option value='American lobster'>
+		American lobster</option>
+	      
+	      <option value='anemone'>
+		anemone</option>
+	      
+	      <option value='Atlantic cod'>
+		Atlantic cod</option>
+	      
+	      <option value='Atlantic wolffish'>
+		Atlantic wolffish</option>
+	      
+	      <option value='black coral'>
+		black coral</option>
+	      
+	      <option value='black dogfish'>
+		black dogfish</option>
+	      
+	      <option value='Black sea bass'>
+		Black sea bass</option>
+	      
+	      <option value='blue hake'>
+		blue hake</option>
+	      
+	      <option value='blue mussel'>
+		blue mussel</option>
+	      
+	      <option value='blue shark'>
+		blue shark</option>
+	      
+	      <option value='bottlebrush coral'>
+		bottlebrush coral</option>
+	      
+	      <option value='brachiopod'>
+		brachiopod</option>
+	      
+	      <option value='brittle star'>
+		brittle star</option>
+	      
+	      <option value='Bryozoan'>
+		Bryozoan</option>
+	      
+	      <option value='Burbot'>
+		Burbot</option>
+	      
+	      <option value='common Atlantic grenadier'>
+		common Atlantic grenadier</option>
+	      
+	      <option value='conger eel'>
+		conger eel</option>
+	      
+	      <option value='coral'>
+		coral</option>
+	      
+	      <option value='Crab'>
+		Crab</option>
+	      
+	      <option value='Ctenophore'>
+		Ctenophore</option>
+	      
+	      <option value='cunner'>
+		cunner</option>
+	      
+	      <option value='cusk'>
+		cusk</option>
+	      
+	      <option value='deep sea king crab'>
+		deep sea king crab</option>
+	      
+	      <option value='deep-sea scallop'>
+		deep-sea scallop</option>
+	      
+	      <option value='flounder'>
+		flounder</option>
+	      
+	      <option value='Frilled anemone'>
+		Frilled anemone</option>
+	      
+	      <option value='galatheid crab'>
+		galatheid crab</option>
+	      
+	      <option value='ghost anemone'>
+		ghost anemone</option>
+	      
+	      <option value='glass sponge'>
+		glass sponge</option>
+	      
+	      <option value='goosefish'>
+		goosefish</option>
+	      
+	      <option value='hake'>
+		hake</option>
+	      
+	      <option value='Hermit crab'>
+		Hermit crab</option>
+	      
+	      <option value='Hydroid'>
+		Hydroid</option>
+	      
+	      <option value='Inshore lizardfish'>
+		Inshore lizardfish</option>
+	      
+	      <option value='jellyfish'>
+		jellyfish</option>
+	      
+	      <option value='Jonah crab'>
+		Jonah crab</option>
+	      
+	      <option value='krill'>
+		krill</option>
+	      
+	      <option value='Lake trout'>
+		Lake trout</option>
+	      
+	      <option value='longfin inshore squid'>
+		longfin inshore squid</option>
+	      
+	      <option value='longhorn sculpin'>
+		longhorn sculpin</option>
+	      
+	      <option value='longnosed eel'>
+		longnosed eel</option>
+	      
+	      <option value='lumpfish'>
+		lumpfish</option>
+	      
+	      <option value='northern cerianthid'>
+		northern cerianthid</option>
+	      
+	      <option value='Northern cutthroat eel'>
+		Northern cutthroat eel</option>
+	      
+	      <option value='Northern red anemone'>
+		Northern red anemone</option>
+	      
+	      <option value='Nudibranch'>
+		Nudibranch</option>
+	      
+	      <option value='ocean pout'>
+		ocean pout</option>
+	      
+	      <option value='octopus'>
+		octopus</option>
+	      
+	      <option value='offshore hake'>
+		offshore hake</option>
+	      
+	      <option value='palmate sponge'>
+		palmate sponge</option>
+	      
+	      <option value='pollock'>
+		pollock</option>
+	      
+	      <option value='red deepsea crab'>
+		red deepsea crab</option>
+	      
+	      <option value='red hake'>
+		red hake</option>
+	      
+	      <option value='red soft coral'>
+		red soft coral</option>
+	      
+	      <option value='redfish'>
+		redfish</option>
+	      
+	      <option value='rock crab'>
+		rock crab</option>
+	      
+	      <option value='rockfishes'>
+		rockfishes</option>
+	      
+	      <option value='round goby'>
+		round goby</option>
+	      
+	      <option value='sculpin'>
+		sculpin</option>
+	      
+	      <option value='Scup'>
+		Scup</option>
+	      
+	      <option value='sea corn'>
+		sea corn</option>
+	      
+	      <option value='sea cucumber'>
+		sea cucumber</option>
+	      
+	      <option value='sea pen'>
+		sea pen</option>
+	      
+	      <option value='sea raven'>
+		sea raven</option>
+	      
+	      <option value='sea spider'>
+		sea spider</option>
+	      
+	      <option value='Sea squirt'>
+		Sea squirt</option>
+	      
+	      <option value='Sea Star'>
+		Sea Star</option>
+	      
+	      <option value='sea strawberry'>
+		sea strawberry</option>
+	      
+	      <option value='sea vase'>
+		sea vase</option>
+	      
+	      <option value='shrimp'>
+		shrimp</option>
+	      
+	      <option value='silver hake'>
+		silver hake</option>
+	      
+	      <option value='skate'>
+		skate</option>
+	      
+	      <option value='smooth sunstar'>
+		smooth sunstar</option>
+	      
+	      <option value='snail'>
+		snail</option>
+	      
+	      <option value='spiny dogfish'>
+		spiny dogfish</option>
+	      
+	      <option value='spiny sunstar'>
+		spiny sunstar</option>
+	      
+	      <option value='sponge'>
+		sponge</option>
+	      
+	      <option value='squid'>
+		squid</option>
+	      
+	      <option value='Tilefish'>
+		Tilefish</option>
+	      
+	      <option value='urchin'>
+		urchin</option>
+	      
+	      <option value='whelk'>
+		whelk</option>
+	      
+	      <option value='winter flounder'>
+		winter flounder</option>
+	      
+	      <option value='winter skate'>
+		winter skate</option>
+	      
+	      <option value='zebra mussel'>
+		zebra mussel</option>
+	      
+	    </select>
+	    </span>
+	  </td>
+	  <td width="95" align="left"><img src="http://data.nurp.noaa.gov/mmedia/Images/Titles/GS.gif"></td>    
+	  <td width="195">
+	    <span class="B1">
+	    <select name="GS" style="width: 195px; font-size: 8pt">
+	      <option value="ALL">ALL</option>
+	      
+	      <option value='Anarhichas lupus'>
+		Anarhichas lupus</option>
+	      
+	      <option value='Anoplodactylus lentus'>
+		Anoplodactylus lentus</option>
+	      
+	      <option value='Antimora rostrata'>
+		Antimora rostrata</option>
+	      
+	      <option value='Asterias forbesii'>
+		Asterias forbesii</option>
+	      
+	      <option value='Bolocera tuidiae'>
+		Bolocera tuidiae</option>
+	      
+	      <option value='Brosme brosme'>
+		Brosme brosme</option>
+	      
+	      <option value='Cancer borealis'>
+		Cancer borealis</option>
+	      
+	      <option value='Cancer irroratus'>
+		Cancer irroratus</option>
+	      
+	      <option value='Centropristis striata'>
+		Centropristis striata</option>
+	      
+	      <option value='Centroscyllium fabricii'>
+		Centroscyllium fabricii</option>
+	      
+	      <option value='Cerianthus borealis'>
+		Cerianthus borealis</option>
+	      
+	      <option value='Conger oceanicus'>
+		Conger oceanicus</option>
+	      
+	      <option value='Crossaster papposus'>
+		Crossaster papposus</option>
+	      
+	      <option value='Cyclopterus lumpus'>
+		Cyclopterus lumpus</option>
+	      
+	      <option value='Diadumene leucolena'>
+		Diadumene leucolena</option>
+	      
+	      <option value='Didemnum sp.'>
+		Didemnum sp.</option>
+	      
+	      <option value='Dreissenia polymorpha'>
+		Dreissenia polymorpha</option>
+	      
+	      <option value='Euplectella'>
+		Euplectella</option>
+	      
+	      <option value='Gadus morhua'>
+		Gadus morhua</option>
+	      
+	      <option value='Gersemia rubiformis'>
+		Gersemia rubiformis</option>
+	      
+	      <option value='Geryon quinquedens'>
+		Geryon quinquedens</option>
+	      
+	      <option value='Gonatus'>
+		Gonatus</option>
+	      
+	      <option value='Hemitripterus americanus'>
+		Hemitripterus americanus</option>
+	      
+	      <option value='Homarus americanus'>
+		Homarus americanus</option>
+	      
+	      <option value='Isodictya palmata'>
+		Isodictya palmata</option>
+	      
+	      <option value='Lithodes maja'>
+		Lithodes maja</option>
+	      
+	      <option value='Loligo pealeii'>
+		Loligo pealeii</option>
+	      
+	      <option value='Lophius americanus'>
+		Lophius americanus</option>
+	      
+	      <option value='Lopholatilus chamaeleonticeps'>
+		Lopholatilus chamaeleonticeps</option>
+	      
+	      <option value='Lota lota'>
+		Lota lota</option>
+	      
+	      <option value='Macrozoarces americanus'>
+		Macrozoarces americanus</option>
+	      
+	      <option value='Merluccius albidus'>
+		Merluccius albidus</option>
+	      
+	      <option value='Merluccius bilinearis'>
+		Merluccius bilinearis</option>
+	      
+	      <option value='Metridium senile'>
+		Metridium senile</option>
+	      
+	      <option value='Myoxocephalus octodecemspinosus'>
+		Myoxocephalus octodecemspinosus</option>
+	      
+	      <option value='Myoxocephalus sp.'>
+		Myoxocephalus sp.</option>
+	      
+	      <option value='Mytilus edulis'>
+		Mytilus edulis</option>
+	      
+	      <option value='Neogobius melanstomus'>
+		Neogobius melanstomus</option>
+	      
+	      <option value='Nezumia aequalis'>
+		Nezumia aequalis</option>
+	      
+	      <option value='Octopus vulgaris'>
+		Octopus vulgaris</option>
+	      
+	      <option value='Oculina varicosa'>
+		Oculina varicosa</option>
+	      
+	      <option value='Pagurus sp.'>
+		Pagurus sp.</option>
+	      
+	      <option value='Paramuricea grandis'>
+		Paramuricea grandis</option>
+	      
+	      <option value='Pennatula aculeata'>
+		Pennatula aculeata</option>
+	      
+	      <option value='Placopecten magellanicus'>
+		Placopecten magellanicus</option>
+	      
+	      <option value='Pollachius virens'>
+		Pollachius virens</option>
+	      
+	      <option value='Primnoa resedaeformis'>
+		Primnoa resedaeformis</option>
+	      
+	      <option value='Prionace glauca'>
+		Prionace glauca</option>
+	      
+	      <option value='Pseudopleuronectes americanus'>
+		Pseudopleuronectes americanus</option>
+	      
+	      <option value='Raja ocellata'>
+		Raja ocellata</option>
+	      
+	      <option value='Raja sp.'>
+		Raja sp.</option>
+	      
+	      <option value='Salvelinus namaycush'>
+		Salvelinus namaycush</option>
+	      
+	      <option value='Sebastes'>
+		Sebastes</option>
+	      
+	      <option value='Sebastes fasciatus'>
+		Sebastes fasciatus</option>
+	      
+	      <option value='Seriola'>
+		Seriola</option>
+	      
+	      <option value='Solaster endeca'>
+		Solaster endeca</option>
+	      
+	      <option value='Squalus acanthias'>
+		Squalus acanthias</option>
+	      
+	      <option value='Stenotomus chrysops'>
+		Stenotomus chrysops</option>
+	      
+	      <option value='Synaphobranchus kaupii'>
+		Synaphobranchus kaupii</option>
+	      
+	      <option value='Synodus foetens'>
+		Synodus foetens</option>
+	      
+	      <option value='Tautogolabrus adspersus'>
+		Tautogolabrus adspersus</option>
+	      
+	      <option value='Thourella'>
+		Thourella</option>
+	      
+	      <option value='Tubularia sp.'>
+		Tubularia sp.</option>
+	      
+	      <option value='Urophycis chuss'>
+		Urophycis chuss</option>
+	      
+	      <option value='Urticina felina'>
+		Urticina felina</option>
+	      
+	    </select>
+	    </span>
+	  </td>
+	</tr>
+	<tr height="30">
+	  <td width="95" align="left"><img src="http://data.nurp.noaa.gov/mmedia/Images/Titles/Tech.gif"></td>
+	  <td width="195">
+	    <span class="B1">
+	    <select name="Tech" style="width: 195px; font-size: 8pt">
+	      <option value="ALL">ALL</option>
+	      
+	      <option value='benthic grab'>
+		benthic grab</option>
+	      
+	      <option value='box core'>
+		box core</option>
+	      
+	      <option value='Clelia'>
+		Clelia</option>
+	      
+	      <option value='electroshocker'>
+		electroshocker</option>
+	      
+	      <option value='end effector'>
+		end effector</option>
+	      
+	      <option value='H.M.S. Britannic'>
+		H.M.S. Britannic</option>
+	      
+	      <option value='Johnson Sea Link'>
+		Johnson Sea Link</option>
+	      
+	      <option value='lobster trap'>
+		lobster trap</option>
+	      
+	      <option value='LV-51 Lightship'>
+		LV-51 Lightship</option>
+	      
+	      <option value='Montana steamship'>
+		Montana steamship</option>
+	      
+	      <option value='NR-1 submersible'>
+		NR-1 submersible</option>
+	      
+	      <option value='rebreather'>
+		rebreather</option>
+	      
+	      <option value='SCUBA'>
+		SCUBA</option>
+	      
+	      <option value='suction sampler'>
+		suction sampler</option>
+	      
+	    </select>
+	    </span>
+	  </td>
+	  <td width="95" align="left"><img src="Images/Titles/Keyword.gif"></td>
+	  <td width="195"><span class="B1"><input type="text" name="Keyword" style="width: 195px"></span></td>
+	</tr>
+      </table>
+    </td>
+  </tr>
+  <tr height="60">
+    <td width="640" align="center" valign="middle" colspan="3"><img src="Images/Titles/GeoSearch.gif" alt="Geographic Search"
+      border="0" vspace="15"></td>
+  </tr>
+  <tr height="25">
+    <td width="640" align="center" colspan="3" valign="middle"><a name="ssearch"><input type="checkbox" name="SpatialSearch"></a><span class="B1">
+      &nbsp;Check this box to confine search to the geographic coordinates of the map below</span></td>
+  </tr>
+  <tr>
+    <td width="640" colspan="3">
+      <TABLE WIDTH=546 HEIGHT=333 BORDER=0 CELLPADDING=0 CELLSPACING=0 align="center">
+        <TR>
+	  <TD ROWSPAN=7 WIDTH=64 HEIGHT=333>&nbsp;</TD>
+	  <TD COLSPAN=2 ROWSPAN=2 WIDTH=19 HEIGHT=19><a onMouseOver="changeImage('PanCtrl_01','PanCtrlS[1]');" 
+	    onMouseOut="changeImage('PanCtrl_01','PanCtrl[1]');" href="javascript:pan(0.25,0.25);">
+	    <IMG NAME="PanCtrl_01" SRC="MapTools/PanCtrl_01.gif" WIDTH=19 HEIGHT=19 ALT="" BORDER="0"></a></TD>
+	  <TD WIDTH=152 HEIGHT=15><IMG SRC="MapTools/Blank.gif" WIDTH=152 HEIGHT=15 ALT=""></TD>
+	  <TD WIDTH=76 HEIGHT=15><a onMouseOver="changeImage('PanCtrl_02','PanCtrlS[2]');" 
+	    onMouseOut="changeImage('PanCtrl_02','PanCtrl[2]');" href="javascript:pan(0.5,0.25);">
+	    <IMG NAME="PanCtrl_02" SRC="MapTools/PanCtrl_02.gif" WIDTH=76 HEIGHT=15 ALT="" BORDER="0"></a></TD>
+	  <TD WIDTH=152 HEIGHT=15><IMG SRC="MapTools/Blank.gif" WIDTH=152 HEIGHT=15 ALT=""></TD>
+	  <TD COLSPAN=2 ROWSPAN=2 WIDTH=19 HEIGHT=19><a onMouseOver="changeImage('PanCtrl_03','PanCtrlS[3]');" 
+	    onMouseOut="changeImage('PanCtrl_03','PanCtrl[3]');" href="javascript:pan(0.75,0.25);">
+	    <IMG NAME="PanCtrl_03" SRC="MapTools/PanCtrl_03.gif" WIDTH=19 HEIGHT=19 ALT="" BORDER="0"></a></TD>	
+      	  <TD ROWSPAN=7 WIDTH=10 HEIGHT=333><IMG SRC="MapTools/blank.gif" WIDTH=10 HEIGHT=333 ALT=""></TD>
+          <TD ROWSPAN=7 WIDTH=64 HEIGHT=333> 
+            <TABLE WIDTH=54 HEIGHT=289 BORDER=0 CELLPADDING=0 CELLSPACING=0 ALIGN="CENTER">
+              <TR> 
+             	<TD WIDTH=54 HEIGHT=12 align="center"><IMG SRC="MapTools/ZoomText.gif" WIDTH=31 HEIGHT=11 BORDER="0"></TD>
+              </TR>
+              <TR> 
+            	<TD WIDTH=54 HEIGHT=11 valign="middle" align="center"><img src="MapTools/Divider.gif" width=45 
+	  	  height=7 alt=""></TD>
+              </TR>
+              <TR> 
+            	<TD WIDTH=54 HEIGHT=26 valign="middle" align="center"><a onMouseOver="changeImage('ZIn','ZInButtonS');" 
+		  onMouseOut="changeImage('ZIn','ZInButton');" href="javascript:zoomby(1);"><IMG NAME="Blank" 
+		  SRC="MapTools/Blank.gif" WIDTH=6 HEIGHT=11 ALT="" BORDER="0" vspace="7"><IMG NAME="In" 
+		  SRC="MapTools/InText.gif" WIDTH=11 HEIGHT=11 ALT="" BORDER="0" vspace="7"><IMG NAME="ZIn" 
+	 	  SRC="MapTools/ZInButton.gif" WIDTH=22 HEIGHT=22 ALT="" BORDER="0" vspace="2"></a></TD>
+              </TR>
+              <TR> 
+            	<TD WIDTH=54 HEIGHT=99> 
+              	  <TABLE WIDTH=32 HEIGHT=99 BORDER=0 CELLPADDING=0 CELLSPACING=0 align="center">
+                    <TR> 
+                      <TD WIDTH=32 HEIGHT=11 align="center"><a onMouseOver="changeZImage('8','S');" 
+			onMouseOut="changeZImage('8','');" href="javascript:zoomto(8);"><IMG NAME="ZLevel8" 
+			SRC="MapTools/ZButton.gif" WIDTH=28 HEIGHT=9 ALT="" BORDER="0"></a></TD>
+                    </TR>
+                    <TR> 
+                      <TD WIDTH=32 HEIGHT=11 align="center"><a onMouseOver="changeZImage('7','S');" 
+			onMouseOut="changeZImage('7','');" href="javascript:zoomto(7);"><IMG NAME="ZLevel7" 
+			SRC="MapTools/ZButton.gif" WIDTH=28 HEIGHT=9 ALT="" BORDER="0"></a></TD>
+                    </TR>
+                    <TR> 
+                      <TD WIDTH=32 HEIGHT=11 align="center"><a onMouseOver="changeZImage('6','S');" 
+			onMouseOut="changeZImage('6','');" href="javascript:zoomto(6);"><IMG NAME="ZLevel6" 
+			SRC="MapTools/ZButton.gif" WIDTH=28 HEIGHT=9 ALT="" BORDER="0"></a></TD>
+                    </TR>
+                    <TR> 
+                      <TD WIDTH=32 HEIGHT=11 align="center"><a onMouseOver="changeZImage('5','S');" 
+			onMouseOut="changeZImage('5','');" href="javascript:zoomto(5);"><IMG NAME="ZLevel5" 
+			SRC="MapTools/ZButton.gif" WIDTH=28 HEIGHT=9 ALT="" BORDER="0"></a></TD>
+                    </TR>
+                    <TR> 
+                      <TD WIDTH=32 HEIGHT=11 align="center"><a onMouseOver="changeZImage('4','S');" 
+			onMouseOut="changeZImage('4','');" href="javascript:zoomto(4);"><IMG NAME="ZLevel4" 
+			SRC="MapTools/ZButton.gif" WIDTH=28 HEIGHT=9 ALT="" BORDER="0"></a></TD>
+                    </TR>
+                    <TR> 
+                      <TD WIDTH=32 HEIGHT=11 align="center"><a onMouseOver="changeZImage('3','S');" 
+			onMouseOut="changeZImage('3','');" href="javascript:zoomto(3);"><IMG NAME="ZLevel3" 
+			SRC="MapTools/ZButton.gif" WIDTH=28 HEIGHT=9 ALT="" BORDER="0"></a></TD>
+                    </TR>
+                    <TR> 
+                      <TD WIDTH=32 HEIGHT=11 align="center"><a onMouseOver="changeZImage('2','S');" 
+			onMouseOut="changeZImage('2','');" href="javascript:zoomto(2);"><IMG NAME="ZLevel2" 
+			SRC="MapTools/ZButton.gif" WIDTH=28 HEIGHT=9 ALT="" BORDER="0"></a></TD>
+                    </TR>
+                    <TR> 
+                      <TD WIDTH=32 HEIGHT=11 align="center"><a onMouseOver="changeZImage('1','S');" 
+			onMouseOut="changeZImage('1','');" href="javascript:zoomto(1);"><IMG NAME="ZLevel1" 
+			SRC="MapTools/ZButton.gif" WIDTH=28 HEIGHT=9 ALT="" BORDER="0"></a></TD>
+                    </TR>
+                  </TABLE>
+		  <script language=JavaScript>
+		    changeImage(('ZLevel' + 2),'ZButtonS');
+		  </script>
+                </TD>
+              </TR>
+              <TR> 
+                <TD WIDTH=54 HEIGHT=2><IMG SRC="MapTools/blank.gif" WIDTH=54 HEIGHT=2 ALT=""></TD>
+              </TR>
+              <TR> 
+                <TD WIDTH=54 HEIGHT=26 align="center"><a onMouseOver="changeImage('ZOut','ZOutButtonS');" 
+		  onMouseOut="changeImage('ZOut','ZOutButton');" href="javascript:zoomby(-1);">
+		  <IMG NAME="Blank" SRC="MapTools/Blank.gif" WIDTH=4 HEIGHT=11 ALT="" BORDER="0" vspace="7">
+		  <IMG NAME="Out" SRC="MapTools/OutText.gif" WIDTH=21 HEIGHT=11 ALT="" BORDER="0" vspace="7">
+		  <IMG NAME="ZOut" SRC="MapTools/ZOutButton.gif" WIDTH=21 HEIGHT=22 ALT="" BORDER="0" vspace="2"></a></TD>
+              </TR>
+              <TR> 
+                <TD WIDTH=54 HEIGHT=24 align="center"><IMG SRC="MapTools/Blank.gif" WIDTH=54 HEIGHT=24 ALT=""></TD>
+              </TR>
+              <TR> 
+                <TD WIDTH=54 HEIGHT=11 align="center"><a onMouseOver="changeImage('ZFull','ZFullButtonS');" 
+		  onMouseOut="changeImage('ZFull','ZFullButton');" href="javascript:zoomfull();">
+		  <IMG SRC="MapTools/ZFullText.gif" WIDTH=51 HEIGHT=11 ALT="" BORDER="0"></a></TD>
+              </TR>
+              <TR> 
+                <TD WIDTH=54 HEIGHT=26 align="center"><a onMouseOver="changeImage('ZFull','ZFullButtonS');" 
+		  onMouseOut="changeImage('ZFull','ZFullButton');" href="javascript:zoomfull();">
+		  <IMG NAME="ZFull" SRC="MapTools/ZFullButton.gif" WIDTH=25 HEIGHT=25 ALT="" BORDER="0"></a></TD>
+              </TR>
+              <TR> 
+                <TD WIDTH=54 HEIGHT=52><IMG SRC="MapTools/Blank.gif" WIDTH=54 HEIGHT=52 ALT="" BORDER="0"></TD>
+              </TR>
+            </TABLE>		
+          </TD>
+	</TR>
+	<TR>
+	  <TD COLSPAN=3 WIDTH=380 HEIGHT=4><IMG SRC="MapTools/TBorder.gif" WIDTH=380 HEIGHT=4 ALT=""></TD>
+	</TR>
+	<TR>
+    	  <TD WIDTH=15 HEIGHT=110>&nbsp;</TD>
+	  <TD ROWSPAN=3 WIDTH=4 HEIGHT=295><IMG SRC="MapTools/LBorder.gif" WIDTH=4 HEIGHT=295 ALT=""></TD>
+	  <TD COLSPAN=3 ROWSPAN=3 WIDTH=380 HEIGHT=295><input type="image" name="iMap" onClick="changeCSource('iMap');" 
+	    bordercolor="#000000" src=http://data.nurp.noaa.gov/output/USSearchMap_APPSERVER181221564302.jpg width=380 height=295 border="0"></TD>
+	  <TD ROWSPAN=3 WIDTH=4 HEIGHT=295><IMG SRC="MapTools/RBorder.gif" WIDTH=4 HEIGHT=295 ALT=""></TD>
+	  <TD WIDTH=15 HEIGHT=110>&nbsp;</TD>
+	</TR>
+	<TR>
+	  <TD WIDTH=15 HEIGHT=75><a onMouseOver="changeImage('PanCtrl_04','PanCtrlS[4]');" 
+	    onMouseOut="changeImage('PanCtrl_04','PanCtrl[4]');" href="javascript:pan(0.25,0.5);">
+	    <IMG NAME="PanCtrl_04" SRC="MapTools/PanCtrl_04.gif" WIDTH=15 HEIGHT=75 ALT="" BORDER="0"></a></TD>
+	  <TD WIDTH=15 HEIGHT=75><a onMouseOver="changeImage('PanCtrl_05','PanCtrlS[5]');" 
+	    onMouseOut="changeImage('PanCtrl_05','PanCtrl[5]');" href="javascript:pan(0.75,0.5);">
+	    <IMG NAME="PanCtrl_05" SRC="MapTools/PanCtrl_05.gif" WIDTH=15 HEIGHT=75 ALT="" BORDER="0"></a></TD>
+	</TR>
+	<TR>
+    	  <TD WIDTH=15 HEIGHT=110>&nbsp;</TD>
+	  <TD WIDTH=15 HEIGHT=110>&nbsp;</TD>
+	</TR>
+	<TR>
+	  <TD COLSPAN=2 ROWSPAN=2 WIDTH=19 HEIGHT=19><a onMouseOver="changeImage('PanCtrl_06','PanCtrlS[6]');" 
+	    onMouseOut="changeImage('PanCtrl_06','PanCtrl[6]');" href="javascript:pan(0.25,0.75);">
+	    <IMG NAME="PanCtrl_06" SRC="MapTools/PanCtrl_06.gif" WIDTH=19 HEIGHT=19 ALT="" BORDER="0"></a></TD>
+	  <TD COLSPAN=3 WIDTH=380 HEIGHT=4><IMG SRC="MapTools/BBorder.gif" WIDTH=380 HEIGHT=4 ALT=""></TD>
+	  <TD COLSPAN=2 ROWSPAN=2 WIDTH=19 HEIGHT=19><a onMouseOver="changeImage('PanCtrl_07','PanCtrlS[7]');" 
+	    onMouseOut="changeImage('PanCtrl_07','PanCtrl[7]');" href="javascript:pan(0.75,0.75);">
+	    <IMG NAME="PanCtrl_07" SRC="MapTools/PanCtrl_07.gif" WIDTH=19 HEIGHT=19 ALT="" BORDER="0"></a></TD>
+	</TR>
+	<TR>
+	  <TD WIDTH=152 HEIGHT=15><IMG SRC="MapTools/Blank.gif" WIDTH=152 HEIGHT=15 ALT=""></TD>
+	  <TD WIDTH=76 HEIGHT=15><a onMouseOver="changeImage('PanCtrl_08','PanCtrlS[8]');" 
+	    onMouseOut="changeImage('PanCtrl_08','PanCtrl[8]');" href="javascript:pan(0.5,0.75);">
+	    <IMG NAME="PanCtrl_08" SRC="MapTools/PanCtrl_08.gif" WIDTH=76 HEIGHT=15 ALT="" BORDER="0"></a></TD>
+	  <TD WIDTH=152 HEIGHT=15><IMG SRC="MapTools/Blank.gif" WIDTH=152 HEIGHT=15 ALT=""></TD>
+	</TR>
+      </TABLE>
+    </td>
+  </tr>
+  <!--Hidden inputs to pass values to MMSearch.asp -->
+    <input type="hidden" name="ctool" value="Pan">
+    <input type="hidden" name="YMax" value="86">
+    <input type="hidden" name="XMin" value="-172.059">
+    <input type="hidden" name="XMax" value="-63.340">
+    <input type="hidden" name="YMin" value="1.6">
+    <input type="hidden" name="cSource" value=>
+    <input type="hidden" name="mTool" value=Pan>
+    <input type="hidden" name="zLevel" value=2>
+    <input type="hidden" name="mParam1">
+    <input type="hidden" name="mParam2">
+    <input type="hidden" name="qcheck">
+  <tr height="50">
+    <td width="640" colspan="3">
+      <table align="center" width="380" height="50">
+	<tr>
+	  <td width="70" valign="middle"><img src="Images/Bandwidth.gif" border="0"></td>
+	  <td width="160" valign="middle">
+      	    <span class="B1">
+      	    <select name="BW" style="width: 150px; font-size: 8pt">
+	      <option value="LBW">Modem (&lt; 56 Kbps)</option>
+	      <option value="MBW">DSL, Cable (56K-1.5 Mbps)</option>
+	      <option selected value="HBW">T1, LAN (&gt; 1.5 Mbps)</option>
+            </select>
+            </span>
+	  </td>
+	  <td width="90" valign="middle"><img src="Images/RecPage.gif" border="0"></td>
+	  <td width="60" valign="middle">
+	    <span class="B1">
+      	    <select name="PSize" style="width: 40px; font-size: 8pt">
+   	      <option selected value="12">12</option>
+	      <option value="24">24</option>
+	      <option value="48">48</option>
+            </select>
+            </span>
+          </td>
+	</tr>
+      </table>
+    </td>
+  </tr>
+  <tr height="30">
+    <td width="640" align="center" valign="middle" colspan="3">
+      <a href="javascript:submitquery();"><img src="images/buttons/search.gif" border="0" alt="Search" vspace="10"></a>
+      <a href="javascript:resetquery();"><img src="images/buttons/reset.gif" border="0" alt="Reset" vspace="10"></a>
+    </td>
+  </tr>
+  </form>
+
+  
+	    
+  <tr height="50">
+    <td width="640" align="center" valign="middle" colspan="3"><a href="http://www.apple.com/quicktime/download/" target="_blank">
+      <img src="Images/getQT.gif" border="0" vspace="15"></a></td>
+  </tr>	
+  <tr height="90">
+    <td align="center" valign="middle" width="120" height="90"><a href="http://www.nurp.noaa.gov">
+      <img src="images/Logos/NURP.gif" width="75" height="75" alt="NURP" border="0" hspace="22"></a></td>
+    <td align="center" valign="middle" width="400" height="90"><span class="B1">
+	<a href="http://www.nurp.noaa.gov/index.html">Home</a>&nbsp;&nbsp;
+	<a href="http://www.nurp.noaa.gov/whatisnurp.html">About</a>&nbsp;&nbsp;
+	<a href="http://data.nurp.noaa.gov/nurp03/research.asp">Research</a>&nbsp;&nbsp;
+	<a href="http://www.nurp.noaa.gov/underseatechnologies.html">Technology</a>&nbsp;&nbsp;
+	<a href="http://www.nurp.noaa.gov/undersearesearchcenters.html">Centers</a>&nbsp;&nbsp;
+	<a href="http://www.nurp.noaa.gov/news.html">News</a>&nbsp;&nbsp;
+	<a href="http://www.nurp.noaa.gov/funding.html">Funding</a>&nbsp;&nbsp;
+	<a href="http://www.nurp.noaa.gov/projects.html">Products</a></span><hr>
+	<span class="B1"><b>NOAA's Undersea Research Program</b><br> 
+	  1315 East-West Highway, R/NURP - Silver Spring, MD 20910<br>
+	  Phone: (301) 713-2427 &nbsp; Fax: (301) 713-1967 &nbsp; 
+	  <a href="mailto:mckee@uconn.edu">Email Contact</a></span><br>
+    </td>
+    <td align="center" valign="middle" width="120" height="90"><a href="http://www.noaa.gov">
+      <img src="Images/logos/noaa.gif" width="75" height="75" alt="NOAA" border="0" hspace="22"></a></td>
+  </tr>
+</table>
+</body>
+</html>
+

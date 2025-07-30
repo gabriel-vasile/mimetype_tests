@@ -1,0 +1,385 @@
+//  @(#)datetime.cpp	1.5 -- 08/28/01
+
+//    datetime.cpp - Time class origninally created by Charles Schwarz to
+//             store time in a standard format and provide functions
+//             to allow conversion between different, commonly used
+//             time formats.  The code was changed to meet SDB
+//             time definitions
+
+// 23-Aug-01 - Gordon Adams
+//             Added SCCS keywords.
+//             Changed the signatures for the initializer methods to have
+//             the parameters passed by constant reference since they are
+//             not changed and are structures.
+//             Changed the signatures of the constructors to have the
+//             parameters passed by reference since they are strucutres.
+//
+// 27-Jul-00 - Gordon Adams
+//             Changed the "long double" declarations to "double".  After
+//             talking with Steve Hilla I learned that long double was not
+//             providing anything to the effective precision of the
+//             computations and that type is a different size on different
+//             machines (80 to 128 bits).  It may evn slow down computations
+//
+// 02-Jun-97 - Gordon Adams
+//             Moved constants from the datetime.h file into the datetime.cpp
+//             file since the datetime routines are the only ones that use
+//             the constants.  Created the getGPSSeconds() method that returns
+//             the GPS time in seconds.
+//
+//             Modified the GetYearDay() method to not use the mjd form of the
+//             GPS time when generating the YearDay form. This gives an exact
+//             representation of the seconds, thus preventing rounding errors.
+//             A similar change was made to the
+//
+//             Removed the old datetime constructor that took a YearDay
+//             argument but went through the mjd format to initialize the
+//             private variables.  This step was unnecessary and caused
+//             hassles with round-off errors.
+
+// 15-Aug-96 - Gordon Adams
+//             Made modifications to handle the 400 year component
+//             for computing the leap years.  Charlie Schwarz did
+//             most of the work and I made the final edits.
+//             I moved the Leap[] and Normal[] arrays from datetime.h
+//             to datetime.cpp since only the methods use them. I
+//             also dropped the operator- that returned a DateTime
+//             object. This was was a wrong idea since one date minus
+//             another date does not yeild a third date.  It just
+//             yields a difference, in this case it is the number of
+//             seconds.
+
+#include "datetime.h"
+#include <math.h>
+
+const long     DaysIn100Years    = 36524;   // 25 * 1461 - 1
+const long     DaysIn4Years      = 1461;    // 3 * 365 + 366
+const long     DaysIn400Years    = 146097;  // 4 * 36524 + 1
+const long     DaysInNonLeapYear = 365;
+const long     DaysInWeek        = 7;
+const long     HoursInDay        = 24;
+const long     MJDJan61980       = 44244;   // Start of GPS time
+const long     MJDJan1Year1      = -678575;
+const long     MinutesInDay      = 1440;
+const long     MinutesInHour     = 60;
+const double   SecondsInDay      = 86400.0;
+const double   SecondsInHour     = 3600.0;
+const double   SecondsInMin      = 60.0;
+const double   SecondsInWeek     = 604800.0;
+
+const long Leap[ 13 ] = { 0,  31,  60,  91, 121, 152, 182,
+                             213, 244, 274, 305, 335, 366 };
+
+const long Normal[ 13 ] = { 0,  31,  59,  90, 120, 151, 181,
+                               212, 243, 273, 304, 334, 365 };
+
+// Constructors
+
+DateTime::DateTime() { GPSWeek = 0; secsOfWeek = 0.0; }
+
+DateTime::DateTime( GPSTime & gpstime )
+{
+   GPSWeek    = gpstime.GPSWeek;
+   secsOfWeek = gpstime.secsOfWeek;
+}
+
+DateTime::DateTime( MJD & mjd )
+{
+   GPSWeek    = ( long ) floor( ( mjd.mjd - MJDJan61980 ) / (double) DaysInWeek );
+
+   secsOfWeek = ( ( double ) ( mjd.mjd - MJDJan61980 - GPSWeek * DaysInWeek )
+                  + mjd.fmjd )
+                   * SecondsInDay;
+}
+
+DateTime::DateTime( YearDay & yearday )
+{
+   long  adjustedYear = yearday.year - 1;
+   long  mjd;
+
+   mjd = ( adjustedYear/400 * DaysIn400Years ) +
+         ( ( adjustedYear % 400 )/100 * DaysIn100Years ) +
+         ( ( adjustedYear % 100 )/4 * DaysIn4Years ) +
+         ( ( adjustedYear % 4 ) * DaysInNonLeapYear ) +
+         ( yearday.yday - 1 ) +
+         MJDJan1Year1;
+
+   GPSWeek = ( long ) floor( ( mjd - MJDJan61980 ) / (double) DaysInWeek );
+
+   secsOfWeek = ( mjd - MJDJan61980 - GPSWeek * DaysInWeek ) * SecondsInDay;
+   secsOfWeek += yearday.hour * SecondsInHour +
+                 yearday.min * SecondsInMin +
+                 yearday.sec;
+}
+
+DateTime::DateTime( const YearMonthDay & yearmonthday )
+{
+   YearDay yd;
+
+   yd.year = yearmonthday.year;
+
+   if ( yearmonthday.year % 400 == 0 ||    // leap year
+        ( yearmonthday.year % 100 != 0 &&
+          yearmonthday.year % 4 == 0 ) )
+   {
+      yd.yday = Leap[ yearmonthday.month - 1 ] + yearmonthday.monthday;
+   }
+   else                                    // normal year
+   {
+      yd.yday = Normal[ yearmonthday.month - 1 ] + yearmonthday.monthday;
+   }
+
+   yd.hour = yearmonthday.hour;
+   yd.min  = yearmonthday.min;
+   yd.sec  = yearmonthday.sec;
+
+   DateTime tt = DateTime( yd );
+   GPSWeek     = tt.GPSWeek;
+   secsOfWeek  = tt.secsOfWeek;
+}
+
+
+DateTime::DateTime( unsigned long year, unsigned long month,
+                    unsigned long monthday, unsigned long hour,
+                    unsigned long min, double sec )
+{
+   YearDay yd;
+
+   yd.year = year;
+
+   if ( year % 400 == 0 || ( year % 100 != 0 && year % 4 == 0 ) )
+   {                       // leap year
+      yd.yday = Leap[ month - 1 ] + monthday;
+   }
+   else                    // normal year
+   {
+      yd.yday = Normal[ month - 1 ] + monthday;
+   }
+
+   yd.hour = hour;
+   yd.min  = min;
+   yd.sec  = sec;
+
+   DateTime tt = DateTime( yd );
+   GPSWeek     = tt.GPSWeek;
+   secsOfWeek  = tt.secsOfWeek;
+}
+
+// Initializers - used to set the value of an existing variable.
+
+void DateTime::SetGPSTime( GPSTime & gpstime )
+{
+   *this = DateTime( gpstime );
+}
+
+void DateTime::SetMJD( MJD & mjd )
+{
+   *this = DateTime( mjd );
+}
+
+void DateTime::SetYearDay( YearDay & yearday )
+{
+   *this = DateTime( yearday );
+}
+
+void DateTime::SetYearMonthDay( const YearMonthDay & yearmonthday )
+{
+   *this = DateTime( yearmonthday );
+}
+
+void DateTime::SetYMDHMS( unsigned long year, unsigned long month,
+                          unsigned long monthday, unsigned long hour,
+                          unsigned long min, double sec )
+{
+   *this = DateTime( year, month, monthday, hour, min, sec );
+}
+
+
+// Selectors - return the contents of a variable.
+
+double DateTime::GetGPSSeconds()
+{
+   return ( ( GPSWeek * SecondsInWeek ) + secsOfWeek );
+}
+
+GPSTime DateTime::GetGPSTime()
+{
+   GPSTime tt;
+
+   tt.GPSWeek    = GPSWeek;
+   tt.secsOfWeek = secsOfWeek;
+   return tt;
+}
+
+MJD DateTime::GetMJD()
+{
+   MJD mjd;
+
+   mjd.mjd  = ( long ) floor( ( GPSWeek * DaysInWeek ) + MJDJan61980 +
+                     secsOfWeek / SecondsInDay );
+   mjd.fmjd = fmod( secsOfWeek, SecondsInDay ) / SecondsInDay;
+
+   return mjd;
+}
+
+
+YearDay DateTime::GetYearDay()
+{
+   long     dayCount;
+   long     daysFromJan1Year1;
+   long     extraDays;
+   long     fourHundredYearHunks;
+   long     fourYearHunks;
+   long     oneHundredYearHunks;
+   long     oneYearHunks;
+   double   secsOfDay;
+   YearDay  yd;
+
+   daysFromJan1Year1 = ( long ) floor( ( GPSWeek * DaysInWeek ) + MJDJan61980
+                                       + ( secsOfWeek / SecondsInDay ) )
+                                    - MJDJan1Year1;
+   fourHundredYearHunks = daysFromJan1Year1 / DaysIn400Years;
+   oneHundredYearHunks  = ( daysFromJan1Year1 -
+                            ( fourHundredYearHunks * DaysIn400Years ) ) /
+                                DaysIn100Years;
+   fourYearHunks = ( daysFromJan1Year1 -
+                     ( fourHundredYearHunks * DaysIn400Years ) -
+                     ( oneHundredYearHunks * DaysIn100Years ) ) /
+                         DaysIn4Years;
+   extraDays = ( daysFromJan1Year1 -
+                 ( fourHundredYearHunks * DaysIn400Years ) -
+                 ( oneHundredYearHunks * DaysIn100Years ) -
+                 ( fourYearHunks * DaysIn4Years ) );
+
+// If the number of extra days is less than three years, the number
+// of one-year-hunks is the integer part of quotient of the extra days
+// divided by the number of days on a non leap year.
+// If the number of extra days falls anywhere in the fourth year the
+// one-year-hunks is set to 3. This is to prevent the last day of the
+// leap year (12/31) from causing the one-year-hunks from being 4, pushing
+// the computed date ahead one day and into the next year.
+
+   oneYearHunks = ( extraDays < 1095 ) ? ( extraDays / DaysInNonLeapYear )
+                                         : 3;
+
+   yd.year = 1 +
+             fourHundredYearHunks * 400 +
+             oneHundredYearHunks * 100 +
+             fourYearHunks * 4 +
+             oneYearHunks;
+
+   yd.yday = ( daysFromJan1Year1 -
+               ( fourHundredYearHunks * DaysIn400Years ) -
+               ( oneHundredYearHunks * DaysIn100Years ) -
+               ( fourYearHunks * DaysIn4Years ) -
+               ( oneYearHunks * DaysInNonLeapYear ) + 1 );
+
+   dayCount = ( long ) ( secsOfWeek / SecondsInDay );
+   secsOfDay = secsOfWeek - ( SecondsInDay * dayCount );
+
+   yd.hour = ( long ) ( secsOfDay / SecondsInHour );
+   yd.min  = ( long ) ( secsOfDay - ( yd.hour * SecondsInHour ) )
+                      / SecondsInMin;
+   yd.sec  = secsOfDay - ( yd.hour * SecondsInHour )
+                       - ( yd.min * SecondsInMin ) ;
+
+   return yd;
+}
+
+
+YearMonthDay DateTime::GetYearMonthDay()
+{
+   int          done = 0;
+   int          i;
+   YearMonthDay ymd;
+   YearDay      yd = this->GetYearDay();
+
+   ymd.year = yd.year;
+
+   if ( ymd.year % 400 == 0 ||
+        ( ymd.year % 100 != 0  &&  ymd.year % 4 == 0 ) )
+   {         // leap year
+      for ( i = 0; i < 12 && !done; i++ )
+      {
+         if ( yd.yday > Leap[i] && yd.yday <= Leap[i+1] )
+         {
+            ymd.month    = i+1;
+            ymd.monthday = yd.yday - Leap[i];
+            done         = 1;
+         }
+      }
+   }
+   else
+   {         // normal year
+      for ( i = 0; i < 12 && !done; i++ )
+      {
+         if ( yd.yday > Normal[i] && yd.yday <= Normal[i+1])
+         {
+            ymd.month    = i+1;
+            ymd.monthday = yd.yday - Normal[i];
+            done         = 1;
+         }
+      }
+   }   // end normal year. end if.
+
+   ymd.hour = yd.hour;
+   ymd.min  = yd.min;
+   ymd.sec  = yd.sec;
+   return ymd;
+}
+
+// Operators
+
+DateTime DateTime::operator + ( const double secs )
+{
+   DateTime   DT;
+
+   DT.GPSWeek    = GPSWeek;
+   DT.secsOfWeek = secsOfWeek + secs;
+
+   DT.GPSWeek = ( long ) floor( GPSWeek +
+                                double( secsOfWeek + secs ) / SecondsInWeek );
+
+   DT.secsOfWeek = secsOfWeek + secs +
+                   ( GPSWeek - DT.GPSWeek ) * SecondsInWeek;
+
+   return DT;
+}
+
+double DateTime::operator - ( const DateTime &DT2 )
+{
+   return ( ( double ) ( ( GPSWeek - DT2.GPSWeek ) * SecondsInWeek ) +
+            ( secsOfWeek - DT2.secsOfWeek ) );
+}
+
+int DateTime::operator == ( const DateTime &DT2 )
+{
+   return ( GPSWeek == DT2.GPSWeek  &&  secsOfWeek == DT2.secsOfWeek );
+}
+
+int DateTime::operator != ( const DateTime &DT2 )
+{
+   return ( GPSWeek != DT2.GPSWeek  ||  secsOfWeek != DT2.secsOfWeek );
+}
+
+int DateTime::operator >= ( const DateTime &DT2 )
+{
+   if ( GPSWeek > DT2.GPSWeek  ||
+        GPSWeek == DT2.GPSWeek  &&  secsOfWeek >= DT2.secsOfWeek )
+   {
+      return 1;
+   }
+
+   return 0;
+}
+
+int DateTime::operator < ( const DateTime &DT2 )
+{
+   if ( GPSWeek < DT2.GPSWeek  ||
+        GPSWeek == DT2.GPSWeek &&  secsOfWeek < DT2.secsOfWeek )
+   {
+      return 1;
+   }
+
+   return 0;
+}

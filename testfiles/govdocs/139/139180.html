@@ -1,0 +1,218 @@
+<HTML>
+<HEAD><title>HTML Help for GEOMV</title></HEAD>
+<BODY>
+<H1>Help for GEOMV</H1>
+<pre>
+PURPOSE
+     GEOMV is a VICAR applications program which makes geometric
+     changes in pictures.  It can be used for many purposes including
+     correcting geometric distortion, increasing picture <A HREF="geomv_level2.html#size">size</A>, reducing 
+     picture <A HREF="geomv_level2.html#size">size</A>, and rotating a picture.  The motive for creating
+     GEOMV was to use approximately 1000 x 1000 geometric transformation
+     grids to allow modelling terrain, etc.  The following are the
+     principal differences with respect to the programs LGEOM and
+     GEOMV:
+
+	1. No limits on <A HREF="geomv_level2.html#size">size</A> of input/output pictures in GEOMV.
+	   For really large images the program automatically goes
+           into a strip processing mode, see parameters <A HREF="geomv_level2.html#vmemsize">VMEMSIZE</A>
+           and <A HREF="geomv_level2.html#tmpfile">TMPFILE</A>.
+	2. No limits on <A HREF="geomv_level2.html#size">size</A> of interpolation grid in GEOMV
+	   except due to virtual memory limits.  There is about
+	   a thousandfold increase in capacity vs the older geom
+	   programs.  The large grids can only be transferred by
+	   means of IBIS files.  TIECONV has been designed as a
+	   companion program to handle large numbers of irregular
+	   tiepoints as input and large grids as output.  A 4000
+	   by 4000 image was transformed by a 500 x 500 grid
+	   in 99 seconds on a SPARCstation 20.
+	3. GEOMV uses double precision throughout.  There are 
+	   frequent differences in LGEOM and GEOMV results for
+	   cells larger than 150 pixels.  It appears that GEOMV is
+	   much more accurate.  Making LGEOM more accurate would
+	   probably make it slower than GEOMV.
+	4. Preparation of "sharp edges" for mosaicking is
+           available using <A HREF="geomv_level2.html#znoin">ZNOIN</A> (GEOMV) and NOIZ (LGEOM).  The
+           two programs may do it differently, if so there should 
+           probably be a standardization of this operation.  In
+           GEOMV, any 0 input to the bilinear interpolation (the
+           four neighbors) causes nearest neighbor interpolation.
+	5. GEOMV is a little slower than LGEOM (249 seconds for an 
+	   8000 x 8000 image vs 221 seconds for LGEOM).
+	6. GEOMV has no bad cases.  The old restriction of less
+	   than 85 degree rotation in MGEOM is gone.  Reading of
+	   data for grid cells one at a time is gone.
+	7. GEOMV is written entirely in C and uses dynamic allocation
+	   for all data dependent arrays.
+	8. The parameters <A HREF="geomv_level2.html#nah">NAH</A> and <A HREF="geomv_level2.html#nav">NAV</A> are ignored but are kept for
+	   compatibility with the profusion of data sets.  The actual
+	   values are calculated from the grid while the grid is
+	   checked for rectangularity.
+	9. GEOMV precalculates from the grid what part of the input
+	   is needed.  For example, if you GEOMV a tiny portion of
+	   Australia, then the program will only read in the tiny
+	   portion of huge input that is needed.  This precalculation
+	   is not affected by the fact that the grid might cover a
+	   much larger output.  The result is not only speedup of
+	   smaller cases but it also allows truly huge GEOM's to
+	   be calculated in the strip mode.
+       10. Grid spacing requirements differ from LGEOM.  The output
+           points do not have to be integral, but the spacing has
+           to be uniform in each direction.  This is easy to meet
+           for mathematically generated grids, or for grids that
+           come from routine TIECONV.  Incidentally, LGEOM does not
+           presently check for non-integral output tiepoints, but
+           seems to calculate an erroneous output.
+       11. Automatic GeoTIFF labelling is supported.
+	   
+CALL
+     geomv (INPUT,GRID) OUTPUT <A HREF="geomv_level2.html#size">SIZE</A> '(QUALIFIERS) <A HREF="geomv_level2.html#tiepoint">TIEPOINT</A>-GRID
+  WHERE:
+     INPUT          is the input data set.
+     GRID           is an IBIS file containing a warp grid.
+     OUTPUT         is the output data set.
+     <A HREF="geomv_level2.html#size">SIZE</A>           is a VICAR size field for the output file
+     QUALIFIERS     consist of any of the following keywords:
+          NOIN          no interpolation is to be done.
+          <A HREF="geomv_level2.html#znoin">ZNOIN</A>         no interpolation for points with 0 DN.
+     <A HREF="geomv_level2.html#tiepoint">TIEPOINT</A>-GRID      is an alternative form for the warp grid.
+
+     The two forms of the warp grid will now be described.
+
+     The IBIS-file form of the grid contains four columns of
+single or double precision <A HREF="geomv_level2.html#tiepoint">tiepoint</A> records.  The columns in
+order are (newline,newsamp,oldline,oldsamp); or the column order
+can be user specified.  <A HREF="geomv_level2.html#nah">NAH</A> and <A HREF="geomv_level2.html#nav">NAV</A> will be calculated from the
+grid and the grid must be rectangular.
+
+     The <A HREF="geomv_level2.html#tiepoint">TIEPOINT</A>-GRID is a set of points describing the relation
+of the output file to that of the input file using the keyword
+<A HREF="geomv_level2.html#tiepoint">TIEPOINT</A> and optionally <A HREF="geomv_level2.html#nah">NAH</A> and <A HREF="geomv_level2.html#nav">NAV</A> which are ignored.
+   <A HREF="geomv_level2.html#nah">NAH</A>=nah  <A HREF="geomv_level2.html#nav">NAV</A>=nav
+     <A HREF="geomv_level2.html#tiepoint">tiepoint</A>=(nl1,ns1,ol1,os1,nl2,ns2,ol2,os2,...
+                   ...nlk,nsk,olk,osk)
+
+where the grid is rectangular in the output image space, <A HREF="geomv_level2.html#nah">nah</A> is
+the number of grid cells horizontally (across the top in the sample
+direction), <A HREF="geomv_level2.html#nav">nav</A> is the number of grid cells vertically in the output
+image space, the point pairs (nli,nsi,oli,osi) are line-sample
+coordinates in the output (new) and input (old) spaces respectively.
+the number of pairs k must equal (<A HREF="geomv_level2.html#nah">nah</A>+1)*(<A HREF="geomv_level2.html#nav">nav</A>+1).  The grid must be
+perfectly rectangular in the output image space (the rows and
+columns must be perfectly horizontal and vertical respectively).
+Each direction must be evenly spaced as well, but all values can
+br fractional.  The keywords <A HREF="geomv_level2.html#nah">NAH</A> and <A HREF="geomv_level2.html#nav">NAV</A> are ignored and the true
+values are calculated from the grid.
+
+The input image may either be byte or halfword data.  The data format is taken
+from the VICAR label of the input file.  The output image has the same data 
+format (byte or halfword) as the input image.  
+
+Truly large cases (I envision 100 GB) are done by computing a strip <A HREF="geomv_level2.html#size">size</A>
+that depends on the parameter <A HREF="geomv_level2.html#vmemsize">VMEMSIZE</A>.  VMEMSIZE is presently defaulted to
+300 MB under the assumption that a 2 GB memory can handle that pretty easily
+without too much paging.  But it can be reset larger or smaller as needed and
+should be defaulted larger in the future (say when 10 GB memories are common).
+Then, if the warp area of the input image is larger than <A HREF="geomv_level2.html#vmemsize">VMEMSIZE</A>, the program
+shifts into a "strip processing" mode using the filename given by parameter
+<A HREF="geomv_level2.html#tmpfile">TMPFILE</A> followed by a sequence of digits to create one file for each strip.
+Then all of the strips are concatenated to give the final output.  Each piece
+of each strip is designed to fit within the user provided or defaulted virtual
+memory <A HREF="geomv_level2.html#size">size</A>.  Do not use a link for <A HREF="geomv_level2.html#tmpfile">tmpfile</A>.  Instead, you can use a path/filename
+for the <A HREF="geomv_level2.html#tmpfile">TMPFILE</A>.  This is because multiple files will be created with TMPFILE as a
+root.  You must delete the <A HREF="geomv_level2.html#tmpfile">TMPFILE</A> files after the run.
+  
+OPERATION
+
+GEOMV calculates what part of the input is needed for the output, and
+reads that entire amount into (virtual) memory.  Images up to 8000
+square can be handled easily by the current (1999) generation of
+workstations.  Larger images can be handled by sectioning of the output
+into a set of tiles, warping them, and then mosaicking the tiles.
+The tiles are guaranteed to butt together perfectly.
+
+Unlike MGEOM, GEOMV does not tile the input for the warp grid cells.
+It holds all of the cells for a cell-row of output in memory and holds
+all of the input image in memory.  Thus there is little penalty for
+having a vast number of grid cells.
+
+PERFORMANCE
+
+A 4000 by 4000 image was transformed by a 500 x 500 grid
+in 99 seconds on a SPARCstation 20.  Reducing the grid to 30 x 30
+cut the time to 39 seconds.  This shows that the use of a large 
+grid doesn't penalize the time too much.
+
+Restrictions
+------------
+
+The output grid must cover the output image.  The program gives an
+error message and stops if it doesn't.  The output grid can be larger.
+There are no restrictions on the input grid. 
+
+THE OUTPUT GRID MUST ALSO BE UNIFORMLY SPACED IN EACH DIRECTION
+(MORE RESTRICTIVE THAN LGEOM).  THE SPACING VERTICALLY DOES
+NOT HAVE TO EQUAL THE SPACING HORIZONTALLY THOUGH.
+ON THE OTHER HAND, THE OUTPUT GRID VALUES CAN BE FRACTIONAL (LGEOM
+REQUIRES WHOLE NUMBERS).  THESE REQUIREMENTS ARE EASY TO MEET IF THE
+GRID IS GENERATED MATHEMATICALLY OR IF A PROGRAM SUCH AS TIECONV IS
+USED.
+
+Original Programmer: A. L. Zobrist, 17 Jul. 1999
+<A NAME="CogProg">Current Cognizant Programmer: A. L. Zobrist</A>
+25 April 2007 Change to 2 dimensional arrays: A. L. Zobrist
+25 April 2007 Do strips if memory too small, handles huge cases: A. L. Zobrist
+25 April 2007 Add cubic convolution and cubic spline: A. L. Zobrist
+
+</pre>
+<hr>
+<H2>PARAMETERS:</H2>
+<HR><A HREF="geomv_level2.html#inp"><H3>INP</H3></A>
+Input file name, second file
+Optional grid (IBIS format)
+,third file GeoTIFF reference
+<HR><A HREF="geomv_level2.html#out"><H3>OUT</H3></A>
+Output file name
+<HR><A HREF="geomv_level2.html#size"><H3>SIZE</H3></A>
+Standard VICAR <A HREF="geomv_level2.html#size">Size</A> Field
+<HR><A HREF="geomv_level2.html#sl"><H3>SL</H3></A>
+Starting line for output
+<HR><A HREF="geomv_level2.html#ss"><H3>SS</H3></A>
+Starting sample for output
+<HR><A HREF="geomv_level2.html#nl"><H3>NL</H3></A>
+Number of lines for output
+* See restrictions
+<HR><A HREF="geomv_level2.html#ns"><H3>NS</H3></A>
+Number of samples for output
+* See restrictions
+<HR><A HREF="geomv_level2.html#interp"><H3>INTERP</H3></A>
+interpolation options
+Valid: NOIN,<A HREF="geomv_level2.html#znoin">ZNOIN</A>,BILIN,CUBCONV,CUBSPLIN
+<HR><A HREF="geomv_level2.html#format"><H3>FORMAT</H3></A>
+FORMAT is ignored.
+<HR><A HREF="geomv_level2.html#nah"><H3>NAH</H3></A>
+ignored, will calculate
+from grid
+<HR><A HREF="geomv_level2.html#nav"><H3>NAV</H3></A>
+ignored, will calculate
+from grid
+<HR><A HREF="geomv_level2.html#cols"><H3>COLS</H3></A>
+Columns to use from
+optional IBIS file.
+<HR><A HREF="geomv_level2.html#tiepoint"><H3>TIEPOINT</H3></A>
+grid corner tiepoints in
+rows NL1,NS1,OL1,OS1,...
+<HR><A HREF="geomv_level2.html#parms"><H3>PARMS</H3></A>
+previously saved parameter
+dataset
+<HR><A HREF="geomv_level2.html#vmemsize"><H3>VMEMSIZE</H3></A>
+max allocation for input
+image, larger case goes
+to "strip process" mode
+<HR><A HREF="geomv_level2.html#tmpfile"><H3>TMPFILE</H3></A>
+temp filename root for
+"strip process" mode
+<HR><A HREF="geomv.html#examples"><H4>See Examples:</H4></A>
+<HR><A HREF="geomv.html#CogProg"><H4>Cognizant Programmer:</H4></A>
+</BODY>
+</HTML>

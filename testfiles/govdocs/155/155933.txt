@@ -1,0 +1,114 @@
+//    datetime.h
+//
+//     gps day, time, and date routines
+//
+//
+//  DateTime is an abstraction of the following ways of representing time:
+//         1. GPS time (GPS week and second of week)
+//         2. Modified Julian Date (MJD)
+//         3. Year, day, hour, minute sec.
+//         4. Year, Month, day, hour, minute, second
+//
+// An object of the class DateTime may be initialized (constructed) from
+//   any of the representations and viewed in any other representation.
+//
+
+// Modification History.
+
+// 27-Jul-00 -- Gordon Adams
+//    Removed the DateTime:: from the operator + declaration.  This was
+//    causing a complier error on HP which said that you cannot use the
+//    "::" operator on an incompletely defined class.
+//    Changed the "long double" declarations to "double".  long doulbe 
+//    is over kill and adds nothing to the precision of the computations.
+
+
+#if !defined( __DateTime__ )
+   #define  __DateTime__
+
+//
+//  DateTime class is an abstraction of the following ways of representing
+//  time:
+//         1. GPS time (GPS week and second of week)
+//         2. Modified Julian Date (MJD)
+//         3. Year, day, hour, minute sec.
+//         4. Year, Month, day, hour, minute, second
+//
+//  An object of the class DateTime may be initialized (constructed) from
+//  any of the representations and viewed in any other representation.
+//
+
+   typedef struct{
+      long     GPSWeek;
+      double   secsOfWeek;
+   }  GPSTime;
+
+   typedef struct{
+      long     mjd;
+      double   fmjd;
+   }  MJD;
+
+   typedef struct{
+      long     year;
+      long     yday;
+      long     hour;
+      long     min;
+      double   sec;
+   }  YearDay;
+
+   typedef struct{
+      long     year;
+      long     month;
+      long     monthday;
+      long     hour;
+      long     min;
+      double   sec;
+   }  YearMonthDay;
+
+   class DateTime
+   {
+      public:
+// constructors
+
+         DateTime();
+         DateTime( GPSTime & gpstime );
+         DateTime( MJD & mjd );
+         DateTime( YearDay & yearday );
+         DateTime( const YearMonthDay & yearmonthday );
+         DateTime( unsigned long year, unsigned long month,
+                   unsigned long monthday, unsigned long hour,
+                   unsigned long min, double sec );
+
+// initializers
+
+         void  SetGPSTime( GPSTime & gpstime );
+         void  SetMJD( MJD & mjd );
+         void  SetYearDay( YearDay & yearday );
+         void  SetYearMonthDay( const YearMonthDay & yearmonthday );
+         void  SetYMDHMS( unsigned long year, unsigned long month,
+                          unsigned long monthday, unsigned long hour,
+                          unsigned long min, double sec );
+
+// selectors
+
+         double         GetGPSSeconds();
+         GPSTime        GetGPSTime();
+         MJD            GetMJD();
+         YearDay        GetYearDay();
+         YearMonthDay   GetYearMonthDay();
+
+// manipulators
+
+         DateTime operator + ( const double secs );
+         double   operator - ( const DateTime &DT2 );
+         int      operator == ( const DateTime &DT2 );
+         int      operator != ( const DateTime &DT2 );
+         int      operator >= ( const DateTime &DT2 );
+         int      operator <  ( const DateTime &DT2 );
+
+      private:
+         long     GPSWeek;
+         double   secsOfWeek;
+   };
+
+#endif

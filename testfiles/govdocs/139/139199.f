@@ -1,0 +1,213 @@
+      program main
+c
+c  calculate pdef bilin file for ncep grid 218, a lambert 
+c  grid.  the xdef/ydef that goes with this is:  
+c     xdef 700 linear 220 0.11
+c     ydef 500 linear 12 0.11
+c
+       real xi(700,500),xj(700,500),wrot(700,500)
+c
+       do 10 j=1,500
+        rlat = 12.0+float(j-1)*0.11
+        do 10 i=1,700
+         rlon = 220.0+float(i-1)*0.11
+         call w3fb11(rlat,rlon,12.190,226.541,12191.,265.0,25.0,
+     &             xi(i,j),xj(i,j))
+         if (xi(i,j).lt.1.0 .or. xi(i,j).gt.614.0 .or. 
+     &     xj(i,j).lt.1.0 .or. xj(i,j).gt.428.0) then
+          xi(i,j) = -999.0
+          xj(i,j) = -999.0
+          wrot(i,j) = -999.0
+         else
+          call w3fc03 (rlon,265.0,25.0,wrot(i,j))
+         endif
+10     continue
+c
+       open (8,file="grib218.pdef",form="unformatted")
+c
+c  important to do seperate writes, so that grads 
+c  can figure it out
+c
+       write(8) xi
+       write(8) xj
+       write(8) wrot
+       stop
+       end
+c
+       SUBROUTINE W3FB11(ALAT,ELON,ALAT1,ELON1,DX,ELONV,ALATAN,XI,XJ)
+C$$$   SUBPROGRAM  DOCUMENTATION  BLOCK
+C
+C SUBPROGRAM:  W3FB11        LAT/LON TO LAMBERT(I,J) FOR GRIB
+C   PRGMMR: STACKPOLE        ORG: NMC42       DATE:88-11-28
+C
+C ABSTRACT: CONVERTS THE COORDINATES OF A LOCATION ON EARTH GIVEN IN
+C   THE NATURAL COORDINATE SYSTEM OF LATITUDE/LONGITUDE TO A GRID
+C   COORDINATE SYSTEM OVERLAID ON A LAMBERT CONFORMAL TANGENT CONE
+C   PROJECTION TRUE AT A GIVEN N OR S LATITUDE. W3FB11 IS THE REVERSE
+C   OF W3FB12. USES GRIB SPECIFICATION OF THE LOCATION OF THE GRID
+C
+C PROGRAM HISTORY LOG:
+C   88-11-25  ORIGINAL AUTHOR:  STACKPOLE, W/NMC42
+C   90-04-12  R.E.JONES   CONVERT TO CFT77 FORTRAN
+C   94-04-28  R.E.JONES   ADD SAVE STATEMENT
+C
+C USAGE:  CALL W3FB11 (ALAT,ELON,ALAT1,ELON1,DX,ELONV,ALATAN,XI,XJ)
+C   INPUT ARGUMENT LIST:
+C     ALAT     - LATITUDE IN DEGREES (NEGATIVE IN SOUTHERN HEMIS)
+C     ELON     - EAST LONGITUDE IN DEGREES, REAL*4
+C     ALAT1    - LATITUDE  OF LOWER LEFT POINT OF GRID (POINT (1,1))
+C     ELON1    - LONGITUDE OF LOWER LEFT POINT OF GRID (POINT (1,1))
+C                ALL REAL*4
+C     DX       - MESH LENGTH OF GRID IN METERS AT TANGENT LATITUDE
+C     ELONV    - THE ORIENTATION OF THE GRID.  I.E.,
+C                THE EAST LONGITUDE VALUE OF THE VERTICAL MERIDIAN
+C                WHICH IS PARALLEL TO THE Y-AXIS (OR COLUMNS OF
+C                OF THE GRID) ALONG WHICH LATITUDE INCREASES AS
+C                THE Y-COORDINATE INCREASES.  REAL*4
+C                THIS IS ALSO THE MERIDIAN (ON THE BACK SIDE OF THE
+C                TANGENT CONE) ALONG WHICH THE CUT IS MADE TO LAY
+C                THE CONE FLAT.
+C     ALATAN   - THE LATITUDE AT WHICH THE LAMBERT CONE IS TANGENT TO
+C                (TOUCHING) THE SPHERICAL EARTH.
+C                 SET NEGATIVE TO INDICATE A
+C                 SOUTHERN HEMISPHERE PROJECTION.
+C
+C   OUTPUT ARGUMENT LIST:
+C     XI       - I COORDINATE OF THE POINT SPECIFIED BY ALAT, ELON
+C     XJ       - J COORDINATE OF THE POINT; BOTH REAL*4
+C
+C   REMARKS: FORMULAE AND NOTATION LOOSELY BASED ON HOKE, HAYES,
+C     AND RENNINGER'S "MAP PROJECTIONS AND GRID SYSTEMS...", MARCH 1981
+C     AFGWC/TN-79/003
+C
+C ATTRIBUTES:
+C   LANGUAGE: CRAY CFT77 FORTRAN
+C   MACHINE:  CRAY C916-128, CRAY Y-MP8/864, CRAY Y-MP EL2/256
+C
+C$$$
+C
+         SAVE
+C
+         DATA  RERTH /6.3712E+6/, PI/3.14159/
+C
+C        PRELIMINARY VARIABLES AND REDIFINITIONS
+C
+C        H = 1 FOR NORTHERN HEMISPHERE; = -1 FOR SOUTHERN
+C
+         IF (ALATAN.GT.0) THEN
+           H = 1.
+         ELSE
+           H = -1.
+         ENDIF
+C
+         RADPD  = PI    / 180.0
+         REBYDX = RERTH / DX
+         ALATN1 = ALATAN * RADPD
+         AN     = H * SIN(ALATN1)
+         COSLTN = COS(ALATN1)
+C
+C        MAKE SURE THAT INPUT LONGITUDES DO NOT PASS THROUGH
+C        THE CUT ZONE (FORBIDDEN TERRITORY) OF THE FLAT MAP
+C        AS MEASURED FROM THE VERTICAL (REFERENCE) LONGITUDE.
+C
+         ELON1L = ELON1
+         IF ((ELON1 - ELONV).GT.180.)
+     &     ELON1L = ELON1 - 360.
+         IF ((ELON1 - ELONV).LT.(-180.))
+     &     ELON1L = ELON1 + 360.
+C
+         ELONL = ELON
+         IF ((ELON  - ELONV).GT.180.)
+     &     ELONL  = ELON  - 360.
+         IF ((ELON - ELONV).LT.(-180.))
+     &     ELONL = ELON + 360.
+C
+         ELONVR = ELONV * RADPD
+C
+C        RADIUS TO LOWER LEFT HAND (LL) CORNER
+C
+         ALA1 =  ALAT1 * RADPD
+         RMLL = REBYDX * (((COSLTN)**(1.-AN))*(1.+AN)**AN) *
+     &           (((COS(ALA1))/(1.+H*SIN(ALA1)))**AN)/AN
+C
+C        USE LL POINT INFO TO LOCATE POLE POINT
+C
+         ELO1 = ELON1L * RADPD
+         ARG = AN * (ELO1-ELONVR)
+         POLEI = 1. - H * RMLL * SIN(ARG)
+         POLEJ = 1. + RMLL * COS(ARG)
+C
+C        RADIUS TO DESIRED POINT AND THE I J TOO
+C
+         ALA =  ALAT * RADPD
+         RM = REBYDX * ((COSLTN**(1.-AN))*(1.+AN)**AN) *
+     &           (((COS(ALA))/(1.+H*SIN(ALA)))**AN)/AN
+C
+         ELO = ELONL * RADPD
+         ARG = AN*(ELO-ELONVR)
+         XI = POLEI + H * RM * SIN(ARG)
+         XJ = POLEJ - RM * COS(ARG)
+C
+C        IF COORDINATE LESS THAN 1
+C        COMPENSATE FOR ORIGIN AT (1,1)
+C
+         IF (XI.LT.1.)  XI = XI - 1.
+         IF (XJ.LT.1.)  XJ = XJ - 1.
+C
+      RETURN
+      END
+c
+       SUBROUTINE W3FC03(SLON,CENLON,XLAT1,angle)
+C$$$   SUBPROGRAM  DOCUMENTATION  BLOCK
+C
+C SUBPROGRAM: W3FC03         GRID U,V WIND COMPS. TO DIR. AND SPEED
+C   AUTHOR: ROGERS/BRILL     ORG: WD22       DATE: 00-03-27
+C
+C ABSTRACT: GIVEN THE GRID-ORIENTED WIND COMPONENTS ON A 
+C   LAMBERT CONFORMAL GRID POINT, COMPUTE THE DIRECTION
+C   AND SPEED OF THE WIND AT THAT POINT.  INPUT WINDS AT THE NORTH
+C   POLE POINT ARE ASSUMED TO HAVE THEIR COMPONENTS FOLLOW THE WMO
+C   STANDARDS FOR REPORTING WINDS AT THE NORTH POLE.
+C   (SEE OFFICE NOTE 241 FOR WMO DEFINITION). OUTPUT DIRECTION
+C   WILL FOLLOW WMO CONVENTION.
+C
+C PROGRAM HISTORY LOG:
+C   00-03-27  BRILL/ROGERS 
+c
+c   00-10-30  doty:  modified to just return rotation angle
+C
+C USAGE:  CALL W3FC03 (SLON,FGU,FGV,CENLON,XLAT1,DIR,SPD)
+C
+C   INPUT VARIABLES:
+C     NAMES  INTERFACE DESCRIPTION OF VARIABLES AND TYPES
+C     ------ --------- -----------------------------------------------
+C     SLON   ARG LIST  REAL*4    STATION LONGITUDE (-DEG W)
+C     CENLON ARG LIST  REAL*4    CENTRAL LONGITUDE
+C     XLAT1  ARG LIST  REAL*4    TRUE LATITUDE #1
+C
+C   OUTPUT VARIABLES:
+C     NAMES  INTERFACE DESCRIPTION OF VARIABLES AND TYPES
+C     ------ --------- -----------------------------------------------
+c     angle  arg list  rotation angle
+C
+C   SUBPROGRAMS CALLED:
+C     NAMES                                                   LIBRARY
+C     ------------------------------------------------------- --------
+C     ABS  ACOS   ATAN2   SQRT                                SYSTEM
+C
+C WARNING: THIS JOB WILL NOT VECTORIZE ON A CRAY
+C
+C ATTRIBUTES:
+C   LANGUAGE: FORTRAN 90
+C   MACHINE:  IBM SP
+C
+C$$$
+      PARAMETER (DTR=3.1415926/180.0)
+C
+C  COMPUTE CONSTANT OF CONE
+C
+      COCON = SIN(XLAT1*DTR)
+      ANGLE = COCON * (cenlon-slon) * DTR
+c     ANGLE = COCON * (SLON-CENLON) * DTR
+      RETURN
+      END

@@ -1,0 +1,25 @@
+pro ftp_bursts
+   filelist=findfile('data_disk2:[amy.cosmic]*.*')
+   for i=0,(n_elements(filelist)-1) do begin
+ 	break_file,filelist(i),disk_log,dir,filnam,ext,fversion,node
+        filelist(i)=filnam+ext
+   endfor
+   openw, lun, 'ftp_bursts.com', /get_lun
+   printf, lun, '$ set def data_disk2:[amy.cosmic]'
+   printf, lun, '$ ftp umbra'
+;   printf, lun, 'user amy'
+   printf, lun, 'amy'
+   printf, lun, 'fuufuU'
+   printf, lun, 'bin'
+   printf, lun, 'prompt'
+   printf, lun, 'cd /scratch/amy/bursts'
+   for j=0,(n_elements(filelist)-1) do $
+	printf,lun,'put '+filelist(j)+' '+strupcase(filelist(j))
+;   printf, lun, 'mput batse_*.ps'
+   printf, lun, 'quit'
+   free_lun, lun
+   spawn, '@ftp_bursts.com'
+;   spawn, 'delete ftp_batseplots.com;, BATSE_PSPLOTS:batse_*.ps;*'
+
+return & end
+
