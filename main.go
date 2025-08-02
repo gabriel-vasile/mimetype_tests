@@ -17,56 +17,41 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 )
 
+// This code is a mess, but it works well enough.
+// How to run:
+// DEBUG=1 will enable verbose logging: all wrong detections are logged
+// and tallied at afterwards: DEBUG=1 go run main.go
+
+// go run main.go # will compare mimetype to file
+// go run main.go persist # will compare mimetype to file and persist the results on disk
+// go run main.go compare # will compare mimetype to file and compare current run with the one persisted on disk
+
 const (
 	statusBad         = "bad"
 	statusGood        = "good"
 	statusUnsupported = "unsupported"
+
+	threads = 6
 )
 
-func red(s string) string {
-	return fmt.Sprintf("\033[31m" + s + "\033[0m")
-}
-func green(s string) string {
-	return fmt.Sprintf("\033[32m" + s + "\033[0m")
-}
-
-func allFilesInDir(dir string) []string {
-	ret := []string{}
-	err := filepath.Walk(dir,
-		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if strings.HasSuffix(path, ".java") {
-				return nil
-			}
-			if strings.Contains(path, "/.git/") {
-				return nil
-			}
-			if strings.Contains(path, "/trunc/") {
-				return nil
-			}
-			if info.Mode().IsRegular() {
-				ret = append(ret, path)
-			}
-			return nil
-		})
-	if err != nil {
-		log.Fatal(err)
-	}
-	return ret
-}
+var debug = os.Getenv("DEBUG") != ""
 
 func main() {
+	if debug {
+		fmt.Println("=================================")
+		fmt.Println("How to read the output of script:")
+		fmt.Println(red("Red mimetypes ") + "are our own mimetypes when we identified the files wrong")
+		fmt.Println(green("Green mimetypes ") + "are the correct mimetypes as identified by file --mime")
+		fmt.Println("=================================\n")
+	}
 	start := time.Now()
 	fs := allFilesInDir("testfiles")
 	mimetype.SetLimit(0)
 
-	debug := os.Getenv("DEBUG") != ""
 	results := []Result{}
 	wg := sync.WaitGroup{}
 	mu := &sync.Mutex{}
-	for s := range slices.Chunk(fs, len(fs)/4) {
+	for s := range slices.Chunk(fs, len(fs)/threads) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -81,30 +66,16 @@ func main() {
 				if skipFile(mag, m.String()) {
 					continue
 				}
-				declaredExtension := filepath.Ext(f)
-				status := statusBad
-				if !mimetype.EqualsAny(mag, "application/octet-stream") && mimetype.Lookup(mag) == nil {
+				status := statusGood
+				if !m.Is(mag) {
 					if debug {
-						fmt.Printf("not supported %s %s %s\n",
+						fmt.Printf("filepth:%s\nguessed:%s\ncorrect:%s\n\n",
 							f,
 							red(fmt.Sprintf("%s", m)),
 							green(mag),
 						)
 					}
-					status = statusUnsupported
-				} else if !m.Is(mag) &&
-					// if the declaredExtension is what mimetype detection
-					// then mark as statusGood
-					m.Extension() != declaredExtension {
-					if debug {
-						fmt.Printf("diff %s %s %s\n",
-							f,
-							red(fmt.Sprintf("%s", m)),
-							green(mag))
-					}
 					status = statusBad
-				} else if m.Is(mag) {
-					status = statusGood
 				}
 				mu.Lock()
 				results = append(results, Result{
@@ -118,8 +89,8 @@ func main() {
 		}()
 	}
 	wg.Wait()
-	baddies(results)
-	fmt.Println(time.Now().Sub(start))
+	tallyResults(results)
+	fmt.Println("Runtime: ", time.Now().Sub(start))
 	fmt.Printf("curr run: %v\n", statistic(results))
 
 	if len(os.Args) > 1 && os.Args[1] == "persist" {
@@ -176,14 +147,26 @@ func compareResults(old, curr []Result) {
 	fmt.Printf("        curr run: %v\n", statistic(curr))
 }
 
-func statistic(rs []Result) map[string]float64 {
-	stats := map[string]float64{}
+func statistic(rs []Result) string {
+	stats := map[string]int{}
 	for _, r := range rs {
 		stats[r.Status]++
 	}
-	total := float64(len(rs))
-	stats["percentBads+Unsupported"] = percent(stats[statusBad]+stats[statusUnsupported], total)
-	return stats
+
+	return fmt.Sprintf(`
+totalFiles: %d
+identified: %d
+misIdentified: %d
+unsupported: %d
+
+identifiedPercent: %.2f`,
+		len(rs),
+		stats[statusGood],
+		stats[statusBad],
+		stats[statusUnsupported],
+
+		percent(float64(stats[statusGood]), float64(len(rs))),
+	)
 }
 
 // percent return x is what percent of y.
@@ -191,8 +174,13 @@ func percent(x, y float64) float64 {
 	return x * 100 / y
 }
 
-// baddies func prints the most misidentified mime types.
-func baddies(r1 []Result) any {
+// tallyResults func prints the most misidentified mime types.
+func tallyResults(r1 []Result) any {
+	if !debug {
+		return nil
+	}
+
+	fmt.Println("Tallying results to see which file formats were most misidentified...")
 	type misIdentified struct {
 		count         int
 		misIdentified map[string]int
@@ -229,10 +217,41 @@ func baddies(r1 []Result) any {
 	for _, b := range baddiesStruct {
 		fmt.Printf(`
 %s was misidentified %d times as:
-%v
-`, b.magic, b.count, b.misIdentified)
+%s
+`, green(b.magic), b.count, red(fmt.Sprintf("%v", b.misIdentified)))
 	}
 	return baddiesStruct
+}
+
+func red(s string) string {
+	return fmt.Sprintf("\033[31m" + s + "\033[0m")
+}
+func green(s string) string {
+	return fmt.Sprintf("\033[32m" + s + "\033[0m")
+}
+
+func allFilesInDir(dir string) []string {
+	ret := []string{}
+	err := filepath.Walk(dir,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if strings.HasSuffix(path, ".java") {
+				return nil
+			}
+			if strings.Contains(path, "/.git/") {
+				return nil
+			}
+			if info.Mode().IsRegular() {
+				ret = append(ret, path)
+			}
+			return nil
+		})
+	if err != nil {
+		log.Fatal(err)
+	}
+	return ret
 }
 
 type Result struct {
