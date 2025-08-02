@@ -43,7 +43,7 @@ func main() {
 	fmt.Println(green("Green mimetypes ") + "are the correct mimetypes as identified by file --mime")
 	fmt.Println("=================================\n")
 	start := time.Now()
-	fs := allFilesInDir("testfiles/govdocs")
+	fs := allFilesInDir("testfiles")
 	mimetype.SetLimit(0)
 
 	results := []Result{}
