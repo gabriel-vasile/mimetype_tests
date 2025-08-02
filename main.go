@@ -31,21 +31,19 @@ const (
 	statusGood        = "good"
 	statusUnsupported = "unsupported"
 
-	threads = 6
+	threads = 4
 )
 
 var debug = os.Getenv("DEBUG") != ""
 
 func main() {
-	if debug {
-		fmt.Println("=================================")
-		fmt.Println("How to read the output of script:")
-		fmt.Println(red("Red mimetypes ") + "are our own mimetypes when we identified the files wrong")
-		fmt.Println(green("Green mimetypes ") + "are the correct mimetypes as identified by file --mime")
-		fmt.Println("=================================\n")
-	}
+	fmt.Println("=================================")
+	fmt.Println("How to read the output of script:")
+	fmt.Println(red("Red mimetypes ") + "are our own mimetypes when we identified the files wrong")
+	fmt.Println(green("Green mimetypes ") + "are the correct mimetypes as identified by file --mime")
+	fmt.Println("=================================\n")
 	start := time.Now()
-	fs := allFilesInDir("testfiles")
+	fs := allFilesInDir("testfiles/govdocs")
 	mimetype.SetLimit(0)
 
 	results := []Result{}
@@ -176,10 +174,6 @@ func percent(x, y float64) float64 {
 
 // tallyResults func prints the most misidentified mime types.
 func tallyResults(r1 []Result) any {
-	if !debug {
-		return nil
-	}
-
 	fmt.Println("Tallying results to see which file formats were most misidentified...")
 	type misIdentified struct {
 		count         int

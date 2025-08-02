@@ -6,7 +6,7 @@ compare [mimetype](https://github.com/gabriel-vasile/mimetype/) with the
 
 
 ### Contents
-- [testfiles](testfiles) contains all the test files (around 75 000 entries)
+- [testfiles](testfiles) contains all the test files (around 32 000 entries)
 - [zipshuffler.go](zipshuffler.go) reads zip files and then creates random
 permutations of the files inside the zip.
 - [truncate.go](truncate.go) creates 3KB truncated copies of all the files
@@ -15,10 +15,13 @@ results of `file --mime`
 
 
 ### Results
-Around 95% of the files are identified correctly. Of the 5% misidentified files,
-majority are obscure file formats that we don't support and some happen because
-`mimetype` identifies more precisely than `file`:
+Around 95% of the files are identified correctly. The 5% misidentified files,
+most are indeed misidentified files, but some happen because `mimetype`
+identifies more precisely than `file`:
+- XML based file formats, like GML, GPX, are seens as `text/xml` by `file`
 - mimetype identifies subtitles as `text/vtt`, while `file` sees them just as `plain/text`
--
-Results can be seen in the [actions](actions) tab.
-If you want to test for yourself, you can use these commands.
+
+[Actions](https://github.com/gabriel-vasile/mimetype_samples/actions) page shows
+the latest percentage of misidentified files and a breakdown of what are the
+most misidentified formats.
+If you want to run the tests, use [these commands](https://github.com/gabriel-vasile/mimetype_samples/blob/ee7f11cdc202944593a61ba0c675183b797a11ba/.github/workflows/test.yml#L30-L32).
