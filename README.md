@@ -1,4 +1,4 @@
-#  mimetype sample files
+#  mimetype tests files
 
 A collection of files gathered from different sources to be used for tests that
 compare [mimetype](https://github.com/gabriel-vasile/mimetype/) with the
@@ -23,7 +23,7 @@ identifies more precisely than `file`:
 - `mimetype` identifies `text/tab-separated-values`, while `file` sees just `plain/text`
 - etc.
  
-[Actions](https://github.com/gabriel-vasile/mimetype_samples/actions) page shows
+[Actions](https://github.com/gabriel-vasile/mimetype_tests/actions) page shows
 the latest percentage of misidentified files and a breakdown of what are the
 most misidentified formats.
-If you want to run the tests, use [these commands](https://github.com/gabriel-vasile/mimetype_samples/blob/ee7f11cdc202944593a61ba0c675183b797a11ba/.github/workflows/test.yml#L30-L32).
+If you want to run the tests, use [these commands](https://github.com/gabriel-vasile/mimetype_tests/blob/ee7f11cdc202944593a61ba0c675183b797a11ba/.github/workflows/test.yml#L30-L32).
