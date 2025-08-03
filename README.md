@@ -15,12 +15,14 @@ results of `file --mime`
 
 
 ### Results
-Around 95% of the files are identified correctly. The 5% misidentified files,
+Around 97% of the files are identified correctly. The 3% misidentified files,
 most are indeed misidentified files, but some happen because `mimetype`
 identifies more precisely than `file`:
-- XML based file formats, like GML, GPX, are seens as `text/xml` by `file`
-- mimetype identifies subtitles as `text/vtt`, while `file` sees them just as `plain/text`
-
+- XML based file formats, like GML, GPX, are seens as generic `text/xml` by `file`
+- `mimetype` identifies subtitles as `text/vtt`, while `file` sees them just as `plain/text`
+- `mimetype` identifies `text/tab-separated-values`, while `file` sees just `plain/text`
+- etc.
+ 
 [Actions](https://github.com/gabriel-vasile/mimetype_samples/actions) page shows
 the latest percentage of misidentified files and a breakdown of what are the
 most misidentified formats.
