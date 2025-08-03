@@ -15,7 +15,10 @@ results of `file --mime`
 
 
 ### Results
-Around 97% of the files are identified correctly. The 3% misidentified files,
+TLDR: ~97% of samples identified correctly
+
+
+The 3% misidentified files,
 most are indeed misidentified files, but some happen because `mimetype`
 identifies more precisely than `file`:
 - XML based file formats, like GML, GPX, are seens as generic `text/xml` by `file`
@@ -23,7 +26,7 @@ identifies more precisely than `file`:
 - `mimetype` identifies `text/tab-separated-values`, while `file` sees just `plain/text`
 - etc.
  
-[Actions](https://github.com/gabriel-vasile/mimetype_tests/actions) page shows
+[Results](https://github.com/gabriel-vasile/mimetype_tests/actions) show
 the latest percentage of misidentified files and a breakdown of what are the
 most misidentified formats.
-If you want to run the tests, use [these commands](https://github.com/gabriel-vasile/mimetype_tests/blob/ee7f11cdc202944593a61ba0c675183b797a11ba/.github/workflows/test.yml#L30-L32).
+If you want to run the tests, use [these commands](https://github.com/gabriel-vasile/mimetype_tests/blob/1c1f5cd612cb56c45c8ad3f608b94167063b6de0/.github/workflows/test.yml#L31-L34).
