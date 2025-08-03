@@ -6,7 +6,7 @@ compare [mimetype](https://github.com/gabriel-vasile/mimetype/) with the
 
 
 ### Contents
-- [testfiles](testfiles) contains all the test files (around 32 000 entries)
+- [testfiles](testfiles) contains all the test files (around 50 000 entries)
 - [zipshuffler.go](zipshuffler.go) reads zip files and then creates random
 permutations of the files inside the zip.
 - [truncate.go](truncate.go) creates 3KB truncated copies of all the files
