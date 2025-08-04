@@ -20,16 +20,14 @@ import (
 // This code is a mess, but it works well enough.
 // How to run:
 // DEBUG=1 will enable verbose logging: all wrong detections are logged
-// and tallied at afterwards: DEBUG=1 go run main.go
+// and tallied afterwards: DEBUG=1 go run main.go
 
 // go run main.go # will compare mimetype to file
-// go run main.go persist # will compare mimetype to file and persist the results on disk
-// go run main.go compare # will compare mimetype to file and compare current run with the one persisted on disk
+// go run main.go persist # will additionally persist the results on disk as json
 
 const (
-	statusBad         = "bad"
-	statusGood        = "good"
-	statusUnsupported = "unsupported"
+	statusBad  = "bad"
+	statusGood = "good"
 
 	threads = 4
 )
@@ -37,11 +35,15 @@ const (
 var debug = os.Getenv("DEBUG") != ""
 
 func main() {
-	fmt.Println("=================================")
-	fmt.Println("How to read the output of script:")
-	fmt.Println(red("Red mimetypes ") + "are our own mimetypes when we identified the files wrong")
-	fmt.Println(green("Green mimetypes ") + "are the correct mimetypes as identified by file --mime")
-	fmt.Println("=================================\n")
+	fmt.Println(`
+This script will iterate over the samples from testfiles dir and call mimetype
+and file --mime utility. When mimetype and file disagree on what format a sample
+should be it will get logged if DEBUG=1. After all samples have been compared,
+the results are tallied and printed sorted by which file formats have been most
+wrongfully identified. At the very end, statistics are printed as a percentage.
+
+Expect this script to take a few minutes to run.
+Call with "DEBUG=1 go run main.go" if you want to see more logging.`)
 	start := time.Now()
 	fs := allFilesInDir("testfiles")
 	mimetype.SetLimit(0)
@@ -54,34 +56,12 @@ func main() {
 		go func() {
 			defer wg.Done()
 			for _, f := range s {
-				m, err := mimetype.DetectFile(f)
-				if err != nil {
-					log.Fatal(err)
-				}
-
-				mag := mag(f)
-				mag, _, _ = mime.ParseMediaType(mag)
-				if skipFile(mag, m.String()) {
+				skip, result := compareFile(f)
+				if skip {
 					continue
 				}
-				status := statusGood
-				if !m.Is(mag) {
-					if debug {
-						fmt.Printf("filepth:%s\nguessed:%s\ncorrect:%s\n\n",
-							f,
-							red(fmt.Sprintf("%s", m)),
-							green(mag),
-						)
-					}
-					status = statusBad
-				}
 				mu.Lock()
-				results = append(results, Result{
-					File:     f,
-					Status:   status,
-					Mimetype: m.String(),
-					Magic:    mag,
-				})
+				results = append(results, result)
 				mu.Unlock()
 			}
 		}()
@@ -95,54 +75,63 @@ func main() {
 		fmt.Println("persisting")
 		f, err := os.OpenFile("results.json", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.ModePerm)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		enc := json.NewEncoder(f)
 		enc.SetIndent("", "    ")
 		if err := enc.Encode(results); err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 	}
+}
 
-	if len(os.Args) > 1 && os.Args[1] == "compare" {
-		fmt.Println("comparing")
-		f, err := os.Open("results.json")
-		if err != nil {
-			panic(err)
+func compareFile(f string) (skip bool, r Result) {
+	m, err := mimetype.DetectFile(f)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	mag := mag(f)
+	mag, _, _ = mime.ParseMediaType(mag)
+	if skipFile(mag, m.String()) {
+		return true, r
+	}
+	status := statusGood
+	// If the format declared by the extension is what we detected,
+	// then consider it a correct guess for mimetype and wrong for file.
+	// Although file is great, it still has cases when it's wrong.
+	if !m.Is(mag) && m.Extension() != filepath.Ext(f) {
+		if debug {
+			fmt.Printf("filepth:%s\nguessed:%s\ncorrect:%s\n\n", f, m, mag)
 		}
-		res := []Result{}
-		if err := json.NewDecoder(f).Decode(&res); err != nil {
-			panic(err)
-		}
-		compareResults(res, results)
+		status = statusBad
+	}
+	return false, Result{
+		File:     f,
+		Status:   status,
+		Mimetype: m.String(),
+		Magic:    mag,
 	}
 }
 
 func skipFile(mag, m string) bool {
 	mea := mimetype.EqualsAny
 	// If even file cannot detect, then skip.
-	return mea(mag, "application/octet-stream") ||
-		// inode/x-empty is for directories, skip.
-		mea(mag, "inode/x-empty") ||
+	// inode/x-empty is for directories, skip.
+	return mea(mag, "inode/x-empty") ||
 		// magic cannot detect text/vtt and we can, skip.
 		(mea(m, "text/vtt") && mea(mag, "text/plain")) ||
 		(mea(m, "application/x-subrip") && mea(mag, "text/plain"))
 }
 
-// mag calls the magic detection.
+// mag calls the file magic detection.
 func mag(f string) string {
 	out, err := exec.Command("file", "-b", "--mime", f).Output()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	return string(out)
-}
-
-func compareResults(old, curr []Result) {
-	fmt.Printf("results.json has %d, current run has %d\n", len(old), len(curr))
-	fmt.Printf("old results.json: %v\n", statistic(old))
-	fmt.Printf("        curr run: %v\n", statistic(curr))
 }
 
 func statistic(rs []Result) string {
@@ -155,13 +144,11 @@ func statistic(rs []Result) string {
 totalFiles: %d
 identified: %d
 misIdentified: %d
-unsupported: %d
 
 identifiedPercent: %.2f`,
 		len(rs),
 		stats[statusGood],
 		stats[statusBad],
-		stats[statusUnsupported],
 
 		percent(float64(stats[statusGood]), float64(len(rs))),
 	)
@@ -211,17 +198,10 @@ func tallyResults(r1 []Result) any {
 	for _, b := range baddiesStruct {
 		fmt.Printf(`
 %s was misidentified %d times as:
-%s
-`, green(b.magic), b.count, red(fmt.Sprintf("%v", b.misIdentified)))
+%v
+`, b.magic, b.count, b.misIdentified)
 	}
 	return baddiesStruct
-}
-
-func red(s string) string {
-	return fmt.Sprintf("\033[31m" + s + "\033[0m")
-}
-func green(s string) string {
-	return fmt.Sprintf("\033[32m" + s + "\033[0m")
 }
 
 func allFilesInDir(dir string) []string {
