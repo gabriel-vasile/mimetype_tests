@@ -12,7 +12,6 @@ import (
 	"sort"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/gabriel-vasile/mimetype"
 )
@@ -44,7 +43,6 @@ wrongfully identified. At the very end, statistics are printed as a percentage.
 
 Expect this script to take a few minutes to run.
 Call with "DEBUG=1 go run main.go" if you want to see more logging.`)
-	start := time.Now()
 	fs := allFilesInDir("testfiles")
 	mimetype.SetLimit(0)
 
@@ -68,7 +66,6 @@ Call with "DEBUG=1 go run main.go" if you want to see more logging.`)
 	}
 	wg.Wait()
 	tallyResults(results)
-	fmt.Println("Runtime: ", time.Now().Sub(start))
 	fmt.Printf("curr run: %v\n", statistic(results))
 
 	if len(os.Args) > 1 && os.Args[1] == "persist" {
