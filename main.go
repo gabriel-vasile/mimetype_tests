@@ -179,29 +179,35 @@ func tallyResults(r1 []Result) any {
 		}
 	}
 
-	baddiesStruct := []struct {
+	// bs counts the most misidentified formats and what they were misidentified as.
+	bs := []struct {
 		magic         string
 		count         int
 		misIdentified map[string]int
 	}{}
 	for k, v := range baddies {
-		baddiesStruct = append(baddiesStruct, struct {
+		bs = append(bs, struct {
 			magic         string
 			count         int
 			misIdentified map[string]int
 		}{k, v.count, v.misIdentified})
 	}
 
-	sort.Slice(baddiesStruct, func(i, j int) bool {
-		return baddiesStruct[i].count > baddiesStruct[j].count
+	sort.Slice(bs, func(i, j int) bool {
+		// sort by most misidentified
+		if bs[i].count != bs[j].count {
+			return bs[i].count > bs[j].count
+		}
+		// to keep results stable sort alphabetically too
+		return bs[i].magic > bs[j].magic
 	})
-	for _, b := range baddiesStruct {
+	for _, b := range bs {
 		fmt.Printf(`
 %s was misidentified %d times as:
 %v
 `, b.magic, b.count, b.misIdentified)
 	}
-	return baddiesStruct
+	return bs
 }
 
 func allFilesInDir(dir string) []string {
