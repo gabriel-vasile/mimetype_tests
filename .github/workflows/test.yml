@@ -2,9 +2,15 @@ name: Test mimetype against UNIX file(1)
 on:
   workflow_dispatch:
     inputs:
-      commit:
-        description: 'What commit of mimetype to test with. By default uses latest release.'
+      version1:
+        description: 'What mimetype version to test initially'
+        default: 'github.com/gabriel-vasile/mimetype@master'
+      version2:
+        description: |
+          What mimetype version to compare with;
+          forks can be used too, ex: github.com/username/mimetype@commitSHA
         default: ''
+        required: true
 env:
   CI: true
 
@@ -21,14 +27,19 @@ jobs:
       uses: actions/setup-go@v5.4.0
       with:
         go-version-file: 'go.mod'
-    - name: Install mimetype latest release
-      if: ${{ github.event.inputs.commit == '' }}
-      run: go get -u github.com/gabriel-vasile/mimetype
-    - name: Install mimetype from commit
-      if: ${{ github.event.inputs.commit != '' }}
-      run: go get -u "github.com/gabriel-vasile/mimetype@${{ github.event.inputs.commit }}"
-    - name: Compare mimetype with file --mime utility
+    - name: Generate extra files
       run: |
         go run zipshuffler.go
         go run truncate.go
-        go run main.go
+    - name: Initial run
+      run: |
+        go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version1 }}"
+        go mod tidy
+        go run main.go > version1
+    - name: Second run
+      run: |
+        go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version2 }}"
+        go mod tidy
+        go run main.go > version2
+    - name: Compare results
+      run: diff version1 version2
