@@ -141,12 +141,10 @@ func statistic(rs []Result) string {
 totalFiles: %d
 identified: %d
 misIdentified: %d
-
 identifiedPercent: %.2f`,
 		len(rs),
 		stats[statusGood],
 		stats[statusBad],
-
 		percent(float64(stats[statusGood]), float64(len(rs))),
 	)
 }
