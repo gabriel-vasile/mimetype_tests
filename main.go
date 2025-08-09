@@ -3,15 +3,18 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"mime"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/gabriel-vasile/mimetype"
 )
@@ -27,8 +30,6 @@ import (
 const (
 	statusBad  = "bad"
 	statusGood = "good"
-
-	threads = 4
 )
 
 var debug = os.Getenv("DEBUG") != ""
@@ -49,7 +50,7 @@ Call with "DEBUG=1 go run main.go" if you want to see more logging.`)
 	results := []Result{}
 	wg := sync.WaitGroup{}
 	mu := &sync.Mutex{}
-	for s := range slices.Chunk(fs, len(fs)/threads) {
+	for s := range slices.Chunk(fs, len(fs)/threads()) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -65,7 +66,7 @@ Call with "DEBUG=1 go run main.go" if you want to see more logging.`)
 		}()
 	}
 	wg.Wait()
-	tallyResults(results)
+	_, excessiveRuntime := tallyResults(results)
 	fmt.Printf("curr run: %v\n", statistic(results))
 
 	if len(os.Args) > 1 && os.Args[1] == "persist" {
@@ -81,13 +82,20 @@ Call with "DEBUG=1 go run main.go" if you want to see more logging.`)
 			log.Fatal(err)
 		}
 	}
+	if excessiveRuntime {
+		log.Fatal("excessiveRuntime, check logs above")
+	}
 }
 
 func compareFile(f string) (skip bool, r Result) {
-	m, err := mimetype.DetectFile(f)
+	d, err := ioutil.ReadFile(f)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	start := time.Now()
+	m := mimetype.Detect(d)
+	r.Runtime = time.Now().Sub(start)
 
 	mag := mag(f)
 	mag, _, _ = mime.ParseMediaType(mag)
@@ -109,6 +117,7 @@ func compareFile(f string) (skip bool, r Result) {
 		Status:   status,
 		Mimetype: m.String(),
 		Magic:    mag,
+		Runtime:  r.Runtime,
 	}
 }
 
@@ -155,14 +164,19 @@ func percent(x, y float64) float64 {
 }
 
 // tallyResults func prints the most misidentified mime types.
-func tallyResults(r1 []Result) any {
+func tallyResults(r1 []Result) (any, bool) {
 	fmt.Println("Tallying results to see which file formats were most misidentified...")
 	type misIdentified struct {
 		count         int
 		misIdentified map[string]int
 	}
+	excessiveRuntime := false
 	baddies := map[string]misIdentified{}
 	for _, r := range r1 {
+		if excessiveDuration(r.Runtime) {
+			excessiveRuntime = true
+			log.Print("excessive runtime", r)
+		}
 		if r.Status != statusGood {
 			baddie := baddies[r.Magic]
 			baddie.count++
@@ -202,7 +216,7 @@ func tallyResults(r1 []Result) any {
 %v
 `, b.magic, b.count, b.misIdentified)
 	}
-	return bs
+	return bs, excessiveRuntime
 }
 
 func allFilesInDir(dir string) []string {
@@ -234,4 +248,15 @@ type Result struct {
 	Status   string
 	Mimetype string
 	Magic    string
+	Runtime  time.Duration
+}
+
+func excessiveDuration(d time.Duration) bool {
+	return d > 50*time.Millisecond
+}
+func threads() int {
+	if os.Getenv("CI") != "" {
+		return 4
+	}
+	return runtime.NumCPU() - 2
 }
