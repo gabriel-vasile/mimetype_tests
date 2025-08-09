@@ -21,8 +21,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4.2.2
     - name: Checkout file
       uses: actions/checkout@v4.2.2
       with:
@@ -30,6 +28,7 @@ jobs:
         path: file
     - name: Build file
       run: |
+        cd file
         which file
         file --version
         ./configure --disable-silent-rules
@@ -37,6 +36,8 @@ jobs:
         make install
         which file
         file --version
+    - name: Checkout code
+      uses: actions/checkout@v4.2.2
     - name: Install Go
       uses: actions/setup-go@v5.4.0
       with:
