@@ -43,13 +43,12 @@ jobs:
       uses: actions/checkout@v4.2.2
       with:
         path: mimetype_tests
+    - run: cd mimetype_tests
     - name: Install Go
       uses: actions/setup-go@v5.4.0
       with:
         go-version-file: 'go.mod'
     - name: Generate extra files
-      run: |
-        cd mimetype_tests
         go run zipshuffler.go
         go run truncate.go
     - name: Initial run
