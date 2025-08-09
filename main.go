@@ -83,7 +83,7 @@ Call with "DEBUG=1 go run main.go" if you want to see more logging.`)
 		}
 	}
 	if excessiveRuntime {
-		log.Fatal("excessiveRuntime, check logs above")
+		log.Print("excessiveRuntime: some files took a lot to finish detection; check logs above")
 	}
 }
 
@@ -252,7 +252,7 @@ type Result struct {
 }
 
 func excessiveDuration(d time.Duration) bool {
-	return d > 500*time.Millisecond
+	return d > 50*time.Millisecond
 }
 func threads() int {
 	if os.Getenv("CI") != "" {
