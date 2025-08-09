@@ -252,7 +252,7 @@ type Result struct {
 }
 
 func excessiveDuration(d time.Duration) bool {
-	return d > 50*time.Millisecond
+	return d > 500*time.Millisecond
 }
 func threads() int {
 	if os.Getenv("CI") != "" {
