@@ -31,31 +31,9 @@ jobs:
         cd file
         which file
         file --version
-        autoreconf -f -i
         ./configure --disable-silent-rules
         make -j4
-        sudo make install
+        make install
         which file
         file --version
-    - name: Checkout code
-      uses: actions/checkout@v4.2.2
-    - name: Install Go
-      uses: actions/setup-go@v5.4.0
-      with:
-        go-version-file: 'go.mod'
-    - name: Generate extra files
-      run: |
-        go run zipshuffler.go
-        go run truncate.go
-    - name: Initial run
-      run: |
-        go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version1 }}"
-        go mod tidy
-        go run main.go > version1
-    - name: Second run
-      run: |
-        go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version2 }}"
-        go mod tidy
-        go run main.go > version2
-    - name: Compare results
-      run: diff --color=always version1 version2 || true
+        file --mime ./*
