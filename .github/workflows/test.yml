@@ -23,6 +23,19 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4.2.2
+    - name: Checkout file
+      uses: actions/checkout@v4.2.2
+      repository: file/file
+      path: file
+    - name: Build file
+      run: |
+        which file
+        file --version
+        ./configure --disable-silent-rules
+        make -j4
+        make install
+        which file
+        file --version
     - name: Install Go
       uses: actions/setup-go@v5.4.0
       with:
