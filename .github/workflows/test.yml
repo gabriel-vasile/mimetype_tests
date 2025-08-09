@@ -21,6 +21,22 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout file
+      uses: actions/checkout@v4.2.2
+      with:
+        repository: file/file
+    - name: Build file
+      run: |
+        which file
+        file --version
+        autoreconf -f -i
+        ./configure --disable-silent-rules
+        make -j4
+        sudo make install
+        which file
+        file --version
+        file --mime ./*
+        sudo rm -rf ./**
     - name: Checkout code
       uses: actions/checkout@v4.2.2
     - name: Install Go
