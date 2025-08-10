@@ -34,6 +34,7 @@ jobs:
         ./configure --disable-silent-rules
         make -j4
         mkdir /tmp/file && cp -r ./* /tmp/file
+        sudo apt-get -y remove file
         pushd /tmp/file && sudo make install && popd
         shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
         alias file='/tmp/file/src/file -m /tmp/file/magic/magic.mgc'
