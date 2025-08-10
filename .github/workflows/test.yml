@@ -34,9 +34,10 @@ jobs:
         make -j4
         sudo apt-get -y purge file
         sudo make install
+        alias file='/usr/local/bin/file -m /usr/local/share/misc'
         which file
-        /usr/local/bin/file --version
-        /usr/local/bin/file --mime ./*
+        file --version
+        file --mime ./*
         sudo rm -rf ./**
     - name: Checkout code
       uses: actions/checkout@v4.2.2
@@ -52,15 +53,11 @@ jobs:
       run: |
         go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version1 }}"
         go mod tidy
-        DEBUG=1 go run main.go > version1
+        go run main.go > version1
     - name: Second run
       run: |
         go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version2 }}"
         go mod tidy
-        DEBUG=1 go run main.go > version2
-    - name: v1
-      run: cat version1
-    - name: v2
-      run: cat version2
+        go run main.go > version2
     - name: Compare results
       run: diff --color=always version1 version2 || true
