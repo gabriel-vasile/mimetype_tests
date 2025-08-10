@@ -50,6 +50,12 @@ jobs:
       run: |
         go run zipshuffler.go
         go run truncate.go
+    - name: debug
+      run: |
+        shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
+        alias file='/tmp/file/src/file -m /tmp/file/magic/magic.mgc'
+        file --mime --debug testfiles/zips/166.zip
+        exit 1
     - name: Initial run
       run: |
         shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
@@ -63,6 +69,11 @@ jobs:
         alias file='/tmp/file/src/file -m /tmp/file/magic/magic.mgc'
         go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version2 }}"
         go mod tidy
-        DEBUG=1 go run main.go > version2 && cat version2 && exit 1
+        DEBUG=1 go run main.go > version2
     - name: Compare results
       run: diff --color=always version1 version2 || true
+    - name: debug
+      run: |
+        shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
+        alias file='/tmp/file/src/file -m /tmp/file/magic/magic.mgc'
+        file --mime --debug testfiles/zips/166.zip
