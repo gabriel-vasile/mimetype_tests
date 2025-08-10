@@ -10,7 +10,7 @@ on:
           What mimetype version to compare with;
           forks can be used too, ex: github.com/username/mimetype@commitSHA
         default: ''
-        required: true
+        # required: true
 env:
   CI: true
 
@@ -36,11 +36,6 @@ jobs:
         mkdir /tmp/file && cp -r ./* /tmp/file
         sudo apt-get -y remove file libmagic1
         pushd /tmp/file && sudo make install && popd
-        shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
-        alias file='/tmp/file/src/file -m /tmp/file/magic/magic.mgc'
-        which file
-        file --version
-        file --mime ./*
     - name: Checkout code
       uses: actions/checkout@v4.2.2
     - name: Install Go
@@ -51,25 +46,9 @@ jobs:
       run: |
         go run zipshuffler.go
         go run truncate.go
-    - name: debug
-      run: |
-        shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
-        alias file='/tmp/file/src/file -m /tmp/file/magic/magic.mgc'
-        file --version
-        file --mime --debug testfiles/zips/166.zip
     - name: Initial run
       run: |
         shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
         alias file='/tmp/file/src/file -m /tmp/file/magic/magic.mgc'
-        go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version1 }}"
-        go mod tidy
-        go run main.go > version1
-    - name: Second run
-      run: |
-        shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
-        alias file='/tmp/file/src/file -m /tmp/file/magic/magic.mgc'
-        go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version2 }}"
-        go mod tidy
-        DEBUG=1 go run main.go > version2
-    - name: Compare results
-      run: diff --color=always version1 version2 || true
+        file --mime --debug testfiles/zips/166.zip
+        file --mime testfiles/zips/166.zip
