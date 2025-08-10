@@ -34,13 +34,36 @@ jobs:
         ./configure --disable-silent-rules
         make -j4
         sudo make install
+        cp src/file /tmp/file
+        cp src/magic/magic.mgc /tmp/magic.mgc
         shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
-        alias file='${{ github.workspace }}/src/file -m ${{ github.workspace }}/magic/magic.mgc'
+        alias file='/tmp/file -m /tmp/magic.mgc'
         which file
         file --version
         file --mime ./*
-        sudo rm -rf ./**
     - name: Checkout code
       uses: actions/checkout@v4.2.2
-    - name: debug
-      run: file --mime --debug testfiles/zips/166.zip
+    - name: Install Go
+      uses: actions/setup-go@v5.4.0
+      with:
+        go-version-file: 'go.mod'
+    - name: Generate extra files
+      run: |
+        go run zipshuffler.go
+        go run truncate.go
+    - name: Initial run
+      run: |
+        shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
+        alias file='/tmp/file -m /tmp/magic.mgc'
+        go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version1 }}"
+        go mod tidy
+        go run main.go > version1
+    - name: Second run
+      run: |
+        shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
+        alias file='/tmp/file -m /tmp/magic.mgc'
+        go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version2 }}"
+        go mod tidy
+        DEBUG=1 go run main.go > version2 && cat version2 && exit 1
+    - name: Compare results
+      run: diff --color=always version1 version2 || true
