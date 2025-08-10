@@ -52,11 +52,15 @@ jobs:
       run: |
         go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version1 }}"
         go mod tidy
-        go run main.go > version1
+        DEBUG=1 go run main.go > version1
     - name: Second run
       run: |
         go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version2 }}"
         go mod tidy
-        go run main.go > version2
+        DEBUG=1 go run main.go > version2
+    - name: v1
+      run: cat version1
+    - name: v2
+      run: cat version2
     - name: Compare results
       run: diff --color=always version1 version2 || true
