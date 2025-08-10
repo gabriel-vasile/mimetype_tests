@@ -27,16 +27,15 @@ jobs:
         repository: file/file
     - name: Build file
       run: |
+        echo "RUNNER home ${{ runner.home }}"
         which file
         file --version
         autoreconf -f -i
         ./configure --disable-silent-rules
         make -j4
-        sudo apt-get -y purge file
-        sudo apt-get install libtool libtool-bin
         sudo make install
         shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
-        alias file='/usr/local/bin/file -m /usr/local/share/misc'
+        alias file='${{ runner.home }}/src/file -m ${{ runner.home }}/magic/magic.mgc'
         which file
         file --version
         file --mime ./*
