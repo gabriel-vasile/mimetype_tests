@@ -86,8 +86,12 @@ func createZip(dst string, fs []*zip.File) error {
 
 	}
 
-	f.Close()
-	w.Close()
+	if err := w.Close(); err != nil {
+		return err
+	}
+	if err := f.Close(); err != nil {
+		return err
+	}
 
 	f, err = os.Open(dst)
 	if err != nil {
