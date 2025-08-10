@@ -27,7 +27,7 @@ jobs:
         repository: file/file
     - name: Build file
       run: |
-        echo "RUNNER home ${{ runner.home }}"
+        echo "RUNNER home ${{ github.workspace }}"
         which file
         file --version
         autoreconf -f -i
@@ -35,7 +35,7 @@ jobs:
         make -j4
         sudo make install
         shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
-        alias file='${{ runner.home }}/src/file -m ${{ runner.home }}/magic/magic.mgc'
+        alias file='${{ github.workspace }}/src/file -m ${{ github.workspace }}/magic/magic.mgc'
         which file
         file --version
         file --mime ./*
