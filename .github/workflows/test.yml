@@ -34,10 +34,9 @@ jobs:
         ./configure --disable-silent-rules
         make -j4
         sudo make install
-        cp src/file /tmp/file
-        cp magic/magic.mgc /tmp/magic.mgc
+        mkdir /tmp/file && cp -r ./* /tmp/file
         shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
-        alias file='/tmp/file -m /tmp/magic.mgc'
+        alias file='/tmp/file/src/file -m /tmp/file/magic/magic.mgc'
         which file
         file --version
         file --mime ./*
@@ -54,14 +53,14 @@ jobs:
     - name: Initial run
       run: |
         shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
-        alias file='/tmp/file -m /tmp/magic.mgc'
+        alias file='/tmp/file/src/file -m /tmp/file/magic/magic.mgc'
         go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version1 }}"
         go mod tidy
         go run main.go > version1
     - name: Second run
       run: |
         shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
-        alias file='/tmp/file -m /tmp/magic.mgc'
+        alias file='/tmp/file/src/file -m /tmp/file/magic/magic.mgc'
         go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version2 }}"
         go mod tidy
         DEBUG=1 go run main.go > version2 && cat version2 && exit 1
