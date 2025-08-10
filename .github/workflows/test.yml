@@ -33,9 +33,8 @@ jobs:
         autoreconf -f -i
         ./configure --disable-silent-rules
         make -j4
-        sudo apt-get -y remove file
-        sudo make install
         mkdir /tmp/file && cp -r ./* /tmp/file
+        pushd /tmp/file && sudo make install && popd
         shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
         alias file='/tmp/file/src/file -m /tmp/file/magic/magic.mgc'
         which file
@@ -78,4 +77,3 @@ jobs:
         shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
         alias file='/tmp/file/src/file -m /tmp/file/magic/magic.mgc'
         file --mime --debug testfiles/zips/166.zip
-
