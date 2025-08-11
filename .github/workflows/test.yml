@@ -37,8 +37,9 @@ jobs:
         sudo make install
         sudo rm /usr/bin/file /lib/x86_64-linux-gnu/libmagic.so.1
         which file
-        /usr/local/bin/file --version
-        /usr/local/bin/file --mime --debug /usr/local/bin/file 
+        ll /usr/local/lib
+        LD_PRELOAD=/usr/local/lib/libmagic.so.1.0.0 /usr/local/bin/file --version
+        LD_PRELOAD=/usr/local/lib/libmagic.so.1.0.0 /usr/local/bin/file --mime --debug /usr/local/bin/file 
         file --version
     - name: Checkout code
       uses: actions/checkout@v4.2.2
