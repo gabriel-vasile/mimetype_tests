@@ -50,6 +50,7 @@ jobs:
         go run truncate.go
     - name: Initial run
       run: |
+        set -x
         shopt -s expand_aliases
         alias file='LD_PRELOAD=/usr/local/lib/libmagic.so.1.0.0 /usr/local/bin/file -m /usr/local/share/misc/magic.mgc'
         file --mime --debug testfiles/zips/166.zip
@@ -59,6 +60,7 @@ jobs:
         go run main.go > version1
     - name: Second run
       run: |
+        set -x
         shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
         alias file='LD_PRELOAD=/usr/local/lib/libmagic.so.1.0.0 /usr/local/bin/file -m /usr/local/share/misc/magic.mgc'
         go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version2 }}"
