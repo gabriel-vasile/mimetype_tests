@@ -32,7 +32,10 @@ const (
 	statusGood = "good"
 )
 
-var debug = os.Getenv("DEBUG") != ""
+var (
+	debug = os.Getenv("DEBUG") != ""
+	ci    = os.Getenv("CI") != ""
+)
 
 func main() {
 	fmt.Println(`
@@ -111,6 +114,8 @@ func compareFile(f string) (skip bool, r Result) {
 			fmt.Printf("filepth:%s\nguessed:%s\ncorrect:%s\n\n", f, m, mag)
 		}
 		status = statusBad
+	} else {
+		fmt.Printf("filepth:%s\nguessed:%s\ncorrect:%s\n\n", f, m, mag)
 	}
 	return false, Result{
 		File:     f,
@@ -133,7 +138,15 @@ func skipFile(mag, m string) bool {
 
 // mag calls the file magic detection.
 func mag(f string) string {
-	out, err := exec.Command("file", "-b", "--mime", f).Output()
+	out := []byte{}
+	var err error
+	if ci {
+		cmd := exec.Command("file", "-b", "-mime", "-m", "/usr/local/share/misc/magic.mgc", f)
+		cmd.Env = []string{"LD_PRELOAD=/usr/local/lib/libmagic.so.1.0.0"}
+		out, err = cmd.Output()
+	} else {
+		out, err = exec.Command("file", "-b", "--mime", f).Output()
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
