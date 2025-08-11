@@ -31,11 +31,11 @@ jobs:
         which file
         file --version
         ldd /usr/bin/file
-        sudo rm /usr/bin/file
         autoreconf -f -i
-        ./configure --disable-silent-rules --prefix=/usr/local
+        ./configure --disable-silent-rules
         make -j4
         sudo make install
+        sudo rm /usr/bin/file /lib/x86_64-linux-gnu/libmagic.so.1
         which file
         file --version
     - name: Checkout code
