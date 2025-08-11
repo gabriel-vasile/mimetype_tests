@@ -21,26 +21,18 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout file
-      uses: actions/checkout@v4.2.2
-      with:
-        repository: file/file
     - name: Build file
       run: |
         echo "RUNNER home ${{ github.workspace }}"
-        which file
-        file --version
-        ldd /usr/bin/file
         autoreconf -f -i
         ./configure --disable-silent-rules
         make -j4
         sudo make install
+        # remove original file so it does not interfere
         sudo rm /usr/bin/file /lib/x86_64-linux-gnu/libmagic.so.1
-        which file
-        ls -alh /usr/local/lib
-        LD_PRELOAD=/usr/local/lib/libmagic.so.1.0.0 /usr/local/bin/file --version
-        LD_PRELOAD=/usr/local/lib/libmagic.so.1.0.0 /usr/local/bin/file --mime --debug /usr/local/bin/file 
-        file --version
+        # https://github.com/actions/toolkit/issues/766
+        shopt -s expand_aliases
+        alias file='LD_PRELOAD=/usr/local/lib/libmagic.so.1.0.0 /usr/local/bin/file -m /usr/local/share/misc/magic.mgc'
     - name: Checkout code
       uses: actions/checkout@v4.2.2
     - name: Install Go
@@ -53,5 +45,18 @@ jobs:
         go run truncate.go
     - name: Initial run
       run: |
+        shopt -s expand_aliases
+        alias file='LD_PRELOAD=/usr/local/lib/libmagic.so.1.0.0 /usr/local/bin/file -m /usr/local/share/misc/magic.mgc'
         file --mime --debug testfiles/zips/166.zip
-        file --mime testfiles/zips/166.zip
+        go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version1 }}"
+        go mod tidy
+        go run main.go > version1
+    - name: Second run
+      run: |
+        shopt -s expand_aliases # https://github.com/actions/toolkit/issues/766
+        alias file='LD_PRELOAD=/usr/local/lib/libmagic.so.1.0.0 /usr/local/bin/file -m /usr/local/share/misc/magic.mgc'
+        go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version2 }}"
+        go mod tidy
+        DEBUG=1 go run main.go > version2
+    - name: Compare results
+      run: diff --color=always version1 version2 || true
