@@ -38,6 +38,8 @@ var (
 )
 
 func main() {
+	mag("testfiles/zips/1.zip")
+	return
 	fmt.Println(`
 This script will iterate over the samples from testfiles dir and call mimetype
 and file --mime utility. When mimetype and file disagree on what format a sample
@@ -142,7 +144,7 @@ func mag(f string) string {
 	var cmd *exec.Cmd
 	if ci {
 		cmd = exec.Command("file", "-b", "-mime", "-m", "/usr/local/share/misc/magic.mgc", f)
-		cmd.Env = []string{"LD_PRELOAD=/usr/local/lib/libmagic.so.1.0.0"}
+		cmd.Env = append([]string{"LD_PRELOAD=/usr/local/lib/libmagic.so.1.0.0"}, os.Environ()...)
 	} else {
 		cmd = exec.Command("file", "-b", "--mime", f)
 	}
