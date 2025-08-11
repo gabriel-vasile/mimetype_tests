@@ -34,7 +34,8 @@ jobs:
         ./configure --disable-silent-rules
         make -j4
         mkdir /tmp/file && cp -r ./* /tmp/file
-        sudo apt-get -y remove file libmagic1
+        sudo apt-get -y purge file libmagic1
+        sudo apt-get install libtool
         pushd /tmp/file && sudo make install && popd
     - name: Checkout code
       uses: actions/checkout@v4.2.2
