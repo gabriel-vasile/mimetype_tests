@@ -139,16 +139,16 @@ func skipFile(mag, m string) bool {
 // mag calls the file magic detection.
 func mag(f string) string {
 	out := []byte{}
-	var err error
+	var cmd *exec.Cmd
 	if ci {
-		cmd := exec.Command("file", "-b", "-mime", "-m", "/usr/local/share/misc/magic.mgc", f)
+		cmd = exec.Command("file", "-b", "-mime", "-m", "/usr/local/share/misc/magic.mgc", f)
 		cmd.Env = []string{"LD_PRELOAD=/usr/local/lib/libmagic.so.1.0.0"}
-		out, err = cmd.Output()
 	} else {
-		out, err = exec.Command("file", "-b", "--mime", f).Output()
+		cmd = exec.Command("file", "-b", "--mime", f)
 	}
+	out, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("mag", err, string(out))
 	}
 	return string(out)
 }
