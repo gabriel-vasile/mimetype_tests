@@ -30,10 +30,11 @@ jobs:
         echo "RUNNER home ${{ github.workspace }}"
         which file
         file --version
-        sudo apt-get -y purge file libmagic1
         sudo apt-get install libtool
+        sudo apt-get -y purge file libmagic1
+        which file
         autoreconf -f -i
-        ./configure --disable-silent-rules --prefix=/usr
+        ./configure --disable-silent-rules --prefix=/usr/local
         make -j4
         sudo make install
     - name: Checkout code
