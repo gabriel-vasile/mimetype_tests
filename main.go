@@ -34,7 +34,7 @@ const (
 
 var (
 	debug = os.Getenv("DEBUG") != ""
-	ci    = os.GetEnv("CI") != ""
+	ci    = os.Getenv("CI") != ""
 )
 
 func main() {
@@ -114,6 +114,8 @@ func compareFile(f string) (skip bool, r Result) {
 			fmt.Printf("filepth:%s\nguessed:%s\ncorrect:%s\n\n", f, m, mag)
 		}
 		status = statusBad
+	} else {
+		fmt.Printf("filepth:%s\nguessed:%s\ncorrect:%s\n\n", f, m, mag)
 	}
 	return false, Result{
 		File:     f,
