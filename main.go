@@ -38,8 +38,6 @@ var (
 )
 
 func main() {
-	mag("testfiles/zips/1.zip")
-	return
 	fmt.Println(`
 This script will iterate over the samples from testfiles dir and call mimetype
 and file --mime utility. When mimetype and file disagree on what format a sample
