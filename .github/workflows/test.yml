@@ -10,7 +10,7 @@ on:
           What mimetype version to compare with;
           forks can be used too, ex: github.com/username/mimetype@commitSHA
         default: ''
-        # required: true
+        required: true
 env:
   CI: true
 
@@ -53,6 +53,7 @@ jobs:
         shopt -s expand_aliases
         alias file='LD_PRELOAD=/usr/local/lib/libmagic.so.1.0.0 /usr/local/bin/file -m /usr/local/share/misc/magic.mgc'
         file --mime --debug testfiles/zips/166.zip
+        file --mime testfiles/zips/166.zip
         go mod edit -replace="github.com/gabriel-vasile/mimetype=${{ github.event.inputs.version1 }}"
         go mod tidy
         go run main.go > version1
