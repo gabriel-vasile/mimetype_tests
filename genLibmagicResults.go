@@ -4,20 +4,31 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"al.essio.dev/pkg/shellescape"
 )
 
 func main() {
 	fs := allFilesInDir("testfiles")
 
-	for c := range slices.Chunk(fs, 50) {
-		fmt.Println(c)
+	// if err := exec.Command("truncate", "--
+	f, err := os.Create("libmagicResults")
+	if err != nil {
+		panic(err)
 	}
+	f.Truncate(0)
+	defer f.Close()
 
-	e1 := exec.Command("truncate", "libmagicResults").Run()
+	for c := range slices.Chunk(fs, 40) {
+		args := []string{"file", "--mime"}
+		for _, f := range c {
+			args = append(args, f)
+		}
+		fmt.Println(shellescape.QuoteCommand(args))
+	}
 }
 
 func allFilesInDir(dir string) []string {
