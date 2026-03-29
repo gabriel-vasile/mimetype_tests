@@ -45,6 +45,12 @@ Call with "DEBUG=1 go run main.go" if you want to see more logging.`)
 	mimetype.SetLimit(0)
 
 	libmagicResults = loadFile("libmagicResults")
+	// libmagicResults = loadFile("magikaResults")
+	overwrites := loadFile("overwrites")
+	for k, v := range overwrites {
+		libmagicResults[k] = v
+	}
+	fmt.Printf("loaded %d overwrites\n", len(overwrites))
 
 	results := []Result{}
 	for _, f := range fs {
@@ -59,6 +65,10 @@ Call with "DEBUG=1 go run main.go" if you want to see more logging.`)
 
 	if excessiveRuntime {
 		fmt.Print("excessiveRuntime: some files took a lot to finish detection; check logs above")
+		os.Exit(1)
+	}
+	if err := overwritesCorrect(overwrites, results); err != nil {
+		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 }
@@ -83,7 +93,7 @@ func compareFile(f string) (skip bool, r Result) {
 	// Although file is great, it still has cases when it's wrong.
 	if !m.Is(correct) && m.Extension() != filepath.Ext(f) {
 		if debug {
-			fmt.Printf("filepth:%s\nguessed:%s\ncorrect:%s\n\n", f, m, correct)
+			fmt.Printf("%s %s correct:%s\n", f, m, correct)
 		}
 		status = statusBad
 	}
@@ -106,6 +116,9 @@ func loadFile(f string) map[string]string {
 	ret := map[string]string{}
 	s := bufio.NewScanner(fr)
 	for s.Scan() {
+		if l := strings.TrimSpace(s.Text()); l == "" || l[0] == '#' {
+			continue
+		}
 		parts := strings.Split(s.Text(), ": ")
 		if len(parts) != 2 {
 			panic(fmt.Sprintf("not two parts %s %s", f, s.Text()))
@@ -191,10 +204,7 @@ func tallyResults(rs []Result) (any, bool) {
 		return bs[i].magic > bs[j].magic
 	})
 	for _, b := range bs {
-		fmt.Printf(`
-%s was misidentified %d times as:
-%v
-`, b.magic, b.count, b.misIdentified)
+		fmt.Printf("%s was misidentified %d times as: %v\n", b.magic, b.count, b.misIdentified)
 	}
 	return bs, excessiveRuntime
 }
@@ -221,6 +231,25 @@ func allFilesInDir(dir string) []string {
 		log.Fatal(err)
 	}
 	return ret
+}
+
+func overwritesCorrect(overwrites map[string]string, results []Result) error {
+	gotIncorrect := false
+	for k, v := range overwrites {
+		for _, r := range results {
+			if r.File == k {
+				if !mimetype.EqualsAny(r.Mimetype, v) {
+					gotIncorrect = true
+					fmt.Printf("one overwrite is not detected correctly %s; got: %s, correct %s\n",
+						r.File, r.Mimetype, v)
+				}
+			}
+		}
+	}
+	if gotIncorrect {
+		return fmt.Errorf("overwrites incorrectly detected")
+	}
+	return nil
 }
 
 type Result struct {

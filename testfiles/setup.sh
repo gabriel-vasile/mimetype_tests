@@ -14,3 +14,8 @@ for key in "${!repos[@]}"; do
         git clone --depth=1 "${repos[$key]}" "$key"
 	fi
 done
+
+# tika has the java source code which libmagic identifies as text/x-java
+# but mimetype identifies as text/plain.
+# delete all .java files so they don't count for comparison.
+find ./tika -type f -name "*.java" -delete
