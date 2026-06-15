@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gabriel-vasile/mimetype"
@@ -43,6 +44,14 @@ Call with "DEBUG=1 go run main.go" if you want to see more logging.`)
 	dir := "testfiles"
 	fs := allFilesInDir(dir)
 	mimetype.SetLimit(0)
+	exitCode := 0
+	defer func() {
+		os.Exit(exitCode)
+	}()
+	now := time.Now()
+	defer func() {
+		fmt.Println("total duration: %s", time.Now().Sub(now))
+	}()
 
 	libmagicResults = loadFile("libmagicResults")
 	// libmagicResults = loadFile("magikaResults")
@@ -52,24 +61,51 @@ Call with "DEBUG=1 go run main.go" if you want to see more logging.`)
 	}
 	fmt.Printf("loaded %d overwrites\n", len(overwrites))
 
-	results := []Result{}
+	jobs := make(chan string, len(fs))
+	resultsCh := make(chan Result)
+	var wg sync.WaitGroup
+	for range 3 {
+		wg.Go(func() {
+			for f := range jobs {
+				skip, r := compareFile(f)
+				if skip {
+					continue
+				}
+				resultsCh <- r
+			}
+		})
+	}
 	for _, f := range fs {
-		skip, r := compareFile(f)
-		if skip {
-			continue
-		}
+		jobs <- f
+	}
+	close(jobs)
+	go func() {
+		wg.Wait()
+		close(resultsCh)
+	}()
+
+	results := []Result{}
+	for r := range resultsCh {
 		results = append(results, r)
+	}
+	sort.SliceStable(results, func(i, j int) bool {
+		return results[i].File < results[j].File
+	})
+	for _, r := range results {
+		if r.Log != "" {
+			fmt.Println(r.Log)
+		}
 	}
 	_, excessiveRuntime := tallyResults(results)
 	fmt.Printf("curr run: %v\n", statistic(results))
 
 	if excessiveRuntime {
-		fmt.Print("excessiveRuntime: some files took a lot to finish detection; check logs above")
-		os.Exit(1)
+		fmt.Println("excessiveRuntime: some files took a lot to finish detection; check logs above")
+		exitCode = 1
 	}
 	if err := overwritesCorrect(overwrites, results); err != nil {
 		fmt.Println(err.Error())
-		os.Exit(1)
+		exitCode = 1
 	}
 }
 
@@ -91,9 +127,10 @@ func compareFile(f string) (skip bool, r Result) {
 	// If the format declared by the extension is what we detected,
 	// then consider it a correct guess for mimetype and wrong for file.
 	// Although file is great, it still has cases when it's wrong.
+	var logLine string
 	if !m.Is(correct) && m.Extension() != filepath.Ext(f) {
 		if debug {
-			fmt.Printf("%s %s correct:%s\n", f, m, correct)
+			logLine = fmt.Sprintf("%s %s correct:%s", f, m, correct)
 		}
 		status = statusBad
 	}
@@ -103,6 +140,7 @@ func compareFile(f string) (skip bool, r Result) {
 		Mimetype: m.String(),
 		Magic:    correct,
 		Runtime:  r.Runtime,
+		Log:      logLine,
 	}
 }
 
@@ -222,6 +260,9 @@ func allFilesInDir(dir string) []string {
 			if info.Size() == 0 {
 				return nil
 			}
+			if strings.Contains(path, "/trunc/") {
+				return nil
+			}
 			if info.Mode().IsRegular() {
 				ret = append(ret, path)
 			}
@@ -258,6 +299,7 @@ type Result struct {
 	Mimetype string
 	Magic    string
 	Runtime  time.Duration
+	Log      string
 }
 
 func excessiveDuration(d time.Duration) bool {
