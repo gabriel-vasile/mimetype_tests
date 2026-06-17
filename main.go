@@ -147,7 +147,7 @@ func compareFile(f string) (skip bool, r Result) {
 func loadFile(f string) map[string]string {
 	fr, err := os.Open(f)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer fr.Close()
 
@@ -159,14 +159,14 @@ func loadFile(f string) map[string]string {
 		}
 		parts := strings.Split(s.Text(), ": ")
 		if len(parts) != 2 {
-			panic(fmt.Sprintf("not two parts %s %s", f, s.Text()))
+			log.Fatal(fmt.Sprintf("not two parts %s %s", f, s.Text()))
 		}
 
 		result, _, _ := mime.ParseMediaType(strings.TrimSpace(parts[1]))
 		ret[strings.TrimSpace(parts[0])] = result
 	}
 	if err := s.Err(); err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	return ret
 }
