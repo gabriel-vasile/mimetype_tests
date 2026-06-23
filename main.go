@@ -233,7 +233,7 @@ func tallyResults(rs []Result) (any, bool) {
 		}{k, v.count, v.misIdentified})
 	}
 
-	sort.Slice(bs, func(i, j int) bool {
+	sort.SliceStable(bs, func(i, j int) bool {
 		// sort by most misidentified
 		if bs[i].count != bs[j].count {
 			return bs[i].count > bs[j].count

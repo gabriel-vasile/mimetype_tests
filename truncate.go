@@ -20,10 +20,10 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		if len(d) <= 3072 {
+		if len(d) <= 4096 {
 			continue
 		}
-		d = d[:3072]
+		d = d[:4096]
 
 		f = strings.TrimPrefix(f, "testfiles/")
 		dst := "testfiles/trunc/" + f
